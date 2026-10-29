@@ -1,7 +1,4 @@
 # Replication Package
-
-Replication package for the paper **"We'd Love Your Help, We Just Don't Have Time: An Empirical Study of Newcomer Onboarding in Robotics Open-Source Projects"**.
-
 The study analyzes 472 GitHub repositories of ROS 2 packages (Humble, Jazzy and Kilted) over a 12-month window, May 1, 2025 to April 30, 2026 (RQ1–RQ3), and a survey of 21 ROS package maintainers (RQ4). This repository holds the scripts, the data snapshots they read, and every figure, table and number in the paper.
 
 ## Quick start
@@ -96,10 +93,3 @@ Shared modules: `commit_type_classifier.py` (classifies a commit as code, config
 `29a_anonymize_survey.py` builds these files from the raw Qualtrics export, which is not shared because it contains names, email addresses, IP addresses and locations. The script drops all Qualtrics metadata, the consent answers, the list of OSS projects each respondent contributed to (it identifies them), and the question about joining future studies. It also redacts five project, library or tool names in open-ended answers that would identify a respondent's project. The redactions are listed in the script.
 
 Survey participants were the maintainers listed in the `package.xml` files of the 472 repositories (`20_extract_maintainers_from_package_xml.py`, `21_filter_maintainer_emails_for_final_dataset.py`, `22_unique_maintainer_emails.py`). Their outputs contain maintainer email addresses and are not included. `out/package_xml_coverage_report.txt` and `out/final_repos_missing_package_xml.csv` give the counts reported in the paper.
-
-## Contact
-
-* Juliana Freitas (jfreit4@lsu.edu)
-* Elijah Phifer (ephife3@lsu.edu)
-* Nabila Fairuz (nfairu1@lsu.edu)
-* Felipe Fronchetti (ffronchetti@lsu.edu)
