@@ -17,7 +17,7 @@ finished the survey, and only the answers analyzed in the paper:
   - drops the consent answers (all kept respondents consented), Q33 (names of
     the OSS projects each respondent contributed to, which identifies them)
     and Q26 (willingness to join future studies);
-  - numbers respondents P1-P21 in order of submission, the IDs quoted in the
+  - numbers respondents P1-P22 in order of submission, the IDs quoted in the
     paper;
   - redacts project, library and tool names in the open-ended answers that
     would point to a respondent's project (REDACTIONS below).
@@ -25,7 +25,7 @@ finished the survey, and only the answers analyzed in the paper:
 Run by the authors, who hold the raw export; everyone else uses the outputs.
 
 Input (not in the repository):
-  out/survey_results/ROS package maintainers’ perceived challenges for onboarding newcomers_October 12, 2026_07.36.csv
+  out/survey_results/ROS package maintainers’ perceived challenges for onboarding newcomers_October 29, 2026_08.22.csv
 
 Output (survey/):
   responses_anonymized.csv  one row per respondent, Participant + kept answers
@@ -42,7 +42,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + "/..")
 from config import PROJECT_ROOT
 
 IN_PATH = (PROJECT_ROOT / "out" / "survey_results" /
-           "ROS package maintainers’ perceived challenges for onboarding newcomers_October 12, 2026_07.36.csv")
+           "ROS package maintainers’ perceived challenges for onboarding newcomers_October 29, 2026_08.22.csv")
 OUT_DIR = PROJECT_ROOT / "survey"
 
 # Qualtrics metadata, not survey questions.
@@ -80,7 +80,7 @@ def main():
     finished = df["Finished"].eq("True")
     keep = consented & ~gdpr_declined & finished
 
-    # Submission order = RecordedDate order; P1-P21 follow it.
+    # Submission order = RecordedDate order; P1-P22 follow it.
     kept = df[keep].sort_values("RecordedDate", kind="stable").reset_index(drop=True)
     answer_cols = [c for c in df.columns if c not in METADATA_COLS + DROPPED_QUESTIONS]
     out = kept[answer_cols].copy()

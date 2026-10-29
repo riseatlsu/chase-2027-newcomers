@@ -10,7 +10,7 @@ maintainer onboarding survey (Qualtrics export), styled to match the
 compound panels from 13_plot_inflow.py and 30_plot_compound_newcomers_contributions.py
 (true-size 10pt text, same green/red palette).
 
-Reads the anonymized responses written by 29a_anonymize_survey.py: the 21
+Reads the anonymized responses written by 29a_anonymize_survey.py: the 22
 respondents who consented (online consent and, for EU respondents, GDPR
 consent) and finished the survey.
 

@@ -1,5 +1,5 @@
 # Replication Package
-The study analyzes 472 GitHub repositories of ROS 2 packages (Humble, Jazzy and Kilted) over a 12-month window, May 1, 2025 to April 30, 2026 (RQ1–RQ3), and a survey of 21 ROS package maintainers (RQ4). This repository holds the scripts, the data snapshots they read, and every figure, table and number in the paper.
+The study analyzes 472 GitHub repositories of ROS 2 packages (Humble, Jazzy and Kilted) over a 12-month window, May 1, 2025 to April 30, 2026 (RQ1–RQ3), and a survey of 22 ROS package maintainers (RQ4). This repository holds the scripts, the data snapshots they read, and every figure, table and number in the paper.
 
 ## Quick start
 
@@ -34,7 +34,7 @@ This reruns package discovery and GitHub collection first. GitHub, ROS Index and
 | Fig. Respondent background (RQ4) | `figs/compound/survey_bg_{1_experience,2_projects}` | `29_plot_survey_results.py` |
 | Fig. Maintainers' views on onboarding (RQ4) | `figs/compound/survey_onboarding_{1_importance,2_yes_no}` | `29_plot_survey_results.py` |
 | Numbers quoted in the text | `out/paper_numbers.csv` | `34_paper_numbers.py` |
-| Survey quotes (P1–P21) | `survey/responses_anonymized.csv` | `29a_anonymize_survey.py` |
+| Survey quotes (P1–P22) | `survey/responses_anonymized.csv` | `29a_anonymize_survey.py` |
 
 Table II (onboarding practices and references) and the method overview figure are not generated from data.
 
@@ -86,7 +86,7 @@ Shared modules: `commit_type_classifier.py` (classifies a commit as code, config
 
 `survey/` holds the anonymized survey data:
 
-- `responses_anonymized.csv`: answers of the 21 respondents who consented and finished the survey, numbered P1–P21 in order of submission (the IDs quoted in the paper).
+- `responses_anonymized.csv`: answers of the 22 respondents who consented and finished the survey, numbered P1–P22 in order of submission (the IDs quoted in the paper).
 - `questionnaire.csv`: the text of every survey question. The `in_responses` column marks which ones appear in the responses.
 - `response_counts.csv`: responses recorded, consented and complete.
 
