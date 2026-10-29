@@ -1,0 +1,335 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T05:45:45Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "Simple-Robotics",
+    "repo": "nanoeigenpy"
+  },
+  "data": [
+    {
+      "author": "ManifoldFR",
+      "date": "2024-12-19T10:28:08Z",
+      "sha": "137f7eaf9acf4e7c513cf88330b371283adad6f9",
+      "message": "Add jrl-cmakemodules",
+      "files_changed": 2,
+      "additions": 4,
+      "deletions": 0,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "2b7a4fe10be4def3b75624e91852ee7add08eaa2",
+          "filename": ".gitmodules",
+          "status": "added",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/Simple-Robotics/nanoeigenpy/blob/137f7eaf9acf4e7c513cf88330b371283adad6f9/.gitmodules",
+          "raw_url": "https://github.com/Simple-Robotics/nanoeigenpy/raw/137f7eaf9acf4e7c513cf88330b371283adad6f9/.gitmodules",
+          "contents_url": "https://api.github.com/repos/Simple-Robotics/nanoeigenpy/contents/.gitmodules?ref=137f7eaf9acf4e7c513cf88330b371283adad6f9",
+          "patch": "@@ -0,0 +1,3 @@\n+[submodule \"cmake\"]\n+\tpath = cmake\n+\turl = https://github.com/jrl-umi3218/jrl-cmakemodules.git"
+        },
+        {
+          "sha": "29c0eb4e659304f44d55a0389e2749812d858659",
+          "filename": "cmake",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": null,
+          "raw_url": null,
+          "contents_url": "https://api.github.com/repos/Simple-Robotics/nanoeigenpy/contents/cmake?ref=137f7eaf9acf4e7c513cf88330b371283adad6f9",
+          "patch": "@@ -0,0 +1 @@\n+Subproject commit 29c0eb4e659304f44d55a0389e2749812d858659"
+        }
+      ]
+    },
+    {
+      "author": "jorisv",
+      "date": "2025-04-25T15:07:32Z",
+      "sha": "fefde9fbf03f241a0b6371e2cf801320862954f4",
+      "message": "Fix Windows installation issue (#11)\n\n* cmake: Fix Windows installation issue\n\n* ci: Install nanoeigenpy\n\n* lint: run pre-commit",
+      "files_changed": 2,
+      "additions": 8,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "94ad305779cf559367b00a9638eb1bfc77189866",
+          "filename": ".github/workflows/macos-linux-windows-pixi.yml",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/Simple-Robotics/nanoeigenpy/blob/fefde9fbf03f241a0b6371e2cf801320862954f4/.github%2Fworkflows%2Fmacos-linux-windows-pixi.yml",
+          "raw_url": "https://github.com/Simple-Robotics/nanoeigenpy/raw/fefde9fbf03f241a0b6371e2cf801320862954f4/.github%2Fworkflows%2Fmacos-linux-windows-pixi.yml",
+          "contents_url": "https://api.github.com/repos/Simple-Robotics/nanoeigenpy/contents/.github%2Fworkflows%2Fmacos-linux-windows-pixi.yml?ref=fefde9fbf03f241a0b6371e2cf801320862954f4",
+          "patch": "@@ -70,6 +70,10 @@ jobs:\n       run: |\n         pixi run -e ${{ matrix.environment }} ctest --test-dir build --output-on-failure\n \n+    - name: Install nanoeigenpy [MacOS/Linux/Windows]\n+      run: |\n+        pixi run -e ${{ matrix.environment }} cmake --build build --target install\n+\n   check:\n     if: always()\n     name: check-macos-linux-windows-pixi"
+        },
+        {
+          "sha": "c29d9e547a88865c40d906e3d5c58e3e3a8be2fd",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/Simple-Robotics/nanoeigenpy/blob/fefde9fbf03f241a0b6371e2cf801320862954f4/CMakeLists.txt",
+          "raw_url": "https://github.com/Simple-Robotics/nanoeigenpy/raw/fefde9fbf03f241a0b6371e2cf801320862954f4/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/Simple-Robotics/nanoeigenpy/contents/CMakeLists.txt?ref=fefde9fbf03f241a0b6371e2cf801320862954f4",
+          "patch": "@@ -101,6 +101,10 @@ endif(APPLE)\n ADD_PROJECT_DEPENDENCY(Eigen3 REQUIRED PKG_CONFIG_REQUIRES \"eigen3 >= 3.3.1\")\n \n find_package(Python REQUIRED COMPONENTS Interpreter Development)\n+# On Windows Python_SITELIB contains \\ that can create installation issues\n+if(WIN32)\n+  string(REPLACE \"\\\\\" \"/\" Python_SITELIB \"${Python_SITELIB}\")\n+endif()\n \n # Detect the installed nanobind package and import it into CMake\n execute_process("
+        }
+      ]
+    },
+    {
+      "author": "dependabot[bot]",
+      "date": "2025-12-11T15:31:00Z",
+      "sha": "f8a5d5f1cb6688c7eec6d0c9a7139cd5cc627a80",
+      "message": "build(deps): bump actions/checkout from 4 to 6\n\nBumps [actions/checkout](https://github.com/actions/checkout) from 4 to 6.\n- [Release notes](https://github.com/actions/checkout/releases)\n- [Changelog](https://github.com/actions/checkout/blob/main/CHANGELOG.md)\n- [Commits](https://github.com/actions/checkout/compare/v4...v6)\n\n---\nupdated-dependencies:\n- dependency-name: actions/checkout\n  dependency-version: '6'\n  dependency-type: direct:production\n  update-type: version-update:semver-major\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>",
+      "files_changed": 4,
+      "additions": 5,
+      "deletions": 5,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "850a32a94fa38cb6d4de43ea8ab5da8a5b470410",
+          "filename": ".github/workflows/macos-linux-windows-pixi.yml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/Simple-Robotics/nanoeigenpy/blob/f8a5d5f1cb6688c7eec6d0c9a7139cd5cc627a80/.github%2Fworkflows%2Fmacos-linux-windows-pixi.yml",
+          "raw_url": "https://github.com/Simple-Robotics/nanoeigenpy/raw/f8a5d5f1cb6688c7eec6d0c9a7139cd5cc627a80/.github%2Fworkflows%2Fmacos-linux-windows-pixi.yml",
+          "contents_url": "https://api.github.com/repos/Simple-Robotics/nanoeigenpy/contents/.github%2Fworkflows%2Fmacos-linux-windows-pixi.yml?ref=f8a5d5f1cb6688c7eec6d0c9a7139cd5cc627a80",
+          "patch": "@@ -54,7 +54,7 @@ jobs:\n             build_type: Release\n \n     steps:\n-    - uses: actions/checkout@v4\n+    - uses: actions/checkout@v6\n       with:\n         submodules: recursive\n \n@@ -101,7 +101,7 @@ jobs:\n         os: [ubuntu-latest, macos-latest, macos-15-intel, windows-latest]\n \n     steps:\n-    - uses: actions/checkout@v5\n+    - uses: actions/checkout@v6\n       with:\n         submodules: recursive\n "
+        },
+        {
+          "sha": "f4d6da10cdd3f6cfc89dc52e68e48b7d8d9b9765",
+          "filename": ".github/workflows/nix.yml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/Simple-Robotics/nanoeigenpy/blob/f8a5d5f1cb6688c7eec6d0c9a7139cd5cc627a80/.github%2Fworkflows%2Fnix.yml",
+          "raw_url": "https://github.com/Simple-Robotics/nanoeigenpy/raw/f8a5d5f1cb6688c7eec6d0c9a7139cd5cc627a80/.github%2Fworkflows%2Fnix.yml",
+          "contents_url": "https://api.github.com/repos/Simple-Robotics/nanoeigenpy/contents/.github%2Fworkflows%2Fnix.yml?ref=f8a5d5f1cb6688c7eec6d0c9a7139cd5cc627a80",
+          "patch": "@@ -15,7 +15,7 @@ jobs:\n       matrix:\n         os: [ubuntu, macos]\n     steps:\n-      - uses: actions/checkout@v4\n+      - uses: actions/checkout@v6\n       - uses: cachix/install-nix-action@v31\n       - uses: cachix/cachix-action@v16\n         with:"
+        },
+        {
+          "sha": "77d7128859c682f94c5ce4660c467c3b4ba3fc74",
+          "filename": ".github/workflows/ros_ci.yml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/Simple-Robotics/nanoeigenpy/blob/f8a5d5f1cb6688c7eec6d0c9a7139cd5cc627a80/.github%2Fworkflows%2Fros_ci.yml",
+          "raw_url": "https://github.com/Simple-Robotics/nanoeigenpy/raw/f8a5d5f1cb6688c7eec6d0c9a7139cd5cc627a80/.github%2Fworkflows%2Fros_ci.yml",
+          "contents_url": "https://api.github.com/repos/Simple-Robotics/nanoeigenpy/contents/.github%2Fworkflows%2Fros_ci.yml?ref=f8a5d5f1cb6688c7eec6d0c9a7139cd5cc627a80",
+          "patch": "@@ -33,7 +33,7 @@ jobs:\n       BUILDER: colcon\n     runs-on: ubuntu-latest\n     steps:\n-      - uses: actions/checkout@v4\n+      - uses: actions/checkout@v6\n         with:\n           submodules: recursive\n       # Run industrial_ci"
+        },
+        {
+          "sha": "e6a0fd3a95853685384ac2d7910ac69ff2fd5c37",
+          "filename": ".github/workflows/update_pixi_lockfile.yml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/Simple-Robotics/nanoeigenpy/blob/f8a5d5f1cb6688c7eec6d0c9a7139cd5cc627a80/.github%2Fworkflows%2Fupdate_pixi_lockfile.yml",
+          "raw_url": "https://github.com/Simple-Robotics/nanoeigenpy/raw/f8a5d5f1cb6688c7eec6d0c9a7139cd5cc627a80/.github%2Fworkflows%2Fupdate_pixi_lockfile.yml",
+          "contents_url": "https://api.github.com/repos/Simple-Robotics/nanoeigenpy/contents/.github%2Fworkflows%2Fupdate_pixi_lockfile.yml?ref=f8a5d5f1cb6688c7eec6d0c9a7139cd5cc627a80",
+          "patch": "@@ -19,7 +19,7 @@ jobs:\n           app-id: ${{ secrets.APP_ID }}\n           private-key: ${{ secrets.APP_PRIVATE_KEY }}\n \n-      - uses: actions/checkout@v4\n+      - uses: actions/checkout@v6\n         with:\n           token: ${{ steps.generate-token.outputs.token }}\n           ref: devel"
+        }
+      ]
+    },
+    {
+      "author": "ahoarau",
+      "date": "2025-11-25T09:35:54Z",
+      "sha": "79c49fd2deaff10ce5c2ddf3adabb018051b8bf5",
+      "message": "fix typo _MSVC_LAG -> _MSVC_LANG",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "9546110a3cd966263d8d927a6d43fe7ed1a66163",
+          "filename": "include/nanoeigenpy/fwd.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/Simple-Robotics/nanoeigenpy/blob/79c49fd2deaff10ce5c2ddf3adabb018051b8bf5/include%2Fnanoeigenpy%2Ffwd.hpp",
+          "raw_url": "https://github.com/Simple-Robotics/nanoeigenpy/raw/79c49fd2deaff10ce5c2ddf3adabb018051b8bf5/include%2Fnanoeigenpy%2Ffwd.hpp",
+          "contents_url": "https://api.github.com/repos/Simple-Robotics/nanoeigenpy/contents/include%2Fnanoeigenpy%2Ffwd.hpp?ref=79c49fd2deaff10ce5c2ddf3adabb018051b8bf5",
+          "patch": "@@ -29,7 +29,7 @@\n #define NANOEIGENPY_HAS_ACCELERATE\n #endif\n \n-#if (__cplusplus >= 202002L || (defined(_MSVC_LAG) && _MSVC_LANG >= 202002L))\n+#if (__cplusplus >= 202002L || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L))\n #define NANOEIGENPY_WITH_CXX20_SUPPORT\n #endif\n "
+        }
+      ]
+    },
+    {
+      "author": "nim65s",
+      "date": "2025-08-04T06:25:39Z",
+      "sha": "5ace1f554455196f94c15eaf9b960a54750a3284",
+      "message": "CI: ROS",
+      "files_changed": 1,
+      "additions": 56,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "e53275f4d631b2d81b3549516c3585773e2444d7",
+          "filename": ".github/workflows/ros_ci.yml",
+          "status": "added",
+          "additions": 56,
+          "deletions": 0,
+          "changes": 56,
+          "blob_url": "https://github.com/Simple-Robotics/nanoeigenpy/blob/5ace1f554455196f94c15eaf9b960a54750a3284/.github%2Fworkflows%2Fros_ci.yml",
+          "raw_url": "https://github.com/Simple-Robotics/nanoeigenpy/raw/5ace1f554455196f94c15eaf9b960a54750a3284/.github%2Fworkflows%2Fros_ci.yml",
+          "contents_url": "https://api.github.com/repos/Simple-Robotics/nanoeigenpy/contents/.github%2Fworkflows%2Fros_ci.yml?ref=5ace1f554455196f94c15eaf9b960a54750a3284",
+          "patch": "@@ -0,0 +1,56 @@\n+# This config uses industrial_ci (https://github.com/ros-industrial/industrial_ci.git).\n+# For troubleshooting, see readme (https://github.com/ros-industrial/industrial_ci/blob/master/README.rst)\n+\n+name: CI - Linux via ROS\n+\n+# This determines when this workflow is run\n+on:\n+  push:\n+    paths-ignore:\n+      - '*.md'\n+      - 'LICENSE'\n+      - '.pre-commit-config.yaml'\n+  pull_request:\n+    paths-ignore:\n+      - '*.md'\n+      - 'LICENSE'\n+      - '.pre-commit-config.yaml'\n+concurrency:\n+  group: ${{ github.workflow }}-${{ github.ref }}\n+  cancel-in-progress: true\n+\n+jobs:\n+  CI:\n+    strategy:\n+      matrix:\n+        env:\n+          - {ROS_DISTRO: humble}\n+          - {ROS_DISTRO: jazzy}\n+          - {ROS_DISTRO: kilted}\n+          - {ROS_DISTRO: rolling}\n+    env:\n+      # PRERELEASE: true  # Fails due to issues in the underlying Docker image\n+      BUILDER: colcon\n+    runs-on: ubuntu-latest\n+    steps:\n+      - uses: actions/checkout@v4\n+        with:\n+          submodules: recursive\n+      # Run industrial_ci\n+      - uses: 'ros-industrial/industrial_ci@e3d16c224caf4832cf68e74093eb70f3a979b4cc'\n+        env: ${{ matrix.env }}\n+\n+  check:\n+    if: always()\n+    name: check-ros-ci\n+\n+    needs:\n+    - CI\n+\n+    runs-on: Ubuntu-latest\n+\n+    steps:\n+    - name: Decide whether the needed jobs succeeded or failed\n+      uses: re-actors/alls-green@release/v1\n+      with:\n+        jobs: ${{ toJSON(needs) }}"
+        }
+      ]
+    },
+    {
+      "author": "Lucas-Haubert",
+      "date": "2025-03-09T23:25:35Z",
+      "sha": "84d9bb771b2a5256c15a21120ef451229696f768",
+      "message": "completed llt and ldlt",
+      "files_changed": 9,
+      "additions": 415,
+      "deletions": 27,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "fde90cfe6bf2279b5ce08f3274ba449bc223ca29",
+          "filename": "include/nanoeigenpy/decompositions.hpp",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/Simple-Robotics/nanoeigenpy/blob/84d9bb771b2a5256c15a21120ef451229696f768/include%2Fnanoeigenpy%2Fdecompositions.hpp",
+          "raw_url": "https://github.com/Simple-Robotics/nanoeigenpy/raw/84d9bb771b2a5256c15a21120ef451229696f768/include%2Fnanoeigenpy%2Fdecompositions.hpp",
+          "contents_url": "https://api.github.com/repos/Simple-Robotics/nanoeigenpy/contents/include%2Fnanoeigenpy%2Fdecompositions.hpp?ref=84d9bb771b2a5256c15a21120ef451229696f768",
+          "patch": "@@ -0,0 +1,4 @@\n+#pragma once\n+\n+#include \"nanoeigenpy/decompositions/ldlt.hpp\"\n+#include \"nanoeigenpy/decompositions/llt.hpp\""
+        },
+        {
+          "sha": "f7f4e9318e3fbd33a50d9489d1c404e94b768b4c",
+          "filename": "include/nanoeigenpy/decompositions/ldlt.hpp",
+          "status": "modified",
+          "additions": 104,
+          "deletions": 11,
+          "changes": 115,
+          "blob_url": "https://github.com/Simple-Robotics/nanoeigenpy/blob/84d9bb771b2a5256c15a21120ef451229696f768/include%2Fnanoeigenpy%2Fdecompositions%2Fldlt.hpp",
+          "raw_url": "https://github.com/Simple-Robotics/nanoeigenpy/raw/84d9bb771b2a5256c15a21120ef451229696f768/include%2Fnanoeigenpy%2Fdecompositions%2Fldlt.hpp",
+          "contents_url": "https://api.github.com/repos/Simple-Robotics/nanoeigenpy/contents/include%2Fnanoeigenpy%2Fdecompositions%2Fldlt.hpp?ref=84d9bb771b2a5256c15a21120ef451229696f768",
+          "patch": "@@ -6,31 +6,124 @@\n namespace nanoeigenpy {\n namespace nb = nanobind;\n \n+template <typename MatrixType, typename MatrixOrVector>\n+MatrixOrVector solve(const Eigen::LDLT<MatrixType> &c, const MatrixOrVector &vec) {\n+     return c.solve(vec);\n+}\n+\n template <typename MatrixType>\n void exposeLDLTSolver(nb::module_ m, const char *name) {\n   using Solver = Eigen::LDLT<MatrixType>;\n   using Scalar = typename MatrixType::Scalar;\n   using VectorType = Eigen::Matrix<Scalar, -1, 1>;\n-  auto cl = nb::class_<Solver>(m, name)\n-                .def(nb::init<const MatrixType &>(), nb::arg(\"matrix\"))\n-                .def(nb::init<Eigen::DenseIndex>(), nb::arg(\"size\"))\n+  auto cl = nb::class_<Solver>(m, name, \n+               \"Robust Cholesky decomposition of a matrix with pivoting.\\n\\n\"\n+               \"Perform a robust Cholesky decomposition of a positive semidefinite or \"\n+               \"negative semidefinite matrix $ A $ such that $ A = P^TLDL^*P $, where \"\n+               \"P is a permutation matrix, L is lower triangular with a unit diagonal \"\n+               \"and D is a diagonal matrix.\\n\\n\"\n+               \"The decomposition uses pivoting to ensure stability, so that L will \"\n+               \"have zeros in the bottom right rank(A) - n submatrix. Avoiding the \"\n+               \"square root on D also stabilizes the computation.\")\n+\n+                .def(nb::init<>(), \n+                \"Default constructor.\")\n+                .def(nb::init<Eigen::DenseIndex>(), nb::arg(\"size\"), \n+                \"Default constructor with memory preallocation.\")\n+                .def(nb::init<const MatrixType &>(), nb::arg(\"matrix\"), \n+                \"Constructs a LLT factorization from a given matrix.\")\n+\n                 .def(EigenBaseVisitor())\n-                .def(\"isNegative\", &Solver::isNegative)\n-                .def(\"isPositive\", &Solver::isPositive)\n+\n+                .def(\"isNegative\", &Solver::isNegative,\n+                \"Returns true if the matrix is negative (semidefinite).\")                                               \n+                .def(\"isPositive\", &Solver::isPositive,\n+                \"Returns true if the matrix is positive (semidefinite).\")                                                \n+\n                 .def(\"matrixL\",\n-                     [](Solver const &c) -> MatrixType { return c.matrixL(); })\n+                     [](Solver const &c) -> MatrixType { return c.matrixL(); },\n+                     \"Returns the lower triangular matrix L.\")\n                 .def(\"matrixU\",\n-                     [](Solver const &c) -> MatrixType { return c.matrixU(); })\n+                     [](Solver const &c) -> MatrixType { return c.matrixU(); },\n+                     \"Returns the upper triangular matrix U.\")\n                 .def(\"vectorD\",\n-                     [](Solver const &c) -> VectorType { return c.vectorD(); })\n+                     [](Solver const &c) -> VectorType { return c.vectorD(); },\n+                     \"Returns the coefficients of the diagonal matrix D.\")\n                 .def(\"matrixLDLT\", &Solver::matrixLDLT,\n+                     \"Returns the LDLT decomposition matrix.\",\n                      nb::rv_policy::reference_internal)\n-                .def(\n-                    \"rankUpdate\",\n+\n+                .def(\"transpositionsP\",\n+                     [](Solver const &c) -> MatrixType { return c.transpositionsP() * \n+                     MatrixType::Identity(c.matrixL().rows(), c.matrixL().rows()); },\n+                     \"Returns the permutation matrix P.\")\n+\n+                .def(\"rankUpdate\",\n                     [](Solver &c, VectorType const &w, Scalar sigma) {\n                       return c.rankUpdate(w, sigma);\n                     },\n-                    nb::arg(\"w\"), nb::arg(\"sigma\"));\n+                    nb::arg(\"w\"), nb::arg(\"sigma\"))\n+\n+#if EIGEN_VERSION_AT_LEAST(3, 3, 0)\n+                .def(\"adjoint\", &Solver::adjoint,                                                  \n+                     \"Returns the adjoint, that is, a reference to the decomposition \"\n+                     \"itself as if the underlying matrix is self-adjoint.\",\n+                     nb::rv_policy::reference)\n+#endif\n+\n+                .def(\"compute\",                                                                 \n+                    [](Solver &c, VectorType const &matrix) {\n+                      return c.compute(matrix);\n+                    },\n+                    nb::arg(\"matrix\"),\n+                    \"Computes the LDLT of given matrix.\",\n+                    nb::rv_policy::reference)\n+                .def(\"info\", &Solver::info,                                                       \n+                     \"NumericalIssue if the input contains INF or NaN values or \"\n+                     \"overflow occured. Returns Success otherwise.\")\n+\n+#if EIGEN_VERSION_AT_LEAST(3, 3, 0)\n+                .def(\"rcond\", &Solver::rcond,                                                       \n+                     \"Returns an estimate of the reciprocal condition number of the \"\n+                     \"matrix.\")\n+#endif\n+\n+                .def(\"reconstructedMatrix\", &Solver::reconstructedMatrix,                         \n+                     \"Returns the matrix represented by the decomposition, i.e., it \"\n+                     \"returns the product: L L^*. This function is provided for debug \"\n+                     \"purpose.\")\n+                \n+                .def(\"solve\",                                                                        \n+                     [](Solver const &c, VectorType const &b) -> VectorType { return solve(c, b); },\n+                     nb::arg(\"b\"),\n+                     \"Returns the solution x of A x = b using the current \"\n+                     \"decomposition of A.\")\n+                .def(\"solve\",                                                                        \n+                     [](Solver const &c, MatrixType const &B) -> MatrixType { return solve(c, B); },\n+                     nb::arg(\"B\"),\n+                     \"Returns the solution X of A X = B using the current \"\n+                     \"decomposition of A where B is a right hand side matrix.\")\n+\n+                .def(\"setZero\", &Solver::setZero,                                                       \n+                     \"Clear any existing decomposition.\")\n+\n+                .def(\"id\",                                                                             \n+                     [](Solver const &c) -> int64_t { return reinterpret_cast<int64_t>(&c); },\n+                     \"Returns the unique identity of an object.\\n\"\n+                     \"For objects held in C++, it corresponds to its memory address.\");\n+\n }\n \n }  // namespace nanoeigenpy\n+\n+\n+// TODO\n+\n+// Tests that were not done in eigenpy that we could add in nanoeigenpy: (+ those cited in llt.hpp)\n+// setZero\n+\n+// Expose supplementary content:\n+// setZero in LLT decomp too ? (not done in eigenpy)\n+\n+// Questions about eigenpy itself:\n+// Relevant to have the reconstructedMatrix method ? (knowing that we are on LDLT, not LLT)\n\\ No newline at end of file"
+        },
+        {
+          "sha": "8b03653249eac2b1db80573b1ac13b9de91d75b9",
+          "filename": "include/nanoeigenpy/decompositions/llt.hpp",
+          "status": "modified",
+          "additions": 118,
+          "deletions": 10,
+          "changes": 128,
+          "blob_url": "https://github.com/Simple-Robotics/nanoeigenpy/blob/84d9bb771b2a5256c15a21120ef451229696f768/include%2Fnanoeigenpy%2Fdecompositions%2Fllt.hpp",
+          "raw_url": "https://github.com/Simple-Robotics/nanoeigenpy/raw/84d9bb771b2a5256c15a21120ef451229696f768/include%2Fnanoeigenpy%2Fdecompositions%2Fllt.hpp",
+          "contents_url": "https://api.github.com/repos/Simple-Robotics/nanoeigenpy/contents/include%2Fnanoeigenpy%2Fdecompositions%2Fllt.hpp?ref=84d9bb771b2a5256c15a21120ef451229696f768",
+          "patch": "@@ -6,19 +6,127 @@\n namespace nanoeigenpy {\n namespace nb = nanobind;\n \n+template <typename MatrixType, typename MatrixOrVector>\n+MatrixOrVector solve(const Eigen::LLT<MatrixType> &c, const MatrixOrVector &vec) {\n+     return c.solve(vec);\n+}\n+\n template <typename MatrixType>\n void exposeLLTSolver(nb::module_ m, const char *name) {\n   using Chol = Eigen::LLT<MatrixType>;\n-  auto cl = nb::class_<Chol>(m, name)\n-                .def(nb::init<const MatrixType &>(), nb::arg(\"matrix\"))\n-                .def(nb::init<Eigen::DenseIndex>(), nb::arg(\"size\"))\n-                .def(EigenBaseVisitor())\n-                .def(\"matrixL\",\n-                     [](Chol const &c) -> MatrixType { return c.matrixL(); })\n-                .def(\"matrixU\",\n-                     [](Chol const &c) -> MatrixType { return c.matrixU(); })\n-                .def(\"matrixLLT\", &Chol::matrixLLT,\n-                     nb::rv_policy::reference_internal);\n+  using Scalar = typename MatrixType::Scalar;\n+  using VectorType = Eigen::Matrix<Scalar, -1, 1>;\n+  auto cl = nb::class_<Chol>(m, name, \n+                \"Standard Cholesky decomposition (LL^T) of a matrix and associated \"\n+                \"features.\\n\\n\"\n+                \"This class performs a LL^T Cholesky decomposition of a symmetric, \"\n+                \"positive definite matrix A such that A = LL^* = U^*U, where L is \"\n+                \"lower triangular.\\n\\n\"\n+                \"While the Cholesky decomposition is particularly useful to solve \"\n+                \"selfadjoint problems like D^*D x = b, for that purpose, we recommend \"\n+                \"the Cholesky decomposition without square root which is more stable \"\n+                \"and even faster. Nevertheless, this standard Cholesky decomposition \"\n+                \"remains useful in many other situations like generalised eigen \"\n+                \"problems with hermitian matrices.\")\n+\n+                .def(nb::init<>(),                                                              \n+                \"Default constructor.\")\n+                .def(nb::init<Eigen::DenseIndex>(), nb::arg(\"size\"),                       \n+                \"Default constructor with memory preallocation.\")\n+                .def(nb::init<const MatrixType &>(), nb::arg(\"matrix\"),                   \n+                \"Constructs a LLT factorization from a given matrix.\")\n+\n+                .def(EigenBaseVisitor())                                                         \n+\n+                .def(\"matrixL\",                                                                 \n+                     [](Chol const &c) -> MatrixType { return c.matrixL(); },\n+                     \"Returns the lower triangular matrix L.\")\n+                .def(\"matrixU\",                                                                 \n+                     [](Chol const &c) -> MatrixType { return c.matrixU(); },\n+                     \"Returns the upper triangular matrix U.\")\n+                .def(\"matrixLLT\", &Chol::matrixLLT,                                             \n+                     \"Returns the LLT decomposition matrix.\",\n+                     nb::rv_policy::reference_internal)\n+\n+#if EIGEN_VERSION_AT_LEAST(3, 3, 90)               \n+                .def(\"rankUpdate\",                                                               \n+                    [](Chol &c, VectorType const &w, Scalar sigma) {\n+                      return c.rankUpdate(w, sigma);\n+                    },\n+                    nb::arg(\"w\"), nb::arg(\"sigma\"),                          \n+                    nb::rv_policy::reference)\n+#else\n+                .def(\"rankUpdate\",\n+                    [](Chol &c, VectorType const &w, Scalar sigma) {\n+                      return c.rankUpdate(w, sigma);\n+                    },\n+                    nb::arg(\"w\"), nb::arg(\"sigma\"))\n+#endif\n+\n+#if EIGEN_VERSION_AT_LEAST(3, 3, 0)\n+                .def(\"adjoint\", &Chol::adjoint,                                                  \n+                     \"Returns the adjoint, that is, a reference to the decomposition \"\n+                     \"itself as if the underlying matrix is self-adjoint.\",\n+                     nb::rv_policy::reference)\n+#endif\n+\n+                .def(\"compute\",                                                                 \n+                    [](Chol &c, VectorType const &matrix) {\n+                      return c.compute(matrix);\n+                    },\n+                    nb::arg(\"matrix\"),\n+                    \"Computes the LDLT of given matrix.\",\n+                    nb::rv_policy::reference)\n+                .def(\"info\", &Chol::info,                                                       \n+                     \"NumericalIssue if the input contains INF or NaN values or \"\n+                     \"overflow occured. Returns Success otherwise.\")\n+\n+#if EIGEN_VERSION_AT_LEAST(3, 3, 0)\n+                .def(\"rcond\", &Chol::rcond,                                                       \n+                     \"Returns an estimate of the reciprocal condition number of the \"\n+                     \"matrix.\")\n+#endif\n+\n+                .def(\"reconstructedMatrix\", &Chol::reconstructedMatrix,                         \n+                     \"Returns the matrix represented by the decomposition, i.e., it \"\n+                     \"returns the product: L L^*. This function is provided for debug \"\n+                     \"purpose.\")\n+\n+                .def(\"solve\",                                                                        \n+                     [](Chol const &c, VectorType const &b) -> VectorType { return solve(c, b); },\n+                     nb::arg(\"b\"),\n+                     \"Returns the solution x of A x = b using the current \"\n+                     \"decomposition of A.\")\n+                .def(\"solve\",                                                                        \n+                     [](Chol const &c, MatrixType const &B) -> MatrixType { return solve(c, B); },\n+                     nb::arg(\"B\"),\n+                     \"Returns the solution X of A X = B using the current \"\n+                     \"decomposition of A where B is a right hand side matrix.\")\n+\n+                .def(\"id\",                                                                             \n+                     [](Chol const &c) -> int64_t { return reinterpret_cast<int64_t>(&c); },\n+                     \"Returns the unique identity of an object.\\n\"\n+                     \"For objects held in C++, it corresponds to its memory address.\");\n+\n }\n \n }  // namespace nanoeigenpy\n+\n+\n+// TODO\n+\n+// Tests that were not done in eigenpy that we could add in nanoeigenpy:\n+// Default constructor\n+// Default constructor with memory preallocation\n+// matrixLLT\n+// rankUpdate\n+// adjoint\n+// compute\n+// rcond\n+// reconstructedMatrix\n+\n+// Expose supplementary content:\n+// Expose ComputationInfo to test info\n+\n+// Assertions for the solve method on vectors x_est and b\n+// Expose is_approx for vectors too (exposed and tested for ùatrices only in eigenpy)"
+        },
+        {
+          "sha": "ca0199913b6ee1e4248d36334b869f381e0e5fe2",
+          "filename": "include/nanoeigenpy/eigen-typedef.hpp",
+          "status": "added",
+          "additions": 14,
+          "deletions": 0,
+          "changes": 14,
+          "blob_url": "https://github.com/Simple-Robotics/nanoeigenpy/blob/84d9bb771b2a5256c15a21120ef451229696f768/include%2Fnanoeigenpy%2Feigen-typedef.hpp",
+          "raw_url": "https://github.com/Simple-Robotics/nanoeigenpy/raw/84d9bb771b2a5256c15a21120ef451229696f768/include%2Fnanoeigenpy%2Feigen-typedef.hpp",
+          "contents_url": "https://api.github.com/repos/Simple-Robotics/nanoeigenpy/contents/include%2Fnanoeigenpy%2Feigen-typedef.hpp?ref=84d9bb771b2a5256c15a21120ef451229696f768",
+          "patch": "@@ -0,0 +1,14 @@\n+/// Copyright 2025 INRIA\n+#pragma once\n+\n+#include <Eigen/Core>\n+#include <Eigen/SparseCore>\n+\n+#define NANOEIGENPY_MAKE_TYPEDEFS(Type, Options, TypeSuffix, Size, SizeSuffix) \\\n+  /** \\ingroup matrixtypedefs */                                                \\\n+  typedef Eigen::Matrix<Type, Size, Size, Options>                              \\\n+      Matrix##SizeSuffix##TypeSuffix;                                           \\\n+  /** \\ingroup matrixtypedefs */                                                \\\n+  typedef Eigen::Matrix<Type, Size, 1> Vector##SizeSuffix##TypeSuffix;          \\\n+  /** \\ingroup matrixtypedefs */                                                \\\n+  typedef Eigen::Matrix<Type, 1, Size> RowVector##SizeSuffix##TypeSuffix;"
+        },
+        {
+          "sha": "7b2ae24d9cd661b9dc20b18cce38a8ae50865af0",
+          "filename": "include/nanoeigenpy/fwd.hpp",
+          "status": "added",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/Simple-Robotics/nanoeigenpy/blob/84d9bb771b2a5256c15a21120ef451229696f768/include%2Fnanoeigenpy%2Ffwd.hpp",
+          "raw_url": "https://github.com/Simple-Robotics/nanoeigenpy/raw/84d9bb771b2a5256c15a21120ef451229696f768/include%2Fnanoeigenpy%2Ffwd.hpp",
+          "contents_url": "https://api.github.com/repos/Simple-Robotics/nanoeigenpy/contents/include%2Fnanoeigenpy%2Ffwd.hpp?ref=84d9bb771b2a5256c15a21120ef451229696f768",
+          "patch": "@@ -0,0 +1,5 @@\n+/// Copyright 2025 INRIA\n+#pragma once\n+\n+#define NANOEIGENPY_UNUSED_VARIABLE(var) (void)(var)\n+#define NANOEIGENPY_UNUSED_TYPE(type) NANOEIGENPY_UNUSED_VARIABLE((type *)(NULL))\n\\ No newline at end of file"
+        },
+        {
+          "sha": "afd8d94853cdb08b44663861a60453f95097ba78",
+          "filename": "include/nanoeigenpy/utils/is-approx.hpp",
+          "status": "added",
+          "additions": 70,
+          "deletions": 0,
+          "changes": 70,
+          "blob_url": "https://github.com/Simple-Robotics/nanoeigenpy/blob/84d9bb771b2a5256c15a21120ef451229696f768/include%2Fnanoeigenpy%2Futils%2Fis-approx.hpp",
+          "raw_url": "https://github.com/Simple-Robotics/nanoeigenpy/raw/84d9bb771b2a5256c15a21120ef451229696f768/include%2Fnanoeigenpy%2Futils%2Fis-approx.hpp",
+          "contents_url": "https://api.github.com/repos/Simple-Robotics/nanoeigenpy/contents/include%2Fnanoeigenpy%2Futils%2Fis-approx.hpp?ref=84d9bb771b2a5256c15a21120ef451229696f768",
+          "patch": "@@ -0,0 +1,70 @@\n+/// Copyright 2025 INRIA\n+#pragma once\n+\n+#include <Eigen/Core>\n+#include <Eigen/SparseCore>\n+#include <nanobind/nanobind.h>\n+\n+#include \"nanoeigenpy/eigen-typedef.hpp\"\n+#include \"nanoeigenpy/fwd.hpp\"\n+\n+namespace nanoeigenpy {\n+\n+template <typename MatrixType1, typename MatrixType2>\n+EIGEN_DONT_INLINE bool is_approx(const Eigen::MatrixBase<MatrixType1>& mat1,\n+                                 const Eigen::MatrixBase<MatrixType2>& mat2,\n+                                 const typename MatrixType1::RealScalar& prec) {\n+  return mat1.isApprox(mat2, prec);\n+}\n+\n+template <typename MatrixType1, typename MatrixType2>\n+EIGEN_DONT_INLINE bool is_approx(const Eigen::MatrixBase<MatrixType1>& mat1,\n+                                 const Eigen::MatrixBase<MatrixType2>& mat2) {\n+  return is_approx(\n+      mat1, mat2,\n+      Eigen::NumTraits<typename MatrixType1::RealScalar>::dummy_precision());\n+}\n+\n+template <typename MatrixType1, typename MatrixType2>\n+EIGEN_DONT_INLINE bool is_approx(\n+    const Eigen::SparseMatrixBase<MatrixType1>& mat1,\n+    const Eigen::SparseMatrixBase<MatrixType2>& mat2,\n+    const typename MatrixType1::RealScalar& prec) {\n+  return mat1.isApprox(mat2, prec);\n+}\n+\n+template <typename MatrixType1, typename MatrixType2>\n+EIGEN_DONT_INLINE bool is_approx(\n+    const Eigen::SparseMatrixBase<MatrixType1>& mat1,\n+    const Eigen::SparseMatrixBase<MatrixType2>& mat2) {\n+  return is_approx(\n+      mat1, mat2,\n+      Eigen::NumTraits<typename MatrixType1::RealScalar>::dummy_precision());\n+}\n+\n+namespace nb = nanobind;\n+\n+template <typename Scalar>\n+void exposeIsApprox(nb::module_ m) {\n+    enum { Options = 0 };\n+    NANOEIGENPY_MAKE_TYPEDEFS(Scalar, Options, s, Eigen::Dynamic, X);\n+    NANOEIGENPY_UNUSED_TYPE(VectorXs);\n+    NANOEIGENPY_UNUSED_TYPE(RowVectorXs);\n+    typedef typename MatrixXs::RealScalar RealScalar;\n+\n+    using namespace Eigen;\n+    const RealScalar dummy_precision =\n+        Eigen::NumTraits<RealScalar>::dummy_precision();\n+\n+    // Exposition de la fonction is_approx pour matrices denses\n+    m.def(\"is_approx\",\n+          [](const MatrixXs& mat1, const MatrixXs& mat2, RealScalar precision) {\n+              return is_approx(mat1, mat2, precision);\n+          },\n+          nb::arg(\"mat1\"), nb::arg(\"mat2\"),\n+          nb::arg(\"precision\") = dummy_precision,\n+          \"Check if two dense matrices are approximately equal.\");\n+}\n+\n+}  // namespace nanoeigenpy\n+"
+        },
+        {
+          "sha": "8ee74da6e8e8927d2eec1a97c956d1d794ab5714",
+          "filename": "src/module.cpp",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 2,
+          "changes": 12,
+          "blob_url": "https://github.com/Simple-Robotics/nanoeigenpy/blob/84d9bb771b2a5256c15a21120ef451229696f768/src%2Fmodule.cpp",
+          "raw_url": "https://github.com/Simple-Robotics/nanoeigenpy/raw/84d9bb771b2a5256c15a21120ef451229696f768/src%2Fmodule.cpp",
+          "contents_url": "https://api.github.com/repos/Simple-Robotics/nanoeigenpy/contents/src%2Fmodule.cpp?ref=84d9bb771b2a5256c15a21120ef451229696f768",
+          "patch": "@@ -2,9 +2,9 @@\n #include <nanobind/nanobind.h>\n #include <nanobind/stl/string.h>\n \n-#include \"nanoeigenpy/decompositions/ldlt.hpp\"\n-#include \"nanoeigenpy/decompositions/llt.hpp\"\n+#include \"nanoeigenpy/decompositions.hpp\"\n #include \"nanoeigenpy/geometry.hpp\"\n+#include \"nanoeigenpy/utils/is-approx.hpp\"\n \n using namespace nanoeigenpy;\n \n@@ -16,10 +16,18 @@ using Quaternion = Eigen::Quaternion<Scalar, Options>;\n \n NB_MAKE_OPAQUE(Eigen::LLT<Eigen::MatrixXd>)\n NB_MAKE_OPAQUE(Eigen::LDLT<Eigen::MatrixXd>)\n+// TODO: Same for geometry stuff ?\n \n NB_MODULE(nanoeigenpy, m) {\n+  // Decompositions\n   exposeLLTSolver<Matrix>(m, \"LLT\");\n   exposeLDLTSolver<Matrix>(m, \"LDLT\");\n+\n+  // Geometry\n   exposeQuaternion<Scalar>(m, \"Quaternion\");\n   exposeAngleAxis<double>(m, \"AngleAxis\");\n+\n+  // Utils\n+  exposeIsApprox<double>(m);\n+  exposeIsApprox<std::complex<double>>(m);\n }"
+        },
+        {
+          "sha": "2e0446007608f88fea1b8d8ba749d7114dc0d4ff",
+          "filename": "tests/python/test_ldlt.py",
+          "status": "added",
+          "additions": 53,
+          "deletions": 0,
+          "changes": 53,
+          "blob_url": "https://github.com/Simple-Robotics/nanoeigenpy/blob/84d9bb771b2a5256c15a21120ef451229696f768/tests%2Fpython%2Ftest_ldlt.py",
+          "raw_url": "https://github.com/Simple-Robotics/nanoeigenpy/raw/84d9bb771b2a5256c15a21120ef451229696f768/tests%2Fpython%2Ftest_ldlt.py",
+          "contents_url": "https://api.github.com/repos/Simple-Robotics/nanoeigenpy/contents/tests%2Fpython%2Ftest_ldlt.py?ref=84d9bb771b2a5256c15a21120ef451229696f768",
+          "patch": "@@ -0,0 +1,53 @@\n+import nanoeigenpy\n+import numpy as np\n+\n+dim = 100\n+rng = np.random.default_rng()\n+\n+\n+A_neg = -np.eye(dim)\n+ldlt_neg = nanoeigenpy.LDLT(A_neg)\n+assert ldlt_neg.isNegative() == True\n+assert ldlt_neg.isPositive() == False\n+\n+A_pos = np.eye(dim)\n+ldlt_pos = nanoeigenpy.LDLT(A_pos)\n+assert ldlt_pos.isPositive() == True\n+assert ldlt_pos.isNegative() == False\n+\n+\n+A = rng.random((dim, dim))\n+A = (A + A.T) * 0.5 + np.diag(10.0 + rng.random(dim))\n+\n+ldlt = nanoeigenpy.LDLT(A)\n+\n+\n+L = ldlt.matrixL()\n+D = ldlt.vectorD()\n+P = ldlt.transpositionsP()\n+assert nanoeigenpy.is_approx(np.transpose(P).dot(L.dot(np.diag(D).dot(np.transpose(L).dot(P)))), A)\n+\n+\n+X = rng.random((dim, 20))\n+B = A.dot(X)\n+X_est = ldlt.solve(B)\n+assert nanoeigenpy.is_approx(X, X_est)\n+assert nanoeigenpy.is_approx(A.dot(X_est), B)\n+\n+x = rng.random(dim)\n+b = A.dot(x)\n+x_est = ldlt.solve(b)\n+# assert nanoeigenpy.is_approx(x, x_est)             # not exposed yet for vectors\n+# assert nanoeigenpy.is_approx(A.dot(x_est), b)      # not exposed yet for vectors\n+\n+\n+ldlt1 = nanoeigenpy.LDLT()\n+ldlt2 = nanoeigenpy.LDLT()\n+\n+id1 = ldlt1.id()\n+id2 = ldlt2.id()\n+\n+assert id1 != id2\n+assert id1 == ldlt1.id()\n+assert id2 == ldlt2.id()\n+"
+        },
+        {
+          "sha": "534ce1361b26e9d4e4c6b9f6584dbf3bcc3def46",
+          "filename": "tests/python/test_llt.py",
+          "status": "modified",
+          "additions": 37,
+          "deletions": 4,
+          "changes": 41,
+          "blob_url": "https://github.com/Simple-Robotics/nanoeigenpy/blob/84d9bb771b2a5256c15a21120ef451229696f768/tests%2Fpython%2Ftest_llt.py",
+          "raw_url": "https://github.com/Simple-Robotics/nanoeigenpy/raw/84d9bb771b2a5256c15a21120ef451229696f768/tests%2Fpython%2Ftest_llt.py",
+          "contents_url": "https://api.github.com/repos/Simple-Robotics/nanoeigenpy/contents/tests%2Fpython%2Ftest_llt.py?ref=84d9bb771b2a5256c15a21120ef451229696f768",
+          "patch": "@@ -1,9 +1,42 @@\n import nanoeigenpy\n import numpy as np\n \n-m = 4\n-a = np.random.randn(m, m + 1)\n-a = a @ a.T\n+dim = 100\n+rng = np.random.default_rng()\n+\n+A = rng.random((dim, dim))\n+A = (A + A.T) * 0.5 + np.diag(10.0 + rng.random(dim))\n+\n+llt = nanoeigenpy.LLT(A)\n+\n \n-llt = nanoeigenpy.LLT(a)\n L = llt.matrixL()\n+assert nanoeigenpy.is_approx(L.dot(np.transpose(L)), A)\n+\n+U = llt.matrixU()\n+LU = L @ U\n+assert nanoeigenpy.is_approx(LU, A)\n+\n+\n+X = rng.random((dim, 20))\n+B = A.dot(X)\n+X_est = llt.solve(B)\n+assert nanoeigenpy.is_approx(X, X_est)\n+assert nanoeigenpy.is_approx(A.dot(X_est), B)\n+\n+x = rng.random(dim)\n+b = A.dot(x)\n+x_est = llt.solve(b)\n+# assert nanoeigenpy.is_approx(x, x_est)             # not exposed yet for vectors\n+# assert nanoeigenpy.is_approx(A.dot(x_est), b)      # not exposed yet for vectors\n+\n+\n+ldlt1 = nanoeigenpy.LLT()\n+ldlt2 = nanoeigenpy.LLT()\n+\n+id1 = ldlt1.id()\n+id2 = ldlt2.id()\n+\n+assert id1 != id2\n+assert id1 == ldlt1.id()\n+assert id2 == ldlt2.id()"
+        }
+      ]
+    },
+    {
+      "author": "jcarpent",
+      "date": "2025-03-19T09:29:19Z",
+      "sha": "65761edc704f6db062f402fa4857e07050093581",
+      "message": "pre-commit: update",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "d9302e397ab731be3f6fdceb0571d0108d71695b",
+          "filename": ".pre-commit-config.yaml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/Simple-Robotics/nanoeigenpy/blob/65761edc704f6db062f402fa4857e07050093581/.pre-commit-config.yaml",
+          "raw_url": "https://github.com/Simple-Robotics/nanoeigenpy/raw/65761edc704f6db062f402fa4857e07050093581/.pre-commit-config.yaml",
+          "contents_url": "https://api.github.com/repos/Simple-Robotics/nanoeigenpy/contents/.pre-commit-config.yaml?ref=65761edc704f6db062f402fa4857e07050093581",
+          "patch": "@@ -5,7 +5,7 @@ ci:\n   submodules: true\n repos:\n   - repo: https://github.com/pre-commit/mirrors-clang-format\n-    rev: v19.1.7\n+    rev: v20.1.0\n     hooks:\n     - id: clang-format\n       types_or: []\n@@ -28,7 +28,7 @@ repos:\n                 doc/doxygen-awesome.*\n             )$\n   - repo: https://github.com/BlankSpruce/gersemi\n-    rev: 0.19.0\n+    rev: 0.19.2\n     hooks:\n       - id: gersemi\n   - repo: https://github.com/Lucas-C/pre-commit-hooks"
+        }
+      ]
+    }
+  ]
+}

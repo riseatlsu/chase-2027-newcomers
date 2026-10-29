@@ -1,0 +1,297 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T06:44:08Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "synapticon",
+    "repo": "synapticon_ros2_control"
+  },
+  "data": [
+    {
+      "author": "AndyZe",
+      "date": "2024-12-09T19:05:00Z",
+      "sha": "7ad722175ee8deb09eb0a9ccafb0433bccc7d7d3",
+      "message": "Implement a ros2_control hw interface",
+      "files_changed": 5,
+      "additions": 500,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "43716f25dc68d71233fcbd5bce9c76e22c7df6ff",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 60,
+          "deletions": 0,
+          "changes": 60,
+          "blob_url": "https://github.com/synapticon/synapticon_ros2_control/blob/7ad722175ee8deb09eb0a9ccafb0433bccc7d7d3/CMakeLists.txt",
+          "raw_url": "https://github.com/synapticon/synapticon_ros2_control/raw/7ad722175ee8deb09eb0a9ccafb0433bccc7d7d3/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/synapticon/synapticon_ros2_control/contents/CMakeLists.txt?ref=7ad722175ee8deb09eb0a9ccafb0433bccc7d7d3",
+          "patch": "@@ -0,0 +1,60 @@\n+cmake_minimum_required(VERSION 3.8)\n+project(synapticon_ros2_control)\n+\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  add_compile_options(-Wall -Wextra -Wpedantic)\n+endif()\n+\n+# set the same behavior for windows as it is on linux\n+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)\n+\n+set(THIS_PACKAGE_INCLUDE_DEPENDS\n+  hardware_interface\n+  pluginlib\n+  rclcpp\n+  rclcpp_lifecycle\n+)\n+\n+find_package(backward_ros REQUIRED)\n+find_package(ament_cmake REQUIRED)\n+foreach(Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})\n+  find_package(${Dependency} REQUIRED)\n+endforeach()\n+\n+include_directories(include)\n+\n+add_library(\n+  synapticon_ros2_control\n+  SHARED\n+  src/synapticon_interface.cpp\n+)\n+target_compile_features(synapticon_ros2_control PUBLIC cxx_std_17)\n+target_include_directories(synapticon_ros2_control PUBLIC\n+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>\n+)\n+ament_target_dependencies(\n+  synapticon_ros2_control PUBLIC\n+  ${THIS_PACKAGE_INCLUDE_DEPENDS}\n+)\n+\n+# Export hardware plugins\n+pluginlib_export_plugin_description_file(hardware_interface synapticon_ros2_control.xml)\n+\n+install(\n+  DIRECTORY include/\n+  DESTINATION include/synapticon_ros2_control\n+)\n+install(TARGETS synapticon_ros2_control\n+  EXPORT export_synapticon_ros2_control\n+  ARCHIVE DESTINATION lib\n+  LIBRARY DESTINATION lib\n+  RUNTIME DESTINATION bin\n+)\n+\n+if(BUILD_TESTING)\n+  # TODO\n+endif()\n+\n+ament_export_targets(export_synapticon_ros2_control HAS_LIBRARY_TARGET)\n+ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})\n+ament_package()"
+        },
+        {
+          "sha": "2c73e363544b4b35db853ab7265df026783be058",
+          "filename": "include/synapticon_ros2_control/synapticon_interface.hpp",
+          "status": "added",
+          "additions": 89,
+          "deletions": 0,
+          "changes": 89,
+          "blob_url": "https://github.com/synapticon/synapticon_ros2_control/blob/7ad722175ee8deb09eb0a9ccafb0433bccc7d7d3/include%2Fsynapticon_ros2_control%2Fsynapticon_interface.hpp",
+          "raw_url": "https://github.com/synapticon/synapticon_ros2_control/raw/7ad722175ee8deb09eb0a9ccafb0433bccc7d7d3/include%2Fsynapticon_ros2_control%2Fsynapticon_interface.hpp",
+          "contents_url": "https://api.github.com/repos/synapticon/synapticon_ros2_control/contents/include%2Fsynapticon_ros2_control%2Fsynapticon_interface.hpp?ref=7ad722175ee8deb09eb0a9ccafb0433bccc7d7d3",
+          "patch": "@@ -0,0 +1,89 @@\n+#pragma once\n+\n+#include <memory>\n+#include <string>\n+#include <vector>\n+\n+#include <hardware_interface/handle.hpp>\n+#include <hardware_interface/hardware_info.hpp>\n+#include <hardware_interface/system_interface.hpp>\n+#include <hardware_interface/types/hardware_interface_return_values.hpp>\n+#include <rclcpp/clock.hpp>\n+#include <rclcpp/logger.hpp>\n+#include <rclcpp/macros.hpp>\n+#include <rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp>\n+#include <rclcpp_lifecycle/state.hpp>\n+\n+namespace synapticon_ros2_control\n+{\n+class SynapticonSystemInterface : public hardware_interface::SystemInterface\n+{\n+public:\n+  RCLCPP_SHARED_PTR_DEFINITIONS(SynapticonSystemInterface)\n+\n+  hardware_interface::CallbackReturn on_init(\n+    const hardware_interface::HardwareInfo & info) override;\n+\n+  hardware_interface::return_type prepare_command_mode_switch(\n+    const std::vector<std::string> & start_interfaces,\n+    const std::vector<std::string> & stop_interfaces) override;\n+\n+  hardware_interface::CallbackReturn on_activate(\n+    const rclcpp_lifecycle::State & previous_state) override;\n+\n+  hardware_interface::CallbackReturn on_deactivate(\n+    const rclcpp_lifecycle::State & previous_state) override;\n+\n+  hardware_interface::return_type read(\n+    const rclcpp::Time & time, const rclcpp::Duration & period) override;\n+\n+  hardware_interface::return_type write(\n+    const rclcpp::Time & time, const rclcpp::Duration & period) override;\n+\n+  std::vector<hardware_interface::StateInterface> export_state_interfaces() override;\n+\n+  std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;\n+\n+  /**\n+   * \\return logger of the SystemInterface.\n+   */\n+  rclcpp::Logger get_logger() const { return *logger_; }\n+\n+  /**\n+   * \\return clock of the SystemInterface.\n+   */\n+  rclcpp::Clock::SharedPtr get_clock() const { return clock_; }\n+\n+private:\n+  // Parameters for the RRBot simulation\n+  double hw_start_sec_;\n+  double hw_stop_sec_;\n+  double hw_slowdown_;\n+\n+  // Objects for logging\n+  std::shared_ptr<rclcpp::Logger> logger_;\n+  rclcpp::Clock::SharedPtr clock_;\n+\n+  // Store the commands for the simulated robot\n+  std::vector<double> hw_commands_positions_;\n+  std::vector<double> hw_commands_velocities_;\n+  std::vector<double> hw_commands_accelerations_;\n+  std::vector<double> hw_states_positions_;\n+  std::vector<double> hw_states_velocities_;\n+  std::vector<double> hw_states_accelerations_;\n+\n+  // Enum defining at which control level we are\n+  // Dumb way of maintaining the command_interface type per joint.\n+  enum integration_level_t : std::uint8_t\n+  {\n+    UNDEFINED = 0,\n+    POSITION = 1,\n+    VELOCITY = 2,\n+    ACCELERATION = 3\n+  };\n+\n+  // Active control mode for each actuator\n+  std::vector<integration_level_t> control_level_;\n+};\n+\n+}  // namespace synapticon_ros2_control"
+        },
+        {
+          "sha": "d5e009ffc09d50beecf58830865a2ec97518b589",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 30,
+          "deletions": 0,
+          "changes": 30,
+          "blob_url": "https://github.com/synapticon/synapticon_ros2_control/blob/7ad722175ee8deb09eb0a9ccafb0433bccc7d7d3/package.xml",
+          "raw_url": "https://github.com/synapticon/synapticon_ros2_control/raw/7ad722175ee8deb09eb0a9ccafb0433bccc7d7d3/package.xml",
+          "contents_url": "https://api.github.com/repos/synapticon/synapticon_ros2_control/contents/package.xml?ref=7ad722175ee8deb09eb0a9ccafb0433bccc7d7d3",
+          "patch": "@@ -0,0 +1,30 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n+  <name>synapticon_ros2_control</name>\n+  <version>0.0.0</version>\n+  <description>A ros2_control interface for Synapticon motor drivers</description>\n+  <maintainer email=\"andyzelenak@apptronik.com\">apptronik</maintainer>\n+  <license>Proprietary</license>\n+\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+\n+  <depend>backward_ros</depend>\n+  <depend>hardware_interface</depend>\n+  <depend>pluginlib</depend>\n+  <depend>rclcpp</depend>\n+  <depend>rclcpp_lifecycle</depend>\n+\n+  <exec_depend>controller_manager</exec_depend>\n+  <exec_depend>forward_command_controller</exec_depend>\n+  <exec_depend>joint_state_broadcaster</exec_depend>\n+  <exec_depend>joint_trajectory_controller</exec_depend>\n+  <exec_depend>robot_state_publisher</exec_depend>\n+  <exec_depend>ros2controlcli</exec_depend>\n+  <exec_depend>ros2launch</exec_depend>\n+  <exec_depend>xacro</exec_depend>\n+\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n+</package>"
+        },
+        {
+          "sha": "bd78be9cee86e2feb53a56deab8801a64b003ba0",
+          "filename": "src/synapticon_interface.cpp",
+          "status": "added",
+          "additions": 312,
+          "deletions": 0,
+          "changes": 312,
+          "blob_url": "https://github.com/synapticon/synapticon_ros2_control/blob/7ad722175ee8deb09eb0a9ccafb0433bccc7d7d3/src%2Fsynapticon_interface.cpp",
+          "raw_url": "https://github.com/synapticon/synapticon_ros2_control/raw/7ad722175ee8deb09eb0a9ccafb0433bccc7d7d3/src%2Fsynapticon_interface.cpp",
+          "contents_url": "https://api.github.com/repos/synapticon/synapticon_ros2_control/contents/src%2Fsynapticon_interface.cpp?ref=7ad722175ee8deb09eb0a9ccafb0433bccc7d7d3",
+          "patch": "@@ -0,0 +1,312 @@\n+#include \"synapticon_ros2_control/synapticon_interface.hpp\"\n+\n+#include <hardware_interface/types/hardware_interface_type_values.hpp>\n+#include <rclcpp/rclcpp.hpp>\n+\n+namespace synapticon_ros2_control\n+{\n+namespace\n+{\n+  constexpr char LOG_NAME[] = \"synapticon_ros2_control\";\n+}\n+\n+hardware_interface::CallbackReturn SynapticonSystemInterface::on_init(\n+  const hardware_interface::HardwareInfo & info)\n+{\n+  if (\n+    hardware_interface::SystemInterface::on_init(info) !=\n+    hardware_interface::CallbackReturn::SUCCESS)\n+  {\n+    return hardware_interface::CallbackReturn::ERROR;\n+  }\n+  logger_ = std::make_shared<rclcpp::Logger>(rclcpp::get_logger(\n+    \"synapticon_interface\"));\n+  clock_ = std::make_shared<rclcpp::Clock>(rclcpp::Clock());\n+\n+  // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code\n+  hw_start_sec_ = 1.0;\n+  hw_stop_sec_ = 1.0;\n+  hw_slowdown_ = 1.0;\n+  // END: This part here is for exemplary purposes - Please do not copy to your production code\n+  hw_states_positions_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());\n+  hw_states_velocities_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());\n+  hw_states_accelerations_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());\n+  hw_commands_positions_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());\n+  hw_commands_velocities_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());\n+  hw_commands_accelerations_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());\n+  control_level_.resize(info_.joints.size(), integration_level_t::POSITION);\n+\n+  for (const hardware_interface::ComponentInfo & joint : info_.joints)\n+  {\n+    if (joint.command_interfaces.size() != 3)\n+    {\n+      RCLCPP_FATAL(\n+        get_logger(), \"Joint '%s' has %zu command interfaces. 3 expected.\", joint.name.c_str(),\n+        joint.command_interfaces.size());\n+      return hardware_interface::CallbackReturn::ERROR;\n+    }\n+\n+    if (!(joint.command_interfaces[0].name == hardware_interface::HW_IF_POSITION ||\n+          joint.command_interfaces[0].name == hardware_interface::HW_IF_VELOCITY ||\n+          joint.command_interfaces[0].name == hardware_interface::HW_IF_ACCELERATION))\n+    {\n+      RCLCPP_FATAL(\n+        get_logger(), \"Joint '%s' has %s command interface. Expected %s, %s, or %s.\",\n+        joint.name.c_str(), joint.command_interfaces[0].name.c_str(),\n+        hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_VELOCITY,\n+        hardware_interface::HW_IF_ACCELERATION);\n+      return hardware_interface::CallbackReturn::ERROR;\n+    }\n+\n+    if (joint.state_interfaces.size() != 3)\n+    {\n+      RCLCPP_FATAL(\n+        get_logger(), \"Joint '%s'has %zu state interfaces. 3 expected.\", joint.name.c_str(),\n+        joint.command_interfaces.size());\n+      return hardware_interface::CallbackReturn::ERROR;\n+    }\n+\n+    if (!(joint.state_interfaces[0].name == hardware_interface::HW_IF_POSITION ||\n+          joint.state_interfaces[0].name == hardware_interface::HW_IF_VELOCITY ||\n+          joint.state_interfaces[0].name == hardware_interface::HW_IF_ACCELERATION))\n+    {\n+      RCLCPP_FATAL(\n+        get_logger(), \"Joint '%s' has %s state interface. Expected %s, %s, or %s.\",\n+        joint.name.c_str(), joint.state_interfaces[0].name.c_str(),\n+        hardware_interface::HW_IF_POSITION, hardware_interface::HW_IF_VELOCITY,\n+        hardware_interface::HW_IF_ACCELERATION);\n+      return hardware_interface::CallbackReturn::ERROR;\n+    }\n+  }\n+\n+  return hardware_interface::CallbackReturn::SUCCESS;\n+}\n+\n+hardware_interface::return_type SynapticonSystemInterface::prepare_command_mode_switch(\n+  const std::vector<std::string> & start_interfaces,\n+  const std::vector<std::string> & stop_interfaces)\n+{\n+  // Prepare for new command modes\n+  std::vector<integration_level_t> new_modes = {};\n+  for (std::string key : start_interfaces)\n+  {\n+    for (std::size_t i = 0; i < info_.joints.size(); i++)\n+    {\n+      if (key == info_.joints[i].name + \"/\" + hardware_interface::HW_IF_POSITION)\n+      {\n+        new_modes.push_back(integration_level_t::POSITION);\n+      }\n+      if (key == info_.joints[i].name + \"/\" + hardware_interface::HW_IF_VELOCITY)\n+      {\n+        new_modes.push_back(integration_level_t::VELOCITY);\n+      }\n+      if (key == info_.joints[i].name + \"/\" + hardware_interface::HW_IF_ACCELERATION)\n+      {\n+        new_modes.push_back(integration_level_t::ACCELERATION);\n+      }\n+    }\n+  }\n+  // // Example criteria: All joints must be given new command mode at the same time\n+  // if (new_modes.size() != info_.joints.size())\n+  // {\n+  //   return hardware_interface::return_type::ERROR;\n+  // }\n+  // // Example criteria: All joints must have the same command mode\n+  // if (!std::all_of(\n+  //       new_modes.begin() + 1, new_modes.end(),\n+  //       [&](integration_level_t mode) { return mode == new_modes[0]; }))\n+  // {\n+  //   return hardware_interface::return_type::ERROR;\n+  // }\n+\n+  // Stop motion on all relevant joints that are stopping\n+  for (std::string key : stop_interfaces)\n+  {\n+    for (std::size_t i = 0; i < info_.joints.size(); i++)\n+    {\n+      if (key.find(info_.joints[i].name) != std::string::npos)\n+      {\n+        hw_commands_velocities_[i] = 0;\n+        hw_commands_accelerations_[i] = 0;\n+        control_level_[i] = integration_level_t::UNDEFINED;  // Revert to undefined\n+      }\n+    }\n+  }\n+  // Set the new command modes\n+  for (std::size_t i = 0; i < info_.joints.size(); i++)\n+  {\n+    if (control_level_[i] != integration_level_t::UNDEFINED)\n+    {\n+      // Something else is using the joint! Abort!\n+      return hardware_interface::return_type::ERROR;\n+    }\n+    control_level_[i] = new_modes[i];\n+  }\n+  return hardware_interface::return_type::OK;\n+}\n+\n+hardware_interface::CallbackReturn SynapticonSystemInterface::on_activate(\n+  const rclcpp_lifecycle::State & /*previous_state*/)\n+{\n+  // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code\n+  RCLCPP_INFO(get_logger(), \"Activating... please wait...\");\n+\n+  for (int i = 0; i < hw_start_sec_; i++)\n+  {\n+    rclcpp::sleep_for(std::chrono::seconds(1));\n+    RCLCPP_INFO(get_logger(), \"%.1f seconds left...\", hw_start_sec_ - i);\n+  }\n+  // END: This part here is for exemplary purposes - Please do not copy to your production code\n+\n+  // Set some default values\n+  for (std::size_t i = 0; i < hw_states_positions_.size(); i++)\n+  {\n+    if (std::isnan(hw_states_positions_[i]))\n+    {\n+      hw_states_positions_[i] = 0;\n+    }\n+    if (std::isnan(hw_states_velocities_[i]))\n+    {\n+      hw_states_velocities_[i] = 0;\n+    }\n+    if (std::isnan(hw_states_accelerations_[i]))\n+    {\n+      hw_states_accelerations_[i] = 0;\n+    }\n+    if (std::isnan(hw_commands_positions_[i]))\n+    {\n+      hw_commands_positions_[i] = 0;\n+    }\n+    if (std::isnan(hw_commands_velocities_[i]))\n+    {\n+      hw_commands_velocities_[i] = 0;\n+    }\n+    if (std::isnan(hw_commands_accelerations_[i]))\n+    {\n+      hw_commands_accelerations_[i] = 0;\n+    }\n+    control_level_[i] = integration_level_t::UNDEFINED;\n+  }\n+\n+  RCLCPP_INFO(get_logger(), \"System successfully activated! Control level: %u\", control_level_[0]);\n+\n+  return hardware_interface::CallbackReturn::SUCCESS;\n+}\n+\n+hardware_interface::CallbackReturn SynapticonSystemInterface::on_deactivate(\n+  const rclcpp_lifecycle::State & /*previous_state*/)\n+{\n+  // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code\n+  RCLCPP_INFO(get_logger(), \"Deactivating... please wait...\");\n+\n+  for (int i = 0; i < hw_stop_sec_; i++)\n+  {\n+    rclcpp::sleep_for(std::chrono::seconds(1));\n+    RCLCPP_INFO(get_logger(), \"%.1f seconds left...\", hw_stop_sec_ - i);\n+  }\n+\n+  RCLCPP_INFO(get_logger(), \"Successfully deactivated!\");\n+  // END: This part here is for exemplary purposes - Please do not copy to your production code\n+\n+  return hardware_interface::CallbackReturn::SUCCESS;\n+}\n+\n+hardware_interface::return_type SynapticonSystemInterface::read(\n+  const rclcpp::Time & /*time*/, const rclcpp::Duration & period)\n+{\n+  // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code\n+  std::stringstream ss;\n+  ss << \"Reading states:\";\n+  for (std::size_t i = 0; i < hw_states_positions_.size(); i++)\n+  {\n+    switch (control_level_[i])\n+    {\n+      case integration_level_t::UNDEFINED:\n+        // RCLCPP_INFO(get_logger(), \"Nothing is using the hardware interface!\");\n+        return hardware_interface::return_type::OK;\n+        break;\n+      case integration_level_t::POSITION:\n+        hw_states_accelerations_[i] = 0;\n+        hw_states_velocities_[i] = 0;\n+        hw_states_positions_[i] +=\n+          (hw_commands_positions_[i] - hw_states_positions_[i]) / hw_slowdown_;\n+        break;\n+      case integration_level_t::VELOCITY:\n+        hw_states_accelerations_[i] = 0;\n+        hw_states_velocities_[i] = hw_commands_velocities_[i];\n+        hw_states_positions_[i] += (hw_states_velocities_[i] * period.seconds()) / hw_slowdown_;\n+        break;\n+      case integration_level_t::ACCELERATION:\n+        hw_states_accelerations_[i] = hw_commands_accelerations_[i];\n+        hw_states_velocities_[i] += (hw_states_accelerations_[i] * period.seconds()) / hw_slowdown_;\n+        hw_states_positions_[i] += (hw_states_velocities_[i] * period.seconds()) / hw_slowdown_;\n+        break;\n+    }\n+    ss << std::fixed << std::setprecision(2) << std::endl\n+       << \"\\t\"\n+       << \"pos: \" << hw_states_positions_[i] << \", vel: \" << hw_states_velocities_[i]\n+       << \", acc: \" << hw_states_accelerations_[i] << \" for joint \" << i;\n+  }\n+  RCLCPP_INFO_THROTTLE(get_logger(), *get_clock(), 500, \"%s\", ss.str().c_str());\n+  // END: This part here is for exemplary purposes - Please do not copy to your production code\n+  return hardware_interface::return_type::OK;\n+}\n+\n+hardware_interface::return_type SynapticonSystemInterface::write(\n+  const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)\n+{\n+  // // BEGIN: This part here is for exemplary purposes - Please do not copy to your production code\n+  // std::stringstream ss;\n+  // ss << \"Writing commands:\";\n+  // for (std::size_t i = 0; i < hw_commands_positions_.size(); i++)\n+  // {\n+  //   // Simulate sending commands to the hardware\n+  //   ss << std::fixed << std::setprecision(2) << std::endl\n+  //      << \"\\t\"\n+  //      << \"command pos: \" << hw_commands_positions_[i] << \", vel: \" << hw_commands_velocities_[i]\n+  //      << \", acc: \" << hw_commands_accelerations_[i] << \" for joint \" << i\n+  //      << \", control lvl: \" << static_cast<int>(control_level_[i]);\n+  // }\n+  // RCLCPP_INFO_THROTTLE(get_logger(), *get_clock(), 500, \"%s\", ss.str().c_str());\n+  // // END: This part here is for exemplary purposes - Please do not copy to your production code\n+\n+  return hardware_interface::return_type::OK;\n+}\n+\n+std::vector<hardware_interface::StateInterface> SynapticonSystemInterface::export_state_interfaces()\n+{\n+  std::vector<hardware_interface::StateInterface> state_interfaces;\n+  for (std::size_t i = 0; i < info_.joints.size(); i++)\n+  {\n+    state_interfaces.emplace_back(hardware_interface::StateInterface(\n+      info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_states_positions_[i]));\n+    state_interfaces.emplace_back(hardware_interface::StateInterface(\n+      info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_states_velocities_[i]));\n+    state_interfaces.emplace_back(hardware_interface::StateInterface(\n+      info_.joints[i].name, hardware_interface::HW_IF_ACCELERATION, &hw_states_accelerations_[i]));\n+  }\n+  return state_interfaces;\n+}\n+\n+std::vector<hardware_interface::CommandInterface> SynapticonSystemInterface::export_command_interfaces()\n+{\n+  std::vector<hardware_interface::CommandInterface> command_interfaces;\n+  for (std::size_t i = 0; i < info_.joints.size(); i++)\n+  {\n+    command_interfaces.emplace_back(hardware_interface::CommandInterface(\n+      info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_commands_positions_[i]));\n+    command_interfaces.emplace_back(hardware_interface::CommandInterface(\n+      info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_commands_velocities_[i]));\n+    command_interfaces.emplace_back(hardware_interface::CommandInterface(\n+      info_.joints[i].name, hardware_interface::HW_IF_ACCELERATION,\n+      &hw_commands_accelerations_[i]));\n+  }\n+  return command_interfaces;\n+}\n+\n+}  // namespace synapticon_ros2_control\n+\n+#include \"pluginlib/class_list_macros.hpp\"\n+\n+PLUGINLIB_EXPORT_CLASS(\n+  synapticon_ros2_control::SynapticonSystemInterface, hardware_interface::SystemInterface)"
+        },
+        {
+          "sha": "bd4811b89f6bbe687990c8159cdfecb7278766aa",
+          "filename": "synapticon_ros2_control.xml",
+          "status": "added",
+          "additions": 9,
+          "deletions": 0,
+          "changes": 9,
+          "blob_url": "https://github.com/synapticon/synapticon_ros2_control/blob/7ad722175ee8deb09eb0a9ccafb0433bccc7d7d3/synapticon_ros2_control.xml",
+          "raw_url": "https://github.com/synapticon/synapticon_ros2_control/raw/7ad722175ee8deb09eb0a9ccafb0433bccc7d7d3/synapticon_ros2_control.xml",
+          "contents_url": "https://api.github.com/repos/synapticon/synapticon_ros2_control/contents/synapticon_ros2_control.xml?ref=7ad722175ee8deb09eb0a9ccafb0433bccc7d7d3",
+          "patch": "@@ -0,0 +1,9 @@\n+<library path=\"synapticon_ros2_control\">\n+  <class name=\"synapticon_ros2_control/SynapticonSystemInterface\"\n+         type=\"synapticon_ros2_control::SynapticonSystemInterface\"\n+         base_class_type=\"hardware_interface::SystemInterface\">\n+    <description>\n+      A ros2_control interface for Synapticon motor drivers.\n+    </description>\n+  </class>\n+</library>"
+        }
+      ]
+    },
+    {
+      "author": "floweisshardt",
+      "date": "2025-02-17T16:30:18Z",
+      "sha": "3204a067d31e9c4f5e3f7958d68192bdececde50",
+      "message": "add rolling",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "8497946ee16c028f4b171812b36b37b2eafacb71",
+          "filename": ".github/workflows/industrial_ci.yml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/synapticon/synapticon_ros2_control/blob/3204a067d31e9c4f5e3f7958d68192bdececde50/.github%2Fworkflows%2Findustrial_ci.yml",
+          "raw_url": "https://github.com/synapticon/synapticon_ros2_control/raw/3204a067d31e9c4f5e3f7958d68192bdececde50/.github%2Fworkflows%2Findustrial_ci.yml",
+          "contents_url": "https://api.github.com/repos/synapticon/synapticon_ros2_control/contents/.github%2Fworkflows%2Findustrial_ci.yml?ref=3204a067d31e9c4f5e3f7958d68192bdececde50",
+          "patch": "@@ -8,6 +8,7 @@ jobs:\n       matrix:\n         env:\n           - {ROS_DISTRO: humble, ROS_REPO: main}\n+          - {ROS_DISTRO: rolling, ROS_REPO: main}\n     runs-on: ubuntu-latest\n     steps:\n       - uses: actions/checkout@v4"
+        }
+      ]
+    },
+    {
+      "author": "christophfroehlich",
+      "date": "2025-10-02T10:22:58Z",
+      "sha": "51fcbce0e1b7e1ece1607409d6d4cdf2f0f25c18",
+      "message": "Fix deprecated hardware_interface API",
+      "files_changed": 2,
+      "additions": 3,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "eabf736b3e69cabd7bde145ca14ccd54b3b21ed6",
+          "filename": "include/synapticon_ros2_control/synapticon_interface.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/synapticon/synapticon_ros2_control/blob/51fcbce0e1b7e1ece1607409d6d4cdf2f0f25c18/include%2Fsynapticon_ros2_control%2Fsynapticon_interface.hpp",
+          "raw_url": "https://github.com/synapticon/synapticon_ros2_control/raw/51fcbce0e1b7e1ece1607409d6d4cdf2f0f25c18/include%2Fsynapticon_ros2_control%2Fsynapticon_interface.hpp",
+          "contents_url": "https://api.github.com/repos/synapticon/synapticon_ros2_control/contents/include%2Fsynapticon_ros2_control%2Fsynapticon_interface.hpp?ref=51fcbce0e1b7e1ece1607409d6d4cdf2f0f25c18",
+          "patch": "@@ -81,7 +81,7 @@ class SynapticonSystemInterface : public hardware_interface::SystemInterface {\n   ~SynapticonSystemInterface();\n \n   hardware_interface::CallbackReturn\n-  on_init(const hardware_interface::HardwareInfo &info) override;\n+  on_init(const hardware_interface::HardwareComponentInterfaceParams &params) override;\n \n   hardware_interface::return_type prepare_command_mode_switch(\n       const std::vector<std::string> &start_interfaces,"
+        },
+        {
+          "sha": "69d843e73f10559e2db1d4a184e0ee78d736c834",
+          "filename": "src/synapticon_interface.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/synapticon/synapticon_ros2_control/blob/51fcbce0e1b7e1ece1607409d6d4cdf2f0f25c18/src%2Fsynapticon_interface.cpp",
+          "raw_url": "https://github.com/synapticon/synapticon_ros2_control/raw/51fcbce0e1b7e1ece1607409d6d4cdf2f0f25c18/src%2Fsynapticon_interface.cpp",
+          "contents_url": "https://api.github.com/repos/synapticon/synapticon_ros2_control/contents/src%2Fsynapticon_interface.cpp?ref=51fcbce0e1b7e1ece1607409d6d4cdf2f0f25c18",
+          "patch": "@@ -47,8 +47,8 @@ OSAL_THREAD_FUNC ecatCheckWrapper(void *ptr) {\n } // namespace\n \n hardware_interface::CallbackReturn SynapticonSystemInterface::on_init(\n-    const hardware_interface::HardwareInfo &info) {\n-  if (hardware_interface::SystemInterface::on_init(info) !=\n+    const hardware_interface::HardwareComponentInterfaceParams &params) {\n+  if (hardware_interface::SystemInterface::on_init(params) !=\n       hardware_interface::CallbackReturn::SUCCESS) {\n     return hardware_interface::CallbackReturn::ERROR;\n   }"
+        }
+      ]
+    },
+    {
+      "author": "zvezdan94",
+      "date": "2025-02-12T10:58:02Z",
+      "sha": "64cdb3fd1dfcdbda1b2ff9900bf1155466a4d3b0",
+      "message": "added motor model for nicer visualization",
+      "files_changed": 4,
+      "additions": 56,
+      "deletions": 55,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "006d99e10006722f8893cc619b612e092913c8e7",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/synapticon/synapticon_ros2_control/blob/64cdb3fd1dfcdbda1b2ff9900bf1155466a4d3b0/CMakeLists.txt",
+          "raw_url": "https://github.com/synapticon/synapticon_ros2_control/raw/64cdb3fd1dfcdbda1b2ff9900bf1155466a4d3b0/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/synapticon/synapticon_ros2_control/contents/CMakeLists.txt?ref=64cdb3fd1dfcdbda1b2ff9900bf1155466a4d3b0",
+          "patch": "@@ -110,5 +110,10 @@ ament_export_include_directories(\n   ${CMAKE_CURRENT_SOURCE_DIR}/oshw/${OS}\n   ${CMAKE_CURRENT_SOURCE_DIR}/soem\n )\n+\n+# Install meshes directory\n+install(DIRECTORY meshes/\n+  DESTINATION share/${PROJECT_NAME}/meshes\n+)\n ament_export_targets(synapticon_soem HAS_LIBRARY_TARGET)\n ament_package()"
+        },
+        {
+          "sha": "fb7d4acea6784bcef6099736cdfcedf90c12f789",
+          "filename": "description/urdf/single_dof_macro.urdf.xacro",
+          "status": "modified",
+          "additions": 51,
+          "deletions": 55,
+          "changes": 106,
+          "blob_url": "https://github.com/synapticon/synapticon_ros2_control/blob/64cdb3fd1dfcdbda1b2ff9900bf1155466a4d3b0/description%2Furdf%2Fsingle_dof_macro.urdf.xacro",
+          "raw_url": "https://github.com/synapticon/synapticon_ros2_control/raw/64cdb3fd1dfcdbda1b2ff9900bf1155466a4d3b0/description%2Furdf%2Fsingle_dof_macro.urdf.xacro",
+          "contents_url": "https://api.github.com/repos/synapticon/synapticon_ros2_control/contents/description%2Furdf%2Fsingle_dof_macro.urdf.xacro?ref=64cdb3fd1dfcdbda1b2ff9900bf1155466a4d3b0",
+          "patch": "@@ -1,59 +1,55 @@\n-<?xml version=\"1.0\"?>\n <robot xmlns:xacro=\"http://www.ros.org/wiki/xacro\">\n-\n   <xacro:macro name=\"single_dof\" params=\"parent prefix *origin\">\n-\n-  <!-- Constants for robot dimensions -->\n-  <xacro:property name=\"width\" value=\"0.1\" /> <!-- Square dimensions (widthxwidth) of beams -->\n-  <xacro:property name=\"height1\" value=\"2\" /> <!-- Link 1 -->\n-  <xacro:property name=\"height2\" value=\"1\" /> <!-- Link 2 -->\n-  <xacro:property name=\"axel_offset\" value=\"0.05\" />\n-\n-  <joint name=\"${prefix}base_joint\" type=\"fixed\">\n-    <xacro:insert_block name=\"origin\" />\n-    <parent link=\"${parent}\"/>\n-    <child link=\"${prefix}base_link\" />\n-  </joint>\n-\n-  <link name=\"${prefix}base_link\">\n-    <collision>\n-      <origin xyz=\"0 0 ${height1/2}\" rpy=\"0 0 0\"/>\n-      <geometry>\n-        <box size=\"${width} ${width} ${height1}\"/>\n-      </geometry>\n-    </collision>\n-    <visual>\n-      <origin xyz=\"0 0 ${height1/2}\" rpy=\"0 0 0\"/>\n-      <geometry>\n-        <box size=\"${width} ${width} ${height1}\"/>\n-      </geometry>\n-    </visual>\n-  </link>\n-\n-  <joint name=\"${prefix}joint1\" type=\"continuous\">\n-    <parent link=\"${prefix}base_link\"/>\n-    <child link=\"${prefix}link1\"/>\n-    <origin xyz=\"0 ${width} ${height1 - axel_offset}\" rpy=\"0 0 0\"/>\n-    <axis xyz=\"0 1 0\"/>\n-    <dynamics damping=\"0.7\"/>\n-    <limit effort=\"100\" velocity=\"1.0\"/>\n-  </joint>\n-\n-  <link name=\"${prefix}link1\">\n-    <collision>\n-      <origin xyz=\"0 0 ${height2/2 - axel_offset}\" rpy=\"0 0 0\"/>\n-      <geometry>\n-        <box size=\"${width} ${width} ${height2}\"/>\n-      </geometry>\n-    </collision>\n-    <visual>\n-      <origin xyz=\"0 0 ${height2/2 - axel_offset}\" rpy=\"0 0 0\"/>\n-      <geometry>\n-        <box size=\"${width} ${width} ${height2}\"/>\n-      </geometry>\n-    </visual>\n-  </link>\n-\n+    <!-- Constants for robot dimensions -->\n+    <xacro:property name=\"axel_offset\" value=\"0.00\" />\n+\n+    <!-- Base Joint -->\n+    <joint name=\"${prefix}base_joint\" type=\"fixed\">\n+      <xacro:insert_block name=\"origin\" />\n+      <parent link=\"${parent}\"/>\n+      <child link=\"${prefix}base_link\" />\n+    </joint>\n+\n+    <!-- Base Link with NEMA 17 Stepper Motor -->\n+    <link name=\"${prefix}base_link\">\n+      <visual>\n+        <origin xyz=\"0 0 0\" rpy=\"0 0 0\"/>\n+        <geometry>\n+          <mesh filename=\"package://synapticon_ros2_control/meshes/flywheel.stl\" scale=\"1 1 1\"/>\n+        </geometry>\n+      </visual>\n+      <collision>\n+        <origin xyz=\"0 0 0\" rpy=\"0 0 0\"/>\n+        <geometry>\n+          <mesh filename=\"package://synapticon_ros2_control/meshes/flywheel.stl\" scale=\"1 1 1\"/>\n+        </geometry>\n+      </collision>\n+    </link>\n+\n+    <!-- Rotational Joint -->\n+    <joint name=\"${prefix}joint1\" type=\"continuous\">\n+      <parent link=\"${prefix}base_link\"/>\n+      <child link=\"${prefix}link1\"/>\n+      <origin xyz=\"0 0 0\" rpy=\"0 0 0\"/>\n+      <axis xyz=\"0 0 1\"/>\n+      <dynamics damping=\"0.7\"/>\n+      <limit effort=\"100\" velocity=\"1.0\"/>\n+    </joint>\n+\n+    <!-- Link1 with Flywheel -->\n+    <link name=\"${prefix}link1\">\n+      <visual>\n+        <origin xyz=\"0 0 0\" rpy=\"0 0 0\"/>\n+        <geometry>\n+          <mesh filename=\"package://synapticon_ros2_control/meshes/motor.stl\" scale=\"1 1 1\"/>\n+        </geometry>\n+      </visual>\n+      <collision>\n+        <origin xyz=\"0 0 0\" rpy=\"0 0 0\"/>\n+        <geometry>\n+          <mesh filename=\"package://synapticon_ros2_control/meshes/motor.stl\" scale=\"1 1 1\"/>\n+        </geometry>\n+      </collision>\n+    </link>\n   </xacro:macro>\n-\n </robot>"
+        },
+        {
+          "sha": "123ab943e898237d47e6a626b1eb0951e9a7f622",
+          "filename": "meshes/flywheel.stl",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/synapticon/synapticon_ros2_control/blob/64cdb3fd1dfcdbda1b2ff9900bf1155466a4d3b0/meshes%2Fflywheel.stl",
+          "raw_url": "https://github.com/synapticon/synapticon_ros2_control/raw/64cdb3fd1dfcdbda1b2ff9900bf1155466a4d3b0/meshes%2Fflywheel.stl",
+          "contents_url": "https://api.github.com/repos/synapticon/synapticon_ros2_control/contents/meshes%2Fflywheel.stl?ref=64cdb3fd1dfcdbda1b2ff9900bf1155466a4d3b0"
+        },
+        {
+          "sha": "583c601697f19e6c975b63d21fe6ef8f474e6873",
+          "filename": "meshes/motor.stl",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/synapticon/synapticon_ros2_control/blob/64cdb3fd1dfcdbda1b2ff9900bf1155466a4d3b0/meshes%2Fmotor.stl",
+          "raw_url": "https://github.com/synapticon/synapticon_ros2_control/raw/64cdb3fd1dfcdbda1b2ff9900bf1155466a4d3b0/meshes%2Fmotor.stl",
+          "contents_url": "https://api.github.com/repos/synapticon/synapticon_ros2_control/contents/meshes%2Fmotor.stl?ref=64cdb3fd1dfcdbda1b2ff9900bf1155466a4d3b0"
+        }
+      ]
+    },
+    {
+      "author": "MorryKane",
+      "date": "2025-02-19T13:56:07Z",
+      "sha": "22f4ab443f39f2fbca93bb1c593cd1a6f5223df3",
+      "message": "make ethercat interface an argument instead of hardcoding it\n\nTo explain what I have done:\n\nFirstly, torque_control_executable.cpp is a standalone executable intended for testing without ros2_control, so fixing this is easy, just revise the main function like this:\n\nint main(int /*argc*/, char * /*argv*/[]) {\n  printf(\"SOEM (Simple Open EtherCAT Master)\\nSimple test\\n\");\n\n  if (argc > 1)\n  {\n      /* create thread to handle slave error handling in OP */\n//      pthread_create( &thread1, NULL, (void *) &ecatcheck, (void*) &ctime);\n      osal_thread_create(&thread1, 128000, &ecatcheck, (void*)&ctime);\n      /* start cyclic part */\n      simpletest(argv[1]);\n  }\n  else\n  {\n      printf(\"TODO: Add instructions on how this executable should be used. Maybe add the following example\\n\");\n      printf(\"ros2 run synapticon_ros2_control torque_control_executable -- eno0\\n\");\n      ec_adaptert* adapter = NULL;\n      printf(\"\\nAvailable adapters:\\n\");\n      adapter = ec_find_adapters();\n      while (adapter != NULL)\n      {\n          printf(\"    - %s  (%s)\\n\", adapter->name, adapter->desc);\n          adapter = adapter->next;\n      }\n      ec_free_adapters(adapter);\n  }\n\n  printf(\"End program\\n\");\n  return (0);\n}\n\nPlease do note this sentence and revise it.\nprintf(\"TODO: Add instructions on how this executable should be used. Maybe add the following example\\n\");\n\nThen when running the executable after building, you need to explicitly input your adapter name (eno0 for example) like this:\nros2 run synapticon_ros2_control torque_control_executable -- eno0\n\nAs for the synapticon_interface related to ros2_control, my idea is to make the interface_name defined in the two xacro files become arguments.\n\nTo do that, we can add this\n<xacro:arg name=\"interface_name\" default=\"eno0\"/>\nAnd then replace this\n<param name=\"interface_name\">eno0</param>\nwith this\n<param name=\"interface_name\">${interface_name}</param>\n\nAfter this, we just need to revise the launch files in the bringup folder to accept an argument, which is then passed as the argument for the xacro file. I forgot how to do that so I just told GPT my request and let it do the job. Also, I only revised single_dof.launch.py as an initial test.\n\nThen when running the launch file after building, you need to explicitly input your adapter name (eno0 for example) like this:\nros2 launch synapticon_ros2_control single_dof.launch.py interface_name:=eno0",
+      "files_changed": 4,
+      "additions": 47,
+      "deletions": 22,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b50c56fa2712d52bd9923ad51e255d8f3e53673d",
+          "filename": "bringup/launch/single_dof.launch.py",
+          "status": "modified",
+          "additions": 19,
+          "deletions": 15,
+          "changes": 34,
+          "blob_url": "https://github.com/synapticon/synapticon_ros2_control/blob/22f4ab443f39f2fbca93bb1c593cd1a6f5223df3/bringup%2Flaunch%2Fsingle_dof.launch.py",
+          "raw_url": "https://github.com/synapticon/synapticon_ros2_control/raw/22f4ab443f39f2fbca93bb1c593cd1a6f5223df3/bringup%2Flaunch%2Fsingle_dof.launch.py",
+          "contents_url": "https://api.github.com/repos/synapticon/synapticon_ros2_control/contents/bringup%2Flaunch%2Fsingle_dof.launch.py?ref=22f4ab443f39f2fbca93bb1c593cd1a6f5223df3",
+          "patch": "@@ -8,13 +8,11 @@\n     LaunchConfiguration,\n     PathJoinSubstitution,\n )\n-\n from launch_ros.actions import Node\n from launch_ros.substitutions import FindPackageShare\n \n-\n def generate_launch_description():\n-    # Declare arguments\n+    # Declare launch arguments, including one for the interface name\n     declared_arguments = []\n     declared_arguments.append(\n         DeclareLaunchArgument(\n@@ -23,11 +21,19 @@ def generate_launch_description():\n             description=\"Start RViz2 automatically with this launch file.\",\n         )\n     )\n+    declared_arguments.append(\n+        DeclareLaunchArgument(\n+            \"interface_name\",\n+            default_value=\"eno0\",\n+            description=\"Ethernet interface name (e.g., eno0, eth0)\",\n+        )\n+    )\n \n-    # Initialize Arguments\n+    # Initialize LaunchConfigurations\n     gui = LaunchConfiguration(\"gui\")\n+    interface_name = LaunchConfiguration(\"interface_name\")\n \n-    # Get URDF via xacro\n+    # Get URDF via xacro, passing the interface_name argument\n     robot_description_content = Command(\n         [\n             PathJoinSubstitution([FindExecutable(name=\"xacro\")]),\n@@ -39,18 +45,20 @@ def generate_launch_description():\n                     \"single_dof_in_world.urdf.xacro\",\n                 ]\n             ),\n+            \" interface_name:=\",\n+            interface_name,\n         ]\n     )\n     robot_description = {\"robot_description\": robot_description_content}\n \n+    # Other configurations (controllers, rviz config, etc.)\n     robot_controllers = PathJoinSubstitution(\n         [\n             FindPackageShare(\"synapticon_ros2_control\"),\n             \"config\",\n             \"single_dof_controllers.yaml\",\n         ]\n     )\n-\n     rviz_config_file = PathJoinSubstitution(\n         [FindPackageShare(\"synapticon_ros2_control\"), \"config\", \"single_dof.rviz\"]\n     )\n@@ -91,22 +99,18 @@ def generate_launch_description():\n         ],\n     )\n \n-    # Delay rviz start after `joint_state_broadcaster`\n+    # Delay event handlers for starting nodes in order\n     delay_rviz_after_joint_state_broadcaster_spawner = RegisterEventHandler(\n         event_handler=OnProcessExit(\n             target_action=joint_state_broadcaster_spawner,\n             on_exit=[rviz_node],\n         )\n     )\n \n-    # Delay start of joint_state_broadcaster after `robot_controller`\n-    # TODO(anyone): This is a workaround for flaky tests. Remove when fixed.\n-    delay_joint_state_broadcaster_after_inactive_controller_spawner = (\n-        RegisterEventHandler(\n-            event_handler=OnProcessExit(\n-                target_action=inactive_controller_spawner,\n-                on_exit=[joint_state_broadcaster_spawner],\n-            )\n+    delay_joint_state_broadcaster_after_inactive_controller_spawner = RegisterEventHandler(\n+        event_handler=OnProcessExit(\n+            target_action=inactive_controller_spawner,\n+            on_exit=[joint_state_broadcaster_spawner],\n         )\n     )\n "
+        },
+        {
+          "sha": "f4f66251e208ea095427494da65fffe52af38ac2",
+          "filename": "description/ros2_control/single_dof.ros2_control.xacro",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "changes": 4,
+          "blob_url": "https://github.com/synapticon/synapticon_ros2_control/blob/22f4ab443f39f2fbca93bb1c593cd1a6f5223df3/description%2Fros2_control%2Fsingle_dof.ros2_control.xacro",
+          "raw_url": "https://github.com/synapticon/synapticon_ros2_control/raw/22f4ab443f39f2fbca93bb1c593cd1a6f5223df3/description%2Fros2_control%2Fsingle_dof.ros2_control.xacro",
+          "contents_url": "https://api.github.com/repos/synapticon/synapticon_ros2_control/contents/description%2Fros2_control%2Fsingle_dof.ros2_control.xacro?ref=22f4ab443f39f2fbca93bb1c593cd1a6f5223df3",
+          "patch": "@@ -1,6 +1,8 @@\n <?xml version=\"1.0\"?>\n <robot xmlns:xacro=\"http://www.ros.org/wiki/xacro\">\n \n+  <xacro:arg name=\"interface_name\" default=\"eno0\"/>\n+\n   <xacro:macro name=\"single_dof_ros2_control\" params=\"name prefix\">\n \n     <ros2_control name=\"${name}\" type=\"system\">\n@@ -10,7 +12,7 @@\n         <!-- For testing, GenericSystem is much simpler and doesn't depend on the code in this package -->\n         <!-- plugin>mock_components/GenericSystem</plugin -->\n \n-        <param name=\"interface_name\">eno0</param>\n+        <param name=\"interface_name\">${interface_name}</param>\n       </hardware>\n \n       <joint name=\"${prefix}joint1\">"
+        },
+        {
+          "sha": "b8dfc2d8d1b964428eb0917c993349070634303d",
+          "filename": "description/ros2_control/two_dof.ros2_control.xacro",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "changes": 4,
+          "blob_url": "https://github.com/synapticon/synapticon_ros2_control/blob/22f4ab443f39f2fbca93bb1c593cd1a6f5223df3/description%2Fros2_control%2Ftwo_dof.ros2_control.xacro",
+          "raw_url": "https://github.com/synapticon/synapticon_ros2_control/raw/22f4ab443f39f2fbca93bb1c593cd1a6f5223df3/description%2Fros2_control%2Ftwo_dof.ros2_control.xacro",
+          "contents_url": "https://api.github.com/repos/synapticon/synapticon_ros2_control/contents/description%2Fros2_control%2Ftwo_dof.ros2_control.xacro?ref=22f4ab443f39f2fbca93bb1c593cd1a6f5223df3",
+          "patch": "@@ -1,13 +1,15 @@\n <?xml version=\"1.0\"?>\n <robot xmlns:xacro=\"http://www.ros.org/wiki/xacro\">\n \n+  <xacro:arg name=\"interface_name\" default=\"eno0\"/>\n+\t\n   <xacro:macro name=\"two_dof_ros2_control\" params=\"name prefix\">\n \n     <ros2_control name=\"${name}\" type=\"system\">\n       <hardware>\n         <plugin>synapticon_ros2_control/SynapticonSystemInterface</plugin>\n \n-        <param name=\"interface_name\">eno0</param>\n+        <param name=\"interface_name\">${interface_name}</param>\n       </hardware>\n \n       <joint name=\"${prefix}joint1\">"
+        },
+        {
+          "sha": "0bcb58bf756036d4e8ed14f63abafa65451914b3",
+          "filename": "src/torque_control_executable.cpp",
+          "status": "modified",
+          "additions": 22,
+          "deletions": 5,
+          "changes": 27,
+          "blob_url": "https://github.com/synapticon/synapticon_ros2_control/blob/22f4ab443f39f2fbca93bb1c593cd1a6f5223df3/src%2Ftorque_control_executable.cpp",
+          "raw_url": "https://github.com/synapticon/synapticon_ros2_control/raw/22f4ab443f39f2fbca93bb1c593cd1a6f5223df3/src%2Ftorque_control_executable.cpp",
+          "contents_url": "https://api.github.com/repos/synapticon/synapticon_ros2_control/contents/src%2Ftorque_control_executable.cpp?ref=22f4ab443f39f2fbca93bb1c593cd1a6f5223df3",
+          "patch": "@@ -260,11 +260,28 @@ OSAL_THREAD_FUNC ecatcheck(void *ptr) {\n int main(int /*argc*/, char * /*argv*/[]) {\n   printf(\"SOEM (Simple Open EtherCAT Master)\\nSimple test\\n\");\n \n-  // create thread to handle slave error handling in OP\n-  osal_thread_create(&thread1, 128000, (void *)&ecatcheck, (void *)&ctime);\n-  // start cyclic part\n-  const char interface_name[] = \"eno0\";\n-  simpletest(interface_name);\n+  if (argc > 1)\n+  {\n+      /* create thread to handle slave error handling in OP */\n+//      pthread_create( &thread1, NULL, (void *) &ecatcheck, (void*) &ctime);\n+      osal_thread_create(&thread1, 128000, &ecatcheck, (void*)&ctime);\n+      /* start cyclic part */\n+      simpletest(argv[1]);\n+  }\n+  else\n+  {\n+      printf(\"TODO: Add instructions on how this executable should be used. Maybe add the following example\\n\");\n+      printf(\"ros2 run synapticon_ros2_control torque_control_executable -- eno0\\n\");\n+      ec_adaptert* adapter = NULL;\n+      printf(\"\\nAvailable adapters:\\n\");\n+      adapter = ec_find_adapters();\n+      while (adapter != NULL)\n+      {\n+          printf(\"    - %s  (%s)\\n\", adapter->name, adapter->desc);\n+          adapter = adapter->next;\n+      }\n+      ec_free_adapters(adapter);\n+  }\n \n   printf(\"End program\\n\");\n   return (0);"
+        }
+      ]
+    },
+    {
+      "author": "Andy Zelenak",
+      "date": "2024-12-09T15:38:54Z",
+      "sha": "f371c16a74fc3e117f63b96f7c05030c4f60644e",
+      "message": "Initial commit",
+      "files_changed": 2,
+      "additions": 79,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "b24d71e22373e5147f3c05c68a8742714a89b5d6",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 50,
+          "deletions": 0,
+          "changes": 50,
+          "blob_url": "https://github.com/synapticon/synapticon_ros2_control/blob/f371c16a74fc3e117f63b96f7c05030c4f60644e/.gitignore",
+          "raw_url": "https://github.com/synapticon/synapticon_ros2_control/raw/f371c16a74fc3e117f63b96f7c05030c4f60644e/.gitignore",
+          "contents_url": "https://api.github.com/repos/synapticon/synapticon_ros2_control/contents/.gitignore?ref=f371c16a74fc3e117f63b96f7c05030c4f60644e",
+          "patch": "@@ -0,0 +1,50 @@\n+# These are some examples of commonly ignored file patterns.\n+# You should customize this list as applicable to your project.\n+# Learn more about .gitignore:\n+#     https://www.atlassian.com/git/tutorials/saving-changes/gitignore\n+\n+# Node artifact files\n+node_modules/\n+dist/\n+\n+# Compiled Java class files\n+*.class\n+\n+# Compiled Python bytecode\n+*.py[cod]\n+\n+# Log files\n+*.log\n+\n+# Package files\n+*.jar\n+\n+# Maven\n+target/\n+dist/\n+\n+# JetBrains IDE\n+.idea/\n+\n+# Unit test reports\n+TEST*.xml\n+\n+# Generated by MacOS\n+.DS_Store\n+\n+# Generated by Windows\n+Thumbs.db\n+\n+# Applications\n+*.app\n+*.exe\n+*.war\n+\n+# Large media files\n+*.mp4\n+*.tiff\n+*.avi\n+*.flv\n+*.mov\n+*.wmv\n+"
+        },
+        {
+          "sha": "39af52c077c0d4c3bc7730b362592e0bf7f635db",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 29,
+          "deletions": 0,
+          "changes": 29,
+          "blob_url": "https://github.com/synapticon/synapticon_ros2_control/blob/f371c16a74fc3e117f63b96f7c05030c4f60644e/README.md",
+          "raw_url": "https://github.com/synapticon/synapticon_ros2_control/raw/f371c16a74fc3e117f63b96f7c05030c4f60644e/README.md",
+          "contents_url": "https://api.github.com/repos/synapticon/synapticon_ros2_control/contents/README.md?ref=f371c16a74fc3e117f63b96f7c05030c4f60644e",
+          "patch": "@@ -0,0 +1,29 @@\n+# README #\n+\n+This README would normally document whatever steps are necessary to get your application up and running.\n+\n+### What is this repository for? ###\n+\n+* Quick summary\n+* Version\n+* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)\n+\n+### How do I get set up? ###\n+\n+* Summary of set up\n+* Configuration\n+* Dependencies\n+* Database configuration\n+* How to run tests\n+* Deployment instructions\n+\n+### Contribution guidelines ###\n+\n+* Writing tests\n+* Code review\n+* Other guidelines\n+\n+### Who do I talk to? ###\n+\n+* Repo owner or admin\n+* Other community or team contact\n\\ No newline at end of file"
+        }
+      ]
+    }
+  ]
+}

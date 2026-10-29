@@ -1,0 +1,729 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T07:02:50Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ipa320",
+    "repo": "rqt_frame_editor_plugin"
+  },
+  "data": [
+    {
+      "author": "cellios-fbr",
+      "date": "2025-12-15T17:40:27Z",
+      "sha": "14f64b271714c2b322c1abb5021cf2bbc958b6ae",
+      "message": "feat: add renaming functionality",
+      "files_changed": 6,
+      "additions": 146,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "57d4c23d9fc4855de77bf6d83b0d5de125d2492d",
+          "filename": "frame_editor/CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/14f64b271714c2b322c1abb5021cf2bbc958b6ae/frame_editor%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/14f64b271714c2b322c1abb5021cf2bbc958b6ae/frame_editor%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2FCMakeLists.txt?ref=14f64b271714c2b322c1abb5021cf2bbc958b6ae",
+          "patch": "@@ -65,6 +65,7 @@ add_service_files(\n   GetFrame.srv\n   GetFrameNames.srv\n   RemoveFrame.srv\n+  RenameFrame.srv\n   SetFrame.srv\n   SetParentFrame.srv\n   CopyFrame.srv"
+        },
+        {
+          "sha": "655fcc3941bf3b34683fd63e0494c82109cd5d9a",
+          "filename": "frame_editor/src/frame_editor/FrameEditorGUI.ui",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 2,
+          "changes": 13,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/14f64b271714c2b322c1abb5021cf2bbc958b6ae/frame_editor%2Fsrc%2Fframe_editor%2FFrameEditorGUI.ui",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/14f64b271714c2b322c1abb5021cf2bbc958b6ae/frame_editor%2Fsrc%2Fframe_editor%2FFrameEditorGUI.ui",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrc%2Fframe_editor%2FFrameEditorGUI.ui?ref=14f64b271714c2b322c1abb5021cf2bbc958b6ae",
+          "patch": "@@ -123,6 +123,17 @@\n                  </property>\n                 </widget>\n                </item>\n+               <item>\n+                <widget class=\"QPushButton\" name=\"btn_rename\">\n+                 <property name=\"text\">\n+                  <string>Rename</string>\n+                 </property>\n+                 <property name=\"icon\">\n+                  <iconset theme=\"text-editor\">\n+                   <normaloff>.</normaloff>.</iconset>\n+                 </property>\n+                </widget>\n+               </item>\n               </layout>\n              </item>\n             </layout>\n@@ -174,9 +185,7 @@\n              </item>\n              <item>\n               <widget class=\"QLineEdit\" name=\"txt_name\">\n-               <property name=\"readOnly\">\n                 <bool>true</bool>\n-               </property>\n               </widget>\n              </item>\n              <item>"
+        },
+        {
+          "sha": "dde49fbb4c783645a39264e874c0798511520d30",
+          "filename": "frame_editor/src/frame_editor/commands.py",
+          "status": "modified",
+          "additions": 54,
+          "deletions": 0,
+          "changes": 54,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/14f64b271714c2b322c1abb5021cf2bbc958b6ae/frame_editor%2Fsrc%2Fframe_editor%2Fcommands.py",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/14f64b271714c2b322c1abb5021cf2bbc958b6ae/frame_editor%2Fsrc%2Fframe_editor%2Fcommands.py",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrc%2Fframe_editor%2Fcommands.py?ref=14f64b271714c2b322c1abb5021cf2bbc958b6ae",
+          "patch": "@@ -188,7 +188,61 @@ def undo(self):\n         self.element.hidden = True\n         self.editor.add_undo_level(1, [self.element])\n \n+class Command_RenameElement(QUndoCommand):\n+    '''Copys a source frame's transformation and sets a new parent\n+    '''\n+\n+    def __init__(self, editor, element, new_name):\n+        QUndoCommand.__init__(self, \"Rename\")\n+        self.editor = editor\n+        self.element = element\n+\n+        if editor.active_frame is element:\n+            self.was_active = True\n+        else:\n+            self.was_active = False\n+\n+        self.new_name = new_name\n+        self.old_name = element.name\n+\n+        self.element.name = self.new_name\n+        \n+    def redo(self):\n+        if self.was_active:\n+            self.editor.active_frame = self.element\n+            self.editor.add_undo_level(2)\n+\n+        # Remove old frame\n+        if self.editor.frames.get(self.old_name):\n+            del self.editor.frames[self.old_name]\n+\n+        # Add new frame\n+        self.element.name = self.new_name\n+        self.editor.frames[self.new_name] = self.element\n+        self.editor.add_undo_level(1, [self.element])\n+\n+        # Update parent names \n+        for frame in self.editor.frames.values():\n+            if frame.parent == self.old_name:\n+                frame.parent = self.new_name\n+        self.editor.add_undo_level(4, [frame])\n+\n+    def undo(self):\n+        if self.was_active:\n+            self.editor.active_frame = self.element\n+            self.editor.add_undo_level(2)\n+\n+        if self.editor.frames.get(self.new_name):\n+            del self.editor.frames[self.new_name]\n+\n+        self.element.name = self.old_name\n+        self.editor.frames[self.old_name] = self.element\n+        self.editor.add_undo_level(1, [self.element])\n \n+        for frame in self.editor.frames.values():\n+            if frame.parent == self.new_name:\n+                frame.parent = self.old_name\n+        self.editor.add_undo_level(4, [frame])\n \n class Command_RebaseElement(QUndoCommand):\n     '''Copys a source frame's transformation and sets a new parent"
+        },
+        {
+          "sha": "fb64e879b918f258f991f60ed116931c4865b5a2",
+          "filename": "frame_editor/src/frame_editor/interface_services.py",
+          "status": "modified",
+          "additions": 32,
+          "deletions": 0,
+          "changes": 32,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/14f64b271714c2b322c1abb5021cf2bbc958b6ae/frame_editor%2Fsrc%2Fframe_editor%2Finterface_services.py",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/14f64b271714c2b322c1abb5021cf2bbc958b6ae/frame_editor%2Fsrc%2Fframe_editor%2Finterface_services.py",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrc%2Fframe_editor%2Finterface_services.py?ref=14f64b271714c2b322c1abb5021cf2bbc958b6ae",
+          "patch": "@@ -30,6 +30,7 @@ def __init__(self, frame_editor):\n         rospy.Service(\"~set_frame\", SetFrame, self.callback_set_frame)\n         rospy.Service(\"~set_parent\", SetParentFrame, self.callback_set_parent_frame)\n         rospy.Service(\"~copy_frame\", CopyFrame, self.callback_copy_frame)\n+        rospy.Service(\"~rename_frame\", RenameFrame, self.callback_rename_frame)\n \n         rospy.Service(\"~load_yaml\", LoadYaml, self.callback_load_yaml)\n         rospy.Service(\"~save_yaml\", SaveYaml, self.callback_save_yaml)\n@@ -276,5 +277,36 @@ def callback_copy_frame(self, request):\n                 response.error_code = 9\n \n         return response\n+    \n+    def callback_rename_frame(self, request):\n+        rospy.loginfo(\"> Request to rename frame '{}' with new name '{}'\".format(request.source_name, request.new_name))\n+\n+        response = RenameFrameResponse()\n+        response.error_code = 0\n+\n+        if request.new_name == \"\":\n+            rospy.logerr(\" Error: No name given\")\n+            response.error_code = 1\n+\n+        elif request.source_name == \"\":\n+            rospy.logerr(\" Error: No source name given\")\n+            response.error_code = 3\n+\n+        elif request.source_name not in self.editor.frames:\n+            rospy.logerr(f\" Error: Frame not found: {request.source_name}\")\n+            response.error_code = 2\n+            \n+        elif request.new_name in self.editor.frames:\n+            rospy.logerr(f\" Error: New frame name already exists: {request.new_name}\")\n+            response.error_code = 4\n+\n+        else:\n+            try:\n+                self.editor.command(Command_RenameElement(self.editor, self.editor.frames[request.source_name], request.new_name))\n+            except Exception as e:\n+                rospy.logerr(\"Error: unhandled exception {}\".format(e))\n+                response.error_code = 9\n+\n+        return response\n \n # eof"
+        },
+        {
+          "sha": "2822234450179ba362b2f2f5b3ea58143588d4e9",
+          "filename": "frame_editor/src/frame_editor/rqt_editor.py",
+          "status": "modified",
+          "additions": 44,
+          "deletions": 1,
+          "changes": 45,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/14f64b271714c2b322c1abb5021cf2bbc958b6ae/frame_editor%2Fsrc%2Fframe_editor%2Frqt_editor.py",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/14f64b271714c2b322c1abb5021cf2bbc958b6ae/frame_editor%2Fsrc%2Fframe_editor%2Frqt_editor.py",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrc%2Fframe_editor%2Frqt_editor.py?ref=14f64b271714c2b322c1abb5021cf2bbc958b6ae",
+          "patch": "@@ -116,6 +116,7 @@ def create_main_widget(self):\n         ##\n         widget.btn_add.clicked.connect(self.btn_add_clicked)\n         widget.btn_delete.clicked.connect(self.btn_delete_clicked)\n+        widget.btn_rename.clicked.connect(self.btn_rename_clicked)\n         widget.btn_duplicate.clicked.connect(self.btn_duplicate_clicked)\n         widget.list_frames.currentItemChanged.connect(self.selected_frame_changed)\n         widget.list_tf.currentItemChanged.connect(self.update_measurement)\n@@ -151,6 +152,7 @@ def create_main_widget(self):\n         widget.txt_c.editingFinished.connect(self.c_valueChanged)\n \n         widget.txt_group.editingFinished.connect(self.group_valueChanged)\n+        widget.txt_name.editingFinished.connect(self.frameName_valueChanged)\n \n         widget.btn_rad.toggled.connect(self.update_fields)\n \n@@ -559,6 +561,24 @@ def btn_duplicate_clicked(self, checked):\n \n         self.editor.command(Command_CopyElement(self.editor, name, source_name, parent_name))\n         self.signal_update_tf.emit(False, False)\n+        \n+    @Slot(bool)\n+    def btn_rename_clicked(self, checked):\n+        item = self.widget.list_frames.currentItem()\n+        if not item:\n+            return\n+\n+        # Check if the item is a frame. Early returns if selected item is not a frame (e.g. a group)\n+        source_name = item.text(0)\n+        if self.editor.frames.get(source_name) is None:\n+            return\n+\n+        new_name = self.get_valid_frame_name(\"Rename Frame\", default_name=source_name)\n+        if not new_name:\n+            return\n+\n+        self.editor.command(Command_RenameElement(self.editor, self.editor.frames[source_name], new_name))\n+        self.signal_update_tf.emit(True, True)\n \n     def get_sleep_time(self):\n         return max(5.0 / self.editor.hz, 0.1)\n@@ -585,7 +605,13 @@ def btn_delete_clicked(self, checked):\n         item = self.widget.list_frames.currentItem()\n         if not item:\n             return\n-        self.editor.command(Command_RemoveElement(self.editor, self.editor.frames[item.text(0)]))\n+        \n+        # Check if the item is a frame. Early returns if selected item is not a frame (e.g. a group)\n+        source_name = item.text(0)\n+        if self.editor.frames.get(source_name) is None:\n+            return\n+\n+        self.editor.command(Command_RemoveElement(self.editor, self.editor.frames[source_name]))\n         self.signal_update_tf.emit(True, True)\n         \n     ## PARENTING ##\n@@ -714,7 +740,24 @@ def group_valueChanged(self):\n         if self.editor.active_frame.group != value:\n             self.editor.command(Command_SetGroup(self.editor, self.editor.active_frame, value))\n \n+    @Slot()\n+    def frameName_valueChanged(self):\n+        item = self.widget.list_frames.currentItem()\n+        if not item:\n+            return\n+        source_name = item.text(0)\n+\n+        new_name = self.widget.txt_name.text()\n+        existing_tf_frames = set(self.editor.all_frame_ids())\n+        existing_editor_frames = set(self.editor.all_editor_frame_ids())\n \n+        # allow recreating if frame was published by frameditor node originally\n+        if new_name in existing_editor_frames or (new_name in existing_tf_frames and not Frame.was_published_by_frameeditor(new_name)):\n+            self.widget.txt_name.setText(source_name)\n+            return None\n+        \n+        self.editor.command(Command_RenameElement(self.editor, self.editor.frames[source_name], new_name))\n+        self.signal_update_tf.emit(True, True)\n \n     ## FRAME STYLE ##\n     ##"
+        },
+        {
+          "sha": "c3b0ba8ed06960fd3f3ab787faf1813d544e7bdd",
+          "filename": "frame_editor/srv/RenameFrame.srv",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/14f64b271714c2b322c1abb5021cf2bbc958b6ae/frame_editor%2Fsrv%2FRenameFrame.srv",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/14f64b271714c2b322c1abb5021cf2bbc958b6ae/frame_editor%2Fsrv%2FRenameFrame.srv",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrv%2FRenameFrame.srv?ref=14f64b271714c2b322c1abb5021cf2bbc958b6ae",
+          "patch": "@@ -0,0 +1,4 @@\n+string source_name\n+string new_name\n+---\n+int32 error_code\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "ipa-danb",
+      "date": "2021-11-25T10:47:23Z",
+      "sha": "d7bc7d0e65ffa528ccadd10dca596d77ce776cc2",
+      "message": "added argparse option to change publishing rate",
+      "files_changed": 2,
+      "additions": 8,
+      "deletions": 4,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "a95338e74162491b14d5d700ddc4a6b361622bcc",
+          "filename": "frame_editor/launch/frame_editor.launch",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/d7bc7d0e65ffa528ccadd10dca596d77ce776cc2/frame_editor%2Flaunch%2Fframe_editor.launch",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/d7bc7d0e65ffa528ccadd10dca596d77ce776cc2/frame_editor%2Flaunch%2Fframe_editor.launch",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Flaunch%2Fframe_editor.launch?ref=d7bc7d0e65ffa528ccadd10dca596d77ce776cc2",
+          "patch": "@@ -1,8 +1,8 @@\n <?xml version=\"1.0\"?>\n \n <launch>\n-    <node pkg=\"rqt_gui\" type=\"rqt_gui\" name=\"frame_editor\" \n-        args=\"--standalone frame_editor --args --load '$(find frame_editor)/etc/frames.yaml'\"\n+    <node pkg=\"rqt_gui\" type=\"rqt_gui\" name=\"frame_editor\"\n+        args=\"--standalone frame_editor --args --load '$(find frame_editor)/etc/frames.yaml' --rate 200\"\n         output=\"screen\"/>\n \n     <node pkg=\"rviz\" type=\"rviz\" name=\"rviz\" args=\"-d $(find frame_editor)/etc/frame_editor.rviz\"/>"
+        },
+        {
+          "sha": "56c59f48b858494b71ebfc6b2fbebe6788907d04",
+          "filename": "frame_editor/src/frame_editor/editor.py",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 2,
+          "changes": 8,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/d7bc7d0e65ffa528ccadd10dca596d77ce776cc2/frame_editor%2Fsrc%2Fframe_editor%2Feditor.py",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/d7bc7d0e65ffa528ccadd10dca596d77ce776cc2/frame_editor%2Fsrc%2Fframe_editor%2Feditor.py",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrc%2Fframe_editor%2Feditor.py?ref=d7bc7d0e65ffa528ccadd10dca596d77ce776cc2",
+          "patch": "@@ -46,6 +46,7 @@ def __init__(self):\n \n         self.namespace = \"frame_editor\"\n         self.full_file_path = None\n+        self.hz = 200\n \n \n     def get_file_name(self):\n@@ -289,7 +290,7 @@ def update_file_format(self, frame):\n \n     def run(self):\n         print(\"> Going for some spins\")\n-        rate = rospy.Rate(200) # hz\n+        rate = rospy.Rate(self.hz) # hz\n         while not rospy.is_shutdown():\n             self.broadcast()\n             rate.sleep()\n@@ -307,14 +308,17 @@ def parse_args(self, argv):\n         parser.add_argument(\"-l\", \"--load\", action=\"append\",\n                       dest=\"file\",\n                       help=\"Load a file at startup. [rospack filepath/file]\")\n+        parser.add_argument(\"-r\", \"--rate\", type=int)\n \n         args, unknowns = parser.parse_known_args(argv)\n         print('arguments: {}'.format(args))\n         if unknowns:\n             print('unknown parameters found: {}'.format(unknowns))\n \n+        if args.rate:\n+            self.hz = args.rate\n+\n         ## Load file ##\n-        ##\n         if args.file:\n             arg_path = args.file[0].split()\n             if len(arg_path) == 1:"
+        }
+      ]
+    },
+    {
+      "author": "Jan Krieglstein",
+      "date": "2023-12-04T09:49:06Z",
+      "sha": "f1ca98dd50cc15dce18bb17da137d99e95701a84",
+      "message": "Add service to get all frame names",
+      "files_changed": 3,
+      "additions": 17,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "33d6972bdb38b268b807fe74fdaa7c24923572f1",
+          "filename": "frame_editor/CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/f1ca98dd50cc15dce18bb17da137d99e95701a84/frame_editor%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/f1ca98dd50cc15dce18bb17da137d99e95701a84/frame_editor%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2FCMakeLists.txt?ref=f1ca98dd50cc15dce18bb17da137d99e95701a84",
+          "patch": "@@ -63,6 +63,7 @@ add_service_files(\n   AlignFrame.srv\n   EditFrame.srv\n   GetFrame.srv\n+  GetFrameNames.srv\n   RemoveFrame.srv\n   SetFrame.srv\n   SetParentFrame.srv"
+        },
+        {
+          "sha": "5f860a2d00d6c796a08b1adb16688de1eaae412d",
+          "filename": "frame_editor/src/frame_editor/interface_services.py",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 0,
+          "changes": 13,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/f1ca98dd50cc15dce18bb17da137d99e95701a84/frame_editor%2Fsrc%2Fframe_editor%2Finterface_services.py",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/f1ca98dd50cc15dce18bb17da137d99e95701a84/frame_editor%2Fsrc%2Fframe_editor%2Finterface_services.py",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrc%2Fframe_editor%2Finterface_services.py?ref=f1ca98dd50cc15dce18bb17da137d99e95701a84",
+          "patch": "@@ -25,6 +25,7 @@ def __init__(self, frame_editor):\n         rospy.Service(\"~align_frame\", AlignFrame, self.callback_align_frame)\n         rospy.Service(\"~edit_frame\", EditFrame, self.callback_edit_frame)\n         rospy.Service(\"~get_frame\", GetFrame, self.callback_get_frame)\n+        rospy.Service(\"~get_frame_names\", GetFrameNames, self.callback_get_frame_names)\n         rospy.Service(\"~remove_frame\", RemoveFrame, self.callback_remove_frame)\n         rospy.Service(\"~set_frame\", SetFrame, self.callback_set_frame)\n         rospy.Service(\"~set_parent\", SetParentFrame, self.callback_set_parent_frame)\n@@ -112,6 +113,18 @@ def callback_get_frame(self, request):\n             response.pose = ToPose(f.position, f.orientation)\n \n         return response\n+    \n+\n+    def callback_get_frame_names(self, request):\n+        print(\"> Request to get frame names\")\n+\n+        response = GetFrameNamesResponse()\n+        response.error_code = 0\n+\n+        for frame in self.editor.frames.values():\n+            response.names.append(frame.name)\n+\n+        return response\n \n \n     def callback_remove_frame(self, request):"
+        },
+        {
+          "sha": "eee7ce5a393116a5b866cf25835c6842c668f382",
+          "filename": "frame_editor/srv/GetFrameNames.srv",
+          "status": "added",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/f1ca98dd50cc15dce18bb17da137d99e95701a84/frame_editor%2Fsrv%2FGetFrameNames.srv",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/f1ca98dd50cc15dce18bb17da137d99e95701a84/frame_editor%2Fsrv%2FGetFrameNames.srv",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrv%2FGetFrameNames.srv?ref=f1ca98dd50cc15dce18bb17da137d99e95701a84",
+          "patch": "@@ -0,0 +1,3 @@\n+---\n+int32 error_code\n+string[] names"
+        }
+      ]
+    },
+    {
+      "author": "kriegljan",
+      "date": "2024-11-11T16:49:41Z",
+      "sha": "ff6a724e513c191154a2040185c616e39474a86e",
+      "message": "Merge pull request #35 from ipa-jsk/noetic-devel\n\nAdd service to get all frame names",
+      "files_changed": 3,
+      "additions": 17,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "33d6972bdb38b268b807fe74fdaa7c24923572f1",
+          "filename": "frame_editor/CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/ff6a724e513c191154a2040185c616e39474a86e/frame_editor%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/ff6a724e513c191154a2040185c616e39474a86e/frame_editor%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2FCMakeLists.txt?ref=ff6a724e513c191154a2040185c616e39474a86e",
+          "patch": "@@ -63,6 +63,7 @@ add_service_files(\n   AlignFrame.srv\n   EditFrame.srv\n   GetFrame.srv\n+  GetFrameNames.srv\n   RemoveFrame.srv\n   SetFrame.srv\n   SetParentFrame.srv"
+        },
+        {
+          "sha": "5f860a2d00d6c796a08b1adb16688de1eaae412d",
+          "filename": "frame_editor/src/frame_editor/interface_services.py",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 0,
+          "changes": 13,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/ff6a724e513c191154a2040185c616e39474a86e/frame_editor%2Fsrc%2Fframe_editor%2Finterface_services.py",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/ff6a724e513c191154a2040185c616e39474a86e/frame_editor%2Fsrc%2Fframe_editor%2Finterface_services.py",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrc%2Fframe_editor%2Finterface_services.py?ref=ff6a724e513c191154a2040185c616e39474a86e",
+          "patch": "@@ -25,6 +25,7 @@ def __init__(self, frame_editor):\n         rospy.Service(\"~align_frame\", AlignFrame, self.callback_align_frame)\n         rospy.Service(\"~edit_frame\", EditFrame, self.callback_edit_frame)\n         rospy.Service(\"~get_frame\", GetFrame, self.callback_get_frame)\n+        rospy.Service(\"~get_frame_names\", GetFrameNames, self.callback_get_frame_names)\n         rospy.Service(\"~remove_frame\", RemoveFrame, self.callback_remove_frame)\n         rospy.Service(\"~set_frame\", SetFrame, self.callback_set_frame)\n         rospy.Service(\"~set_parent\", SetParentFrame, self.callback_set_parent_frame)\n@@ -112,6 +113,18 @@ def callback_get_frame(self, request):\n             response.pose = ToPose(f.position, f.orientation)\n \n         return response\n+    \n+\n+    def callback_get_frame_names(self, request):\n+        print(\"> Request to get frame names\")\n+\n+        response = GetFrameNamesResponse()\n+        response.error_code = 0\n+\n+        for frame in self.editor.frames.values():\n+            response.names.append(frame.name)\n+\n+        return response\n \n \n     def callback_remove_frame(self, request):"
+        },
+        {
+          "sha": "eee7ce5a393116a5b866cf25835c6842c668f382",
+          "filename": "frame_editor/srv/GetFrameNames.srv",
+          "status": "added",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/ff6a724e513c191154a2040185c616e39474a86e/frame_editor%2Fsrv%2FGetFrameNames.srv",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/ff6a724e513c191154a2040185c616e39474a86e/frame_editor%2Fsrv%2FGetFrameNames.srv",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrv%2FGetFrameNames.srv?ref=ff6a724e513c191154a2040185c616e39474a86e",
+          "patch": "@@ -0,0 +1,3 @@\n+---\n+int32 error_code\n+string[] names"
+        }
+      ]
+    },
+    {
+      "author": "ipa-pgt",
+      "date": "2017-07-12T09:16:14Z",
+      "sha": "de497aced721fdbb70709781267721f61a399a9c",
+      "message": "added Duplicate Frame button",
+      "files_changed": 2,
+      "additions": 36,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "231e5fe6b20c8f1b5a4cd7b07fdc121358ff413b",
+          "filename": "frame_editor/src/frame_editor/FrameEditorGUI.ui",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 2,
+          "changes": 14,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/de497aced721fdbb70709781267721f61a399a9c/frame_editor%2Fsrc%2Fframe_editor%2FFrameEditorGUI.ui",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/de497aced721fdbb70709781267721f61a399a9c/frame_editor%2Fsrc%2Fframe_editor%2FFrameEditorGUI.ui",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrc%2Fframe_editor%2FFrameEditorGUI.ui?ref=de497aced721fdbb70709781267721f61a399a9c",
+          "patch": "@@ -54,8 +54,8 @@\n              <rect>\n               <x>0</x>\n               <y>0</y>\n-              <width>310</width>\n-              <height>564</height>\n+              <width>321</width>\n+              <height>548</height>\n              </rect>\n             </property>\n             <layout class=\"QVBoxLayout\" name=\"verticalLayout_5\">\n@@ -79,6 +79,16 @@\n                  </property>\n                 </widget>\n                </item>\n+               <item>\n+                <widget class=\"QPushButton\" name=\"btn_duplicate\">\n+                 <property name=\"text\">\n+                  <string>Duplicate</string>\n+                 </property>\n+                 <property name=\"icon\">\n+                  <iconset theme=\"edit-copy\"/>\n+                 </property>\n+                </widget>\n+               </item>\n                <item>\n                 <widget class=\"QPushButton\" name=\"btn_add\">\n                  <property name=\"text\">"
+        },
+        {
+          "sha": "7e99981d817581c70dc19927edd391fd7665fcef",
+          "filename": "frame_editor/src/frame_editor/rqt_editor.py",
+          "status": "modified",
+          "additions": 24,
+          "deletions": 1,
+          "changes": 25,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/de497aced721fdbb70709781267721f61a399a9c/frame_editor%2Fsrc%2Fframe_editor%2Frqt_editor.py",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/de497aced721fdbb70709781267721f61a399a9c/frame_editor%2Fsrc%2Fframe_editor%2Frqt_editor.py",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrc%2Fframe_editor%2Frqt_editor.py?ref=de497aced721fdbb70709781267721f61a399a9c",
+          "patch": "@@ -133,6 +133,7 @@ def create_main_widget(self):\n         ##\n         widget.btn_add.clicked.connect(self.btn_add_clicked)\n         widget.btn_delete.clicked.connect(self.btn_delete_clicked)\n+        widget.btn_duplicate.clicked.connect(self.btn_duplicate_clicked)\n         widget.list_frames.currentTextChanged.connect(self.selected_frame_changed)\n         widget.btn_refresh.clicked.connect(self.update_tf_list)\n \n@@ -344,13 +345,35 @@ def btn_add_clicked(self, checked):\n \n \n \n+    @Slot(bool)\n+    def btn_duplicate_clicked(self, checked):\n+        item = self.widget.list_frames.currentItem()\n+        if not item:\n+            return\n+        source_name = item.text()\n+        parent_name = self.editor.frames[source_name].parent\n+\n+        # Get a unique frame name\n+        existing_frames = set(self.editor.all_frame_ids())\n+\n+        name, ok = QtWidgets.QInputDialog.getText(self.widget, \"Duplicate Frame\", \"Name:\", QtWidgets.QLineEdit.Normal, source_name);\n+\n+        while ok and name in existing_frames:\n+            name, ok = QtWidgets.QInputDialog.getText(self.widget, \"Duplicate Frame\", \"Name (must be unique):\", QtWidgets.QLineEdit.Normal, source_name)\n+        if not ok:\n+            return\n+\n+        self.editor.command(Command_CopyElement(self.editor, name, source_name, parent_name))\n+\n+\n+\n     @Slot(bool)\n     def btn_delete_clicked(self, checked):\n         item = self.widget.list_frames.currentItem()\n         if not item:\n             return\n         self.editor.command(Command_RemoveElement(self.editor, self.editor.frames[item.text()]))\n-        \n+\n \n     ## PARENTING ##\n     ##"
+        }
+      ]
+    },
+    {
+      "author": "mintar",
+      "date": "2021-06-23T07:56:07Z",
+      "sha": "077e872d7d0dd8163ed4e1a6ba22d1bfcba5d6cc",
+      "message": "Add missing dependency on qt_gui_py_common\n\nThis fixes the following error on Noetic:\n\n    RosPluginProvider.load(frame_editor/Frame Editor) exception raised in __builtin__.__import__(frame_editor.rqt_editor, [FrameEditorGUI]):\n    Traceback (most recent call last):\n      File \"/opt/ros/noetic/lib/python3/dist-packages/rqt_gui/ros_plugin_provider.py\", line 79, in load\n        module = __builtin__.__import__(\n      File \"[...]/rqt_frame_editor_plugin/frame_editor/src/frame_editor/rqt_editor.py\", line 11, in <module>\n        from qt_gui_py_common.worker_thread import WorkerThread\n    ModuleNotFoundError: No module named 'qt_gui_py_common'",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "0baaac304a7040a5b1a5f5cee7b0efe7c84eaf0d",
+          "filename": "frame_editor/package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/077e872d7d0dd8163ed4e1a6ba22d1bfcba5d6cc/frame_editor%2Fpackage.xml",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/077e872d7d0dd8163ed4e1a6ba22d1bfcba5d6cc/frame_editor%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fpackage.xml?ref=077e872d7d0dd8163ed4e1a6ba22d1bfcba5d6cc",
+          "patch": "@@ -36,6 +36,8 @@\n   <depend>rqt_gui</depend>\n   <depend>rqt_gui_py</depend>\n \n+  <exec_depend>qt_gui_py_common</exec_depend>\n+\n   <build_depend>message_generation</build_depend>\n   <build_export_depend>message_runtime</build_export_depend>\n   <exec_depend>message_runtime</exec_depend>"
+        }
+      ]
+    },
+    {
+      "author": "Lorenz Halt",
+      "date": "2015-08-10T15:34:53Z",
+      "sha": "c1ab4cd1c9f70ab2f555c5af1d193cf9e631447d",
+      "message": "Allow to load a yaml file on startup.\n$ rqt --standalone frame_editor --args --load 'myRosPackage pathInMyRosPackage/frames.yaml'",
+      "files_changed": 1,
+      "additions": 24,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "98220eac72b1ed5c9125103f70da00105b629bd5",
+          "filename": "frame_editor/src/frame_editor/rqt_editor.py",
+          "status": "modified",
+          "additions": 24,
+          "deletions": 2,
+          "changes": 26,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/c1ab4cd1c9f70ab2f555c5af1d193cf9e631447d/frame_editor%2Fsrc%2Fframe_editor%2Frqt_editor.py",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/c1ab4cd1c9f70ab2f555c5af1d193cf9e631447d/frame_editor%2Fsrc%2Fframe_editor%2Frqt_editor.py",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrc%2Fframe_editor%2Frqt_editor.py?ref=c1ab4cd1c9f70ab2f555c5af1d193cf9e631447d",
+          "patch": "@@ -41,12 +41,15 @@ def __init__(self, context):\n         parser.add_argument(\"-q\", \"--quiet\", action=\"store_true\",\n                       dest=\"quiet\",\n                       help=\"Put plugin in silent mode\")\n+        parser.add_argument(\"-l\", \"--load\", action=\"append\",\n+                      dest=\"file\",\n+                      help=\"Load a file at startup. [rospack filepath/file]\")\n+\n         args, unknowns = parser.parse_known_args(context.argv())\n         if not args.quiet:\n             print 'arguments: ', args\n             print 'unknowns: ', unknowns\n \n-\n         ## Editor ##\n         ##\n         self.namespace = \"frame_editor\"\n@@ -63,7 +66,6 @@ def __init__(self, context):\n         self.old_frame_list = []\n         self.old_selected = \"\"\n \n-\n         ## Create QWidget ##\n         ##\n         self._widget = QWidget()\n@@ -80,6 +82,26 @@ def __init__(self, context):\n         self._widget.undo_frame.layout().addWidget(QtGui.QUndoView(self.editor.undo_stack))\n \n \n+        ## Load file ##\n+        ##\n+        arg_path = args.file[0].split()\n+        if len(arg_path) == 1:\n+            #load file\n+            filename = arg_path[0]\n+            print \"Loading\", filename\n+            self.editor.load_file(str(filename), self.namespace)\n+        elif len(arg_path) == 2:\n+            #load rospack\n+            rospack = rospkg.RosPack()\n+            filename = os.path.join(rospack.get_path(arg_path[0]), arg_path[1])\n+            print \"Loading\", filename\n+            self.editor.load_file(str(filename), self.namespace)\n+        else:\n+            print \"Load argument not understood! --load\", arg_path\n+            print \"Please use --load 'myRosPackage pathInMyPackage/myYaml.yaml'\"\n+            print \"or use --load 'fullPathToMyYaml.yaml'\"\n+\n+\n         ## Connections ##\n         ##\n         self._widget.btn_open.clicked.connect(self.open_file)"
+        }
+      ]
+    },
+    {
+      "author": "ipa-lth",
+      "date": "2015-09-23T15:42:43Z",
+      "sha": "9b8df2fa43e2bdb4da5eaae5025eebdb90c268e2",
+      "message": "rqt tip",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "5e71f548f55f04645119c9512848689dfb7c3e3a",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/9b8df2fa43e2bdb4da5eaae5025eebdb90c268e2/README.md",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/9b8df2fa43e2bdb4da5eaae5025eebdb90c268e2/README.md",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/README.md?ref=9b8df2fa43e2bdb4da5eaae5025eebdb90c268e2",
+          "patch": "@@ -17,3 +17,4 @@ ServiceException: service [/align_frame] already registered\n * Hidden plugins can be recovered by rightclicking in the empty space and selecting the plugin (so far only called \"Form\")\n * Closing and starting the plugin doesn't seem to work, so:\n * The best way is to restart rqt. \n+* If the plugin is not found in rqt, try 'rqt --force-discover' to make rqt search for new plugins"
+        }
+      ]
+    },
+    {
+      "author": "Witalij Siebert",
+      "date": "2018-05-14T13:57:34Z",
+      "sha": "86521e4f5532a27c790729668b418a94dd9a9291",
+      "message": "Encapsulated ROS services into a given namespace",
+      "files_changed": 1,
+      "additions": 7,
+      "deletions": 7,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e016858195e21e8939ff6daf62a219a1c5ee37b9",
+          "filename": "frame_editor/src/frame_editor/interface_services.py",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 7,
+          "changes": 14,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/86521e4f5532a27c790729668b418a94dd9a9291/frame_editor%2Fsrc%2Fframe_editor%2Finterface_services.py",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/86521e4f5532a27c790729668b418a94dd9a9291/frame_editor%2Fsrc%2Fframe_editor%2Finterface_services.py",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrc%2Fframe_editor%2Finterface_services.py?ref=86521e4f5532a27c790729668b418a94dd9a9291",
+          "patch": "@@ -21,13 +21,13 @@ def __init__(self, frame_editor):\n \n         self.editor = frame_editor\n \n-        rospy.Service(\"align_frame\", AlignFrame, self.callback_align_frame)\n-        rospy.Service(\"edit_frame\", EditFrame, self.callback_edit_frame)\n-        rospy.Service(\"get_frame\", GetFrame, self.callback_get_frame)\n-        rospy.Service(\"remove_frame\", RemoveFrame, self.callback_remove_frame)\n-        rospy.Service(\"set_frame\", SetFrame, self.callback_set_frame)\n-        rospy.Service(\"set_parent\", SetParentFrame, self.callback_set_parent_frame)\n-        rospy.Service(\"copy_frame\", CopyFrame, self.callback_copy_frame)\n+        rospy.Service(\"~align_frame\", AlignFrame, self.callback_align_frame)\n+        rospy.Service(\"~edit_frame\", EditFrame, self.callback_edit_frame)\n+        rospy.Service(\"~get_frame\", GetFrame, self.callback_get_frame)\n+        rospy.Service(\"~remove_frame\", RemoveFrame, self.callback_remove_frame)\n+        rospy.Service(\"~set_frame\", SetFrame, self.callback_set_frame)\n+        rospy.Service(\"~set_parent\", SetParentFrame, self.callback_set_parent_frame)\n+        rospy.Service(\"~copy_frame\", CopyFrame, self.callback_copy_frame)\n \n \n     def callback_align_frame(self, request):"
+        }
+      ]
+    },
+    {
+      "author": "cellios-frn",
+      "date": "2015-03-16T14:35:12Z",
+      "sha": "0677cb407503969655fa7016112e42e06c28b274",
+      "message": "dispatcher, gui, services, package: initial commits",
+      "files_changed": 9,
+      "additions": 787,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "25012bda37435efa388c50b5caad51e8befd5a75",
+          "filename": "intent_dispatcher/CMakeLists.txt",
+          "status": "added",
+          "additions": 163,
+          "deletions": 0,
+          "changes": 163,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/0677cb407503969655fa7016112e42e06c28b274/intent_dispatcher%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/0677cb407503969655fa7016112e42e06c28b274/intent_dispatcher%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/intent_dispatcher%2FCMakeLists.txt?ref=0677cb407503969655fa7016112e42e06c28b274",
+          "patch": "@@ -0,0 +1,163 @@\n+cmake_minimum_required(VERSION 2.8.3)\n+project(intent_dispatcher)\n+\n+## Find catkin macros and libraries\n+## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)\n+## is used, also find other catkin packages\n+find_package(catkin REQUIRED COMPONENTS\n+  rospy\n+  std_msgs\n+  message_generation\n+)\n+\n+## System dependencies are found with CMake's conventions\n+# find_package(Boost REQUIRED COMPONENTS system)\n+\n+\n+## Uncomment this if the package has a setup.py. This macro ensures\n+## modules and global scripts declared therein get installed\n+## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html\n+catkin_python_setup()\n+\n+################################################\n+## Declare ROS messages, services and actions ##\n+################################################\n+\n+## To declare and build messages, services or actions from within this\n+## package, follow these steps:\n+## * Let MSG_DEP_SET be the set of packages whose message types you use in\n+##   your messages/services/actions (e.g. std_msgs, actionlib_msgs, ...).\n+## * In the file package.xml:\n+##   * add a build_depend and a run_depend tag for each package in MSG_DEP_SET\n+##   * If MSG_DEP_SET isn't empty the following dependencies might have been\n+##     pulled in transitively but can be declared for certainty nonetheless:\n+##     * add a build_depend tag for \"message_generation\"\n+##     * add a run_depend tag for \"message_runtime\"\n+## * In this file (CMakeLists.txt):\n+##   * add \"message_generation\" and every package in MSG_DEP_SET to\n+##     find_package(catkin REQUIRED COMPONENTS ...)\n+##   * add \"message_runtime\" and every package in MSG_DEP_SET to\n+##     catkin_package(CATKIN_DEPENDS ...)\n+##   * uncomment the add_*_files sections below as needed\n+##     and list every .msg/.srv/.action file to be processed\n+##   * uncomment the generate_messages entry below\n+##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)\n+\n+## Generate messages in the 'msg' folder\n+# add_message_files(\n+#   FILES\n+#   Message1.msg\n+#   Message2.msg\n+# )\n+\n+## Generate services in the 'srv' folder\n+add_service_files(\n+  FILES\n+  AddProxy.srv\n+  AddProvider.srv\n+)\n+\n+## Generate actions in the 'action' folder\n+# add_action_files(\n+#   FILES\n+#   Action1.action\n+#   Action2.action\n+# )\n+\n+## Generate added messages and services with any dependencies listed here\n+generate_messages(\n+  DEPENDENCIES\n+  std_msgs\n+)\n+\n+###################################\n+## catkin specific configuration ##\n+###################################\n+## The catkin_package macro generates cmake config files for your package\n+## Declare things to be passed to dependent projects\n+## INCLUDE_DIRS: uncomment this if you package contains header files\n+## LIBRARIES: libraries you create in this project that dependent projects also need\n+## CATKIN_DEPENDS: catkin_packages dependent projects also need\n+## DEPENDS: system dependencies of this project that dependent projects also need\n+catkin_package(\n+#  INCLUDE_DIRS include\n+#  LIBRARIES intent_dispatcher\n+  CATKIN_DEPENDS rospy std_msgs message_runtime\n+#  DEPENDS system_lib\n+)\n+\n+###########\n+## Build ##\n+###########\n+\n+## Specify additional locations of header files\n+## Your package locations should be listed before other locations\n+# include_directories(include)\n+include_directories(\n+  ${catkin_INCLUDE_DIRS}\n+)\n+\n+## Declare a cpp library\n+# add_library(intent_dispatcher\n+#   src/${PROJECT_NAME}/intent_dispatcher.cpp\n+# )\n+\n+## Declare a cpp executable\n+# add_executable(intent_dispatcher_node src/intent_dispatcher_node.cpp)\n+\n+## Add cmake target dependencies of the executable/library\n+## as an example, message headers may need to be generated before nodes\n+# add_dependencies(intent_dispatcher_node intent_dispatcher_generate_messages_cpp)\n+\n+## Specify libraries to link a library or executable target against\n+# target_link_libraries(intent_dispatcher_node\n+#   ${catkin_LIBRARIES}\n+# )\n+\n+#############\n+## Install ##\n+#############\n+\n+# all install targets should use catkin DESTINATION variables\n+# See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html\n+\n+## Mark executable scripts (Python etc.) for installation\n+## in contrast to setup.py, you can choose the destination\n+# install(PROGRAMS\n+#   scripts/my_python_script\n+#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n+# )\n+\n+## Mark executables and/or libraries for installation\n+# install(TARGETS intent_dispatcher intent_dispatcher_node\n+#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n+#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n+#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n+# )\n+\n+## Mark cpp header files for installation\n+# install(DIRECTORY include/${PROJECT_NAME}/\n+#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}\n+#   FILES_MATCHING PATTERN \"*.h\"\n+#   PATTERN \".svn\" EXCLUDE\n+# )\n+\n+## Mark other files for installation (e.g. launch and bag files, etc.)\n+# install(FILES\n+#   # myfile1\n+#   # myfile2\n+#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}\n+# )\n+\n+#############\n+## Testing ##\n+#############\n+\n+## Add gtest based cpp test target and link libraries\n+# catkin_add_gtest(${PROJECT_NAME}-test test/test_intent_dispatcher.cpp)\n+# if(TARGET ${PROJECT_NAME}-test)\n+#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})\n+# endif()\n+\n+## Add folders to be run by python nosetests\n+# catkin_add_nosetests(test)"
+        },
+        {
+          "sha": "d84f5067eb69e74f8dd321a8c92466b92b72682f",
+          "filename": "intent_dispatcher/package.xml",
+          "status": "added",
+          "additions": 35,
+          "deletions": 0,
+          "changes": 35,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/0677cb407503969655fa7016112e42e06c28b274/intent_dispatcher%2Fpackage.xml",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/0677cb407503969655fa7016112e42e06c28b274/intent_dispatcher%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/intent_dispatcher%2Fpackage.xml?ref=0677cb407503969655fa7016112e42e06c28b274",
+          "patch": "@@ -0,0 +1,35 @@\n+<?xml version=\"1.0\"?>\n+<package>\n+  <name>intent_dispatcher</name>\n+  <version>0.0.0</version>\n+  <description>LIAA Robot Programming Toolbox Intent Dispatcher</description>\n+\n+  <!-- One maintainer tag required, multiple allowed, one person per tag --> \n+  <maintainer email=\"frank.naegele@ipa.fraunhofer.de\">Frank Naegele</maintainer>\n+\n+\n+  <!-- One license tag required, multiple allowed, one license per tag -->\n+  <license>Proprietary (free for project partners within and during the LIAA project)</license>\n+\n+\n+  <!-- Author tags are optional, mutiple are allowed, one per tag -->\n+  <!-- Authors do not have to be maintianers, but could be -->\n+  <author email=\"frank.naegele@ipa.fraunhofer.de\">Frank Naegele</author>\n+\n+\n+  <buildtool_depend>catkin</buildtool_depend>\n+  \n+  <build_depend>rospy</build_depend>\n+  <build_depend>std_msgs</build_depend>\n+  <build_depend>message_generation</build_depend>\n+  \n+  <run_depend>rospy</run_depend>\n+  <run_depend>std_msgs</run_depend>\n+  <run_depend>message_runtime</run_depend>\n+  \n+\n+  <!-- The export tag contains other, unspecified, tags -->\n+  <export>\n+\n+  </export>\n+</package>"
+        },
+        {
+          "sha": "0a269c8b23305dd845f9174f50cc2e23a77bc5e6",
+          "filename": "intent_dispatcher/setup.py",
+          "status": "added",
+          "additions": 11,
+          "deletions": 0,
+          "changes": 11,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/0677cb407503969655fa7016112e42e06c28b274/intent_dispatcher%2Fsetup.py",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/0677cb407503969655fa7016112e42e06c28b274/intent_dispatcher%2Fsetup.py",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/intent_dispatcher%2Fsetup.py?ref=0677cb407503969655fa7016112e42e06c28b274",
+          "patch": "@@ -0,0 +1,11 @@\n+#!/usr/bin/env python\n+\n+from distutils.core import setup\n+from catkin_pkg.python_setup import generate_distutils_setup\n+\n+d = generate_distutils_setup(\n+    packages=['intent_dispatcher'],\n+    package_dir={'': 'src'}\n+)\n+\n+setup(**d)\n\\ No newline at end of file"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "intent_dispatcher/src/intent_dispatcher/__init__.py",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/0677cb407503969655fa7016112e42e06c28b274/intent_dispatcher%2Fsrc%2Fintent_dispatcher%2F__init__.py",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/0677cb407503969655fa7016112e42e06c28b274/intent_dispatcher%2Fsrc%2Fintent_dispatcher%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/intent_dispatcher%2Fsrc%2Fintent_dispatcher%2F__init__.py?ref=0677cb407503969655fa7016112e42e06c28b274"
+        },
+        {
+          "sha": "96d06f78b4c6adc03e9ce45d4b71071d38b5f18b",
+          "filename": "intent_dispatcher/src/intent_dispatcher/dispatcher.py",
+          "status": "added",
+          "additions": 192,
+          "deletions": 0,
+          "changes": 192,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/0677cb407503969655fa7016112e42e06c28b274/intent_dispatcher%2Fsrc%2Fintent_dispatcher%2Fdispatcher.py",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/0677cb407503969655fa7016112e42e06c28b274/intent_dispatcher%2Fsrc%2Fintent_dispatcher%2Fdispatcher.py",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/intent_dispatcher%2Fsrc%2Fintent_dispatcher%2Fdispatcher.py?ref=0677cb407503969655fa7016112e42e06c28b274",
+          "patch": "@@ -0,0 +1,192 @@\n+#!/usr/bin/env python\n+\n+## Python ##\n+##\n+import importlib\n+\n+## ROS ##\n+##\n+import rospy\n+import actionlib\n+\n+from intent_dispatcher.srv import *\n+\n+\n+class Provider:\n+    def __init__(self, request):\n+        self.provider_type_module = request.provider_type_module # e.g. \"std_srvs\"\n+        self.provider_type_name   = request.provider_type_name   # e.g. \"Empty\"\n+        self.provider_name        = request.provider_name        # e.g. \"my_original_service\"\n+        self.proxy_name           = request.proxy_name           # e.g. \"my_new_service\"\n+        self.name                 = request.name                 # human readable name\n+        self.description          = request.description          # human readable description\n+        self.icon_path            = request.icon_path\n+\n+\n+class Proxy:\n+    '''Every NewService object handles a callback for _one_ specific _new_ service.'''\n+\n+    def __init__(self, request, chooser):\n+\n+        ## Variables ##\n+        ##\n+        self.proxy_type        = request.proxy_type        # \"action\" or \"service\"\n+        self.proxy_type_module = request.proxy_type_module # e.g. \"std_srvs\"\n+        self.proxy_type_name   = request.proxy_type_name   # e.g. \"Empty\"\n+        self.proxy_name        = request.proxy_name        # e.g. \"my_new_service\"\n+        self.name              = request.name              # human readable name\n+        self.description       = request.description       # human readable description\n+        self.icon_path         = request.icon_path\n+    \n+        self.providers = {}\n+\n+        self.choose_provider = chooser\n+        self.active = False\n+\n+        ## Module name ##\n+        ##\n+        if self.proxy_type == \"action\":\n+            module_name = self.proxy_type_module + \".msg\"\n+        elif self.proxy_type == \"service\":\n+            module_name = self.proxy_type_module + \".srv\"\n+        else:\n+            print \"Proxy type has to be 'action' or 'service'\"\n+            raise ValueError\n+\n+\n+        ## Import module ##\n+        ##\n+        imported_module = importlib.import_module(module_name) # raises ImportError\n+        self.proxy_class = getattr(imported_module, self.proxy_type_name)\n+\n+        ## Provide action/service ##\n+        ##\n+        if self.proxy_type == \"action\":\n+            self.action_server = actionlib.SimpleActionServer(self.proxy_name, self.proxy_class, execute_cb=self.execute_callback, auto_start=False)\n+            self.action_server.start()\n+\n+        elif self.proxy_type == \"service\":\n+            self.service = rospy.Service(self.proxy_name, self.proxy_class, self.service_callback)\n+\n+\n+    def add_provider(self, provider_name, provider):\n+        print \"Adding provider: \", provider_name\n+        self.providers[provider_name] = provider\n+        print self.providers\n+    \n+\n+    ## SERVICES ##\n+    ##\n+    def service_callback(self, req):\n+        print \"Handling callback!\"\n+        \n+        ## Look for recipient ##\n+        ##\n+        provider = self.choose_provider(self, self.providers)\n+\n+        ## Call service ##\n+        ##\n+        print \"Calling service\"\n+        service = rospy.ServiceProxy(provider.provider_name, self.proxy_class)\n+        return service(req)\n+\n+\n+    ## ACTIONS ##\n+    ##    \n+    def execute_callback(self, goal):\n+        print \"Handling callback!\"\n+\n+        ## Look for recipient ##\n+        ##\n+        provider = self.choose_provider(self, self.providers)\n+\n+        ## Call action ##\n+        ##\n+        print \"Calling action\"\n+        client = actionlib.SimpleActionClient(provider.provider_name, self.proxy_class)\n+        client.wait_for_server()\n+        client.send_goal(goal, feedback_cb=self.feedback_callback)\n+        result = client.wait_for_result()\n+        self.action_server.set_succeeded(result)\n+        print \"result done\"\n+\n+    def feedback_callback(self, feedback):\n+        self.action_server.publish_feedback(feedback)\n+        \n+\n+def text_chooser(providers):\n+    if len(providers) == 0:\n+        return None\n+    else:\n+        print \"Which action should be taken?\"\n+        for i, provider in enumerate(providers):\n+            print i,\":\", provider\n+\n+        ## Let user decide ##\n+        ##\n+        names = providers.keys()\n+        try:\n+            num = int(raw_input('Number: '))\n+            return providers[names[num]]\n+        except:\n+            print \"Not a number or number not valid. Failed. Returning!\"\n+            return None ## TODO\n+        \n+   \n+class Dispatcher:\n+\n+    def __init__(self):\n+        self.proxies = {}\n+\n+        ## Register service ##\n+        ##\n+        rospy.Service(\"register_proxy\",       AddProxy, self.add_proxy_callback)\n+        rospy.Service(\"register_provider\", AddProvider, self.add_provider_callback)\n+\n+        self.set_chooser(text_chooser)\n+\n+\n+    def set_chooser(self, chooser):\n+        self.default_chooser = chooser\n+\n+    \n+    def add_proxy_callback(self, req):\n+\n+        ## Check ##\n+        ##\n+        if req.proxy_name in self.proxies:\n+            print \"Proxy already exists:\", self.proxies[req.proxy_name]\n+            return AddProxyResponse()\n+\n+        ## Create Proxy ##\n+        ##\n+        self.proxies[req.proxy_name] = Proxy(req, self.default_chooser)\n+        \n+        return AddProxyResponse()\n+\n+\n+    def add_provider_callback(self, req):\n+\n+        ## Check ##\n+        ##\n+        if not req.proxy_name in self.proxies:\n+            print \"Proxy does not exist\", req.proxy_name\n+            return AddProxyResponse()\n+\n+        ## Add provider ##\n+        ##\n+        provider = Provider(req)\n+        self.proxies[req.proxy_name].add_provider(req.provider_name, provider)\n+        \n+        return AddProviderResponse()\n+   \n+    \n+if __name__ == \"__main__\":\n+\n+    rospy.init_node('intent_dispatcher')\n+\n+    dispatcher = Dispatcher()\n+\n+    print \"Dispatcher ready: Call service '/register_intent' to register a new service.\"\n+    rospy.spin()\n+    \n\\ No newline at end of file"
+        },
+        {
+          "sha": "8d72b0f0c0b8bd7638a342a00cb19dd2a0f30a90",
+          "filename": "intent_dispatcher/src/intent_dispatcher/qt_dispatcher.py",
+          "status": "added",
+          "additions": 207,
+          "deletions": 0,
+          "changes": 207,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/0677cb407503969655fa7016112e42e06c28b274/intent_dispatcher%2Fsrc%2Fintent_dispatcher%2Fqt_dispatcher.py",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/0677cb407503969655fa7016112e42e06c28b274/intent_dispatcher%2Fsrc%2Fintent_dispatcher%2Fqt_dispatcher.py",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/intent_dispatcher%2Fsrc%2Fintent_dispatcher%2Fqt_dispatcher.py?ref=0677cb407503969655fa7016112e42e06c28b274",
+          "patch": "@@ -0,0 +1,207 @@\n+#!/usr/bin/python\n+\n+## Python ##\n+##\n+import os\n+import sys\n+import thread\n+import threading\n+import time\n+\n+## ROS ##\n+##\n+import rospy\n+import rospkg\n+import actionlib\n+\n+## Qt ##\n+##\n+from python_qt_binding import loadUi\n+from python_qt_binding import QtCore\n+from python_qt_binding import QtGui\n+from python_qt_binding.QtCore import Qt\n+\n+\n+from intent_dispatcher import dispatcher\n+\n+\n+\n+class Dispatcher_Dialog(QtGui.QDialog):\n+\n+    def __init__(self):\n+        super(Dispatcher_Dialog, self).__init__()\n+\n+        self.row = -1\n+\n+        ## Load UI file ##\n+        ##\n+        rospack = rospkg.RosPack()\n+        package_path = rospack.get_path('intent_dispatcher')\n+        ui_file = os.path.join(package_path, 'ui', 'dispatcher.ui')\n+        ui = loadUi(ui_file, self)\n+        self.ui = ui\n+\n+        ## Table ##\n+        ##\n+        table = self.ui.table_providers\n+        table.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)\n+        table.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)\n+        table.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)\n+        table.verticalHeader().setDefaultSectionSize(100);\n+        table.currentCellChanged.connect(self.provider_selected)\n+\n+        ## GUI ##\n+        ##\n+        self.rejected.connect(self.rejected_cb)\n+        self.event = threading.Event()\n+\n+        # ui.btn_expert.toggled.connect(self.set_expert)\n+        ui.btnOk.clicked.connect(self.btn_ok_cb)\n+        ui.btnOk.setEnabled(False)\n+\n+        return\n+\n+    @QtCore.Slot(int)\n+    def provider_selected(self, currentRow):\n+        self.ui.btnOk.setEnabled(True)\n+\n+    @QtCore.Slot(int)\n+    def btn_ok_cb(self):\n+        self.row = self.ui.table_providers.currentRow()\n+        self.event.set() # wake up chooser\n+        self.accept() # close dialog\n+\n+    @QtCore.Slot()\n+    def rejected_cb(self):\n+        self.row = -1 # none selected\n+        self.event.set() # wake up chooser\n+\n+\n+\n+    def choose_provider(self, intent, providers):\n+        '''Runs in callback thread'''\n+\n+        ## Checks ##\n+        ##\n+        if len(providers) == 0:\n+            return None\n+\n+        print \"choose\"\n+        self.intent = intent\n+        self.providers = providers\n+\n+        ## Start dialog ##\n+        ##\n+        QtCore.QMetaObject.invokeMethod(widget, \"update_table\", Qt.QueuedConnection);\n+        QtCore.QMetaObject.invokeMethod(widget, \"show\", Qt.QueuedConnection);\n+\n+        print \"wait\"\n+        self.event.wait()\n+        self.event.clear()\n+\n+        self.ui.table_providers.clearSelection()\n+        self.ui.table_providers.setRowCount(0)\n+        self.ui.btnOk.setEnabled(False)\n+\n+        print \"return\"\n+        names = providers.keys()\n+        return providers[names[self.row]]\n+\n+\n+    @QtCore.Slot()\n+    def update_table(self):\n+        '''Runs in main Qt thread (necessary for using QIcons)'''\n+\n+        print \"update\"\n+        intent = self.intent\n+        providers = self.providers\n+\n+        ## Text field ##\n+        ##\n+        self.ui.txtIntentDescription.setText(intent.name+\": \"+intent.description)\n+\n+        ## Table ##\n+        ##\n+        self.ui.table_providers.setRowCount(len(providers))\n+\n+        for i, provider in enumerate(providers.values()):\n+\n+            title = provider.name + \": \" + provider.description\n+\n+            # item = QtGui.QTableWidgetItem(provider.name)\n+            # self.ui.table_providers.setItem(i, 1, item)\n+\n+            # item = QtGui.QTableWidgetItem(provider.description)\n+            # self.ui.table_providers.setItem(i, 2, item)\n+\n+            #item = QtGui.QTableWidgetItem(QtGui.QApplication.style().standardIcon(QtGui.QStyle.SP_FileIcon), \"\")\n+            print provider.icon_path\n+            icon = QtGui.QIcon(provider.icon_path);\n+            item = QtGui.QTableWidgetItem(icon, title)\n+            self.ui.table_providers.setItem(i, 0, item)\n+\n+        self.adjustSize()\n+\n+\n+## Qt ##\n+##\n+def qt_loop():\n+    global widget\n+\n+    app = QtGui.QApplication(sys.argv)\n+    app.setQuitOnLastWindowClosed(False) # runs in background and doesn't quit once a dialog is closed\n+\n+    ## Widget (must be created in the main Qt thread) ##\n+    ##\n+    widget = Dispatcher_Dialog()\n+    #widget.resize(1024, 768)\n+    #widget.move(300, 300)\n+    widget.setWindowTitle('Intent Dispatcher')\n+    widget.setModal(True)\n+\n+    app.exec_()\n+\n+\n+\n+\n+\n+## Main ##\n+##\n+def main():\n+\n+    ## ROS ##\n+    ##\n+    rospy.init_node('intent_dispatcher_gui')\n+\n+\n+    ## Qt ##\n+    ##\n+    thread.start_new_thread( qt_loop, () )\n+\n+\n+    ## Dispatcher ##\n+    ##\n+    time.sleep(1) ## TODO\n+    disp = dispatcher.Dispatcher()\n+    disp.set_chooser(widget.choose_provider)\n+\n+\n+    ## For Testing ##\n+    ##\n+    #time.sleep(1)\n+    #QtCore.QMetaObject.invokeMethod(widget, \"show\", Qt.QueuedConnection);\n+\n+\n+    ## ROS loop ##\n+    ##\n+    rate = rospy.Rate(10) # 10hz\n+    while not rospy.is_shutdown():\n+        rate.sleep()\n+\n+    return\n+\n+\n+if __name__ == '__main__':\n+    main()\n+\n+# eof"
+        },
+        {
+          "sha": "88080e7131842c3a4f748f45055373bebd7c1cfd",
+          "filename": "intent_dispatcher/srv/AddProvider.srv",
+          "status": "added",
+          "additions": 10,
+          "deletions": 0,
+          "changes": 10,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/0677cb407503969655fa7016112e42e06c28b274/intent_dispatcher%2Fsrv%2FAddProvider.srv",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/0677cb407503969655fa7016112e42e06c28b274/intent_dispatcher%2Fsrv%2FAddProvider.srv",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/intent_dispatcher%2Fsrv%2FAddProvider.srv?ref=0677cb407503969655fa7016112e42e06c28b274",
+          "patch": "@@ -0,0 +1,10 @@\n+string provider_type        # \"service\" or \"action\"\n+string provider_type_module # e.g. \"std_srvs\"\n+string provider_type_name   # e.g. \"Empty\"\n+string provider_name        # e.g. \"my_old_service\"\n+string proxy_name           # e.g. \"my_new_service\"\n+string name                 # human readable name\n+string description          # human readable description\n+string icon_path\n+---\n+int32 error_code"
+        },
+        {
+          "sha": "d2ad37346f742e98571eb1e14749f2833da6f52c",
+          "filename": "intent_dispatcher/srv/AddProxy.srv",
+          "status": "added",
+          "additions": 9,
+          "deletions": 0,
+          "changes": 9,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/0677cb407503969655fa7016112e42e06c28b274/intent_dispatcher%2Fsrv%2FAddProxy.srv",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/0677cb407503969655fa7016112e42e06c28b274/intent_dispatcher%2Fsrv%2FAddProxy.srv",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/intent_dispatcher%2Fsrv%2FAddProxy.srv?ref=0677cb407503969655fa7016112e42e06c28b274",
+          "patch": "@@ -0,0 +1,9 @@\n+string proxy_type        # \"service\" or \"action\"\n+string proxy_type_module # e.g. \"std_srvs\"\n+string proxy_type_name   # e.g. \"Empty\"\n+string proxy_name        # e.g. \"my_new_service\"\n+string name              # human readable name\n+string description       # human readable description\n+string icon_path\n+---\n+int32 error_code"
+        },
+        {
+          "sha": "17542b6cbdf061e23de61f942cfc3beca6819645",
+          "filename": "intent_dispatcher/ui/dispatcher.ui",
+          "status": "added",
+          "additions": 160,
+          "deletions": 0,
+          "changes": 160,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/0677cb407503969655fa7016112e42e06c28b274/intent_dispatcher%2Fui%2Fdispatcher.ui",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/0677cb407503969655fa7016112e42e06c28b274/intent_dispatcher%2Fui%2Fdispatcher.ui",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/intent_dispatcher%2Fui%2Fdispatcher.ui?ref=0677cb407503969655fa7016112e42e06c28b274",
+          "patch": "@@ -0,0 +1,160 @@\n+<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n+<ui version=\"4.0\">\n+ <class>Dialog</class>\n+ <widget class=\"QDialog\" name=\"Dialog\">\n+  <property name=\"geometry\">\n+   <rect>\n+    <x>0</x>\n+    <y>0</y>\n+    <width>642</width>\n+    <height>224</height>\n+   </rect>\n+  </property>\n+  <property name=\"windowTitle\">\n+   <string>Dialog</string>\n+  </property>\n+  <layout class=\"QVBoxLayout\" name=\"verticalLayout_4\">\n+   <item>\n+    <widget class=\"QFrame\" name=\"frame\">\n+     <property name=\"minimumSize\">\n+      <size>\n+       <width>0</width>\n+       <height>48</height>\n+      </size>\n+     </property>\n+     <property name=\"frameShape\">\n+      <enum>QFrame::StyledPanel</enum>\n+     </property>\n+     <property name=\"frameShadow\">\n+      <enum>QFrame::Raised</enum>\n+     </property>\n+     <layout class=\"QVBoxLayout\" name=\"verticalLayout_2\">\n+      <item>\n+       <widget class=\"QLabel\" name=\"txtIntentDescription\">\n+        <property name=\"text\">\n+         <string>Intent Description</string>\n+        </property>\n+       </widget>\n+      </item>\n+     </layout>\n+    </widget>\n+   </item>\n+   <item>\n+    <widget class=\"QTableWidget\" name=\"table_providers\">\n+     <property name=\"styleSheet\">\n+      <string notr=\"true\">QTableView::item:hover {\n+    background-color: rgba(200,200,220,255);\n+} </string>\n+     </property>\n+     <property name=\"iconSize\">\n+      <size>\n+       <width>90</width>\n+       <height>90</height>\n+      </size>\n+     </property>\n+     <attribute name=\"horizontalHeaderVisible\">\n+      <bool>false</bool>\n+     </attribute>\n+     <attribute name=\"horizontalHeaderStretchLastSection\">\n+      <bool>true</bool>\n+     </attribute>\n+     <attribute name=\"verticalHeaderVisible\">\n+      <bool>false</bool>\n+     </attribute>\n+     <row>\n+      <property name=\"text\">\n+       <string>asd</string>\n+      </property>\n+     </row>\n+     <column>\n+      <property name=\"text\">\n+       <string>Widgets</string>\n+      </property>\n+     </column>\n+    </widget>\n+   </item>\n+   <item>\n+    <widget class=\"QFrame\" name=\"frame_2\">\n+     <property name=\"frameShape\">\n+      <enum>QFrame::StyledPanel</enum>\n+     </property>\n+     <property name=\"frameShadow\">\n+      <enum>QFrame::Raised</enum>\n+     </property>\n+     <layout class=\"QHBoxLayout\" name=\"horizontalLayout\">\n+      <item>\n+       <widget class=\"QPushButton\" name=\"btnExpert\">\n+        <property name=\"enabled\">\n+         <bool>false</bool>\n+        </property>\n+        <property name=\"minimumSize\">\n+         <size>\n+          <width>0</width>\n+          <height>48</height>\n+         </size>\n+        </property>\n+        <property name=\"text\">\n+         <string>Expert</string>\n+        </property>\n+        <property name=\"checkable\">\n+         <bool>true</bool>\n+        </property>\n+       </widget>\n+      </item>\n+      <item>\n+       <widget class=\"QPushButton\" name=\"btnCancel\">\n+        <property name=\"minimumSize\">\n+         <size>\n+          <width>0</width>\n+          <height>48</height>\n+         </size>\n+        </property>\n+        <property name=\"text\">\n+         <string>Cancel</string>\n+        </property>\n+       </widget>\n+      </item>\n+      <item>\n+       <widget class=\"QPushButton\" name=\"btnOk\">\n+        <property name=\"minimumSize\">\n+         <size>\n+          <width>0</width>\n+          <height>48</height>\n+         </size>\n+        </property>\n+        <property name=\"text\">\n+         <string>Ok</string>\n+        </property>\n+       </widget>\n+      </item>\n+     </layout>\n+    </widget>\n+   </item>\n+  </layout>\n+ </widget>\n+ <tabstops>\n+  <tabstop>btnOk</tabstop>\n+  <tabstop>btnCancel</tabstop>\n+  <tabstop>btnExpert</tabstop>\n+  <tabstop>table_providers</tabstop>\n+ </tabstops>\n+ <resources/>\n+ <connections>\n+  <connection>\n+   <sender>btnCancel</sender>\n+   <signal>released()</signal>\n+   <receiver>Dialog</receiver>\n+   <slot>reject()</slot>\n+   <hints>\n+    <hint type=\"sourcelabel\">\n+     <x>622</x>\n+     <y>204</y>\n+    </hint>\n+    <hint type=\"destinationlabel\">\n+     <x>335</x>\n+     <y>5</y>\n+    </hint>\n+   </hints>\n+  </connection>\n+ </connections>\n+</ui>"
+        }
+      ]
+    },
+    {
+      "author": "lth",
+      "date": "2015-09-22T15:06:23Z",
+      "sha": "82a5f4b5c85b5c1d866f49226e1e73ece55e51c9",
+      "message": "MESH with bug",
+      "files_changed": 6,
+      "additions": 35,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "8f96179926602ce85e12fe8ec7e2377e77fd1f89",
+          "filename": "frame_editor/mesh/weber_pitek.stl",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/82a5f4b5c85b5c1d866f49226e1e73ece55e51c9/frame_editor%2Fmesh%2Fweber_pitek.stl",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/82a5f4b5c85b5c1d866f49226e1e73ece55e51c9/frame_editor%2Fmesh%2Fweber_pitek.stl",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fmesh%2Fweber_pitek.stl?ref=82a5f4b5c85b5c1d866f49226e1e73ece55e51c9"
+        },
+        {
+          "sha": "7a03e4daee63498a48f819143556172ade096084",
+          "filename": "frame_editor/src/frame_editor/FrameEditorGUI.ui",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/82a5f4b5c85b5c1d866f49226e1e73ece55e51c9/frame_editor%2Fsrc%2Fframe_editor%2FFrameEditorGUI.ui",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/82a5f4b5c85b5c1d866f49226e1e73ece55e51c9/frame_editor%2Fsrc%2Fframe_editor%2FFrameEditorGUI.ui",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrc%2Fframe_editor%2FFrameEditorGUI.ui?ref=82a5f4b5c85b5c1d866f49226e1e73ece55e51c9",
+          "patch": "@@ -675,6 +675,11 @@\n                  <string>axis</string>\n                 </property>\n                </item>\n+               <item>\n+                <property name=\"text\">\n+                 <string>mesh</string>\n+                </property>\n+               </item>\n               </widget>\n              </item>\n             </layout>"
+        },
+        {
+          "sha": "78ceb8cd0d0e6b5ef14fec290ecda276148ea614",
+          "filename": "frame_editor/src/frame_editor/commands.py",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 2,
+          "changes": 5,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/82a5f4b5c85b5c1d866f49226e1e73ece55e51c9/frame_editor%2Fsrc%2Fframe_editor%2Fcommands.py",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/82a5f4b5c85b5c1d866f49226e1e73ece55e51c9/frame_editor%2Fsrc%2Fframe_editor%2Fcommands.py",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrc%2Fframe_editor%2Fcommands.py?ref=82a5f4b5c85b5c1d866f49226e1e73ece55e51c9",
+          "patch": "@@ -307,10 +307,9 @@ def undo(self):\n         self.element.broadcast()\n         self.editor.add_undo_level(4, [self.element])\n \n-\n class Command_SetStyle(QUndoCommand):\n \n-    def __init__(self, editor, element, style):\n+    def __init__(self, editor, element, style, path=None):\n         QUndoCommand.__init__(self, \"Style\")\n         self.editor = editor\n \n@@ -324,6 +323,8 @@ def __init__(self, editor, element, style):\n             self.new_element = Object_Sphere(element.name, element.position, element.orientation, element.parent)\n         elif style == \"axis\":\n             self.new_element = Object_Axis(element.name, element.position, element.orientation, element.parent)\n+        elif style == \"mesh\":\n+            self.new_element = Object_Mesh(element.name, element.position, element.orientation, element.parent, path)\n         else:\n             self.new_element = Frame(element.name, element.position, element.orientation, element.parent)\n "
+        },
+        {
+          "sha": "11c04615e70f0100cc58abd5c8f3a6276daac815",
+          "filename": "frame_editor/src/frame_editor/editor.py",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/82a5f4b5c85b5c1d866f49226e1e73ece55e51c9/frame_editor%2Fsrc%2Fframe_editor%2Feditor.py",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/82a5f4b5c85b5c1d866f49226e1e73ece55e51c9/frame_editor%2Fsrc%2Fframe_editor%2Feditor.py",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrc%2Fframe_editor%2Feditor.py?ref=82a5f4b5c85b5c1d866f49226e1e73ece55e51c9",
+          "patch": "@@ -138,6 +138,8 @@ def load_data(self, data):\n                 f = Object_Sphere(name, position, orientation, frame[\"parent\"], dat[\"diameter\"])\n             elif style == \"axis\":\n                 f = Object_Axis(name, position, orientation, frame[\"parent\"], dat[\"length\"], dat[\"width\"])\n+            elif style == \"mesh\":\n+                f = Object_Mesh(name, position, orientation, frame[\"parent\"], dat[\"path\"], dat[\"scale\"])\n             else:\n                 f = Frame(name, position, orientation, frame[\"parent\"])\n             \n@@ -184,6 +186,8 @@ def save_file(self, filename, namespace):\n             elif frame.style == \"axis\":\n                 f[\"data\"] = { \"length\": frame.length, \"width\": frame.width }\n \n+            elif frame.style == \"mesh\":\n+                f[\"data\"] = { \"path\" : frame.path, \"scale\" : frame.scale }\n             frames[frame.name] = f\n \n         data[\"frames\"] = frames"
+        },
+        {
+          "sha": "6c4384d5d90917ae18c68a29369cbe9328f0f133",
+          "filename": "frame_editor/src/frame_editor/objects.py",
+          "status": "modified",
+          "additions": 19,
+          "deletions": 0,
+          "changes": 19,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/82a5f4b5c85b5c1d866f49226e1e73ece55e51c9/frame_editor%2Fsrc%2Fframe_editor%2Fobjects.py",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/82a5f4b5c85b5c1d866f49226e1e73ece55e51c9/frame_editor%2Fsrc%2Fframe_editor%2Fobjects.py",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrc%2Fframe_editor%2Fobjects.py?ref=82a5f4b5c85b5c1d866f49226e1e73ece55e51c9",
+          "patch": "@@ -177,4 +177,23 @@ def update_marker(self):\n         self.marker.type = Marker.ARROW\n         self.marker.scale = NewVector3(self.length, self.width, self.width)\n \n+\n+class Object_Mesh(Object_Geometry):\n+\n+    def __init__(self, name, position, orientation, parent, mesh_path, scale=1.0):\n+\n+        self.scale = scale\n+        self.path = mesh_path\n+        # TODO remove\n+        self.path = \"package://frame_editor/mesh/weber_pitek.stl\"\n+\n+        super(Object_Mesh, self).__init__(name, position, orientation, parent, \"mesh\")\n+\n+    def update_marker(self):\n+        super(Object_Mesh, self).update_marker()\n+\n+        self.marker.type = Marker.MESH_RESOURCE\n+        self.marker.mesh_resource = self.path\n+        self.marker.scale = NewVector3(self.scale, self.scale, self.scale)\n+\n # eof"
+        },
+        {
+          "sha": "d77234fd76263f6d6940ea232e453b8d7ba8f39d",
+          "filename": "frame_editor/src/frame_editor/rqt_editor.py",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 1,
+          "changes": 5,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/82a5f4b5c85b5c1d866f49226e1e73ece55e51c9/frame_editor%2Fsrc%2Fframe_editor%2Frqt_editor.py",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/82a5f4b5c85b5c1d866f49226e1e73ece55e51c9/frame_editor%2Fsrc%2Fframe_editor%2Frqt_editor.py",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrc%2Fframe_editor%2Frqt_editor.py?ref=82a5f4b5c85b5c1d866f49226e1e73ece55e51c9",
+          "patch": "@@ -565,7 +565,10 @@ def c_valueChanged(self):\n     def frame_style_changed(self, id):\n         style = self._widget.combo_style.currentText().lower()\n         if self.editor.active_frame.style != style:\n-            self.editor.command(Command_SetStyle(self.editor, self.editor.active_frame, style))\n+            path = None\n+            if style == \"mesh\":\n+                path = QtGui.QFileDialog.getOpenFileName(None, 'Open file', '/home')\n+            self.editor.command(Command_SetStyle(self.editor, self.editor.active_frame, style, path))\n \n \n     ## PLUGIN ##"
+        }
+      ]
+    },
+    {
+      "author": "pgorczak",
+      "date": "2015-09-24T15:03:46Z",
+      "sha": "5e7f29772cf2bc87b0e269305ae08a04d7c7e314",
+      "message": "Improve copy frame behavior.",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 5,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "9c6d82d53bb0736edfa9acf264e6744762bc4c07",
+          "filename": "frame_editor/src/frame_editor/interface_services.py",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 5,
+          "changes": 9,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/5e7f29772cf2bc87b0e269305ae08a04d7c7e314/frame_editor%2Fsrc%2Fframe_editor%2Finterface_services.py",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/5e7f29772cf2bc87b0e269305ae08a04d7c7e314/frame_editor%2Fsrc%2Fframe_editor%2Finterface_services.py",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrc%2Fframe_editor%2Finterface_services.py?ref=5e7f29772cf2bc87b0e269305ae08a04d7c7e314",
+          "patch": "@@ -192,18 +192,17 @@ def callback_copy_frame(self, request):\n                 frame.name = request.name\n                 frame.broadcast()\n                 self.editor.command(Command_AddElement(self.editor, frame))\n+                frame = self.editor.frames[request.name]\n             else:\n                 ## Align with source frame\n                 frame = self.editor.frames[request.name]\n                 self.editor.command(Command_AlignElement(self.editor, frame, request.source_name, ['x', 'y', 'z', 'a', 'b', 'c', ]))\n \n             ## Set parent\n             if (request.parent != \"\") and (frame.parent != request.parent):\n-                frame = self.editor.frames[request.name]\n-                \n-                # If the frame was newly created, we have to wait for a transform\n-                # Might introduce nasty delays in transitions.\n-                frame.listener.waitForTransform(request.parent, frame.name, rospy.Time(0), rospy.Duration(1.0), polling_sleep_duration=rospy.Duration(0.001))\n+                frame.broadcast()\n+                ## Make sure the listener knows the new frame / its new aligned position\n+                frame.listener.waitForTransform(request.parent, request.name, rospy.Time(), rospy.Duration(1.0), rospy.Duration(0.01))\n                 self.editor.command(Command_SetParent(self.editor, frame, request.parent, True))\n \n         return response"
+        }
+      ]
+    },
+    {
+      "author": "Pyxidis-UR5",
+      "date": "2016-05-17T14:06:00Z",
+      "sha": "6241f61e43619b75f400bd4479b43cefeae62399",
+      "message": "bugfix: additional broadcast to prevent timeout",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "1163eed0c2e0be0acce1b61a958f48a0146a7ba2",
+          "filename": "frame_editor/src/frame_editor/interface_services.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/6241f61e43619b75f400bd4479b43cefeae62399/frame_editor%2Fsrc%2Fframe_editor%2Finterface_services.py",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/6241f61e43619b75f400bd4479b43cefeae62399/frame_editor%2Fsrc%2Fframe_editor%2Finterface_services.py",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrc%2Fframe_editor%2Finterface_services.py?ref=6241f61e43619b75f400bd4479b43cefeae62399",
+          "patch": "@@ -204,6 +204,7 @@ def callback_copy_frame(self, request):\n             ## Set parent\n             if (request.parent != \"\") and (frame.parent != request.parent):\n                 ## Make sure the listener knows the new frame / its new aligned position\n+                self.editor.broadcast() # apparently you can't broadcast often enough\n                 frame_tf = frame.tf_buffer.can_transform(frame.parent, frame.name, rospy.Time.now(), rospy.Duration(1.0), rospy.Duration(0.01))\n                 new_tf = frame.tf_buffer.can_transform(request.parent, frame.name, rospy.Time.now(), rospy.Duration(1.0), rospy.Duration(0.01))\n                 if not (frame_tf and new_tf):"
+        }
+      ]
+    },
+    {
+      "author": "TESTPERSONAL",
+      "date": "2015-06-26T12:15:13Z",
+      "sha": "70b95245089a27a02e095f4022c3d6d37d92ec89",
+      "message": "frame editor: numpy marshalling bug fix",
+      "files_changed": 2,
+      "additions": 8,
+      "deletions": 8,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "8af0b6d96c109f1dc88429eede8402b360bb5dfb",
+          "filename": "frame_editor/src/frame_editor/editor.py",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 7,
+          "changes": 14,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/70b95245089a27a02e095f4022c3d6d37d92ec89/frame_editor%2Fsrc%2Fframe_editor%2Feditor.py",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/70b95245089a27a02e095f4022c3d6d37d92ec89/frame_editor%2Fsrc%2Fframe_editor%2Feditor.py",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrc%2Fframe_editor%2Feditor.py?ref=70b95245089a27a02e095f4022c3d6d37d92ec89",
+          "patch": "@@ -156,15 +156,15 @@ def save_file(self, filename, namespace):\n \n         for frame in self.frames.values():\n             t = {}\n-            t[\"x\"] = frame.position[0]\n-            t[\"y\"] = frame.position[1]\n-            t[\"z\"] = frame.position[2]\n+            t[\"x\"] = float(frame.position[0])\n+            t[\"y\"] = float(frame.position[1])\n+            t[\"z\"] = float(frame.position[2])\n \n             o = {}\n-            o[\"x\"] = frame.orientation[0]\n-            o[\"y\"] = frame.orientation[1]\n-            o[\"z\"] = frame.orientation[2]\n-            o[\"w\"] = frame.orientation[3]\n+            o[\"x\"] = float(frame.orientation[0])\n+            o[\"y\"] = float(frame.orientation[1])\n+            o[\"z\"] = float(frame.orientation[2])\n+            o[\"w\"] = float(frame.orientation[3])\n \n             f = {}\n             f[\"parent\"] = frame.parent"
+        },
+        {
+          "sha": "2d0d91df9ae35e4e817070ee7943b10d2f06e0d3",
+          "filename": "frame_editor/src/frame_editor/objects.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/70b95245089a27a02e095f4022c3d6d37d92ec89/frame_editor%2Fsrc%2Fframe_editor%2Fobjects.py",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/70b95245089a27a02e095f4022c3d6d37d92ec89/frame_editor%2Fsrc%2Fframe_editor%2Fobjects.py",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrc%2Fframe_editor%2Fobjects.py?ref=70b95245089a27a02e095f4022c3d6d37d92ec89",
+          "patch": "@@ -86,7 +86,7 @@ def set_value(self, symbol, value):\n                 rpy[1] = value\n             elif symbol == 'c':\n                 rpy[2] = value\n-            self.orientation = tf.transformations.quaternion_from_euler(*rpy)\n+            self.orientation = tuple(tf.transformations.quaternion_from_euler(*rpy))\n \n \n class Object_Geometry(Frame):"
+        }
+      ]
+    },
+    {
+      "author": "lth-rl",
+      "date": "2015-09-23T12:07:16Z",
+      "sha": "4b404ded56c756e83fbcc820f437e084fbc6e260",
+      "message": "frame editor: service: set parent",
+      "files_changed": 4,
+      "additions": 28,
+      "deletions": 4,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "9ec2f3110a2b8eca7a4abf7bf0091a74ae452b25",
+          "filename": "frame_editor/CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/4b404ded56c756e83fbcc820f437e084fbc6e260/frame_editor%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/4b404ded56c756e83fbcc820f437e084fbc6e260/frame_editor%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2FCMakeLists.txt?ref=4b404ded56c756e83fbcc820f437e084fbc6e260",
+          "patch": "@@ -65,6 +65,7 @@ add_service_files(\n   GetFrame.srv\n   RemoveFrame.srv\n   SetFrame.srv\n+  SetParentFrame.srv\n )\n \n ## Generate actions in the 'action' folder"
+        },
+        {
+          "sha": "66c440d35ea8a4b64a843e951e0e524223e0c47f",
+          "filename": "frame_editor/src/frame_editor/interface_services.py",
+          "status": "modified",
+          "additions": 22,
+          "deletions": 0,
+          "changes": 22,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/4b404ded56c756e83fbcc820f437e084fbc6e260/frame_editor%2Fsrc%2Fframe_editor%2Finterface_services.py",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/4b404ded56c756e83fbcc820f437e084fbc6e260/frame_editor%2Fsrc%2Fframe_editor%2Finterface_services.py",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrc%2Fframe_editor%2Finterface_services.py?ref=4b404ded56c756e83fbcc820f437e084fbc6e260",
+          "patch": "@@ -25,6 +25,7 @@ def __init__(self, frame_editor):\n         rospy.Service(\"get_frame\", GetFrame, self.callback_get_frame)\n         rospy.Service(\"remove_frame\", RemoveFrame, self.callback_remove_frame)\n         rospy.Service(\"set_frame\", SetFrame, self.callback_set_frame)\n+        rospy.Service(\"set_parent\", SetParentFrame, self.callback_set_parent_frame)\n \n \n     def callback_align_frame(self, request):\n@@ -146,4 +147,25 @@ def callback_set_frame(self, request):\n \n         return response\n \n+\n+    def callback_set_parent_frame(self, request):\n+        print \"> Request to set parent_frame\", request.name\n+\n+        response = SetParentFrameResponse()\n+        response.error_code = 0\n+\n+        if request.name == \"\":\n+            print \" Error: No frame_name given\"\n+            response.error_code = 1\n+\n+        elif request.parent == \"\":\n+            print \" Error: No parent_name given\"\n+            response.error_code = 2\n+\n+        else:\n+            f = self.editor.frames[request.name]\n+            self.editor.command(Command_SetParent(self.editor, f, request.parent, request.keep_absolute))\n+\n+        return response\n+\n # eof"
+        },
+        {
+          "sha": "c95e03c03f515b903d2921faf30c2e1405ee72b1",
+          "filename": "frame_editor/srv/AlignFrame.srv",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 4,
+          "changes": 4,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/4b404ded56c756e83fbcc820f437e084fbc6e260/frame_editor%2Fsrv%2FAlignFrame.srv",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/4b404ded56c756e83fbcc820f437e084fbc6e260/frame_editor%2Fsrv%2FAlignFrame.srv",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrv%2FAlignFrame.srv?ref=4b404ded56c756e83fbcc820f437e084fbc6e260",
+          "patch": "@@ -14,10 +14,6 @@ int32 mode_a = 8\n int32 mode_b = 16\n int32 mode_c = 32\n \n-## ToDo\n-#int32 mode_parent_absolute = 64\n-#int32 mode_parent_relative = 128\n-\n ## common binary combinations\n int32 mode_position = 7\n int32 mode_orientation = 56"
+        },
+        {
+          "sha": "299ba24f5266ba826cb74c52b59bb1247618afaa",
+          "filename": "frame_editor/srv/SetParentFrame.srv",
+          "status": "added",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/4b404ded56c756e83fbcc820f437e084fbc6e260/frame_editor%2Fsrv%2FSetParentFrame.srv",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/4b404ded56c756e83fbcc820f437e084fbc6e260/frame_editor%2Fsrv%2FSetParentFrame.srv",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/frame_editor%2Fsrv%2FSetParentFrame.srv?ref=4b404ded56c756e83fbcc820f437e084fbc6e260",
+          "patch": "@@ -0,0 +1,5 @@\n+string name\n+string parent\n+bool keep_absolute\n+---\n+int32 error_code"
+        }
+      ]
+    },
+    {
+      "author": "ipa325",
+      "date": "2014-11-07T09:35:17Z",
+      "sha": "4a40cf9fe55ae123a1ea28f856163b7c0a1369fd",
+      "message": "Initial commit",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "9adc2afdff23edc1ca6ca2a3dd4196df30379d38",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/ipa320/rqt_frame_editor_plugin/blob/4a40cf9fe55ae123a1ea28f856163b7c0a1369fd/README.md",
+          "raw_url": "https://github.com/ipa320/rqt_frame_editor_plugin/raw/4a40cf9fe55ae123a1ea28f856163b7c0a1369fd/README.md",
+          "contents_url": "https://api.github.com/repos/ipa320/rqt_frame_editor_plugin/contents/README.md?ref=4a40cf9fe55ae123a1ea28f856163b7c0a1369fd",
+          "patch": "@@ -0,0 +1,4 @@\n+wp06_multimodal_robot_programming_toolbox\n+=========================================\n+\n+This repository contains the Augmented Reality enhanced multimodal robot programming toolbox and related programs."
+        }
+      ]
+    }
+  ]
+}

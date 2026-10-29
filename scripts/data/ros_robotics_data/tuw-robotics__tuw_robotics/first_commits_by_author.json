@@ -1,0 +1,131 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T07:09:09Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "tuw-robotics",
+    "repo": "tuw_robotics"
+  },
+  "data": [
+    {
+      "author": "Geibinger",
+      "date": "2025-06-17T13:09:47Z",
+      "sha": "77430921c73d683c73bb6aad795cd64ed2d8eecd",
+      "message": "added angular flip and fast button parameters",
+      "files_changed": 3,
+      "additions": 20,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "14f984d8082d26585bfeed87dfe190374ed4538b",
+          "filename": "tuw_gamepad/README.md",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "changes": 4,
+          "blob_url": "https://github.com/tuw-robotics/tuw_robotics/blob/77430921c73d683c73bb6aad795cd64ed2d8eecd/tuw_gamepad%2FREADME.md",
+          "raw_url": "https://github.com/tuw-robotics/tuw_robotics/raw/77430921c73d683c73bb6aad795cd64ed2d8eecd/tuw_gamepad%2FREADME.md",
+          "contents_url": "https://api.github.com/repos/tuw-robotics/tuw_robotics/contents/tuw_gamepad%2FREADME.md?ref=77430921c73d683c73bb6aad795cd64ed2d8eecd",
+          "patch": "@@ -14,7 +14,9 @@ ros2 run tuw_gamepad gamepad_node --ros-args -p use_stamped_velocity:=true -p de\n * __device__: default /dev/input/js0, Joystick device\n * __use_stamped_velocity__: default false, On true it uses **TwistStamped** messages, otherwise **Twist**!\n * __debug__: default false, On true it prints changes on the joystick\n-* __button_deadman__: default 4, button id deadman\n+* __flip_angular_when_reversing__: default false, On true it flips the angular velocity when reversing\n+* __button_deadman__: default 4, button id deadman, if not pressed, no motion is published\n+* __button_fast__: default 5, button id fast, if pressed, the robot moves 2x faster\n * __lx__: default 4, axis linear x  (-1 means not used)\n * __ax__: default -1, axis angular x (-1 means not used)\n * __ly__: default -1, axis linear y  (-1 means not used)"
+        },
+        {
+          "sha": "078ee1e059c65cf0b2007c054f6c968b8cd8ed72",
+          "filename": "tuw_gamepad/include/tuw_gamepad/gamepad_node.hpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/tuw-robotics/tuw_robotics/blob/77430921c73d683c73bb6aad795cd64ed2d8eecd/tuw_gamepad%2Finclude%2Ftuw_gamepad%2Fgamepad_node.hpp",
+          "raw_url": "https://github.com/tuw-robotics/tuw_robotics/raw/77430921c73d683c73bb6aad795cd64ed2d8eecd/tuw_gamepad%2Finclude%2Ftuw_gamepad%2Fgamepad_node.hpp",
+          "contents_url": "https://api.github.com/repos/tuw-robotics/tuw_robotics/contents/tuw_gamepad%2Finclude%2Ftuw_gamepad%2Fgamepad_node.hpp?ref=77430921c73d683c73bb6aad795cd64ed2d8eecd",
+          "patch": "@@ -41,6 +41,7 @@ class Gamepad : public tuw::Node\n   std::string device_;          /// static parameter: Joystick device default \"/dev/input/js0\"\n   bool use_stamped_velocity_;    /// static parameter: On true it uses TwistStamped messages, otherwise Twist!\n   int button_deadman_;         /// static parameter: deadmean button id\n+  int button_fast_;          /// static parameter: fast button id\n   double scale_linear_;        /// static parameter: scale in linear  [m/s]\n   double scale_angular_;       /// static parameter: scale in rotation  [rad/s]\n   int axis_linear_x_;          /// static parameter: axis id of x velocity\n@@ -50,6 +51,7 @@ class Gamepad : public tuw::Node\n   int axis_linear_z_;          /// static parameter: axis id of z velocity\n   int axis_angular_z_;         /// static parameter: axis id of z rotation\n   bool debug_;                 /// static parameter: On true it prints changes on the joystick\n+  bool flip_angular_when_reversing_; /// static parameter: On true it flips the angular velocity when reversing\n \n   void declare_parameters();        // declare parameters\n   void read_static_parameters();    // ready the static parameters"
+        },
+        {
+          "sha": "7fe4e02e06d76467af1a20dd8372408be9534ddf",
+          "filename": "tuw_gamepad/src/gamepad_node.cpp",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 0,
+          "changes": 15,
+          "blob_url": "https://github.com/tuw-robotics/tuw_robotics/blob/77430921c73d683c73bb6aad795cd64ed2d8eecd/tuw_gamepad%2Fsrc%2Fgamepad_node.cpp",
+          "raw_url": "https://github.com/tuw-robotics/tuw_robotics/raw/77430921c73d683c73bb6aad795cd64ed2d8eecd/tuw_gamepad%2Fsrc%2Fgamepad_node.cpp",
+          "contents_url": "https://api.github.com/repos/tuw-robotics/tuw_robotics/contents/tuw_gamepad%2Fsrc%2Fgamepad_node.cpp?ref=77430921c73d683c73bb6aad795cd64ed2d8eecd",
+          "patch": "@@ -83,6 +83,18 @@ void Gamepad::on_timer()\n     if (axis_angular_z_ >= 0) {\n       current_cmd_.twist.angular.z = axes[axis_angular_z_] * scale_angular_;\n     }\n+    if (flip_angular_when_reversing_ && current_cmd_.twist.linear.x < 0.0) {\n+      current_cmd_.twist.angular.z = - current_cmd_.twist.angular.z;\n+    }\n+\n+    if (buttons[button_fast_]) {\n+      current_cmd_.twist.linear.x *= 2.0;\n+      current_cmd_.twist.linear.y *= 2.0;\n+      current_cmd_.twist.linear.z *= 2.0;\n+      current_cmd_.twist.angular.x *= 2.0;\n+      current_cmd_.twist.angular.y *= 2.0;\n+      current_cmd_.twist.angular.z *= 2.0;\n+    }\n   }\n   if (debug_ & state_changed) {\n     RCLCPP_INFO(this->get_logger(), \"\\n%s\", joystick_->state().c_str());\n@@ -109,6 +121,7 @@ void Gamepad::declare_parameters()\n   declare_parameters_with_description(\"use_stamped_velocity\", false,\n     \"On true it uses TwistStamped messages, otherwise Twist!\");\n   declare_parameters_with_description(\"debug\", false, \"On true it prints changes on the joystick\");\n+  declare_parameters_with_description(\"flip_angular_when_reversing\", false, \"On true it flips the angular velocity when reversing\");\n \n   declare_parameters_with_description(\"button_deadman\", 4, \"button id deadman\", 0, 8, 1);\n   declare_parameters_with_description(\"lx\", 4, \"axis linear x  (-1 means not used)\", -1, 8, 1);\n@@ -131,6 +144,7 @@ bool Gamepad::read_dynamic_parameters()\n   if (first_call || ((current_call - last_call)).seconds() > 1.0) {\n     update_parameter_and_log(\"rate\", rate_, changes, first_call);\n     update_parameter_and_log(\"button_deadman\", button_deadman_, changes, first_call);\n+    update_parameter_and_log(\"button_fast\", button_fast_, changes, first_call);\n     update_parameter_and_log(\"lx\", axis_linear_x_, changes, first_call);\n     update_parameter_and_log(\"ax\", axis_angular_x_, changes, first_call);\n     update_parameter_and_log(\"ly\", axis_linear_y_, changes, first_call);\n@@ -139,6 +153,7 @@ bool Gamepad::read_dynamic_parameters()\n     update_parameter_and_log(\"az\", axis_angular_z_, changes, first_call);\n     update_parameter_and_log(\"scale_linear\", scale_linear_, changes, first_call);\n     update_parameter_and_log(\"scale_angular\", scale_angular_, changes, first_call);\n+    update_parameter_and_log(\"flip_angular_when_reversing\", flip_angular_when_reversing_, changes, first_call);\n   }\n   first_call = false;\n   return changes;"
+        }
+      ]
+    },
+    {
+      "author": "maxbader",
+      "date": "2024-11-26T09:12:59Z",
+      "sha": "bd21f159778d621c4966767e3fbf5912961bada3",
+      "message": "Initial commit",
+      "files_changed": 3,
+      "additions": 62,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "259148fa18f9fb7ef58563f4ff15fc7b172339fb",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 32,
+          "deletions": 0,
+          "changes": 32,
+          "blob_url": "https://github.com/tuw-robotics/tuw_robotics/blob/bd21f159778d621c4966767e3fbf5912961bada3/.gitignore",
+          "raw_url": "https://github.com/tuw-robotics/tuw_robotics/raw/bd21f159778d621c4966767e3fbf5912961bada3/.gitignore",
+          "contents_url": "https://api.github.com/repos/tuw-robotics/tuw_robotics/contents/.gitignore?ref=bd21f159778d621c4966767e3fbf5912961bada3",
+          "patch": "@@ -0,0 +1,32 @@\n+# Prerequisites\n+*.d\n+\n+# Compiled Object files\n+*.slo\n+*.lo\n+*.o\n+*.obj\n+\n+# Precompiled Headers\n+*.gch\n+*.pch\n+\n+# Compiled Dynamic libraries\n+*.so\n+*.dylib\n+*.dll\n+\n+# Fortran module files\n+*.mod\n+*.smod\n+\n+# Compiled Static libraries\n+*.lai\n+*.la\n+*.a\n+*.lib\n+\n+# Executables\n+*.exe\n+*.out\n+*.app"
+        },
+        {
+          "sha": "d34495b724481d4d9f87d18cdb2600ea716cbfb8",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 28,
+          "deletions": 0,
+          "changes": 28,
+          "blob_url": "https://github.com/tuw-robotics/tuw_robotics/blob/bd21f159778d621c4966767e3fbf5912961bada3/LICENSE",
+          "raw_url": "https://github.com/tuw-robotics/tuw_robotics/raw/bd21f159778d621c4966767e3fbf5912961bada3/LICENSE",
+          "contents_url": "https://api.github.com/repos/tuw-robotics/tuw_robotics/contents/LICENSE?ref=bd21f159778d621c4966767e3fbf5912961bada3",
+          "patch": "@@ -0,0 +1,28 @@\n+BSD 3-Clause License\n+\n+Copyright (c) 2024, TU Wien Robotics\n+\n+Redistribution and use in source and binary forms, with or without\n+modification, are permitted provided that the following conditions are met:\n+\n+1. Redistributions of source code must retain the above copyright notice, this\n+   list of conditions and the following disclaimer.\n+\n+2. Redistributions in binary form must reproduce the above copyright notice,\n+   this list of conditions and the following disclaimer in the documentation\n+   and/or other materials provided with the distribution.\n+\n+3. Neither the name of the copyright holder nor the names of its\n+   contributors may be used to endorse or promote products derived from\n+   this software without specific prior written permission.\n+\n+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\n+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE\n+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL\n+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR\n+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\n+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+        },
+        {
+          "sha": "6ed0ef046afa2bfdfcaa66314138528ad6356374",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/tuw-robotics/tuw_robotics/blob/bd21f159778d621c4966767e3fbf5912961bada3/README.md",
+          "raw_url": "https://github.com/tuw-robotics/tuw_robotics/raw/bd21f159778d621c4966767e3fbf5912961bada3/README.md",
+          "contents_url": "https://api.github.com/repos/tuw-robotics/tuw_robotics/contents/README.md?ref=bd21f159778d621c4966767e3fbf5912961bada3",
+          "patch": "@@ -0,0 +1,2 @@\n+# tuw_robotics\n+ROS package collection"
+        }
+      ]
+    },
+    {
+      "author": "MoritzTaf",
+      "date": "2025-06-04T09:47:45Z",
+      "sha": "d2e38f77d4a957630f437f6fa3e4431352f7686e",
+      "message": "fix typo",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "2a02526721570381a0262ccdc49a29151d26a096",
+          "filename": "tuw_gamepad/include/tuw_gamepad/gamepad_node.hpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/tuw-robotics/tuw_robotics/blob/d2e38f77d4a957630f437f6fa3e4431352f7686e/tuw_gamepad%2Finclude%2Ftuw_gamepad%2Fgamepad_node.hpp",
+          "raw_url": "https://github.com/tuw-robotics/tuw_robotics/raw/d2e38f77d4a957630f437f6fa3e4431352f7686e/tuw_gamepad%2Finclude%2Ftuw_gamepad%2Fgamepad_node.hpp",
+          "contents_url": "https://api.github.com/repos/tuw-robotics/tuw_robotics/contents/tuw_gamepad%2Finclude%2Ftuw_gamepad%2Fgamepad_node.hpp?ref=d2e38f77d4a957630f437f6fa3e4431352f7686e",
+          "patch": "@@ -38,8 +38,8 @@ namespace tuw_gamepad\n \n     double rate_;              /// dynamic parameter: Publishing rate in [hz]\n     std::string frame_id_;     /// static parameter: Frame used in TwistStamped messages\n-    std::string device;        /// static parameter: Joystick device default \"/dev/input/js0\"\n-    bool use_stamped_velocity; /// static parameter: On true it uses TwistStamped messages, otherwise Twist!\n+    std::string device_;        /// static parameter: Joystick device default \"/dev/input/js0\"\n+    bool use_stamped_velocity_;  /// static parameter: On true it uses TwistStamped messages, otherwise Twist!\n     int button_deadman_;       /// static parameter: deadmean button id\n     double scale_linear_;      /// static parameter: scale in linear  [m/s]\n     double scale_angular_;     /// static parameter: scale in rotation  [rad/s]"
+        }
+      ]
+    }
+  ]
+}

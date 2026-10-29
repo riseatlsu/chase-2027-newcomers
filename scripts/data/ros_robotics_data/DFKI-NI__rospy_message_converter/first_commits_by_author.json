@@ -1,0 +1,813 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T04:23:03Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "DFKI-NI",
+    "repo": "rospy_message_converter"
+  },
+  "data": [
+    {
+      "author": "mintar",
+      "date": "2019-01-14T09:31:50Z",
+      "sha": "1e0d1cb18df525524f5b1e5633d5639737314330",
+      "message": "Test lunar + melodic in Travis",
+      "files_changed": 3,
+      "additions": 34,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "fdf53ce52f932985d155c05bd877c087e06b6baa",
+          "filename": ".travis.yml",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/1e0d1cb18df525524f5b1e5633d5639737314330/.travis.yml",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/1e0d1cb18df525524f5b1e5633d5639737314330/.travis.yml",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/.travis.yml?ref=1e0d1cb18df525524f5b1e5633d5639737314330",
+          "patch": "@@ -7,8 +7,12 @@ before_install:\n   - docker build -t rospy_message_converter_indigo -f Dockerfile-indigo .\n   - docker build -t rospy_message_converter_jade -f Dockerfile-jade .\n   - docker build -t rospy_message_converter_kinetic -f Dockerfile-kinetic .\n+  - docker build -t rospy_message_converter_lunar -f Dockerfile-lunar .\n+  - docker build -t rospy_message_converter_melodic -f Dockerfile-melodic .\n \n script:\n   - docker run rospy_message_converter_indigo /bin/bash -c \"source devel/setup.bash && rostest rospy_message_converter test_all.test\"\n   - docker run rospy_message_converter_jade /bin/bash -c \"source devel/setup.bash && rostest rospy_message_converter test_all.test\"\n   - docker run rospy_message_converter_kinetic /bin/bash -c \"source devel/setup.bash && rostest rospy_message_converter test_all.test\"\n+  - docker run rospy_message_converter_lunar /bin/bash -c \"source devel/setup.bash && rostest rospy_message_converter test_all.test\"\n+  - docker run rospy_message_converter_melodic /bin/bash -c \"source devel/setup.bash && rostest rospy_message_converter test_all.test\""
+        },
+        {
+          "sha": "5b049afd1510616817ddc66cefeeef4d5897e77f",
+          "filename": "Dockerfile-lunar",
+          "status": "added",
+          "additions": 15,
+          "deletions": 0,
+          "changes": 15,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/1e0d1cb18df525524f5b1e5633d5639737314330/Dockerfile-lunar",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/1e0d1cb18df525524f5b1e5633d5639737314330/Dockerfile-lunar",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/Dockerfile-lunar?ref=1e0d1cb18df525524f5b1e5633d5639737314330",
+          "patch": "@@ -0,0 +1,15 @@\n+FROM ros:lunar-ros-core\n+\n+RUN apt-get update && apt-get install -y \\\n+    build-essential\n+\n+# Create ROS workspace\n+COPY . /ws/src/rospy_message_converter\n+WORKDIR /ws\n+\n+# Install the package and its dependencies\n+RUN rosdep install --from-paths src --ignore-src --rosdistro lunar -y\n+\n+# Set up the development environment\n+RUN /bin/bash -c \"source /opt/ros/lunar/setup.bash && \\\n+    catkin_make install\""
+        },
+        {
+          "sha": "97ac1c138bee774aeec555cf1940718af34d7880",
+          "filename": "Dockerfile-melodic",
+          "status": "added",
+          "additions": 15,
+          "deletions": 0,
+          "changes": 15,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/1e0d1cb18df525524f5b1e5633d5639737314330/Dockerfile-melodic",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/1e0d1cb18df525524f5b1e5633d5639737314330/Dockerfile-melodic",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/Dockerfile-melodic?ref=1e0d1cb18df525524f5b1e5633d5639737314330",
+          "patch": "@@ -0,0 +1,15 @@\n+FROM ros:melodic-ros-core\n+\n+RUN apt-get update && apt-get install -y \\\n+    build-essential\n+\n+# Create ROS workspace\n+COPY . /ws/src/rospy_message_converter\n+WORKDIR /ws\n+\n+# Install the package and its dependencies\n+RUN rosdep install --from-paths src --ignore-src --rosdistro melodic -y\n+\n+# Set up the development environment\n+RUN /bin/bash -c \"source /opt/ros/melodic/setup.bash && \\\n+    catkin_make install\""
+        }
+      ]
+    },
+    {
+      "author": "yurirocha15",
+      "date": "2021-11-23T09:15:05Z",
+      "sha": "b5e715e8285d88ebcf6b8bc5e402faf4636c6bf7",
+      "message": "add option to change log level (#58)",
+      "files_changed": 2,
+      "additions": 12,
+      "deletions": 4,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "1dffee23d7d95f25f074fdbe6b625339f839098d",
+          "filename": "src/rospy_message_converter/json_message_converter.py",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 2,
+          "changes": 6,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/b5e715e8285d88ebcf6b8bc5e402faf4636c6bf7/src%2Frospy_message_converter%2Fjson_message_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/b5e715e8285d88ebcf6b8bc5e402faf4636c6bf7/src%2Frospy_message_converter%2Fjson_message_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/src%2Frospy_message_converter%2Fjson_message_converter.py?ref=b5e715e8285d88ebcf6b8bc5e402faf4636c6bf7",
+          "patch": "@@ -3,7 +3,7 @@\n from rospy_message_converter import message_converter\n \n \n-def convert_json_to_ros_message(message_type, json_message, strict_mode=True):\n+def convert_json_to_ros_message(message_type, json_message, strict_mode=True, log_level='error'):\n     \"\"\"\n     Takes in the message type and a JSON-formatted string and returns a ROS\n     message.\n@@ -14,6 +14,8 @@ def convert_json_to_ros_message(message_type, json_message, strict_mode=True):\n     :type  json_message: str\n     :param strict_mode: If strict_mode is set, an exception will be thrown if the json message contains extra fields.\n     :type  strict_mode: bool, optional\n+    :param log_level: The log level to be used. Available levels: debug, info, warning, error, critical\n+    :type  log_level: str, optional\n     :return: A ROS message\n     :rtype: class:`genpy.Message`\n \n@@ -24,7 +26,7 @@ def convert_json_to_ros_message(message_type, json_message, strict_mode=True):\n         data: \"Hello, Robot\"\n     \"\"\"\n     dictionary = json.loads(json_message)\n-    return message_converter.convert_dictionary_to_ros_message(message_type, dictionary, strict_mode=strict_mode)\n+    return message_converter.convert_dictionary_to_ros_message(message_type, dictionary, strict_mode=strict_mode, log_level=log_level)\n \n \n def convert_ros_message_to_json(message, binary_array_as_bytes=True):"
+        },
+        {
+          "sha": "bcbe2f814270a7850767acb070a8c8427f4cfd85",
+          "filename": "src/rospy_message_converter/message_converter.py",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 2,
+          "changes": 10,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/b5e715e8285d88ebcf6b8bc5e402faf4636c6bf7/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/b5e715e8285d88ebcf6b8bc5e402faf4636c6bf7/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/src%2Frospy_message_converter%2Fmessage_converter.py?ref=b5e715e8285d88ebcf6b8bc5e402faf4636c6bf7",
+          "patch": "@@ -31,6 +31,7 @@\n # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n # POSSIBILITY OF SUCH DAMAGE.\n \n+import logging\n import roslib.message\n import rospy\n import base64\n@@ -102,7 +103,7 @@\n ros_header_types = ['Header', 'std_msgs/Header', 'roslib/Header']\n \n def convert_dictionary_to_ros_message(message_type, dictionary, kind='message', strict_mode=True,\n-                                      check_missing_fields=False, check_types=True):\n+                                      check_missing_fields=False, check_types=True, log_level='error'):\n     \"\"\"\n     Takes in the message type and a Python dictionary and returns a ROS message.\n \n@@ -149,7 +150,12 @@ def convert_dictionary_to_ros_message(message_type, dictionary, kind='message',\n             if strict_mode:\n                 raise ValueError(error_message)\n             else:\n-                rospy.logerr('{}! It will be ignored.'.format(error_message))\n+                if log_level not in [\"debug\", \"info\", \"warning\", \"error\", \"critical\"]:\n+                    log_level = \"error\"\n+                logger = logging.getLogger('rosout')\n+                log_func = getattr(logger, log_level)\n+                \n+                log_func('{}! It will be ignored.'.format(error_message))                    \n \n     if check_missing_fields and remaining_message_fields:\n         error_message = 'Missing fields \"{0}\"'.format(remaining_message_fields)"
+        }
+      ]
+    },
+    {
+      "author": "marbosjo",
+      "date": "2020-12-11T20:10:45Z",
+      "sha": "431058c4a59a3165996a4fe073cc4fe37b13842e",
+      "message": "propagate check_types in _convert_to_ros_type (#51)\n\nCo-authored-by: Martin Günther <martin.guenther@dfki.de>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "a316a9b464b8b5a2164f9b01df48bde70b76dd38",
+          "filename": "src/rospy_message_converter/message_converter.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/431058c4a59a3165996a4fe073cc4fe37b13842e/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/431058c4a59a3165996a4fe073cc4fe37b13842e/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/src%2Frospy_message_converter%2Fmessage_converter.py?ref=431058c4a59a3165996a4fe073cc4fe37b13842e",
+          "patch": "@@ -170,7 +170,7 @@ def _convert_to_ros_type(field_name, field_type, field_value, check_types=True):\n     elif _is_field_type_an_array(field_type):\n         field_value = _convert_to_ros_array(field_name, field_type, field_value, check_types)\n     else:\n-        field_value = convert_dictionary_to_ros_message(field_type, field_value)\n+        field_value = convert_dictionary_to_ros_message(field_type, field_value, check_types=check_types)\n \n     return field_value\n "
+        }
+      ]
+    },
+    {
+      "author": "Otacon5555",
+      "date": "2020-11-09T16:07:58Z",
+      "sha": "4ac9c3bcbe011362f4a48f9805ba4aa898cc95f0",
+      "message": "Add param binary_array_as_bytes\n\nCloses #45.",
+      "files_changed": 3,
+      "additions": 20,
+      "deletions": 6,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "79008173f37410bf38de720911e294261c833f69",
+          "filename": "src/rospy_message_converter/json_message_converter.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/4ac9c3bcbe011362f4a48f9805ba4aa898cc95f0/src%2Frospy_message_converter%2Fjson_message_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/4ac9c3bcbe011362f4a48f9805ba4aa898cc95f0/src%2Frospy_message_converter%2Fjson_message_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/src%2Frospy_message_converter%2Fjson_message_converter.py?ref=4ac9c3bcbe011362f4a48f9805ba4aa898cc95f0",
+          "patch": "@@ -16,14 +16,14 @@ def convert_json_to_ros_message(message_type, json_message, strict_mode=True):\n     dictionary = json.loads(json_message)\n     return message_converter.convert_dictionary_to_ros_message(message_type, dictionary, strict_mode=strict_mode)\n \n-def convert_ros_message_to_json(message):\n+def convert_ros_message_to_json(message, binary_array_as_bytes=True):\n     \"\"\"\n     Takes in a ROS message and returns a JSON-formatted string.\n \n     Example:\n         ros_message = std_msgs.msg.String(data=\"Hello, Robot\")\n         json_message = convert_ros_message_to_json(ros_message)\n     \"\"\"\n-    dictionary = message_converter.convert_ros_message_to_dictionary(message)\n+    dictionary = message_converter.convert_ros_message_to_dictionary(message, binary_array_as_bytes)\n     json_message = json.dumps(dictionary)\n     return json_message"
+        },
+        {
+          "sha": "4a03e9e1ee3cba10ddd52efdad1c8b37848946a0",
+          "filename": "src/rospy_message_converter/message_converter.py",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 4,
+          "changes": 14,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/4ac9c3bcbe011362f4a48f9805ba4aa898cc95f0/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/4ac9c3bcbe011362f4a48f9805ba4aa898cc95f0/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/src%2Frospy_message_converter%2Fmessage_converter.py?ref=4ac9c3bcbe011362f4a48f9805ba4aa898cc95f0",
+          "patch": "@@ -215,7 +215,7 @@ def _convert_to_ros_array(field_name, field_type, list_value, check_types=True):\n     list_type = field_type[:field_type.index('[')]\n     return [_convert_to_ros_type(field_name, list_type, value, check_types) for value in list_value]\n \n-def convert_ros_message_to_dictionary(message):\n+def convert_ros_message_to_dictionary(message, binary_array_as_bytes=True):\n     \"\"\"\n     Takes in a ROS message and returns a Python dictionary.\n \n@@ -227,17 +227,23 @@ def convert_ros_message_to_dictionary(message):\n     message_fields = _get_message_fields(message)\n     for field_name, field_type in message_fields:\n         field_value = getattr(message, field_name)\n-        dictionary[field_name] = _convert_from_ros_type(field_type, field_value)\n+        dictionary[field_name] = _convert_from_ros_type(field_type, field_value, binary_array_as_bytes)\n \n     return dictionary\n \n-def _convert_from_ros_type(field_type, field_value):\n+\n+def _convert_from_ros_type(field_type, field_value, binary_array_as_bytes=True):\n     if field_type in ros_primitive_types:\n         field_value = _convert_from_ros_primitive(field_type, field_value)\n     elif field_type in ros_time_types:\n         field_value = _convert_from_ros_time(field_type, field_value)\n     elif _is_ros_binary_type(field_type):\n-        field_value = _convert_from_ros_binary(field_type, field_value)\n+        if binary_array_as_bytes:\n+            field_value = _convert_from_ros_binary(field_type, field_value)\n+        elif type(field_value) == str:\n+            field_value = [ord(v) for v in field_value]\n+        else:\n+            field_value = list(field_value)\n     elif _is_field_type_a_primitive_array(field_type):\n         field_value = list(field_value)\n     elif _is_field_type_an_array(field_type):"
+        },
+        {
+          "sha": "5fbb3158ab231ecbfc6ed72db542dc99a7ee2b6a",
+          "filename": "test/test_message_converter.py",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/4ac9c3bcbe011362f4a48f9805ba4aa898cc95f0/test%2Ftest_message_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/4ac9c3bcbe011362f4a48f9805ba4aa898cc95f0/test%2Ftest_message_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/test%2Ftest_message_converter.py?ref=4ac9c3bcbe011362f4a48f9805ba4aa898cc95f0",
+          "patch": "@@ -138,6 +138,14 @@ def test_ros_message_with_3uint8_array(self):\n         expected_data = b64encode(bytearray(expected_data)).decode('utf-8')\n         self.assertEqual(dictionary[\"data\"], expected_data)\n \n+    def test_ros_message_with_3uint8_array_binary_array_as_array(self):\n+        from rospy_message_converter.msg import Uint8Array3TestMessage\n+        expected_data = [97, 98, 99]\n+        message = Uint8Array3TestMessage(data=expected_data)\n+        message = serialize_deserialize(message)\n+        dictionary = message_converter.convert_ros_message_to_dictionary(message, False)\n+        self.assertEqual(dictionary[\"data\"], expected_data)\n+\n     def test_ros_message_with_int16(self):\n         from std_msgs.msg import Int16\n         expected_dictionary = { 'data': -0x7FFF }"
+        }
+      ]
+    },
+    {
+      "author": "betaboon",
+      "date": "2020-10-07T10:33:41Z",
+      "sha": "35f12383a1652792dd2fdf73e8b2e19b9da92fc9",
+      "message": "Avoid numpy dependency",
+      "files_changed": 2,
+      "additions": 47,
+      "deletions": 19,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "783581f5ce648ebaae8a8d0dc1007a1787d9db9d",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 5,
+          "changes": 12,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/35f12383a1652792dd2fdf73e8b2e19b9da92fc9/package.xml",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/35f12383a1652792dd2fdf73e8b2e19b9da92fc9/package.xml",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/package.xml?ref=35f12383a1652792dd2fdf73e8b2e19b9da92fc9",
+          "patch": "@@ -1,5 +1,5 @@\n <?xml version=\"1.0\"?>\n-<package>\n+<package format=\"3\">\n   <name>rospy_message_converter</name>\n   <version>0.5.3</version>\n   <description>Converts between Python dictionaries and JSON to rospy messages.</description>\n@@ -15,11 +15,13 @@\n   <build_depend>message_generation</build_depend>\n   <build_depend>std_msgs</build_depend>\n \n-  <run_depend>roslib</run_depend>\n-  <run_depend>rospy</run_depend>\n-  <run_depend>message_runtime</run_depend>\n-  <run_depend>std_msgs</run_depend>\n+  <exec_depend>roslib</exec_depend>\n+  <exec_depend>rospy</exec_depend>\n+  <exec_depend>message_runtime</exec_depend>\n+  <exec_depend>std_msgs</exec_depend>\n \n   <test_depend>rosunit</test_depend>\n   <test_depend>std_srvs</test_depend>\n+  <test_depend condition=\"$ROS_PYTHON_VERSION == 2\">python-numpy</test_depend>\n+  <test_depend condition=\"$ROS_PYTHON_VERSION == 3\">python3-numpy</test_depend>\n </package>"
+        },
+        {
+          "sha": "e6351aa1acdc58c9a1f94854d7b1f7d4c9a615ef",
+          "filename": "src/rospy_message_converter/message_converter.py",
+          "status": "modified",
+          "additions": 40,
+          "deletions": 14,
+          "changes": 54,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/35f12383a1652792dd2fdf73e8b2e19b9da92fc9/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/35f12383a1652792dd2fdf73e8b2e19b9da92fc9/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/src%2Frospy_message_converter%2Fmessage_converter.py?ref=35f12383a1652792dd2fdf73e8b2e19b9da92fc9",
+          "patch": "@@ -36,7 +36,7 @@\n import base64\n import sys\n import copy\n-import numpy as np\n+import collections\n \n python3 = (sys.hexversion > 0x03000000)\n \n@@ -53,22 +53,48 @@\n \n ros_to_python_type_map = {\n     'bool'    : [bool],\n-    'float32' : python_float_types + python_int_types + [np.float32, np.int8, np.int16, np.uint8, np.uint16],\n-       # don't include int32, because conversion to float may change value: v = np.iinfo(np.int32).max; np.float32(v) != v\n-    'float64' : python_float_types + python_int_types + [np.float32, np.float64, np.int8, np.int16, np.int32, np.uint8, np.uint16, np.uint32],\n-    'int8'    : python_int_types + [np.int8],\n-    'int16'   : python_int_types + [np.int8, np.int16, np.uint8],\n-    'int32'   : python_int_types + [np.int8, np.int16, np.int32, np.uint8, np.uint16],\n-    'int64'   : python_int_types + [np.int8, np.int16, np.int32, np.int64, np.uint8, np.uint16, np.uint32],\n-    'uint8'   : python_int_types + [np.uint8],\n-    'uint16'  : python_int_types + [np.uint8, np.uint16],\n-    'uint32'  : python_int_types + [np.uint8, np.uint16, np.uint32],\n-    'uint64'  : python_int_types + [np.uint8, np.uint16, np.uint32, np.uint64],\n-    'byte'    : python_int_types + [np.int8],\n-    'char'    : python_int_types + [np.uint8],\n+    'float32' : python_float_types + python_int_types,\n+    'float64' : python_float_types + python_int_types,\n+    'int8'    : python_int_types,\n+    'int16'   : python_int_types,\n+    'int32'   : python_int_types,\n+    'int64'   : python_int_types,\n+    'uint8'   : python_int_types,\n+    'uint16'  : python_int_types,\n+    'uint32'  : python_int_types,\n+    'uint64'  : python_int_types,\n+    'byte'    : python_int_types,\n+    'char'    : python_int_types,\n     'string'  : python_string_types\n }\n \n+try:\n+    import numpy as np\n+    _ros_to_numpy_type_map = {\n+        'float32' : [np.float32, np.int8, np.int16, np.uint8, np.uint16],\n+        # don't include int32, because conversion to float may change value: v = np.iinfo(np.int32).max; np.float32(v) != v\n+        'float64' : [np.float32, np.float64, np.int8, np.int16, np.int32, np.uint8, np.uint16, np.uint32],\n+        'int8'    : [np.int8],\n+        'int16'   : [np.int8, np.int16, np.uint8],\n+        'int32'   : [np.int8, np.int16, np.int32, np.uint8, np.uint16],\n+        'int64'   : [np.int8, np.int16, np.int32, np.int64, np.uint8, np.uint16, np.uint32],\n+        'uint8'   : [np.uint8],\n+        'uint16'  : [np.uint8, np.uint16],\n+        'uint32'  : [np.uint8, np.uint16, np.uint32],\n+        'uint64'  : [np.uint8, np.uint16, np.uint32, np.uint64],\n+        'byte'    : [np.int8],\n+        'char'    : [np.uint8],\n+    }\n+\n+    # merge type_maps\n+    merged = collections.defaultdict(list, ros_to_python_type_map)\n+    for k, v in _ros_to_numpy_type_map.items():\n+        merged[k].extend(v)\n+    ros_to_python_type_map = dict(merged)\n+except ImportError:\n+    pass\n+\n+\n ros_time_types = ['time', 'duration']\n ros_primitive_types = ['bool', 'byte', 'char', 'int8', 'uint8', 'int16',\n                        'uint16', 'int32', 'uint32', 'int64', 'uint64',"
+        }
+      ]
+    },
+    {
+      "author": "mag-sruehl",
+      "date": "2020-08-11T12:54:18Z",
+      "sha": "b8ec15271c5cc82457129dceabc8cac86bf984de",
+      "message": "python 3 fix for _convert_to_ros_binary",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "7e4880624645c1f1804f6f72d7a1d00397f54c10",
+          "filename": "src/rospy_message_converter/message_converter.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/b8ec15271c5cc82457129dceabc8cac86bf984de/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/b8ec15271c5cc82457129dceabc8cac86bf984de/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/src%2Frospy_message_converter%2Fmessage_converter.py?ref=b8ec15271c5cc82457129dceabc8cac86bf984de",
+          "patch": "@@ -150,9 +150,10 @@ def _convert_to_ros_type(field_type, field_value):\n def _convert_to_ros_binary(field_type, field_value):\n     if type(field_value) in python_string_types:\n         binary_value_as_string = base64.standard_b64decode(field_value)\n+    elif python3:\n+        binary_value_as_string = bytes(bytearray(field_value))\n     else:\n         binary_value_as_string = str(bytearray(field_value))\n-\n     return binary_value_as_string\n \n def _convert_to_ros_time(field_type, field_value):"
+        }
+      ]
+    },
+    {
+      "author": "alecarnevale",
+      "date": "2020-07-09T10:50:32Z",
+      "sha": "5d8922d4fd9b25e3c6896fec77a30829266e2ff8",
+      "message": "Check for missing fields when converting from dict to message",
+      "files_changed": 1,
+      "additions": 8,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "a417a64fedbd23a37cc4a00fcc05a217fbf98140",
+          "filename": "src/rospy_message_converter/message_converter.py",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/5d8922d4fd9b25e3c6896fec77a30829266e2ff8/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/5d8922d4fd9b25e3c6896fec77a30829266e2ff8/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/src%2Frospy_message_converter%2Fmessage_converter.py?ref=5d8922d4fd9b25e3c6896fec77a30829266e2ff8",
+          "patch": "@@ -36,6 +36,7 @@\n import re\n import base64\n import sys\n+import copy\n python3 = True if sys.hexversion > 0x03000000 else False\n python_to_ros_type_map = {\n     'bool'    : ['bool'],\n@@ -89,11 +90,14 @@ def convert_dictionary_to_ros_message(message_type, dictionary, kind='message',\n         raise ValueError('Unknown kind \"%s\".' % kind)\n     message_fields = dict(_get_message_fields(message))\n \n+    remaining_message_fields = copy.deepcopy(message_fields)\n+\n     for field_name, field_value in dictionary.items():\n         if field_name in message_fields:\n             field_type = message_fields[field_name]\n             field_value = _convert_to_ros_type(field_type, field_value)\n             setattr(message, field_name, field_value)\n+            del remaining_message_fields[field_name]\n         else:\n             error_message = 'ROS message type \"{0}\" has no field named \"{1}\"'\\\n                 .format(message_type, field_name)\n@@ -102,6 +106,10 @@ def convert_dictionary_to_ros_message(message_type, dictionary, kind='message',\n             else:\n                 rospy.logerr('{}! It will be ignored.'.format(error_message))\n \n+    if remaining_message_fields:\n+        error_message = 'Missing fields \"{0}\"'.format(remaining_message_fields)\n+        raise ValueError(error_message)\n+\n     return message\n \n def _convert_to_ros_type(field_type, field_value):"
+        }
+      ]
+    },
+    {
+      "author": "nyxaria",
+      "date": "2020-04-08T16:42:57Z",
+      "sha": "ff44b976ea50189f01f96c30a7c3b4aba3b331a4",
+      "message": "add check for python3 str serializing #33 (#34)\n\nCo-Authored-By: Martin Günther <martin.guenther@dfki.de>",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b9609c86c6730899fb88efc9dd7f3a323603e004",
+          "filename": "src/rospy_message_converter/message_converter.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/ff44b976ea50189f01f96c30a7c3b4aba3b331a4/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/ff44b976ea50189f01f96c30a7c3b4aba3b331a4/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/src%2Frospy_message_converter%2Fmessage_converter.py?ref=ff44b976ea50189f01f96c30a7c3b4aba3b331a4",
+          "patch": "@@ -146,7 +146,8 @@ def _convert_to_ros_time(field_type, field_value):\n     return time\n \n def _convert_to_ros_primitive(field_type, field_value):\n-    if field_type == \"string\":\n+    # std_msgs/msg/_String.py always calls encode() on python3, so don't do it here\n+    if field_type == \"string\" and not python3:\n         field_value = field_value.encode('utf-8')\n     return field_value\n "
+        }
+      ]
+    },
+    {
+      "author": "Omri Rozenzaft",
+      "date": "2020-02-25T12:06:27Z",
+      "sha": "6b0343df67000540d2572acecb557664d18e3e85",
+      "message": "removed unused _convert_from_ros_primitive",
+      "files_changed": 1,
+      "additions": 0,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "a61a8ab09bdf37a36d6afac80da4f5d2579cb053",
+          "filename": "src/rospy_message_converter/message_converter.py",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 3,
+          "changes": 3,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/6b0343df67000540d2572acecb557664d18e3e85/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/6b0343df67000540d2572acecb557664d18e3e85/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/src%2Frospy_message_converter%2Fmessage_converter.py?ref=6b0343df67000540d2572acecb557664d18e3e85",
+          "patch": "@@ -212,9 +212,6 @@ def _convert_from_ros_time(field_type, field_value):\n     }\n     return field_value\n \n-def _convert_from_ros_primitive(field_type, field_value):\n-    return field_value\n-\n def _convert_from_ros_array(field_type, field_value):\n     list_type = list_brackets.sub('', field_type)\n     return [_convert_from_ros_type(list_type, value) for value in field_value]"
+        }
+      ]
+    },
+    {
+      "author": "Jannik Abbenseth",
+      "date": "2020-02-13T15:56:32Z",
+      "sha": "d78fa5d6da1032a99d9e514b2c4c0fd1d6648ffa",
+      "message": "optionally ignore extra fields when deserializing (#29)",
+      "files_changed": 3,
+      "additions": 24,
+      "deletions": 4,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "569e0826c55ce75a1b2859ead43b0970990203d5",
+          "filename": "src/rospy_message_converter/json_message_converter.py",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 2,
+          "changes": 6,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/d78fa5d6da1032a99d9e514b2c4c0fd1d6648ffa/src%2Frospy_message_converter%2Fjson_message_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/d78fa5d6da1032a99d9e514b2c4c0fd1d6648ffa/src%2Frospy_message_converter%2Fjson_message_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/src%2Frospy_message_converter%2Fjson_message_converter.py?ref=d78fa5d6da1032a99d9e514b2c4c0fd1d6648ffa",
+          "patch": "@@ -1,18 +1,20 @@\n import json\n from rospy_message_converter import message_converter\n \n-def convert_json_to_ros_message(message_type, json_message):\n+def convert_json_to_ros_message(message_type, json_message, strict_mode=True):\n     \"\"\"\n     Takes in the message type and a JSON-formatted string and returns a ROS\n     message.\n \n+    If strict_mode is set, an exception will be thrown if the json message contains extra fields\n+    \n     Example:\n         message_type = \"std_msgs/String\"\n         json_message = '{\"data\": \"Hello, Robot\"}'\n         ros_message = convert_json_to_ros_message(message_type, json_message)\n     \"\"\"\n     dictionary = json.loads(json_message)\n-    return message_converter.convert_dictionary_to_ros_message(message_type, dictionary)\n+    return message_converter.convert_dictionary_to_ros_message(message_type, dictionary, strict_mode=strict_mode)\n \n def convert_ros_message_to_json(message):\n     \"\"\""
+        },
+        {
+          "sha": "f4267898f98f50914001a81c4e6359f8c6899d8b",
+          "filename": "src/rospy_message_converter/message_converter.py",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 2,
+          "changes": 7,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/d78fa5d6da1032a99d9e514b2c4c0fd1d6648ffa/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/d78fa5d6da1032a99d9e514b2c4c0fd1d6648ffa/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/src%2Frospy_message_converter%2Fmessage_converter.py?ref=d78fa5d6da1032a99d9e514b2c4c0fd1d6648ffa",
+          "patch": "@@ -62,7 +62,7 @@\n \n list_brackets = re.compile(r'\\[[^\\]]*\\]')\n \n-def convert_dictionary_to_ros_message(message_type, dictionary, kind='message'):\n+def convert_dictionary_to_ros_message(message_type, dictionary, kind='message', strict_mode=True):\n     \"\"\"\n     Takes in the message type and a Python dictionary and returns a ROS message.\n \n@@ -97,7 +97,10 @@ def convert_dictionary_to_ros_message(message_type, dictionary, kind='message'):\n         else:\n             error_message = 'ROS message type \"{0}\" has no field named \"{1}\"'\\\n                 .format(message_type, field_name)\n-            raise ValueError(error_message)\n+            if strict_mode:\n+                raise ValueError(error_message)\n+            else:\n+                rospy.logerr('{}! It will be ignored.'.format(error_message))\n \n     return message\n "
+        },
+        {
+          "sha": "e901766330b150c2bae76564fd566bd8206abb1b",
+          "filename": "test/test_message_converter.py",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 0,
+          "changes": 15,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/d78fa5d6da1032a99d9e514b2c4c0fd1d6648ffa/test%2Ftest_message_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/d78fa5d6da1032a99d9e514b2c4c0fd1d6648ffa/test%2Ftest_message_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/test%2Ftest_message_converter.py?ref=d78fa5d6da1032a99d9e514b2c4c0fd1d6648ffa",
+          "patch": "@@ -286,6 +286,21 @@ def test_dictionary_with_empty(self):\n         expected_message = serialize_deserialize(expected_message)\n         self.assertEqual(message, expected_message)\n \n+    def test_dictionary_with_empty_additional_args_strict_mode(self):\n+        from std_msgs.msg import Empty\n+        dictionary = {\"additional_args\": \"should raise value error\"}\n+        with self.assertRaises(ValueError) as context:\n+            message_converter.convert_dictionary_to_ros_message('std_msgs/Empty', dictionary)\n+        self.assertTrue(\"has no field named\" in context.exception.message)\n+\n+    def test_dictionary_with_empty_additional_args_forgiving(self):\n+        from std_msgs.msg import Empty\n+        expected_message = Empty()\n+        dictionary = {\"additional_args\": \"should be ignored\"}\n+        message = message_converter.convert_dictionary_to_ros_message('std_msgs/Empty', dictionary, strict_mode=False)\n+        expected_message = serialize_deserialize(expected_message)\n+        self.assertEqual(message, expected_message)\n+\n     def test_dictionary_with_float32(self):\n         from std_msgs.msg import Float32\n         expected_message = Float32(data = struct.unpack('<f', '\\x7F\\x7F\\xFF\\xFD')[0])"
+        }
+      ]
+    },
+    {
+      "author": "Jean-Baptiste Doyon",
+      "date": "2017-05-10T15:08:50Z",
+      "sha": "ad09a9eba3f30d25eb8da6b68c994d68a0583c7a",
+      "message": "Removes unnecessary dependency on ROS master node (#18)\n\nThe rospy.init_node method was being called (for creating\ntimestamps with now's time), but using the python time module for\nseeding the object is sufficient (wall-clock).\n\nRemoves the rospy.init_node calls, which turns the whole test class\ninto a UNIT test WITHOUT need for a ROS master node.",
+      "files_changed": 3,
+      "additions": 17,
+      "deletions": 15,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b0d345fdbfa7772b0e96c12dfc80fac9fafef8fb",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/ad09a9eba3f30d25eb8da6b68c994d68a0583c7a/CHANGELOG.rst",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/ad09a9eba3f30d25eb8da6b68c994d68a0583c7a/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/CHANGELOG.rst?ref=ad09a9eba3f30d25eb8da6b68c994d68a0583c7a",
+          "patch": "@@ -4,6 +4,8 @@ Change Log\n Unreleased\n ------------------\n - Fixes fixed-size uint8 array conversion failure (GitHub issue #5)\n+- Removes dependency on ROS master in tests (all tests are now unit\n+  tests)\n \n 0.4.0 (2015-12-13)\n ------------------"
+        },
+        {
+          "sha": "1ee0a2696b8037ea71c99d644e7c4c5bc598dabf",
+          "filename": "test/test_json_message_converter.py",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 4,
+          "changes": 8,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/ad09a9eba3f30d25eb8da6b68c994d68a0583c7a/test%2Ftest_json_message_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/ad09a9eba3f30d25eb8da6b68c994d68a0583c7a/test%2Ftest_json_message_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/test%2Ftest_json_message_converter.py?ref=ad09a9eba3f30d25eb8da6b68c994d68a0583c7a",
+          "patch": "@@ -15,8 +15,8 @@ def test_ros_message_with_string(self):\n \n     def test_ros_message_with_header(self):\n         from std_msgs.msg import Header\n-        rospy.init_node('time_node')\n-        now_time = rospy.Time.now()\n+        from time import time\n+        now_time = rospy.Time(time())\n         expected_json = '{{\"stamp\": {{\"secs\": {0}, \"nsecs\": {1}}}, \"frame_id\": \"my_frame\", \"seq\": 3}}'\\\n             .format(now_time.secs, now_time.nsecs)\n         message = Header(stamp = now_time, frame_id = 'my_frame', seq = 3)\n@@ -48,8 +48,8 @@ def test_json_with_string(self):\n \n     def test_json_with_header(self):\n         from std_msgs.msg import Header\n-        rospy.init_node('time_node')\n-        now_time = rospy.Time.now()\n+        from time import time\n+        now_time = rospy.Time(time())\n         expected_message = Header(\n             stamp = now_time,\n             frame_id = 'my_frame',"
+        },
+        {
+          "sha": "bb1e3f91e30b4d8b22eb032b17aa0273dbfa0266",
+          "filename": "test/test_message_converter.py",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 11,
+          "changes": 22,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/ad09a9eba3f30d25eb8da6b68c994d68a0583c7a/test%2Ftest_message_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/ad09a9eba3f30d25eb8da6b68c994d68a0583c7a/test%2Ftest_message_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/test%2Ftest_message_converter.py?ref=ad09a9eba3f30d25eb8da6b68c994d68a0583c7a",
+          "patch": "@@ -1,8 +1,6 @@\n #!/usr/bin/env python\n import unittest\n import rospy\n-import rostest\n-from pprint import pprint\n from rospy_message_converter import message_converter\n \n class TestMessageConverter(unittest.TestCase):\n@@ -73,8 +71,8 @@ def test_ros_message_with_float64(self):\n \n     def test_ros_message_with_header(self):\n         from std_msgs.msg import Header\n-        rospy.init_node('time_node')\n-        now_time = rospy.Time.now()\n+        from time import time\n+        now_time = rospy.Time(time())\n         expected_dictionary = {\n             'stamp': { 'secs': now_time.secs, 'nsecs': now_time.nsecs },\n             'frame_id' : 'my_frame',\n@@ -169,8 +167,8 @@ def test_ros_message_with_string(self):\n \n     def test_ros_message_with_time(self):\n         from std_msgs.msg import Time\n-        rospy.init_node('time_node')\n-        now_time = rospy.Time.now()\n+        from time import time\n+        now_time = rospy.Time(time())\n         expected_dictionary = {\n             'data': { 'secs': now_time.secs, 'nsecs': now_time.nsecs }\n         }\n@@ -275,8 +273,8 @@ def test_dictionary_with_float64(self):\n \n     def test_dictionary_with_header(self):\n         from std_msgs.msg import Header\n-        rospy.init_node('time_node')\n-        now_time = rospy.Time.now()\n+        from time import time\n+        now_time = rospy.Time(time())\n         expected_message = Header(\n             stamp = now_time,\n             frame_id = 'my_frame',\n@@ -292,8 +290,8 @@ def test_dictionary_with_header(self):\n \n     def test_dictionary_with_header_with_no_prefix(self):\n         from std_msgs.msg import Header\n-        rospy.init_node('time_node')\n-        now_time = rospy.Time.now()\n+        from time import time\n+        now_time = rospy.Time(time())\n         expected_message = Header(\n             stamp = now_time,\n             frame_id = 'my_frame',\n@@ -380,7 +378,8 @@ def test_dictionary_with_unicode(self):\n \n     def test_dictionary_with_time(self):\n         from std_msgs.msg import Time\n-        now_time = rospy.Time.now()\n+        from time import time\n+        now_time = rospy.Time(time())\n         expected_message = Time(data=now_time)\n         dictionary = {\n             'data': {\n@@ -473,4 +472,5 @@ def test_dictionary_with_trigger_service(self):\n PKG = 'rospy_message_converter'\n NAME = 'test_message_converter'\n if __name__ == '__main__':\n+    import rostest\n     rostest.unitrun(PKG, NAME, TestMessageConverter)"
+        }
+      ]
+    },
+    {
+      "author": "neka-nat",
+      "date": "2018-02-17T14:23:25Z",
+      "sha": "74e1c224ad1877c0a941dccbdcd8013e122d02b6",
+      "message": "Add service request/response support (#17)",
+      "files_changed": 2,
+      "additions": 55,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "7cd558fb9d49fe4bfcdf44052259f0ca545564fc",
+          "filename": "src/rospy_message_converter/message_converter.py",
+          "status": "modified",
+          "additions": 17,
+          "deletions": 3,
+          "changes": 20,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/74e1c224ad1877c0a941dccbdcd8013e122d02b6/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/74e1c224ad1877c0a941dccbdcd8013e122d02b6/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/src%2Frospy_message_converter%2Fmessage_converter.py?ref=74e1c224ad1877c0a941dccbdcd8013e122d02b6",
+          "patch": "@@ -64,17 +64,31 @@\n \n list_brackets = re.compile(r'\\[[^\\]]*\\]')\n \n-def convert_dictionary_to_ros_message(message_type, dictionary):\n+def convert_dictionary_to_ros_message(message_type, dictionary, kind='message'):\n     \"\"\"\n     Takes in the message type and a Python dictionary and returns a ROS message.\n \n     Example:\n         message_type = \"std_msgs/String\"\n         dict_message = { \"data\": \"Hello, Robot\" }\n         ros_message = convert_dictionary_to_ros_message(message_type, dict_message)\n+\n+        message_type = \"std_srvs/SetBool\"\n+        dict_message = { \"data\": True }\n+        kind = \"request\"\n+        ros_message = convert_dictionary_to_ros_message(message_type, dict_message, kind)\n     \"\"\"\n-    message_class = roslib.message.get_message_class(message_type)\n-    message = message_class()\n+    if kind == 'message':\n+        message_class = roslib.message.get_message_class(message_type)\n+        message = message_class()\n+    elif kind == 'request':\n+        service_class = roslib.message.get_service_class(message_type)\n+        message = service_class._request_class()\n+    elif kind == 'response':\n+        service_class = roslib.message.get_service_class(message_type)\n+        message = service_class._response_class()\n+    else:\n+        raise ValueError('Unknown kind \"%s\".' % kind)\n     message_fields = dict(_get_message_fields(message))\n \n     for field_name, field_value in dictionary.items():"
+        },
+        {
+          "sha": "2fffc934d4927d87c627ca19aa5854c20c20ec52",
+          "filename": "test/test_message_converter.py",
+          "status": "modified",
+          "additions": 38,
+          "deletions": 0,
+          "changes": 38,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/74e1c224ad1877c0a941dccbdcd8013e122d02b6/test%2Ftest_message_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/74e1c224ad1877c0a941dccbdcd8013e122d02b6/test%2Ftest_message_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/test%2Ftest_message_converter.py?ref=74e1c224ad1877c0a941dccbdcd8013e122d02b6",
+          "patch": "@@ -430,6 +430,44 @@ def test_dictionary_with_invalid_message_fields(self):\n                           'std_msgs/Empty',\n                           {'invalid_field': 1})\n \n+    def test_dictionary_with_empty_service(self):\n+        from std_srvs.srv import Empty, EmptyRequest, EmptyResponse\n+        expected_req = EmptyRequest()\n+        expected_res = EmptyResponse()\n+        dictionary_req = {}\n+        dictionary_res = {}\n+        message = message_converter.convert_dictionary_to_ros_message('std_srvs/Empty', dictionary_req,\n+                                                                      'request')\n+        self.assertEqual(message, expected_req)\n+        message = message_converter.convert_dictionary_to_ros_message('std_srvs/Empty', dictionary_res,\n+                                                                      'response')\n+        self.assertEqual(message, expected_res)\n+\n+    def test_dictionary_with_setbool_service(self):\n+        from std_srvs.srv import SetBool, SetBoolRequest, SetBoolResponse\n+        expected_req = SetBoolRequest(data=True)\n+        expected_res = SetBoolResponse(success=True, message='Success!')\n+        dictionary_req = { 'data': True }\n+        dictionary_res = { 'success': True, 'message': 'Success!' }\n+        message = message_converter.convert_dictionary_to_ros_message('std_srvs/SetBool', dictionary_req,\n+                                                                      'request')\n+        self.assertEqual(message, expected_req)\n+        message = message_converter.convert_dictionary_to_ros_message('std_srvs/SetBool', dictionary_res,\n+                                                                      'response')\n+        self.assertEqual(message, expected_res)\n+\n+    def test_dictionary_with_trigger_service(self):\n+        from std_srvs.srv import Trigger, TriggerRequest, TriggerResponse\n+        expected_req = TriggerRequest()\n+        expected_res = TriggerResponse(success=True, message='Success!')\n+        dictionary_req = {}\n+        dictionary_res = { 'success': True, 'message': 'Success!' }\n+        message = message_converter.convert_dictionary_to_ros_message('std_srvs/Trigger', dictionary_req,\n+                                                                      'request')\n+        self.assertEqual(message, expected_req)\n+        message = message_converter.convert_dictionary_to_ros_message('std_srvs/Trigger', dictionary_res,\n+                                                                      'response')\n+        self.assertEqual(message, expected_res)\n \n \n PKG = 'rospy_message_converter'"
+        }
+      ]
+    },
+    {
+      "author": "schlevik",
+      "date": "2017-11-16T09:38:43Z",
+      "sha": "7e69cabbed24c8b05b41ce39afd925d1ef9080c3",
+      "message": "functionality to handle unicode messages added.\n\nSupersedes #13 (this commit is python3 compatible).",
+      "files_changed": 1,
+      "additions": 10,
+      "deletions": 5,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "2360dff09377d846fe4c8b06e3be9fd5739181a8",
+          "filename": "src/rospy_message_converter/message_converter.py",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 5,
+          "changes": 15,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/7e69cabbed24c8b05b41ce39afd925d1ef9080c3/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/7e69cabbed24c8b05b41ce39afd925d1ef9080c3/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/src%2Frospy_message_converter%2Fmessage_converter.py?ref=7e69cabbed24c8b05b41ce39afd925d1ef9080c3",
+          "patch": "@@ -35,8 +35,8 @@\n import rospy\n import re\n import base64\n-from pprint import pprint\n-\n+import sys\n+python3 = True if sys.hexversion > 0x03000000 else False\n python_to_ros_type_map = {\n     'bool'    : ['bool'],\n     'int'     : ['int8', 'byte', 'uint8', 'char',\n@@ -47,9 +47,12 @@\n     'unicode' : ['string'],\n     'long'    : ['uint64']\n }\n-\n-python_primitive_types = [bool, int, long, float]\n-python_string_types = [str, unicode]\n+if python3:\n+    python_primitive_types = [bool, int, float]\n+    python_string_types = [str]\n+else:\n+    python_primitive_types = [bool, int, long, float]\n+    python_string_types = [str, unicode]\n python_list_types = [list, tuple]\n \n ros_time_types = ['time', 'duration']\n@@ -127,6 +130,8 @@ def _convert_to_ros_time(field_type, field_value):\n     return time\n \n def _convert_to_ros_primitive(field_type, field_value):\n+    if field_type == \"string\":\n+        field_value = field_value.encode('utf-8')\n     return field_value\n \n def _convert_to_ros_array(field_type, list_value):"
+        }
+      ]
+    },
+    {
+      "author": "WBaker",
+      "date": "2016-10-26T15:35:52Z",
+      "sha": "32e45954612578cabd6d8cb9135b67c6a3a497e8",
+      "message": "add test for unicode\n\nTaken from #13.",
+      "files_changed": 1,
+      "additions": 8,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "7269c202b38766b7bb06178bbfa946db233eb00c",
+          "filename": "test/test_message_converter.py",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/32e45954612578cabd6d8cb9135b67c6a3a497e8/test%2Ftest_message_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/32e45954612578cabd6d8cb9135b67c6a3a497e8/test%2Ftest_message_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/test%2Ftest_message_converter.py?ref=32e45954612578cabd6d8cb9135b67c6a3a497e8",
+          "patch": "@@ -370,6 +370,14 @@ def test_dictionary_with_string(self):\n         message = message_converter.convert_dictionary_to_ros_message('std_msgs/String', dictionary)\n         self.assertEqual(message, expected_message)\n \n+    def test_dictionary_with_unicode(self):\n+        from std_msgs.msg import String\n+        expected_message = String(data = 'Hello')\n+        dictionary = { 'data': unicode(expected_message.data) }\n+        message = message_converter.convert_dictionary_to_ros_message('std_msgs/String', dictionary)\n+        self.assertEqual(message.data,expected_message.data)\n+        self.assertEqual(type(message.data),type(expected_message.data))\n+\n     def test_dictionary_with_time(self):\n         from std_msgs.msg import Time\n         now_time = rospy.Time.now()"
+        }
+      ]
+    },
+    {
+      "author": "George",
+      "date": "2015-10-28T13:14:35Z",
+      "sha": "6dd7e759df54712d939ad3c5599312b75b6aaf5b",
+      "message": "Enable testing only if CATKIN_ENABLE_TESTING is set (#9)",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "dcd259045a7007439aa553562b10776f976785e9",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/6dd7e759df54712d939ad3c5599312b75b6aaf5b/CMakeLists.txt",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/6dd7e759df54712d939ad3c5599312b75b6aaf5b/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/CMakeLists.txt?ref=6dd7e759df54712d939ad3c5599312b75b6aaf5b",
+          "patch": "@@ -23,4 +23,6 @@ generate_messages(\n catkin_package(CATKIN_DEPENDS message_runtime std_msgs)\n \n # Test launch files\n+if(CATKIN_ENABLE_TESTING)\n add_rostest(test/test_all.test)\n+endif(CATKIN_ENABLE_TESTING)"
+        }
+      ]
+    },
+    {
+      "author": "OverkillGuy",
+      "date": "2017-05-06T01:19:20Z",
+      "sha": "e846f546530c05184fdea8afe36db148cf348b43",
+      "message": "Fixes fixed-size uint8 arrays differential treatment (#15)\n\n* Adds tests for uint8[] and uint8[3] to message converter\r\n\r\nThis test shows that uint8 arrays of fixed size are handled\r\ndifferently (interpreted to be array of numbers, where uint8[] is\r\nconsidered byte string), which shouldn't be the case.\r\n\r\nReproduces Github Issue #5, test code inspired by PR #8.\r\n\r\n* Fixes GitHub issue #5\r\n\r\nThe check for ROS binary types was a simple \"in\" check for uint8[] and\r\nchar[]. This implied fixed-size uint8 array fail the check and were\r\nconsidered \"regular\" type arrays, with no base64 encoding in sight.\r\n\r\nFixed by making the binary type check a regex-match on the data type,\r\nrefactored into a separate function.\r\n\r\nAll tests now pass.\r\n\r\n* Adds test for json conversion of fixed size uint8 array\r\n\r\nAlso, updates the ros->dict type check to use regex instead of\r\nnow-defunct ros_binary_types array (woopsie)",
+      "files_changed": 7,
+      "additions": 64,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "ca9731537b302e4bfbbfcfdcfaeb7eac1392208a",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/e846f546530c05184fdea8afe36db148cf348b43/CHANGELOG.rst",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/e846f546530c05184fdea8afe36db148cf348b43/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/CHANGELOG.rst?ref=e846f546530c05184fdea8afe36db148cf348b43",
+          "patch": "@@ -1,6 +1,10 @@\n Change Log\n ==========\n \n+Unreleased\n+------------------\n+- Fixes fixed-size uint8 array conversion failure (GitHub issue #5)\n+\n 0.4.0 (2015-12-13)\n ------------------\n - Adds support for ROS Jade"
+        },
+        {
+          "sha": "d94bb7ed1726eed19ed46056f349b0a45100f6b4",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/e846f546530c05184fdea8afe36db148cf348b43/CMakeLists.txt",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/e846f546530c05184fdea8afe36db148cf348b43/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/CMakeLists.txt?ref=e846f546530c05184fdea8afe36db148cf348b43",
+          "patch": "@@ -7,6 +7,8 @@ find_package(catkin REQUIRED COMPONENTS message_generation roslib rospy rostest\n add_message_files(\n   FILES\n   TestArray.msg\n+  Uint8Array3TestMessage.msg\n+  Uint8ArrayTestMessage.msg\n   NOINSTALL\n )\n "
+        },
+        {
+          "sha": "e97c0cd30b24ab7ac3998133892b049ee19598d6",
+          "filename": "msg/Uint8Array3TestMessage.msg",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/e846f546530c05184fdea8afe36db148cf348b43/msg%2FUint8Array3TestMessage.msg",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/e846f546530c05184fdea8afe36db148cf348b43/msg%2FUint8Array3TestMessage.msg",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/msg%2FUint8Array3TestMessage.msg?ref=e846f546530c05184fdea8afe36db148cf348b43",
+          "patch": "@@ -0,0 +1,2 @@\n+# Fixed size uint8 array for testing purposes\n+uint8[3] data"
+        },
+        {
+          "sha": "b66b73a0d63dcdb327f0dceeb6e5dc5fc549fec8",
+          "filename": "msg/Uint8ArrayTestMessage.msg",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/e846f546530c05184fdea8afe36db148cf348b43/msg%2FUint8ArrayTestMessage.msg",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/e846f546530c05184fdea8afe36db148cf348b43/msg%2FUint8ArrayTestMessage.msg",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/msg%2FUint8ArrayTestMessage.msg?ref=e846f546530c05184fdea8afe36db148cf348b43",
+          "patch": "@@ -0,0 +1,2 @@\n+# Size-agnostic uint8 array for testing purposes\n+uint8[] data"
+        },
+        {
+          "sha": "503df3650d6888d3bfcb93b1cfc8a025f7ca1472",
+          "filename": "src/rospy_message_converter/message_converter.py",
+          "status": "modified",
+          "additions": 22,
+          "deletions": 3,
+          "changes": 25,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/e846f546530c05184fdea8afe36db148cf348b43/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/e846f546530c05184fdea8afe36db148cf348b43/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/src%2Frospy_message_converter%2Fmessage_converter.py?ref=e846f546530c05184fdea8afe36db148cf348b43",
+          "patch": "@@ -57,7 +57,7 @@\n                        'uint16', 'int32', 'uint32', 'int64', 'uint64',\n                        'float32', 'float64', 'string']\n ros_header_types = ['Header', 'std_msgs/Header', 'roslib/Header']\n-ros_binary_types = ['uint8[]', 'char[]']\n+ros_binary_types_regexp = re.compile(r'(uint8|char)\\[[^\\]]*\\]')\n \n list_brackets = re.compile(r'\\[[^\\]]*\\]')\n \n@@ -87,7 +87,7 @@ def convert_dictionary_to_ros_message(message_type, dictionary):\n     return message\n \n def _convert_to_ros_type(field_type, field_value):\n-    if field_type in ros_binary_types:\n+    if is_ros_binary_type(field_type, field_value):\n         field_value = _convert_to_ros_binary(field_type, field_value)\n     elif field_type in ros_time_types:\n         field_value = _convert_to_ros_time(field_type, field_value)\n@@ -150,7 +150,7 @@ def convert_ros_message_to_dictionary(message):\n     return dictionary\n \n def _convert_from_ros_type(field_type, field_value):\n-    if field_type in ros_binary_types:\n+    if is_ros_binary_type(field_type, field_value):\n         field_value = _convert_from_ros_binary(field_type, field_value)\n     elif field_type in ros_time_types:\n         field_value = _convert_from_ros_time(field_type, field_value)\n@@ -163,6 +163,25 @@ def _convert_from_ros_type(field_type, field_value):\n \n     return field_value\n \n+\n+def is_ros_binary_type(field_type, field_value):\n+    \"\"\" Checks if the field is a binary array one, fixed size or not\n+\n+    is_ros_binary_type(\"uint8\", 42)\n+    >>> False\n+    is_ros_binary_type(\"uint8[]\", [42, 18])\n+    >>> True\n+    is_ros_binary_type(\"uint8[3]\", [42, 18, 21]\n+    >>> True\n+    is_ros_binary_type(\"char\", 42)\n+    >>> False\n+    is_ros_binary_type(\"char[]\", [42, 18])\n+    >>> True\n+    is_ros_binary_type(\"char[3]\", [42, 18, 21]\n+    >>> True\n+    \"\"\"\n+    return re.search(ros_binary_types_regexp, field_type) is not None\n+\n def _convert_from_ros_binary(field_type, field_value):\n     field_value = base64.standard_b64encode(field_value)\n     return field_value"
+        },
+        {
+          "sha": "64cc94c81dbc2db66012abc6ade493588f362012",
+          "filename": "test/test_json_message_converter.py",
+          "status": "modified",
+          "additions": 16,
+          "deletions": 0,
+          "changes": 16,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/e846f546530c05184fdea8afe36db148cf348b43/test%2Ftest_json_message_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/e846f546530c05184fdea8afe36db148cf348b43/test%2Ftest_json_message_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/test%2Ftest_json_message_converter.py?ref=e846f546530c05184fdea8afe36db148cf348b43",
+          "patch": "@@ -23,6 +23,22 @@ def test_ros_message_with_header(self):\n         returned_json = json_message_converter.convert_ros_message_to_json(message)\n         self.assertEqual(returned_json, expected_json)\n \n+    def test_ros_message_with_uint8_array(self):\n+        from rospy_message_converter.msg import Uint8ArrayTestMessage\n+        input_data = \"\".join([chr(i) for i in [97, 98, 99, 100]])\n+        expected_json = '{\"data\": \"YWJjZA==\"}'  # base64encode(\"abcd\") is YWJjZA==\n+        message = Uint8ArrayTestMessage(data=input_data)\n+        returned_json = json_message_converter.convert_ros_message_to_json(message)\n+        self.assertEqual(returned_json, expected_json)\n+\n+    def test_ros_message_with_uint8_array(self):\n+        from rospy_message_converter.msg import Uint8Array3TestMessage\n+        input_data = \"\".join([chr(i) for i in [97, 98, 99, 100]])\n+        expected_json = '{\"data\": \"YWJjZA==\"}'  # base64encode(\"abcd\") YWJjZA==\n+        message = Uint8Array3TestMessage(data=input_data)\n+        returned_json = json_message_converter.convert_ros_message_to_json(message)\n+        self.assertEqual(returned_json, expected_json)\n+\n     def test_json_with_string(self):\n         from std_msgs.msg import String\n         expected_message = String(data = 'Hello')"
+        },
+        {
+          "sha": "b1a6f96d84f8e1cdff2808af836e758ede5d4788",
+          "filename": "test/test_message_converter.py",
+          "status": "modified",
+          "additions": 16,
+          "deletions": 0,
+          "changes": 16,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/e846f546530c05184fdea8afe36db148cf348b43/test%2Ftest_message_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/e846f546530c05184fdea8afe36db148cf348b43/test%2Ftest_message_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/test%2Ftest_message_converter.py?ref=e846f546530c05184fdea8afe36db148cf348b43",
+          "patch": "@@ -102,6 +102,22 @@ def test_ros_message_with_uint8(self):\n         dictionary = message_converter.convert_ros_message_to_dictionary(message)\n         self.assertEqual(dictionary, expected_dictionary)\n \n+    def test_ros_message_with_uint8_array(self):\n+        from rospy_message_converter.msg import Uint8ArrayTestMessage\n+        from base64 import standard_b64encode\n+        expected_data = \"\".join([chr(i) for i in [97, 98, 99, 100]])\n+        message = Uint8ArrayTestMessage(data=expected_data)\n+        dictionary = message_converter.convert_ros_message_to_dictionary(message)\n+        self.assertEqual(dictionary[\"data\"], standard_b64encode(expected_data))\n+\n+    def test_ros_message_with_3uint8_array(self):\n+        from rospy_message_converter.msg import Uint8Array3TestMessage\n+        from base64 import standard_b64encode\n+        expected_data = \"\".join([chr(i) for i in [97, 98, 99, 100]])\n+        message = Uint8Array3TestMessage(data=expected_data)\n+        dictionary = message_converter.convert_ros_message_to_dictionary(message)\n+        self.assertEqual(dictionary[\"data\"], standard_b64encode(expected_data))\n+\n     def test_ros_message_with_int16(self):\n         from std_msgs.msg import Int16\n         expected_dictionary = { 'data': -0x7FFF }"
+        }
+      ]
+    },
+    {
+      "author": "baalexander",
+      "date": "2013-01-25T18:44:32Z",
+      "sha": "79e977d8241534e4b6dc1f73bc97d1995d4acbd8",
+      "message": "Initial commit of rospy message converter.",
+      "files_changed": 13,
+      "additions": 732,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "ad1d2998a32e2b576706f0a61853f1151cd92952",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/.gitignore",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/.gitignore",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/.gitignore?ref=79e977d8241534e4b6dc1f73bc97d1995d4acbd8",
+          "patch": "@@ -0,0 +1,3 @@\n+*.pyc\n+.idea\n+*.iml"
+        },
+        {
+          "sha": "78c3b8e0b4432e8e4fa74b6c3f66ebcec6e5c369",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 24,
+          "deletions": 0,
+          "changes": 24,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/CMakeLists.txt",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/CMakeLists.txt?ref=79e977d8241534e4b6dc1f73bc97d1995d4acbd8",
+          "patch": "@@ -0,0 +1,24 @@\n+cmake_minimum_required(VERSION 2.8.3)\n+project(rospy_message_converter)\n+\n+find_package(catkin REQUIRED COMPONENTS message_generation roslib rospy rostest std_msgs)\n+\n+# Generate messages for testing (NOINSTALL)\n+add_message_files(\n+  FILES\n+  TestArray.msg\n+  NOINSTALL\n+)\n+\n+catkin_python_setup()\n+\n+# Generate added messages and services with any dependencies listed here\n+generate_messages(\n+  DEPENDENCIES\n+  std_msgs  # Or other packages containing msgs\n+)\n+\n+catkin_package()\n+\n+# Test launch files\n+add_rostest(test/test_all.test)"
+        },
+        {
+          "sha": "df0356a091db2041fce14b076da26f2838d2afc6",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 54,
+          "deletions": 0,
+          "changes": 54,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/README.md",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/README.md",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/README.md?ref=79e977d8241534e4b6dc1f73bc97d1995d4acbd8",
+          "patch": "@@ -0,0 +1,54 @@\n+\n+Rospy_message_converter is a lightweight ROS package and Python library to\n+convert from Python dictionaries and JSON messages to\n+[rospy](http://www.ros.org/wiki/rospy) messages, and vice versa.\n+\n+# Usage\n+\n+Convert a dictionary to a ROS message\n+\n+```python\n+from rospy_message_converter import message_converter\n+from std_msgs.msg import String\n+dictionary = { 'data': 'Howdy' }\n+message = message_converter.convert_dictionary_to_ros_message('std_msgs/String', dictionary)\n+```\n+\n+Convert a ROS message to a dictionary\n+\n+```python\n+from rospy_message_converter import message_converter\n+from std_msgs.msg import String\n+message = String(data = 'Howdy')\n+dictionary = message_converter.convert_ros_message_to_dictionary(message)\n+```\n+\n+Convert JSON to a ROS message\n+\n+```python\n+from rospy_message_converter import json_message_converter\n+from std_msgs.msg import String\n+json_str = '{\"data\": \"Hello\"}'\n+message = json_message_converter.convert_json_to_ros_message('std_msgs/String', json_str)\n+```\n+\n+Convert a ROS message to JSON\n+\n+```python\n+from rospy_message_converter import json_message_converter\n+from std_msgs.msg import String\n+message = String(data = 'Hello')\n+json_str = json_message_converter.convert_ros_message_to_json(message)\n+```\n+\n+## Test\n+\n+To run the tests:\n+\n+```bash\n+rostest rospy_message_converter test_all.test\n+```\n+\n+## License\n+\n+Project is released under the BSD license."
+        },
+        {
+          "sha": "6627cb8b51f0cbe1b9add3ba1fb89bc9fdfacc74",
+          "filename": "msg/TestArray.msg",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/msg%2FTestArray.msg",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/msg%2FTestArray.msg",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/msg%2FTestArray.msg?ref=79e977d8241534e4b6dc1f73bc97d1995d4acbd8",
+          "patch": "@@ -0,0 +1 @@\n+float64[] data\n\\ No newline at end of file"
+        },
+        {
+          "sha": "728d46768d4e510b34c31d5d5008322eafe2a6c3",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 16,
+          "deletions": 0,
+          "changes": 16,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/package.xml",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/package.xml",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/package.xml?ref=79e977d8241534e4b6dc1f73bc97d1995d4acbd8",
+          "patch": "@@ -0,0 +1,16 @@\n+<?xml version=\"1.0\"?>\n+<package>\n+  <name>rospy_message_converter</name>\n+  <version>0.0.1</version>\n+  <description>Converts between Python dictionaries and JSON to rospy messages.</description>\n+  <maintainer email=\"baalexander@gmail.com\">Brandon Alexander</maintainer>\n+  <license>BSD</license>\n+  <!--<url type=\"website\">http://ros.org/wiki/ros_message_json_converter</url>-->\n+  <author email=\"baalexander@gmail.com\">Brandon Alexander</author>\n+\n+  <buildtool_depend>catkin</buildtool_depend>\n+  <build_depend>roslib</build_depend>\n+  <build_depend>rospy</build_depend>\n+  <run_depend>roslib</run_depend>\n+  <run_depend>rospy</run_depend>\n+</package>\n\\ No newline at end of file"
+        },
+        {
+          "sha": "8582d5ae33db29668b7a436ff05c1cae5fe90d05",
+          "filename": "setup.py",
+          "status": "added",
+          "additions": 11,
+          "deletions": 0,
+          "changes": 11,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/setup.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/setup.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/setup.py?ref=79e977d8241534e4b6dc1f73bc97d1995d4acbd8",
+          "patch": "@@ -0,0 +1,11 @@\n+#!/usr/bin/env python\n+\n+from distutils.core import setup\n+from catkin_pkg.python_setup import generate_distutils_setup\n+\n+d = generate_distutils_setup(\n+    packages=['rospy_message_converter'],\n+    package_dir={'' : 'src'},\n+)\n+\n+setup(**d)"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "src/rospy_message_converter/__init__.py",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/src%2Frospy_message_converter%2F__init__.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/src%2Frospy_message_converter%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/src%2Frospy_message_converter%2F__init__.py?ref=79e977d8241534e4b6dc1f73bc97d1995d4acbd8"
+        },
+        {
+          "sha": "8db5a2623756ef0e2292e4dc8de7b47ff0fcaefe",
+          "filename": "src/rospy_message_converter/json_message_converter.py",
+          "status": "added",
+          "additions": 11,
+          "deletions": 0,
+          "changes": 11,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/src%2Frospy_message_converter%2Fjson_message_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/src%2Frospy_message_converter%2Fjson_message_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/src%2Frospy_message_converter%2Fjson_message_converter.py?ref=79e977d8241534e4b6dc1f73bc97d1995d4acbd8",
+          "patch": "@@ -0,0 +1,11 @@\n+import json\n+from rospy_message_converter import message_converter\n+\n+def convert_json_to_ros_message(message_type, json_message):\n+    dictionary = json.loads(json_message)\n+    return message_converter.convert_dictionary_to_ros_message(message_type, dictionary)\n+\n+def convert_ros_message_to_json(message):\n+    dictionary = message_converter.convert_ros_message_to_dictionary(message)\n+    json_message = json.dumps(dictionary)\n+    return json_message"
+        },
+        {
+          "sha": "b9a10862af5bc05cde5d4cf243e167b97ce987a6",
+          "filename": "src/rospy_message_converter/message_converter.py",
+          "status": "added",
+          "additions": 168,
+          "deletions": 0,
+          "changes": 168,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/src%2Frospy_message_converter%2Fmessage_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/src%2Frospy_message_converter%2Fmessage_converter.py?ref=79e977d8241534e4b6dc1f73bc97d1995d4acbd8",
+          "patch": "@@ -0,0 +1,168 @@\n+#!/usr/bin/env python\n+# Software License Agreement (BSD License)\n+#\n+# Copyright (c) 2013, Willow Garage, Inc.\n+# All rights reserved.\n+#\n+# Redistribution and use in source and binary forms, with or without\n+# modification, are permitted provided that the following conditions\n+# are met:\n+#\n+#  * Redistributions of source code must retain the above copyright\n+#    notice, this list of conditions and the following disclaimer.\n+#  * Redistributions in binary form must reproduce the above\n+#    copyright notice, this list of conditions and the following\n+#    disclaimer in the documentation and/or other materials provided\n+#    with the distribution.\n+#  * Neither the name of Willow Garage, Inc. nor the names of its\n+#    contributors may be used to endorse or promote products derived\n+#    from this software without specific prior written permission.\n+#\n+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n+# \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS\n+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\n+# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,\n+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,\n+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\n+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN\n+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+# POSSIBILITY OF SUCH DAMAGE.\n+\n+import roslib.message\n+import rospy\n+import re\n+import base64\n+from pprint import pprint\n+\n+python_to_ros_type_map = {\n+    'bool'    : ['bool'],\n+    'int'     : ['int8', 'byte', 'uint8', 'char',\n+                 'int16', 'uint16', 'int32', 'uint32',\n+                 'int64', 'uint64', 'float32', 'float64'],\n+    'float'   : ['float32', 'float64'],\n+    'str'     : ['string'],\n+    'unicode' : ['string'],\n+    'long'    : ['uint64']\n+}\n+\n+python_primitive_types = [bool, int, long, float]\n+python_string_types = [str, unicode]\n+python_list_types = [list, tuple]\n+\n+ros_time_types = ['time', 'duration']\n+ros_primitive_types = ['bool', 'byte', 'char', 'int8', 'uint8', 'int16',\n+                       'uint16', 'int32', 'uint32', 'int64', 'uint64',\n+                       'float32', 'float64', 'string']\n+ros_header_types = ['Header', 'std_msgs/Header', 'roslib/Header']\n+ros_binary_types = ['uint8[]', 'char[]']\n+\n+list_brackets = re.compile(r'\\[[^\\]]*\\]')\n+\n+def convert_dictionary_to_ros_message(message_type, dictionary):\n+    message_class = roslib.message.get_message_class(message_type)\n+    message = message_class()\n+    message_fields = dict(_get_message_fields(message))\n+\n+    for field_name, field_value in dictionary.items():\n+        field_type = message_fields[field_name]\n+        field_value = _convert_to_ros_type(field_type, field_value)\n+        setattr(message, field_name, field_value)\n+\n+    return message\n+\n+def _convert_to_ros_type(field_type, field_value):\n+    if field_type in ros_binary_types:\n+        field_value = _convert_to_ros_binary(field_type, field_value)\n+    elif field_type in ros_time_types:\n+        field_value = _convert_to_ros_time(field_type, field_value)\n+    elif field_type in ros_primitive_types:\n+        field_value = _convert_to_ros_primitive(field_type, field_value)\n+    elif _is_field_type_an_array(field_type):\n+        field_value = _convert_to_ros_array(field_type, field_value)\n+    else:\n+        field_value = convert_dictionary_to_ros_message(field_type, field_value)\n+\n+    return field_value\n+\n+def _convert_to_ros_binary(field_type, field_value):\n+    binary_value_as_string = field_value\n+    if type(field_value) in python_string_types:\n+        binary_value_as_string = base64.standard_b64decode(field_value)\n+    else:\n+        binary_value_as_string = str(bytearray(field_value))\n+\n+    return binary_value_as_string\n+\n+def _convert_to_ros_time(field_type, field_value):\n+    time = None\n+\n+    if field_type == 'time' and field_value == 'now':\n+        time = rospy.get_rostime()\n+    else:\n+        if field_type == 'time':\n+            time = rospy.rostime.Time()\n+        elif field_type == 'duration':\n+            time = rospy.rostime.Duration()\n+        if 'secs' in field_value:\n+            setattr(time, 'secs', field_value['secs'])\n+        if 'nsecs' in field_value:\n+            setattr(time, 'nsecs', field_value['nsecs'])\n+\n+    return time\n+\n+def _convert_to_ros_primitive(field_type, field_value):\n+    return field_value\n+\n+def _convert_to_ros_array(field_type, list_value):\n+    list_type = list_brackets.sub('', field_type)\n+    return [_convert_to_ros_type(list_type, value) for value in list_value]\n+\n+def convert_ros_message_to_dictionary(message):\n+    dictionary = {}\n+    message_fields = _get_message_fields(message)\n+    for field_name, field_type in message_fields:\n+        field_value = getattr(message, field_name)\n+        dictionary[field_name] = _convert_from_ros_type(field_type, field_value)\n+\n+    return dictionary\n+\n+def _convert_from_ros_type(field_type, field_value):\n+    if field_type in ros_binary_types:\n+        field_value = _convert_from_ros_binary(field_type, field_value)\n+    elif field_type in ros_time_types:\n+        field_value = _convert_from_ros_time(field_type, field_value)\n+    elif field_type in ros_primitive_types:\n+        field_value = field_value\n+    elif _is_field_type_an_array(field_type):\n+        field_value = _convert_from_ros_array(field_type, field_value)\n+    else:\n+        field_value = convert_ros_message_to_dictionary(field_value)\n+\n+    return field_value\n+\n+def _convert_from_ros_binary(field_type, field_value):\n+    field_value = base64.standard_b64encode(field_value)\n+    return field_value\n+\n+def _convert_from_ros_time(field_type, field_value):\n+    field_value = {\n+        'secs'  : field_value.secs,\n+        'nsecs' : field_value.nsecs\n+    }\n+    return field_value\n+\n+def _convert_from_ros_primitive(field_type, field_value):\n+    return field_value\n+\n+def _convert_from_ros_array(field_type, field_value):\n+    list_type = list_brackets.sub('', field_type)\n+    return [_convert_from_ros_type(list_type, value) for value in field_value]\n+\n+def _get_message_fields(message):\n+    return zip(message.__slots__, message._slot_types)\n+\n+def _is_field_type_an_array(field_type):\n+    return list_brackets.search(field_type) is not None"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "test/__init__.py",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/test%2F__init__.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/test%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/test%2F__init__.py?ref=79e977d8241534e4b6dc1f73bc97d1995d4acbd8"
+        },
+        {
+          "sha": "da73df09256188b6c5912df7d910b9c14a5479d5",
+          "filename": "test/test_all.test",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/test%2Ftest_all.test",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/test%2Ftest_all.test",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/test%2Ftest_all.test?ref=79e977d8241534e4b6dc1f73bc97d1995d4acbd8",
+          "patch": "@@ -0,0 +1,4 @@\n+<launch>\n+    <test test-name=\"test_message_converter\" pkg=\"rospy_message_converter\" type=\"test_message_converter.py\" />\n+    <test test-name=\"test_json_message_converter\" pkg=\"rospy_message_converter\" type=\"test_json_message_converter.py\" />\n+</launch>"
+        },
+        {
+          "sha": "6c02e74566cb8eb5fe045f649ee2edff61f93bfb",
+          "filename": "test/test_json_message_converter.py",
+          "status": "added",
+          "additions": 50,
+          "deletions": 0,
+          "changes": 50,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/test%2Ftest_json_message_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/test%2Ftest_json_message_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/test%2Ftest_json_message_converter.py?ref=79e977d8241534e4b6dc1f73bc97d1995d4acbd8",
+          "patch": "@@ -0,0 +1,50 @@\n+#!/usr/bin/env python\n+import unittest\n+import rospy\n+import rostest\n+from rospy_message_converter import json_message_converter\n+\n+class TestJsonMessageConverter(unittest.TestCase):\n+\n+    def test_ros_message_with_string(self):\n+        from std_msgs.msg import String\n+        expected_json = '{\"data\": \"Hello\"}'\n+        message = String(data = 'Hello')\n+        returned_json = json_message_converter.convert_ros_message_to_json(message)\n+        self.assertEqual(returned_json, expected_json)\n+\n+    def test_ros_message_with_header(self):\n+        from std_msgs.msg import Header\n+        rospy.init_node('time_node')\n+        now_time = rospy.Time.now()\n+        expected_json = '{{\"stamp\": {{\"secs\": {0}, \"nsecs\": {1}}}, \"frame_id\": \"my_frame\", \"seq\": 3}}'\\\n+            .format(now_time.secs, now_time.nsecs)\n+        message = Header(stamp = now_time, frame_id = 'my_frame', seq = 3)\n+        returned_json = json_message_converter.convert_ros_message_to_json(message)\n+        self.assertEqual(returned_json, expected_json)\n+\n+    def test_json_with_string(self):\n+        from std_msgs.msg import String\n+        expected_message = String(data = 'Hello')\n+        json_str = '{\"data\": \"Hello\"}'\n+        message = json_message_converter.convert_json_to_ros_message('std_msgs/String', json_str)\n+        self.assertEqual(message, expected_message)\n+\n+    def test_json_with_header(self):\n+        from std_msgs.msg import Header\n+        rospy.init_node('time_node')\n+        now_time = rospy.Time.now()\n+        expected_message = Header(\n+            stamp = now_time,\n+            frame_id = 'my_frame',\n+            seq = 12\n+        )\n+        json_str = '{{\"stamp\": {{\"secs\": {0}, \"nsecs\": {1}}}, \"frame_id\": \"my_frame\", \"seq\": 12}}'\\\n+            .format(now_time.secs, now_time.nsecs)\n+        message = json_message_converter.convert_json_to_ros_message('std_msgs/Header', json_str)\n+        self.assertEqual(message, expected_message)\n+\n+PKG = 'rospy_message_converter'\n+NAME = 'test_json_message_converter'\n+if __name__ == '__main__':\n+    rostest.unitrun(PKG, NAME, TestJsonMessageConverter)"
+        },
+        {
+          "sha": "f8c9aba91f9a4e733819f9edbc86eb90288b072e",
+          "filename": "test/test_message_converter.py",
+          "status": "added",
+          "additions": 390,
+          "deletions": 0,
+          "changes": 390,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/test%2Ftest_message_converter.py",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/79e977d8241534e4b6dc1f73bc97d1995d4acbd8/test%2Ftest_message_converter.py",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/test%2Ftest_message_converter.py?ref=79e977d8241534e4b6dc1f73bc97d1995d4acbd8",
+          "patch": "@@ -0,0 +1,390 @@\n+#!/usr/bin/env python\n+import unittest\n+import rospy\n+import rostest\n+from pprint import pprint\n+from rospy_message_converter import message_converter\n+\n+class TestMessageConverter(unittest.TestCase):\n+\n+    def test_ros_message_with_array(self):\n+        from rospy_message_converter.msg import TestArray\n+        expected_dictionary = {\n+            'data': [1.1, 2.2, 3.3]\n+        }\n+        message = TestArray(data = expected_dictionary['data'])\n+        dictionary = message_converter.convert_ros_message_to_dictionary(message)\n+        self.assertEqual(dictionary, expected_dictionary)\n+\n+    def test_ros_message_with_bool(self):\n+        from std_msgs.msg import Bool\n+        expected_dictionary = { 'data': True }\n+        message = Bool(data=expected_dictionary['data'])\n+        dictionary = message_converter.convert_ros_message_to_dictionary(message)\n+        self.assertEqual(dictionary, expected_dictionary)\n+\n+    def test_ros_message_with_byte(self):\n+        from std_msgs.msg import Byte\n+        expected_dictionary = { 'data': 5 }\n+        message = Byte(data=expected_dictionary['data'])\n+        dictionary = message_converter.convert_ros_message_to_dictionary(message)\n+        self.assertEqual(dictionary, expected_dictionary)\n+\n+    def test_ros_message_with_char(self):\n+        from std_msgs.msg import Char\n+        expected_dictionary = { 'data': 'c' }\n+        message = Char(data=expected_dictionary['data'])\n+        dictionary = message_converter.convert_ros_message_to_dictionary(message)\n+        self.assertEqual(dictionary, expected_dictionary)\n+\n+    def test_ros_message_with_duration(self):\n+        from std_msgs.msg import Duration\n+        duration = rospy.rostime.Duration(33, 25)\n+        expected_dictionary = {\n+            'data': {\n+                'secs'  : duration.secs,\n+                'nsecs' : duration.nsecs\n+            }\n+        }\n+        message = Duration(data=duration)\n+        dictionary = message_converter.convert_ros_message_to_dictionary(message)\n+        self.assertEqual(dictionary, expected_dictionary)\n+\n+    def test_ros_message_with_empty(self):\n+        from std_msgs.msg import Empty\n+        expected_dictionary = {}\n+        message = Empty()\n+        dictionary = message_converter.convert_ros_message_to_dictionary(message)\n+        self.assertEqual(dictionary, expected_dictionary)\n+\n+    def test_ros_message_with_float32(self):\n+        from std_msgs.msg import Float32\n+        expected_dictionary = { 'data': 0x7F7FFFFD }\n+        message = Float32(data=expected_dictionary['data'])\n+        dictionary = message_converter.convert_ros_message_to_dictionary(message)\n+        self.assertEqual(dictionary, expected_dictionary)\n+\n+    def test_ros_message_with_float64(self):\n+        from std_msgs.msg import Float64\n+        expected_dictionary = { 'data': 0x7FEFFFFFFFFFFFF }\n+        message = Float64(data=expected_dictionary['data'])\n+        dictionary = message_converter.convert_ros_message_to_dictionary(message)\n+        self.assertEqual(dictionary, expected_dictionary)\n+\n+    def test_ros_message_with_header(self):\n+        from std_msgs.msg import Header\n+        rospy.init_node('time_node')\n+        now_time = rospy.Time.now()\n+        expected_dictionary = {\n+            'stamp': { 'secs': now_time.secs, 'nsecs': now_time.nsecs },\n+            'frame_id' : 'my_frame',\n+            'seq': 3\n+        }\n+        message = Header(\n+            stamp = now_time,\n+            frame_id = expected_dictionary['frame_id'],\n+            seq = expected_dictionary['seq']\n+        )\n+        dictionary = message_converter.convert_ros_message_to_dictionary(message)\n+        self.assertEqual(dictionary, expected_dictionary)\n+\n+    def test_ros_message_with_int8(self):\n+        from std_msgs.msg import Int8\n+        expected_dictionary = { 'data': -0x7F }\n+        message = Int8(data=expected_dictionary['data'])\n+        dictionary = message_converter.convert_ros_message_to_dictionary(message)\n+        self.assertEqual(dictionary, expected_dictionary)\n+\n+    def test_ros_message_with_uint8(self):\n+        from std_msgs.msg import UInt8\n+        expected_dictionary = { 'data': 0xFF }\n+        message = UInt8(data=expected_dictionary['data'])\n+        dictionary = message_converter.convert_ros_message_to_dictionary(message)\n+        self.assertEqual(dictionary, expected_dictionary)\n+\n+    def test_ros_message_with_int16(self):\n+        from std_msgs.msg import Int16\n+        expected_dictionary = { 'data': -0x7FFF }\n+        message = Int16(data=expected_dictionary['data'])\n+        dictionary = message_converter.convert_ros_message_to_dictionary(message)\n+        self.assertEqual(dictionary, expected_dictionary)\n+\n+    def test_ros_message_with_uint16(self):\n+        from std_msgs.msg import UInt16\n+        expected_dictionary = { 'data': 0xFFFF }\n+        message = UInt16(data=expected_dictionary['data'])\n+        dictionary = message_converter.convert_ros_message_to_dictionary(message)\n+        self.assertEqual(dictionary, expected_dictionary)\n+\n+    def test_ros_message_with_int32(self):\n+        from std_msgs.msg import Int32\n+        expected_dictionary = { 'data': -0x7FFFFFFF }\n+        message = Int32(data=expected_dictionary['data'])\n+        dictionary = message_converter.convert_ros_message_to_dictionary(message)\n+        self.assertEqual(dictionary, expected_dictionary)\n+\n+    def test_ros_message_with_uint32(self):\n+        from std_msgs.msg import UInt32\n+        expected_dictionary = { 'data': 0xFFFFFFFF }\n+        message = UInt32(data=expected_dictionary['data'])\n+        dictionary = message_converter.convert_ros_message_to_dictionary(message)\n+        self.assertEqual(dictionary, expected_dictionary)\n+\n+    def test_ros_message_with_int64(self):\n+        from std_msgs.msg import Int64\n+        expected_dictionary = { 'data': -0x7FFFFFFFFFFFFFFF }\n+        message = Int64(data=expected_dictionary['data'])\n+        dictionary = message_converter.convert_ros_message_to_dictionary(message)\n+        self.assertEqual(dictionary, expected_dictionary)\n+\n+    def test_ros_message_with_uint64(self):\n+        from std_msgs.msg import UInt64\n+        expected_dictionary = { 'data': 0xFFFFFFFFFFFFFFFF }\n+        message = UInt64(data=expected_dictionary['data'])\n+        dictionary = message_converter.convert_ros_message_to_dictionary(message)\n+        self.assertEqual(dictionary, expected_dictionary)\n+\n+    def test_ros_message_with_string(self):\n+        from std_msgs.msg import String\n+        expected_dictionary = { 'data': 'Hello' }\n+        message = String(data=expected_dictionary['data'])\n+        dictionary = message_converter.convert_ros_message_to_dictionary(message)\n+        self.assertEqual(dictionary, expected_dictionary)\n+\n+    def test_ros_message_with_time(self):\n+        from std_msgs.msg import Time\n+        rospy.init_node('time_node')\n+        now_time = rospy.Time.now()\n+        expected_dictionary = {\n+            'data': { 'secs': now_time.secs, 'nsecs': now_time.nsecs }\n+        }\n+        message = Time(data=now_time)\n+        dictionary = message_converter.convert_ros_message_to_dictionary(message)\n+        self.assertEqual(dictionary, expected_dictionary)\n+\n+    def test_ros_message_with_child_message(self):\n+        from std_msgs.msg import Float64MultiArray, MultiArrayLayout, MultiArrayDimension\n+        expected_dictionary = {\n+            'layout': {\n+                'dim': [\n+                    { 'label': 'Dimension1', 'size': 12, 'stride': 7 },\n+                    { 'label': 'Dimension2', 'size': 24, 'stride': 14 }\n+                ],\n+                'data_offset': 0\n+            },\n+            'data': [1.1, 2.2, 3.3]\n+        }\n+        dimension1 = MultiArrayDimension(\n+            label  = expected_dictionary['layout']['dim'][0]['label'],\n+            size   = expected_dictionary['layout']['dim'][0]['size'],\n+            stride = expected_dictionary['layout']['dim'][0]['stride']\n+        )\n+        dimension2 = MultiArrayDimension(\n+            label  = expected_dictionary['layout']['dim'][1]['label'],\n+            size   = expected_dictionary['layout']['dim'][1]['size'],\n+            stride = expected_dictionary['layout']['dim'][1]['stride']\n+        )\n+        layout = MultiArrayLayout(\n+            dim = [dimension1, dimension2],\n+            data_offset = expected_dictionary['layout']['data_offset']\n+        )\n+        multiArray = Float64MultiArray(\n+            layout = layout,\n+            data   = expected_dictionary['data']\n+        )\n+        dictionary = message_converter.convert_ros_message_to_dictionary(multiArray)\n+        self.assertEqual(dictionary, expected_dictionary)\n+\n+    def test_dictionary_with_array(self):\n+        from rospy_message_converter.msg import TestArray\n+        expected_message = TestArray(data = [1.1, 2.2, 3.3, 4.4])\n+        dictionary = { 'data': expected_message.data }\n+        message = message_converter.convert_dictionary_to_ros_message('rospy_message_converter/TestArray', dictionary)\n+        self.assertEqual(message, expected_message)\n+\n+    def test_dictionary_with_bool(self):\n+        from std_msgs.msg import Bool\n+        expected_message = Bool(data = True)\n+        dictionary = { 'data': expected_message.data }\n+        message = message_converter.convert_dictionary_to_ros_message('std_msgs/Bool', dictionary)\n+        self.assertEqual(message, expected_message)\n+\n+    def test_dictionary_with_byte(self):\n+        from std_msgs.msg import Byte\n+        expected_message = Byte(data = 3)\n+        dictionary = { 'data': expected_message.data }\n+        message = message_converter.convert_dictionary_to_ros_message('std_msgs/Byte', dictionary)\n+        self.assertEqual(message, expected_message)\n+\n+    def test_dictionary_with_char(self):\n+        from std_msgs.msg import Char\n+        expected_message = Char(data = 'c')\n+        dictionary = { 'data': expected_message.data }\n+        message = message_converter.convert_dictionary_to_ros_message('std_msgs/Char', dictionary)\n+        self.assertEqual(message, expected_message)\n+\n+    def test_dictionary_with_duration(self):\n+        from std_msgs.msg import Duration\n+        duration = rospy.rostime.Duration(33, 25)\n+        expected_message = Duration(data = duration)\n+        dictionary = {\n+            'data': {\n+                'secs'  : duration.secs,\n+                'nsecs' : duration.nsecs\n+            }\n+        }\n+        message = message_converter.convert_dictionary_to_ros_message('std_msgs/Duration', dictionary)\n+        self.assertEqual(message, expected_message)\n+\n+    def test_dictionary_with_empty(self):\n+        from std_msgs.msg import Empty\n+        expected_message = Empty()\n+        dictionary = {}\n+        message = message_converter.convert_dictionary_to_ros_message('std_msgs/Empty', dictionary)\n+        self.assertEqual(message, expected_message)\n+\n+    def test_dictionary_with_float32(self):\n+        from std_msgs.msg import Float32\n+        expected_message = Float32(data = 0x7F7FFFFD)\n+        dictionary = { 'data': expected_message.data }\n+        message = message_converter.convert_dictionary_to_ros_message('std_msgs/Float32', dictionary)\n+        self.assertEqual(message, expected_message)\n+\n+    def test_dictionary_with_float64(self):\n+        from std_msgs.msg import Float64\n+        expected_message = Float64(data = 0x7FEFFFFFFFFFFFF)\n+        dictionary = { 'data': expected_message.data }\n+        message = message_converter.convert_dictionary_to_ros_message('std_msgs/Float64', dictionary)\n+        self.assertEqual(message, expected_message)\n+\n+    def test_dictionary_with_header(self):\n+        from std_msgs.msg import Header\n+        rospy.init_node('time_node')\n+        now_time = rospy.Time.now()\n+        expected_message = Header(\n+            stamp = now_time,\n+            frame_id = 'my_frame',\n+            seq = 12\n+        )\n+        dictionary = {\n+            'stamp': { 'secs': now_time.secs, 'nsecs': now_time.nsecs },\n+            'frame_id' : expected_message.frame_id,\n+            'seq': expected_message.seq\n+        }\n+        message = message_converter.convert_dictionary_to_ros_message('std_msgs/Header', dictionary)\n+        self.assertEqual(message, expected_message)\n+\n+    def test_dictionary_with_int8(self):\n+        from std_msgs.msg import Int8\n+        expected_message = Int8(data = -0x7F)\n+        dictionary = { 'data': expected_message.data }\n+        message = message_converter.convert_dictionary_to_ros_message('std_msgs/Int8', dictionary)\n+        self.assertEqual(message, expected_message)\n+\n+    def test_dictionary_with_uint8(self):\n+        from std_msgs.msg import UInt8\n+        expected_message = UInt8(data = 0xFF)\n+        dictionary = { 'data': expected_message.data }\n+        message = message_converter.convert_dictionary_to_ros_message('std_msgs/UInt8', dictionary)\n+        self.assertEqual(message, expected_message)\n+\n+    def test_dictionary_with_int16(self):\n+        from std_msgs.msg import Int16\n+        expected_message = Int16(data = -0x7FFF)\n+        dictionary = { 'data': expected_message.data }\n+        message = message_converter.convert_dictionary_to_ros_message('std_msgs/Int16', dictionary)\n+        self.assertEqual(message, expected_message)\n+\n+    def test_dictionary_with_uint16(self):\n+        from std_msgs.msg import UInt16\n+        expected_message = UInt16(data = 0xFFFF)\n+        dictionary = { 'data': expected_message.data }\n+        message = message_converter.convert_dictionary_to_ros_message('std_msgs/UInt16', dictionary)\n+        self.assertEqual(message, expected_message)\n+\n+    def test_dictionary_with_int32(self):\n+        from std_msgs.msg import Int32\n+        expected_message = Int32(data = -0x7FFFFFFF)\n+        dictionary = { 'data': expected_message.data }\n+        message = message_converter.convert_dictionary_to_ros_message('std_msgs/Int32', dictionary)\n+        self.assertEqual(message, expected_message)\n+\n+    def test_dictionary_with_uint32(self):\n+        from std_msgs.msg import UInt32\n+        expected_message = UInt32(data = 0xFFFFFFFF)\n+        dictionary = { 'data': expected_message.data }\n+        message = message_converter.convert_dictionary_to_ros_message('std_msgs/UInt32', dictionary)\n+        self.assertEqual(message, expected_message)\n+\n+    def test_dictionary_with_int64(self):\n+        from std_msgs.msg import Int64\n+        expected_message = Int64(data = -0x7FFFFFFFFFFFFFFF)\n+        dictionary = { 'data': expected_message.data }\n+        message = message_converter.convert_dictionary_to_ros_message('std_msgs/Int64', dictionary)\n+        self.assertEqual(message, expected_message)\n+\n+    def test_dictionary_with_uint64(self):\n+        from std_msgs.msg import UInt64\n+        expected_message = UInt64(data = 0xFFFFFFFFFFFFFFFF)\n+        dictionary = { 'data': expected_message.data }\n+        message = message_converter.convert_dictionary_to_ros_message('std_msgs/UInt64', dictionary)\n+        self.assertEqual(message, expected_message)\n+\n+    def test_dictionary_with_string(self):\n+        from std_msgs.msg import String\n+        expected_message = String(data = 'Hello')\n+        dictionary = { 'data': expected_message.data }\n+        message = message_converter.convert_dictionary_to_ros_message('std_msgs/String', dictionary)\n+        self.assertEqual(message, expected_message)\n+\n+    def test_dictionary_with_time(self):\n+        from std_msgs.msg import Time\n+        now_time = rospy.Time.now()\n+        expected_message = Time(data=now_time)\n+        dictionary = {\n+            'data': {\n+                'secs'  : now_time.secs,\n+                'nsecs' : now_time.nsecs\n+            }\n+        }\n+        message = message_converter.convert_dictionary_to_ros_message('std_msgs/Time', dictionary)\n+        self.assertEqual(message, expected_message)\n+\n+    def test_dictionary_with_child_message(self):\n+        from std_msgs.msg import Float64MultiArray, MultiArrayLayout, MultiArrayDimension\n+        expected_message = Float64MultiArray(\n+            layout = MultiArrayLayout(\n+                dim = [\n+                    MultiArrayDimension(label = 'Dimension1', size = 12, stride = 7),\n+                    MultiArrayDimension(label = 'Dimension2', size = 90, stride = 8)\n+                ],\n+                data_offset = 1\n+            ),\n+            data = [1.1, 2.2, 3.3]\n+        )\n+        dictionary = {\n+            'layout': {\n+                'dim': [\n+                    {\n+                        'label'  : expected_message.layout.dim[0].label,\n+                        'size'   : expected_message.layout.dim[0].size,\n+                        'stride' : expected_message.layout.dim[0].stride\n+                    },\n+                    {\n+                        'label'  : expected_message.layout.dim[1].label,\n+                        'size'   : expected_message.layout.dim[1].size,\n+                        'stride' : expected_message.layout.dim[1].stride\n+                    }\n+                ],\n+                'data_offset': expected_message.layout.data_offset\n+            },\n+            'data': expected_message.data\n+        }\n+        message = message_converter.convert_dictionary_to_ros_message('std_msgs/Float64MultiArray', dictionary)\n+        self.assertEqual(message, expected_message)\n+\n+\n+PKG = 'rospy_message_converter'\n+NAME = 'test_message_converter'\n+if __name__ == '__main__':\n+    rostest.unitrun(PKG, NAME, TestMessageConverter)"
+        }
+      ]
+    },
+    {
+      "author": "reinzor",
+      "date": "2016-05-12T08:18:43Z",
+      "sha": "eeb3024a8dd5ac578afc4b80cef0cc103d5d5b9a",
+      "message": "Added kinetic dockerfile",
+      "files_changed": 1,
+      "additions": 15,
+      "deletions": 0,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "21b53f1a921143bff288824e1f25cd17fc7cc0cb",
+          "filename": "Dockerfile-kinetic",
+          "status": "added",
+          "additions": 15,
+          "deletions": 0,
+          "changes": 15,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/eeb3024a8dd5ac578afc4b80cef0cc103d5d5b9a/Dockerfile-kinetic",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/eeb3024a8dd5ac578afc4b80cef0cc103d5d5b9a/Dockerfile-kinetic",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/Dockerfile-kinetic?ref=eeb3024a8dd5ac578afc4b80cef0cc103d5d5b9a",
+          "patch": "@@ -0,0 +1,15 @@\n+FROM ros:kinetic-ros-core\n+\n+RUN apt-get update && apt-get install -y \\\n+    build-essential\n+\n+# Create ROS workspace\n+COPY . /ws/src/rospy_message_converter\n+WORKDIR /ws\n+\n+# Install the package and its dependencies\n+RUN rosdep install --from-paths src --ignore-src --rosdistro kinetic -y\n+\n+# Set up the development environment\n+RUN /bin/bash -c \"source /opt/ros/kinetic/setup.bash && \\\n+    catkin_make install\""
+        }
+      ]
+    },
+    {
+      "author": "vrabaud",
+      "date": "2013-03-04T23:22:50Z",
+      "sha": "035d75e34b9ee6157ecf7b5da9c2caf85c27cdf6",
+      "message": "remove extra dependencies",
+      "files_changed": 1,
+      "additions": 0,
+      "deletions": 4,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "8a75af3d80d788fe892e6fe29237e0c0fa8573f2",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 4,
+          "changes": 4,
+          "blob_url": "https://github.com/DFKI-NI/rospy_message_converter/blob/035d75e34b9ee6157ecf7b5da9c2caf85c27cdf6/package.xml",
+          "raw_url": "https://github.com/DFKI-NI/rospy_message_converter/raw/035d75e34b9ee6157ecf7b5da9c2caf85c27cdf6/package.xml",
+          "contents_url": "https://api.github.com/repos/DFKI-NI/rospy_message_converter/contents/package.xml?ref=035d75e34b9ee6157ecf7b5da9c2caf85c27cdf6",
+          "patch": "@@ -10,16 +10,12 @@\n \n   <buildtool_depend>catkin</buildtool_depend>\n \n-  <build_depend>roslib</build_depend>\n-  <build_depend>rospy</build_depend>\n   <build_depend>message_generation</build_depend>\n   <build_depend>std_msgs</build_depend>\n   <build_depend>rostest</build_depend>\n \n   <run_depend>roslib</run_depend>\n   <run_depend>rospy</run_depend>\n-  <run_depend>message_generation</run_depend>\n   <run_depend>message_runtime</run_depend>\n   <run_depend>std_msgs</run_depend>\n-  <run_depend>rostest</run_depend>\n </package>"
+        }
+      ]
+    }
+  ]
+}

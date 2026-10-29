@@ -1,0 +1,107 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T04:27:43Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "rt-net",
+    "repo": "rt_manipulators_cpp"
+  },
+  "data": [
+    {
+      "author": "chama1176",
+      "date": "2024-07-01T10:57:11Z",
+      "sha": "faa425914005b557feb57dce84d42766c7e33d6b",
+      "message": "github workflowの設定にworkflow dispatchを追加します (#33)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "13af10144e3a126efeac03beb2ec29f0d16e5098",
+          "filename": ".github/workflows/build_test.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/rt-net/rt_manipulators_cpp/blob/faa425914005b557feb57dce84d42766c7e33d6b/.github%2Fworkflows%2Fbuild_test.yaml",
+          "raw_url": "https://github.com/rt-net/rt_manipulators_cpp/raw/faa425914005b557feb57dce84d42766c7e33d6b/.github%2Fworkflows%2Fbuild_test.yaml",
+          "contents_url": "https://api.github.com/repos/rt-net/rt_manipulators_cpp/contents/.github%2Fworkflows%2Fbuild_test.yaml?ref=faa425914005b557feb57dce84d42766c7e33d6b",
+          "patch": "@@ -13,6 +13,7 @@ on:\n       - '**.md'\n   schedule:\n     - cron: \"0 2 * * 0\" # Weekly on Sundays at 02:00\n+  workflow_dispatch:\n \n jobs:\n   lint:"
+        }
+      ]
+    },
+    {
+      "author": "Shota Aoki",
+      "date": "2021-10-20T09:26:07Z",
+      "sha": "d66678ec1f6f4adc4d41a62ca61ce6210848c4a2",
+      "message": "Merge pull request #2 from rt-net/add_workflow\n\nAdd workflow file",
+      "files_changed": 1,
+      "additions": 35,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "2bebc5b990ba56cb436c8bed2d6a3d9c851fa527",
+          "filename": ".github/workflows/build_test.yaml",
+          "status": "added",
+          "additions": 35,
+          "deletions": 0,
+          "changes": 35,
+          "blob_url": "https://github.com/rt-net/rt_manipulators_cpp/blob/d66678ec1f6f4adc4d41a62ca61ce6210848c4a2/.github%2Fworkflows%2Fbuild_test.yaml",
+          "raw_url": "https://github.com/rt-net/rt_manipulators_cpp/raw/d66678ec1f6f4adc4d41a62ca61ce6210848c4a2/.github%2Fworkflows%2Fbuild_test.yaml",
+          "contents_url": "https://api.github.com/repos/rt-net/rt_manipulators_cpp/contents/.github%2Fworkflows%2Fbuild_test.yaml?ref=d66678ec1f6f4adc4d41a62ca61ce6210848c4a2",
+          "patch": "@@ -0,0 +1,35 @@\n+name: BuildAndTest\n+\n+on: workflow_dispatch # 手動トリガー\n+\n+jobs:\n+  lint:\n+    needs: [build]\n+    runs-on: ubuntu-latest\n+    steps:\n+      - uses: actions/setup-python@v2\n+      - run: pip install cpplint\n+      - uses: actions/checkout@v2\n+      - run: .tools/cpplint.bash\n+\n+  build:\n+    needs: lint\n+    strategy:\n+      fail-fast: false # 他のjobが失敗してもキャンセルしない\n+      matrix:\n+        os: [ubuntu-18.04, ubuntu-20.04]\n+    runs-on: ${{ matrix.os}}\n+    steps:\n+      - name: Install Dynamixel SDK\n+        run: |\n+          cd ..\n+          git clone https://github.com/ROBOTIS-GIT/DynamixelSDK.git\n+          cd DynamixelSDK/c++/build/linux64\n+          make\n+          sudo make install\n+      - uses: actions/checkout@v2\n+      - name: Build and insall library\n+        run: ./rt_manipulators_lib/build_install_library.bash\n+      - name: Build Samples\n+        run: |\n+          ./samples/samples01/build_samples.bash"
+        }
+      ]
+    },
+    {
+      "author": "Tiryoh",
+      "date": "2023-11-02T05:39:18Z",
+      "sha": "153cde31fa5804fd0e54d4686e2020263090a6dc",
+      "message": "Update GitHub Actions settings (#29)\n\n* Update GitHub Actions package\r\n\r\n* Specify Python version",
+      "files_changed": 1,
+      "additions": 9,
+      "deletions": 3,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "28e775467bcd20488df0c30eddc9d211c0787c7c",
+          "filename": ".github/workflows/build_test.yaml",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 3,
+          "changes": 12,
+          "blob_url": "https://github.com/rt-net/rt_manipulators_cpp/blob/153cde31fa5804fd0e54d4686e2020263090a6dc/.github%2Fworkflows%2Fbuild_test.yaml",
+          "raw_url": "https://github.com/rt-net/rt_manipulators_cpp/raw/153cde31fa5804fd0e54d4686e2020263090a6dc/.github%2Fworkflows%2Fbuild_test.yaml",
+          "contents_url": "https://api.github.com/repos/rt-net/rt_manipulators_cpp/contents/.github%2Fworkflows%2Fbuild_test.yaml?ref=153cde31fa5804fd0e54d4686e2020263090a6dc",
+          "patch": "@@ -2,9 +2,13 @@ name: BuildAndTest\n \n on:\n   push:\n+    branches:\n+      - main\n     paths-ignore:\n       - '**.md'\n   pull_request:\n+    branches:\n+      - main\n     paths-ignore:\n       - '**.md'\n   schedule:\n@@ -14,9 +18,11 @@ jobs:\n   lint:\n     runs-on: ubuntu-latest\n     steps:\n-      - uses: actions/setup-python@v2\n+      - uses: actions/setup-python@v4\n+        with:\n+          python-version: '3.8'\n       - run: pip install cpplint\n-      - uses: actions/checkout@v2\n+      - uses: actions/checkout@v3\n       - run: .tools/cpplint.bash\n \n   build_and_test:\n@@ -45,7 +51,7 @@ jobs:\n           sudo make install\n       - name: Install dependencies\n         run: sudo apt install libyaml-cpp-dev libeigen3-dev\n-      - uses: actions/checkout@v2\n+      - uses: actions/checkout@v3\n       - name: Build and insall library\n         run: ./rt_manipulators_lib/build_install_library.bash\n       - name: Build Samples"
+        }
+      ]
+    },
+    {
+      "author": "ShotaAk",
+      "date": "2021-10-11T09:44:13Z",
+      "sha": "59218c7f613214854922c481f586e06c48c59646",
+      "message": "first commit",
+      "files_changed": 1,
+      "additions": 35,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "89cf69eac99c93b53d95a998685123a139ab9e5a",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 35,
+          "deletions": 0,
+          "changes": 35,
+          "blob_url": "https://github.com/rt-net/rt_manipulators_cpp/blob/59218c7f613214854922c481f586e06c48c59646/.gitignore",
+          "raw_url": "https://github.com/rt-net/rt_manipulators_cpp/raw/59218c7f613214854922c481f586e06c48c59646/.gitignore",
+          "contents_url": "https://api.github.com/repos/rt-net/rt_manipulators_cpp/contents/.gitignore?ref=59218c7f613214854922c481f586e06c48c59646",
+          "patch": "@@ -0,0 +1,35 @@\n+# Prerequisites\n+*.d\n+\n+# Compiled Object files\n+*.slo\n+*.lo\n+*.o\n+*.obj\n+\n+# Precompiled Headers\n+*.gch\n+*.pch\n+\n+# Compiled Dynamic libraries\n+*.so\n+*.dylib\n+*.dll\n+\n+# Fortran module files\n+*.mod\n+*.smod\n+\n+# Compiled Static libraries\n+*.lai\n+*.la\n+*.a\n+*.lib\n+\n+# Executables\n+*.exe\n+*.out\n+*.app\n+\n+build\n+bin\n\\ No newline at end of file"
+        }
+      ]
+    }
+  ]
+}

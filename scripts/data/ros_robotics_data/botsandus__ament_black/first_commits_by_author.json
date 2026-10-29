@@ -1,0 +1,378 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T03:56:36Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "botsandus",
+    "repo": "ament_black"
+  },
+  "data": [
+    {
+      "author": "nachovizzo",
+      "date": "2023-10-03T16:17:11Z",
+      "sha": "8e2513086a5fa59385639d3f2c2b8444b1d3ff5b",
+      "message": "Simplify logic by using python black package instead of binary\n\nThis is to support the pre-commit hooks efforts",
+      "files_changed": 2,
+      "additions": 27,
+      "deletions": 59,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "7b0596197d7afea9189e570f6dd4051976ca5e90",
+          "filename": "ament_black/ament_black/main.py",
+          "status": "modified",
+          "additions": 18,
+          "deletions": 53,
+          "changes": 71,
+          "blob_url": "https://github.com/botsandus/ament_black/blob/8e2513086a5fa59385639d3f2c2b8444b1d3ff5b/ament_black%2Fament_black%2Fmain.py",
+          "raw_url": "https://github.com/botsandus/ament_black/raw/8e2513086a5fa59385639d3f2c2b8444b1d3ff5b/ament_black%2Fament_black%2Fmain.py",
+          "contents_url": "https://api.github.com/repos/botsandus/ament_black/contents/ament_black%2Fament_black%2Fmain.py?ref=8e2513086a5fa59385639d3f2c2b8444b1d3ff5b",
+          "patch": "@@ -1,6 +1,7 @@\n #!/usr/bin/env python3\n \n # Copyright 2019 Picknik Robotics.\n+# Copyright 2023 Dexory\n #\n # Licensed under the Apache License, Version 2.0 (the \"License\");\n # you may not use this file except in compliance with the License.\n@@ -15,12 +16,15 @@\n # limitations under the License.\n \n import argparse\n+import contextlib\n+import io\n import os\n-import subprocess\n import sys\n+import tempfile\n import time\n-from xml.sax.saxutils import escape\n-from xml.sax.saxutils import quoteattr\n+from xml.sax.saxutils import escape, quoteattr\n+\n+from black import main as black\n from unidiff import PatchSet\n \n \n@@ -66,36 +70,19 @@ def main(argv=sys.argv[1:]):\n         print(\"No files found\", file=sys.stderr)\n         return 1\n \n-    bin_names = [\"black\"]\n-    black_bin = find_executable(bin_names)\n-    if not black_bin:\n-        print(\n-            \"Could not find %s executable\"\n-            % \" / \".join([\"'%s'\" % n for n in bin_names]),\n-            file=sys.stderr,\n-        )\n-        return 1\n-\n     report = []\n \n     # invoke black\n-    cmd = [black_bin, \"--diff\"]\n+    black_args = []\n     if args.config_file is not None:\n-        cmd.extend([\"--config\", args.config_file])\n-    cmd.extend(files)\n+        black_args.extend([\"--config\", args.config_file])\n+    black_args.extend(files)\n \n-    proc = subprocess.Popen(\n-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding=\"utf-8\"\n-    )\n-    output, _ = proc.communicate()\n-\n-    if proc.returncode:\n-        print(\n-            \"The invocation of '%s' failed with error code %d\"\n-            % (os.path.basename(black_bin), proc.returncode),\n-            file=sys.stderr,\n-        )\n-        return 1\n+    with tempfile.NamedTemporaryFile(\"w\") as diff:\n+        with contextlib.redirect_stdout(diff):\n+            black([*black_args, \"--diff\"], standalone_mode=False)\n+            with open(diff.name, \"r\") as file:\n+                output = file.read()\n \n     # output errors\n     patch_set = PatchSet(output)\n@@ -109,19 +96,7 @@ def main(argv=sys.argv[1:]):\n \n     # overwrite original with reformatted files\n     if args.reformat and changed_files:\n-        cmd = [black_bin]\n-        if args.config_file is not None:\n-            cmd.extend([\"--config\", args.config_file])\n-        cmd.extend(files)\n-        try:\n-            subprocess.check_call(cmd)\n-        except subprocess.CalledProcessError as e:\n-            print(\n-                \"The invocation of '%s' failed with error code %d: %s\"\n-                % (os.path.basename(black_bin), e.returncode, e),\n-                file=sys.stderr,\n-            )\n-            return 1\n+        black(black_args)\n \n     # output summary\n     file_count = sum(1 if report[k] else 0 for k in report.keys())\n@@ -142,10 +117,10 @@ def main(argv=sys.argv[1:]):\n         file_name = os.path.basename(args.xunit_file)\n         suffix = \".xml\"\n         if file_name.endswith(suffix):\n-            file_name = file_name[0: -len(suffix)]\n+            file_name = file_name[0 : -len(suffix)]\n             suffix = \".xunit\"\n             if file_name.endswith(suffix):\n-                file_name = file_name[0: -len(suffix)]\n+                file_name = file_name[0 : -len(suffix)]\n         testname = \"%s.%s\" % (folder_name, file_name)\n \n         xml = get_xunit_content(report, testname, time.time() - start_time)\n@@ -158,16 +133,6 @@ def main(argv=sys.argv[1:]):\n     return rc\n \n \n-def find_executable(file_names):\n-    paths = os.getenv(\"PATH\").split(os.path.pathsep)\n-    for file_name in file_names:\n-        for path in paths:\n-            file_path = os.path.join(path, file_name)\n-            if os.path.isfile(file_path) and os.access(file_path, os.X_OK):\n-                return file_path\n-    return None\n-\n-\n def get_files(paths, extensions):\n     files = []\n     for path in paths:"
+        },
+        {
+          "sha": "4e009352a60cbf13eea7ff76778683ab35dc1ee1",
+          "filename": "ament_black/setup.py",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 6,
+          "changes": 15,
+          "blob_url": "https://github.com/botsandus/ament_black/blob/8e2513086a5fa59385639d3f2c2b8444b1d3ff5b/ament_black%2Fsetup.py",
+          "raw_url": "https://github.com/botsandus/ament_black/raw/8e2513086a5fa59385639d3f2c2b8444b1d3ff5b/ament_black%2Fsetup.py",
+          "contents_url": "https://api.github.com/repos/botsandus/ament_black/contents/ament_black%2Fsetup.py?ref=8e2513086a5fa59385639d3f2c2b8444b1d3ff5b",
+          "patch": "@@ -1,24 +1,27 @@\n-from setuptools import find_packages\n-from setuptools import setup\n+from setuptools import find_packages, setup\n \n package_name = \"ament_black\"\n \n setup(\n     name=package_name,\n-    version=\"0.0.1\",\n+    version=\"0.14.2\",\n     packages=find_packages(exclude=[\"test\"]),\n     data_files=[\n         (\"share/\" + package_name, [\"package.xml\"]),\n         (\"share/ament_index/resource_index/packages\", [\"resource/\" + package_name]),\n     ],\n-    install_requires=[\"setuptools\", \"pyyaml\"],\n+    install_requires=[\n+        \"setuptools\",\n+        \"unidiff\",\n+        \"black\",\n+    ],\n     zip_safe=False,\n     author=\"Tyler Weaver\",\n     author_email=\"tylerjw@gmail.com\",\n     maintainer=\"Tyler Weaver\",\n     maintainer_email=\"tylerjw@gmail.com\",\n-    url=\"https://github.com/tylerjw/ament_black\",\n-    download_url=\"https://github.com/tylerjw/ament_black/releases\",\n+    url=\"https://github.com/nachovizzo/ament_black\",\n+    download_url=\"https://github.com/nachovizzo/ament_black/releases\",\n     keywords=[\"ROS\"],\n     classifiers=[\n         \"Intended Audience :: Developers\","
+        }
+      ]
+    },
+    {
+      "author": "ruffsl",
+      "date": "2024-09-05T08:16:19Z",
+      "sha": "1da4e602a17333b072fcef1a5c8edcc195e6d211",
+      "message": "Add packaging as a required dependency (#14)\n\nFollow up to:\r\n- https://github.com/botsandus/ament_black/pull/13",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "4622c781e49dbfc4c591e103927d427ac55955c5",
+          "filename": "ament_black/setup.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/botsandus/ament_black/blob/1da4e602a17333b072fcef1a5c8edcc195e6d211/ament_black%2Fsetup.py",
+          "raw_url": "https://github.com/botsandus/ament_black/raw/1da4e602a17333b072fcef1a5c8edcc195e6d211/ament_black%2Fsetup.py",
+          "contents_url": "https://api.github.com/repos/botsandus/ament_black/contents/ament_black%2Fsetup.py?ref=1da4e602a17333b072fcef1a5c8edcc195e6d211",
+          "patch": "@@ -13,6 +13,7 @@\n     ],\n     install_requires=[\n         'black==21.12b0',\n+        'packaging>=20.3',\n         'setuptools>=56',\n         'unidiff>=0.5',\n         'uvloop==0.17.0',"
+        }
+      ]
+    },
+    {
+      "author": "bjsowa",
+      "date": "2024-07-29T10:12:31Z",
+      "sha": "4f3cea99394aa1f6513853e482eac1a18c241bad",
+      "message": "Fix ament_black for new get_sources API (#13)\n\n* Fix ament_black for new get_sources API\r\n\r\n* Fix import order\r\n\r\n* Add backward compatibility with older black versions\r\n\r\n* style\r\n\r\n* Move global variables inside method to fix flake8\r\n\r\n* Import only for newer versions\r\n\r\n* Last tweak\r\n\r\n---------\r\n\r\nCo-authored-by: Ignacio Vizzo <ignacio@dexory.com>",
+      "files_changed": 1,
+      "additions": 33,
+      "deletions": 13,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e210991ceadf12f483f819b649aeb95c2ee02ebf",
+          "filename": "ament_black/ament_black/main.py",
+          "status": "modified",
+          "additions": 33,
+          "deletions": 13,
+          "changes": 46,
+          "blob_url": "https://github.com/botsandus/ament_black/blob/4f3cea99394aa1f6513853e482eac1a18c241bad/ament_black%2Fament_black%2Fmain.py",
+          "raw_url": "https://github.com/botsandus/ament_black/raw/4f3cea99394aa1f6513853e482eac1a18c241bad/ament_black%2Fament_black%2Fmain.py",
+          "contents_url": "https://api.github.com/repos/botsandus/ament_black/contents/ament_black%2Fament_black%2Fmain.py?ref=4f3cea99394aa1f6513853e482eac1a18c241bad",
+          "patch": "@@ -17,6 +17,7 @@\n \n import argparse\n import contextlib\n+from importlib import metadata\n import os\n import sys\n import tempfile\n@@ -32,6 +33,7 @@\n from black.const import DEFAULT_INCLUDES\n from black.report import Report\n import click\n+from packaging.version import Version\n from unidiff import PatchSet\n \n \n@@ -78,18 +80,37 @@ def main(argv=sys.argv[1:]):\n         return 1\n \n     # TODO(Nacho): Inject the config file results into the ctx (use read_pyproject_toml)\n-    sources = get_sources(\n-        ctx=click.Context(black),\n-        src=tuple(args.paths),\n-        quiet=True,\n-        verbose=False,\n-        include=re_compile_maybe_verbose(DEFAULT_INCLUDES),\n-        exclude=re_compile_maybe_verbose(DEFAULT_EXCLUDES),\n-        extend_exclude=None,\n-        force_exclude=None,\n-        report=Report(),\n-        stdin_filename='',\n-    )\n+    BLACK_VERSION = Version(metadata.version('black'))\n+    if BLACK_VERSION < Version('23.9.0'):\n+        sources = get_sources(\n+            ctx=click.Context(black),\n+            src=tuple(args.paths),\n+            quiet=True,\n+            verbose=False,\n+            include=re_compile_maybe_verbose(DEFAULT_INCLUDES),\n+            exclude=re_compile_maybe_verbose(DEFAULT_EXCLUDES),\n+            extend_exclude=None,\n+            force_exclude=None,\n+            report=Report(),\n+            stdin_filename='',\n+        )\n+    else:\n+        # Hack to support newer versions of black in ROS Jazzy\n+        # https://github.com/botsandus/ament_black/issues/12\n+        from black import find_project_root\n+\n+        sources = get_sources(\n+            root=find_project_root(tuple(args.paths))[0],\n+            src=tuple(args.paths),\n+            quiet=True,\n+            verbose=False,\n+            include=re_compile_maybe_verbose(DEFAULT_INCLUDES),\n+            exclude=re_compile_maybe_verbose(DEFAULT_EXCLUDES),\n+            extend_exclude=None,\n+            force_exclude=None,\n+            report=Report(),\n+            stdin_filename='',\n+        )\n     checked_files = [str(path) for path in sources]\n \n     if args.xunit_file:\n@@ -238,7 +259,6 @@ def get_xunit_content(report, testname, elapsed, checked_files):\n \"\"\"\n         % data\n     )\n-\n     xml += '</testsuite>\\n'\n     return xml\n "
+        }
+      ]
+    },
+    {
+      "author": "gstorer",
+      "date": "2024-04-08T09:33:06Z",
+      "sha": "febe275865945632debebc7e638bae4d75501776",
+      "message": "Add ament_cmake_black_CONFIG_FILE option. (#11)\n\nament_cmake_black_CONFIG_FILE mimics the options available in other ament lint packages like ament_cmake_flake8",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "41a2a8547973368247e8dfb6e26a7bb559271e74",
+          "filename": "ament_cmake_black/cmake/ament_black.cmake",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/botsandus/ament_black/blob/febe275865945632debebc7e638bae4d75501776/ament_cmake_black%2Fcmake%2Fament_black.cmake",
+          "raw_url": "https://github.com/botsandus/ament_black/raw/febe275865945632debebc7e638bae4d75501776/ament_cmake_black%2Fcmake%2Fament_black.cmake",
+          "contents_url": "https://api.github.com/repos/botsandus/ament_black/contents/ament_cmake_black%2Fcmake%2Fament_black.cmake?ref=febe275865945632debebc7e638bae4d75501776",
+          "patch": "@@ -38,6 +38,8 @@ function(ament_black)\n   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})\n   if(ARG_CONFIG_FILE)\n     list(APPEND cmd \"--config\" \"${ARG_CONFIG_FILE}\")\n+  elseif(DEFINED ament_cmake_black_CONFIG_FILE)\n+    list(APPEND cmd \"--config\" \"${ament_cmake_black_CONFIG_FILE}\")\n   endif()\n   file(MAKE_DIRECTORY \"${CMAKE_BINARY_DIR}/ament_black\")\n   ament_add_test("
+        }
+      ]
+    },
+    {
+      "author": "Timple",
+      "date": "2022-05-31T11:55:33Z",
+      "sha": "fea7be430ba415faffc3273a885b50df7914a0d1",
+      "message": "Add myself as maintainer",
+      "files_changed": 2,
+      "additions": 6,
+      "deletions": 3,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "ae6850fb19d6b5c68068adae0c5c77f21c05ff42",
+          "filename": "ament_black/package.xml",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 2,
+          "changes": 6,
+          "blob_url": "https://github.com/botsandus/ament_black/blob/fea7be430ba415faffc3273a885b50df7914a0d1/ament_black%2Fpackage.xml",
+          "raw_url": "https://github.com/botsandus/ament_black/raw/fea7be430ba415faffc3273a885b50df7914a0d1/ament_black%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/botsandus/ament_black/contents/ament_black%2Fpackage.xml?ref=fea7be430ba415faffc3273a885b50df7914a0d1",
+          "patch": "@@ -5,8 +5,10 @@\n   <version>0.8.1</version>\n   <description>\n     The ability to check code against style conventions using\n-    black and generate xUnit test result files.</description>\n-  <maintainer email=\"tylerjw@gamil.com\">Tyler Weaver</maintainer>\n+    black and generate xUnit test result files.\n+  </description>\n+  <maintainer email=\"tim.clephas@nobleo.nl\">Tim Clephas</maintainer>\n+  <author email=\"tylerjw@gamil.com\">Tyler Weaver</author>\n   <license>Apache License 2.0</license>\n \n   <exec_depend>black</exec_depend>"
+        },
+        {
+          "sha": "7fc00c46a7f3559d3668b614211eb4007215a3c2",
+          "filename": "ament_cmake_black/package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/botsandus/ament_black/blob/fea7be430ba415faffc3273a885b50df7914a0d1/ament_cmake_black%2Fpackage.xml",
+          "raw_url": "https://github.com/botsandus/ament_black/raw/fea7be430ba415faffc3273a885b50df7914a0d1/ament_cmake_black%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/botsandus/ament_black/contents/ament_cmake_black%2Fpackage.xml?ref=fea7be430ba415faffc3273a885b50df7914a0d1",
+          "patch": "@@ -6,7 +6,8 @@\n   <description>\n     The CMake API for ament_black to lint Python code using black.\n   </description>\n-  <maintainer email=\"tylerjw@gmail.com\">Tyler Weaver</maintainer>\n+  <maintainer email=\"tim.clephas@nobleo.nl\">Tim Clephas</maintainer>\n+  <author email=\"tylerjw@gmail.com\">Tyler Weaver</author>\n   <license>Apache License 2.0</license>\n \n   <buildtool_depend>ament_cmake_core</buildtool_depend>"
+        }
+      ]
+    },
+    {
+      "author": "asymingt",
+      "date": "2022-06-28T18:32:16Z",
+      "sha": "d3b232fa0c453871d368dc49fb74c190a6b4568a",
+      "message": "Support *.pyi interfaces and allow config file to be specified",
+      "files_changed": 3,
+      "additions": 14,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "955dd6407bea0d7dee9d522c1186dcbc7b221553",
+          "filename": "ament_black/ament_black/main.py",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 0,
+          "changes": 10,
+          "blob_url": "https://github.com/botsandus/ament_black/blob/d3b232fa0c453871d368dc49fb74c190a6b4568a/ament_black%2Fament_black%2Fmain.py",
+          "raw_url": "https://github.com/botsandus/ament_black/raw/d3b232fa0c453871d368dc49fb74c190a6b4568a/ament_black%2Fament_black%2Fmain.py",
+          "contents_url": "https://api.github.com/repos/botsandus/ament_black/contents/ament_black%2Fament_black%2Fmain.py?ref=d3b232fa0c453871d368dc49fb74c190a6b4568a",
+          "patch": "@@ -39,6 +39,12 @@ def main(argv=sys.argv[1:]):\n         help=\"The files or directories to check. For directories files ending \"\n         \"in %s will be considered.\" % \", \".join([\"'.%s'\" % e for e in extensions]),\n     )\n+    parser.add_argument(\n+        '--config',\n+        metavar='path',\n+        default=None,\n+        dest='config_file',\n+        help='The config file')\n     parser.add_argument(\n         \"--reformat\", action=\"store_true\", help=\"Reformat the files in place\"\n     )\n@@ -71,6 +77,8 @@ def main(argv=sys.argv[1:]):\n \n     # invoke black\n     cmd = [black_bin, \"--diff\"]\n+    if args.config is not None:\n+        cmd.extend([\"--config\", args.config])\n     cmd.extend(files)\n \n     proc = subprocess.Popen(\n@@ -99,6 +107,8 @@ def main(argv=sys.argv[1:]):\n     # overwrite original with reformatted files\n     if args.reformat and changed_files:\n         cmd = [black_bin]\n+        if args.config is not None:\n+            cmd.extend([\"--config\", args.config])\n         cmd.extend(files)\n         try:\n             subprocess.check_call(cmd)"
+        },
+        {
+          "sha": "8a1e6f07dafbff4d2d5350944d1d5ee4dd17ba33",
+          "filename": "ament_cmake_black/cmake/ament_black.cmake",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "changes": 4,
+          "blob_url": "https://github.com/botsandus/ament_black/blob/d3b232fa0c453871d368dc49fb74c190a6b4568a/ament_cmake_black%2Fcmake%2Fament_black.cmake",
+          "raw_url": "https://github.com/botsandus/ament_black/raw/d3b232fa0c453871d368dc49fb74c190a6b4568a/ament_cmake_black%2Fcmake%2Fament_black.cmake",
+          "contents_url": "https://api.github.com/repos/botsandus/ament_black/contents/ament_cmake_black%2Fcmake%2Fament_black.cmake?ref=d3b232fa0c453871d368dc49fb74c190a6b4568a",
+          "patch": "@@ -36,7 +36,9 @@ function(ament_black)\n   set(result_file \"${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/${ARG_TESTNAME}.xunit.xml\")\n   set(cmd \"${ament_black_BIN}\" \"--xunit-file\" \"${result_file}\")\n   list(APPEND cmd ${ARG_UNPARSED_ARGUMENTS})\n-\n+  if(ARG_CONFIG_FILE)\n+    list(APPEND cmd \"--config\" \"${ARG_CONFIG_FILE}\")\n+  endif()\n   file(MAKE_DIRECTORY \"${CMAKE_BINARY_DIR}/ament_black\")\n   ament_add_test(\n     \"${ARG_TESTNAME}\""
+        },
+        {
+          "sha": "3e63ff4e934beba19df1f643ec51aa89fccaf0c2",
+          "filename": "ament_cmake_black/cmake/ament_cmake_black_lint_hook.cmake",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/botsandus/ament_black/blob/d3b232fa0c453871d368dc49fb74c190a6b4568a/ament_cmake_black%2Fcmake%2Fament_cmake_black_lint_hook.cmake",
+          "raw_url": "https://github.com/botsandus/ament_black/raw/d3b232fa0c453871d368dc49fb74c190a6b4568a/ament_cmake_black%2Fcmake%2Fament_cmake_black_lint_hook.cmake",
+          "contents_url": "https://api.github.com/repos/botsandus/ament_black/contents/ament_cmake_black%2Fcmake%2Fament_cmake_black_lint_hook.cmake?ref=d3b232fa0c453871d368dc49fb74c190a6b4568a",
+          "patch": "@@ -14,6 +14,7 @@\n \n file(GLOB_RECURSE _source_files FOLLOW_SYMLINKS\n   \"*.py\"\n+  \"*.pyi\"\n )\n if(_source_files)\n   message(STATUS \"Added test 'black' to check Python code style\")"
+        }
+      ]
+    },
+    {
+      "author": "tylerjw",
+      "date": "2020-03-23T21:06:12Z",
+      "sha": "73ba148b98d8945ae00a061a7d3e5f7c82003a51",
+      "message": "initial commit",
+      "files_changed": 14,
+      "additions": 646,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "cfba094dace53df09974dc9bf5bb9e3c2c677e97",
+          "filename": "CONTRIBUTING.md",
+          "status": "added",
+          "additions": 18,
+          "deletions": 0,
+          "changes": 18,
+          "blob_url": "https://github.com/botsandus/ament_black/blob/73ba148b98d8945ae00a061a7d3e5f7c82003a51/CONTRIBUTING.md",
+          "raw_url": "https://github.com/botsandus/ament_black/raw/73ba148b98d8945ae00a061a7d3e5f7c82003a51/CONTRIBUTING.md",
+          "contents_url": "https://api.github.com/repos/botsandus/ament_black/contents/CONTRIBUTING.md?ref=73ba148b98d8945ae00a061a7d3e5f7c82003a51",
+          "patch": "@@ -0,0 +1,18 @@\n+Any contribution that you make to this repository will\n+be under the Apache 2 License, as dictated by that\n+[license](http://www.apache.org/licenses/LICENSE-2.0.html):\n+\n+~~~\n+5. Submission of Contributions. Unless You explicitly state otherwise,\n+   any Contribution intentionally submitted for inclusion in the Work\n+   by You to the Licensor shall be under the terms and conditions of\n+   this License, without any additional terms or conditions.\n+   Notwithstanding the above, nothing herein shall supersede or modify\n+   the terms of any separate license agreement you may have executed\n+   with Licensor regarding such Contributions.\n+~~~\n+\n+Contributors must sign-off each commit by adding a `Signed-off-by: ...`\n+line to commit messages to certify that they have the right to submit\n+the code they are contributing to the project according to the\n+[Developer Certificate of Origin (DCO)](https://developercertificate.org/)."
+        },
+        {
+          "sha": "d645695673349e3947e8e5ae42332d0ac3164cd7",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 202,
+          "deletions": 0,
+          "changes": 202,
+          "blob_url": "https://github.com/botsandus/ament_black/blob/73ba148b98d8945ae00a061a7d3e5f7c82003a51/LICENSE",
+          "raw_url": "https://github.com/botsandus/ament_black/raw/73ba148b98d8945ae00a061a7d3e5f7c82003a51/LICENSE",
+          "contents_url": "https://api.github.com/repos/botsandus/ament_black/contents/LICENSE?ref=73ba148b98d8945ae00a061a7d3e5f7c82003a51",
+          "patch": "@@ -0,0 +1,202 @@\n+\n+                                 Apache License\n+                           Version 2.0, January 2004\n+                        http://www.apache.org/licenses/\n+\n+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION\n+\n+   1. Definitions.\n+\n+      \"License\" shall mean the terms and conditions for use, reproduction,\n+      and distribution as defined by Sections 1 through 9 of this document.\n+\n+      \"Licensor\" shall mean the copyright owner or entity authorized by\n+      the copyright owner that is granting the License.\n+\n+      \"Legal Entity\" shall mean the union of the acting entity and all\n+      other entities that control, are controlled by, or are under common\n+      control with that entity. For the purposes of this definition,\n+      \"control\" means (i) the power, direct or indirect, to cause the\n+      direction or management of such entity, whether by contract or\n+      otherwise, or (ii) ownership of fifty percent (50%) or more of the\n+      outstanding shares, or (iii) beneficial ownership of such entity.\n+\n+      \"You\" (or \"Your\") shall mean an individual or Legal Entity\n+      exercising permissions granted by this License.\n+\n+      \"Source\" form shall mean the preferred form for making modifications,\n+      including but not limited to software source code, documentation\n+      source, and configuration files.\n+\n+      \"Object\" form shall mean any form resulting from mechanical\n+      transformation or translation of a Source form, including but\n+      not limited to compiled object code, generated documentation,\n+      and conversions to other media types.\n+\n+      \"Work\" shall mean the work of authorship, whether in Source or\n+      Object form, made available under the License, as indicated by a\n+      copyright notice that is included in or attached to the work\n+      (an example is provided in the Appendix below).\n+\n+      \"Derivative Works\" shall mean any work, whether in Source or Object\n+      form, that is based on (or derived from) the Work and for which the\n+      editorial revisions, annotations, elaborations, or other modifications\n+      represent, as a whole, an original work of authorship. For the purposes\n+      of this License, Derivative Works shall not include works that remain\n+      separable from, or merely link (or bind by name) to the interfaces of,\n+      the Work and Derivative Works thereof.\n+\n+      \"Contribution\" shall mean any work of authorship, including\n+      the original version of the Work and any modifications or additions\n+      to that Work or Derivative Works thereof, that is intentionally\n+      submitted to Licensor for inclusion in the Work by the copyright owner\n+      or by an individual or Legal Entity authorized to submit on behalf of\n+      the copyright owner. For the purposes of this definition, \"submitted\"\n+      means any form of electronic, verbal, or written communication sent\n+      to the Licensor or its representatives, including but not limited to\n+      communication on electronic mailing lists, source code control systems,\n+      and issue tracking systems that are managed by, or on behalf of, the\n+      Licensor for the purpose of discussing and improving the Work, but\n+      excluding communication that is conspicuously marked or otherwise\n+      designated in writing by the copyright owner as \"Not a Contribution.\"\n+\n+      \"Contributor\" shall mean Licensor and any individual or Legal Entity\n+      on behalf of whom a Contribution has been received by Licensor and\n+      subsequently incorporated within the Work.\n+\n+   2. Grant of Copyright License. Subject to the terms and conditions of\n+      this License, each Contributor hereby grants to You a perpetual,\n+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n+      copyright license to reproduce, prepare Derivative Works of,\n+      publicly display, publicly perform, sublicense, and distribute the\n+      Work and such Derivative Works in Source or Object form.\n+\n+   3. Grant of Patent License. Subject to the terms and conditions of\n+      this License, each Contributor hereby grants to You a perpetual,\n+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n+      (except as stated in this section) patent license to make, have made,\n+      use, offer to sell, sell, import, and otherwise transfer the Work,\n+      where such license applies only to those patent claims licensable\n+      by such Contributor that are necessarily infringed by their\n+      Contribution(s) alone or by combination of their Contribution(s)\n+      with the Work to which such Contribution(s) was submitted. If You\n+      institute patent litigation against any entity (including a\n+      cross-claim or counterclaim in a lawsuit) alleging that the Work\n+      or a Contribution incorporated within the Work constitutes direct\n+      or contributory patent infringement, then any patent licenses\n+      granted to You under this License for that Work shall terminate\n+      as of the date such litigation is filed.\n+\n+   4. Redistribution. You may reproduce and distribute copies of the\n+      Work or Derivative Works thereof in any medium, with or without\n+      modifications, and in Source or Object form, provided that You\n+      meet the following conditions:\n+\n+      (a) You must give any other recipients of the Work or\n+          Derivative Works a copy of this License; and\n+\n+      (b) You must cause any modified files to carry prominent notices\n+          stating that You changed the files; and\n+\n+      (c) You must retain, in the Source form of any Derivative Works\n+          that You distribute, all copyright, patent, trademark, and\n+          attribution notices from the Source form of the Work,\n+          excluding those notices that do not pertain to any part of\n+          the Derivative Works; and\n+\n+      (d) If the Work includes a \"NOTICE\" text file as part of its\n+          distribution, then any Derivative Works that You distribute must\n+          include a readable copy of the attribution notices contained\n+          within such NOTICE file, excluding those notices that do not\n+          pertain to any part of the Derivative Works, in at least one\n+          of the following places: within a NOTICE text file distributed\n+          as part of the Derivative Works; within the Source form or\n+          documentation, if provided along with the Derivative Works; or,\n+          within a display generated by the Derivative Works, if and\n+          wherever such third-party notices normally appear. The contents\n+          of the NOTICE file are for informational purposes only and\n+          do not modify the License. You may add Your own attribution\n+          notices within Derivative Works that You distribute, alongside\n+          or as an addendum to the NOTICE text from the Work, provided\n+          that such additional attribution notices cannot be construed\n+          as modifying the License.\n+\n+      You may add Your own copyright statement to Your modifications and\n+      may provide additional or different license terms and conditions\n+      for use, reproduction, or distribution of Your modifications, or\n+      for any such Derivative Works as a whole, provided Your use,\n+      reproduction, and distribution of the Work otherwise complies with\n+      the conditions stated in this License.\n+\n+   5. Submission of Contributions. Unless You explicitly state otherwise,\n+      any Contribution intentionally submitted for inclusion in the Work\n+      by You to the Licensor shall be under the terms and conditions of\n+      this License, without any additional terms or conditions.\n+      Notwithstanding the above, nothing herein shall supersede or modify\n+      the terms of any separate license agreement you may have executed\n+      with Licensor regarding such Contributions.\n+\n+   6. Trademarks. This License does not grant permission to use the trade\n+      names, trademarks, service marks, or product names of the Licensor,\n+      except as required for reasonable and customary use in describing the\n+      origin of the Work and reproducing the content of the NOTICE file.\n+\n+   7. Disclaimer of Warranty. Unless required by applicable law or\n+      agreed to in writing, Licensor provides the Work (and each\n+      Contributor provides its Contributions) on an \"AS IS\" BASIS,\n+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or\n+      implied, including, without limitation, any warranties or conditions\n+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A\n+      PARTICULAR PURPOSE. You are solely responsible for determining the\n+      appropriateness of using or redistributing the Work and assume any\n+      risks associated with Your exercise of permissions under this License.\n+\n+   8. Limitation of Liability. In no event and under no legal theory,\n+      whether in tort (including negligence), contract, or otherwise,\n+      unless required by applicable law (such as deliberate and grossly\n+      negligent acts) or agreed to in writing, shall any Contributor be\n+      liable to You for damages, including any direct, indirect, special,\n+      incidental, or consequential damages of any character arising as a\n+      result of this License or out of the use or inability to use the\n+      Work (including but not limited to damages for loss of goodwill,\n+      work stoppage, computer failure or malfunction, or any and all\n+      other commercial damages or losses), even if such Contributor\n+      has been advised of the possibility of such damages.\n+\n+   9. Accepting Warranty or Additional Liability. While redistributing\n+      the Work or Derivative Works thereof, You may choose to offer,\n+      and charge a fee for, acceptance of support, warranty, indemnity,\n+      or other liability obligations and/or rights consistent with this\n+      License. However, in accepting such obligations, You may act only\n+      on Your own behalf and on Your sole responsibility, not on behalf\n+      of any other Contributor, and only if You agree to indemnify,\n+      defend, and hold each Contributor harmless for any liability\n+      incurred by, or claims asserted against, such Contributor by reason\n+      of your accepting any such warranty or additional liability.\n+\n+   END OF TERMS AND CONDITIONS\n+\n+   APPENDIX: How to apply the Apache License to your work.\n+\n+      To apply the Apache License to your work, attach the following\n+      boilerplate notice, with the fields enclosed by brackets \"[]\"\n+      replaced with your own identifying information. (Don't include\n+      the brackets!)  The text should be enclosed in the appropriate\n+      comment syntax for the file format. We also recommend that a\n+      file or class name and description of purpose be included on the\n+      same \"printed page\" as the copyright notice for easier\n+      identification within third-party archives.\n+\n+   Copyright [yyyy] [name of copyright owner]\n+\n+   Licensed under the Apache License, Version 2.0 (the \"License\");\n+   you may not use this file except in compliance with the License.\n+   You may obtain a copy of the License at\n+\n+       http://www.apache.org/licenses/LICENSE-2.0\n+\n+   Unless required by applicable law or agreed to in writing, software\n+   distributed under the License is distributed on an \"AS IS\" BASIS,\n+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+   See the License for the specific language governing permissions and\n+   limitations under the License."
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "ament_black/ament_black/__init__.py",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/botsandus/ament_black/blob/73ba148b98d8945ae00a061a7d3e5f7c82003a51/ament_black%2Fament_black%2F__init__.py",
+          "raw_url": "https://github.com/botsandus/ament_black/raw/73ba148b98d8945ae00a061a7d3e5f7c82003a51/ament_black%2Fament_black%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/botsandus/ament_black/contents/ament_black%2Fament_black%2F__init__.py?ref=73ba148b98d8945ae00a061a7d3e5f7c82003a51"
+        },
+        {
+          "sha": "12330664d733cb79969e2c21450862ca33045089",
+          "filename": "ament_black/ament_black/main.py",
+          "status": "added",
+          "additions": 274,
+          "deletions": 0,
+          "changes": 274,
+          "blob_url": "https://github.com/botsandus/ament_black/blob/73ba148b98d8945ae00a061a7d3e5f7c82003a51/ament_black%2Fament_black%2Fmain.py",
+          "raw_url": "https://github.com/botsandus/ament_black/raw/73ba148b98d8945ae00a061a7d3e5f7c82003a51/ament_black%2Fament_black%2Fmain.py",
+          "contents_url": "https://api.github.com/repos/botsandus/ament_black/contents/ament_black%2Fament_black%2Fmain.py?ref=73ba148b98d8945ae00a061a7d3e5f7c82003a51",
+          "patch": "@@ -0,0 +1,274 @@\n+#!/usr/bin/env python3\n+\n+# Copyright 2019 Picknik Robotics.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+import argparse\n+import os\n+import subprocess\n+import sys\n+import time\n+from xml.etree import ElementTree\n+from xml.sax.saxutils import escape\n+from xml.sax.saxutils import quoteattr\n+from unidiff import PatchSet\n+\n+\n+def main(argv=sys.argv[1:]):\n+    extensions = [\"py\"]\n+\n+    parser = argparse.ArgumentParser(\n+        description=\"Check code style using black.\",\n+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,\n+    )\n+    parser.add_argument(\n+        \"paths\",\n+        nargs=\"*\",\n+        default=[os.curdir],\n+        help=\"The files or directories to check. For directories files ending \"\n+        \"in %s will be considered.\" % \", \".join([\"'.%s'\" % e for e in extensions]),\n+    )\n+    parser.add_argument(\n+        \"--reformat\", action=\"store_true\", help=\"Reformat the files in place\"\n+    )\n+    # not using a file handle directly\n+    # in order to prevent leaving an empty file when something fails early\n+    parser.add_argument(\"--xunit-file\", help=\"Generate a xunit compliant XML file\")\n+    args = parser.parse_args(argv)\n+\n+    if args.xunit_file:\n+        start_time = time.time()\n+\n+    files = get_files(args.paths, extensions)\n+    if not files:\n+        print(\"No files found\", file=sys.stderr)\n+        return 1\n+\n+    bin_names = [\n+        \"black\",\n+    ]\n+    black_bin = find_executable(bin_names)\n+    if not black_bin:\n+        print(\n+            \"Could not find %s executable\"\n+            % \" / \".join([\"'%s'\" % n for n in bin_names]),\n+            file=sys.stderr,\n+        )\n+        return 1\n+\n+    report = []\n+\n+    # invoke black\n+    cmd = [black_bin, \"--diff\"]\n+    cmd.extend(files)\n+\n+    proc = subprocess.Popen(\n+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding=\"utf-8\"\n+    )\n+    output, _ = proc.communicate()\n+\n+    if proc.returncode:\n+        print(\n+            \"The invocation of '%s' failed with error code %d\"\n+            % (os.path.basename(black_bin), proc.returncode),\n+            file=sys.stderr,\n+        )\n+        return 1\n+\n+    # output errors\n+    patch_set = PatchSet(output)\n+\n+    changed_files = []\n+    report = {}\n+    for patch in patch_set:\n+        filename = patch.source_file\n+        changed_files.append(filename)\n+        report[filename] = patch\n+\n+    # overwrite original with reformatted files\n+    if args.reformat and changed_files:\n+        cmd = [black_bin]\n+        cmd.extend(files)\n+        try:\n+            subprocess.check_call(cmd)\n+        except subprocess.CalledProcessError as e:\n+            print(\n+                \"The invocation of '%s' failed with error code %d: %s\"\n+                % (os.path.basename(black_bin), e.returncode, e),\n+                file=sys.stderr,\n+            )\n+            return 1\n+\n+    # output summary\n+    file_count = sum(1 if report[k] else 0 for k in report.keys())\n+    replacement_count = sum(len(r) for r in report.values())\n+    if not file_count:\n+        print(\"No problems found\")\n+        rc = 0\n+    else:\n+        print(\n+            \"%d files with %d code style divergences\" % (file_count, replacement_count),\n+            file=sys.stderr,\n+        )\n+        rc = 1\n+\n+    # generate xunit file\n+    if args.xunit_file:\n+        folder_name = os.path.basename(os.path.dirname(args.xunit_file))\n+        file_name = os.path.basename(args.xunit_file)\n+        suffix = \".xml\"\n+        if file_name.endswith(suffix):\n+            file_name = file_name[0 : -len(suffix)]\n+            suffix = \".xunit\"\n+            if file_name.endswith(suffix):\n+                file_name = file_name[0 : -len(suffix)]\n+        testname = \"%s.%s\" % (folder_name, file_name)\n+\n+        xml = get_xunit_content(report, testname, time.time() - start_time)\n+        path = os.path.dirname(os.path.abspath(args.xunit_file))\n+        if not os.path.exists(path):\n+            os.makedirs(path)\n+        with open(args.xunit_file, \"w\") as f:\n+            f.write(xml)\n+\n+    return rc\n+\n+\n+def find_executable(file_names):\n+    paths = os.getenv(\"PATH\").split(os.path.pathsep)\n+    for file_name in file_names:\n+        for path in paths:\n+            file_path = os.path.join(path, file_name)\n+            if os.path.isfile(file_path) and os.access(file_path, os.X_OK):\n+                return file_path\n+    return None\n+\n+\n+def get_files(paths, extensions):\n+    files = []\n+    for path in paths:\n+        if os.path.isdir(path):\n+            for dirpath, dirnames, filenames in os.walk(path):\n+                if \"AMENT_IGNORE\" in filenames:\n+                    dirnames[:] = []\n+                    continue\n+                # ignore folder starting with . or _\n+                dirnames[:] = [d for d in dirnames if d[0] not in [\".\", \"_\"]]\n+                dirnames.sort()\n+\n+                # select files by extension\n+                for filename in sorted(filenames):\n+                    _, ext = os.path.splitext(filename)\n+                    if ext in (\".%s\" % e for e in extensions):\n+                        files.append(os.path.join(dirpath, filename))\n+        if os.path.isfile(path):\n+            files.append(path)\n+    return [os.path.normpath(f) for f in files]\n+\n+\n+def find_index_of_line_start(data, offset):\n+    index_1 = data.rfind(\"\\n\", 0, offset) + 1\n+    index_2 = data.rfind(\"\\r\", 0, offset) + 1\n+    return max(index_1, index_2)\n+\n+\n+def find_index_of_line_end(data, offset):\n+    index_1 = data.find(\"\\n\", offset)\n+    if index_1 == -1:\n+        index_1 = len(data)\n+    index_2 = data.find(\"\\r\", offset)\n+    if index_2 == -1:\n+        index_2 = len(data)\n+    return min(index_1, index_2)\n+\n+\n+def get_line_number(data, offset):\n+    return data[0:offset].count(\"\\n\") + data[0:offset].count(\"\\r\") + 1\n+\n+\n+def get_xunit_content(report, testname, elapsed):\n+    test_count = sum(max(len(r), 1) for r in report.values())\n+    error_count = sum(len(r) for r in report.values())\n+    data = {\n+        \"testname\": testname,\n+        \"test_count\": test_count,\n+        \"error_count\": error_count,\n+        \"time\": \"%.3f\" % round(elapsed, 3),\n+    }\n+    xml = (\n+        \"\"\"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n+<testsuite\n+  name=\"%(testname)s\"\n+  tests=\"%(test_count)d\"\n+  errors=\"0\"\n+  failures=\"%(error_count)d\"\n+  time=\"%(time)s\"\n+>\n+\"\"\"\n+        % data\n+    )\n+\n+    for filename in sorted(report.keys()):\n+        hunks = report[filename]\n+\n+        if hunks:\n+            for hunk in hunks:\n+                data = {\n+                    \"quoted_location\": quoteattr(\n+                        \"%s:%d\" % (filename, hunk.source_start)\n+                    ),\n+                    \"testname\": testname,\n+                    \"quoted_message\": quoteattr(str(hunk)),\n+                }\n+                xml += (\n+                    \"\"\"  <testcase\n+    name=%(quoted_location)s\n+    classname=\"%(testname)s\"\n+  >\n+      <failure message=%(quoted_message)s></failure>\n+  </testcase>\n+\"\"\"\n+                    % data\n+                )\n+\n+        else:\n+            # if there are no replacements report a single successful test\n+            data = {\n+                \"quoted_location\": quoteattr(filename),\n+                \"testname\": testname,\n+            }\n+            xml += (\n+                \"\"\"  <testcase\n+    name=%(quoted_location)s\n+    classname=\"%(testname)s\"/>\n+\"\"\"\n+                % data\n+            )\n+\n+    # output list of checked files\n+    data = {\n+        \"escaped_files\": escape(\"\".join([\"\\n* %s\" % r for r in sorted(report.keys())])),\n+    }\n+    xml += (\n+        \"\"\"  <system-out>Checked files:%(escaped_files)s</system-out>\n+\"\"\"\n+        % data\n+    )\n+\n+    xml += \"</testsuite>\\n\"\n+    return xml\n+\n+\n+if __name__ == \"__main__\":\n+    sys.exit(main())"
+        },
+        {
+          "sha": "bb8ccd53211720b561fbcf195b1059dacd7c4e5d",
+          "filename": "ament_black/doc/index.rst",
+          "status": "added",
+          "additions": 24,
+          "deletions": 0,
+          "changes": 24,
+          "blob_url": "https://github.com/botsandus/ament_black/blob/73ba148b98d8945ae00a061a7d3e5f7c82003a51/ament_black%2Fdoc%2Findex.rst",
+          "raw_url": "https://github.com/botsandus/ament_black/raw/73ba148b98d8945ae00a061a7d3e5f7c82003a51/ament_black%2Fdoc%2Findex.rst",
+          "contents_url": "https://api.github.com/repos/botsandus/ament_black/contents/ament_black%2Fdoc%2Findex.rst?ref=73ba148b98d8945ae00a061a7d3e5f7c82003a51",
+          "patch": "@@ -0,0 +1,24 @@\n+ament_clang_format\n+==================\n+\n+Checks the code style of Python source files using `black\n+<http://https://github.com/psf/black>`_.\n+Files with the following extension is being considered:\n+``.py``.\n+\n+\n+How to run the check from the command line?\n+-------------------------------------------\n+\n+.. code:: sh\n+\n+    ament_black [<path> ...]\n+\n+When using the option ``--reformat`` the proposed changes are applied in place.\n+\n+\n+How to run the check from within a CMake ament package as part of the tests?\n+----------------------------------------------------------------------------\n+\n+The CMake integration is provided by the package `ament_cmake_black\n+<https://github.com/tylerjw/ament_black/ament_cmake_black>`_."
+        },
+        {
+          "sha": "e657c96866872e49ac61f5902b947df7d337fccd",
+          "filename": "ament_black/package.xml",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/botsandus/ament_black/blob/73ba148b98d8945ae00a061a7d3e5f7c82003a51/ament_black%2Fpackage.xml",
+          "raw_url": "https://github.com/botsandus/ament_black/raw/73ba148b98d8945ae00a061a7d3e5f7c82003a51/ament_black%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/botsandus/ament_black/contents/ament_black%2Fpackage.xml?ref=73ba148b98d8945ae00a061a7d3e5f7c82003a51",
+          "patch": "@@ -0,0 +1,23 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"2\">\n+  <name>ament_black</name>\n+  <version>0.8.1</version>\n+  <description>\n+    The ability to check code against style conventions using\n+    black and generate xUnit test result files.</description>\n+  <maintainer email=\"tylerjw@gamil.com\">Tyler Weaver</maintainer>\n+  <license>Apache License 2.0</license>\n+\n+  <exec_depend>black</exec_depend>\n+  <exec_depend>python3-unidiff</exec_depend>\n+\n+  <test_depend>ament_copyright</test_depend>\n+  <test_depend>ament_flake8</test_depend>\n+  <test_depend>ament_pep257</test_depend>\n+  <test_depend>python3-pytest</test_depend>\n+\n+  <export>\n+    <build_type>ament_python</build_type>\n+  </export>\n+</package>"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "ament_black/resource/ament_black",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/botsandus/ament_black/blob/73ba148b98d8945ae00a061a7d3e5f7c82003a51/ament_black%2Fresource%2Fament_black",
+          "raw_url": "https://github.com/botsandus/ament_black/raw/73ba148b98d8945ae00a061a7d3e5f7c82003a51/ament_black%2Fresource%2Fament_black",
+          "contents_url": "https://api.github.com/repos/botsandus/ament_black/contents/ament_black%2Fresource%2Fament_black?ref=73ba148b98d8945ae00a061a7d3e5f7c82003a51"
+        },
+        {
+          "sha": "134bece8a0a59dce52670e2f53a08e818086c685",
+          "filename": "ament_black/setup.py",
+          "status": "added",
+          "additions": 36,
+          "deletions": 0,
+          "changes": 36,
+          "blob_url": "https://github.com/botsandus/ament_black/blob/73ba148b98d8945ae00a061a7d3e5f7c82003a51/ament_black%2Fsetup.py",
+          "raw_url": "https://github.com/botsandus/ament_black/raw/73ba148b98d8945ae00a061a7d3e5f7c82003a51/ament_black%2Fsetup.py",
+          "contents_url": "https://api.github.com/repos/botsandus/ament_black/contents/ament_black%2Fsetup.py?ref=73ba148b98d8945ae00a061a7d3e5f7c82003a51",
+          "patch": "@@ -0,0 +1,36 @@\n+from setuptools import find_packages\n+from setuptools import setup\n+\n+package_name = \"ament_black\"\n+\n+setup(\n+    name=package_name,\n+    version=\"0.0.1\",\n+    packages=find_packages(exclude=[\"test\"]),\n+    data_files=[\n+        (\"share/\" + package_name, [\"package.xml\"]),\n+        (\"share/ament_index/resource_index/packages\", [\"resource/\" + package_name]),\n+    ],\n+    install_requires=[\"setuptools\", \"pyyaml\"],\n+    zip_safe=False,\n+    author=\"Tyler Weaver\",\n+    author_email=\"tylerjw@gmail.com\",\n+    maintainer=\"Tyler Weaver\",\n+    maintainer_email=\"tylerjw@gmail.com\",\n+    url=\"https://github.com/tylerjw/ament_black\",\n+    download_url=\"https://github.com/tylerjw/ament_black/releases\",\n+    keywords=[\"ROS\"],\n+    classifiers=[\n+        \"Intended Audience :: Developers\",\n+        \"License :: OSI Approved :: Apache Software License\",\n+        \"Programming Language :: Python\",\n+        \"Topic :: Software Development\",\n+    ],\n+    description=\"Check Python code style using black.\",\n+    long_description=\"\"\"\\\n+The ability to check code against style conventions using black\n+and generate xUnit test result files.\"\"\",\n+    license=\"Apache License, Version 2.0, BSD\",\n+    tests_require=[\"pytest\"],\n+    entry_points={\"console_scripts\": [\"ament_black = ament_black.main:main\",],},\n+)"
+        },
+        {
+          "sha": "782bcced27d21d0cb5aeb2bee27d316fbd09d659",
+          "filename": "ament_black/test/__pycache__/test_copyright.cpython-36-pytest-5.4.1.pyc",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/botsandus/ament_black/blob/73ba148b98d8945ae00a061a7d3e5f7c82003a51/ament_black%2Ftest%2F__pycache__%2Ftest_copyright.cpython-36-pytest-5.4.1.pyc",
+          "raw_url": "https://github.com/botsandus/ament_black/raw/73ba148b98d8945ae00a061a7d3e5f7c82003a51/ament_black%2Ftest%2F__pycache__%2Ftest_copyright.cpython-36-pytest-5.4.1.pyc",
+          "contents_url": "https://api.github.com/repos/botsandus/ament_black/contents/ament_black%2Ftest%2F__pycache__%2Ftest_copyright.cpython-36-pytest-5.4.1.pyc?ref=73ba148b98d8945ae00a061a7d3e5f7c82003a51"
+        },
+        {
+          "sha": "308cc1b7e5116f91a1f53418b92cbc5c8004c042",
+          "filename": "ament_black/test/__pycache__/test_flake8.cpython-36-pytest-5.4.1.pyc",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/botsandus/ament_black/blob/73ba148b98d8945ae00a061a7d3e5f7c82003a51/ament_black%2Ftest%2F__pycache__%2Ftest_flake8.cpython-36-pytest-5.4.1.pyc",
+          "raw_url": "https://github.com/botsandus/ament_black/raw/73ba148b98d8945ae00a061a7d3e5f7c82003a51/ament_black%2Ftest%2F__pycache__%2Ftest_flake8.cpython-36-pytest-5.4.1.pyc",
+          "contents_url": "https://api.github.com/repos/botsandus/ament_black/contents/ament_black%2Ftest%2F__pycache__%2Ftest_flake8.cpython-36-pytest-5.4.1.pyc?ref=73ba148b98d8945ae00a061a7d3e5f7c82003a51"
+        },
+        {
+          "sha": "8b9525ef634404e124930390a7486e7664a02e23",
+          "filename": "ament_black/test/__pycache__/test_pep257.cpython-36-pytest-5.4.1.pyc",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/botsandus/ament_black/blob/73ba148b98d8945ae00a061a7d3e5f7c82003a51/ament_black%2Ftest%2F__pycache__%2Ftest_pep257.cpython-36-pytest-5.4.1.pyc",
+          "raw_url": "https://github.com/botsandus/ament_black/raw/73ba148b98d8945ae00a061a7d3e5f7c82003a51/ament_black%2Ftest%2F__pycache__%2Ftest_pep257.cpython-36-pytest-5.4.1.pyc",
+          "contents_url": "https://api.github.com/repos/botsandus/ament_black/contents/ament_black%2Ftest%2F__pycache__%2Ftest_pep257.cpython-36-pytest-5.4.1.pyc?ref=73ba148b98d8945ae00a061a7d3e5f7c82003a51"
+        },
+        {
+          "sha": "b3219d3f54efa476a54b3e05b7ccfc33bc1b7301",
+          "filename": "ament_black/test/test_copyright.py",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/botsandus/ament_black/blob/73ba148b98d8945ae00a061a7d3e5f7c82003a51/ament_black%2Ftest%2Ftest_copyright.py",
+          "raw_url": "https://github.com/botsandus/ament_black/raw/73ba148b98d8945ae00a061a7d3e5f7c82003a51/ament_black%2Ftest%2Ftest_copyright.py",
+          "contents_url": "https://api.github.com/repos/botsandus/ament_black/contents/ament_black%2Ftest%2Ftest_copyright.py?ref=73ba148b98d8945ae00a061a7d3e5f7c82003a51",
+          "patch": "@@ -0,0 +1,23 @@\n+# Copyright 2015 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_copyright.main import main\n+import pytest\n+\n+\n+@pytest.mark.copyright\n+@pytest.mark.linter\n+def test_copyright():\n+    rc = main(argv=[\"ament_clang_format\", \"test\"])\n+    assert rc == 0, \"Found errors\""
+        },
+        {
+          "sha": "3ca62d2d3788c5fbdd3d9aeae54aed6110d02504",
+          "filename": "ament_black/test/test_flake8.py",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/botsandus/ament_black/blob/73ba148b98d8945ae00a061a7d3e5f7c82003a51/ament_black%2Ftest%2Ftest_flake8.py",
+          "raw_url": "https://github.com/botsandus/ament_black/raw/73ba148b98d8945ae00a061a7d3e5f7c82003a51/ament_black%2Ftest%2Ftest_flake8.py",
+          "contents_url": "https://api.github.com/repos/botsandus/ament_black/contents/ament_black%2Ftest%2Ftest_flake8.py?ref=73ba148b98d8945ae00a061a7d3e5f7c82003a51",
+          "patch": "@@ -0,0 +1,23 @@\n+# Copyright 2016 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_flake8.main import main\n+import pytest\n+\n+\n+@pytest.mark.flake8\n+@pytest.mark.linter\n+def test_flake8():\n+    rc = main(argv=[])\n+    assert rc == 0, \"Found code style errors / warnings\""
+        },
+        {
+          "sha": "7bf8648e22534f596ff815b83ffd819dd482eba2",
+          "filename": "ament_black/test/test_pep257.py",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/botsandus/ament_black/blob/73ba148b98d8945ae00a061a7d3e5f7c82003a51/ament_black%2Ftest%2Ftest_pep257.py",
+          "raw_url": "https://github.com/botsandus/ament_black/raw/73ba148b98d8945ae00a061a7d3e5f7c82003a51/ament_black%2Ftest%2Ftest_pep257.py",
+          "contents_url": "https://api.github.com/repos/botsandus/ament_black/contents/ament_black%2Ftest%2Ftest_pep257.py?ref=73ba148b98d8945ae00a061a7d3e5f7c82003a51",
+          "patch": "@@ -0,0 +1,23 @@\n+# Copyright 2015 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_pep257.main import main\n+import pytest\n+\n+\n+@pytest.mark.linter\n+@pytest.mark.pep257\n+def test_pep257():\n+    rc = main(argv=[\"ament_clang_format\", \"test\"])\n+    assert rc == 0, \"Found docblock style errors\""
+        }
+      ]
+    }
+  ]
+}

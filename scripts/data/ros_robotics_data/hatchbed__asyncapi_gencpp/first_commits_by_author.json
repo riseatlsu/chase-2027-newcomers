@@ -1,0 +1,59 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T07:01:31Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "hatchbed",
+    "repo": "asyncapi_gencpp"
+  },
+  "data": [
+    {
+      "author": "malban",
+      "date": "2022-02-24T22:00:25Z",
+      "sha": "c1a4e82fd49d25312e6ab8aa5964a1621ff6d0fc",
+      "message": "Initial commit",
+      "files_changed": 1,
+      "additions": 29,
+      "deletions": 0,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "917beac2245739b87c486596f3ecb78eb9d61683",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 29,
+          "deletions": 0,
+          "changes": 29,
+          "blob_url": "https://github.com/hatchbed/asyncapi_gencpp/blob/c1a4e82fd49d25312e6ab8aa5964a1621ff6d0fc/LICENSE",
+          "raw_url": "https://github.com/hatchbed/asyncapi_gencpp/raw/c1a4e82fd49d25312e6ab8aa5964a1621ff6d0fc/LICENSE",
+          "contents_url": "https://api.github.com/repos/hatchbed/asyncapi_gencpp/contents/LICENSE?ref=c1a4e82fd49d25312e6ab8aa5964a1621ff6d0fc",
+          "patch": "@@ -0,0 +1,29 @@\n+BSD 3-Clause License\n+\n+Copyright (c) 2022, Hatchbed\n+All rights reserved.\n+\n+Redistribution and use in source and binary forms, with or without\n+modification, are permitted provided that the following conditions are met:\n+\n+1. Redistributions of source code must retain the above copyright notice, this\n+   list of conditions and the following disclaimer.\n+\n+2. Redistributions in binary form must reproduce the above copyright notice,\n+   this list of conditions and the following disclaimer in the documentation\n+   and/or other materials provided with the distribution.\n+\n+3. Neither the name of the copyright holder nor the names of its\n+   contributors may be used to endorse or promote products derived from\n+   this software without specific prior written permission.\n+\n+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\n+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE\n+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL\n+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR\n+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\n+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+        }
+      ]
+    },
+    {
+      "author": "pjreed",
+      "date": "2022-04-12T20:37:22Z",
+      "sha": "ea562a3ed0f2a8c1ca51d343608b4f7a5ff0efd0",
+      "message": "Only loop over arrays if there are conditions\n\nIf a type definition had an array of items that did not have any conditions,\nthis code would generate an empty loop, like so:\n\n```c++\n        for (const auto& item: masks) {\n        }\n```\n\nThis would cause compiler warnings in code that included this header due to\nthe unused variable and could potentially make serialization less efficient\nif the compiler did not optimize that out.  This change will omit the\nloop entirely if no conditions are generated.\n\nSigned-off-by: P. J. Reed <phillipreed@hatchbed.com>",
+      "files_changed": 1,
+      "additions": 30,
+      "deletions": 27,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "edd3d12ee1b966c8dfc856001ab63f4d0812968b",
+          "filename": "src/asyncapi_gencpp.py",
+          "status": "modified",
+          "additions": 30,
+          "deletions": 27,
+          "changes": 57,
+          "blob_url": "https://github.com/hatchbed/asyncapi_gencpp/blob/ea562a3ed0f2a8c1ca51d343608b4f7a5ff0efd0/src%2Fasyncapi_gencpp.py",
+          "raw_url": "https://github.com/hatchbed/asyncapi_gencpp/raw/ea562a3ed0f2a8c1ca51d343608b4f7a5ff0efd0/src%2Fasyncapi_gencpp.py",
+          "contents_url": "https://api.github.com/repos/hatchbed/asyncapi_gencpp/contents/src%2Fasyncapi_gencpp.py?ref=ea562a3ed0f2a8c1ca51d343608b4f7a5ff0efd0",
+          "patch": "@@ -209,48 +209,51 @@ def build_object(name, definition, prefix, all_required=False):\n         resolved_def = resolve_definition(prop_type, prop_def)\n         prop_type = resolve_type(prop_type)\n         if item_type is not None:\n-            lines.append(\"    for (const auto& item: {}) {{\".format(prop_name_snake))\n             item_def = resolve_definition(item_type, resolved_def[\"items\"])\n             item_type = resolve_type(item_type)\n+            conditions = []\n             if item_type == \"std::string\":\n                 if \"maxLength\" in item_def:\n-                    lines.append(\"      if (item.length() > {}) {{\".format(item_def[\"maxLength\"]))\n-                    lines.append(\"        return false;\")\n-                    lines.append(\"      }\")\n+                    conditions.append(\"      if (item.length() > {}) {{\".format(item_def[\"maxLength\"]))\n+                    conditions.append(\"        return false;\")\n+                    conditions.append(\"      }\")\n                 if \"minLength\" in item_def:\n-                    lines.append(\"      if (item.length() < {}) {{\".format(item_def[\"minLength\"]))\n-                    lines.append(\"        return false;\")\n-                    lines.append(\"      }\")\n+                    conditions.append(\"      if (item.length() < {}) {{\".format(item_def[\"minLength\"]))\n+                    conditions.append(\"        return false;\")\n+                    conditions.append(\"      }\")\n                 if \"enum\" in item_def:\n-                    lines.append(\"      bool in_enum = false;\")\n+                    conditions.append(\"      bool in_enum = false;\")\n \n                     if len(item_def[\"enum\"]) > 0:\n-                        lines.append('      if (item == \"{}\") {{'.format(item_def[\"enum\"][0]))\n-                        lines.append(\"        in_enum = true;\")\n-                        lines.append(\"      }\")\n+                        conditions.append('      if (item == \"{}\") {{'.format(item_def[\"enum\"][0]))\n+                        conditions.append(\"        in_enum = true;\")\n+                        conditions.append(\"      }\")\n                         for enum in item_def[\"enum\"][1:]:\n-                            lines.append('      else if (item == \"{}\") {{'.format(enum))\n-                            lines.append(\"        in_enum = true;\")\n-                            lines.append(\"      }\")\n-                    lines.append(\"      if (!in_enum) {\")\n-                    lines.append(\"        return false;\")\n-                    lines.append(\"      }\")\n+                            conditions.append('      else if (item == \"{}\") {{'.format(enum))\n+                            conditions.append(\"        in_enum = true;\")\n+                            conditions.append(\"      }\")\n+                    conditions.append(\"      if (!in_enum) {\")\n+                    conditions.append(\"        return false;\")\n+                    conditions.append(\"      }\")\n             elif item_type == \"int\" or item_type == \"double\":\n                 if \"maximum\" in item_def:\n-                    lines.append(\"      if (item > {}) {{\".format(item_def[\"maximum\"]))\n-                    lines.append(\"        return false;\")\n-                    lines.append(\"      }\")\n+                    conditions.append(\"      if (item > {}) {{\".format(item_def[\"maximum\"]))\n+                    conditions.append(\"        return false;\")\n+                    conditions.append(\"      }\")\n                 if \"minimum\" in item_def:\n-                    lines.append(\"      if (item < {}) {{\".format(item_def[\"minimum\"]))\n-                    lines.append(\"        return false;\")\n-                    lines.append(\"      }\")\n+                    conditions.append(\"      if (item < {}) {{\".format(item_def[\"minimum\"]))\n+                    conditions.append(\"        return false;\")\n+                    conditions.append(\"      }\")\n             elif item_type == \"bool\":\n                 pass\n             else:\n-                lines.append(\"      if (!item.isValid()) {\")\n-                lines.append(\"        return false;\")\n-                lines.append(\"      }\")\n-            lines.append(\"    }\")\n+                conditions.append(\"      if (!item.isValid()) {\")\n+                conditions.append(\"        return false;\")\n+                conditions.append(\"      }\")\n+            if len(conditions) > 0:\n+                lines.append(\"    for (const auto& item: {}) {{\".format(prop_name_snake))\n+                lines.extend(conditions)\n+                lines.append(\"    }\")\n         elif prop_name in required or all_required:\n             if prop_type == \"std::string\":\n                 if \"maxLength\" in resolved_def:"
+        }
+      ]
+    }
+  ]
+}

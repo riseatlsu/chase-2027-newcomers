@@ -1,0 +1,633 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T04:37:41Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ros",
+    "repo": "angles"
+  },
+  "data": [
+    {
+      "author": "sloretz",
+      "date": "2022-01-14T22:26:53Z",
+      "sha": "1c07a742376ea0b0c8795b278f091e8ecac93e14",
+      "message": "Install includes to include/ (#28)\n\nSigned-off-by: Shane Loretz <sloretz@osrfoundation.org>",
+      "files_changed": 1,
+      "additions": 6,
+      "deletions": 5,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "24327671b65913cdc70d675463d3b0c31bfd23fe",
+          "filename": "angles/CMakeLists.txt",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 5,
+          "changes": 11,
+          "blob_url": "https://github.com/ros/angles/blob/1c07a742376ea0b0c8795b278f091e8ecac93e14/angles%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros/angles/raw/1c07a742376ea0b0c8795b278f091e8ecac93e14/angles%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2FCMakeLists.txt?ref=1c07a742376ea0b0c8795b278f091e8ecac93e14",
+          "patch": "@@ -13,12 +13,13 @@ endif()\n \n find_package(ament_cmake REQUIRED)\n \n-install(DIRECTORY include/${PROJECT_NAME}/\n-        DESTINATION include/${PROJECT_NAME}/\n-        FILES_MATCHING PATTERN \"*.h\")\n+add_library(angles INTERFACE)\n+target_link_libraries(angles INTERFACE\n+  \"$<INSTALL_INTERFACE:install/angles>\")\n+install(TARGETS angles EXPORT export_angles)\n \n-include_directories(include)\n+ament_export_targets(export_angles)\n \n-ament_export_include_directories(include)\n+install(DIRECTORY include/ DESTINATION include/angles)\n \n ament_package()"
+        }
+      ]
+    },
+    {
+      "author": "traversaro",
+      "date": "2025-02-19T17:41:41Z",
+      "sha": "633d83eeb79ae09c077e169b1e9d7718ab17900d",
+      "message": "Ensure that M_PI is defined in any downstream compilation unit in Windows (#44)",
+      "files_changed": 2,
+      "additions": 6,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "0489df18de98277572234d9e8fd9d86e6e9e2390",
+          "filename": "angles/CMakeLists.txt",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ros/angles/blob/633d83eeb79ae09c077e169b1e9d7718ab17900d/angles%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros/angles/raw/633d83eeb79ae09c077e169b1e9d7718ab17900d/angles%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2FCMakeLists.txt?ref=633d83eeb79ae09c077e169b1e9d7718ab17900d",
+          "patch": "@@ -16,6 +16,9 @@ find_package(ament_cmake REQUIRED)\n add_library(angles INTERFACE)\n target_include_directories(angles INTERFACE\n   \"$<INSTALL_INTERFACE:include/angles>\")\n+if(WIN32)\n+  target_compile_definitions(angles INTERFACE _USE_MATH_DEFINES)\n+endif()\n \n if(BUILD_TESTING)\n   find_package(ament_cmake_gtest REQUIRED)"
+        },
+        {
+          "sha": "2c322b7357ea9e1606f24d9b4af0a1788b525dc7",
+          "filename": "angles/include/angles/angles.h",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ros/angles/blob/633d83eeb79ae09c077e169b1e9d7718ab17900d/angles%2Finclude%2Fangles%2Fangles.h",
+          "raw_url": "https://github.com/ros/angles/raw/633d83eeb79ae09c077e169b1e9d7718ab17900d/angles%2Finclude%2Fangles%2Fangles.h",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Finclude%2Fangles%2Fangles.h?ref=633d83eeb79ae09c077e169b1e9d7718ab17900d",
+          "patch": "@@ -35,7 +35,10 @@\n #ifndef GEOMETRY_ANGLES_UTILS_H\n #define GEOMETRY_ANGLES_UTILS_H\n \n+#ifndef _USE_MATH_DEFINES\n #define _USE_MATH_DEFINES\n+#endif\n+\n #include <algorithm>\n #include <cmath>\n "
+        }
+      ]
+    },
+    {
+      "author": "DLu",
+      "date": "2015-09-28T15:17:09Z",
+      "sha": "6e90e4a3d1e012b3072a99827e56a56565a056e5",
+      "message": "Initial copy",
+      "files_changed": 1,
+      "additions": 279,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "df2b9ed2bf452fa34b1a2d23c0f1aa4ca790936d",
+          "filename": "angles/src/angles/__init__.py",
+          "status": "added",
+          "additions": 279,
+          "deletions": 0,
+          "changes": 279,
+          "blob_url": "https://github.com/ros/angles/blob/6e90e4a3d1e012b3072a99827e56a56565a056e5/angles%2Fsrc%2Fangles%2F__init__.py",
+          "raw_url": "https://github.com/ros/angles/raw/6e90e4a3d1e012b3072a99827e56a56565a056e5/angles%2Fsrc%2Fangles%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Fsrc%2Fangles%2F__init__.py?ref=6e90e4a3d1e012b3072a99827e56a56565a056e5",
+          "patch": "@@ -0,0 +1,279 @@\n+/*********************************************************************\n+* Software License Agreement (BSD License)\n+*\n+*  Copyright (c) 2008, Willow Garage, Inc.\n+*  All rights reserved.\n+*\n+*  Redistribution and use in source and binary forms, with or without\n+*  modification, are permitted provided that the following conditions\n+*  are met:\n+*\n+*   * Redistributions of source code must retain the above copyright\n+*     notice, this list of conditions and the following disclaimer.\n+*   * Redistributions in binary form must reproduce the above\n+*     copyright notice, this list of conditions and the following\n+*     disclaimer in the documentation and/or other materials provided\n+*     with the distribution.\n+*   * Neither the name of the Willow Garage nor the names of its\n+*     contributors may be used to endorse or promote products derived\n+*     from this software without specific prior written permission.\n+*\n+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n+*  \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n+*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS\n+*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\n+*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,\n+*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,\n+*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\n+*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN\n+*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+*  POSSIBILITY OF SUCH DAMAGE.\n+*********************************************************************/\n+\n+#ifndef GEOMETRY_ANGLES_UTILS_H\n+#define GEOMETRY_ANGLES_UTILS_H\n+\n+#include <algorithm>\n+#include <cmath>\n+\n+namespace angles\n+{\n+\n+  /*!\n+   * \\brief Convert degrees to radians\n+   */\n+\n+  static inline double from_degrees(double degrees)\n+  {\n+    return degrees * M_PI / 180.0;\n+  }\n+\n+  /*!\n+   * \\brief Convert radians to degrees\n+   */\n+  static inline double to_degrees(double radians)\n+  {\n+    return radians * 180.0 / M_PI;\n+  }\n+\n+\n+  /*!\n+   * \\brief normalize_angle_positive\n+   *\n+   *        Normalizes the angle to be 0 to 2*M_PI\n+   *        It takes and returns radians.\n+   */\n+  static inline double normalize_angle_positive(double angle)\n+  {\n+    return fmod(fmod(angle, 2.0*M_PI) + 2.0*M_PI, 2.0*M_PI);\n+  }\n+\n+\n+  /*!\n+   * \\brief normalize\n+   *\n+   * Normalizes the angle to be -M_PI circle to +M_PI circle\n+   * It takes and returns radians.\n+   *\n+   */\n+  static inline double normalize_angle(double angle)\n+  {\n+    double a = normalize_angle_positive(angle);\n+    if (a > M_PI)\n+      a -= 2.0 *M_PI;\n+    return a;\n+  }\n+\n+\n+  /*!\n+   * \\function\n+   * \\brief shortest_angular_distance\n+   *\n+   * Given 2 angles, this returns the shortest angular\n+   * difference.  The inputs and ouputs are of course radians.\n+   *\n+   * The result\n+   * would always be -pi <= result <= pi.  Adding the result\n+   * to \"from\" will always get you an equivelent angle to \"to\".\n+   */\n+\n+  static inline double shortest_angular_distance(double from, double to)\n+  {\n+    return normalize_angle(to-from);\n+  }\n+\n+  /*!\n+   * \\function\n+   *\n+   * \\brief returns the angle in [-2*M_PI, 2*M_PI]  going the other way along the unit circle.\n+   * \\param angle The angle to which you want to turn in the range [-2*M_PI, 2*M_PI]\n+   * E.g. two_pi_complement(-M_PI/4) returns 7_M_PI/4\n+   * two_pi_complement(M_PI/4) returns -7*M_PI/4\n+   *\n+   */\n+  static inline double two_pi_complement(double angle)\n+  {\n+    //check input conditions\n+    if (angle > 2*M_PI || angle < -2.0*M_PI)\n+      angle = fmod(angle, 2.0*M_PI);\n+    if(angle < 0)\n+      return (2*M_PI+angle);\n+    else if (angle > 0)\n+      return (-2*M_PI+angle);\n+\n+    return(2*M_PI);\n+  }\n+\n+  /*!\n+   * \\function\n+   *\n+   * \\brief This function is only intended for internal use and not intended for external use. If you do use it, read the documentation very carefully. Returns the min and max amount (in radians) that can be moved from \"from\" angle to \"left_limit\" and \"right_limit\".\n+   * \\return returns false if \"from\" angle does not lie in the interval [left_limit,right_limit]\n+   * \\param from - \"from\" angle - must lie in [-M_PI, M_PI)\n+   * \\param left_limit - left limit of valid interval for angular position - must lie in [-M_PI, M_PI], left and right limits are specified on the unit circle w.r.t to a reference pointing inwards\n+   * \\param right_limit - right limit of valid interval for angular position - must lie in [-M_PI, M_PI], left and right limits are specified on the unit circle w.r.t to a reference pointing inwards\n+   * \\param result_min_delta - minimum (delta) angle (in radians) that can be moved from \"from\" position before hitting the joint stop\n+   * \\param result_max_delta - maximum (delta) angle (in radians) that can be movedd from \"from\" position before hitting the joint stop\n+   */\n+  static bool find_min_max_delta(double from, double left_limit, double right_limit, double &result_min_delta, double &result_max_delta)\n+  {\n+    double delta[4];\n+\n+    delta[0] = shortest_angular_distance(from,left_limit);\n+    delta[1] = shortest_angular_distance(from,right_limit);\n+\n+    delta[2] = two_pi_complement(delta[0]);\n+    delta[3] = two_pi_complement(delta[1]);\n+\n+    if(delta[0] == 0)\n+    {\n+      result_min_delta = delta[0];\n+      result_max_delta = std::max<double>(delta[1],delta[3]);\n+      return true;\n+    }\n+\n+    if(delta[1] == 0)\n+    {\n+        result_max_delta = delta[1];\n+        result_min_delta = std::min<double>(delta[0],delta[2]);\n+        return true;\n+    }\n+\n+\n+    double delta_min = delta[0];\n+    double delta_min_2pi = delta[2];\n+    if(delta[2] < delta_min)\n+    {\n+      delta_min = delta[2];\n+      delta_min_2pi = delta[0];\n+    }\n+\n+    double delta_max = delta[1];\n+    double delta_max_2pi = delta[3];\n+    if(delta[3] > delta_max)\n+    {\n+      delta_max = delta[3];\n+      delta_max_2pi = delta[1];\n+    }\n+\n+\n+    //    printf(\"%f %f %f %f\\n\",delta_min,delta_min_2pi,delta_max,delta_max_2pi);\n+    if((delta_min <= delta_max_2pi) || (delta_max >= delta_min_2pi))\n+    {\n+      result_min_delta = delta_max_2pi;\n+      result_max_delta = delta_min_2pi;\n+      if(left_limit == -M_PI && right_limit == M_PI)\n+        return true;\n+      else\n+        return false;\n+    }\n+    result_min_delta = delta_min;\n+    result_max_delta = delta_max;\n+    return true;\n+  }\n+\n+\n+  /*!\n+   * \\function\n+   *\n+   * \\brief Returns the delta from \"from_angle\" to \"to_angle\" making sure it does not violate limits specified by left_limit and right_limit.\n+   * The valid interval of angular positions is [left_limit,right_limit]. E.g., [-0.25,0.25] is a 0.5 radians wide interval that contains 0.\n+   * But [0.25,-0.25] is a 2*M_PI-0.5 wide interval that contains M_PI (but not 0).\n+   * The value of shortest_angle is the angular difference between \"from\" and \"to\" that lies within the defined valid interval.\n+   * E.g. shortest_angular_distance_with_limits(-0.5,0.5,0.25,-0.25,ss) evaluates ss to 2*M_PI-1.0 and returns true while\n+   * shortest_angular_distance_with_limits(-0.5,0.5,-0.25,0.25,ss) returns false since -0.5 and 0.5 do not lie in the interval [-0.25,0.25]\n+   *\n+   * \\return true if \"from\" and \"to\" positions are within the limit interval, false otherwise\n+   * \\param from - \"from\" angle\n+   * \\param to - \"to\" angle\n+   * \\param left_limit - left limit of valid interval for angular position, left and right limits are specified on the unit circle w.r.t to a reference pointing inwards\n+   * \\param right_limit - right limit of valid interval for angular position, left and right limits are specified on the unit circle w.r.t to a reference pointing inwards\n+   * \\param shortest_angle - result of the shortest angle calculation\n+   */\n+  static inline bool shortest_angular_distance_with_limits(double from, double to, double left_limit, double right_limit, double &shortest_angle)\n+  {\n+\n+    double min_delta = -2*M_PI;\n+    double max_delta = 2*M_PI;\n+    double min_delta_to = -2*M_PI;\n+    double max_delta_to = 2*M_PI;\n+    bool flag    = find_min_max_delta(from,left_limit,right_limit,min_delta,max_delta);\n+    double delta = shortest_angular_distance(from,to);\n+    double delta_mod_2pi  = two_pi_complement(delta);\n+\n+\n+    if(flag)//from position is within the limits\n+    {\n+      if(delta >= min_delta && delta <= max_delta)\n+      {\n+        shortest_angle = delta;\n+        return true;\n+      }\n+      else if(delta_mod_2pi >= min_delta && delta_mod_2pi <= max_delta)\n+      {\n+        shortest_angle = delta_mod_2pi;\n+        return true;\n+      }\n+      else //to position is outside the limits\n+      {\n+        find_min_max_delta(to,left_limit,right_limit,min_delta_to,max_delta_to);\n+          if(fabs(min_delta_to) < fabs(max_delta_to))\n+            shortest_angle = std::max<double>(delta,delta_mod_2pi);\n+          else if(fabs(min_delta_to) > fabs(max_delta_to))\n+            shortest_angle =  std::min<double>(delta,delta_mod_2pi);\n+          else\n+          {\n+            if (fabs(delta) < fabs(delta_mod_2pi))\n+              shortest_angle = delta;\n+            else\n+              shortest_angle = delta_mod_2pi;\n+          }\n+          return false;\n+      }\n+    }\n+    else // from position is outside the limits\n+    {\n+        find_min_max_delta(to,left_limit,right_limit,min_delta_to,max_delta_to);\n+\n+          if(fabs(min_delta) < fabs(max_delta))\n+            shortest_angle = std::min<double>(delta,delta_mod_2pi);\n+          else if (fabs(min_delta) > fabs(max_delta))\n+            shortest_angle =  std::max<double>(delta,delta_mod_2pi);\n+          else\n+          {\n+            if (fabs(delta) < fabs(delta_mod_2pi))\n+              shortest_angle = delta;\n+            else\n+              shortest_angle = delta_mod_2pi;\n+          }\n+      return false;\n+    }\n+\n+    shortest_angle = delta;\n+    return false;\n+  }\n+}\n+\n+#endif"
+        }
+      ]
+    },
+    {
+      "author": "gbiggs",
+      "date": "2022-07-12T07:32:26Z",
+      "sha": "940cc7bb4c0623beec20882cb36745bf779ce4df",
+      "message": "Correct versions for version bump\n\nSigned-off-by: Geoffrey Biggs <gbiggs@killbots.net>",
+      "files_changed": 2,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "47aedab40b4e69cfe8f5940a5485e83313081071",
+          "filename": "angles/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros/angles/blob/940cc7bb4c0623beec20882cb36745bf779ce4df/angles%2Fpackage.xml",
+          "raw_url": "https://github.com/ros/angles/raw/940cc7bb4c0623beec20882cb36745bf779ce4df/angles%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Fpackage.xml?ref=940cc7bb4c0623beec20882cb36745bf779ce4df",
+          "patch": "@@ -4,7 +4,7 @@\n   schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"3\">\n   <name>angles</name>\n-  <version>1.13.0</version>\n+  <version>1.15.0</version>\n   <description>This package provides a set of simple math utilities to work\n         with angles. The utilities cover simple things like\n         normalizing an angle and conversion between degrees and"
+        },
+        {
+          "sha": "4036ac9f4462153885b3384e349427162358ee7a",
+          "filename": "angles/setup.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros/angles/blob/940cc7bb4c0623beec20882cb36745bf779ce4df/angles%2Fsetup.py",
+          "raw_url": "https://github.com/ros/angles/raw/940cc7bb4c0623beec20882cb36745bf779ce4df/angles%2Fsetup.py",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Fsetup.py?ref=940cc7bb4c0623beec20882cb36745bf779ce4df",
+          "patch": "@@ -4,7 +4,7 @@\n \n setup(\n     name=package_name,\n-    version='1.13.0',\n+    version='1.16.0',\n     package_dir={'': 'src'},\n     packages=[package_name],\n     data_files=["
+        }
+      ]
+    },
+    {
+      "author": "Ace314159",
+      "date": "2022-01-30T22:47:06Z",
+      "sha": "522ff31e307e2bff8b131c2d5c248ef1c4b5f14b",
+      "message": "Fix M_PI on Windows (#34)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "ff7d74ab82b3fb45f2a9d916251dcf0536d04d64",
+          "filename": "angles/include/angles/angles.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros/angles/blob/522ff31e307e2bff8b131c2d5c248ef1c4b5f14b/angles%2Finclude%2Fangles%2Fangles.h",
+          "raw_url": "https://github.com/ros/angles/raw/522ff31e307e2bff8b131c2d5c248ef1c4b5f14b/angles%2Finclude%2Fangles%2Fangles.h",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Finclude%2Fangles%2Fangles.h?ref=522ff31e307e2bff8b131c2d5c248ef1c4b5f14b",
+          "patch": "@@ -35,6 +35,7 @@\n #ifndef GEOMETRY_ANGLES_UTILS_H\n #define GEOMETRY_ANGLES_UTILS_H\n \n+#define _USE_MATH_DEFINES\n #include <algorithm>\n #include <cmath>\n "
+        }
+      ]
+    },
+    {
+      "author": "cottsay",
+      "date": "2014-04-28T23:17:53Z",
+      "sha": "2b39e9c93af20ed2d92d3f7f06737116ff1b4266",
+      "message": "Export architecture_independent flag in package.xml",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "443e9b2c2a82a0aa162804b62842e55108c1d002",
+          "filename": "angles/package.xml",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/ros/angles/blob/2b39e9c93af20ed2d92d3f7f06737116ff1b4266/angles%2Fpackage.xml",
+          "raw_url": "https://github.com/ros/angles/raw/2b39e9c93af20ed2d92d3f7f06737116ff1b4266/angles%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Fpackage.xml?ref=2b39e9c93af20ed2d92d3f7f06737116ff1b4266",
+          "patch": "@@ -17,4 +17,8 @@\n   <url>http://ros.org/wiki/angles</url>\n \n   <buildtool_depend version_gte=\"0.5.68\">catkin</buildtool_depend>\n+\n+  <export>\n+    <architecture_independent/>\n+  </export>\n </package>"
+        }
+      ]
+    },
+    {
+      "author": "tfoote",
+      "date": "2012-12-14T22:40:44Z",
+      "sha": "3db09ea5021c455446dab45109332fcf1348a8f2",
+      "message": "catkin as a buildtool dependency",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "5c840e6e0363d317060b7649f93f97399b614863",
+          "filename": "angles/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros/angles/blob/3db09ea5021c455446dab45109332fcf1348a8f2/angles%2Fpackage.xml",
+          "raw_url": "https://github.com/ros/angles/raw/3db09ea5021c455446dab45109332fcf1348a8f2/angles%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Fpackage.xml?ref=3db09ea5021c455446dab45109332fcf1348a8f2",
+          "patch": "@@ -16,5 +16,5 @@\n \n   <url>http://ros.org/wiki/angles</url>\n \n-  <build_depend>catkin</build_depend>\n+  <buildtool_depend>catkin</buildtool_depend>\n </package>"
+        }
+      ]
+    },
+    {
+      "author": "francofusco",
+      "date": "2019-10-28T22:41:37Z",
+      "sha": "8318b284aa3cb93660a304240f0ea69ca308ad80",
+      "message": "Added support for \"large limits\" (#16)\n\n* Added support for \"large limits\"\r\n\r\n* shortest_angle_with_large_limits in python",
+      "files_changed": 4,
+      "additions": 196,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "f66856ead3740696302b64a306575314e4a90be6",
+          "filename": "angles/include/angles/angles.h",
+          "status": "modified",
+          "additions": 73,
+          "deletions": 0,
+          "changes": 73,
+          "blob_url": "https://github.com/ros/angles/blob/8318b284aa3cb93660a304240f0ea69ca308ad80/angles%2Finclude%2Fangles%2Fangles.h",
+          "raw_url": "https://github.com/ros/angles/raw/8318b284aa3cb93660a304240f0ea69ca308ad80/angles%2Finclude%2Fangles%2Fangles.h",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Finclude%2Fangles%2Fangles.h?ref=8318b284aa3cb93660a304240f0ea69ca308ad80",
+          "patch": "@@ -195,6 +195,79 @@ namespace angles\n   }\n \n \n+  /*!\n+   * \\function\n+   *\n+   * \\brief Returns the delta from `from_angle` to `to_angle`, making sure it does not violate limits specified by `left_limit` and `right_limit`.\n+   * This function is similar to `shortest_angular_distance_with_limits()`, with the main difference that it accepts limits outside the `[-M_PI, M_PI]` range.\n+   * Even if this is quite uncommon, one could indeed consider revolute joints with large rotation limits, e.g., in the range `[-2*M_PI, 2*M_PI]`.\n+   *\n+   * In this case, a strict requirement is to have `left_limit` smaller than `right_limit`.\n+   * Note also that `from` must lie inside the valid range, while `to` does not need to.\n+   * In fact, this function will evaluate the shortest (valid) angle `shortest_angle` so that `from+shortest_angle` equals `to` up to an integer multiple of `2*M_PI`.\n+   * As an example, a call to `shortest_angular_distance_with_large_limits(0, 10.5*M_PI, -2*M_PI, 2*M_PI, shortest_angle)` will return `true`, with `shortest_angle=0.5*M_PI`.\n+   * This is because `from` and `from+shortest_angle` are both inside the limits, and `fmod(to+shortest_angle, 2*M_PI)` equals `fmod(to, 2*M_PI)`.\n+   * On the other hand, `shortest_angular_distance_with_large_limits(10.5*M_PI, 0, -2*M_PI, 2*M_PI, shortest_angle)` will return false, since `from` is not in the valid range.\n+   * Finally, note that the call `shortest_angular_distance_with_large_limits(0, 10.5*M_PI, -2*M_PI, 0.1*M_PI, shortest_angle)` will also return `true`.\n+   * However, `shortest_angle` in this case will be `-1.5*M_PI`.\n+   *\n+   * \\return true if `left_limit < right_limit` and if \"from\" and \"from+shortest_angle\" positions are within the valid interval, false otherwise.\n+   * \\param from - \"from\" angle.\n+   * \\param to - \"to\" angle.\n+   * \\param left_limit - left limit of valid interval, must be smaller than right_limit.\n+   * \\param right_limit - right limit of valid interval, must be greater than left_limit.\n+   * \\param shortest_angle - result of the shortest angle calculation.\n+   */\n+  static inline bool shortest_angular_distance_with_large_limits(double from, double to, double left_limit, double right_limit, double &shortest_angle)\n+  {\n+    // Shortest steps in the two directions\n+    double delta = shortest_angular_distance(from, to);\n+    double delta_2pi = two_pi_complement(delta);\n+\n+    // \"sort\" distances so that delta is shorter than delta_2pi\n+    if(std::fabs(delta) > std::fabs(delta_2pi))\n+      std::swap(delta, delta_2pi);\n+\n+    if(left_limit > right_limit) {\n+      // If limits are something like [PI/2 , -PI/2] it actually means that we\n+      // want rotations to be in the interval [-PI,PI/2] U [PI/2,PI], ie, the\n+      // half unit circle not containing the 0. This is already gracefully\n+      // handled by shortest_angular_distance_with_limits, and therefore this\n+      // function should not be called at all. However, if one has limits that\n+      // are larger than PI, the same rationale behind shortest_angular_distance_with_limits\n+      // does not hold, ie, M_PI+x should not be directly equal to -M_PI+x.\n+      // In this case, the correct way of getting the shortest solution is to\n+      // properly set the limits, eg, by saying that the interval is either\n+      // [PI/2, 3*PI/2] or [-3*M_PI/2, -M_PI/2]. For this reason, here we\n+      // return false by default.\n+      shortest_angle = delta;\n+      return false;\n+    }\n+\n+    // Check in which direction we should turn (clockwise or counter-clockwise).\n+\n+    // start by trying with the shortest angle (delta).\n+    double to2 = from + delta;\n+    if(left_limit <= to2 && to2 <= right_limit) {\n+      // we can move in this direction: return success if the \"from\" angle is inside limits\n+      shortest_angle = delta;\n+      return left_limit <= from && from <= right_limit;\n+    }\n+\n+    // delta is not ok, try to move in the other direction (using its complement)\n+    to2 = from + delta_2pi;\n+    if(left_limit <= to2 && to2 <= right_limit) {\n+      // we can move in this direction: return success if the \"from\" angle is inside limits\n+      shortest_angle = delta_2pi;\n+      return left_limit <= from && from <= right_limit;\n+    }\n+\n+    // nothing works: we always go outside limits\n+    shortest_angle = delta; // at least give some \"coherent\" result\n+    return false;\n+  }\n+\n+\n   /*!\n    * \\function\n    *"
+        },
+        {
+          "sha": "c64f170853bede404f3bc1199589e24a5519f2a8",
+          "filename": "angles/src/angles/__init__.py",
+          "status": "modified",
+          "additions": 59,
+          "deletions": 0,
+          "changes": 59,
+          "blob_url": "https://github.com/ros/angles/blob/8318b284aa3cb93660a304240f0ea69ca308ad80/angles%2Fsrc%2Fangles%2F__init__.py",
+          "raw_url": "https://github.com/ros/angles/raw/8318b284aa3cb93660a304240f0ea69ca308ad80/angles%2Fsrc%2Fangles%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Fsrc%2Fangles%2F__init__.py?ref=8318b284aa3cb93660a304240f0ea69ca308ad80",
+          "patch": "@@ -177,3 +177,62 @@ def shortest_angular_distance_with_limits(from_angle, to_angle, left_limit, righ\n                 shortest_angle = delta_mod_2pi\n         return False, shortest_angle\n \n+def shortest_angular_distance_with_large_limits(from_angle, to_angle, left_limit, right_limit):\n+    \"\"\" Returns the delta from `from_angle` to `to_angle`, making sure it does not violate limits specified by `left_limit` and `right_limit`.\n+        This function is similar to `shortest_angular_distance_with_limits()`, with the main difference that it accepts limits outside the `[-M_PI, M_PI]` range.\n+        Even if this is quite uncommon, one could indeed consider revolute joints with large rotation limits, e.g., in the range `[-2*M_PI, 2*M_PI]`.\n+\n+        In this case, a strict requirement is to have `left_limit` smaller than `right_limit`.\n+        Note also that `from_angle` must lie inside the valid range, while `to_angle` does not need to.\n+        In fact, this function will evaluate the shortest (valid) angle `shortest_angle` so that `from_angle+shortest_angle` equals `to_angle` up to an integer multiple of `2*M_PI`.\n+        As an example, a call to `shortest_angular_distance_with_large_limits(0, 10.5*M_PI, -2*M_PI, 2*M_PI)` will return `true`, with `shortest_angle=0.5*M_PI`.\n+        This is because `from_angle` and `from_angle+shortest_angle` are both inside the limits, and `fmod(to_angle+shortest_angle, 2*M_PI)` equals `fmod(to_angle, 2*M_PI)`.\n+        On the other hand, `shortest_angular_distance_with_large_limits(10.5*M_PI, 0, -2*M_PI, 2*M_PI)` will return false, since `from_angle` is not in the valid range.\n+        Finally, note that the call `shortest_angular_distance_with_large_limits(0, 10.5*M_PI, -2*M_PI, 0.1*M_PI)` will also return `true`.\n+        However, `shortest_angle` in this case will be `-1.5*M_PI`.\n+\n+        \\return valid_flag, shortest_angle - valid_flag will be true if `left_limit < right_limit` and if \"from_angle\" and \"from_angle+shortest_angle\" positions are within the valid interval, false otherwise.\n+        \\param left_limit - left limit of valid interval, must be smaller than right_limit.\n+        \\param right_limit - right limit of valid interval, must be greater than left_limit.\n+    \"\"\"\n+    # Shortest steps in the two directions\n+    delta = shortest_angular_distance(from_angle, to_angle)\n+    delta_2pi = two_pi_complement(delta)\n+\n+    # \"sort\" distances so that delta is shorter than delta_2pi\n+    if fabs(delta) > fabs(delta_2pi):\n+        delta, delta_2pi = delta_2pi, delta\n+\n+    if left_limit > right_limit:\n+        # If limits are something like [PI/2 , -PI/2] it actually means that we\n+        # want rotations to be in the interval [-PI,PI/2] U [PI/2,PI], ie, the\n+        # half unit circle not containing the 0. This is already gracefully\n+        # handled by shortest_angular_distance_with_limits, and therefore this\n+        # function should not be called at all. However, if one has limits that\n+        # are larger than PI, the same rationale behind shortest_angular_distance_with_limits\n+        # does not hold, ie, M_PI+x should not be directly equal to -M_PI+x.\n+        # In this case, the correct way of getting the shortest solution is to\n+        # properly set the limits, eg, by saying that the interval is either\n+        # [PI/2, 3*PI/2] or [-3*M_PI/2, -M_PI/2]. For this reason, here we\n+        # return false by default.\n+        return False, delta\n+    \n+\n+    # Check in which direction we should turn (clockwise or counter-clockwise).\n+\n+    # start by trying with the shortest angle (delta).\n+    to2 = from_angle + delta\n+    if left_limit <= to2 and to2 <= right_limit:\n+        # we can move in this direction: return success if the \"from\" angle is inside limits\n+        valid_flag = left_limit <= from_angle and from_angle <= right_limit\n+        return valid_flag, delta\n+\n+    # delta is not ok, try to move in the other direction (using its complement)\n+    to2 = from_angle + delta_2pi\n+    if left_limit <= to2 and to2 <= right_limit:\n+        # we can move in this direction: return success if the \"from\" angle is inside limits\n+        valid_flag = left_limit <= from_angle and from_angle <= right_limit\n+        return valid_flag, delta_2pi\n+\n+    # nothing works: we always go outside limits\n+    return False, delta"
+        },
+        {
+          "sha": "454fd8534e40a2afa9e49400a7f608ab7e443763",
+          "filename": "angles/test/utest.cpp",
+          "status": "modified",
+          "additions": 35,
+          "deletions": 0,
+          "changes": 35,
+          "blob_url": "https://github.com/ros/angles/blob/8318b284aa3cb93660a304240f0ea69ca308ad80/angles%2Ftest%2Futest.cpp",
+          "raw_url": "https://github.com/ros/angles/raw/8318b284aa3cb93660a304240f0ea69ca308ad80/angles%2Ftest%2Futest.cpp",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Ftest%2Futest.cpp?ref=8318b284aa3cb93660a304240f0ea69ca308ad80",
+          "patch": "@@ -73,6 +73,41 @@ TEST(Angles, shortestDistanceWithLimits){\n \n }\n \n+\n+TEST(Angles, shortestDistanceWithLargeLimits)\n+{\n+  double shortest_angle;\n+  bool result;\n+\n+  // 'delta' is valid\n+  result = angles::shortest_angular_distance_with_large_limits(0, 10.5*M_PI, -2*M_PI, 2*M_PI, shortest_angle);\n+  EXPECT_TRUE(result);\n+  EXPECT_NEAR(shortest_angle, 0.5*M_PI, 1e-6);\n+\n+  // 'delta' is not valid, but 'delta_2pi' is\n+  result = angles::shortest_angular_distance_with_large_limits(0, 10.5*M_PI, -2*M_PI, 0.1*M_PI, shortest_angle);\n+  EXPECT_TRUE(result);\n+  EXPECT_NEAR(shortest_angle, -1.5*M_PI, 1e-6);\n+\n+  // neither 'delta' nor 'delta_2pi' are valid\n+  result = angles::shortest_angular_distance_with_large_limits(2*M_PI, M_PI, 2*M_PI-0.1, 2*M_PI+0.1, shortest_angle);\n+  EXPECT_FALSE(result);\n+\n+  // start position outside limits\n+  result = angles::shortest_angular_distance_with_large_limits(10.5*M_PI, 0, -2*M_PI, 2*M_PI, shortest_angle);\n+  EXPECT_FALSE(result);\n+\n+  // invalid limits (lower > upper)\n+  result = angles::shortest_angular_distance_with_large_limits(0, 0.1, 2*M_PI, -2*M_PI, shortest_angle);\n+  EXPECT_FALSE(result);\n+\n+  // specific test case\n+  result = angles::shortest_angular_distance_with_large_limits(0.999507, 1.0, -20*M_PI, 20*M_PI, shortest_angle);\n+  EXPECT_TRUE(result);\n+  EXPECT_NEAR(shortest_angle, 0.000493, 1e-6);\n+}\n+\n+\n TEST(Angles, from_degrees)\n {\n   double epsilon = 1e-9;"
+        },
+        {
+          "sha": "13b6a41b73f1b10f46f8b2be70dbdc97806b3e1c",
+          "filename": "angles/test/utest.py",
+          "status": "modified",
+          "additions": 29,
+          "deletions": 1,
+          "changes": 30,
+          "blob_url": "https://github.com/ros/angles/blob/8318b284aa3cb93660a304240f0ea69ca308ad80/angles%2Ftest%2Futest.py",
+          "raw_url": "https://github.com/ros/angles/raw/8318b284aa3cb93660a304240f0ea69ca308ad80/angles%2Ftest%2Futest.py",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Ftest%2Futest.py?ref=8318b284aa3cb93660a304240f0ea69ca308ad80",
+          "patch": "@@ -32,7 +32,7 @@\n #  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n #  POSSIBILITY OF SUCH DAMAGE.\n #********************************************************************/\n-from angles import normalize_angle_positive, normalize_angle, shortest_angular_distance, two_pi_complement, shortest_angular_distance_with_limits\n+from angles import normalize_angle_positive, normalize_angle, shortest_angular_distance, two_pi_complement, shortest_angular_distance_with_limits, shortest_angular_distance_with_large_limits\n from angles import _find_min_max_delta\n import sys\n import unittest\n@@ -106,6 +106,34 @@ def test_shortestDistanceWithLimits(self):\n         result, shortest_angle = shortest_angular_distance_with_limits(-pi, pi,-pi,pi)\n         self.assertTrue(result)\n         self.assertAlmostEqual(shortest_angle,0.0)\n+    \n+    def test_shortestDistanceWithLargeLimits(self):\n+        # 'delta' is valid\n+        result, shortest_angle = shortest_angular_distance_with_large_limits(0, 10.5*pi, -2*pi, 2*pi)\n+        self.assertTrue(result)\n+        self.assertAlmostEqual(shortest_angle, 0.5*pi)\n+\n+        # 'delta' is not valid, but 'delta_2pi' is\n+        result, shortest_angle = shortest_angular_distance_with_large_limits(0, 10.5*pi, -2*pi, 0.1*pi)\n+        self.assertTrue(result)\n+        self.assertAlmostEqual(shortest_angle, -1.5*pi)\n+\n+        # neither 'delta' nor 'delta_2pi' are valid\n+        result, shortest_angle = shortest_angular_distance_with_large_limits(2*pi, pi, 2*pi-0.1, 2*pi+0.1)\n+        self.assertFalse(result)\n+\n+        # start position outside limits\n+        result, shortest_angle = shortest_angular_distance_with_large_limits(10.5*pi, 0, -2*pi, 2*pi)\n+        self.assertFalse(result)\n+\n+        # invalid limits (lower > upper)\n+        result, shortest_angle = shortest_angular_distance_with_large_limits(0, 0.1, 2*pi, -2*pi)\n+        self.assertFalse(result)\n+\n+        # specific test case\n+        result, shortest_angle = shortest_angular_distance_with_large_limits(0.999507, 1.0, -20*pi, 20*pi)\n+        self.assertTrue(result)\n+        self.assertAlmostEqual(shortest_angle, 0.000493)\n \n     def test_normalize_angle_positive(self):\n         self.assertAlmostEqual(0, normalize_angle_positive(0))"
+        }
+      ]
+    },
+    {
+      "author": "Carl Delsey",
+      "date": "2018-09-17T22:31:41Z",
+      "sha": "b46c4dea6f0e44274fd8da048252f1c50f269626",
+      "message": "Adding export lines to CMakeLists.txt (#14)\n\n* Adding export lines to CMakeLists.txt\r\n\r\nThis is needed for dependent packages to pick up the include\r\ndirectory",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "37dd3ed1afd1c190f99d63236cd86d3101bafc3b",
+          "filename": "angles/CMakeLists.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ros/angles/blob/b46c4dea6f0e44274fd8da048252f1c50f269626/angles%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros/angles/raw/b46c4dea6f0e44274fd8da048252f1c50f269626/angles%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2FCMakeLists.txt?ref=b46c4dea6f0e44274fd8da048252f1c50f269626",
+          "patch": "@@ -19,4 +19,6 @@ install(DIRECTORY include/${PROJECT_NAME}/\n \n include_directories(include)\n \n+ament_export_include_directories(include)\n+\n ament_package()"
+        }
+      ]
+    },
+    {
+      "author": "mikaelarguedas",
+      "date": "2018-06-28T20:46:19Z",
+      "sha": "567b7be15e46a184afd6724466bed1d78480e202",
+      "message": "update changelog",
+      "files_changed": 1,
+      "additions": 7,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "d7564f048790a3894b0c0a2fd3108541a354c626",
+          "filename": "angles/CHANGELOG.rst",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/ros/angles/blob/567b7be15e46a184afd6724466bed1d78480e202/angles%2FCHANGELOG.rst",
+          "raw_url": "https://github.com/ros/angles/raw/567b7be15e46a184afd6724466bed1d78480e202/angles%2FCHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2FCHANGELOG.rst?ref=567b7be15e46a184afd6724466bed1d78480e202",
+          "patch": "@@ -2,6 +2,13 @@\n Changelog for package angles\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+Forthcoming\n+-----------\n+* update for ament and ros2 (`#12 <https://github.com/ros/angles/issues/12>`_)\n+* Small documentation updates.\n+* enable for win10 ros2\n+* Contributors: Brian Fjeldstad, Jonathan Binney, Tully Foote\n+\n 1.9.11 (2017-04-14)\n -------------------\n * Add a python implementation of angles"
+        }
+      ]
+    },
+    {
+      "author": "jonbinney",
+      "date": "2018-02-09T01:43:26Z",
+      "sha": "be340e60d2f12a0f9e70a066c3a6699a6db882e1",
+      "message": "Merge pull request #12 from bfjelds/ros2-devel\n\nupdate for ament and ros2",
+      "files_changed": 2,
+      "additions": 19,
+      "deletions": 12,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "a2043b4dab0870ad938bd9e43025d584633d9ef7",
+          "filename": "angles/CMakeLists.txt",
+          "status": "modified",
+          "additions": 14,
+          "deletions": 8,
+          "changes": 22,
+          "blob_url": "https://github.com/ros/angles/blob/be340e60d2f12a0f9e70a066c3a6699a6db882e1/angles%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros/angles/raw/be340e60d2f12a0f9e70a066c3a6699a6db882e1/angles%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2FCMakeLists.txt?ref=be340e60d2f12a0f9e70a066c3a6699a6db882e1",
+          "patch": "@@ -1,16 +1,22 @@\n-cmake_minimum_required(VERSION 2.8)\n+cmake_minimum_required(VERSION 3.5)\n project(angles)\n \n-find_package(catkin REQUIRED)\n-catkin_package(INCLUDE_DIRS include)\n+# Default to C++14\n+if(NOT CMAKE_CXX_STANDARD)\n+  set(CMAKE_CXX_STANDARD 14)\n+endif()\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  # we dont use add_compile_options with pedantic in message packages\n+  # because the Python C extensions dont comply with it\n+  set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic\")\n+endif()\n+\n+find_package(ament_cmake REQUIRED)\n \n install(DIRECTORY include/${PROJECT_NAME}/\n-        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}\n+        DESTINATION include/${PROJECT_NAME}/\n         FILES_MATCHING PATTERN \"*.h\")\n \n include_directories(include)\n \n-if(CATKIN_ENABLE_TESTING)\n-  add_subdirectory(test)\n-endif()\n-catkin_python_setup()\n\\ No newline at end of file\n+ament_package()"
+        },
+        {
+          "sha": "71c7e0fcb92e926c037ad0d72924bc8162ea1584",
+          "filename": "angles/package.xml",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 4,
+          "changes": 9,
+          "blob_url": "https://github.com/ros/angles/blob/be340e60d2f12a0f9e70a066c3a6699a6db882e1/angles%2Fpackage.xml",
+          "raw_url": "https://github.com/ros/angles/raw/be340e60d2f12a0f9e70a066c3a6699a6db882e1/angles%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Fpackage.xml?ref=be340e60d2f12a0f9e70a066c3a6699a6db882e1",
+          "patch": "@@ -1,4 +1,6 @@\n-<package>\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"2\">\n   <name>angles</name>\n   <version>1.9.11</version>\n   <description>This package provides a set of simple math utilities to work\n@@ -16,10 +18,9 @@\n \n   <url>http://wiki.ros.org/angles</url>\n \n-  <buildtool_depend version_gte=\"0.5.68\">catkin</buildtool_depend>\n-  <test_depend>rosunit</test_depend>\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n \n   <export>\n-    <architecture_independent/>\n+    <build_type>ament_cmake</build_type>\n   </export>\n </package>"
+        }
+      ]
+    },
+    {
+      "author": "bfjelds",
+      "date": "2017-11-30T18:43:43Z",
+      "sha": "122ec733a65399b6e72b4015b292ab670437ed63",
+      "message": "enable for win10 ros2",
+      "files_changed": 2,
+      "additions": 19,
+      "deletions": 12,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "a2043b4dab0870ad938bd9e43025d584633d9ef7",
+          "filename": "angles/CMakeLists.txt",
+          "status": "modified",
+          "additions": 14,
+          "deletions": 8,
+          "changes": 22,
+          "blob_url": "https://github.com/ros/angles/blob/122ec733a65399b6e72b4015b292ab670437ed63/angles%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros/angles/raw/122ec733a65399b6e72b4015b292ab670437ed63/angles%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2FCMakeLists.txt?ref=122ec733a65399b6e72b4015b292ab670437ed63",
+          "patch": "@@ -1,16 +1,22 @@\n-cmake_minimum_required(VERSION 2.8)\n+cmake_minimum_required(VERSION 3.5)\n project(angles)\n \n-find_package(catkin REQUIRED)\n-catkin_package(INCLUDE_DIRS include)\n+# Default to C++14\n+if(NOT CMAKE_CXX_STANDARD)\n+  set(CMAKE_CXX_STANDARD 14)\n+endif()\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  # we dont use add_compile_options with pedantic in message packages\n+  # because the Python C extensions dont comply with it\n+  set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic\")\n+endif()\n+\n+find_package(ament_cmake REQUIRED)\n \n install(DIRECTORY include/${PROJECT_NAME}/\n-        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}\n+        DESTINATION include/${PROJECT_NAME}/\n         FILES_MATCHING PATTERN \"*.h\")\n \n include_directories(include)\n \n-if(CATKIN_ENABLE_TESTING)\n-  add_subdirectory(test)\n-endif()\n-catkin_python_setup()\n\\ No newline at end of file\n+ament_package()"
+        },
+        {
+          "sha": "7f2321757c7f1fc7e9391ad8f62691ebda65b93d",
+          "filename": "angles/package.xml",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 4,
+          "changes": 9,
+          "blob_url": "https://github.com/ros/angles/blob/122ec733a65399b6e72b4015b292ab670437ed63/angles%2Fpackage.xml",
+          "raw_url": "https://github.com/ros/angles/raw/122ec733a65399b6e72b4015b292ab670437ed63/angles%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Fpackage.xml?ref=122ec733a65399b6e72b4015b292ab670437ed63",
+          "patch": "@@ -1,4 +1,6 @@\n-<package>\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"2\">\n   <name>angles</name>\n   <version>1.9.11</version>\n   <description>This package provides a set of simple math utilities to work\n@@ -16,10 +18,9 @@\n \n   <url>http://ros.org/wiki/angles</url>\n \n-  <buildtool_depend version_gte=\"0.5.68\">catkin</buildtool_depend>\n-  <test_depend>rosunit</test_depend>\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n \n   <export>\n-    <architecture_independent/>\n+    <build_type>ament_cmake</build_type>\n   </export>\n </package>"
+        }
+      ]
+    },
+    {
+      "author": "garaemon",
+      "date": "2015-01-01T11:33:25Z",
+      "sha": "ce8d609c527ff7f3fc8aa32d6446cfc139717601",
+      "message": "Do not use catkin_add_gtest if CATKIN_ENABLE_TESTING",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 2,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "02fb5ea0e6281f90488c900ecf5828d5883b3fd7",
+          "filename": "angles/test/CMakeLists.txt",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 2,
+          "changes": 5,
+          "blob_url": "https://github.com/ros/angles/blob/ce8d609c527ff7f3fc8aa32d6446cfc139717601/angles%2Ftest%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros/angles/raw/ce8d609c527ff7f3fc8aa32d6446cfc139717601/angles%2Ftest%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Ftest%2FCMakeLists.txt?ref=ce8d609c527ff7f3fc8aa32d6446cfc139717601",
+          "patch": "@@ -1,2 +1,3 @@\n-catkin_add_gtest(utest utest.cpp)\n-\n+if (CATKIN_ENABLE_TESTING)\n+  catkin_add_gtest(utest utest.cpp)\n+endif (CATKIN_ENABLE_TESTING)"
+        }
+      ]
+    },
+    {
+      "author": "dbking77",
+      "date": "2013-11-13T01:40:09Z",
+      "sha": "fa862364842c614cbaab1587ea4e5b19b7cbc536",
+      "message": "Simply and improve performance of shortest_angular_distance().",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 8,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "dbd66a28addbdbe60efdb3e3001d41235a44f593",
+          "filename": "angles/include/angles/angles.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 8,
+          "changes": 9,
+          "blob_url": "https://github.com/ros/angles/blob/fa862364842c614cbaab1587ea4e5b19b7cbc536/angles%2Finclude%2Fangles%2Fangles.h",
+          "raw_url": "https://github.com/ros/angles/raw/fa862364842c614cbaab1587ea4e5b19b7cbc536/angles%2Finclude%2Fangles%2Fangles.h",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Finclude%2Fangles%2Fangles.h?ref=fa862364842c614cbaab1587ea4e5b19b7cbc536",
+          "patch": "@@ -101,14 +101,7 @@ namespace angles\n     \n   static inline double shortest_angular_distance(double from, double to)\n   {\n-    double result = normalize_angle_positive(normalize_angle_positive(to) - normalize_angle_positive(from));\n-\t\n-    if (result > M_PI)\n-      // If the result > 180,\n-      // It's shorter the other way.\n-      result = -(2.0*M_PI - result);\n-\t\n-    return normalize_angle(result);\n+    return normalize_angle(to-from);\n   }\n \n   /*!"
+        }
+      ]
+    },
+    {
+      "author": "bulwahn",
+      "date": "2013-07-15T12:04:43Z",
+      "sha": "8b1879e93b8ae2f89df345edaf688521e5c0ab97",
+      "message": "check for CATKIN_ENABLE_TESTING",
+      "files_changed": 2,
+      "additions": 4,
+      "deletions": 2,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "4026fc603d5310b68b631c2d52a065da9bd371c3",
+          "filename": "angles/CMakeLists.txt",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "changes": 4,
+          "blob_url": "https://github.com/ros/angles/blob/8b1879e93b8ae2f89df345edaf688521e5c0ab97/angles%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros/angles/raw/8b1879e93b8ae2f89df345edaf688521e5c0ab97/angles%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2FCMakeLists.txt?ref=8b1879e93b8ae2f89df345edaf688521e5c0ab97",
+          "patch": "@@ -10,4 +10,6 @@ install(DIRECTORY include/${PROJECT_NAME}/\n \n include_directories(include)\n \n-add_subdirectory(test)\n+if(CATKIN_ENABLE_TESTING)\n+  add_subdirectory(test)\n+endif()"
+        },
+        {
+          "sha": "240959535572e16c49bbec808dd8abd7460a2634",
+          "filename": "angles/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros/angles/blob/8b1879e93b8ae2f89df345edaf688521e5c0ab97/angles%2Fpackage.xml",
+          "raw_url": "https://github.com/ros/angles/raw/8b1879e93b8ae2f89df345edaf688521e5c0ab97/angles%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Fpackage.xml?ref=8b1879e93b8ae2f89df345edaf688521e5c0ab97",
+          "patch": "@@ -16,5 +16,5 @@\n \n   <url>http://ros.org/wiki/angles</url>\n \n-  <buildtool_depend>catkin</buildtool_depend>\n+  <buildtool_depend version_gte=\"0.5.68\">catkin</buildtool_depend>\n </package>"
+        }
+      ]
+    },
+    {
+      "author": "Ioan Sucan",
+      "date": "2012-07-23T22:19:04Z",
+      "sha": "f7961de5b704e16af7f93dd74966d60b3401d6df",
+      "message": "copying from geometry/",
+      "files_changed": 9,
+      "additions": 634,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e5532742e670c91cd78f7dda52fe699194d0c942",
+          "filename": "angles/CMakeLists.txt",
+          "status": "added",
+          "additions": 12,
+          "deletions": 0,
+          "changes": 12,
+          "blob_url": "https://github.com/ros/angles/blob/f7961de5b704e16af7f93dd74966d60b3401d6df/angles%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros/angles/raw/f7961de5b704e16af7f93dd74966d60b3401d6df/angles%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2FCMakeLists.txt?ref=f7961de5b704e16af7f93dd74966d60b3401d6df",
+          "patch": "@@ -0,0 +1,12 @@\n+if(CATKIN)\n+  include(catkin.cmake)\n+  return()\n+endif()\n+\n+cmake_minimum_required(VERSION 2.4.6)\n+include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)\n+rosbuild_init()\n+\n+# Unit tests\n+rosbuild_add_gtest(utest test/utest.cpp)\n+target_link_libraries(utest)"
+        },
+        {
+          "sha": "bbd3fc6049918dcaabb6316186863007edbde771",
+          "filename": "angles/Makefile",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros/angles/blob/f7961de5b704e16af7f93dd74966d60b3401d6df/angles%2FMakefile",
+          "raw_url": "https://github.com/ros/angles/raw/f7961de5b704e16af7f93dd74966d60b3401d6df/angles%2FMakefile",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2FMakefile?ref=f7961de5b704e16af7f93dd74966d60b3401d6df",
+          "patch": "@@ -0,0 +1 @@\n+include $(shell rospack find mk)/cmake.mk"
+        },
+        {
+          "sha": "333821654830334ff6622b8c6aca707765ab0e66",
+          "filename": "angles/catkin.cmake",
+          "status": "added",
+          "additions": 9,
+          "deletions": 0,
+          "changes": 9,
+          "blob_url": "https://github.com/ros/angles/blob/f7961de5b704e16af7f93dd74966d60b3401d6df/angles%2Fcatkin.cmake",
+          "raw_url": "https://github.com/ros/angles/raw/f7961de5b704e16af7f93dd74966d60b3401d6df/angles%2Fcatkin.cmake",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Fcatkin.cmake?ref=f7961de5b704e16af7f93dd74966d60b3401d6df",
+          "patch": "@@ -0,0 +1,9 @@\n+cmake_minimum_required(VERSION 2.8)\n+project(angles)\n+\n+include_directories(include)\n+\n+install_cmake_infrastructure(angles\n+  VERSION 0.0.0\n+  INCLUDE_DIRS include\n+  )"
+        },
+        {
+          "sha": "c5c043b49a19f5dcb93eb0d82c315032cea1f32c",
+          "filename": "angles/doc.dox",
+          "status": "added",
+          "additions": 11,
+          "deletions": 0,
+          "changes": 11,
+          "blob_url": "https://github.com/ros/angles/blob/f7961de5b704e16af7f93dd74966d60b3401d6df/angles%2Fdoc.dox",
+          "raw_url": "https://github.com/ros/angles/raw/f7961de5b704e16af7f93dd74966d60b3401d6df/angles%2Fdoc.dox",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Fdoc.dox?ref=f7961de5b704e16af7f93dd74966d60b3401d6df",
+          "patch": "@@ -0,0 +1,11 @@\n+/**\n+@mainpage\n+\n+@htmlinclude manifest.html\n+\n+The Angles contains the following methods:\n+ \\li Angular conversions: angles::from_degrees, angles::to_degrees\n+ \\li Angular manipulations: angles::normalize_angle_positive, angles::normalize_angle\n+ \\li Angular distance: angles::shortest_angular_distance, angles::shortest_angular_distance_with_limits\n+ \\li Angular tools: angles::find_min_max_delta, angles::two_pi_complement\n+**/"
+        },
+        {
+          "sha": "c53003dc36cb2e5e7cabc392c61ec29bf1a44222",
+          "filename": "angles/include/angles/angles.h",
+          "status": "added",
+          "additions": 292,
+          "deletions": 0,
+          "changes": 292,
+          "blob_url": "https://github.com/ros/angles/blob/f7961de5b704e16af7f93dd74966d60b3401d6df/angles%2Finclude%2Fangles%2Fangles.h",
+          "raw_url": "https://github.com/ros/angles/raw/f7961de5b704e16af7f93dd74966d60b3401d6df/angles%2Finclude%2Fangles%2Fangles.h",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Finclude%2Fangles%2Fangles.h?ref=f7961de5b704e16af7f93dd74966d60b3401d6df",
+          "patch": "@@ -0,0 +1,292 @@\n+/*********************************************************************\n+* Software License Agreement (BSD License)\n+* \n+*  Copyright (c) 2008, Willow Garage, Inc.\n+*  All rights reserved.\n+* \n+*  Redistribution and use in source and binary forms, with or without\n+*  modification, are permitted provided that the following conditions\n+*  are met:\n+* \n+*   * Redistributions of source code must retain the above copyright\n+*     notice, this list of conditions and the following disclaimer.\n+*   * Redistributions in binary form must reproduce the above\n+*     copyright notice, this list of conditions and the following\n+*     disclaimer in the documentation and/or other materials provided\n+*     with the distribution.\n+*   * Neither the name of the Willow Garage nor the names of its\n+*     contributors may be used to endorse or promote products derived\n+*     from this software without specific prior written permission.\n+* \n+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n+*  \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n+*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS\n+*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\n+*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,\n+*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,\n+*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\n+*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN\n+*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+*  POSSIBILITY OF SUCH DAMAGE.\n+*********************************************************************/\n+\n+#ifndef ANGLES_H\n+#define ANGLES_H\n+\n+#include <algorithm>\n+#include <cmath>\n+#include <stdio.h>\n+\n+namespace angles\n+{\n+    \n+  /*!\n+   * \\brief Convert degrees to radians\n+   */\n+    \n+  static inline double from_degrees(double degrees)\n+  {\n+    return degrees * M_PI / 180.0;   \n+  }\n+    \n+  /*!\n+   * \\brief Convert radians to degrees \n+   */\n+  static inline double to_degrees(double radians)\n+  {\n+    return radians * 180.0 / M_PI;\n+  }\n+    \n+\n+  /*!\n+   * \\brief normalize_angle_positive\n+   *\n+   *        Normalizes the angle to be 0 to 2*M_PI\n+   *        It takes and returns radians.\n+   */\n+  static inline double normalize_angle_positive(double angle)\n+  {\n+    return fmod(fmod(angle, 2.0*M_PI) + 2.0*M_PI, 2.0*M_PI);\n+  }\n+\n+\n+  /*!\n+   * \\brief normalize\n+   *\n+   * Normalizes the angle to be -M_PI circle to +M_PI circle\n+   * It takes and returns radians.\n+   *\n+   */    \n+  static inline double normalize_angle(double angle)\n+  {\n+    double a = normalize_angle_positive(angle);\n+    if (a > M_PI)\n+      a -= 2.0 *M_PI;\n+    return a;\n+  }\n+\n+    \n+  /*!\n+   * \\function\n+   * \\brief shortest_angular_distance\n+   *\n+   * Given 2 angles, this returns the shortest angular\n+   * difference.  The inputs and ouputs are of course radians.\n+   *\n+   * The result\n+   * would always be -pi <= result <= pi.  Adding the result\n+   * to \"from\" will always get you an equivelent angle to \"to\".\n+   */\n+    \n+  static inline double shortest_angular_distance(double from, double to)\n+  {\n+    double result = normalize_angle_positive(normalize_angle_positive(to) - normalize_angle_positive(from));\n+\t\n+    if (result > M_PI)\n+      // If the result > 180,\n+      // It's shorter the other way.\n+      result = -(2.0*M_PI - result);\n+\t\n+    return normalize_angle(result);\n+  }\n+\n+  /*!\n+   * \\function\n+   *\n+   * \\brief returns the angle in [-2*M_PI, 2*M_PI]  going the other way along the unit circle. \n+   * \\param angle The angle to which you want to turn in the range [-2*M_PI, 2*M_PI] \n+   * E.g. two_pi_complement(-M_PI/4) returns 7_M_PI/4\n+   * two_pi_complement(M_PI/4) returns -7*M_PI/4\n+   *\n+   */\n+  static inline double two_pi_complement(double angle)\n+  {\n+    //check input conditions\n+    if (angle > 2*M_PI || angle < -2.0*M_PI)\n+      angle = fmod(angle, 2.0*M_PI);    \n+    if(angle < 0)\n+      return (2*M_PI+angle);\n+    else if (angle > 0)\n+      return (-2*M_PI+angle);\n+\n+    return(2*M_PI);\n+  }\n+\n+  /*! \n+   * \\function\n+   *\n+   * \\brief This function is only intended for internal use and not intended for external use. If you do use it, read the documentation very carefully. Returns the min and max amount (in radians) that can be moved from \"from\" angle to \"left_limit\" and \"right_limit\". \n+   * \\return returns false if \"from\" angle does not lie in the interval [left_limit,right_limit]\n+   * \\param from - \"from\" angle - must lie in [-M_PI, M_PI)\n+   * \\param left_limit - left limit of valid interval for angular position - must lie in [-M_PI, M_PI], left and right limits are specified on the unit circle w.r.t to a reference pointing inwards\n+   * \\param right_limit - right limit of valid interval for angular position - must lie in [-M_PI, M_PI], left and right limits are specified on the unit circle w.r.t to a reference pointing inwards \n+   * \\param result_min_delta - minimum (delta) angle (in radians) that can be moved from \"from\" position before hitting the joint stop\n+   * \\param result_max_delta - maximum (delta) angle (in radians) that can be movedd from \"from\" position before hitting the joint stop\n+   */\n+  static bool find_min_max_delta(double from, double left_limit, double right_limit, double &result_min_delta, double &result_max_delta)\n+  {\n+    double delta[4];\n+\n+    delta[0] = shortest_angular_distance(from,left_limit);\n+    delta[1] = shortest_angular_distance(from,right_limit);\n+\n+    delta[2] = two_pi_complement(delta[0]);\n+    delta[3] = two_pi_complement(delta[1]);\n+\n+    if(delta[0] == 0)\n+    {\n+      result_min_delta = delta[0];\n+      result_max_delta = std::max<double>(delta[1],delta[3]);\n+      return true;\n+    }\n+\n+    if(delta[1] == 0)\n+    {\n+        result_max_delta = delta[1];\n+        result_min_delta = std::min<double>(delta[0],delta[2]);\n+        return true;\n+    }\n+\n+\n+    double delta_min = delta[0];\n+    double delta_min_2pi = delta[2];\n+    if(delta[2] < delta_min)\n+    {\n+      delta_min = delta[2];\n+      delta_min_2pi = delta[0];\n+    }\n+\n+    double delta_max = delta[1];\n+    double delta_max_2pi = delta[3];\n+    if(delta[3] > delta_max)\n+    {\n+      delta_max = delta[3];\n+      delta_max_2pi = delta[1];\n+    }\n+\n+\n+    //    printf(\"%f %f %f %f\\n\",delta_min,delta_min_2pi,delta_max,delta_max_2pi);\n+    if((delta_min <= delta_max_2pi) || (delta_max >= delta_min_2pi))\n+    {\n+      result_min_delta = delta_max_2pi;\n+      result_max_delta = delta_min_2pi;\n+      if(left_limit == -M_PI && right_limit == M_PI)\n+        return true;\n+      else\n+        return false;\n+    }\n+    result_min_delta = delta_min;\n+    result_max_delta = delta_max;\n+    return true;\n+  }\n+\n+\n+  /*!\n+   * \\function \n+   *\n+   * \\brief Returns the delta from \"from_angle\" to \"to_angle\" making sure it does not violate limits specified by left_limit and right_limit.\n+   * The valid interval of angular positions is [left_limit,right_limit]. E.g., [-0.25,0.25] is a 0.5 radians wide interval that contains 0. \n+   * But [0.25,-0.25] is a 2*M_PI-0.5 wide interval that contains M_PI (but not 0). \n+   * The value of shortest_angle is the angular difference between \"from\" and \"to\" that lies within the defined valid interval. \n+   * E.g. shortest_angular_distance_with_limits(-0.5,0.5,0.25,-0.25,ss) evaluates ss to 2*M_PI-1.0 and returns true while\n+   * shortest_angular_distance_with_limits(-0.5,0.5,-0.25,0.25,ss) returns false since -0.5 and 0.5 do not lie in the interval [-0.25,0.25]\n+   *\n+   * \\return true if \"from\" and \"to\" positions are within the limit interval, false otherwise\n+   * \\param from - \"from\" angle\n+   * \\param to - \"to\" angle\n+   * \\param left_limit - left limit of valid interval for angular position, left and right limits are specified on the unit circle w.r.t to a reference pointing inwards\n+   * \\param right_limit - right limit of valid interval for angular position, left and right limits are specified on the unit circle w.r.t to a reference pointing inwards\n+   * \\param shortest_angle - result of the shortest angle calculation\n+   */\n+  static inline bool shortest_angular_distance_with_limits(double from, double to, double left_limit, double right_limit, double &shortest_angle)\n+  {\n+\n+    double min_delta = -2*M_PI;\n+    double max_delta = 2*M_PI;\n+    double min_delta_to = -2*M_PI;\n+    double max_delta_to = 2*M_PI;\n+    bool flag    = find_min_max_delta(from,left_limit,right_limit,min_delta,max_delta);\n+    double delta = shortest_angular_distance(from,to);\n+    double delta_mod_2pi  = two_pi_complement(delta);\n+\n+\n+    if(flag)//from position is within the limits\n+    {\n+      if(delta >= min_delta && delta <= max_delta)\n+      {\n+        shortest_angle = delta;\n+        return true;\n+      }\n+      else if(delta_mod_2pi >= min_delta && delta_mod_2pi <= max_delta)\n+      {\n+        shortest_angle = delta_mod_2pi;\n+        return true;\n+      }\n+      else //to position is outside the limits\n+      {\n+        find_min_max_delta(to,left_limit,right_limit,min_delta_to,max_delta_to);\n+          if(fabs(min_delta_to) < fabs(max_delta_to))\n+            shortest_angle = std::max<double>(delta,delta_mod_2pi);\n+          else if(fabs(min_delta_to) > fabs(max_delta_to))\n+            shortest_angle =  std::min<double>(delta,delta_mod_2pi);\n+          else\n+          {\n+            if (fabs(delta) < fabs(delta_mod_2pi))\n+              shortest_angle = delta;\n+            else\n+              shortest_angle = delta_mod_2pi;\n+          }\n+          return false;\n+      }\n+    }\n+    else // from position is outside the limits\n+    {\n+        find_min_max_delta(to,left_limit,right_limit,min_delta_to,max_delta_to);\n+\n+          if(fabs(min_delta) < fabs(max_delta))\n+            shortest_angle = std::min<double>(delta,delta_mod_2pi);\n+          else if (fabs(min_delta) > fabs(max_delta))\n+            shortest_angle =  std::max<double>(delta,delta_mod_2pi);\n+          else\n+          {\n+            if (fabs(delta) < fabs(delta_mod_2pi))\n+              shortest_angle = delta;\n+            else\n+              shortest_angle = delta_mod_2pi;\n+          }\n+      return false;\n+    }\n+\n+    shortest_angle = delta;\n+    return false;\n+  }\n+\n+\n+    \n+\n+\n+}\n+\n+#endif"
+        },
+        {
+          "sha": "2b3f979008740b946627fc29ec8fa6c7852dd6a8",
+          "filename": "angles/lib/libgtest.a",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/ros/angles/blob/f7961de5b704e16af7f93dd74966d60b3401d6df/angles%2Flib%2Flibgtest.a",
+          "raw_url": "https://github.com/ros/angles/raw/f7961de5b704e16af7f93dd74966d60b3401d6df/angles%2Flib%2Flibgtest.a",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Flib%2Flibgtest.a?ref=f7961de5b704e16af7f93dd74966d60b3401d6df"
+        },
+        {
+          "sha": "4fbc5d18650e237dd92ef2f8177da6230c8d78aa",
+          "filename": "angles/lib/libgtest_main.a",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/ros/angles/blob/f7961de5b704e16af7f93dd74966d60b3401d6df/angles%2Flib%2Flibgtest_main.a",
+          "raw_url": "https://github.com/ros/angles/raw/f7961de5b704e16af7f93dd74966d60b3401d6df/angles%2Flib%2Flibgtest_main.a",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Flib%2Flibgtest_main.a?ref=f7961de5b704e16af7f93dd74966d60b3401d6df"
+        },
+        {
+          "sha": "b6580477f69592e49300b9993106d55424bfa9b8",
+          "filename": "angles/manifest.xml",
+          "status": "added",
+          "additions": 24,
+          "deletions": 0,
+          "changes": 24,
+          "blob_url": "https://github.com/ros/angles/blob/f7961de5b704e16af7f93dd74966d60b3401d6df/angles%2Fmanifest.xml",
+          "raw_url": "https://github.com/ros/angles/raw/f7961de5b704e16af7f93dd74966d60b3401d6df/angles%2Fmanifest.xml",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Fmanifest.xml?ref=f7961de5b704e16af7f93dd74966d60b3401d6df",
+          "patch": "@@ -0,0 +1,24 @@\n+<package>\n+  <description brief=\"Simple Angular Math Utilities\">\n+      This package provides a set of simple math utilities to work\n+        with angles. The utilities cover simple things like\n+        normalizing an angle and conversion between degrees and\n+        radians. But even if you're trying to calculate things like\n+        the shortest angular distance between two joinst space\n+        positions of your robot, but the joint motion is constrained\n+        by joint limits, this package is what you need. The code in\n+        this packge is stable and well tested. There are no plans for\n+        major changes in the near future.\n+  </description>\n+  <author>John Hsu, Ioan Sucan</author>\n+  <license>BSD</license>\n+  <url>http://ros.org/wiki/angles</url>\n+  <review status=\"doc reviewed\" notes=\"2009-09-23\"/>\n+  <export>\n+    <cpp cflags=\"-I${prefix}/include\" lflags=\"\"/>\n+  </export>\n+  <platform os=\"ubuntu\" version=\"9.04\"/>\n+  <platform os=\"ubuntu\" version=\"9.10\"/>\n+  <platform os=\"ubuntu\" version=\"10.04\"/>\n+</package>\n+"
+        },
+        {
+          "sha": "9869f592779f2d77b94016ceaf4d543608cabb29",
+          "filename": "angles/test/utest.cpp",
+          "status": "added",
+          "additions": 285,
+          "deletions": 0,
+          "changes": 285,
+          "blob_url": "https://github.com/ros/angles/blob/f7961de5b704e16af7f93dd74966d60b3401d6df/angles%2Ftest%2Futest.cpp",
+          "raw_url": "https://github.com/ros/angles/raw/f7961de5b704e16af7f93dd74966d60b3401d6df/angles%2Ftest%2Futest.cpp",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Ftest%2Futest.cpp?ref=f7961de5b704e16af7f93dd74966d60b3401d6df",
+          "patch": "@@ -0,0 +1,285 @@\n+#include \"angles/angles.h\"\n+#include <gtest/gtest.h>\n+\n+using namespace angles;\n+\n+TEST(Angles, shortestDistanceWithLimits){\n+  double shortest_angle;\n+  bool result = angles::shortest_angular_distance_with_limits(-0.5, 0.5,-0.25,0.25,shortest_angle);\n+  EXPECT_FALSE(result);\n+\n+  result = angles::shortest_angular_distance_with_limits(-0.5, 0.5,0.25,0.25,shortest_angle);\n+  EXPECT_FALSE(result);\n+\n+  result = angles::shortest_angular_distance_with_limits(-0.5, 0.5,0.25,-0.25,shortest_angle);\n+  EXPECT_TRUE(result);\n+  EXPECT_NEAR(shortest_angle, -2*M_PI+1.0,1e-6);\n+\n+  result = angles::shortest_angular_distance_with_limits(0.5, 0.5,0.25,-0.25,shortest_angle);\n+  EXPECT_TRUE(result);\n+  EXPECT_NEAR(shortest_angle, 0,1e-6);\n+\n+  result = angles::shortest_angular_distance_with_limits(0.5, 0,0.25,-0.25,shortest_angle);\n+  EXPECT_FALSE(result);\n+  EXPECT_NEAR(shortest_angle, -0.5,1e-6);\n+\n+  result = angles::shortest_angular_distance_with_limits(-0.5, 0,0.25,-0.25,shortest_angle);\n+  EXPECT_FALSE(result);\n+  EXPECT_NEAR(shortest_angle, 0.5,1e-6);\n+\n+  result = angles::shortest_angular_distance_with_limits(-0.2,0.2,0.25,-0.25,shortest_angle);\n+  EXPECT_FALSE(result);\n+  EXPECT_NEAR(shortest_angle, -2*M_PI+0.4,1e-6);\n+\n+  result = angles::shortest_angular_distance_with_limits(0.2,-0.2,0.25,-0.25,shortest_angle);\n+  EXPECT_FALSE(result);\n+  EXPECT_NEAR(shortest_angle,2*M_PI-0.4,1e-6);\n+\n+  result = angles::shortest_angular_distance_with_limits(0.2,0,0.25,-0.25,shortest_angle);\n+  EXPECT_FALSE(result);\n+  EXPECT_NEAR(shortest_angle,2*M_PI-0.2,1e-6);\n+\n+  result = angles::shortest_angular_distance_with_limits(-0.2,0,0.25,-0.25,shortest_angle);\n+  EXPECT_FALSE(result);\n+  EXPECT_NEAR(shortest_angle,-2*M_PI+0.2,1e-6);\n+\n+  result = angles::shortest_angular_distance_with_limits(-0.25,-0.5,0.25,-0.25,shortest_angle);\n+  EXPECT_TRUE(result);\n+  EXPECT_NEAR(shortest_angle,-0.25,1e-6);\n+\n+  result = angles::shortest_angular_distance_with_limits(-0.25,0.5,0.25,-0.25,shortest_angle);\n+  EXPECT_TRUE(result);\n+  EXPECT_NEAR(shortest_angle,-2*M_PI+0.75,1e-6);\n+\n+  result = angles::shortest_angular_distance_with_limits(-0.2500001,0.5,0.25,-0.25,shortest_angle);\n+  EXPECT_TRUE(result);\n+  EXPECT_NEAR(shortest_angle,-2*M_PI+0.5+0.2500001,1e-6);\n+\n+  result = angles::shortest_angular_distance_with_limits(-0.6, 0.5,-0.25,0.25,shortest_angle);\n+  EXPECT_FALSE(result);\n+\n+  result = angles::shortest_angular_distance_with_limits(-0.5, 0.6,-0.25,0.25,shortest_angle);\n+  EXPECT_FALSE(result);\n+\n+  result = angles::shortest_angular_distance_with_limits(-0.6, 0.75,-0.25,0.3,shortest_angle);\n+  EXPECT_FALSE(result);\n+\n+  result = angles::shortest_angular_distance_with_limits(-0.6, M_PI*3.0/4.0,-0.25,0.3,shortest_angle);\n+  EXPECT_FALSE(result);\n+\n+  result = angles::shortest_angular_distance_with_limits(-M_PI, M_PI,-M_PI,M_PI,shortest_angle);\n+  EXPECT_TRUE(result);\n+  EXPECT_NEAR(shortest_angle,0.0,1e-6);\n+\n+}\n+\n+TEST(Angles, from_degrees)\n+{\n+  double epsilon = 1e-9;\n+  EXPECT_NEAR(0, from_degrees(0), epsilon);\n+  EXPECT_NEAR(M_PI/2, from_degrees(90), epsilon);\n+  EXPECT_NEAR(M_PI, from_degrees(180), epsilon);\n+  EXPECT_NEAR(M_PI*3/2, from_degrees(270), epsilon);\n+  EXPECT_NEAR(2*M_PI, from_degrees(360), epsilon);\n+  EXPECT_NEAR(M_PI/3, from_degrees(60), epsilon);\n+  EXPECT_NEAR(M_PI*2/3, from_degrees(120), epsilon);\n+  EXPECT_NEAR(M_PI/4, from_degrees(45), epsilon);\n+  EXPECT_NEAR(M_PI*3/4, from_degrees(135), epsilon);\n+  EXPECT_NEAR(M_PI/6, from_degrees(30), epsilon);\n+  \n+}\n+\n+TEST(Angles, to_degrees)\n+{\n+  double epsilon = 1e-9;\n+  EXPECT_NEAR(to_degrees(0), 0, epsilon);\n+  EXPECT_NEAR(to_degrees(M_PI/2), 90, epsilon);\n+  EXPECT_NEAR(to_degrees(M_PI), 180, epsilon);\n+  EXPECT_NEAR(to_degrees(M_PI*3/2), 270, epsilon);\n+  EXPECT_NEAR(to_degrees(2*M_PI), 360, epsilon);\n+  EXPECT_NEAR(to_degrees(M_PI/3), 60, epsilon);\n+  EXPECT_NEAR(to_degrees(M_PI*2/3), 120, epsilon);\n+  EXPECT_NEAR(to_degrees(M_PI/4), 45, epsilon);\n+  EXPECT_NEAR(to_degrees(M_PI*3/4), 135, epsilon);\n+  EXPECT_NEAR(to_degrees(M_PI/6), 30, epsilon);\n+}\n+\n+TEST(Angles, normalize_angle_positive)\n+{\n+ double epsilon = 1e-9;\n+ EXPECT_NEAR(0, normalize_angle_positive(0), epsilon);\n+ EXPECT_NEAR(M_PI, normalize_angle_positive(M_PI), epsilon);\n+ EXPECT_NEAR(0, normalize_angle_positive(2*M_PI), epsilon);\n+ EXPECT_NEAR(M_PI, normalize_angle_positive(3*M_PI), epsilon);\n+ EXPECT_NEAR(0, normalize_angle_positive(4*M_PI), epsilon);\n+\n+ EXPECT_NEAR(0, normalize_angle_positive(-0), epsilon);\n+ EXPECT_NEAR(M_PI, normalize_angle_positive(-M_PI), epsilon);\n+ EXPECT_NEAR(0, normalize_angle_positive(-2*M_PI), epsilon);\n+ EXPECT_NEAR(M_PI, normalize_angle_positive(-3*M_PI), epsilon);\n+ EXPECT_NEAR(0, normalize_angle_positive(-4*M_PI), epsilon);\n+\n+ EXPECT_NEAR(0, normalize_angle_positive(-0), epsilon);\n+ EXPECT_NEAR(3*M_PI/2, normalize_angle_positive(-M_PI/2), epsilon);\n+ EXPECT_NEAR(M_PI, normalize_angle_positive(-M_PI), epsilon);\n+ EXPECT_NEAR(M_PI/2, normalize_angle_positive(-3*M_PI/2), epsilon);\n+ EXPECT_NEAR(0, normalize_angle_positive(-4*M_PI/2), epsilon);\n+\n+ EXPECT_NEAR(0, normalize_angle_positive(0), epsilon);\n+ EXPECT_NEAR(M_PI/2, normalize_angle_positive(M_PI/2), epsilon);\n+ EXPECT_NEAR(M_PI/2, normalize_angle_positive(5*M_PI/2), epsilon);\n+ EXPECT_NEAR(M_PI/2, normalize_angle_positive(9*M_PI/2), epsilon);\n+ EXPECT_NEAR(M_PI/2, normalize_angle_positive(-3*M_PI/2), epsilon);\n+\n+}\n+\n+\n+TEST(Angles, normalize_angle)\n+{\n+ double epsilon = 1e-9;\n+ EXPECT_NEAR(0, normalize_angle(0), epsilon);\n+ EXPECT_NEAR(M_PI, normalize_angle(M_PI), epsilon);\n+ EXPECT_NEAR(0, normalize_angle(2*M_PI), epsilon);\n+ EXPECT_NEAR(M_PI, normalize_angle(3*M_PI), epsilon);\n+ EXPECT_NEAR(0, normalize_angle(4*M_PI), epsilon);\n+\n+ EXPECT_NEAR(0, normalize_angle(-0), epsilon);\n+ EXPECT_NEAR(M_PI, normalize_angle(-M_PI), epsilon);\n+ EXPECT_NEAR(0, normalize_angle(-2*M_PI), epsilon);\n+ EXPECT_NEAR(M_PI, normalize_angle(-3*M_PI), epsilon);\n+ EXPECT_NEAR(0, normalize_angle(-4*M_PI), epsilon);\n+\n+ EXPECT_NEAR(0, normalize_angle(-0), epsilon);\n+ EXPECT_NEAR(-M_PI/2, normalize_angle(-M_PI/2), epsilon);\n+ EXPECT_NEAR(M_PI, normalize_angle(-M_PI), epsilon);\n+ EXPECT_NEAR(M_PI/2, normalize_angle(-3*M_PI/2), epsilon);\n+ EXPECT_NEAR(0, normalize_angle(-4*M_PI/2), epsilon);\n+\n+ EXPECT_NEAR(0, normalize_angle(0), epsilon);\n+ EXPECT_NEAR(M_PI/2, normalize_angle(M_PI/2), epsilon);\n+ EXPECT_NEAR(M_PI/2, normalize_angle(5*M_PI/2), epsilon);\n+ EXPECT_NEAR(M_PI/2, normalize_angle(9*M_PI/2), epsilon);\n+ EXPECT_NEAR(M_PI/2, normalize_angle(-3*M_PI/2), epsilon);\n+\n+}\n+\n+TEST(Angles, shortest_angular_distance)\n+{\n+  double epsilon = 1e-9;\n+  EXPECT_NEAR(M_PI/2, shortest_angular_distance(0, M_PI/2), epsilon);\n+  EXPECT_NEAR(-M_PI/2, shortest_angular_distance(0, -M_PI/2), epsilon);\n+  EXPECT_NEAR(-M_PI/2, shortest_angular_distance(M_PI/2, 0), epsilon);\n+  EXPECT_NEAR(M_PI/2, shortest_angular_distance(-M_PI/2, 0), epsilon);\n+\n+  EXPECT_NEAR(-M_PI/2, shortest_angular_distance(M_PI, M_PI/2), epsilon);\n+  EXPECT_NEAR(M_PI/2, shortest_angular_distance(M_PI, -M_PI/2), epsilon);\n+  EXPECT_NEAR(M_PI/2, shortest_angular_distance(M_PI/2, M_PI), epsilon);\n+  EXPECT_NEAR(-M_PI/2, shortest_angular_distance(-M_PI/2, M_PI), epsilon);\n+\n+  EXPECT_NEAR(-M_PI/2, shortest_angular_distance(5*M_PI, M_PI/2), epsilon);\n+  EXPECT_NEAR(M_PI/2, shortest_angular_distance(7*M_PI, -M_PI/2), epsilon);\n+  EXPECT_NEAR(M_PI/2, shortest_angular_distance(9*M_PI/2, M_PI), epsilon);\n+  EXPECT_NEAR(M_PI/2, shortest_angular_distance(-3*M_PI/2, M_PI), epsilon);\n+\n+}\n+\n+TEST(Angles, two_pi_complement)\n+{\n+  double epsilon = 1e-9;\n+  EXPECT_NEAR(two_pi_complement(0), 2*M_PI, epsilon);\n+  EXPECT_NEAR(two_pi_complement(2*M_PI), 0, epsilon); \n+  EXPECT_NEAR(two_pi_complement(-2*M_PI), 0, epsilon); \n+  EXPECT_NEAR(two_pi_complement(2*M_PI-epsilon), -epsilon, epsilon); \n+  EXPECT_NEAR(two_pi_complement(-2*M_PI+epsilon), epsilon, epsilon); \n+  EXPECT_NEAR(two_pi_complement(M_PI/2), -3*M_PI/2, epsilon);\n+  EXPECT_NEAR(two_pi_complement(M_PI), -M_PI, epsilon);\n+  EXPECT_NEAR(two_pi_complement(-M_PI), M_PI, epsilon);\n+  EXPECT_NEAR(two_pi_complement(-M_PI/2), 3*M_PI/2, epsilon);\n+\n+  EXPECT_NEAR(two_pi_complement(3*M_PI), -M_PI, epsilon); \n+  EXPECT_NEAR(two_pi_complement(-3.0*M_PI), M_PI, epsilon);\n+  EXPECT_NEAR(two_pi_complement(-5.0*M_PI/2.0), 3*M_PI/2, epsilon);\n+\n+\n+\n+}\n+\n+TEST(Angles, find_min_max_delta)\n+{\n+  double epsilon = 1e-9;\n+  double min_delta, max_delta;\n+  // Straight forward full range\n+  EXPECT_TRUE(find_min_max_delta( 0, -M_PI, M_PI, min_delta, max_delta));\n+  EXPECT_NEAR(min_delta, -M_PI, epsilon);\n+  EXPECT_NEAR(max_delta, M_PI, epsilon);\n+\n+  // M_PI/2 Full Range\n+  EXPECT_TRUE(find_min_max_delta( M_PI/2, -M_PI, M_PI, min_delta, max_delta));\n+  EXPECT_NEAR(min_delta, -3*M_PI/2, epsilon);\n+  EXPECT_NEAR(max_delta, M_PI/2, epsilon);\n+\n+  // -M_PI/2 Full range\n+  EXPECT_TRUE(find_min_max_delta( -M_PI/2, -M_PI, M_PI, min_delta, max_delta));\n+  EXPECT_NEAR(min_delta, -M_PI/2, epsilon);\n+  EXPECT_NEAR(max_delta, 3*M_PI/2, epsilon);\n+\n+  // Straight forward partial range\n+  EXPECT_TRUE(find_min_max_delta( 0, -M_PI/2, M_PI/2, min_delta, max_delta));\n+  EXPECT_NEAR(min_delta, -M_PI/2, epsilon);\n+  EXPECT_NEAR(max_delta, M_PI/2, epsilon);\n+  \n+  // M_PI/4 Partial Range\n+  EXPECT_TRUE(find_min_max_delta( M_PI/4, -M_PI/2, M_PI/2, min_delta, max_delta));\n+  EXPECT_NEAR(min_delta, -3*M_PI/4, epsilon);\n+  EXPECT_NEAR(max_delta, M_PI/4, epsilon);\n+\n+  // -M_PI/4 Partial Range\n+  EXPECT_TRUE(find_min_max_delta( -M_PI/4, -M_PI/2, M_PI/2, min_delta, max_delta));\n+  EXPECT_NEAR(min_delta, -M_PI/4, epsilon);\n+  EXPECT_NEAR(max_delta, 3*M_PI/4, epsilon);\n+\n+  // bump stop negative full range\n+  EXPECT_TRUE(find_min_max_delta( -M_PI, -M_PI, M_PI, min_delta, max_delta));\n+  EXPECT_TRUE((fabs(min_delta) <= epsilon && fabs(max_delta - 2*M_PI) <= epsilon) || (fabs(min_delta+2*M_PI) <= epsilon && fabs(max_delta) <= epsilon)); \n+  EXPECT_NEAR(min_delta, 0.0, epsilon);\n+  EXPECT_NEAR(max_delta, 2*M_PI, epsilon);\n+\n+  EXPECT_TRUE(find_min_max_delta(-0.25,0.25,-0.25,min_delta, max_delta));\n+  EXPECT_NEAR(min_delta, -2*M_PI+0.5, epsilon);\n+  EXPECT_NEAR(max_delta, 0.0, epsilon);\n+  \n+  // bump stop positive full range\n+  EXPECT_TRUE(find_min_max_delta( M_PI-epsilon, -M_PI, M_PI, min_delta, max_delta));\n+  //EXPECT_TRUE((fabs(min_delta) <= epsilon && fabs(max_delta - 2*M_PI) <= epsilon) || (fabs(min_delta+2*M_PI) <= epsilon && fabs(max_delta) <= epsilon)); \n+  EXPECT_NEAR(min_delta, -2*M_PI+epsilon, epsilon);\n+  EXPECT_NEAR(max_delta, epsilon, epsilon);\n+\n+  // bump stop negative partial range\n+  EXPECT_TRUE(find_min_max_delta( -M_PI, -M_PI, M_PI, min_delta, max_delta));\n+  EXPECT_NEAR(min_delta, 0, epsilon);\n+  EXPECT_NEAR(max_delta, 2*M_PI, epsilon);\n+\n+  // bump stop positive partial range\n+  EXPECT_TRUE(find_min_max_delta( -M_PI/2, -M_PI/2, M_PI/2, min_delta, max_delta));\n+  EXPECT_NEAR(min_delta, 0.0, epsilon);\n+  EXPECT_NEAR(max_delta, M_PI, epsilon);\n+    \n+\n+  //Test out of range negative\n+  EXPECT_FALSE(find_min_max_delta( -M_PI, -M_PI/2, M_PI/2, min_delta, max_delta));\n+  //Test out of range postive\n+  EXPECT_FALSE(find_min_max_delta( M_PI, -M_PI/2, M_PI/2, min_delta, max_delta));\n+\n+\n+  // M_PI/4 Partial Range\n+  EXPECT_TRUE(find_min_max_delta( 3*M_PI/4, M_PI/2, -M_PI/2, min_delta, max_delta));\n+  EXPECT_NEAR(min_delta, -M_PI/4, epsilon);\n+  EXPECT_NEAR(max_delta, 3*M_PI/4, epsilon);\n+\n+\n+}\n+\n+int main(int argc, char **argv){\n+  testing::InitGoogleTest(&argc, argv);\n+  return RUN_ALL_TESTS();\n+}"
+        }
+      ]
+    },
+    {
+      "author": "William Woodall",
+      "date": "2012-12-04T21:10:24Z",
+      "sha": "7ce4fae7cbdc8c3d21d7c6cc03fc72a89b9f18f9",
+      "message": "Removed 'copyright' tag from package.xml",
+      "files_changed": 1,
+      "additions": 0,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "581e57f3223f2703cc3d7fd1eac94d3737d6f7ef",
+          "filename": "angles/package.xml",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 1,
+          "changes": 1,
+          "blob_url": "https://github.com/ros/angles/blob/7ce4fae7cbdc8c3d21d7c6cc03fc72a89b9f18f9/angles%2Fpackage.xml",
+          "raw_url": "https://github.com/ros/angles/raw/7ce4fae7cbdc8c3d21d7c6cc03fc72a89b9f18f9/angles%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Fpackage.xml?ref=7ce4fae7cbdc8c3d21d7c6cc03fc72a89b9f18f9",
+          "patch": "@@ -13,7 +13,6 @@\n   <author email=\"hsu@osrfoundation.org\">John Hsu</author>\n   <maintainer email=\"isucan@willowgarage.com\">Ioan Sucan</maintainer>\n   <license>BSD</license>\n-  <copyright>Willow Garage</copyright>\n \n   <url>http://ros.org/wiki/angles</url>\n "
+        }
+      ]
+    },
+    {
+      "author": "vrabaud",
+      "date": "2012-07-23T22:40:01Z",
+      "sha": "3a6932bfe8980a19959090edc21634befc6cdd89",
+      "message": "remove useless header",
+      "files_changed": 1,
+      "additions": 0,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "a3e9aea83fbef3feabf31605cac4a420a8a47dd2",
+          "filename": "angles/include/angles/angles.h",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 1,
+          "changes": 1,
+          "blob_url": "https://github.com/ros/angles/blob/3a6932bfe8980a19959090edc21634befc6cdd89/angles%2Finclude%2Fangles%2Fangles.h",
+          "raw_url": "https://github.com/ros/angles/raw/3a6932bfe8980a19959090edc21634befc6cdd89/angles%2Finclude%2Fangles%2Fangles.h",
+          "contents_url": "https://api.github.com/repos/ros/angles/contents/angles%2Finclude%2Fangles%2Fangles.h?ref=3a6932bfe8980a19959090edc21634befc6cdd89",
+          "patch": "@@ -37,7 +37,6 @@\n \n #include <algorithm>\n #include <cmath>\n-#include <stdio.h>\n \n namespace angles\n {"
+        }
+      ]
+    }
+  ]
+}

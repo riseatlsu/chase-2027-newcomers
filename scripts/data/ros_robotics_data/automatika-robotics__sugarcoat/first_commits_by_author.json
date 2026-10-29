@@ -1,0 +1,83 @@
+{
+  "_meta": {
+    "fetched_at": "2026-09-21T18:41:59Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "automatika-robotics",
+    "repo": "sugarcoat"
+  },
+  "data": [
+    {
+      "author": "aleph-ra",
+      "date": "2024-09-23T17:52:34Z",
+      "sha": "6ba56832077a8cbd1fc5fd853aaae613d7b4b060",
+      "message": "(fix) Adds handling image encodings with alpha channel",
+      "files_changed": 1,
+      "additions": 11,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "da9e06a8f2716b09f15c89f4d7284e2cad1a5dd7",
+          "filename": "ros_sugar/io/utils.py",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 3,
+          "changes": 14,
+          "blob_url": "https://github.com/automatika-robotics/sugarcoat/blob/6ba56832077a8cbd1fc5fd853aaae613d7b4b060/ros_sugar%2Fio%2Futils.py",
+          "raw_url": "https://github.com/automatika-robotics/sugarcoat/raw/6ba56832077a8cbd1fc5fd853aaae613d7b4b060/ros_sugar%2Fio%2Futils.py",
+          "contents_url": "https://api.github.com/repos/automatika-robotics/sugarcoat/contents/ros_sugar%2Fio%2Futils.py?ref=6ba56832077a8cbd1fc5fd853aaae613d7b4b060",
+          "patch": "@@ -8,19 +8,27 @@\n \n def image_pre_processing(img) -> np.ndarray:\n     \"\"\"\n-    Pre-processing of ROS image msg received in weird encodings\n+    Pre-processing of ROS image msg received in different encodings\n     :param      img:  Image as a middleware defined message\n     :type       img:  Middleware defined message type\n \n     :returns:   Image as an numpy array\n     :rtype:     Numpy array\n     \"\"\"\n-    # any preprocessing logic can be added here\n     if img.encoding == \"yuv422_yuy2\":\n         np_arr = np.asarray(img.data, dtype=\"uint8\").reshape((img.height, img.width, 2))\n         rgb = cv2.cvtColor(np_arr, cv2.COLOR_YUV2RGB_YUYV)\n+\n+    # discard alpha channels if present\n+    elif \"a\" in img.encoding:\n+        np_arr = np.asarray(img.data, dtype=\"uint8\").reshape((img.height, img.width, 4))\n+        np_arr = np_arr[:, :, :3]\n     else:\n-        rgb = np.asarray(img.data, dtype=\"uint8\").reshape((img.height, img.width, 3))\n+        np_arr = np.asarray(img.data, dtype=\"uint8\").reshape((img.height, img.width, 3))\n+\n+    # handle bgr\n+    rgb = cv2.cvtColor(np_arr, cv2.COLOR_BGR2RGB) if \"bgr\" in img.encoding else np_arr\n+\n     return rgb\n \n "
+        }
+      ]
+    },
+    {
+      "author": "mkabtoul",
+      "date": "2024-05-03T13:54:19Z",
+      "sha": "e0e275687ce4b304da6ae31155ac70d1949e5e9c",
+      "message": "init commit",
+      "files_changed": 3,
+      "additions": 61,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "d9b5263ae907995c857e45d3ae101015ff5c1178",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/automatika-robotics/sugarcoat/blob/e0e275687ce4b304da6ae31155ac70d1949e5e9c/README.md",
+          "raw_url": "https://github.com/automatika-robotics/sugarcoat/raw/e0e275687ce4b304da6ae31155ac70d1949e5e9c/README.md",
+          "contents_url": "https://api.github.com/repos/automatika-robotics/sugarcoat/contents/README.md?ref=e0e275687ce4b304da6ae31155ac70d1949e5e9c",
+          "patch": "@@ -0,0 +1,3 @@\n+# ROS SUGAR\n+\n+Syntactic sugar for ROS2 nodes creation and management from python using rclpy and launch_ros"
+        },
+        {
+          "sha": "e469379b4706f7bd2beb8343398dc77047f51749",
+          "filename": "pyproject.toml",
+          "status": "added",
+          "additions": 55,
+          "deletions": 0,
+          "changes": 55,
+          "blob_url": "https://github.com/automatika-robotics/sugarcoat/blob/e0e275687ce4b304da6ae31155ac70d1949e5e9c/pyproject.toml",
+          "raw_url": "https://github.com/automatika-robotics/sugarcoat/raw/e0e275687ce4b304da6ae31155ac70d1949e5e9c/pyproject.toml",
+          "contents_url": "https://api.github.com/repos/automatika-robotics/sugarcoat/contents/pyproject.toml?ref=e0e275687ce4b304da6ae31155ac70d1949e5e9c",
+          "patch": "@@ -0,0 +1,55 @@\n+[build-system]\n+requires = [\"setuptools>=61.0.0\", \"wheel\"]\n+build-backend = \"setuptools.build_meta\"\n+\n+[project]\n+name = \"ros-sugar\"\n+version = \"0.1\"\n+description = \"Syntactic sugar for ROS2\"\n+authors = [{ name = \"Automatika Robotics\", email = \"contact@automatikarobotics.com\" }]\n+classifiers = [\n+    \"Programming Language :: Python\",\n+    \"Programming Language :: Python :: 3\",\n+]\n+dependencies = [\n+    \"rclpy\",\n+]\n+\n+requires-python = \">=3.6\"\n+\n+[project.optional-dependencies]\n+dev = [\"httpx\", \"pip-tools\", \"pytest\", \"pre-commit\", \"black\"]\n+\n+\n+[tool.interrogate]\n+ignore-init-method = true\n+ignore-init-module = false\n+ignore-magic = false\n+ignore-semiprivate = false\n+ignore-private = false\n+ignore-property-decorators = false\n+ignore-module = true\n+ignore-nested-functions = false\n+ignore-nested-classes = true\n+ignore-setters = false\n+exclude = [\"setup.py\", \"docs\", \"build\"]\n+ignore-regex = [\"^get$\", \"^mock_.*\", \".*BaseClass.*\"]\n+quiet = false\n+whitelist-regex = []\n+color = true\n+generate-badge = \".\"\n+badge-format = \"svg\"\n+\n+[tool.black]\n+exclude = '''\n+/(\n+\t\\.git\n+| \\.hg\n+| \\.mypy_cache\n+| \\.tox\n+| \\.venv\n+| _build\n+| buck-out\n+| build\n+)/\n+'''"
+        },
+        {
+          "sha": "606849326a4002007fd42060b51e69a19c18675c",
+          "filename": "setup.py",
+          "status": "added",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/automatika-robotics/sugarcoat/blob/e0e275687ce4b304da6ae31155ac70d1949e5e9c/setup.py",
+          "raw_url": "https://github.com/automatika-robotics/sugarcoat/raw/e0e275687ce4b304da6ae31155ac70d1949e5e9c/setup.py",
+          "contents_url": "https://api.github.com/repos/automatika-robotics/sugarcoat/contents/setup.py?ref=e0e275687ce4b304da6ae31155ac70d1949e5e9c",
+          "patch": "@@ -0,0 +1,3 @@\n+from setuptools import setup\n+\n+setup()"
+        }
+      ]
+    }
+  ]
+}

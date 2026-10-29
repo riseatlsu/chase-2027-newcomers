@@ -1,0 +1,142 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T05:35:29Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "hatchbed",
+    "repo": "log_view"
+  },
+  "data": [
+    {
+      "author": "lucasw",
+      "date": "2022-09-16T19:18:29Z",
+      "sha": "c7b94a30e00f0d2bcd5d38c4742fc1c6526e4c37",
+      "message": "Use default C++ version (#15)",
+      "files_changed": 1,
+      "additions": 0,
+      "deletions": 2,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "60d57f4710a3a9368db81b566b27027cba74f96b",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 2,
+          "changes": 2,
+          "blob_url": "https://github.com/hatchbed/log_view/blob/c7b94a30e00f0d2bcd5d38c4742fc1c6526e4c37/CMakeLists.txt",
+          "raw_url": "https://github.com/hatchbed/log_view/raw/c7b94a30e00f0d2bcd5d38c4742fc1c6526e4c37/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/hatchbed/log_view/contents/CMakeLists.txt?ref=c7b94a30e00f0d2bcd5d38c4742fc1c6526e4c37",
+          "patch": "@@ -1,8 +1,6 @@\n cmake_minimum_required(VERSION 3.0.2)\n project(log_view)\n \n-add_compile_options(-std=c++11)\n-\n find_package(catkin REQUIRED COMPONENTS\n   roscpp\n )"
+        }
+      ]
+    },
+    {
+      "author": "malban",
+      "date": "2020-11-12T05:38:45Z",
+      "sha": "3ba90c7bf720a55ffb5aad953274c54498acd2a1",
+      "message": "Initial code.",
+      "files_changed": 8,
+      "additions": 204,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "680f3dbc0f86c938c915a637c8bd777897549a46",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 47,
+          "deletions": 0,
+          "changes": 47,
+          "blob_url": "https://github.com/hatchbed/log_view/blob/3ba90c7bf720a55ffb5aad953274c54498acd2a1/CMakeLists.txt",
+          "raw_url": "https://github.com/hatchbed/log_view/raw/3ba90c7bf720a55ffb5aad953274c54498acd2a1/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/hatchbed/log_view/contents/CMakeLists.txt?ref=3ba90c7bf720a55ffb5aad953274c54498acd2a1",
+          "patch": "@@ -0,0 +1,47 @@\n+cmake_minimum_required(VERSION 3.0.2)\n+project(log_view)\n+\n+add_compile_options(-std=c++17)\n+\n+find_package(catkin REQUIRED COMPONENTS\n+  roscpp\n+)\n+\n+set(CURSES_NEED_NCURSES TRUE)\n+find_package(Curses REQUIRED COMPONENTS system)\n+\n+catkin_package(\n+#  INCLUDE_DIRS include\n+#  LIBRARIES log_view\n+#  CATKIN_DEPENDS roscpp\n+#  DEPENDS system_lib\n+)\n+\n+###########\n+## Build ##\n+###########\n+\n+include_directories(\n+  include\n+  ${catkin_INCLUDE_DIRS}\n+  ${CURSES_INCLUDE_DIRS}\n+)\n+\n+add_library(${PROJECT_NAME}\n+  src/log_store.cpp\n+  src/log_view.cpp\n+)\n+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${CURSES_LIBRARIES})\n+\n+add_executable(log_viewer src/main.cpp)\n+target_link_libraries(log_viewer ${PROJECT_NAME})\n+\n+#############\n+## Install ##\n+#############\n+\n+install(TARGETS ${PROJECT_NAME} log_viewer\n+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n+  RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}\n+)"
+        },
+        {
+          "sha": "db4aba1db91eee798aaac7744295113161de558a",
+          "filename": "include/log_view/datatypes.h",
+          "status": "added",
+          "additions": 34,
+          "deletions": 0,
+          "changes": 34,
+          "blob_url": "https://github.com/hatchbed/log_view/blob/3ba90c7bf720a55ffb5aad953274c54498acd2a1/include%2Flog_view%2Fdatatypes.h",
+          "raw_url": "https://github.com/hatchbed/log_view/raw/3ba90c7bf720a55ffb5aad953274c54498acd2a1/include%2Flog_view%2Fdatatypes.h",
+          "contents_url": "https://api.github.com/repos/hatchbed/log_view/contents/include%2Flog_view%2Fdatatypes.h?ref=3ba90c7bf720a55ffb5aad953274c54498acd2a1",
+          "patch": "@@ -0,0 +1,34 @@\n+#ifndef LOG_VIEW_DATATYPES_H_\n+#define LOG_VIEW_DATATYPES_H_\n+\n+#include <ros/ros.h>\n+#include <rosgraph_msgs/Log.h>\n+\n+namespace log_view {\n+\n+struct LogEntry\n+{\n+  LogEntry(const rosgraph_msgs::Log& log) :\n+    stamp(log.header.stamp),\n+    seq(log.header.seq),\n+    level(log.level),\n+    node(log.name),\n+    file(log.file),\n+    function(log.function),\n+    line(log.line),\n+    text(log.msg)\n+  {}\n+\n+  ros::Time stamp;\n+  uint32_t seq;\n+  uint8_t level;\n+  std::string node;\n+  std::string file;\n+  std::string function;\n+  uint32_t line;\n+  std::string text;\n+};\n+\n+}  // namespace log_view\n+\n+#endif  // LOG_VIEW_DATATYPES_H_\n\\ No newline at end of file"
+        },
+        {
+          "sha": "f6da6d1f011f19b66c88c2679cb1b5ff9e46d30c",
+          "filename": "include/log_view/log_store.h",
+          "status": "added",
+          "additions": 25,
+          "deletions": 0,
+          "changes": 25,
+          "blob_url": "https://github.com/hatchbed/log_view/blob/3ba90c7bf720a55ffb5aad953274c54498acd2a1/include%2Flog_view%2Flog_store.h",
+          "raw_url": "https://github.com/hatchbed/log_view/raw/3ba90c7bf720a55ffb5aad953274c54498acd2a1/include%2Flog_view%2Flog_store.h",
+          "contents_url": "https://api.github.com/repos/hatchbed/log_view/contents/include%2Flog_view%2Flog_store.h?ref=3ba90c7bf720a55ffb5aad953274c54498acd2a1",
+          "patch": "@@ -0,0 +1,25 @@\n+#ifndef LOG_VIEW_LOG_STORE_H_\n+#define LOG_VIEW_LOG_STORE_H_\n+\n+#include <deque>\n+\n+#include <log_view/datatypes.h>\n+#include <rosgraph_msgs/Log.h>\n+\n+namespace log_view {\n+\n+class LogStore {\n+public:\n+  LogStore() = default;\n+\n+  const std::deque<LogEntry>& logs() const { return logs_; }\n+\n+  void addEntry(const rosgraph_msgs::LogConstPtr& msg);\n+\n+private:\n+  std::deque<LogEntry> logs_;\n+};\n+\n+}  // namespace log_view\n+\n+#endif  // LOG_VIEW_LOG_STORE_H_\n\\ No newline at end of file"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "include/log_view/log_view.h",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/hatchbed/log_view/blob/3ba90c7bf720a55ffb5aad953274c54498acd2a1/include%2Flog_view%2Flog_view.h",
+          "raw_url": "https://github.com/hatchbed/log_view/raw/3ba90c7bf720a55ffb5aad953274c54498acd2a1/include%2Flog_view%2Flog_view.h",
+          "contents_url": "https://api.github.com/repos/hatchbed/log_view/contents/include%2Flog_view%2Flog_view.h?ref=3ba90c7bf720a55ffb5aad953274c54498acd2a1"
+        },
+        {
+          "sha": "292288987c14790d2e9cd3e0286d986d5545ce3a",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 17,
+          "deletions": 0,
+          "changes": 17,
+          "blob_url": "https://github.com/hatchbed/log_view/blob/3ba90c7bf720a55ffb5aad953274c54498acd2a1/package.xml",
+          "raw_url": "https://github.com/hatchbed/log_view/raw/3ba90c7bf720a55ffb5aad953274c54498acd2a1/package.xml",
+          "contents_url": "https://api.github.com/repos/hatchbed/log_view/contents/package.xml?ref=3ba90c7bf720a55ffb5aad953274c54498acd2a1",
+          "patch": "@@ -0,0 +1,17 @@\n+<?xml version=\"1.0\"?>\n+<package format=\"2\">\n+  <name>log_view</name>\n+  <version>0.0.0</version>\n+  <description>The log_view package</description>\n+\n+  <author email=\"marcalban@hatchbed.com\">Marc Alban</author>\n+  <maintainer email=\"marcalban@hatchbed.com\">Marc Alban</maintainer>\n+\n+  <license>BSD</license>\n+\n+  <buildtool_depend>catkin</buildtool_depend>\n+\n+  <depend>roscpp</depend>\n+  <depend>libncurses-dev</depend>\n+\n+</package>"
+        },
+        {
+          "sha": "8f723592128430bb38cb30fbee70122405827758",
+          "filename": "src/log_store.cpp",
+          "status": "added",
+          "additions": 9,
+          "deletions": 0,
+          "changes": 9,
+          "blob_url": "https://github.com/hatchbed/log_view/blob/3ba90c7bf720a55ffb5aad953274c54498acd2a1/src%2Flog_store.cpp",
+          "raw_url": "https://github.com/hatchbed/log_view/raw/3ba90c7bf720a55ffb5aad953274c54498acd2a1/src%2Flog_store.cpp",
+          "contents_url": "https://api.github.com/repos/hatchbed/log_view/contents/src%2Flog_store.cpp?ref=3ba90c7bf720a55ffb5aad953274c54498acd2a1",
+          "patch": "@@ -0,0 +1,9 @@\n+#include <log_view/log_store.h>\n+\n+namespace log_view {\n+\n+void LogStore::addEntry(const rosgraph_msgs::LogConstPtr& msg) {\n+  logs_.emplace_back(*msg);\n+}\n+\n+}  // namespace log_view\n\\ No newline at end of file"
+        },
+        {
+          "sha": "05046b402e4d0da4031f7bf6f5df103e14f3fed4",
+          "filename": "src/log_view.cpp",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/hatchbed/log_view/blob/3ba90c7bf720a55ffb5aad953274c54498acd2a1/src%2Flog_view.cpp",
+          "raw_url": "https://github.com/hatchbed/log_view/raw/3ba90c7bf720a55ffb5aad953274c54498acd2a1/src%2Flog_view.cpp",
+          "contents_url": "https://api.github.com/repos/hatchbed/log_view/contents/src%2Flog_view.cpp?ref=3ba90c7bf720a55ffb5aad953274c54498acd2a1",
+          "patch": "@@ -0,0 +1 @@\n+#include <log_view/log_view.h>\n\\ No newline at end of file"
+        },
+        {
+          "sha": "85fac1d9e0958a581063795b5f7dfabd69526bc3",
+          "filename": "src/main.cpp",
+          "status": "added",
+          "additions": 71,
+          "deletions": 0,
+          "changes": 71,
+          "blob_url": "https://github.com/hatchbed/log_view/blob/3ba90c7bf720a55ffb5aad953274c54498acd2a1/src%2Fmain.cpp",
+          "raw_url": "https://github.com/hatchbed/log_view/raw/3ba90c7bf720a55ffb5aad953274c54498acd2a1/src%2Fmain.cpp",
+          "contents_url": "https://api.github.com/repos/hatchbed/log_view/contents/src%2Fmain.cpp?ref=3ba90c7bf720a55ffb5aad953274c54498acd2a1",
+          "patch": "@@ -0,0 +1,71 @@\n+#include <log_view/log_store.h>\n+#include <rosgraph_msgs/Log.h>\n+\n+#include <chrono>\n+#include <thread>\n+\n+#include <ros/ros.h>\n+\n+class LogViewer {\n+  public:\n+  LogViewer() = default;\n+\n+  ~LogViewer() {\n+    stop();\n+  }\n+\n+  void init() {\n+    thread_ = std::make_shared<std::thread>(&LogViewer::run, this);\n+  }\n+\n+  void stop() {\n+    exit_ = true;\n+    thread_->join();\n+  }\n+\n+  void run() {\n+    printf(\"run...\\n\");\n+    bool connected = false;\n+    while (!exit_) {\n+      bool master_status = ros::master::check();\n+      if (!connected && master_status) {\n+        printf(\"connected to ROS master\\n\");\n+        ros::start();\n+        ros::NodeHandle node;\n+        sub_ = node.subscribe(\"/rosout_agg\", 10000, &LogViewer::handleMsg, this);\n+      }\n+      else if (connected && !master_status) {\n+        ros::shutdown();\n+        printf(\"disconnected from ROS master\\n\");\n+      }\n+      else if (connected && master_status) {\n+        ros::spinOnce();\n+      }\n+\n+      connected = master_status;\n+      std::this_thread::sleep_for(std::chrono::milliseconds(50));\n+    }\n+  }\n+\n+  void handleMsg(const rosgraph_msgs::LogConstPtr& msg) {\n+\n+  }\n+\n+  private:\n+    bool exit_ = false;\n+    ros::Subscriber sub_;\n+\n+    std::shared_ptr<std::thread> thread_;\n+};\n+\n+int main(int argc, char **argv)\n+{\n+  ros::init(argc, argv, \"log_viewer\", ros::init_options::AnonymousName | ros::init_options::NoRosout);\n+  LogViewer log_viewer;\n+  log_viewer.init();\n+  while(true) {\n+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));\n+  }\n+\n+  return 0;\n+}\n\\ No newline at end of file"
+        }
+      ]
+    }
+  ]
+}

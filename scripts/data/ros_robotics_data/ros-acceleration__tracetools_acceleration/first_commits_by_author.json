@@ -1,0 +1,239 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T06:48:04Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ros-acceleration",
+    "repo": "tracetools_acceleration"
+  },
+  "data": [
+    {
+      "author": "vmayoral",
+      "date": "2021-10-12T14:00:30Z",
+      "sha": "29e8c583f94e6734c2801981fe2db5feaead3694",
+      "message": "Initial commit\n\nSigned-off-by: Víctor Mayoral Vilches <v.mayoralv@gmail.com>",
+      "files_changed": 15,
+      "additions": 721,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "c18e2413afacf69f9d067ae16a3a8ecbadb1eb54",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-acceleration/tracetools_acceleration/blob/29e8c583f94e6734c2801981fe2db5feaead3694/.gitignore",
+          "raw_url": "https://github.com/ros-acceleration/tracetools_acceleration/raw/29e8c583f94e6734c2801981fe2db5feaead3694/.gitignore",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/tracetools_acceleration/contents/.gitignore?ref=29e8c583f94e6734c2801981fe2db5feaead3694",
+          "patch": "@@ -0,0 +1,2 @@\n+doc_output/\n+.DS_Store"
+        },
+        {
+          "sha": "28023bfe806dae3cf5da8bfaf1f0b276ac7fdc0c",
+          "filename": "CHANGELOG.rst",
+          "status": "added",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/ros-acceleration/tracetools_acceleration/blob/29e8c583f94e6734c2801981fe2db5feaead3694/CHANGELOG.rst",
+          "raw_url": "https://github.com/ros-acceleration/tracetools_acceleration/raw/29e8c583f94e6734c2801981fe2db5feaead3694/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/tracetools_acceleration/contents/CHANGELOG.rst?ref=29e8c583f94e6734c2801981fe2db5feaead3694",
+          "patch": "@@ -0,0 +1,7 @@\n+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n+Changelog for package tracetools\n+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n+\n+0.1.0 (2021-10-12)\n+------------------\n+* Fork tracetools and shape it as tracetools_acceleration"
+        },
+        {
+          "sha": "dd6603556da97fb9f321a8adfe8972c9d98e547b",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 153,
+          "deletions": 0,
+          "changes": 153,
+          "blob_url": "https://github.com/ros-acceleration/tracetools_acceleration/blob/29e8c583f94e6734c2801981fe2db5feaead3694/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-acceleration/tracetools_acceleration/raw/29e8c583f94e6734c2801981fe2db5feaead3694/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/tracetools_acceleration/contents/CMakeLists.txt?ref=29e8c583f94e6734c2801981fe2db5feaead3694",
+          "patch": "@@ -0,0 +1,153 @@\n+cmake_minimum_required(VERSION 3.5)\n+project(tracetools_acceleration)\n+\n+# Default to C++14\n+if(NOT CMAKE_CXX_STANDARD)\n+  set(CMAKE_CXX_STANDARD 14)\n+endif()\n+\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  add_compile_options(-Wall -Wextra -Wpedantic)\n+elseif(CMAKE_CXX_COMPILER_ID MATCHES \"MSVC\")\n+  add_compile_options(/W4)\n+endif()\n+\n+find_package(ament_cmake_ros REQUIRED)\n+\n+if(WIN32)\n+  set(DISABLED_DEFAULT ON)\n+else()\n+  set(DISABLED_DEFAULT OFF)\n+endif()\n+option(TRACETOOLS_DISABLED \"Explicitly disable support for tracing\" ${DISABLED_DEFAULT})\n+option(TRACETOOLS_NO_RDYNAMIC \"Disable export of -rdynamic link flag\" OFF)\n+option(TRACETOOLS_STATUS_CHECKING_TOOL \"Enable the status checking tool\" ON)\n+\n+if(NOT TRACETOOLS_DISABLED)\n+  # Set TRACETOOLS_LTTNG_ENABLED if we can find lttng-ust\n+  find_package(PkgConfig)\n+  if(PkgConfig_FOUND)\n+    pkg_check_modules(LTTNG lttng-ust)\n+    if(LTTNG_FOUND)\n+      set(TRACETOOLS_LTTNG_ENABLED TRUE)\n+      message(\"LTTng found: tracing enabled\")\n+    endif()\n+  endif()\n+endif()\n+\n+# Store configuration variables for runtime use\n+#   TRACETOOLS_DISABLED\n+#   TRACETOOLS_LTTNG_ENABLED\n+configure_file(include/${PROJECT_NAME}/config.h.in include/${PROJECT_NAME}/config.h)\n+\n+# tracetools_acceleration lib\n+set(SOURCES\n+  src/tracetools.c\n+  src/utils.cpp\n+)\n+set(HEADERS\n+  include/${PROJECT_NAME}/tracetools.h\n+  include/${PROJECT_NAME}/utils.hpp\n+  include/${PROJECT_NAME}/visibility_control.hpp\n+)\n+if(TRACETOOLS_LTTNG_ENABLED)\n+  # We only need these if we're using LTTng\n+  list(APPEND SOURCES\n+    src/tp_call.c\n+  )\n+  list(APPEND HEADERS\n+    include/${PROJECT_NAME}/tp_call.h\n+  )\n+endif()\n+\n+# Copy select headers to the actual include/ directory that we will use and export\n+foreach(_header ${HEADERS})\n+  configure_file(\n+    ${PROJECT_SOURCE_DIR}/${_header}\n+    ${PROJECT_BINARY_DIR}/${_header}\n+    COPYONLY\n+  )\n+endforeach()\n+\n+add_library(${PROJECT_NAME} ${SOURCES})\n+if(TRACETOOLS_LTTNG_ENABLED)\n+  target_link_libraries(${PROJECT_NAME} ${LTTNG_LIBRARIES})\n+  # Export -rdynamic for downtream packages to use when calling\n+  #   ament_target_dependencies()\n+  # which is needed to resolve function addresses to symbols when\n+  # using function pointers directly/without std::bind()\n+  # (the flag should not be used on Windows, but TRACETOOLS_LTTNG_ENABLED\n+  # should never be true on Windows anyway, so there is no need to check)\n+  if(NOT TRACETOOLS_NO_RDYNAMIC)\n+    target_link_libraries(${PROJECT_NAME} \"-rdynamic\")\n+  endif()\n+endif()\n+if(WIN32)\n+  # Causes the visibility macros to use dllexport rather than dllimport\n+  # which is appropriate when building the dll but not consuming it.\n+  target_compile_definitions(${PROJECT_NAME} PRIVATE \"TRACETOOLS_BUILDING_DLL\")\n+endif()\n+\n+# Only use output/binary include directory\n+target_include_directories(${PROJECT_NAME} PUBLIC\n+  \"$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>\"\n+  \"$<INSTALL_INTERFACE:include>\"\n+)\n+ament_export_targets(${PROJECT_NAME}_export HAS_LIBRARY_TARGET)\n+\n+if(TRACETOOLS_STATUS_CHECKING_TOOL)\n+  # Status checking tool\n+  add_executable(status\n+    src/status.c\n+  )\n+  target_link_libraries(status\n+    ${PROJECT_NAME}\n+  )\n+  install(TARGETS\n+    status\n+    DESTINATION lib/${PROJECT_NAME}\n+  )\n+endif()\n+\n+install(\n+  DIRECTORY ${PROJECT_BINARY_DIR}/include/\n+  DESTINATION include\n+)\n+install(\n+  TARGETS ${PROJECT_NAME}\n+  EXPORT ${PROJECT_NAME}_export\n+  LIBRARY DESTINATION lib\n+  ARCHIVE DESTINATION lib\n+  RUNTIME DESTINATION bin\n+  INCLUDES DESTINATION include\n+)\n+\n+ament_export_include_directories(include)\n+if(TRACETOOLS_LTTNG_ENABLED)\n+  ament_export_libraries(${PROJECT_NAME} ${LTTNG_LIBRARIES})\n+  # Export -rdynamic for downstream packages using classic CMake variables\n+  if(NOT TRACETOOLS_NO_RDYNAMIC)\n+    ament_export_link_flags(\"-rdynamic\")\n+  endif()\n+else()\n+  ament_export_libraries(${PROJECT_NAME})\n+endif()\n+\n+if(BUILD_TESTING)\n+  set(ament_cmake_cppcheck_ADDITIONAL_INCLUDE_DIRS ${LTTNG_INCLUDE_DIRS})\n+  find_package(ament_lint_auto REQUIRED)\n+  ament_lint_auto_find_test_dependencies()\n+\n+  if(TRACETOOLS_STATUS_CHECKING_TOOL)\n+    # Run status tool executable as test and set pass/fail expectation appropriately\n+    add_test(test_status_tool status)\n+    if(NOT TRACETOOLS_LTTNG_ENABLED)\n+      set_tests_properties(test_status_tool PROPERTIES WILL_FAIL TRUE)\n+    endif()\n+  endif()\n+\n+endif()\n+\n+ament_package()\n+\n+target_compile_definitions(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_VERSION=\"${${PROJECT_NAME}_VERSION}\")"
+        },
+        {
+          "sha": "9e4e2db39fec97b07471a08b2b7915cd148a681d",
+          "filename": "Doxyfile",
+          "status": "added",
+          "additions": 32,
+          "deletions": 0,
+          "changes": 32,
+          "blob_url": "https://github.com/ros-acceleration/tracetools_acceleration/blob/29e8c583f94e6734c2801981fe2db5feaead3694/Doxyfile",
+          "raw_url": "https://github.com/ros-acceleration/tracetools_acceleration/raw/29e8c583f94e6734c2801981fe2db5feaead3694/Doxyfile",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/tracetools_acceleration/contents/Doxyfile?ref=29e8c583f94e6734c2801981fe2db5feaead3694",
+          "patch": "@@ -0,0 +1,32 @@\n+# All settings not listed here will use the Doxygen default values.\n+\n+PROJECT_NAME           = \"tracetools_acceleration\"\n+PROJECT_NUMBER         = master\n+PROJECT_BRIEF          = \"Tracing tools and instrumentation for hardware acceleration ROS 2\"\n+\n+INPUT                  = ./include\n+\n+RECURSIVE              = YES\n+OUTPUT_DIRECTORY       = doc_output\n+\n+EXTRACT_ALL            = YES\n+SORT_MEMBER_DOCS       = NO\n+\n+GENERATE_LATEX         = NO\n+\n+ENABLE_PREPROCESSING   = YES\n+MACRO_EXPANSION        = YES\n+EXPAND_ONLY_PREDEF     = NO\n+PREDEFINED             = \\\n+    \"TRACETOOLS_PUBLIC=\"\n+\n+EXCLUDE_SYMBOLS        = \\\n+    \"DECLARE_TRACEPOINT\" \\\n+    \"_demangle_symbol\" \\\n+    \"_get_symbol_funcptr\"\n+\n+# Tag files that do not exist will produce a warning and cross-project linking will not work.\n+TAGFILES += \"../../../../../doxygen_tag_files/cppreference-doxygen-web.tag.xml=http://en.cppreference.com/w/\"\n+# Uncomment to generate tag files for cross-project linking.\n+#   (path relative to workspace dir: doxygen_tag_files/$PACKAGE_NAME.tag)\n+#GENERATE_TAGFILE = \"../../../../../doxygen_tag_files/tracetools.tag\""
+        },
+        {
+          "sha": "f2c00f668bdbb62ebbac66d89f4ce3424ac9b903",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/ros-acceleration/tracetools_acceleration/blob/29e8c583f94e6734c2801981fe2db5feaead3694/README.md",
+          "raw_url": "https://github.com/ros-acceleration/tracetools_acceleration/raw/29e8c583f94e6734c2801981fe2db5feaead3694/README.md",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/tracetools_acceleration/contents/README.md?ref=29e8c583f94e6734c2801981fe2db5feaead3694",
+          "patch": "@@ -0,0 +1,7 @@\n+# tracetools_acceleration\n+\n+LTTng tracing provider wrapper for ROS 2 packages using hardware acceleration. `tracetools_acceleration` is a fork of [tracetools](https://gitlab.com/ros-tracing/ros2_tracing/-/tree/master/tracetools), refer to this package for the original work.\n+\n+### Quality Declaration\n+\n+No quality is claimed according to [REP-2004](https://www.ros.org/reps/rep-2004.html)."
+        },
+        {
+          "sha": "23e51415492ada34da1d47e24478eb7113333cfa",
+          "filename": "include/tracetools_acceleration/config.h.in",
+          "status": "added",
+          "additions": 21,
+          "deletions": 0,
+          "changes": 21,
+          "blob_url": "https://github.com/ros-acceleration/tracetools_acceleration/blob/29e8c583f94e6734c2801981fe2db5feaead3694/include%2Ftracetools_acceleration%2Fconfig.h.in",
+          "raw_url": "https://github.com/ros-acceleration/tracetools_acceleration/raw/29e8c583f94e6734c2801981fe2db5feaead3694/include%2Ftracetools_acceleration%2Fconfig.h.in",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/tracetools_acceleration/contents/include%2Ftracetools_acceleration%2Fconfig.h.in?ref=29e8c583f94e6734c2801981fe2db5feaead3694",
+          "patch": "@@ -0,0 +1,21 @@\n+// Copyright 2019 Robert Bosch GmbH\n+//\n+// Licensed under the Apache License, Version 2.0 (the \"License\");\n+// you may not use this file except in compliance with the License.\n+// You may obtain a copy of the License at\n+//\n+//     http://www.apache.org/licenses/LICENSE-2.0\n+//\n+// Unless required by applicable law or agreed to in writing, software\n+// distributed under the License is distributed on an \"AS IS\" BASIS,\n+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+// See the License for the specific language governing permissions and\n+// limitations under the License.\n+\n+#ifndef TRACETOOLS__CONFIG_H_\n+#define TRACETOOLS__CONFIG_H_\n+\n+#cmakedefine TRACETOOLS_DISABLED\n+#cmakedefine TRACETOOLS_LTTNG_ENABLED\n+\n+#endif  // TRACETOOLS__CONFIG_H_"
+        },
+        {
+          "sha": "88b5fb12e5b4e30300abcbb7347b9d8cd3e2a575",
+          "filename": "include/tracetools_acceleration/tp_call.h",
+          "status": "added",
+          "additions": 75,
+          "deletions": 0,
+          "changes": 75,
+          "blob_url": "https://github.com/ros-acceleration/tracetools_acceleration/blob/29e8c583f94e6734c2801981fe2db5feaead3694/include%2Ftracetools_acceleration%2Ftp_call.h",
+          "raw_url": "https://github.com/ros-acceleration/tracetools_acceleration/raw/29e8c583f94e6734c2801981fe2db5feaead3694/include%2Ftracetools_acceleration%2Ftp_call.h",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/tracetools_acceleration/contents/include%2Ftracetools_acceleration%2Ftp_call.h?ref=29e8c583f94e6734c2801981fe2db5feaead3694",
+          "patch": "@@ -0,0 +1,75 @@\n+//     ____  ____\n+//    /   /\\/   /\n+//   /___/  \\  /   Copyright (c) 2021, Xilinx®.\n+//   \\   \\   \\/    Author: Víctor Mayoral Vilches <victorma@xilinx.com>\n+//    \\   \\\n+//    /   /\n+//   /___/   /\\\n+//   \\   \\  /  \\\n+//    \\___\\/\\___\\\n+//\n+// Inspired by https://gitlab.com/ros-tracing/ros2_tracing\n+//\n+// Licensed under the Apache License, Version 2.0 (the \"License\");\n+// you may not use this file except in compliance with the License.\n+// You may obtain a copy of the License at\n+//\n+//     http://www.apache.org/licenses/LICENSE-2.0\n+//\n+// Unless required by applicable law or agreed to in writing, software\n+// distributed under the License is distributed on an \"AS IS\" BASIS,\n+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+// See the License for the specific language governing permissions and\n+// limitations under the License.\n+\n+// Provide fake header guard for cpplint\n+#undef TRACETOOLS__TP_CALL_H_\n+#ifndef TRACETOOLS__TP_CALL_H_\n+#define TRACETOOLS__TP_CALL_H_\n+\n+#undef TRACEPOINT_PROVIDER\n+#define TRACEPOINT_PROVIDER ros2_acceleration\n+\n+#undef TRACEPOINT_INCLUDE\n+#define TRACEPOINT_INCLUDE \"tracetools_acceleration/tp_call.h\"\n+\n+#if !defined(_TRACETOOLS__TP_CALL_H_) || defined(TRACEPOINT_HEADER_MULTI_READ)\n+#define _TRACETOOLS__TP_CALL_H_\n+\n+#include <lttng/tracepoint.h>\n+\n+#include <stdint.h>\n+#include <stdbool.h>\n+\n+#define DATA_SIZE 4096  // 2**12\n+\n+TRACEPOINT_EVENT(\n+  TRACEPOINT_PROVIDER,  // tracepoint provider name\n+  vadd_pre_simple,      // tracepoint name\n+  TP_ARGS(              // input arguments, see https://lttng.org/docs/v2.12/#doc-tpp-def-input-args\n+  ),\n+  TP_FIELDS(            // output event fields, see https://lttng.org/man/3/lttng-ust/v2.12/#doc-ctf-macros\n+    ctf_string(version, tracetools_acceleration_VERSION)\n+  )\n+)\n+\n+TRACEPOINT_EVENT(\n+  TRACEPOINT_PROVIDER,\n+  vadd_pre,\n+  TP_ARGS(\n+    const unsigned int *, in1_arg,\n+    const unsigned int *, in2_arg,\n+    const unsigned int *, out_arg\n+  ),\n+  TP_FIELDS(\n+    ctf_array(const unsigned int *, in1, in1_arg, DATA_SIZE)\n+    ctf_array(const unsigned int *, in2, in2_arg, DATA_SIZE)\n+    ctf_array(const unsigned int *, out, out_arg, DATA_SIZE)\n+  )\n+)\n+\n+#endif  // _TRACETOOLS__TP_CALL_H_\n+\n+#include <lttng/tracepoint-event.h>\n+\n+#endif  // TRACETOOLS__TP_CALL_H_"
+        },
+        {
+          "sha": "db1daa487a1767c1ec892575b47a37c29fdc840e",
+          "filename": "include/tracetools_acceleration/tracetools.h",
+          "status": "added",
+          "additions": 99,
+          "deletions": 0,
+          "changes": 99,
+          "blob_url": "https://github.com/ros-acceleration/tracetools_acceleration/blob/29e8c583f94e6734c2801981fe2db5feaead3694/include%2Ftracetools_acceleration%2Ftracetools.h",
+          "raw_url": "https://github.com/ros-acceleration/tracetools_acceleration/raw/29e8c583f94e6734c2801981fe2db5feaead3694/include%2Ftracetools_acceleration%2Ftracetools.h",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/tracetools_acceleration/contents/include%2Ftracetools_acceleration%2Ftracetools.h?ref=29e8c583f94e6734c2801981fe2db5feaead3694",
+          "patch": "@@ -0,0 +1,99 @@\n+//     ____  ____\n+//    /   /\\/   /\n+//   /___/  \\  /   Copyright (c) 2021, Xilinx®.\n+//   \\   \\   \\/    Author: Víctor Mayoral Vilches <victorma@xilinx.com>\n+//    \\   \\\n+//    /   /\n+//   /___/   /\\\n+//   \\   \\  /  \\\n+//    \\___\\/\\___\\\n+//\n+// Inspired by https://gitlab.com/ros-tracing/ros2_tracing\n+//\n+// Licensed under the Apache License, Version 2.0 (the \"License\");\n+// you may not use this file except in compliance with the License.\n+// You may obtain a copy of the License at\n+//\n+//     http://www.apache.org/licenses/LICENSE-2.0\n+//\n+// Unless required by applicable law or agreed to in writing, software\n+// distributed under the License is distributed on an \"AS IS\" BASIS,\n+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+// See the License for the specific language governing permissions and\n+// limitations under the License.\n+\n+/** \\mainpage tracetools: tracing tools and instrumentation for ROS 2\n+ *\n+ * `tracetools` provides utilities to instrument ROS.\n+ * It provides two main headers:\n+ *\n+ * - tracetools/tracetools.h\n+ *   - instrumentation functions\n+ * - tracetools/utils.hpp\n+ *   - utility functions\n+ */\n+\n+#ifndef TRACETOOLS__TRACETOOLS_H_\n+#define TRACETOOLS__TRACETOOLS_H_\n+\n+#include <stdint.h>\n+#include <string.h>\n+#include <stdbool.h>\n+#include \"tracetools_acceleration/config.h\"\n+#include \"tracetools_acceleration/visibility_control.hpp\"\n+\n+#ifndef TRACETOOLS_DISABLED\n+/// Call a tracepoint.\n+/**\n+ * This is the preferred method over calling the actual function directly.\n+ */\n+#  define TRACEPOINT(event_name, ...) \\\n+  (ros_trace_ ## event_name)(__VA_ARGS__)\n+#  define DECLARE_TRACEPOINT(event_name, ...) \\\n+  TRACETOOLS_PUBLIC void ros_trace_ ## event_name(__VA_ARGS__);\n+#else\n+#  define TRACEPOINT(event_name, ...) ((void) (0))\n+#  define DECLARE_TRACEPOINT(event_name, ...)\n+#endif\n+\n+#ifdef __cplusplus\n+extern \"C\"\n+{\n+#endif\n+\n+/// Get tracing compilation status.\n+/**\n+ * \\return `true` if tracing is enabled, `false` otherwise\n+ */\n+TRACETOOLS_PUBLIC bool ros_trace_compile_status();\n+\n+/// `vadd_pre_simple`\n+/**\n+ * Initialisation for the whole process.\n+ * Notes the `tracetools` version automatically.\n+ */\n+DECLARE_TRACEPOINT(\n+  vadd_pre_simple)\n+\n+/// `vadd_pre`\n+/**\n+ * Node initialisation.\n+ * Links a `rcl_node_t` handle to its `rmw_node_t` handle.\n+ *\n+ * \\param[in] node_handle pointer to the node's `rcl_node_t` handle\n+ * \\param[in] rmw_handle pointer to the node's `rmw_node_t` handle\n+ * \\param[in] node_name node name\n+ * \\param[in] node_namespace node namespace\n+ */\n+DECLARE_TRACEPOINT(\n+  vadd_pre,\n+  const unsigned int * in1,\n+  const unsigned int * in2,\n+  const unsigned int * out)\n+\n+\n+#ifdef __cplusplus\n+}\n+#endif\n+\n+#endif  // TRACETOOLS__TRACETOOLS_H_"
+        },
+        {
+          "sha": "c52499ef6c3f632579c19135ba302622242d6f86",
+          "filename": "include/tracetools_acceleration/utils.hpp",
+          "status": "added",
+          "additions": 65,
+          "deletions": 0,
+          "changes": 65,
+          "blob_url": "https://github.com/ros-acceleration/tracetools_acceleration/blob/29e8c583f94e6734c2801981fe2db5feaead3694/include%2Ftracetools_acceleration%2Futils.hpp",
+          "raw_url": "https://github.com/ros-acceleration/tracetools_acceleration/raw/29e8c583f94e6734c2801981fe2db5feaead3694/include%2Ftracetools_acceleration%2Futils.hpp",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/tracetools_acceleration/contents/include%2Ftracetools_acceleration%2Futils.hpp?ref=29e8c583f94e6734c2801981fe2db5feaead3694",
+          "patch": "@@ -0,0 +1,65 @@\n+// Copyright 2019 Robert Bosch GmbH\n+//\n+// Licensed under the Apache License, Version 2.0 (the \"License\");\n+// you may not use this file except in compliance with the License.\n+// You may obtain a copy of the License at\n+//\n+//     http://www.apache.org/licenses/LICENSE-2.0\n+//\n+// Unless required by applicable law or agreed to in writing, software\n+// distributed under the License is distributed on an \"AS IS\" BASIS,\n+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+// See the License for the specific language governing permissions and\n+// limitations under the License.\n+\n+#ifndef TRACETOOLS__UTILS_HPP_\n+#define TRACETOOLS__UTILS_HPP_\n+\n+#include <stddef.h>\n+#include <functional>\n+\n+#include \"tracetools_acceleration/visibility_control.hpp\"\n+\n+/// Default symbol, used when address resolution fails.\n+#define SYMBOL_UNKNOWN \"UNKNOWN\"\n+\n+TRACETOOLS_PUBLIC const char * _demangle_symbol(const char * mangled);\n+\n+TRACETOOLS_PUBLIC const char * _get_symbol_funcptr(void * funcptr);\n+\n+/// Get symbol from an std::function object.\n+/**\n+ * If function address resolution or symbol demangling fails,\n+ * this will return a string that starts with \\ref SYMBOL_UNKNOWN.\n+ *\n+ * \\param[in] f the std::function object\n+ * \\return the symbol, or a placeholder\n+ */\n+template<typename T, typename ... U>\n+const char * get_symbol(std::function<T(U...)> f)\n+{\n+  typedef T (fnType)(U...);\n+  fnType ** fnPointer = f.template target<fnType *>();\n+  // If we get an actual address\n+  if (fnPointer != nullptr) {\n+    void * funcptr = reinterpret_cast<void *>(*fnPointer);\n+    return _get_symbol_funcptr(funcptr);\n+  }\n+  // Otherwise we have to go through target_type()\n+  return _demangle_symbol(f.target_type().name());\n+}\n+\n+/// Get symbol from a function-related object.\n+/**\n+ * Fallback meant for lambdas with captures.\n+ *\n+ * \\param[in] l a generic object\n+ * \\return the symbol\n+ */\n+template<typename L>\n+const char * get_symbol(L && l)\n+{\n+  return _demangle_symbol(typeid(l).name());\n+}\n+\n+#endif  // TRACETOOLS__UTILS_HPP_"
+        },
+        {
+          "sha": "63a5a588623be07201500aca3a1c7e60458e0495",
+          "filename": "include/tracetools_acceleration/visibility_control.hpp",
+          "status": "added",
+          "additions": 56,
+          "deletions": 0,
+          "changes": 56,
+          "blob_url": "https://github.com/ros-acceleration/tracetools_acceleration/blob/29e8c583f94e6734c2801981fe2db5feaead3694/include%2Ftracetools_acceleration%2Fvisibility_control.hpp",
+          "raw_url": "https://github.com/ros-acceleration/tracetools_acceleration/raw/29e8c583f94e6734c2801981fe2db5feaead3694/include%2Ftracetools_acceleration%2Fvisibility_control.hpp",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/tracetools_acceleration/contents/include%2Ftracetools_acceleration%2Fvisibility_control.hpp?ref=29e8c583f94e6734c2801981fe2db5feaead3694",
+          "patch": "@@ -0,0 +1,56 @@\n+// Copyright 2015 Open Source Robotics Foundation, Inc.\n+//\n+// Licensed under the Apache License, Version 2.0 (the \"License\");\n+// you may not use this file except in compliance with the License.\n+// You may obtain a copy of the License at\n+//\n+//     http://www.apache.org/licenses/LICENSE-2.0\n+//\n+// Unless required by applicable law or agreed to in writing, software\n+// distributed under the License is distributed on an \"AS IS\" BASIS,\n+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+// See the License for the specific language governing permissions and\n+// limitations under the License.\n+\n+/* This header must be included by all TRACETOOLS headers which declare symbols\n+ * which are defined in the TRACETOOLS library. When not building the TRACETOOLS\n+ * library, i.e. when using the headers in other package's code, the contents\n+ * of this header change the visibility of certain symbols which the TRACETOOLS\n+ * library cannot have, but the consuming code must have inorder to link.\n+ */\n+\n+#ifndef TRACETOOLS__VISIBILITY_CONTROL_HPP_\n+#define TRACETOOLS__VISIBILITY_CONTROL_HPP_\n+\n+// This logic was borrowed (then namespaced) from the examples on the gcc wiki:\n+//     https://gcc.gnu.org/wiki/Visibility\n+\n+#if defined _WIN32 || defined __CYGWIN__\n+  #ifdef __GNUC__\n+    #define TRACETOOLS_EXPORT __attribute__ ((dllexport))\n+    #define TRACETOOLS_IMPORT __attribute__ ((dllimport))\n+  #else\n+    #define TRACETOOLS_EXPORT __declspec(dllexport)\n+    #define TRACETOOLS_IMPORT __declspec(dllimport)\n+  #endif\n+  #ifdef TRACETOOLS_BUILDING_DLL\n+    #define TRACETOOLS_PUBLIC TRACETOOLS_EXPORT\n+  #else\n+    #define TRACETOOLS_PUBLIC TRACETOOLS_IMPORT\n+  #endif\n+  #define TRACETOOLS_PUBLIC_TYPE TRACETOOLS_PUBLIC\n+  #define TRACETOOLS_LOCAL\n+#else\n+  #define TRACETOOLS_EXPORT __attribute__ ((visibility(\"default\")))\n+  #define TRACETOOLS_IMPORT\n+  #if __GNUC__ >= 4\n+    #define TRACETOOLS_PUBLIC __attribute__ ((visibility(\"default\")))\n+    #define TRACETOOLS_LOCAL  __attribute__ ((visibility(\"hidden\")))\n+  #else\n+    #define TRACETOOLS_PUBLIC\n+    #define TRACETOOLS_LOCAL\n+  #endif\n+  #define TRACETOOLS_PUBLIC_TYPE\n+#endif\n+\n+#endif  // TRACETOOLS__VISIBILITY_CONTROL_HPP_"
+        },
+        {
+          "sha": "bcb8014af1295ef1848e61c9c32e0b0a47e8d85a",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/ros-acceleration/tracetools_acceleration/blob/29e8c583f94e6734c2801981fe2db5feaead3694/package.xml",
+          "raw_url": "https://github.com/ros-acceleration/tracetools_acceleration/raw/29e8c583f94e6734c2801981fe2db5feaead3694/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/tracetools_acceleration/contents/package.xml?ref=29e8c583f94e6734c2801981fe2db5feaead3694",
+          "patch": "@@ -0,0 +1,23 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"2\">\n+  <name>tracetools_acceleration</name>\n+  <version>0.1.0</version>\n+  <description>\n+    LTTng tracing provider wrapper for ROS 2 packages using hardware acceleration.\n+    Fork of tracetools to trace hardware acceleration in ROS 2.\n+  </description>\n+  <maintainer email=\"victorma@xilinx.com\">Víctor Mayoral-Vilches</maintainer>\n+  <license>Apache 2.0</license>\n+  <author email=\"victorma@xilinx.com\">Víctor Mayoral-Vilches</author>\n+\n+  <buildtool_depend>ament_cmake_ros</buildtool_depend>\n+  <buildtool_depend>pkg-config</buildtool_depend>\n+\n+  <test_depend>ament_lint_auto</test_depend>\n+  <test_depend>ament_lint_common</test_depend>\n+\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n+</package>"
+        },
+        {
+          "sha": "951c36bbcaa433df29e6de2c783ac3b6a12fcebf",
+          "filename": "src/status.c",
+          "status": "added",
+          "additions": 33,
+          "deletions": 0,
+          "changes": 33,
+          "blob_url": "https://github.com/ros-acceleration/tracetools_acceleration/blob/29e8c583f94e6734c2801981fe2db5feaead3694/src%2Fstatus.c",
+          "raw_url": "https://github.com/ros-acceleration/tracetools_acceleration/raw/29e8c583f94e6734c2801981fe2db5feaead3694/src%2Fstatus.c",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/tracetools_acceleration/contents/src%2Fstatus.c?ref=29e8c583f94e6734c2801981fe2db5feaead3694",
+          "patch": "@@ -0,0 +1,33 @@\n+// Copyright 2019 Robert Bosch GmbH\n+//\n+// Licensed under the Apache License, Version 2.0 (the \"License\");\n+// you may not use this file except in compliance with the License.\n+// You may obtain a copy of the License at\n+//\n+//     http://www.apache.org/licenses/LICENSE-2.0\n+//\n+// Unless required by applicable law or agreed to in writing, software\n+// distributed under the License is distributed on an \"AS IS\" BASIS,\n+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+// See the License for the specific language governing permissions and\n+// limitations under the License.\n+\n+#include <stdio.h>\n+#include \"tracetools_acceleration/tracetools.h\"\n+\n+int main()\n+{\n+#ifndef TRACETOOLS_DISABLED\n+  printf(\"Tracing \");\n+  if (ros_trace_compile_status()) {\n+    printf(\"enabled\\n\");\n+    return 0;\n+  } else {\n+    printf(\"disabled\\n\");\n+    return 1;\n+  }\n+#else\n+  printf(\"Tracing disabled through configuration\\n\");\n+  return 1;\n+#endif\n+}"
+        },
+        {
+          "sha": "cb447d3cc9175f332827452e2451f77351b9ed02",
+          "filename": "src/tp_call.c",
+          "status": "added",
+          "additions": 18,
+          "deletions": 0,
+          "changes": 18,
+          "blob_url": "https://github.com/ros-acceleration/tracetools_acceleration/blob/29e8c583f94e6734c2801981fe2db5feaead3694/src%2Ftp_call.c",
+          "raw_url": "https://github.com/ros-acceleration/tracetools_acceleration/raw/29e8c583f94e6734c2801981fe2db5feaead3694/src%2Ftp_call.c",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/tracetools_acceleration/contents/src%2Ftp_call.c?ref=29e8c583f94e6734c2801981fe2db5feaead3694",
+          "patch": "@@ -0,0 +1,18 @@\n+// Copyright 2019 Robert Bosch GmbH\n+//\n+// Licensed under the Apache License, Version 2.0 (the \"License\");\n+// you may not use this file except in compliance with the License.\n+// You may obtain a copy of the License at\n+//\n+//     http://www.apache.org/licenses/LICENSE-2.0\n+//\n+// Unless required by applicable law or agreed to in writing, software\n+// distributed under the License is distributed on an \"AS IS\" BASIS,\n+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+// See the License for the specific language governing permissions and\n+// limitations under the License.\n+\n+#define TRACEPOINT_CREATE_PROBES\n+\n+#define TRACEPOINT_DEFINE\n+#include \"tracetools_acceleration/tp_call.h\""
+        },
+        {
+          "sha": "527c54e18ec95828faf985cba6997343e15f98d7",
+          "filename": "src/tracetools.c",
+          "status": "added",
+          "additions": 80,
+          "deletions": 0,
+          "changes": 80,
+          "blob_url": "https://github.com/ros-acceleration/tracetools_acceleration/blob/29e8c583f94e6734c2801981fe2db5feaead3694/src%2Ftracetools.c",
+          "raw_url": "https://github.com/ros-acceleration/tracetools_acceleration/raw/29e8c583f94e6734c2801981fe2db5feaead3694/src%2Ftracetools.c",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/tracetools_acceleration/contents/src%2Ftracetools.c?ref=29e8c583f94e6734c2801981fe2db5feaead3694",
+          "patch": "@@ -0,0 +1,80 @@\n+//     ____  ____\n+//    /   /\\/   /\n+//   /___/  \\  /   Copyright (c) 2021, Xilinx®.\n+//   \\   \\   \\/    Author: Víctor Mayoral Vilches <victorma@xilinx.com>\n+//    \\   \\\n+//    /   /\n+//   /___/   /\\\n+//   \\   \\  /  \\\n+//    \\___\\/\\___\\\n+//\n+// Inspired by https://gitlab.com/ros-tracing/ros2_tracing\n+//\n+// Licensed under the Apache License, Version 2.0 (the \"License\");\n+// you may not use this file except in compliance with the License.\n+// You may obtain a copy of the License at\n+//\n+//     http://www.apache.org/licenses/LICENSE-2.0\n+//\n+// Unless required by applicable law or agreed to in writing, software\n+// distributed under the License is distributed on an \"AS IS\" BASIS,\n+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+// See the License for the specific language governing permissions and\n+// limitations under the License.\n+\n+#include \"tracetools_acceleration/tracetools.h\"\n+\n+#ifndef TRACETOOLS_DISABLED\n+\n+#ifdef TRACETOOLS_LTTNG_ENABLED\n+# include \"tracetools_acceleration/tp_call.h\"\n+# define CONDITIONAL_TP(...) \\\n+  tracepoint(TRACEPOINT_PROVIDER, __VA_ARGS__)\n+#else\n+# define CONDITIONAL_TP(...)\n+#endif\n+\n+bool ros_trace_compile_status()\n+{\n+#ifdef TRACETOOLS_LTTNG_ENABLED\n+  return true;\n+#else\n+  return false;\n+#endif\n+}\n+\n+#ifndef _WIN32\n+# pragma GCC diagnostic push\n+# pragma GCC diagnostic ignored \"-Wunused-parameter\"\n+#else\n+# pragma warning(push)\n+# pragma warning(disable: 4100)\n+#endif\n+\n+void TRACEPOINT(\n+  vadd_pre_simple)\n+{\n+  CONDITIONAL_TP(\n+    vadd_pre_simple);\n+}\n+\n+void TRACEPOINT(\n+  vadd_pre,\n+  const unsigned int * in1,\n+  const unsigned int * in2,\n+  const unsigned int * out)\n+{\n+  CONDITIONAL_TP(\n+    vadd_pre,\n+    in1,\n+    in2,\n+    out);\n+}\n+\n+#ifndef _WIN32\n+# pragma GCC diagnostic pop\n+#else\n+# pragma warning(pop)\n+#endif\n+\n+#endif  // TRACETOOLS_DISABLED"
+        },
+        {
+          "sha": "070272621c2884e76ba82975d1fd8faa5f81a5e9",
+          "filename": "src/utils.cpp",
+          "status": "added",
+          "additions": 50,
+          "deletions": 0,
+          "changes": 50,
+          "blob_url": "https://github.com/ros-acceleration/tracetools_acceleration/blob/29e8c583f94e6734c2801981fe2db5feaead3694/src%2Futils.cpp",
+          "raw_url": "https://github.com/ros-acceleration/tracetools_acceleration/raw/29e8c583f94e6734c2801981fe2db5feaead3694/src%2Futils.cpp",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/tracetools_acceleration/contents/src%2Futils.cpp?ref=29e8c583f94e6734c2801981fe2db5feaead3694",
+          "patch": "@@ -0,0 +1,50 @@\n+// Copyright 2019 Robert Bosch GmbH\n+//\n+// Licensed under the Apache License, Version 2.0 (the \"License\");\n+// you may not use this file except in compliance with the License.\n+// You may obtain a copy of the License at\n+//\n+//     http://www.apache.org/licenses/LICENSE-2.0\n+//\n+// Unless required by applicable law or agreed to in writing, software\n+// distributed under the License is distributed on an \"AS IS\" BASIS,\n+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+// See the License for the specific language governing permissions and\n+// limitations under the License.\n+\n+#include \"tracetools_acceleration/config.h\"\n+\n+#ifdef TRACETOOLS_LTTNG_ENABLED\n+#include <dlfcn.h>\n+#include <cxxabi.h>\n+#endif\n+#include \"tracetools_acceleration/utils.hpp\"\n+\n+const char * _demangle_symbol(const char * mangled)\n+{\n+#ifdef TRACETOOLS_LTTNG_ENABLED\n+  char * demangled = nullptr;\n+  int status;\n+  demangled = abi::__cxa_demangle(mangled, NULL, 0, &status);\n+  // Use demangled symbol if possible\n+  const char * demangled_val = (status == 0 ? demangled : mangled);\n+  return demangled_val != 0 ? demangled_val : \"UNKNOWN_demangling_failed\";\n+#else\n+  (void)mangled;\n+  return \"DISABLED__demangle_symbol\";\n+#endif\n+}\n+\n+const char * _get_symbol_funcptr(void * funcptr)\n+{\n+#ifdef TRACETOOLS_LTTNG_ENABLED\n+  Dl_info info;\n+  if (dladdr(funcptr, &info) == 0) {\n+    return SYMBOL_UNKNOWN;\n+  }\n+  return _demangle_symbol(info.dli_sname);\n+#else\n+  (void)funcptr;\n+  return \"DISABLED__get_symbol_funcptr\";\n+#endif\n+}"
+        }
+      ]
+    },
+    {
+      "author": "methylDragon",
+      "date": "2022-03-29T19:39:35Z",
+      "sha": "df1432825f09515e56ea1fc2ee2ae8cf4fcfe879",
+      "message": "Implement method namespacing",
+      "files_changed": 2,
+      "additions": 23,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "6cded306237a6dd67e539fbfe2cdc704896b6b64",
+          "filename": "include/tracetools_acceleration/utils.hpp",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 3,
+          "changes": 16,
+          "blob_url": "https://github.com/ros-acceleration/tracetools_acceleration/blob/df1432825f09515e56ea1fc2ee2ae8cf4fcfe879/include%2Ftracetools_acceleration%2Futils.hpp",
+          "raw_url": "https://github.com/ros-acceleration/tracetools_acceleration/raw/df1432825f09515e56ea1fc2ee2ae8cf4fcfe879/include%2Ftracetools_acceleration%2Futils.hpp",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/tracetools_acceleration/contents/include%2Ftracetools_acceleration%2Futils.hpp?ref=df1432825f09515e56ea1fc2ee2ae8cf4fcfe879",
+          "patch": "@@ -24,10 +24,18 @@\n /// Default symbol, used when address resolution fails.\n #define SYMBOL_UNKNOWN \"UNKNOWN\"\n \n+namespace tracetools_acceleration\n+{\n+\n+namespace detail\n+{\n+\n TRACETOOLS_PUBLIC const char * _demangle_symbol(const char * mangled);\n \n TRACETOOLS_PUBLIC const char * _get_symbol_funcptr(void * funcptr);\n \n+}  // namespace detail\n+\n /// Get symbol from an std::function object.\n /**\n  * If function address resolution or symbol demangling fails,\n@@ -44,10 +52,10 @@ const char * get_symbol(std::function<T(U...)> f)\n   // If we get an actual address\n   if (fnPointer != nullptr) {\n     void * funcptr = reinterpret_cast<void *>(*fnPointer);\n-    return _get_symbol_funcptr(funcptr);\n+    return detail::_get_symbol_funcptr(funcptr);\n   }\n   // Otherwise we have to go through target_type()\n-  return _demangle_symbol(f.target_type().name());\n+  return detail::_demangle_symbol(f.target_type().name());\n }\n \n /// Get symbol from a function-related object.\n@@ -60,7 +68,9 @@ const char * get_symbol(std::function<T(U...)> f)\n template<typename L>\n const char * get_symbol(L && l)\n {\n-  return _demangle_symbol(typeid(l).name());\n+  return detail::_demangle_symbol(typeid(l).name());\n }\n \n+}  // namespace tracetools_acceleration\n+\n #endif  // TRACETOOLS_ACCELERATION__UTILS_HPP_"
+        },
+        {
+          "sha": "566f21bf7837a152dace0fca068793b0f599e58f",
+          "filename": "src/utils.cpp",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 0,
+          "changes": 10,
+          "blob_url": "https://github.com/ros-acceleration/tracetools_acceleration/blob/df1432825f09515e56ea1fc2ee2ae8cf4fcfe879/src%2Futils.cpp",
+          "raw_url": "https://github.com/ros-acceleration/tracetools_acceleration/raw/df1432825f09515e56ea1fc2ee2ae8cf4fcfe879/src%2Futils.cpp",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/tracetools_acceleration/contents/src%2Futils.cpp?ref=df1432825f09515e56ea1fc2ee2ae8cf4fcfe879",
+          "patch": "@@ -21,6 +21,12 @@\n #endif\n #include \"tracetools_acceleration/utils.hpp\"\n \n+namespace tracetools_acceleration\n+{\n+\n+namespace detail\n+{\n+\n const char * _demangle_symbol(const char * mangled)\n {\n #ifdef TRACETOOLS_LTTNG_ENABLED\n@@ -49,3 +55,7 @@ const char * _get_symbol_funcptr(void * funcptr)\n   return \"DISABLED__get_symbol_funcptr\";\n #endif\n }\n+\n+}  // namespace detail\n+\n+}  // namespace tracetools_acceleration"
+        }
+      ]
+    }
+  ]
+}

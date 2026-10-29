@@ -1,0 +1,131 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T04:37:11Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ros-acceleration",
+    "repo": "ament_vitis"
+  },
+  "data": [
+    {
+      "author": "vmayoral",
+      "date": "2021-02-19T17:25:00Z",
+      "sha": "2149b59477e28b1bb4680fcd63d672badf5860c7",
+      "message": "Initial commit\n\n- Add first iteration on macros, support both Xilinx tools\nas well as custom ROS packages.\n- Macros work for all build targets\n- Variables shield env. variables abstracting them to have\na coherent environment for Vitis v++.\n\nSigned-off-by: Víctor Mayoral Vilches <v.mayoralv@gmail.com>",
+      "files_changed": 9,
+      "additions": 393,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "f17454b9ee0293b440ad0057d6e53215d75ab018",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 14,
+          "deletions": 0,
+          "changes": 14,
+          "blob_url": "https://github.com/ros-acceleration/ament_vitis/blob/2149b59477e28b1bb4680fcd63d672badf5860c7/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-acceleration/ament_vitis/raw/2149b59477e28b1bb4680fcd63d672badf5860c7/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/ament_vitis/contents/CMakeLists.txt?ref=2149b59477e28b1bb4680fcd63d672badf5860c7",
+          "patch": "@@ -0,0 +1,14 @@\n+cmake_minimum_required(VERSION 3.5)\n+\n+project(ament_vitis NONE)\n+\n+find_package(ament_cmake_core REQUIRED)\n+\n+ament_package(\n+  CONFIG_EXTRAS \"ament_vitis-extras.cmake\"\n+)\n+\n+install(\n+  DIRECTORY cmake\n+  DESTINATION share/${PROJECT_NAME}\n+)"
+        },
+        {
+          "sha": "ec3b793c654ddba57f4392a304cd7a1e1337c11d",
+          "filename": "ament_vitis-extras.cmake",
+          "status": "added",
+          "additions": 25,
+          "deletions": 0,
+          "changes": 25,
+          "blob_url": "https://github.com/ros-acceleration/ament_vitis/blob/2149b59477e28b1bb4680fcd63d672badf5860c7/ament_vitis-extras.cmake",
+          "raw_url": "https://github.com/ros-acceleration/ament_vitis/raw/2149b59477e28b1bb4680fcd63d672badf5860c7/ament_vitis-extras.cmake",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/ament_vitis/contents/ament_vitis-extras.cmake?ref=2149b59477e28b1bb4680fcd63d672badf5860c7",
+          "patch": "@@ -0,0 +1,25 @@\n+#    ____  ____\n+#   /   /\\/   /\n+#  /___/  \\  /   Copyright (c) 2021, Xilinx®.\n+#  \\   \\   \\/    Author: Víctor Mayoral Vilches <v.mayoralv@gmail.com>\n+#   \\   \\\n+#   /   /\n+#  /___/   /\\\n+#  \\   \\  /  \\\n+#   \\___\\/\\___\\\n+#\n+# include vitis extras\n+\n+find_package(ament_cmake_core QUIET REQUIRED)\n+\n+# various functions / macros\n+foreach(filename\n+  \"vitis_acceleration_kernel\"\n+  \"vpp_path\"\n+  \"vitis_path\"\n+  \"vivado_path\"\n+  \"hls_path\"\n+  \"platform_repo_paths\"\n+)\n+  include(${ament_vitis_DIR}/${filename}.cmake)\n+endforeach()"
+        },
+        {
+          "sha": "8521fbb8a2fd9d751bd2f1e8086d91ed41e227fb",
+          "filename": "cmake/hls_path.cmake",
+          "status": "added",
+          "additions": 18,
+          "deletions": 0,
+          "changes": 18,
+          "blob_url": "https://github.com/ros-acceleration/ament_vitis/blob/2149b59477e28b1bb4680fcd63d672badf5860c7/cmake%2Fhls_path.cmake",
+          "raw_url": "https://github.com/ros-acceleration/ament_vitis/raw/2149b59477e28b1bb4680fcd63d672badf5860c7/cmake%2Fhls_path.cmake",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/ament_vitis/contents/cmake%2Fhls_path.cmake?ref=2149b59477e28b1bb4680fcd63d672badf5860c7",
+          "patch": "@@ -0,0 +1,18 @@\n+#    ____  ____\n+#   /   /\\/   /\n+#  /___/  \\  /   Copyright (c) 2021, Xilinx®.\n+#  \\   \\   \\/    Author: Víctor Mayoral Vilches <v.mayoralv@gmail.com>\n+#   \\   \\\n+#   /   /\n+#  /___/   /\\\n+#  \\   \\  /  \\\n+#   \\___\\/\\___\\\n+#\n+# defines the path to the Vitis HLS directory\n+\n+if(DEFINED ENV{XILINX_HLS})\n+  set(XILINX_HLS $ENV{XILINX_HLS})\n+else()\n+  message(\"Deprecated. XILINX_HLS not defined, defaulting to 'xilinx' directory.\")\n+  set(XILINX_HLS ${CMAKE_INSTALL_PREFIX}/../xilinx/hls)  # <ws>/xilinx/hls\n+endif()"
+        },
+        {
+          "sha": "ec3756882f50dc2de8fd0d018e98f4190d2edaca",
+          "filename": "cmake/platform_repo_paths.cmake",
+          "status": "added",
+          "additions": 18,
+          "deletions": 0,
+          "changes": 18,
+          "blob_url": "https://github.com/ros-acceleration/ament_vitis/blob/2149b59477e28b1bb4680fcd63d672badf5860c7/cmake%2Fplatform_repo_paths.cmake",
+          "raw_url": "https://github.com/ros-acceleration/ament_vitis/raw/2149b59477e28b1bb4680fcd63d672badf5860c7/cmake%2Fplatform_repo_paths.cmake",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/ament_vitis/contents/cmake%2Fplatform_repo_paths.cmake?ref=2149b59477e28b1bb4680fcd63d672badf5860c7",
+          "patch": "@@ -0,0 +1,18 @@\n+#    ____  ____\n+#   /   /\\/   /\n+#  /___/  \\  /   Copyright (c) 2021, Xilinx®.\n+#  \\   \\   \\/    Author: Víctor Mayoral Vilches <v.mayoralv@gmail.com>\n+#   \\   \\\n+#   /   /\n+#  /___/   /\\\n+#  \\   \\  /  \\\n+#   \\___\\/\\___\\\n+#\n+# defines the path to the Vitis HLS directory\n+\n+if(DEFINED ENV{PLATFORM_REPO_PATHS})\n+  set(PLATFORM_REPO_PATHS $ENV{PLATFORM_REPO_PATHS})\n+else()\n+  set(PLATFORM_REPO_PATHS ${CMAKE_INSTALL_PREFIX}/../xilinx/firmware/platform)\n+      # <ws>/xilinx/firmware/platform\n+endif()"
+        },
+        {
+          "sha": "af83eb219590173915694da9ca32bac307f06289",
+          "filename": "cmake/vitis_acceleration_kernel.cmake",
+          "status": "added",
+          "additions": 246,
+          "deletions": 0,
+          "changes": 246,
+          "blob_url": "https://github.com/ros-acceleration/ament_vitis/blob/2149b59477e28b1bb4680fcd63d672badf5860c7/cmake%2Fvitis_acceleration_kernel.cmake",
+          "raw_url": "https://github.com/ros-acceleration/ament_vitis/raw/2149b59477e28b1bb4680fcd63d672badf5860c7/cmake%2Fvitis_acceleration_kernel.cmake",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/ament_vitis/contents/cmake%2Fvitis_acceleration_kernel.cmake?ref=2149b59477e28b1bb4680fcd63d672badf5860c7",
+          "patch": "@@ -0,0 +1,246 @@\n+#    ____  ____\n+#   /   /\\/   /\n+#  /___/  \\  /   Copyright (c) 2021, Xilinx®.\n+#  \\   \\   \\/    Author: Víctor Mayoral Vilches <v.mayoralv@gmail.com>\n+#   \\   \\\n+#   /   /\n+#  /___/   /\\\n+#  \\   \\  /  \\\n+#   \\___\\/\\___\\\n+#\n+# base macros and functions to create acceleration kernels\n+\n+#\n+# Build acceleration kernels main macro\n+#\n+# .. note:: call sub-macros or sub-functions to build, link and/or\n+# package, as appropriate.\n+#\n+# .. note:: kernels will be generated with their corresponding \".xclbin\"\n+# format. A signature of the build type will be appended at the end except\n+# for the \"hardware\" build type which includes no signature.\n+# E.g. \"vadd.xclbin.hw_emu\" or \"vadd.xclbin\".\n+#\n+# :param NAME: Name of the kernel to compile and link\n+# :type target: string\n+#\n+# :param FILE: CMAKE_SOURCE_DIR relative path to source code of the kernel\n+# :type target: string\n+#\n+# :param CONFIG: CMAKE_SOURCE_DIR relative path to configuration file\n+# for the kernel e.g. src/zcu102.cfg.\n+# :type target: string\n+#\n+# :param TYPE: type of kernel to generate, could be \"sw_emu\",\n+# \"hw_emu\" or \"hardware\" (or several of them)\n+# :type target: string\n+#\n+# :param INCLUDE: one or muliple relative path directories whereto search for\n+# header files. This option is passed to the OpenCL preprocessor. Directories\n+# are relative to CMAKE_SOURCE_DIR.\n+# :type target: string\n+#\n+# :param PACKAGE: Invoke the -p (package) flag of v++ to generate\n+# the corresponding artifacts for emulation.\n+# :type target: bool\n+#\n+macro(vitis_acceleration_kernel)\n+    set(options PACKAGE)\n+    set(oneValueArgs NAME FILE CONFIG)\n+    set(multiValueArgs TYPE INCLUDE)\n+\n+    cmake_parse_arguments(VITIS_KERNEL \"${options}\" \"${oneValueArgs}\"\n+                          \"${multiValueArgs}\" ${ARGN} )\n+\n+    # debug()\n+\n+    foreach(type ${VITIS_KERNEL_TYPE})\n+      if (${type} STREQUAL \"sw_emu\")\n+        vitis_acceleration_kernel_aux(\n+          NAME ${VITIS_KERNEL_NAME}\n+          FILE ${VITIS_KERNEL_FILE}\n+          TYPE \"sw_emu\"\n+          CONFIG ${VITIS_KERNEL_CONFIG}\n+          INCLUDE ${VITIS_KERNEL_INCLUDE}\n+          PACKAGE ${VITIS_KERNEL_PACKAGE}\n+        )\n+      elseif (${type} STREQUAL \"hw_emu\")\n+        vitis_acceleration_kernel_aux(\n+          NAME ${VITIS_KERNEL_NAME}\n+          FILE ${VITIS_KERNEL_FILE}\n+          TYPE \"hw_emu\"\n+          CONFIG ${VITIS_KERNEL_CONFIG}\n+          INCLUDE ${VITIS_KERNEL_INCLUDE}\n+          PACKAGE ${VITIS_KERNEL_PACKAGE}\n+        )\n+      elseif (${type} STREQUAL \"hw\")\n+        vitis_acceleration_kernel_aux(\n+          NAME ${VITIS_KERNEL_NAME}\n+          FILE ${VITIS_KERNEL_FILE}\n+          TYPE \"hw\"\n+          CONFIG ${VITIS_KERNEL_CONFIG}\n+          INCLUDE ${VITIS_KERNEL_INCLUDE}\n+          PACKAGE ${VITIS_KERNEL_PACKAGE}\n+        )\n+      else()\n+        message(\n+          FATAL_ERROR \"'\" ${type} \"' is not a recognized build target \\\n+          for acceleration kernels. Consider 'sw_emu', 'hw_emu' or 'hardware'.\"\n+        )\n+      endif()\n+    endforeach()\n+\n+endmacro()  # vitis_acceleration_kernel\n+\n+\n+\n+#\n+# Build, link (and package) acceleration kernels for the different targets.\n+# Auxiliary macro.\n+#\n+# :param VITIS_KERNEL_AUX_FILE: CMAKE_SOURCE_DIR relative path to source code of\n+# the kernel\n+# :type target: string\n+#\n+# :param VITIS_KERNEL_AUX_CONFIG: CMAKE_SOURCE_DIR relative path to configuration\n+# file for the kernel e.g. src/zcu102.cfg.\n+# :type target: string\n+#\n+# :param VITIS_KERNEL_AUX_INCLUDE: one or muliple relative path directories whereto\n+# search for header files. This option is passed to the OpenCL preprocessor.\n+# Directories are relative to CMAKE_SOURCE_DIR.\n+# :type target: string\n+#\n+# :param VITIS_KERNEL_AUX_PACKAGE: Invoke the -p (package) flag of v++ to generate\n+# the corresponding artifacts for emulation.\n+# :type target: bool\n+#\n+macro(vitis_acceleration_kernel_aux)\n+  # arguments\n+  set(options PACKAGE)\n+  set(oneValueArgs NAME FILE CONFIG TYPE)\n+  set(multiValueArgs INCLUDE)\n+  cmake_parse_arguments(VITIS_KERNEL_AUX \"${options}\" \"${oneValueArgs}\"\n+                        \"${multiValueArgs}\" ${ARGN} )\n+\n+  message(STATUS \"vitis_acceleration_kernel_swemu\")\n+\n+  # variables for the compilation process\n+  set(ENV{PLATFORM_REPO_PATHS} ${PLATFORM_REPO_PATHS})\n+  set(ENV{XILINX_VIVADO} ${XILINX_VIVADO})\n+  set(ENV{XILINX_VITIS} ${XILINX_VITIS})\n+  set(ENV{XILINX_HLS} ${XILINX_HLS})\n+  # set(ENV{PATH} \"$ENV{PATH}:${XILINX_HLS}/bin\")\n+\n+  # compile\n+  set(CMD \"${VPP_PATH} -c -t ${VITIS_KERNEL_AUX_TYPE} --config \" ${CMAKE_SOURCE_DIR} \"/\"\n+    ${VITIS_KERNEL_AUX_CONFIG} \" -k \" ${VITIS_KERNEL_AUX_NAME}\n+  )\n+  set(INCLUDE_DIRS \"\")\n+  foreach(include_item ${VITIS_KERNEL_AUX_INCLUDE})\n+    list(APPEND INCLUDE_DIRS \"-I${CMAKE_SOURCE_DIR}/${include_item}\")\n+  endforeach()\n+\n+  list(APPEND CMD ${INCLUDE_DIRS})\n+  list(APPEND CMD \" \" ${CMAKE_SOURCE_DIR} \"/\" ${VITIS_KERNEL_AUX_FILE})\n+  list(APPEND CMD \" -o \" ${CMAKE_BINARY_DIR} \"/\" ${VITIS_KERNEL_AUX_NAME} \".xo\")\n+\n+  debug()\n+\n+  # CMake configure time\n+  # Build\n+  execute_process(\n+    COMMAND\n+      ${VPP_PATH} -c -t ${VITIS_KERNEL_AUX_TYPE}\n+        --config \"${CMAKE_SOURCE_DIR}/${VITIS_KERNEL_AUX_CONFIG}\"\n+        -k ${VITIS_KERNEL_AUX_NAME}\n+        ${INCLUDE_DIRS}\n+        \"${CMAKE_SOURCE_DIR}/${VITIS_KERNEL_AUX_FILE}\"\n+        -o \"${CMAKE_BINARY_DIR}/${VITIS_KERNEL_AUX_NAME}.xo\"\n+    RESULT_VARIABLE\n+        CMD_ERROR\n+  )\n+  message(STATUS \"CMD_ERROR: \" ${CMD_ERROR})\n+\n+  # adjust final binary name if not \"hw\" (only \"hw\" build target is without suffix)\n+  set(BINARY_NAME \"${VITIS_KERNEL_AUX_NAME}.xclbin\")\n+  if (NOT ${VITIS_KERNEL_AUX_TYPE} STREQUAL \"hw\")\n+    set(BINARY_NAME \"${VITIS_KERNEL_AUX_NAME}.xclbin.${VITIS_KERNEL_AUX_TYPE}\")\n+    # get a temporary symlink pointing the binary name to allow/permit the\n+    # v++ compilation process\n+    # NOTE: v++ is sensitive to the artifact names.\n+    # See ERROR: [v++ 60-2262] Unsupported input file type specified for\n+    # --package option.\n+    execute_process(\n+      COMMAND\n+        ln -s ${BINARY_NAME} ${VITIS_KERNEL_AUX_NAME}.xclbin\n+    )\n+  endif()\n+\n+  # Link\n+  execute_process(\n+    COMMAND\n+      ${VPP_PATH} -l -t ${VITIS_KERNEL_AUX_TYPE}\n+        --config \"${CMAKE_SOURCE_DIR}/${VITIS_KERNEL_AUX_CONFIG}\"\n+        \"${CMAKE_BINARY_DIR}/${VITIS_KERNEL_AUX_NAME}.xo\"\n+        -o \"${CMAKE_BINARY_DIR}/${BINARY_NAME}\"\n+  )\n+  # package\n+  if (${VITIS_KERNEL_AUX_PACKAGE})\n+    execute_process(\n+      COMMAND\n+        ${VPP_PATH} -p -t ${VITIS_KERNEL_AUX_TYPE}\n+          --config \"${CMAKE_SOURCE_DIR}/${VITIS_KERNEL_AUX_CONFIG}\"\n+          \"${CMAKE_BINARY_DIR}/${VITIS_KERNEL_AUX_NAME}.xclbin\"\n+          --package.out_dir package\n+          --package.no_image\n+    )\n+  endif()  # package\n+\n+  # install\n+  install(\n+    FILES\n+      \"${CMAKE_BINARY_DIR}/${BINARY_NAME}\"\n+    DESTINATION\n+      lib/${PROJECT_NAME}\n+  )\n+  if (${VITIS_KERNEL_AUX_PACKAGE})\n+    install(\n+      DIRECTORY\n+        \"${CMAKE_BINARY_DIR}/package\"\n+      DESTINATION\n+        lib/${PROJECT_NAME}\n+    )\n+  endif()\n+\n+  if (NOT ${VITIS_KERNEL_AUX_TYPE} STREQUAL \"hw\")\n+    execute_process(\n+      COMMAND\n+        unlink ${VITIS_KERNEL_AUX_NAME}.xclbin\n+    )\n+  endif()\n+endmacro()  # vitis_acceleration_kernel_swemu\n+\n+#\n+# Print relevant variables for debugging purposes\n+#\n+macro(debug)\n+  message(\"CMAKE_SOURCE_DIR: \" ${CMAKE_SOURCE_DIR})\n+  message(\"CMAKE_BINARY_DIR: \" ${CMAKE_BINARY_DIR})\n+  message(\"CMAKE_INSTALL_PREFIX: \" ${CMAKE_INSTALL_PREFIX})\n+\n+  message(\"NAME: \" ${VITIS_KERNEL_NAME})\n+  message(\"FILE: \" ${VITIS_KERNEL_FILE})\n+  message(\"CONFIG: \" ${VITIS_KERNEL_CONFIG})\n+  foreach(type ${VITIS_KERNEL_TYPE})\n+    message(\"TYPE: \" ${type})\n+  endforeach()\n+  foreach(include_item ${VITIS_KERNEL_INCLUDE})\n+    message(\"INCLUDE: \" ${include_item})\n+  endforeach()\n+  if (${VITIS_KERNEL_PACKAGE})\n+    message(\"PACKAGE: \" ${VITIS_KERNEL_PACKAGE})\n+  endif()\n+  message(\"CMD: \" ${CMD})\n+  message(\"INCLUDE_DIRS: \" ${INCLUDE_DIRS})\n+endmacro()  # debug"
+        },
+        {
+          "sha": "1b819d1cfdf7b5f3aa2e2c88e3b77658ea4b4595",
+          "filename": "cmake/vitis_path.cmake",
+          "status": "added",
+          "additions": 18,
+          "deletions": 0,
+          "changes": 18,
+          "blob_url": "https://github.com/ros-acceleration/ament_vitis/blob/2149b59477e28b1bb4680fcd63d672badf5860c7/cmake%2Fvitis_path.cmake",
+          "raw_url": "https://github.com/ros-acceleration/ament_vitis/raw/2149b59477e28b1bb4680fcd63d672badf5860c7/cmake%2Fvitis_path.cmake",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/ament_vitis/contents/cmake%2Fvitis_path.cmake?ref=2149b59477e28b1bb4680fcd63d672badf5860c7",
+          "patch": "@@ -0,0 +1,18 @@\n+#    ____  ____\n+#   /   /\\/   /\n+#  /___/  \\  /   Copyright (c) 2021, Xilinx®.\n+#  \\   \\   \\/    Author: Víctor Mayoral Vilches <v.mayoralv@gmail.com>\n+#   \\   \\\n+#   /   /\n+#  /___/   /\\\n+#  \\   \\  /  \\\n+#   \\___\\/\\___\\\n+#\n+# defines the path to the Vitis directory\n+\n+if(DEFINED ENV{XILINX_VITIS})\n+  set(XILINX_VITIS $ENV{XILINX_VITIS})\n+else()\n+  message(\"Deprecated. XILINX_VITIS not defined, defaulting to 'xilinx' directory.\")\n+  set(XILINX_VITIS ${CMAKE_INSTALL_PREFIX}/../xilinx/vitis)  # <ws>/xilinx/vitis\n+endif()"
+        },
+        {
+          "sha": "58dfa0e52ce32c51f10a8ba7b8fc22a2a6d354a0",
+          "filename": "cmake/vivado_path.cmake",
+          "status": "added",
+          "additions": 18,
+          "deletions": 0,
+          "changes": 18,
+          "blob_url": "https://github.com/ros-acceleration/ament_vitis/blob/2149b59477e28b1bb4680fcd63d672badf5860c7/cmake%2Fvivado_path.cmake",
+          "raw_url": "https://github.com/ros-acceleration/ament_vitis/raw/2149b59477e28b1bb4680fcd63d672badf5860c7/cmake%2Fvivado_path.cmake",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/ament_vitis/contents/cmake%2Fvivado_path.cmake?ref=2149b59477e28b1bb4680fcd63d672badf5860c7",
+          "patch": "@@ -0,0 +1,18 @@\n+#    ____  ____\n+#   /   /\\/   /\n+#  /___/  \\  /   Copyright (c) 2021, Xilinx®.\n+#  \\   \\   \\/    Author: Víctor Mayoral Vilches <v.mayoralv@gmail.com>\n+#   \\   \\\n+#   /   /\n+#  /___/   /\\\n+#  \\   \\  /  \\\n+#   \\___\\/\\___\\\n+#\n+# defines the path to the Vivado directory\n+\n+if(DEFINED ENV{XILINX_VIVADO})\n+  set(XILINX_VIVADO $ENV{XILINX_VIVADO})\n+else()\n+  message(\"Deprecated. XILINX_VIVADO not defined, defaulting to 'xilinx' directory.\")\n+  set(XILINX_VIVADO ${CMAKE_INSTALL_PREFIX}/../xilinx/vivado)  # <ws>/xilinx/vivado\n+endif()"
+        },
+        {
+          "sha": "903e9807f972823a8b05e1a01fd7c8d66bfccf81",
+          "filename": "cmake/vpp_path.cmake",
+          "status": "added",
+          "additions": 19,
+          "deletions": 0,
+          "changes": 19,
+          "blob_url": "https://github.com/ros-acceleration/ament_vitis/blob/2149b59477e28b1bb4680fcd63d672badf5860c7/cmake%2Fvpp_path.cmake",
+          "raw_url": "https://github.com/ros-acceleration/ament_vitis/raw/2149b59477e28b1bb4680fcd63d672badf5860c7/cmake%2Fvpp_path.cmake",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/ament_vitis/contents/cmake%2Fvpp_path.cmake?ref=2149b59477e28b1bb4680fcd63d672badf5860c7",
+          "patch": "@@ -0,0 +1,19 @@\n+#    ____  ____\n+#   /   /\\/   /\n+#  /___/  \\  /   Copyright (c) 2021, Xilinx®.\n+#  \\   \\   \\/    Author: Víctor Mayoral Vilches <v.mayoralv@gmail.com>\n+#   \\   \\\n+#   /   /\n+#  /___/   /\\\n+#  \\   \\  /  \\\n+#   \\___\\/\\___\\\n+#\n+# defines the path to the v++ Vitis compiler\n+\n+if(DEFINED ENV{XILINX_VITIS})\n+    set(VPP_PATH $ENV{XILINX_VITIS}/bin/v++)\n+else()  # assume using \"xilinx_vitis\" package\n+  message(\"Deprecated. XILINX_VITIS not defined, defaulting to 'xilinx' directory.\")\n+  set(VITIS_DIR ${CMAKE_INSTALL_PREFIX}/../xilinx/vitis)  # <ws>/xilinx/vitis\n+  set(VPP_PATH ${VITIS_DIR}/bin/v++)\n+endif()"
+        },
+        {
+          "sha": "7ca9d8541a85e1702fe9331088a723b2404a96bb",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 17,
+          "deletions": 0,
+          "changes": 17,
+          "blob_url": "https://github.com/ros-acceleration/ament_vitis/blob/2149b59477e28b1bb4680fcd63d672badf5860c7/package.xml",
+          "raw_url": "https://github.com/ros-acceleration/ament_vitis/raw/2149b59477e28b1bb4680fcd63d672badf5860c7/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/ament_vitis/contents/package.xml?ref=2149b59477e28b1bb4680fcd63d672badf5860c7",
+          "patch": "@@ -0,0 +1,17 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"2\">\n+  <name>ament_vitis</name>\n+  <version>0.1.0</version>\n+  <description>Add functions and macros to facilitate Xilinx Vitis processes.</description>\n+  <maintainer email=\"v.mayoralv@gmail.com\">Víctor Mayoral Vilches</maintainer>\n+  <license>Apache License 2.0</license>\n+\n+  <buildtool_depend>ament_cmake_core</buildtool_depend>\n+\n+  <buildtool_export_depend>ament_cmake_core</buildtool_export_depend>\n+\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n+</package>"
+        }
+      ]
+    }
+  ]
+}

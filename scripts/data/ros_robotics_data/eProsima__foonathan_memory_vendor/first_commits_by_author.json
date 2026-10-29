@@ -1,0 +1,877 @@
+{
+  "_meta": {
+    "fetched_at": "2026-09-24T14:52:13Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "eProsima",
+    "repo": "foonathan_memory_vendor",
+    "refreshed_at": "2026-09-24T14:52:13Z",
+    "refresh_note": "incrementally added 1 author(s) missing from a prior stale cache"
+  },
+  "data": [
+    {
+      "author": "MiguelCompany",
+      "date": "2019-04-29T08:33:34Z",
+      "sha": "7f63c12b0ce82576cda39f21e25ecf65683de5cb",
+      "message": "Refs #5228. Initial version working on Windows.",
+      "files_changed": 5,
+      "additions": 114,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "c6cb99d9f687fe611f43c57824b808313f8d5fed",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/7f63c12b0ce82576cda39f21e25ecf65683de5cb/.gitignore",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/7f63c12b0ce82576cda39f21e25ecf65683de5cb/.gitignore",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/.gitignore?ref=7f63c12b0ce82576cda39f21e25ecf65683de5cb",
+          "patch": "@@ -0,0 +1,6 @@\n+CMakeCache.txt\n+CMakeFiles\n+Makefile\n+cmake_install.cmake\n+install_manifest.txt\n+build"
+        },
+        {
+          "sha": "5305efb9a96a1a347d4f0cadec77ccd2e4e44a25",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 72,
+          "deletions": 0,
+          "changes": 72,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/7f63c12b0ce82576cda39f21e25ecf65683de5cb/CMakeLists.txt",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/7f63c12b0ce82576cda39f21e25ecf65683de5cb/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/CMakeLists.txt?ref=7f63c12b0ce82576cda39f21e25ecf65683de5cb",
+          "patch": "@@ -0,0 +1,72 @@\n+cmake_minimum_required(VERSION 3.5)\n+project(foonathan_memory_vendor VERSION \"0.0.1\")\n+\n+list(APPEND extra_cmake_args -DCMAKE_POSITION_INDEPENDENT_CODE=ON)\n+\n+if(DEFINED CMAKE_BUILD_TYPE)\n+list(APPEND extra_cmake_args -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})\n+endif()\n+\n+if(DEFINED CMAKE_TOOLCHAIN_FILE)\n+list(APPEND extra_cmake_args \"-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}\")\n+if(ANDROID)\n+  if(DEFINED ANDROID_ABI)\n+    list(APPEND extra_cmake_args \"-DANDROID_ABI=${ANDROID_ABI}\")\n+  endif()\n+  if(DEFINED ANDROID_CPP_FEATURES)\n+    list(APPEND extra_cmake_args \"-DANDROID_CPP_FEATURES=${ANDROID_CPP_FEATURES}\")\n+  endif()\n+  if(DEFINED ANDROID_FUNCTION_LEVEL_LINKING)\n+    list(APPEND extra_cmake_args\n+      \"-DANDROID_FUNCTION_LEVEL_LINKING=${ANDROID_FUNCTION_LEVEL_LINKING}\")\n+  endif()\n+  if(DEFINED ANDROID_NATIVE_API_LEVEL)\n+    list(APPEND extra_cmake_args \"-DANDROID_NATIVE_API_LEVEL=${ANDROID_NATIVE_API_LEVEL}\")\n+  endif()\n+  if(DEFINED ANDROID_NDK)\n+    list(APPEND extra_cmake_args \"-DANDROID_NDK=${ANDROID_NDK}\")\n+  endif()\n+  if(DEFINED ANDROID_STL)\n+    list(APPEND extra_cmake_args \"-DANDROID_STL=${ANDROID_STL}\")\n+  endif()\n+  if(DEFINED ANDROID_TOOLCHAIN_NAME)\n+    list(APPEND extra_cmake_args \"-DANDROID_TOOLCHAIN_NAME=${ANDROID_TOOLCHAIN_NAME}\")\n+  endif()\n+endif()\n+endif()\n+include(ExternalProject)\n+\n+ExternalProject_Add(foonathan_memory-ext\n+GIT_REPOSITORY https://github.com/foonathan/memory.git\n+GIT_TAG master\n+TIMEOUT 600\n+CMAKE_ARGS\n+  # -DCMAKE_POSITION_INDEPENDENT_CODE=ON\n+  -DFOONATHAN_MEMORY_BUILD_EXAMPLES=OFF\n+  -DFOONATHAN_MEMORY_BUILD_TESTS=OFF\n+  -DFOONATHAN_MEMORY_BUILD_TOOLS=ON\n+  -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/foonathan_memory_external_project_install\n+  ${extra_cmake_args}\n+  -Wno-dev\n+)\n+\n+# The external project will install to the build folder, but we'll install that on make install.\n+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/foonathan_memory_external_project_install/\n+DESTINATION ${CMAKE_INSTALL_PREFIX})\n+\n+configure_file(foonathan_memory_vendorConfig.cmake.in\n+  \"${PROJECT_BINARY_DIR}/foonathan_memory_vendorConfig.cmake\" @ONLY)\n+\n+include(CMakePackageConfigHelpers)\n+write_basic_package_version_file(\n+  \"${PROJECT_BINARY_DIR}/foonathan_memory_vendorConfig-version.cmake\"\n+  COMPATIBILITY AnyNewerVersion)\n+\n+install(FILES\n+  package.xml\n+  DESTINATION share/${PROJECT_NAME})\n+\n+install(FILES\n+  \"${PROJECT_BINARY_DIR}/foonathan_memory_vendorConfig.cmake\"\n+  \"${PROJECT_BINARY_DIR}/foonathan_memory_vendorConfig-version.cmake\"\n+  DESTINATION share/${PROJECT_NAME}/cmake)"
+        },
+        {
+          "sha": "b88df876fc64dca8b61c47f0e74d82d5c5167ef8",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 1,
+          "changes": 5,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/7f63c12b0ce82576cda39f21e25ecf65683de5cb/README.md",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/7f63c12b0ce82576cda39f21e25ecf65683de5cb/README.md",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/README.md?ref=7f63c12b0ce82576cda39f21e25ecf65683de5cb",
+          "patch": "@@ -1 +1,4 @@\n-# foonathan_memory_vendor\n\\ No newline at end of file\n+# foonathan_memory_vendor\n+Vendor package for foonathan/memory: https://github.com/foonathan/memory\n+\n+This package will download, patch, build and install foonathan_memory for its use with Fast-RTPS."
+        },
+        {
+          "sha": "ad6afcea4e52d3551fe768df153b0195fce539de",
+          "filename": "foonathan_memory_vendorConfig.cmake.in",
+          "status": "added",
+          "additions": 10,
+          "deletions": 0,
+          "changes": 10,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/7f63c12b0ce82576cda39f21e25ecf65683de5cb/foonathan_memory_vendorConfig.cmake.in",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/7f63c12b0ce82576cda39f21e25ecf65683de5cb/foonathan_memory_vendorConfig.cmake.in",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/foonathan_memory_vendorConfig.cmake.in?ref=7f63c12b0ce82576cda39f21e25ecf65683de5cb",
+          "patch": "@@ -0,0 +1,10 @@\n+# prevent multiple inclusion\n+if(_@PROJECT_NAME@_CONFIG_INCLUDED)\n+  return()\n+endif()\n+set(_@PROJECT_NAME@_CONFIG_INCLUDED TRUE)\n+\n+# output package information\n+if(NOT @PROJECT_NAME@_FIND_QUIETLY)\n+  message(STATUS \"Found @PROJECT_NAME@: @PACKAGE_VERSION@ (${@PROJECT_NAME@_DIR})\")\n+endif()"
+        },
+        {
+          "sha": "d7917b3351810161cd9b2024682477015a199ce4",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 22,
+          "deletions": 0,
+          "changes": 22,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/7f63c12b0ce82576cda39f21e25ecf65683de5cb/package.xml",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/7f63c12b0ce82576cda39f21e25ecf65683de5cb/package.xml",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/package.xml?ref=7f63c12b0ce82576cda39f21e25ecf65683de5cb",
+          "patch": "@@ -0,0 +1,22 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model\n+  href=\"http://download.ros.org/schema/package_format3.xsd\"\n+  schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n+  <name>foonathan_memory_vendor</name>\n+  <version>0.0.1</version>\n+  <description>Foonathan/memory vendor package for Fast-RTPS.</description>\n+  <maintainer email=\"miguelcompany@eprosima.com\">Miguel Company</maintainer>\n+  <license>Apache License 2.0</license> <!-- The contents of this vendor package are Apache 2.0 -->\n+  <license>zlib License</license> <!-- foonathan/memory is licensed under the zlib License (https://github.com/foonathan/memory/blob/master/LICENSE) -->\n+  <buildtool_depend>cmake</buildtool_depend>\n+\n+  <buildtool_export_depend>cmake</buildtool_export_depend>\n+\n+  <depend>FOONATHAN_MEMORY</depend>\n+\n+  <export>\n+    <build_type>cmake</build_type>\n+  </export>\n+</package>\n+"
+        }
+      ]
+    },
+    {
+      "author": "mosfet80",
+      "date": "2026-01-02T15:16:41Z",
+      "sha": "0a0f1c479b8d78737bcf8e3d729b04851cc723b1",
+      "message": "Bump foonathan memory to 0.7-4 (#75)\n\n* bump foonathan memory\n\nswitch to version 0.7-4\n changelog: https://github.com/foonathan/memory/releases/tag/v0.7-4\n\nSigned-off-by: mosfet80 <realeandrea@yahoo.it>\n\n* Refs #24032. Patch with fix for C++11.\n\nSigned-off-by: Miguel Company <miguelcompany@eprosima.com>\n\n* Refs #24032. Remove `INSTALLER_PLATFORM` patches.\n\nSigned-off-by: Miguel Company <miguelcompany@eprosima.com>\n\n* Refs #24032. Update changelog.\n\nSigned-off-by: Miguel Company <miguelcompany@eprosima.com>\n\n---------\n\nSigned-off-by: mosfet80 <realeandrea@yahoo.it>\nSigned-off-by: Miguel Company <miguelcompany@eprosima.com>\nCo-authored-by: Miguel Company <miguelcompany@eprosima.com>",
+      "files_changed": 4,
+      "additions": 94,
+      "deletions": 43,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "9f11179ce53ca4addbcce388a5e2837af30604a2",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/0a0f1c479b8d78737bcf8e3d729b04851cc723b1/CHANGELOG.rst",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/0a0f1c479b8d78737bcf8e3d729b04851cc723b1/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/CHANGELOG.rst?ref=0a0f1c479b8d78737bcf8e3d729b04851cc723b1",
+          "patch": "@@ -2,6 +2,11 @@\n Changelog for package foonathan_memory_vendor\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+Forthcoming\n+-----------\n+* Update upstream to release 0.7-4 (#75)\n+* Remove installer CMake patches (#75)\n+\n 1.3.2 (2025-12-22)\n ------------------\n * Improve mechanism to find an installation of foonathan_memory (#67)"
+        },
+        {
+          "sha": "efdbee95adfd877ff62a6b8bc089329d2072b40e",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 6,
+          "changes": 9,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/0a0f1c479b8d78737bcf8e3d729b04851cc723b1/CMakeLists.txt",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/0a0f1c479b8d78737bcf8e3d729b04851cc723b1/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/CMakeLists.txt?ref=0a0f1c479b8d78737bcf8e3d729b04851cc723b1",
+          "patch": "@@ -84,15 +84,12 @@ if(NOT _EXIT_CODE EQUAL 0)\n   endif()\n   include(ExternalProject)\n \n-  if(INSTALLER_PLATFORM)\n-    set(PATCH_COMMAND_STR PATCH_COMMAND\n-      git apply ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt.patch &&\n-      sed -i -e \"s/INSTALLER_PLATFORM/${INSTALLER_PLATFORM}/g\" CMakeLists.txt)\n-  endif()\n+  set(PATCH_COMMAND_STR PATCH_COMMAND\n+    git apply ${CMAKE_CURRENT_SOURCE_DIR}/fix_constexpr_assert.patch)\n \n   externalproject_add(foo_mem-ext\n   GIT_REPOSITORY https://github.com/foonathan/memory.git\n-  GIT_TAG v0.7-3\n+  GIT_TAG v0.7-4\n   TIMEOUT 600\n   # Avoid the update (git pull) and so the recompilation of foonathan_memory library each time.\n   UPDATE_COMMAND \"\""
+        },
+        {
+          "sha": "d6c3caedf431b96a43e7f0bc100dde53b52086ab",
+          "filename": "CMakeLists.txt.patch",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 37,
+          "changes": 37,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/125dafb05bca4814c5a0e8598339fe2d0fc41c4d/CMakeLists.txt.patch",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/125dafb05bca4814c5a0e8598339fe2d0fc41c4d/CMakeLists.txt.patch",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/CMakeLists.txt.patch?ref=125dafb05bca4814c5a0e8598339fe2d0fc41c4d",
+          "patch": "@@ -1,37 +0,0 @@\n-diff --git a/CMakeLists.txt b/CMakeLists.txt\n-index ddbc459..ce03503 100644\n---- a/CMakeLists.txt\n-+++ b/CMakeLists.txt\n-@@ -30,13 +30,13 @@ if(UNIX OR VXWORKS)\n-     set(FOONATHAN_MEMORY_ADDITIONAL_FILES_INSTALL_DIR \"${CMAKE_INSTALL_DATADIR}/foonathan_memory\")\n- elseif(WIN32)\n-     set(FOONATHAN_MEMORY_INC_INSTALL_DIR \"include/foonathan_memory\")\n--    set(FOONATHAN_MEMORY_RUNTIME_INSTALL_DIR   \"bin\")\n--    set(FOONATHAN_MEMORY_LIBRARY_INSTALL_DIR   \"bin\")\n--    set(FOONATHAN_MEMORY_ARCHIVE_INSTALL_DIR   \"lib\")\n--    set(FOONATHAN_MEMORY_FRAMEWORK_INSTALL_DIR \"bin\")\n-+    set(FOONATHAN_MEMORY_RUNTIME_INSTALL_DIR   \"bin/INSTALLER_PLATFORM\")\n-+    set(FOONATHAN_MEMORY_LIBRARY_INSTALL_DIR   \"bin/INSTALLER_PLATFORM\")\n-+    set(FOONATHAN_MEMORY_ARCHIVE_INSTALL_DIR   \"lib/INSTALLER_PLATFORM\")\n-+    set(FOONATHAN_MEMORY_FRAMEWORK_INSTALL_DIR \"bin/INSTALLER_PLATFORM\")\n- \n--    set(FOONATHAN_MEMORY_CMAKE_CONFIG_INSTALL_DIR \"share/foonathan_memory/cmake\")\n--    set(FOONATHAN_MEMORY_ADDITIONAL_FILES_INSTALL_DIR \"share/foonathan_memory\")\n-+    set(FOONATHAN_MEMORY_CMAKE_CONFIG_INSTALL_DIR \"share/foonathan_memory-INSTALLER_PLATFORM/cmake\")\n-+    set(FOONATHAN_MEMORY_ADDITIONAL_FILES_INSTALL_DIR \"share/foonathan_memory-INSTALLER_PLATFORM\")\n-     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)\n-     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY \"${CMAKE_BINARY_DIR}/bin\")\n- else()\n-@@ -66,4 +66,11 @@ install(FILES \"${CMAKE_CURRENT_SOURCE_DIR}/LICENSE\" \"${CMAKE_CURRENT_SOURCE_DIR}\n- install(EXPORT foonathan_memoryTargets DESTINATION ${FOONATHAN_MEMORY_CMAKE_CONFIG_INSTALL_DIR}\n-                                        FILE foonathan_memory-config.cmake)\n- \n--\n-+# install symbol files if any\n-+if(MSVC OR MSVC_IDE)\n-+    install(CODE\n-+        \"file(GLOB_RECURSE PDB_FILE \\\"${CMAKE_CURRENT_BINARY_DIR}/*memory*.pdb\\\") \\n if(PDB_FILE) \\n file(INSTALL \\${PDB_FILE}\\n DESTINATION \\${CMAKE_INSTALL_PREFIX}/${FOONATHAN_MEMORY_ARCHIVE_INSTALL_DIR}) \\n endif()\"\n-+        COMPONENT symbols\n-+        CONFIGURATIONS Debug\n-+        )\n-+endif()"
+        },
+        {
+          "sha": "0df960c3e03efa7b1e8d0332931104f2314200de",
+          "filename": "fix_constexpr_assert.patch",
+          "status": "added",
+          "additions": 86,
+          "deletions": 0,
+          "changes": 86,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/0a0f1c479b8d78737bcf8e3d729b04851cc723b1/fix_constexpr_assert.patch",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/0a0f1c479b8d78737bcf8e3d729b04851cc723b1/fix_constexpr_assert.patch",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/fix_constexpr_assert.patch?ref=0a0f1c479b8d78737bcf8e3d729b04851cc723b1",
+          "patch": "@@ -0,0 +1,86 @@\n+From 6acc02eb1f8f0c6a7b07a7f6dfff981ef2365b8b Mon Sep 17 00:00:00 2001\n+From: Miguel Company <miguelcompany@eprosima.com>\n+Date: Wed, 24 Dec 2025 11:39:41 +0100\n+Subject: [PATCH 1/3] Add new macro for assertion with return value.\n+\n+Signed-off-by: Miguel Company <miguelcompany@eprosima.com>\n+---\n+ include/foonathan/memory/detail/assert.hpp | 7 +++++++\n+ 1 file changed, 7 insertions(+)\n+\n+diff --git a/include/foonathan/memory/detail/assert.hpp b/include/foonathan/memory/detail/assert.hpp\n+index 7317503..895d4b9 100644\n+--- a/include/foonathan/memory/detail/assert.hpp\n++++ b/include/foonathan/memory/detail/assert.hpp\n+@@ -37,6 +37,12 @@ namespace foonathan\n+                                                        __FILE__, __LINE__, __func__),              \\\n+                           true))\n+ \n++#define FOONATHAN_MEMORY_ASSERT_RETURN(Expr, Ret)                                                  \\\n++    ((Expr) ? (Ret)                                                                                \\\n++            : (detail::handle_failed_assert(\"Assertion \\\"\" #Expr \"\\\" failed\", __FILE__,            \\\n++                                            __LINE__, __func__),                                   \\\n++               (Ret)))\n++\n+ #define FOONATHAN_MEMORY_UNREACHABLE(Msg)                                                          \\\n+     detail::handle_failed_assert(\"Unreachable code reached: \" Msg, __FILE__, __LINE__, __func__)\n+ \n+@@ -45,6 +51,7 @@ namespace foonathan\n+ #elif !defined(FOONATHAN_MEMORY_ASSERT)\n+ #define FOONATHAN_MEMORY_ASSERT(Expr)\n+ #define FOONATHAN_MEMORY_ASSERT_MSG(Expr, Msg)\n++#define FOONATHAN_MEMORY_ASSERT_RETURN(Expr, Ret) (Ret)\n+ #define FOONATHAN_MEMORY_UNREACHABLE(Msg) std::abort()\n+ #define FOONATHAN_MEMORY_WARNING(Msg)\n+ #endif\n+\n+From 9b58607b037d372036636b513002168c76383936 Mon Sep 17 00:00:00 2001\n+From: Miguel Company <miguelcompany@eprosima.com>\n+Date: Wed, 24 Dec 2025 11:49:59 +0100\n+Subject: [PATCH 2/3] Use new macro in constexpr method.\n+\n+Signed-off-by: Miguel Company <miguelcompany@eprosima.com>\n+---\n+ include/foonathan/memory/detail/align.hpp | 5 +++--\n+ 1 file changed, 3 insertions(+), 2 deletions(-)\n+\n+diff --git a/include/foonathan/memory/detail/align.hpp b/include/foonathan/memory/detail/align.hpp\n+index 8fcf426..ea4e1d2 100644\n+--- a/include/foonathan/memory/detail/align.hpp\n++++ b/include/foonathan/memory/detail/align.hpp\n+@@ -24,8 +24,9 @@ namespace foonathan\n+             constexpr std::size_t round_up_to_multiple_of_alignment(std::size_t size,\n+                                                                     std::size_t alignment) noexcept\n+             {\n+-                FOONATHAN_MEMORY_ASSERT(is_valid_alignment(alignment));\n+-                return (size + alignment - 1) & ~(alignment - 1);\n++                return FOONATHAN_MEMORY_ASSERT_RETURN(\n++                    is_valid_alignment(alignment),\n++                    (size + alignment - 1) & ~(alignment - 1));\n+             }\n+ \n+             // returns the offset needed to align ptr for given alignment\n+\n+From 1de8562aa2b8241ca3d562ddc6d1e9a5cfc07e94 Mon Sep 17 00:00:00 2001\n+From: Miguel Company <miguelcompany@eprosima.com>\n+Date: Wed, 24 Dec 2025 13:47:21 +0100\n+Subject: [PATCH 3/3] Avoid using `__func__`\n+\n+Signed-off-by: Miguel Company <miguelcompany@eprosima.com>\n+---\n+ include/foonathan/memory/detail/assert.hpp | 2 +-\n+ 1 file changed, 1 insertion(+), 1 deletion(-)\n+\n+diff --git a/include/foonathan/memory/detail/assert.hpp b/include/foonathan/memory/detail/assert.hpp\n+index 895d4b9..4786d78 100644\n+--- a/include/foonathan/memory/detail/assert.hpp\n++++ b/include/foonathan/memory/detail/assert.hpp\n+@@ -40,7 +40,7 @@ namespace foonathan\n+ #define FOONATHAN_MEMORY_ASSERT_RETURN(Expr, Ret)                                                  \\\n+     ((Expr) ? (Ret)                                                                                \\\n+             : (detail::handle_failed_assert(\"Assertion \\\"\" #Expr \"\\\" failed\", __FILE__,            \\\n+-                                            __LINE__, __func__),                                   \\\n++                                            __LINE__, \"some constexpr\"),                           \\\n+                (Ret)))\n+ \n+ #define FOONATHAN_MEMORY_UNREACHABLE(Msg)                                                          \\"
+        }
+      ]
+    },
+    {
+      "author": "LuciaEchevarria99",
+      "date": "2024-10-17T05:58:06Z",
+      "sha": "716cfd8c15ba6d85be89ccc6cbc076ce78be3a10",
+      "message": "Merge pull request #73 from eProsima/hotfix/21890\n\nUpdate commercial support section in project README",
+      "files_changed": 1,
+      "additions": 6,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "f26f9db5ac7acc4b1f662b88059ec9928b447297",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/716cfd8c15ba6d85be89ccc6cbc076ce78be3a10/README.md",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/716cfd8c15ba6d85be89ccc6cbc076ce78be3a10/README.md",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/README.md?ref=716cfd8c15ba6d85be89ccc6cbc076ce78be3a10",
+          "patch": "@@ -12,6 +12,12 @@\n Vendor package for [foonathan/memory](https://github.com/foonathan/memory).\n This package will download, patch, build and install *foonathan/memory* for its use with Fast DDS.\n \n+## Commercial support\n+\n+Looking for commercial support? Write us to info@eprosima.com\n+\n+Find more about us at [eProsima’s webpage](https://eprosima.com/).\n+\n ## Quality Declaration\n \n This package claims to be in the **Quality Level 2** category, see the [Quality Declaration](QUALITY_DECLARATION.md) for more details."
+        }
+      ]
+    },
+    {
+      "author": "JesusPoderoso",
+      "date": "2024-03-12T12:56:22Z",
+      "sha": "ff121da55424f083a89da3e01b8a32fd3beeb6d0",
+      "message": "Add line break to please linters (#70)\n\nSigned-off-by: JesusPoderoso <jesuspoderoso@eprosima.com>",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "058ed2c1e9c34cbafdb1984529cb90659e10012b",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/ff121da55424f083a89da3e01b8a32fd3beeb6d0/CMakeLists.txt",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/ff121da55424f083a89da3e01b8a32fd3beeb6d0/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/CMakeLists.txt?ref=ff121da55424f083a89da3e01b8a32fd3beeb6d0",
+          "patch": "@@ -1,7 +1,8 @@\n cmake_minimum_required(VERSION 3.14)\n project(foonathan_memory_vendor VERSION \"1.3.2\")\n \n-option(FOONATHAN_MEMORY_FORCE_VENDORED_BUILD \"Force foonathan memory vendor package build even if it is already installed in the system\" OFF)\n+option(FOONATHAN_MEMORY_FORCE_VENDORED_BUILD\n+        \"Force foonathan memory vendor package build even if it is already installed in the system\" OFF)\n \n if(NOT FOONATHAN_MEMORY_FORCE_VENDORED_BUILD)\n   execute_process(COMMAND"
+        }
+      ]
+    },
+    {
+      "author": "xavisolesoft",
+      "date": "2024-03-12T10:21:46Z",
+      "sha": "30d9d82691c566735864868a1d3893c83714ed25",
+      "message": "Add force vendored build CMake option (#69)\n\n* Add FORCE_BUILD option to cmake\r\n\r\n* Code Review requested fixes\r\n\r\n* Code Review: Typo\r\n\r\nCo-authored-by: Jesús Poderoso <120394830+JesusPoderoso@users.noreply.github.com>\r\n\r\n---------\r\n\r\nCo-authored-by: Jesús Poderoso <120394830+JesusPoderoso@users.noreply.github.com>",
+      "files_changed": 1,
+      "additions": 14,
+      "deletions": 10,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "1bd1454d8a1ee1add1b92dd79692fae811c24a7a",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 14,
+          "deletions": 10,
+          "changes": 24,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/30d9d82691c566735864868a1d3893c83714ed25/CMakeLists.txt",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/30d9d82691c566735864868a1d3893c83714ed25/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/CMakeLists.txt?ref=30d9d82691c566735864868a1d3893c83714ed25",
+          "patch": "@@ -1,16 +1,20 @@\n cmake_minimum_required(VERSION 3.14)\n project(foonathan_memory_vendor VERSION \"1.3.2\")\n \n-execute_process(COMMAND\n-    ${CMAKE_COMMAND}\n-    --find-package\n-    -DNAME=foonathan_memory\n-    -DCOMPILER_ID=$<IF:$<BOOL:${WIN32}>,MSVC,GNU>\n-    -DLANGUAGE=CXX\n-    -DMODE=EXIST\n-    -DCMAKE_FIND_DEBUG_MODE=ON\n-  ERROR_QUIET\n-  RESULT_VARIABLE _EXIT_CODE)\n+option(FOONATHAN_MEMORY_FORCE_VENDORED_BUILD \"Force foonathan memory vendor package build even if it is already installed in the system\" OFF)\n+\n+if(NOT FOONATHAN_MEMORY_FORCE_VENDORED_BUILD)\n+  execute_process(COMMAND\n+      ${CMAKE_COMMAND}\n+      --find-package\n+      -DNAME=foonathan_memory\n+      -DCOMPILER_ID=$<IF:$<BOOL:${WIN32}>,MSVC,GNU>\n+      -DLANGUAGE=CXX\n+      -DMODE=EXIST\n+      -DCMAKE_FIND_DEBUG_MODE=ON\n+    ERROR_QUIET\n+    RESULT_VARIABLE _EXIT_CODE)\n+endif()\n \n if(NOT _EXIT_CODE EQUAL 0)\n   ###############################################################################"
+        }
+      ]
+    },
+    {
+      "author": "richiware",
+      "date": "2019-04-29T08:10:11Z",
+      "sha": "c36a35156f06b0e8f5d3d579366494b7120ed4e7",
+      "message": "Initial commit",
+      "files_changed": 2,
+      "additions": 202,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 201,
+          "deletions": 0,
+          "changes": 201,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/c36a35156f06b0e8f5d3d579366494b7120ed4e7/LICENSE",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/c36a35156f06b0e8f5d3d579366494b7120ed4e7/LICENSE",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/LICENSE?ref=c36a35156f06b0e8f5d3d579366494b7120ed4e7",
+          "patch": "@@ -0,0 +1,201 @@\n+                                 Apache License\n+                           Version 2.0, January 2004\n+                        http://www.apache.org/licenses/\n+\n+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION\n+\n+   1. Definitions.\n+\n+      \"License\" shall mean the terms and conditions for use, reproduction,\n+      and distribution as defined by Sections 1 through 9 of this document.\n+\n+      \"Licensor\" shall mean the copyright owner or entity authorized by\n+      the copyright owner that is granting the License.\n+\n+      \"Legal Entity\" shall mean the union of the acting entity and all\n+      other entities that control, are controlled by, or are under common\n+      control with that entity. For the purposes of this definition,\n+      \"control\" means (i) the power, direct or indirect, to cause the\n+      direction or management of such entity, whether by contract or\n+      otherwise, or (ii) ownership of fifty percent (50%) or more of the\n+      outstanding shares, or (iii) beneficial ownership of such entity.\n+\n+      \"You\" (or \"Your\") shall mean an individual or Legal Entity\n+      exercising permissions granted by this License.\n+\n+      \"Source\" form shall mean the preferred form for making modifications,\n+      including but not limited to software source code, documentation\n+      source, and configuration files.\n+\n+      \"Object\" form shall mean any form resulting from mechanical\n+      transformation or translation of a Source form, including but\n+      not limited to compiled object code, generated documentation,\n+      and conversions to other media types.\n+\n+      \"Work\" shall mean the work of authorship, whether in Source or\n+      Object form, made available under the License, as indicated by a\n+      copyright notice that is included in or attached to the work\n+      (an example is provided in the Appendix below).\n+\n+      \"Derivative Works\" shall mean any work, whether in Source or Object\n+      form, that is based on (or derived from) the Work and for which the\n+      editorial revisions, annotations, elaborations, or other modifications\n+      represent, as a whole, an original work of authorship. For the purposes\n+      of this License, Derivative Works shall not include works that remain\n+      separable from, or merely link (or bind by name) to the interfaces of,\n+      the Work and Derivative Works thereof.\n+\n+      \"Contribution\" shall mean any work of authorship, including\n+      the original version of the Work and any modifications or additions\n+      to that Work or Derivative Works thereof, that is intentionally\n+      submitted to Licensor for inclusion in the Work by the copyright owner\n+      or by an individual or Legal Entity authorized to submit on behalf of\n+      the copyright owner. For the purposes of this definition, \"submitted\"\n+      means any form of electronic, verbal, or written communication sent\n+      to the Licensor or its representatives, including but not limited to\n+      communication on electronic mailing lists, source code control systems,\n+      and issue tracking systems that are managed by, or on behalf of, the\n+      Licensor for the purpose of discussing and improving the Work, but\n+      excluding communication that is conspicuously marked or otherwise\n+      designated in writing by the copyright owner as \"Not a Contribution.\"\n+\n+      \"Contributor\" shall mean Licensor and any individual or Legal Entity\n+      on behalf of whom a Contribution has been received by Licensor and\n+      subsequently incorporated within the Work.\n+\n+   2. Grant of Copyright License. Subject to the terms and conditions of\n+      this License, each Contributor hereby grants to You a perpetual,\n+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n+      copyright license to reproduce, prepare Derivative Works of,\n+      publicly display, publicly perform, sublicense, and distribute the\n+      Work and such Derivative Works in Source or Object form.\n+\n+   3. Grant of Patent License. Subject to the terms and conditions of\n+      this License, each Contributor hereby grants to You a perpetual,\n+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n+      (except as stated in this section) patent license to make, have made,\n+      use, offer to sell, sell, import, and otherwise transfer the Work,\n+      where such license applies only to those patent claims licensable\n+      by such Contributor that are necessarily infringed by their\n+      Contribution(s) alone or by combination of their Contribution(s)\n+      with the Work to which such Contribution(s) was submitted. If You\n+      institute patent litigation against any entity (including a\n+      cross-claim or counterclaim in a lawsuit) alleging that the Work\n+      or a Contribution incorporated within the Work constitutes direct\n+      or contributory patent infringement, then any patent licenses\n+      granted to You under this License for that Work shall terminate\n+      as of the date such litigation is filed.\n+\n+   4. Redistribution. You may reproduce and distribute copies of the\n+      Work or Derivative Works thereof in any medium, with or without\n+      modifications, and in Source or Object form, provided that You\n+      meet the following conditions:\n+\n+      (a) You must give any other recipients of the Work or\n+          Derivative Works a copy of this License; and\n+\n+      (b) You must cause any modified files to carry prominent notices\n+          stating that You changed the files; and\n+\n+      (c) You must retain, in the Source form of any Derivative Works\n+          that You distribute, all copyright, patent, trademark, and\n+          attribution notices from the Source form of the Work,\n+          excluding those notices that do not pertain to any part of\n+          the Derivative Works; and\n+\n+      (d) If the Work includes a \"NOTICE\" text file as part of its\n+          distribution, then any Derivative Works that You distribute must\n+          include a readable copy of the attribution notices contained\n+          within such NOTICE file, excluding those notices that do not\n+          pertain to any part of the Derivative Works, in at least one\n+          of the following places: within a NOTICE text file distributed\n+          as part of the Derivative Works; within the Source form or\n+          documentation, if provided along with the Derivative Works; or,\n+          within a display generated by the Derivative Works, if and\n+          wherever such third-party notices normally appear. The contents\n+          of the NOTICE file are for informational purposes only and\n+          do not modify the License. You may add Your own attribution\n+          notices within Derivative Works that You distribute, alongside\n+          or as an addendum to the NOTICE text from the Work, provided\n+          that such additional attribution notices cannot be construed\n+          as modifying the License.\n+\n+      You may add Your own copyright statement to Your modifications and\n+      may provide additional or different license terms and conditions\n+      for use, reproduction, or distribution of Your modifications, or\n+      for any such Derivative Works as a whole, provided Your use,\n+      reproduction, and distribution of the Work otherwise complies with\n+      the conditions stated in this License.\n+\n+   5. Submission of Contributions. Unless You explicitly state otherwise,\n+      any Contribution intentionally submitted for inclusion in the Work\n+      by You to the Licensor shall be under the terms and conditions of\n+      this License, without any additional terms or conditions.\n+      Notwithstanding the above, nothing herein shall supersede or modify\n+      the terms of any separate license agreement you may have executed\n+      with Licensor regarding such Contributions.\n+\n+   6. Trademarks. This License does not grant permission to use the trade\n+      names, trademarks, service marks, or product names of the Licensor,\n+      except as required for reasonable and customary use in describing the\n+      origin of the Work and reproducing the content of the NOTICE file.\n+\n+   7. Disclaimer of Warranty. Unless required by applicable law or\n+      agreed to in writing, Licensor provides the Work (and each\n+      Contributor provides its Contributions) on an \"AS IS\" BASIS,\n+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or\n+      implied, including, without limitation, any warranties or conditions\n+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A\n+      PARTICULAR PURPOSE. You are solely responsible for determining the\n+      appropriateness of using or redistributing the Work and assume any\n+      risks associated with Your exercise of permissions under this License.\n+\n+   8. Limitation of Liability. In no event and under no legal theory,\n+      whether in tort (including negligence), contract, or otherwise,\n+      unless required by applicable law (such as deliberate and grossly\n+      negligent acts) or agreed to in writing, shall any Contributor be\n+      liable to You for damages, including any direct, indirect, special,\n+      incidental, or consequential damages of any character arising as a\n+      result of this License or out of the use or inability to use the\n+      Work (including but not limited to damages for loss of goodwill,\n+      work stoppage, computer failure or malfunction, or any and all\n+      other commercial damages or losses), even if such Contributor\n+      has been advised of the possibility of such damages.\n+\n+   9. Accepting Warranty or Additional Liability. While redistributing\n+      the Work or Derivative Works thereof, You may choose to offer,\n+      and charge a fee for, acceptance of support, warranty, indemnity,\n+      or other liability obligations and/or rights consistent with this\n+      License. However, in accepting such obligations, You may act only\n+      on Your own behalf and on Your sole responsibility, not on behalf\n+      of any other Contributor, and only if You agree to indemnify,\n+      defend, and hold each Contributor harmless for any liability\n+      incurred by, or claims asserted against, such Contributor by reason\n+      of your accepting any such warranty or additional liability.\n+\n+   END OF TERMS AND CONDITIONS\n+\n+   APPENDIX: How to apply the Apache License to your work.\n+\n+      To apply the Apache License to your work, attach the following\n+      boilerplate notice, with the fields enclosed by brackets \"[]\"\n+      replaced with your own identifying information. (Don't include\n+      the brackets!)  The text should be enclosed in the appropriate\n+      comment syntax for the file format. We also recommend that a\n+      file or class name and description of purpose be included on the\n+      same \"printed page\" as the copyright notice for easier\n+      identification within third-party archives.\n+\n+   Copyright [yyyy] [name of copyright owner]\n+\n+   Licensed under the Apache License, Version 2.0 (the \"License\");\n+   you may not use this file except in compliance with the License.\n+   You may obtain a copy of the License at\n+\n+       http://www.apache.org/licenses/LICENSE-2.0\n+\n+   Unless required by applicable law or agreed to in writing, software\n+   distributed under the License is distributed on an \"AS IS\" BASIS,\n+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+   See the License for the specific language governing permissions and\n+   limitations under the License."
+        },
+        {
+          "sha": "3bc1f04fa01e6b0faf00660ffad7186a70f14672",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/c36a35156f06b0e8f5d3d579366494b7120ed4e7/README.md",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/c36a35156f06b0e8f5d3d579366494b7120ed4e7/README.md",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/README.md?ref=c36a35156f06b0e8f5d3d579366494b7120ed4e7",
+          "patch": "@@ -0,0 +1 @@\n+# foonathan_memory_vendor\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "jsan-rt",
+      "date": "2023-05-10T14:09:52Z",
+      "sha": "e91681a25711c1811b2eaf2ba1e6996e0d9ecc84",
+      "message": "Bump version and update changelog (#66)\n\nSigned-off-by: Javier Santiago <javiersantiago@eprosima.com>",
+      "files_changed": 3,
+      "additions": 6,
+      "deletions": 2,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "107c4ae88cdf67aed1711e1ae5fad545101eeccc",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/e91681a25711c1811b2eaf2ba1e6996e0d9ecc84/CHANGELOG.rst",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/e91681a25711c1811b2eaf2ba1e6996e0d9ecc84/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/CHANGELOG.rst?ref=e91681a25711c1811b2eaf2ba1e6996e0d9ecc84",
+          "patch": "@@ -2,6 +2,10 @@\n Changelog for package foonathan_memory_vendor\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+1.3.1 (2023-05-10)\n+------------------\n+* Added support for QNX 7.1 build (#65)\n+\n 1.3.0 (2023-02-14)\n ------------------\n * Update upstream to release 0.7-3 (#62)(#63)"
+        },
+        {
+          "sha": "d08261102cb83c9f74088d30bf42e455d04eeb3e",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/e91681a25711c1811b2eaf2ba1e6996e0d9ecc84/CMakeLists.txt",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/e91681a25711c1811b2eaf2ba1e6996e0d9ecc84/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/CMakeLists.txt?ref=e91681a25711c1811b2eaf2ba1e6996e0d9ecc84",
+          "patch": "@@ -1,5 +1,5 @@\n cmake_minimum_required(VERSION 3.14)\n-project(foonathan_memory_vendor VERSION \"1.3.0\")\n+project(foonathan_memory_vendor VERSION \"1.3.1\")\n \n find_package(foonathan_memory QUIET)\n "
+        },
+        {
+          "sha": "a2d76cb2d58b409624e93e79660fd522f1c9d799",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/e91681a25711c1811b2eaf2ba1e6996e0d9ecc84/package.xml",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/e91681a25711c1811b2eaf2ba1e6996e0d9ecc84/package.xml",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/package.xml?ref=e91681a25711c1811b2eaf2ba1e6996e0d9ecc84",
+          "patch": "@@ -4,7 +4,7 @@\n   schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"3\">\n   <name>foonathan_memory_vendor</name>\n-  <version>1.3.0</version>\n+  <version>1.3.1</version>\n   <description>Foonathan/memory vendor package for Fast-RTPS.</description>\n   <maintainer email=\"miguelcompany@eprosima.com\">Miguel Company</maintainer>\n   <maintainer email=\"steven@openrobotics.org\">Steven! Ragnarök</maintainer>"
+        }
+      ]
+    },
+    {
+      "author": "chachoi",
+      "date": "2023-03-23T12:12:58Z",
+      "sha": "fd6ac25119d2f66e89d77c18c454267f4915059d",
+      "message": "Added support for QNX 7.1 build (#65)\n\nSigned-off-by: James Choi <chachoi@blackberry.com>",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "8bc18e1fbc57f9e17c172f614547fd5c40369749",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/fd6ac25119d2f66e89d77c18c454267f4915059d/CMakeLists.txt",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/fd6ac25119d2f66e89d77c18c454267f4915059d/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/CMakeLists.txt?ref=fd6ac25119d2f66e89d77c18c454267f4915059d",
+          "patch": "@@ -64,6 +64,9 @@ if(NOT foonathan_memory_FOUND)\n         list(APPEND extra_cmake_args \"-DANDROID_TOOLCHAIN_NAME=${ANDROID_TOOLCHAIN_NAME}\")\n       endif()\n     endif()\n+    if(QNX)\n+      list(APPEND extra_cmake_args \"-DCMAKE_SYSTEM_PROCESSOR=${CPUVARDIR}\")\n+    endif()\n   endif()\n   include(ExternalProject)\n "
+        }
+      ]
+    },
+    {
+      "author": "JLBuenoLopez",
+      "date": "2022-12-12T11:04:22Z",
+      "sha": "2ef9fc02d9e5483d719d32b06c4670514b25c62a",
+      "message": "Bump version to v1.2.2 and update CHANGELOG (#61)\n\n* Refs #16440: update CHANGELOG\r\n\r\nSigned-off-by: JLBuenoLopez-eProsima <joseluisbueno@eprosima.com>\r\n\r\n* Refs #16440: bump version to v1.2.2\r\n\r\nSigned-off-by: JLBuenoLopez-eProsima <joseluisbueno@eprosima.com>\r\n\r\nSigned-off-by: JLBuenoLopez-eProsima <joseluisbueno@eprosima.com>",
+      "files_changed": 3,
+      "additions": 6,
+      "deletions": 2,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "e91f7618f02666ef40475194bb94db705fc7b7ad",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/2ef9fc02d9e5483d719d32b06c4670514b25c62a/CHANGELOG.rst",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/2ef9fc02d9e5483d719d32b06c4670514b25c62a/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/CHANGELOG.rst?ref=2ef9fc02d9e5483d719d32b06c4670514b25c62a",
+          "patch": "@@ -2,6 +2,10 @@\n Changelog for package foonathan_memory_vendor\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+1.2.2 (2022-12-9)\n+-----------------\n+* Fix CMake minimum required version (#60)\n+\n 1.2.1 (2022-02-24)\n ------------------\n * Propagate `BUILD_SHARED_LIBS` and `CMAKE_POSITION_INDEPENDENT_CODE` to memory (#55)(#58)"
+        },
+        {
+          "sha": "0f423565d84c7eeaef9508251dffa2090be8209c",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/2ef9fc02d9e5483d719d32b06c4670514b25c62a/CMakeLists.txt",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/2ef9fc02d9e5483d719d32b06c4670514b25c62a/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/CMakeLists.txt?ref=2ef9fc02d9e5483d719d32b06c4670514b25c62a",
+          "patch": "@@ -1,5 +1,5 @@\n cmake_minimum_required(VERSION 3.14)\n-project(foonathan_memory_vendor VERSION \"1.2.1\")\n+project(foonathan_memory_vendor VERSION \"1.2.2\")\n \n find_package(foonathan_memory QUIET)\n "
+        },
+        {
+          "sha": "07ad7877ef9d5b4ed7b9418b20b934ef862bcd75",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/2ef9fc02d9e5483d719d32b06c4670514b25c62a/package.xml",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/2ef9fc02d9e5483d719d32b06c4670514b25c62a/package.xml",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/package.xml?ref=2ef9fc02d9e5483d719d32b06c4670514b25c62a",
+          "patch": "@@ -4,7 +4,7 @@\n   schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"3\">\n   <name>foonathan_memory_vendor</name>\n-  <version>1.2.1</version>\n+  <version>1.2.2</version>\n   <description>Foonathan/memory vendor package for Fast-RTPS.</description>\n   <maintainer email=\"miguelcompany@eprosima.com\">Miguel Company</maintainer>\n   <maintainer email=\"steven@openrobotics.org\">Steven! Ragnarök</maintainer>"
+        }
+      ]
+    },
+    {
+      "author": "EduPonz",
+      "date": "2022-02-22T06:19:33Z",
+      "sha": "6df3bcf9fe2d68446c17afcc260a03232d941597",
+      "message": "Propagate CMake flags correctly\n\n* Refs 13853: Propagate BUILD_SHARED_LIBS and CMAKE_POSITION_INDEPENDENT_CODE correctly\r\n\r\nSigned-off-by: Eduardo Ponz <eduardoponz@eprosima.com>\r\n\r\n* Refs 13853: Apply suggestions\r\n\r\nSigned-off-by: Eduardo Ponz <eduardoponz@eprosima.com>",
+      "files_changed": 1,
+      "additions": 10,
+      "deletions": 3,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "d4937ffa0ebfb8cefd34de59f7c2f2b7fc0c5ac5",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 3,
+          "changes": 13,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/6df3bcf9fe2d68446c17afcc260a03232d941597/CMakeLists.txt",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/6df3bcf9fe2d68446c17afcc260a03232d941597/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/CMakeLists.txt?ref=6df3bcf9fe2d68446c17afcc260a03232d941597",
+          "patch": "@@ -26,9 +26,16 @@ if(NOT foonathan_memory_FOUND)\n       \" or BUILD_MEMORY_TESTS are set\")\n   endif()\n \n-  if(BUILD_SHARED_LIBS)\n-    # Library will be statically created with PIC code\n-    list(APPEND extra_cmake_args -DCMAKE_POSITION_INDEPENDENT_CODE=ON)\n+  # Propagate BUILD_SHARED_LIBS\n+  if(DEFINED BUILD_SHARED_LIBS)\n+    list(APPEND extra_cmake_args -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS})\n+  endif()\n+\n+  # Propagate CMAKE_POSITION_INDEPENDENT_CODE\n+  if(DEFINED CMAKE_POSITION_INDEPENDENT_CODE)\n+    list(APPEND extra_cmake_args -DCMAKE_POSITION_INDEPENDENT_CODE=${CMAKE_POSITION_INDEPENDENT_CODE})\n+  elseif(BUILD_SHARED_LIBS)\n+    list(APPEND extra_cmake_args -DCMAKE_POSITION_INDEPENDENT_CODE=ON})\n   endif()\n \n   if(DEFINED CMAKE_BUILD_TYPE)"
+        }
+      ]
+    },
+    {
+      "author": "MiguelBarro",
+      "date": "2019-09-18T05:38:08Z",
+      "sha": "eb152cafa1689f52697145a5a8f56a7e38301dd6",
+      "message": "[6337] Allow foonathan_memory_vendor to behave as any other target under VC generator. (#11)\n\n* Allow foonathan_memory_vendor to behave as any other target under VC generator.\r\n\r\nVC Generator forces you to specify architecture (Win32 or x64) when the Buildsystem is generated (first stage), for example:\r\n\r\nproject > cmake -A x64 -B build64 .\r\n\r\nthen on the build (second stage) a config (Release, Debug, ...) is specified, for example:\r\n\r\nproject > cmake --build build64 --config Debug\r\n\r\nas foonathan_memory_vendor was implemented once the project was generated for an architecture (x64 for example) no other architecture was allowed, for example the following command:\r\n\r\nproject > cmake -A Win32 -B build32 .\r\n\r\nwouldn't generate any vcxproj because it identifies that this project was already generated (unfortunately for the wrong architecture).",
+      "files_changed": 1,
+      "additions": 40,
+      "deletions": 3,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "db5418dad4db3fb00c7aa1bb9fb3735e643c7c23",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 40,
+          "deletions": 3,
+          "changes": 43,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/eb152cafa1689f52697145a5a8f56a7e38301dd6/CMakeLists.txt",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/eb152cafa1689f52697145a5a8f56a7e38301dd6/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/CMakeLists.txt?ref=eb152cafa1689f52697145a5a8f56a7e38301dd6",
+          "patch": "@@ -1,6 +1,39 @@\n cmake_minimum_required(VERSION 3.5)\n project(foonathan_memory_vendor VERSION \"0.2.0\")\n \n+# force install of foonathan_memory has two downsides:\n+# - it requires admin privileges to simply build it when default installation prefix is chosen\n+# - the lack of a build prevents managing several architectures simultaneously (once one is compiled it prevents any\n+#    other generating linking errors)\n+# we are going to profit from CMake capability to search architecture specific config files and solve the second issue\n+\n+if(\"${CMAKE_GENERATOR_PLATFORM}\" MATCHES \"^([Ww][Ii][Nn]32)$\")\n+    set(foonathan_vendor_FIND_LIBRARY_USE \"FIND_LIBRARY_USE_LIB32_PATHS\")\n+    get_property(foonathan_vendor_FIND_LIBRARY_USE_value GLOBAL PROPERTY FIND_LIBRARY_USE_LIB32_PATHS)\n+    set_property(GLOBAL PROPERTY FIND_LIBRARY_USE_LIB32_PATHS TRUE)\n+    set( CMAKE_FIND_LIBRARY_CUSTOM_LIB_SUFFIX 32 )         \n+elseif (\"${CMAKE_GENERATOR_PLATFORM}\" MATCHES \"^([Xx]64)$\")\n+    set(foonathan_vendor_FIND_LIBRARY_USE \"FIND_LIBRARY_USE_LIB64_PATHS\")\n+    get_property(foonathan_vendor_FIND_LIBRARY_USE_value GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)\n+    set_property(GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS TRUE)\n+    set( CMAKE_FIND_LIBRARY_CUSTOM_LIB_SUFFIX 64 )     \n+endif()\n+\n+if( NOT DEFINED FOONATHAN_INSTALLATION_DIR )\n+    if(WIN32)\n+        set( FOONATHAN_INSTALLATION_DIR \"${CMAKE_INSTALL_PREFIX}/lib${CMAKE_FIND_LIBRARY_CUSTOM_LIB_SUFFIX}/${PROJECT_NAME}\")\n+    else()\n+        set( FOONATHAN_INSTALLATION_DIR \"${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}\")\n+    endif()\n+endif()\n+\n+#restore global properties state\n+if(foonathan_vendor_FIND_LIBRARY_USE)\n+    set_property(GLOBAL PROPERTY ${foonathan_vendor_FIND_LIBRARY_USE} ${foonathan_vendor_FIND_LIBRARY_USE_value})\n+    unset(foonathan_vendor_FIND_LIBRARY_USE)\n+    unset(foonathan_vendor_FIND_LIBRARY_USE_value)\n+endif()\n+\n find_package(foonathan_memory QUIET)\n \n if(NOT foonathan_memory_FOUND)\n@@ -20,6 +53,10 @@ if(NOT foonathan_memory_FOUND)\n   if(DEFINED CMAKE_BUILD_TYPE)\n     list(APPEND extra_cmake_args -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})\n   endif()\n+\n+  if(DEFINED CMAKE_LIBRARY_ARCHITECTURE)\n+    list(APPEND extra_cmake_args -DCMAKE_LIBRARY_ARCHITECTURE=${CMAKE_LIBRARY_ARCHITECTURE})\n+  endif()\n   \n   if(DEFINED CMAKE_TOOLCHAIN_FILE)\n     list(APPEND extra_cmake_args \"-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}\")\n@@ -72,7 +109,7 @@ if(NOT foonathan_memory_FOUND)\n   \n   # The external project will install to the build folder, but we'll install that on make install.\n   install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/foo_mem_ext_prj_install/\n-  DESTINATION ${CMAKE_INSTALL_PREFIX})\n+  DESTINATION ${FOONATHAN_INSTALLATION_DIR})\n else()\n   message(STATUS \"Found foonathan_memory ${foonathan_memory_VERSION}\")\n endif()\n@@ -87,9 +124,9 @@ write_basic_package_version_file(\n \n install(FILES\n   package.xml\n-  DESTINATION share/${PROJECT_NAME})\n+  DESTINATION ${FOONATHAN_INSTALLATION_DIR})\n \n install(FILES\n   \"${PROJECT_BINARY_DIR}/foonathan_memory_vendorConfig.cmake\"\n   \"${PROJECT_BINARY_DIR}/foonathan_memory_vendorConfig-version.cmake\"\n-  DESTINATION share/${PROJECT_NAME}/cmake)\n+  DESTINATION ${FOONATHAN_INSTALLATION_DIR}/cmake)"
+        }
+      ]
+    },
+    {
+      "author": "cottsay",
+      "date": "2021-02-12T03:43:49Z",
+      "sha": "ac8e182476db44e601d34d300083f245fb66f1b8",
+      "message": "Shorten some excessively long lines of CMake (#44)\n\nThe line length enforcement in ament_lint_cmake has been broken for some\r\ntime, but will be fixed by ament/ament_lint#236. This change brings this\r\npackage into compliance with a 120 column limit.\r\n\r\nSigned-off-by: Scott K Logan <logans@cottsay.net>",
+      "files_changed": 2,
+      "additions": 13,
+      "deletions": 6,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "3793f39fe9ff5fb0011429687273d90f40c08d34",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 2,
+          "changes": 7,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/ac8e182476db44e601d34d300083f245fb66f1b8/CMakeLists.txt",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/ac8e182476db44e601d34d300083f245fb66f1b8/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/CMakeLists.txt?ref=ac8e182476db44e601d34d300083f245fb66f1b8",
+          "patch": "@@ -65,10 +65,13 @@ if(NOT foonathan_memory_FOUND)\n   include(ExternalProject)\n \n   if(INSTALLER_PLATFORM)\n-    set(PATCH_COMMAND_STR PATCH_COMMAND git apply ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt.patch && sed -i -e \"s/INSTALLER_PLATFORM/${INSTALLER_PLATFORM}/g\" CMakeLists.txt)\n+    set(PATCH_COMMAND_STR PATCH_COMMAND\n+      git apply ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt.patch &&\n+      sed -i -e \"s/INSTALLER_PLATFORM/${INSTALLER_PLATFORM}/g\" CMakeLists.txt)\n   elseif(BUILD_MEMORY_TESTS)\n     # This could be removed whenever we change the GIT_TAG from c619113 to anything above 09b884c\n-    set(PATCH_COMMAND_STR PATCH_COMMAND curl https://github.com/foonathan/memory/commit/09b884c18abb314bfa678df27141a4dcad71c4ba.diff | git apply -)\n+    set(PATCH_COMMAND_STR PATCH_COMMAND\n+      curl https://github.com/foonathan/memory/commit/09b884c18abb314bfa678df27141a4dcad71c4ba.diff | git apply -)\n   endif()\n \n   externalproject_add(foo_mem-ext"
+        },
+        {
+          "sha": "58f288e9eaf054d43cc4c15ba73309f09257dc70",
+          "filename": "foonathan_memory-config.cmake",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 4,
+          "changes": 12,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/ac8e182476db44e601d34d300083f245fb66f1b8/foonathan_memory-config.cmake",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/ac8e182476db44e601d34d300083f245fb66f1b8/foonathan_memory-config.cmake",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/foonathan_memory-config.cmake?ref=ac8e182476db44e601d34d300083f245fb66f1b8",
+          "patch": "@@ -14,15 +14,19 @@\n \n if(MSVC_VERSION EQUAL 1900)\n     if(CMAKE_CL_64)\n-        include(\"${CMAKE_CURRENT_LIST_DIR}/../share/foonathan_memory-x64Win64VS2015/cmake/foonathan_memory-config.cmake\")\n+        include(\n+          \"${CMAKE_CURRENT_LIST_DIR}/../share/foonathan_memory-x64Win64VS2015/cmake/foonathan_memory-config.cmake\")\n     else()\n-        include(\"${CMAKE_CURRENT_LIST_DIR}/../share/foonathan_memory-i86Win32VS2015/cmake/foonathan_memory-config.cmake\")\n+        include(\n+          \"${CMAKE_CURRENT_LIST_DIR}/../share/foonathan_memory-i86Win32VS2015/cmake/foonathan_memory-config.cmake\")\n     endif()\n elseif(MSVC_VERSION GREATER 1900)\n     if(CMAKE_CL_64)\n-        include(\"${CMAKE_CURRENT_LIST_DIR}/../share/foonathan_memory-x64Win64VS2017/cmake/foonathan_memory-config.cmake\")\n+        include(\n+          \"${CMAKE_CURRENT_LIST_DIR}/../share/foonathan_memory-x64Win64VS2017/cmake/foonathan_memory-config.cmake\")\n     else()\n-        include(\"${CMAKE_CURRENT_LIST_DIR}/../share/foonathan_memory-i86Win32VS2017/cmake/foonathan_memory-config.cmake\")\n+        include(\n+          \"${CMAKE_CURRENT_LIST_DIR}/../share/foonathan_memory-i86Win32VS2017/cmake/foonathan_memory-config.cmake\")\n     endif()\n else()\n     message(FATAL_ERROR \"Not supported version of Visual Studio\")"
+        }
+      ]
+    },
+    {
+      "author": "chapulina",
+      "date": "2020-10-13T05:45:04Z",
+      "sha": "e3f41ae281c152b3ff06ccdc870600f0fcf4d66d",
+      "message": "Point to upstream quality declaration and bump to level 2 (#39)\n\nSigned-off-by: Louise Poubel <louise@openrobotics.org>",
+      "files_changed": 2,
+      "additions": 13,
+      "deletions": 161,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "260d5b77bff181c4b07047690c70eed887ff3d34",
+          "filename": "QUALITY_DECLARATION.md",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 13,
+          "changes": 26,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/e3f41ae281c152b3ff06ccdc870600f0fcf4d66d/QUALITY_DECLARATION.md",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/e3f41ae281c152b3ff06ccdc870600f0fcf4d66d/QUALITY_DECLARATION.md",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/QUALITY_DECLARATION.md?ref=e3f41ae281c152b3ff06ccdc870600f0fcf4d66d",
+          "patch": "@@ -2,7 +2,7 @@ This document is a declaration of software quality for the `foonathan_memory_ven\n \n # `foonathan_memory_vendor` Quality Declaration\n \n-The package `foonathan_memory_vendor` claims to be in the **Quality Level 3** category.\n+The package `foonathan_memory_vendor` claims to be in the **Quality Level 2** category.\n \n Below are the rationales, notes, and caveats for this claim, organized by each requirement listed in the [Package Requirements for Quality Level 3 in REP-2004](https://www.ros.org/reps/rep-2004.html).\n \n@@ -108,7 +108,7 @@ It also has several test dependencies, which do not affect the resulting quality\n \n `foonathan_memory` is a C++ library used to augment std::allocator.\n \n-It is **Quality Level 4**, see its [Quality Declaration document](QUALITY_DECLARATION_foonathan_memory.md).\n+It is **Quality Level 2**, see its [Quality Declaration document](https://github.com/eProsima/Fast-DDS/blob/master/Quality_Declaration_foonathan_memory.md).\n \n ## Platform Support [6]\n \n@@ -137,30 +137,30 @@ The chart below compares the requirements in the REP-2004 with the current state\n |1.ii|Stable version |✓||\n |1.iii|Declared public API|None|\n |1.iv|API stability policy|✓|\n-|1.v|ABI stability policy| None |\n-|1.vi_|API/ABI stable within ros distribution|✓|\n+|1.v|ABI stability policy| N/A |\n+|1.vi|API/ABI stable within ros distribution|✓|\n |2| **Change control process** |---|\n |2.i| All changes occur on change request | ✓|\n |2.ii| Contributor origin (DCO, CLA, etc) | ✓|\n |2.iii| Peer review policy | ✓ |\n |2.iv| CI policy for change requests | ✓ |\n |2.v| Documentation policy for change requests | ✓ |\n |3| **Documentation** | --- |\n-|3.i| Per feature documentation | None |\n-|3.ii| Per public API item documentation | None |\n+|3.i| Per feature documentation | N/A |\n+|3.ii| Per public API item documentation | N/A |\n |3.iii| Declared License(s) | ✓ |\n |3.iv| Copyright in source files| ✓ |\n |3.v.a| Quality declaration linked to README | ✓ |\n |3.v.b| Centralized declaration available for peer review |✓|\n |4| **Testing** | --- |\n-|4.i| Feature items tests | None |\n-|4.ii| Public API tests | None |\n-|4.iii.a| Using coverage |None |\n-|4.iii.a| Coverage policy | None |\n-|4.iv.a| Performance tests (if applicable) | None |\n-|4.iv.b| Performance tests policy| None |\n+|4.i| Feature items tests | N/A |\n+|4.ii| Public API tests | N/A |\n+|4.iii.a| Using coverage |N/A |\n+|4.iii.a| Coverage policy | N/A |\n+|4.iv.a| Performance tests (if applicable) | N/A |\n+|4.iv.b| Performance tests policy| N/A |\n |4.v.a| Code style enforcement (linters)| ✓ |\n-|4.v.b| Use of static analysis tools | None |\n+|4.v.b| Use of static analysis tools | N/A |\n |5| **Dependencies** | --- |\n |5.i| Must not have ROS lower level dependencies | ✓ |\n |5.ii| Optional ROS lower level dependencies| ✓ |"
+        },
+        {
+          "sha": "dc5d5432f0c29c91c2f14fdae3486e576bf833b7",
+          "filename": "QUALITY_DECLARATION_foonathan_memory.md",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 148,
+          "changes": 148,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/702182f9a128d5f3a30c68b83b78cbcc772741bb/QUALITY_DECLARATION_foonathan_memory.md",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/702182f9a128d5f3a30c68b83b78cbcc772741bb/QUALITY_DECLARATION_foonathan_memory.md",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/QUALITY_DECLARATION_foonathan_memory.md?ref=702182f9a128d5f3a30c68b83b78cbcc772741bb",
+          "patch": "@@ -1,148 +0,0 @@\n-This document is a declaration of software quality for the `foonathan_memory` package imported by `foonathan_memory_vendor`, based on the guidelines in [REP-2004](https://www.ros.org/reps/rep-2004.html).\n-\n-# `foonathan_memory` Quality Declaration\n-\n-This quality declaration claims that the third party package `foonathan_memory` is in the **Quality Level 4** category.\n-\n-Below are the rationales, notes, and caveats for this claim, organized by each requirement listed in the [Package Requirements for Quality Level 4 in REP-2004](https://www.ros.org/reps/rep-2004.html).\n-\n-## Version Policy [1]\n-\n-### Version Scheme [1.i]\n-\n-`foonathan_memory` does not have a declared versioning scheme.\n-\n-### Version Stability [1.ii]\n-\n-`foonathan_memory` currently has a version less than 1.0 but is in maintenance mode.\n-Large API changes may occur during minor version updates, and smaller API additions may occur during patch version updates.\n-A summary of its changes are contained in its [CHANGELOG](https://github.com/foonathan/memory/blob/master/CHANGELOG.MD).\n-\n-### Public API Declaration [1.iii]\n-\n-All symbols in the installed headers are considered part of the public API with the exception of the `detail` directory and corresponding namespace.\n-\n-All installed headers are in the `include` directory of the package, headers in any other folders are not installed and considered private.\n-\n-### API Stability Within a Released ROS Distribution [1.iv]/[1.vi]\n-\n-`foonathan_memory` is a third party package and does not follow the ROS distribution timeline.\n-It may introduce breaking API changes within a ROS distribution.\n-To avoid breaking API within a ROS distribution, its vendor package `foonathan_memory_vendor` shall import a specific version.\n-\n-### ABI Stability Within a Released ROS Distribution [1.v]/[1.vi]\n-\n-`foonathan_memory` is a third party package and does not follow the ROS distribution timeline.\n-It may introduce breaking ABI changes within a ROS distribution.\n-To avoid breaking API within a ROS distribution, its vendor package `foonathan_memory_vendor` shall import a specific version.\n-\n-## Change Control Process [2]\n-\n-`foonathan_memory` does not have a stated change control process.\n-\n-### Change Requests [2.i]\n-\n-This package does not require that changes occur through a pull request.\n-Many changes are committed directly by its maintainer.\n-\n-### Contributor Origin [2.ii]\n-\n-This package does not have a confirmation of contributor origin policy.\n-\n-### Peer Review Policy [2.iii]\n-\n-There is no stated peer review policy, but each pull request is at least reviewed by the core maintainer.\n-\n-### Continuous Integration [2.iv]\n-\n-Changes must pass CI on AMD 64 for:\n-- Ubuntu 16.04 for gcc 4.9 and 5.5\n-- MacOS with XCode 9.4 with Apple LLVM version 9.1.0\n-- Windows with Microsoft Visual Studio 2015, MSVC 18.0\n-\n-ARM 64 support is not directly evaluated by this package's CI process.\n-\n-Regular CI results can be seen here:\n-* [Ubuntu and OS X](https://travis-ci.org/github/foonathan/memory).\n-* [Windows](https://ci.appveyor.com/project/foonathan/memory/branch/master).\n-\n-### Documentation Policy [2.v]\n-\n-This package does not have a stated documentation policy.\n-\n-## Documentation [3]\n-\n-### Feature Documentation [3.i]\n-\n-`foonathan_memory` has a [feature list](https://foonathan.net/memory/index.html) with descriptions of its main features.\n-\n-### Public API Documentation [3.ii]\n-\n-`foonathan_memory` has embedded API documentation that is generated using doxygen and is [hosted](https://foonathan.net/memory/index.html) alongside the feature documentation.\n-There is documentation for nearly all of the public API.\n-\n-### License [3.iii]\n-\n-The license for `foonathan_memory` is zlib, a summary statement is provided in each source file, and a full copy of the license is in the [LICENSE](https://raw.githubusercontent.com/foonathan/memory/master/LICENSE) file.\n-\n-### Copyright Statements [3.iv]\n-\n-The copyright holders each provide a statement of copyright in each source code file in `foonathan_memory`.\n-\n-## Testing [4]\n-\n-### Feature Testing [4.i]\n-\n-Many features in `foonathan_memory` have corresponding tests which simulate typical usage, and they are located in the `test` directory.\n-\n-### Public API Testing [4.ii]\n-\n-Many parts of the public API have tests.\n-\n-### Coverage [4.iii]\n-\n-`foonathan_memory` does not track testing coverage.\n-\n-### Performance [4.iv]\n-\n-`foonathan_memory` does not conduct performance tests.\n-\n-### Linters and Static Analysis [4.v]\n-\n-`foonathan_memory` does not conduct tests with linters on its public CI.\n-\n-## Dependencies [5]\n-\n-`foonathan_memory` does not have any dependencies outside of the C++ standard library.\n-\n-## Platform Support [6]\n-\n-`foonathan_memory` supports the following platforms and tests each one:\n-- Ubuntu 16.04 for gcc 4.9 and 5.5\n-- MacOS with XCode 9.4 with Apple LLVM version 9.1.0\n-- Windows with Microsoft Visual Studio 2015, MSVC 18.0\n-\n-ARM 64 support is not directly evaluated by this package's CI process.\n-\n-Regular CI results can be seen here:\n-* [Ubuntu and OS X](https://travis-ci.org/github/foonathan/memory).\n-* [Windows](https://ci.appveyor.com/project/foonathan/memory/branch/master).\n-\n-## Vulnerability Disclosure Policy [7.i]\n-\n-`foonathan_memory` does not have a Vulnerability Disclosure Policy\n-\n-\n-## Third-Party Package Quality Level Summary [8]\n-\n-As `foonathan_memory` is a third-party package in maintenance mode, it is unlikely that it will be able to accomplish the remaining steps to become a Quality Level 1 type of package.\n-However, as part of the ROS 2 ecosystem it will be important that it can be validated to the equivalent quality level.\n-\n-Even though `foonathan_memory` by itself will not likely reach the equivalent level of quality as Quality Level 1, there are steps that can be taken by ROS contributors to ensure that its incorporation into ROS packages can provide the equivalent level of quality.\n-ROS contributors will need to conduct coverage tests to identify the remaining API and features that are not currently covered by tests.\n-If features and portions of the public API that are used in ROS dependencies are found to be untested, then the appropriate tests will be required.\n-To solidify version stability, `foonathan_memory_vendor` shall declare a targeted version for each ROS 2 distribution release.\n-If a newer version is desired for a previously released ROS 2 distribution, then it will need to be verified that the API does not change between versions.\n-`foonathan_memory` tests will need to be conducted on all ROS 2 tier 1 platforms for each pinned version so regressions can be identified and ticketed upstream.\n-Performance tests should be written to ensure that `foonathan_memory` meets its performance targets and the ROS community can track performance regressions in newer pinned versions.\n-`foonathan_memory` does not have a rigorous change control policy, therefore the onus is on the ROS packages incorporating each pinned version to provide a suitable review of its quality as a third-party dependency. As `foonathan_memory` is not maintained by the ROS community, requirements for automatic linting can be waved."
+        }
+      ]
+    },
+    {
+      "author": "mauropasse",
+      "date": "2020-09-23T07:39:23Z",
+      "sha": "fa2cb36783bccdab73556342031558048b81962e",
+      "message": "Add options instead of forcing them (#32)\n\n* Add build memory tools option\r\n\r\nSigned-off-by: Mauro <mpasserino@irobot.com>\r\n\r\n* Add options for building tests and examples\r\n\r\nSigned-off-by: Miguel Company <MiguelCompany@eprosima.com>\r\n\r\n* Added option dependency validation\r\n\r\nSigned-off-by: Miguel Company <MiguelCompany@eprosima.com>\r\n\r\nCo-authored-by: Mauro <mpasserino@irobot.com>\r\nCo-authored-by: Miguel Company <MiguelCompany@eprosima.com>",
+      "files_changed": 1,
+      "additions": 16,
+      "deletions": 3,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "70b260772a12a85973140a4dbb236f1f6b84fa1d",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 16,
+          "deletions": 3,
+          "changes": 19,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/fa2cb36783bccdab73556342031558048b81962e/CMakeLists.txt",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/fa2cb36783bccdab73556342031558048b81962e/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/CMakeLists.txt?ref=fa2cb36783bccdab73556342031558048b81962e",
+          "patch": "@@ -12,6 +12,19 @@ if(NOT foonathan_memory_FOUND)\n   # unless the library was explicitly added as a static library.\n   option(BUILD_SHARED_LIBS \"Create shared libraries by default\" ON)\n \n+  # Option to build memory examples\n+  option(BUILD_MEMORY_EXAMPLES \"Build memory examples\" OFF)\n+  # Option to build memory tests\n+  option(BUILD_MEMORY_TESTS \"Build memory tests\" OFF)\n+  # Option to build memory tools\n+  option(BUILD_MEMORY_TOOLS \"Build memory tools\" ON)\n+  \n+  # Validate option dependency\n+  if( (NOT BUILD_MEMORY_TOOLS) AND (BUILD_MEMORY_EXAMPLES OR BUILD_MEMORY_TESTS) )\n+    message(FATAL_ERROR\n+      \"BUILD_MEMORY_TOOLS is required when BUILD_MEMORY_EXAMPLES or BUILD_MEMORY_TESTS are set\")\n+  endif()\n+\n   if(BUILD_SHARED_LIBS)\n     # Library will be statically created with PIC code\n     list(APPEND extra_cmake_args -DCMAKE_POSITION_INDEPENDENT_CODE=ON)\n@@ -61,9 +74,9 @@ if(NOT foonathan_memory_FOUND)\n   # Avoid the update (git pull) and so the recompilation of foonathan_memory library each time.\n   UPDATE_COMMAND \"\"\n   CMAKE_ARGS\n-    -DFOONATHAN_MEMORY_BUILD_EXAMPLES=OFF\n-    -DFOONATHAN_MEMORY_BUILD_TESTS=OFF\n-    -DFOONATHAN_MEMORY_BUILD_TOOLS=ON\n+    -DFOONATHAN_MEMORY_BUILD_EXAMPLES=${BUILD_MEMORY_EXAMPLES}\n+    -DFOONATHAN_MEMORY_BUILD_TESTS=${BUILD_MEMORY_TESTS}\n+    -DFOONATHAN_MEMORY_BUILD_TOOLS=${BUILD_MEMORY_TOOLS}\n     -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/foo_mem_ext_prj_install\n     ${extra_cmake_args}\n     -Wno-dev"
+        }
+      ]
+    },
+    {
+      "author": "hidmic",
+      "date": "2020-07-01T17:22:47Z",
+      "sha": "7ca1e109c2d4d7f0b3b03f6880c770ef00ed79de",
+      "message": "Update vendor package Quality Declaration to QL3. (#35)\n\nSigned-off-by: Michel Hidalgo <michel@ekumenlabs.com>",
+      "files_changed": 2,
+      "additions": 52,
+      "deletions": 2,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "dfee351b34e5ebd8eeb53cd256751c31561e16e4",
+          "filename": "QUALITY_DECLARATION.md",
+          "status": "modified",
+          "additions": 47,
+          "deletions": 2,
+          "changes": 49,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/7ca1e109c2d4d7f0b3b03f6880c770ef00ed79de/QUALITY_DECLARATION.md",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/7ca1e109c2d4d7f0b3b03f6880c770ef00ed79de/QUALITY_DECLARATION.md",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/QUALITY_DECLARATION.md?ref=7ca1e109c2d4d7f0b3b03f6880c770ef00ed79de",
+          "patch": "@@ -2,9 +2,9 @@ This document is a declaration of software quality for the `foonathan_memory_ven\n \n # `foonathan_memory_vendor` Quality Declaration\n \n-The package `foonathan_memory_vendor` claims to be in the **Quality Level 4** category.\n+The package `foonathan_memory_vendor` claims to be in the **Quality Level 3** category.\n \n-Below are the rationales, notes, and caveats for this claim, organized by each requirement listed in the [Package Requirements for Quality Level 4 in REP-2004](https://www.ros.org/reps/rep-2004.html).\n+Below are the rationales, notes, and caveats for this claim, organized by each requirement listed in the [Package Requirements for Quality Level 3 in REP-2004](https://www.ros.org/reps/rep-2004.html).\n \n ## Version Policy [1]\n \n@@ -15,6 +15,7 @@ Below are the rationales, notes, and caveats for this claim, organized by each r\n ### Version Stability [1.ii]\n \n `foonathan_memory_vendor` is at or above a stable version, i.e. `>= 1.0.0`.\n+The current version can be found in its [package.xml](package.xml).\n \n ### Public API Declaration [1.iii]\n \n@@ -124,3 +125,47 @@ Currently nightly results can be seen here:\n ### Vulnerability Disclosure Policy [7.i]\n \n This package conforms to the Vulnerability Disclosure Policy in [REP-2006](https://www.ros.org/reps/rep-2006.html).\n+\n+# Current status Summary\n+\n+The chart below compares the requirements in the REP-2004 with the current state of the `foonathan_memory_vendor` package.\n+\n+|Number|  Requirement| Current state |\n+|--|--|--|\n+|1| **Version policy** |---|\n+|1.i|Version Policy available | ✓ |\n+|1.ii|Stable version |✓||\n+|1.iii|Declared public API|None|\n+|1.iv|API stability policy|✓|\n+|1.v|ABI stability policy| None |\n+|1.vi_|API/ABI stable within ros distribution|✓|\n+|2| **Change control process** |---|\n+|2.i| All changes occur on change request | ✓|\n+|2.ii| Contributor origin (DCO, CLA, etc) | ✓|\n+|2.iii| Peer review policy | ✓ |\n+|2.iv| CI policy for change requests | ✓ |\n+|2.v| Documentation policy for change requests | ✓ |\n+|3| **Documentation** | --- |\n+|3.i| Per feature documentation | None |\n+|3.ii| Per public API item documentation | None |\n+|3.iii| Declared License(s) | ✓ |\n+|3.iv| Copyright in source files| ✓ |\n+|3.v.a| Quality declaration linked to README | ✓ |\n+|3.v.b| Centralized declaration available for peer review |✓|\n+|4| **Testing** | --- |\n+|4.i| Feature items tests | None |\n+|4.ii| Public API tests | None |\n+|4.iii.a| Using coverage |None |\n+|4.iii.a| Coverage policy | None |\n+|4.iv.a| Performance tests (if applicable) | None |\n+|4.iv.b| Performance tests policy| None |\n+|4.v.a| Code style enforcement (linters)| ✓ |\n+|4.v.b| Use of static analysis tools | None |\n+|5| **Dependencies** | --- |\n+|5.i| Must not have ROS lower level dependencies | ✓ |\n+|5.ii| Optional ROS lower level dependencies| ✓ |\n+|5.iii| Justifies quality use of non-ROS dependencies |✓|\n+|6| **Platform support** | --- |\n+|6.i| Support targets Tier1 ROS platforms| ✓ |\n+|7| **Security** | --- |\n+|7.i| Vulnerability Disclosure Policy | ✓ |"
+        },
+        {
+          "sha": "71f8ed74e4836f730f827af81a38c6560101d523",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/7ca1e109c2d4d7f0b3b03f6880c770ef00ed79de/README.md",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/7ca1e109c2d4d7f0b3b03f6880c770ef00ed79de/README.md",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/README.md?ref=7ca1e109c2d4d7f0b3b03f6880c770ef00ed79de",
+          "patch": "@@ -1,4 +1,9 @@\n # foonathan_memory_vendor\n+\n Vendor package for foonathan/memory: https://github.com/foonathan/memory\n \n This package will download, patch, build and install foonathan_memory for its use with Fast-RTPS.\n+\n+## Quality Declaration\n+\n+This package claims to be in the **Quality Level 3** category, see the [Quality Declaration](QUALITY_DECLARATION.md) for more details."
+        }
+      ]
+    },
+    {
+      "author": "clalancette",
+      "date": "2020-06-02T20:06:36Z",
+      "sha": "262d804f9654719cc68d9ed4179e927953e27eeb",
+      "message": "QD Security Vulnerability Declaration: REP 2006 (#34)\n\nSigned-off-by: Chris Lalancette <clalancette@openrobotics.org>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "3c61213936a91304eb5fcc54dae119b3f20eac90",
+          "filename": "QUALITY_DECLARATION.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/262d804f9654719cc68d9ed4179e927953e27eeb/QUALITY_DECLARATION.md",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/262d804f9654719cc68d9ed4179e927953e27eeb/QUALITY_DECLARATION.md",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/QUALITY_DECLARATION.md?ref=262d804f9654719cc68d9ed4179e927953e27eeb",
+          "patch": "@@ -123,4 +123,4 @@ Currently nightly results can be seen here:\n \n ### Vulnerability Disclosure Policy [7.i]\n \n-This package does not yet have a Vulnerability Disclosure Policy.\n+This package conforms to the Vulnerability Disclosure Policy in [REP-2006](https://www.ros.org/reps/rep-2006.html)."
+        }
+      ]
+    },
+    {
+      "author": "nuclearsandwich",
+      "date": "2019-09-24T05:28:49Z",
+      "sha": "017ff0bdfd2c93930bf525a01f8663a032337a14",
+      "message": "Add nuclearsandwich as a maintainer and complete 0.3.0 release. (#13)\n\n* Add myself as a package maintainer.\r\n\r\nSigned-off-by: Steven! Ragnarök <steven@nuclearsandwich.com>\r\n\r\n* 0.3.0\r\n\r\nSigned-off-by: Steven! Ragnarök <steven@nuclearsandwich.com>",
+      "files_changed": 2,
+      "additions": 3,
+      "deletions": 2,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "45a62c7d5767bdb5190a236b7ba6858746e17d13",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/017ff0bdfd2c93930bf525a01f8663a032337a14/CMakeLists.txt",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/017ff0bdfd2c93930bf525a01f8663a032337a14/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/CMakeLists.txt?ref=017ff0bdfd2c93930bf525a01f8663a032337a14",
+          "patch": "@@ -1,5 +1,5 @@\n cmake_minimum_required(VERSION 3.5)\n-project(foonathan_memory_vendor VERSION \"0.2.0\")\n+project(foonathan_memory_vendor VERSION \"0.3.0\")\n \n find_package(foonathan_memory QUIET)\n "
+        },
+        {
+          "sha": "37c609027a4c48fdef56ec41cb968df2ae76f504",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/017ff0bdfd2c93930bf525a01f8663a032337a14/package.xml",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/017ff0bdfd2c93930bf525a01f8663a032337a14/package.xml",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/package.xml?ref=017ff0bdfd2c93930bf525a01f8663a032337a14",
+          "patch": "@@ -4,9 +4,10 @@\n   schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"3\">\n   <name>foonathan_memory_vendor</name>\n-  <version>0.1.0</version>\n+  <version>0.3.0</version>\n   <description>Foonathan/memory vendor package for Fast-RTPS.</description>\n   <maintainer email=\"miguelcompany@eprosima.com\">Miguel Company</maintainer>\n+  <maintainer email=\"steven@openrobotics.org\">Steven! Ragnarök</maintainer>\n   <license>Apache License 2.0</license> <!-- The contents of this vendor package are Apache 2.0 -->\n   <license>zlib License</license> <!-- foonathan/memory is licensed under the zlib License (https://github.com/foonathan/memory/blob/master/LICENSE) -->\n   <buildtool_depend>cmake</buildtool_depend>"
+        }
+      ]
+    },
+    {
+      "author": "brawner",
+      "date": "2020-04-29T21:34:47Z",
+      "sha": "9984a154df589f3a46023c911cc4d4c9e48ed1e0",
+      "message": "Add quality declaration for foonathan_memory (#22)",
+      "files_changed": 1,
+      "additions": 148,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "dc5d5432f0c29c91c2f14fdae3486e576bf833b7",
+          "filename": "QUALITY_DECLARATION_foonathan_memory.md",
+          "status": "added",
+          "additions": 148,
+          "deletions": 0,
+          "changes": 148,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/9984a154df589f3a46023c911cc4d4c9e48ed1e0/QUALITY_DECLARATION_foonathan_memory.md",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/9984a154df589f3a46023c911cc4d4c9e48ed1e0/QUALITY_DECLARATION_foonathan_memory.md",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/QUALITY_DECLARATION_foonathan_memory.md?ref=9984a154df589f3a46023c911cc4d4c9e48ed1e0",
+          "patch": "@@ -0,0 +1,148 @@\n+This document is a declaration of software quality for the `foonathan_memory` package imported by `foonathan_memory_vendor`, based on the guidelines in [REP-2004](https://www.ros.org/reps/rep-2004.html).\n+\n+# `foonathan_memory` Quality Declaration\n+\n+This quality declaration claims that the third party package `foonathan_memory` is in the **Quality Level 4** category.\n+\n+Below are the rationales, notes, and caveats for this claim, organized by each requirement listed in the [Package Requirements for Quality Level 4 in REP-2004](https://www.ros.org/reps/rep-2004.html).\n+\n+## Version Policy [1]\n+\n+### Version Scheme [1.i]\n+\n+`foonathan_memory` does not have a declared versioning scheme.\n+\n+### Version Stability [1.ii]\n+\n+`foonathan_memory` currently has a version less than 1.0 but is in maintenance mode.\n+Large API changes may occur during minor version updates, and smaller API additions may occur during patch version updates.\n+A summary of its changes are contained in its [CHANGELOG](https://github.com/foonathan/memory/blob/master/CHANGELOG.MD).\n+\n+### Public API Declaration [1.iii]\n+\n+All symbols in the installed headers are considered part of the public API with the exception of the `detail` directory and corresponding namespace.\n+\n+All installed headers are in the `include` directory of the package, headers in any other folders are not installed and considered private.\n+\n+### API Stability Within a Released ROS Distribution [1.iv]/[1.vi]\n+\n+`foonathan_memory` is a third party package and does not follow the ROS distribution timeline.\n+It may introduce breaking API changes within a ROS distribution.\n+To avoid breaking API within a ROS distribution, its vendor package `foonathan_memory_vendor` shall import a specific version.\n+\n+### ABI Stability Within a Released ROS Distribution [1.v]/[1.vi]\n+\n+`foonathan_memory` is a third party package and does not follow the ROS distribution timeline.\n+It may introduce breaking ABI changes within a ROS distribution.\n+To avoid breaking API within a ROS distribution, its vendor package `foonathan_memory_vendor` shall import a specific version.\n+\n+## Change Control Process [2]\n+\n+`foonathan_memory` does not have a stated change control process.\n+\n+### Change Requests [2.i]\n+\n+This package does not require that changes occur through a pull request.\n+Many changes are committed directly by its maintainer.\n+\n+### Contributor Origin [2.ii]\n+\n+This package does not have a confirmation of contributor origin policy.\n+\n+### Peer Review Policy [2.iii]\n+\n+There is no stated peer review policy, but each pull request is at least reviewed by the core maintainer.\n+\n+### Continuous Integration [2.iv]\n+\n+Changes must pass CI on AMD 64 for:\n+- Ubuntu 16.04 for gcc 4.9 and 5.5\n+- MacOS with XCode 9.4 with Apple LLVM version 9.1.0\n+- Windows with Microsoft Visual Studio 2015, MSVC 18.0\n+\n+ARM 64 support is not directly evaluated by this package's CI process.\n+\n+Regular CI results can be seen here:\n+* [Ubuntu and OS X](https://travis-ci.org/github/foonathan/memory).\n+* [Windows](https://ci.appveyor.com/project/foonathan/memory/branch/master).\n+\n+### Documentation Policy [2.v]\n+\n+This package does not have a stated documentation policy.\n+\n+## Documentation [3]\n+\n+### Feature Documentation [3.i]\n+\n+`foonathan_memory` has a [feature list](https://foonathan.net/memory/index.html) with descriptions of its main features.\n+\n+### Public API Documentation [3.ii]\n+\n+`foonathan_memory` has embedded API documentation that is generated using doxygen and is [hosted](https://foonathan.net/memory/index.html) alongside the feature documentation.\n+There is documentation for nearly all of the public API.\n+\n+### License [3.iii]\n+\n+The license for `foonathan_memory` is zlib, a summary statement is provided in each source file, and a full copy of the license is in the [LICENSE](https://raw.githubusercontent.com/foonathan/memory/master/LICENSE) file.\n+\n+### Copyright Statements [3.iv]\n+\n+The copyright holders each provide a statement of copyright in each source code file in `foonathan_memory`.\n+\n+## Testing [4]\n+\n+### Feature Testing [4.i]\n+\n+Many features in `foonathan_memory` have corresponding tests which simulate typical usage, and they are located in the `test` directory.\n+\n+### Public API Testing [4.ii]\n+\n+Many parts of the public API have tests.\n+\n+### Coverage [4.iii]\n+\n+`foonathan_memory` does not track testing coverage.\n+\n+### Performance [4.iv]\n+\n+`foonathan_memory` does not conduct performance tests.\n+\n+### Linters and Static Analysis [4.v]\n+\n+`foonathan_memory` does not conduct tests with linters on its public CI.\n+\n+## Dependencies [5]\n+\n+`foonathan_memory` does not have any dependencies outside of the C++ standard library.\n+\n+## Platform Support [6]\n+\n+`foonathan_memory` supports the following platforms and tests each one:\n+- Ubuntu 16.04 for gcc 4.9 and 5.5\n+- MacOS with XCode 9.4 with Apple LLVM version 9.1.0\n+- Windows with Microsoft Visual Studio 2015, MSVC 18.0\n+\n+ARM 64 support is not directly evaluated by this package's CI process.\n+\n+Regular CI results can be seen here:\n+* [Ubuntu and OS X](https://travis-ci.org/github/foonathan/memory).\n+* [Windows](https://ci.appveyor.com/project/foonathan/memory/branch/master).\n+\n+## Vulnerability Disclosure Policy [7.i]\n+\n+`foonathan_memory` does not have a Vulnerability Disclosure Policy\n+\n+\n+## Third-Party Package Quality Level Summary [8]\n+\n+As `foonathan_memory` is a third-party package in maintenance mode, it is unlikely that it will be able to accomplish the remaining steps to become a Quality Level 1 type of package.\n+However, as part of the ROS 2 ecosystem it will be important that it can be validated to the equivalent quality level.\n+\n+Even though `foonathan_memory` by itself will not likely reach the equivalent level of quality as Quality Level 1, there are steps that can be taken by ROS contributors to ensure that its incorporation into ROS packages can provide the equivalent level of quality.\n+ROS contributors will need to conduct coverage tests to identify the remaining API and features that are not currently covered by tests.\n+If features and portions of the public API that are used in ROS dependencies are found to be untested, then the appropriate tests will be required.\n+To solidify version stability, `foonathan_memory_vendor` shall declare a targeted version for each ROS 2 distribution release.\n+If a newer version is desired for a previously released ROS 2 distribution, then it will need to be verified that the API does not change between versions.\n+`foonathan_memory` tests will need to be conducted on all ROS 2 tier 1 platforms for each pinned version so regressions can be identified and ticketed upstream.\n+Performance tests should be written to ensure that `foonathan_memory` meets its performance targets and the ROS community can track performance regressions in newer pinned versions.\n+`foonathan_memory` does not have a rigorous change control policy, therefore the onus is on the ROS packages incorporating each pinned version to provide a suitable review of its quality as a third-party dependency. As `foonathan_memory` is not maintained by the ROS community, requirements for automatic linting can be waved."
+        }
+      ]
+    },
+    {
+      "author": "Blast545",
+      "date": "2020-02-04T05:59:31Z",
+      "sha": "ebf1fe58949148afd4352fbaddd9cf8d22b9e5a9",
+      "message": "Enable linter and copyright tests to the package (#19)\n\n* Enable linter and copyright tests to the package\r\n\r\nSigned-off-by: Jorge J. Perez <jjperez@ekumenlabs.com>\r\n\r\n* Fix to use test dependencies only when found\r\n\r\nSigned-off-by: Jorge J. Perez <jjperez@ekumenlabs.com>\r\n\r\n* Fix to look for test dependencies only when testing\r\n\r\nSigned-off-by: Jorge J. Perez <jjperez@ekumenlabs.com>",
+      "files_changed": 3,
+      "additions": 44,
+      "deletions": 6,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "60bfa5f3c901984c08c631b25be693291e34b4ca",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 21,
+          "deletions": 6,
+          "changes": 27,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/ebf1fe58949148afd4352fbaddd9cf8d22b9e5a9/CMakeLists.txt",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/ebf1fe58949148afd4352fbaddd9cf8d22b9e5a9/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/CMakeLists.txt?ref=ebf1fe58949148afd4352fbaddd9cf8d22b9e5a9",
+          "patch": "@@ -11,16 +11,16 @@ if(NOT foonathan_memory_FOUND)\n   # If set to true, this will cause all libraries to be built shared\n   # unless the library was explicitly added as a static library.\n   option(BUILD_SHARED_LIBS \"Create shared libraries by default\" ON)\n-  \n+\n   if(BUILD_SHARED_LIBS)\n     # Library will be statically created with PIC code\n     list(APPEND extra_cmake_args -DCMAKE_POSITION_INDEPENDENT_CODE=ON)\n   endif()\n-  \n+\n   if(DEFINED CMAKE_BUILD_TYPE)\n     list(APPEND extra_cmake_args -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})\n   endif()\n-  \n+\n   if(DEFINED CMAKE_TOOLCHAIN_FILE)\n     list(APPEND extra_cmake_args \"-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}\")\n     if(ANDROID)\n@@ -49,12 +49,12 @@ if(NOT foonathan_memory_FOUND)\n     endif()\n   endif()\n   include(ExternalProject)\n-  \n+\n   if(INSTALLER_PLATFORM)\n     set(PATCH_COMMAND_STR PATCH_COMMAND git apply ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt.patch && sed -i -e \"s/INSTALLER_PLATFORM/${INSTALLER_PLATFORM}/g\" CMakeLists.txt)\n   endif()\n \n-  ExternalProject_Add(foo_mem-ext\n+  externalproject_add(foo_mem-ext\n   GIT_REPOSITORY https://github.com/foonathan/memory.git\n   GIT_TAG master\n   TIMEOUT 600\n@@ -69,7 +69,7 @@ if(NOT foonathan_memory_FOUND)\n     -Wno-dev\n     ${PATCH_COMMAND_STR}\n   )\n-  \n+\n   # The external project will install to the build folder, but we'll install that on make install.\n   install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/foo_mem_ext_prj_install/\n   DESTINATION ${CMAKE_INSTALL_PREFIX})\n@@ -85,6 +85,21 @@ write_basic_package_version_file(\n   \"${PROJECT_BINARY_DIR}/foonathan_memory_vendorConfig-version.cmake\"\n   COMPATIBILITY AnyNewerVersion)\n \n+if(BUILD_TESTING)\n+  find_package(ament_cmake_copyright QUIET)\n+  find_package(ament_cmake_lint_cmake QUIET)\n+  find_package(ament_cmake_xmllint QUIET)\n+  if(ament_cmake_copyright_FOUND)\n+    ament_copyright()\n+  endif()\n+  if(ament_cmake_lint_cmake_FOUND)\n+    ament_lint_cmake()\n+  endif()\n+  if(ament_cmake_xmllint_FOUND)\n+    ament_xmllint()\n+  endif()\n+endif()\n+\n install(FILES\n   package.xml\n   DESTINATION share/${PROJECT_NAME})"
+        },
+        {
+          "sha": "09362a28ec977d6093f82fe3e9c6d5394200cb6e",
+          "filename": "CONTRIBUTING.md",
+          "status": "added",
+          "additions": 18,
+          "deletions": 0,
+          "changes": 18,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/ebf1fe58949148afd4352fbaddd9cf8d22b9e5a9/CONTRIBUTING.md",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/ebf1fe58949148afd4352fbaddd9cf8d22b9e5a9/CONTRIBUTING.md",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/CONTRIBUTING.md?ref=ebf1fe58949148afd4352fbaddd9cf8d22b9e5a9",
+          "patch": "@@ -0,0 +1,18 @@\n+Any contribution that you make to this repository will\n+be under the Apache 2 License, as dictated by that\n+[license](http://www.apache.org/licenses/LICENSE-2.0.html):\n+\n+~~~\n+5. Submission of Contributions. Unless You explicitly state otherwise,\n+   any Contribution intentionally submitted for inclusion in the Work\n+   by You to the Licensor shall be under the terms and conditions of\n+   this License, without any additional terms or conditions.\n+   Notwithstanding the above, nothing herein shall supersede or modify\n+   the terms of any separate license agreement you may have executed\n+   with Licensor regarding such Contributions.\n+~~~\n+\n+Contributors must sign-off each commit by adding a `Signed-off-by: ...`\n+line to commit messages to certify that they have the right to submit\n+the code they are contributing to the project according to the\n+[Developer Certificate of Origin (DCO)](https://developercertificate.org/).\n\\ No newline at end of file"
+        },
+        {
+          "sha": "131b0cd7ad2dd1d6c3d9c447f0b9bcf3c971ce80",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/ebf1fe58949148afd4352fbaddd9cf8d22b9e5a9/package.xml",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/ebf1fe58949148afd4352fbaddd9cf8d22b9e5a9/package.xml",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/package.xml?ref=ebf1fe58949148afd4352fbaddd9cf8d22b9e5a9",
+          "patch": "@@ -16,6 +16,11 @@\n   <buildtool_export_depend>cmake</buildtool_export_depend>\n \n   <!--depend>FOONATHAN_MEMORY</depend-->\n+  \n+  <test_depend>ament_package</test_depend>\n+  <test_depend>ament_cmake_copyright</test_depend>\n+  <test_depend>ament_cmake_lint_cmake</test_depend>\n+  <test_depend>ament_cmake_xmllint</test_depend>\n \n   <export>\n     <build_type>cmake</build_type>"
+        }
+      ]
+    },
+    {
+      "author": "mjcarroll",
+      "date": "2020-04-10T06:04:17Z",
+      "sha": "a0ea39265ba23eea5fcd5772df5f3a99aa15bebc",
+      "message": "Use a specific revision of foonathan/memory (#24)\n\nSigned-off-by: Michael Carroll <michael@openrobotics.org>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "17c8b82ca79081046c34292990d9b7185adb022a",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/a0ea39265ba23eea5fcd5772df5f3a99aa15bebc/CMakeLists.txt",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/a0ea39265ba23eea5fcd5772df5f3a99aa15bebc/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/CMakeLists.txt?ref=a0ea39265ba23eea5fcd5772df5f3a99aa15bebc",
+          "patch": "@@ -56,7 +56,7 @@ if(NOT foonathan_memory_FOUND)\n \n   externalproject_add(foo_mem-ext\n   GIT_REPOSITORY https://github.com/foonathan/memory.git\n-  GIT_TAG master\n+  GIT_TAG c619113\n   TIMEOUT 600\n   # Avoid the update (git pull) and so the recompilation of foonathan_memory library each time.\n   UPDATE_COMMAND \"\""
+        }
+      ]
+    },
+    {
+      "author": "lauramg15",
+      "date": "2019-11-21T05:56:34Z",
+      "sha": "3cc7f3b284b1c512cfcf94648aee93f701c181f3",
+      "message": "Update CMakeLists patch (#17)",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "054770a170e4a52f6ef5ce5f39e07089227c1f97",
+          "filename": "CMakeLists.txt.patch",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/3cc7f3b284b1c512cfcf94648aee93f701c181f3/CMakeLists.txt.patch",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/3cc7f3b284b1c512cfcf94648aee93f701c181f3/CMakeLists.txt.patch",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/CMakeLists.txt.patch?ref=3cc7f3b284b1c512cfcf94648aee93f701c181f3",
+          "patch": "@@ -15,8 +15,8 @@ index cf28169..16b6cdf 100644\n +    set(FOONATHAN_MEMORY_ARCHIVE_INSTALL_DIR   \"lib/INSTALLER_PLATFORM\")\n +    set(FOONATHAN_MEMORY_FRAMEWORK_INSTALL_DIR \"bin/INSTALLER_PLATFORM\")\n  \n--    set(FOONATHAN_MEMORY_CMAKE_CONFIG_INSTALL_DIR \"cmake\")\n+-    set(FOONATHAN_MEMORY_CMAKE_CONFIG_INSTALL_DIR \"share/foonathan_memory/cmake\")\n +    set(FOONATHAN_MEMORY_CMAKE_CONFIG_INSTALL_DIR \"share/foonathan_memory-INSTALLER_PLATFORM/cmake\")\n-     set(FOONATHAN_MEMORY_ADDITIONAL_FILES_INSTALL_DIR \"./\")\n+     set(FOONATHAN_MEMORY_ADDITIONAL_FILES_INSTALL_DIR \"share/foonathan_memory\")\n      set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)\n  else()"
+        }
+      ]
+    },
+    {
+      "author": "raquelalvarezbanos",
+      "date": "2019-09-18T13:16:42Z",
+      "sha": "f3ab481cda60adc18d4172367f16af6076d8fde4",
+      "message": "Merge pull request #12 from eProsima/feature/revert-platform-specific-libpath\n\nRevert #11",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 40,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "5149a10e55fd28c3930a96f693cfb872e66a6f3b",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 40,
+          "changes": 43,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/f3ab481cda60adc18d4172367f16af6076d8fde4/CMakeLists.txt",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/f3ab481cda60adc18d4172367f16af6076d8fde4/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/CMakeLists.txt?ref=f3ab481cda60adc18d4172367f16af6076d8fde4",
+          "patch": "@@ -1,39 +1,6 @@\n cmake_minimum_required(VERSION 3.5)\n project(foonathan_memory_vendor VERSION \"0.2.0\")\n \n-# force install of foonathan_memory has two downsides:\n-# - it requires admin privileges to simply build it when default installation prefix is chosen\n-# - the lack of a build prevents managing several architectures simultaneously (once one is compiled it prevents any\n-#    other generating linking errors)\n-# we are going to profit from CMake capability to search architecture specific config files and solve the second issue\n-\n-if(\"${CMAKE_GENERATOR_PLATFORM}\" MATCHES \"^([Ww][Ii][Nn]32)$\")\n-    set(foonathan_vendor_FIND_LIBRARY_USE \"FIND_LIBRARY_USE_LIB32_PATHS\")\n-    get_property(foonathan_vendor_FIND_LIBRARY_USE_value GLOBAL PROPERTY FIND_LIBRARY_USE_LIB32_PATHS)\n-    set_property(GLOBAL PROPERTY FIND_LIBRARY_USE_LIB32_PATHS TRUE)\n-    set( CMAKE_FIND_LIBRARY_CUSTOM_LIB_SUFFIX 32 )         \n-elseif (\"${CMAKE_GENERATOR_PLATFORM}\" MATCHES \"^([Xx]64)$\")\n-    set(foonathan_vendor_FIND_LIBRARY_USE \"FIND_LIBRARY_USE_LIB64_PATHS\")\n-    get_property(foonathan_vendor_FIND_LIBRARY_USE_value GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)\n-    set_property(GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS TRUE)\n-    set( CMAKE_FIND_LIBRARY_CUSTOM_LIB_SUFFIX 64 )     \n-endif()\n-\n-if( NOT DEFINED FOONATHAN_INSTALLATION_DIR )\n-    if(WIN32)\n-        set( FOONATHAN_INSTALLATION_DIR \"${CMAKE_INSTALL_PREFIX}/lib${CMAKE_FIND_LIBRARY_CUSTOM_LIB_SUFFIX}/${PROJECT_NAME}\")\n-    else()\n-        set( FOONATHAN_INSTALLATION_DIR \"${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}\")\n-    endif()\n-endif()\n-\n-#restore global properties state\n-if(foonathan_vendor_FIND_LIBRARY_USE)\n-    set_property(GLOBAL PROPERTY ${foonathan_vendor_FIND_LIBRARY_USE} ${foonathan_vendor_FIND_LIBRARY_USE_value})\n-    unset(foonathan_vendor_FIND_LIBRARY_USE)\n-    unset(foonathan_vendor_FIND_LIBRARY_USE_value)\n-endif()\n-\n find_package(foonathan_memory QUIET)\n \n if(NOT foonathan_memory_FOUND)\n@@ -53,10 +20,6 @@ if(NOT foonathan_memory_FOUND)\n   if(DEFINED CMAKE_BUILD_TYPE)\n     list(APPEND extra_cmake_args -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})\n   endif()\n-\n-  if(DEFINED CMAKE_LIBRARY_ARCHITECTURE)\n-    list(APPEND extra_cmake_args -DCMAKE_LIBRARY_ARCHITECTURE=${CMAKE_LIBRARY_ARCHITECTURE})\n-  endif()\n   \n   if(DEFINED CMAKE_TOOLCHAIN_FILE)\n     list(APPEND extra_cmake_args \"-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}\")\n@@ -109,7 +72,7 @@ if(NOT foonathan_memory_FOUND)\n   \n   # The external project will install to the build folder, but we'll install that on make install.\n   install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/foo_mem_ext_prj_install/\n-  DESTINATION ${FOONATHAN_INSTALLATION_DIR})\n+  DESTINATION ${CMAKE_INSTALL_PREFIX})\n else()\n   message(STATUS \"Found foonathan_memory ${foonathan_memory_VERSION}\")\n endif()\n@@ -124,9 +87,9 @@ write_basic_package_version_file(\n \n install(FILES\n   package.xml\n-  DESTINATION ${FOONATHAN_INSTALLATION_DIR})\n+  DESTINATION share/${PROJECT_NAME})\n \n install(FILES\n   \"${PROJECT_BINARY_DIR}/foonathan_memory_vendorConfig.cmake\"\n   \"${PROJECT_BINARY_DIR}/foonathan_memory_vendorConfig-version.cmake\"\n-  DESTINATION ${FOONATHAN_INSTALLATION_DIR}/cmake)\n+  DESTINATION share/${PROJECT_NAME}/cmake)"
+        }
+      ]
+    },
+    {
+      "author": "dirk-thomas",
+      "date": "2019-08-09T18:10:07Z",
+      "sha": "8ebf2ff2a1a32a09d7f39956d5ccb87e77a3459e",
+      "message": "declare missing dependency on git",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "09ea39bc122bca80dc80cd71097aa7f2e0d6dea0",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/8ebf2ff2a1a32a09d7f39956d5ccb87e77a3459e/package.xml",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/8ebf2ff2a1a32a09d7f39956d5ccb87e77a3459e/package.xml",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/package.xml?ref=8ebf2ff2a1a32a09d7f39956d5ccb87e77a3459e",
+          "patch": "@@ -10,6 +10,7 @@\n   <license>Apache License 2.0</license> <!-- The contents of this vendor package are Apache 2.0 -->\n   <license>zlib License</license> <!-- foonathan/memory is licensed under the zlib License (https://github.com/foonathan/memory/blob/master/LICENSE) -->\n   <buildtool_depend>cmake</buildtool_depend>\n+  <buildtool_depend>git</buildtool_depend>\n \n   <buildtool_export_depend>cmake</buildtool_export_depend>\n "
+        }
+      ]
+    },
+    {
+      "author": "mikaelarguedas",
+      "date": "2019-08-07T22:58:47Z",
+      "sha": "e70f9f1d677554f0bb9fdfce48c9879513e4a9ca",
+      "message": "comment out nonexisting rosdep key\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "dae2bb314010106a0e5a07657fc7e11d83550731",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/e70f9f1d677554f0bb9fdfce48c9879513e4a9ca/package.xml",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/e70f9f1d677554f0bb9fdfce48c9879513e4a9ca/package.xml",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/package.xml?ref=e70f9f1d677554f0bb9fdfce48c9879513e4a9ca",
+          "patch": "@@ -13,7 +13,7 @@\n \n   <buildtool_export_depend>cmake</buildtool_export_depend>\n \n-  <depend>FOONATHAN_MEMORY</depend>\n+  <!--depend>FOONATHAN_MEMORY</depend-->\n \n   <export>\n     <build_type>cmake</build_type>"
+        }
+      ]
+    },
+    {
+      "author": "Álvaro Molinillo",
+      "date": "2019-07-31T12:29:45Z",
+      "sha": "a81253c3d671f6ff3541a45ac8b1736fc5294b2f",
+      "message": "Patch to change install directories if a variable is set [6154] (#5)\n\n* Refs #5961. Apply patch over original repo CMakeLists.txt to change\r\ninstall directories. Only if INSTALLER_PLATFORM is set.\r\nAlso added cmake config file to redirect to the correct platfom cmake\r\nconfig file when creating the installer.\r\n\r\n* Refs #5961. Apply patch over original repo src/CMakeLists.txt to change\r\nthe name of the generated library depending on it is static or dynamic.\r\nIf it is static the library name will have the \"lib\" prefix.\r\n\r\n* Refs #5961. Use BUILD_SHARED_LIBS variable as suggested.\r\n\r\n*  Refs #5961. Remove vs2013 platform as suggested.",
+      "files_changed": 3,
+      "additions": 76,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "764bb5d5e438598353ba487e3d3911f1576b1191",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/a81253c3d671f6ff3541a45ac8b1736fc5294b2f/CMakeLists.txt",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/a81253c3d671f6ff3541a45ac8b1736fc5294b2f/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/CMakeLists.txt?ref=a81253c3d671f6ff3541a45ac8b1736fc5294b2f",
+          "patch": "@@ -50,6 +50,10 @@ if(NOT foonathan_memory_FOUND)\n   endif()\n   include(ExternalProject)\n   \n+  if(INSTALLER_PLATFORM)\n+    set(PATCH_COMMAND_STR PATCH_COMMAND git apply ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt.patch && sed -i -e \"s/INSTALLER_PLATFORM/${INSTALLER_PLATFORM}/g\" CMakeLists.txt)\n+  endif()\n+\n   ExternalProject_Add(foo_mem-ext\n   GIT_REPOSITORY https://github.com/foonathan/memory.git\n   GIT_TAG master\n@@ -64,6 +68,7 @@ if(NOT foonathan_memory_FOUND)\n     -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/foo_mem_ext_prj_install\n     ${extra_cmake_args}\n     -Wno-dev\n+    ${PATCH_COMMAND_STR}\n   )\n   \n   # The external project will install to the build folder, but we'll install that on make install."
+        },
+        {
+          "sha": "26e1efc5d64cd5c8a927878580af9ff9c90e437a",
+          "filename": "CMakeLists.txt.patch",
+          "status": "added",
+          "additions": 42,
+          "deletions": 0,
+          "changes": 42,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/a81253c3d671f6ff3541a45ac8b1736fc5294b2f/CMakeLists.txt.patch",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/a81253c3d671f6ff3541a45ac8b1736fc5294b2f/CMakeLists.txt.patch",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/CMakeLists.txt.patch?ref=a81253c3d671f6ff3541a45ac8b1736fc5294b2f",
+          "patch": "@@ -0,0 +1,42 @@\n+diff --git a/CMakeLists.txt b/CMakeLists.txt\n+index cf28169..16b6cdf 100644\n+--- a/CMakeLists.txt\n++++ b/CMakeLists.txt\n+@@ -38,12 +38,12 @@ if(UNIX)\n+ \n+ elseif(WIN32)\n+     set(FOONATHAN_MEMORY_INC_INSTALL_DIR \"include/foonathan_memory\")\n+-    set(FOONATHAN_MEMORY_RUNTIME_INSTALL_DIR   \"bin\") \n+-    set(FOONATHAN_MEMORY_LIBRARY_INSTALL_DIR   \"bin\")\n+-    set(FOONATHAN_MEMORY_ARCHIVE_INSTALL_DIR   \"lib\")\n+-    set(FOONATHAN_MEMORY_FRAMEWORK_INSTALL_DIR \"bin\")\n++    set(FOONATHAN_MEMORY_RUNTIME_INSTALL_DIR   \"bin/INSTALLER_PLATFORM\")\n++    set(FOONATHAN_MEMORY_LIBRARY_INSTALL_DIR   \"bin/INSTALLER_PLATFORM\")\n++    set(FOONATHAN_MEMORY_ARCHIVE_INSTALL_DIR   \"lib/INSTALLER_PLATFORM\")\n++    set(FOONATHAN_MEMORY_FRAMEWORK_INSTALL_DIR \"bin/INSTALLER_PLATFORM\")\n+ \n+-    set(FOONATHAN_MEMORY_CMAKE_CONFIG_INSTALL_DIR \"cmake\")\n++    set(FOONATHAN_MEMORY_CMAKE_CONFIG_INSTALL_DIR \"share/foonathan_memory-INSTALLER_PLATFORM/cmake\")\n+     set(FOONATHAN_MEMORY_ADDITIONAL_FILES_INSTALL_DIR \"./\")\n+     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)\n+ else()\n+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt\n+index 030dba3..855a7aa 100644\n+--- a/src/CMakeLists.txt\n++++ b/src/CMakeLists.txt\n+@@ -100,8 +100,14 @@ target_compile_definitions(foonathan_memory PUBLIC\n+                             FOONATHAN_MEMORY_VERSION_MINOR=${FOONATHAN_MEMORY_VERSION_MINOR}\n+                             FOONATHAN_MEMORY_VERSION_PATCH=${FOONATHAN_MEMORY_VERSION_PATCH})\n+ \n++if(BUILD_SHARED_LIBS)\n++    set(OUTPUT_NAME_STR \"foonathan_memory-${FOONATHAN_MEMORY_VERSION}\")\n++else()\n++    set(OUTPUT_NAME_STR \"libfoonathan_memory-${FOONATHAN_MEMORY_VERSION}\")\n++endif()\n++\n+ set_target_properties(foonathan_memory PROPERTIES\n+-                                       OUTPUT_NAME \"foonathan_memory-${FOONATHAN_MEMORY_VERSION}\")\n++                                       OUTPUT_NAME ${OUTPUT_NAME_STR})\n+ \n+ install(TARGETS foonathan_memory EXPORT foonathan_memoryTargets\n+         RUNTIME       DESTINATION ${FOONATHAN_MEMORY_RUNTIME_INSTALL_DIR}"
+        },
+        {
+          "sha": "8d91a39a1a885018d2f008291f5867b53747a4a8",
+          "filename": "foonathan_memory-config.cmake",
+          "status": "added",
+          "additions": 29,
+          "deletions": 0,
+          "changes": 29,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/a81253c3d671f6ff3541a45ac8b1736fc5294b2f/foonathan_memory-config.cmake",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/a81253c3d671f6ff3541a45ac8b1736fc5294b2f/foonathan_memory-config.cmake",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/foonathan_memory-config.cmake?ref=a81253c3d671f6ff3541a45ac8b1736fc5294b2f",
+          "patch": "@@ -0,0 +1,29 @@\n+# Copyright 2016 Proyectos y Sistemas de Mantenimiento SL (eProsima).\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+if(MSVC_VERSION EQUAL 1900)\n+    if(CMAKE_CL_64)\n+        include(\"${CMAKE_CURRENT_LIST_DIR}/../share/foonathan_memory-x64Win64VS2015/cmake/foonathan_memory-config.cmake\")\n+    else()\n+        include(\"${CMAKE_CURRENT_LIST_DIR}/../share/foonathan_memory-i86Win32VS2015/cmake/foonathan_memory-config.cmake\")\n+    endif()\n+elseif(MSVC_VERSION GREATER 1900)\n+    if(CMAKE_CL_64)\n+        include(\"${CMAKE_CURRENT_LIST_DIR}/../share/foonathan_memory-x64Win64VS2017/cmake/foonathan_memory-config.cmake\")\n+    else()\n+        include(\"${CMAKE_CURRENT_LIST_DIR}/../share/foonathan_memory-i86Win32VS2017/cmake/foonathan_memory-config.cmake\")\n+    endif()\n+else()\n+    message(FATAL_ERROR \"Not supported version of Visual Studio\")\n+endif()"
+        }
+      ]
+    },
+    {
+      "author": "Michael Carroll",
+      "date": "2020-04-10T06:04:17Z",
+      "sha": "a0ea39265ba23eea5fcd5772df5f3a99aa15bebc",
+      "message": "Use a specific revision of foonathan/memory (#24)\n\nSigned-off-by: Michael Carroll <michael@openrobotics.org>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "17c8b82ca79081046c34292990d9b7185adb022a",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/eProsima/foonathan_memory_vendor/blob/a0ea39265ba23eea5fcd5772df5f3a99aa15bebc/CMakeLists.txt",
+          "raw_url": "https://github.com/eProsima/foonathan_memory_vendor/raw/a0ea39265ba23eea5fcd5772df5f3a99aa15bebc/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/eProsima/foonathan_memory_vendor/contents/CMakeLists.txt?ref=a0ea39265ba23eea5fcd5772df5f3a99aa15bebc",
+          "patch": "@@ -56,7 +56,7 @@ if(NOT foonathan_memory_FOUND)\n \n   externalproject_add(foo_mem-ext\n   GIT_REPOSITORY https://github.com/foonathan/memory.git\n-  GIT_TAG master\n+  GIT_TAG c619113\n   TIMEOUT 600\n   # Avoid the update (git pull) and so the recompilation of foonathan_memory library each time.\n   UPDATE_COMMAND \"\""
+        }
+      ]
+    }
+  ]
+}

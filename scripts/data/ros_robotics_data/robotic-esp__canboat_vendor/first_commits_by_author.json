@@ -1,0 +1,83 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T04:45:30Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "robotic-esp",
+    "repo": "canboat_vendor"
+  },
+  "data": [
+    {
+      "author": "Severn-J-Lortie",
+      "date": "2025-05-12T19:51:24Z",
+      "sha": "42057cb5cf70c2b394cd13e5a48d627813e895a3",
+      "message": "Initial commit",
+      "files_changed": 5,
+      "additions": 72,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "8b4cebe6bca3c81cb7b2c683a66cdf70ad988767",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/robotic-esp/canboat_vendor/blob/42057cb5cf70c2b394cd13e5a48d627813e895a3/.gitignore",
+          "raw_url": "https://github.com/robotic-esp/canboat_vendor/raw/42057cb5cf70c2b394cd13e5a48d627813e895a3/.gitignore",
+          "contents_url": "https://api.github.com/repos/robotic-esp/canboat_vendor/contents/.gitignore?ref=42057cb5cf70c2b394cd13e5a48d627813e895a3",
+          "patch": "@@ -0,0 +1,3 @@\n+build\n+install\n+log"
+        },
+        {
+          "sha": "4c294a429a2f077a7232d62485664d09678f60f6",
+          "filename": ".gitmodules",
+          "status": "added",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/robotic-esp/canboat_vendor/blob/42057cb5cf70c2b394cd13e5a48d627813e895a3/.gitmodules",
+          "raw_url": "https://github.com/robotic-esp/canboat_vendor/raw/42057cb5cf70c2b394cd13e5a48d627813e895a3/.gitmodules",
+          "contents_url": "https://api.github.com/repos/robotic-esp/canboat_vendor/contents/.gitmodules?ref=42057cb5cf70c2b394cd13e5a48d627813e895a3",
+          "patch": "@@ -0,0 +1,3 @@\n+[submodule \"external/canboat\"]\n+\tpath = external/canboat\n+\turl = https://github.com/canboat/canboat.git"
+        },
+        {
+          "sha": "4189b2031401b6c1c22a2a89cda68028dbb795cf",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 47,
+          "deletions": 0,
+          "changes": 47,
+          "blob_url": "https://github.com/robotic-esp/canboat_vendor/blob/42057cb5cf70c2b394cd13e5a48d627813e895a3/CMakeLists.txt",
+          "raw_url": "https://github.com/robotic-esp/canboat_vendor/raw/42057cb5cf70c2b394cd13e5a48d627813e895a3/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/robotic-esp/canboat_vendor/contents/CMakeLists.txt?ref=42057cb5cf70c2b394cd13e5a48d627813e895a3",
+          "patch": "@@ -0,0 +1,47 @@\n+cmake_minimum_required(VERSION 3.8)\n+project(ros_canboat)\n+\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  add_compile_options(-Wall -Wextra -Wpedantic)\n+endif()\n+\n+find_package(ament_cmake REQUIRED)\n+\n+if(BUILD_TESTING)\n+  find_package(ament_lint_auto REQUIRED)\n+  set(ament_cmake_copyright_FOUND TRUE)\n+  set(ament_cmake_cpplint_FOUND TRUE)\n+  ament_lint_auto_find_test_dependencies()\n+endif()\n+\n+execute_process(\n+  COMMAND uname\n+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}\n+  OUTPUT_VARIABLE OS_NAME\n+  OUTPUT_STRIP_TRAILING_WHITESPACE\n+)\n+string(TOLOWER \"${OS_NAME}\" OS_NAME_LOWER)\n+\n+execute_process(\n+  COMMAND uname -m\n+  OUTPUT_VARIABLE ARCH\n+  OUTPUT_STRIP_TRAILING_WHITESPACE\n+)\n+set(BUILD_DIR \"rel/${OS_NAME_LOWER}-${ARCH}\")\n+message(STATUS \"Canboat building into: ${BUILD_DIR}\")\n+\n+add_custom_target(build_canboat ALL\n+  COMMAND make\n+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external/canboat\n+)\n+\n+file(GLOB CANBOAT_BINARIES\n+  \"${CMAKE_CURRENT_SOURCE_DIR}/external/canboat/${BUILD_DIR}/*\"\n+)\n+\n+install(PROGRAMS\n+  ${CANBOAT_BINARIES}\n+  DESTINATION lib/${PROJECT_NAME}\n+)\n+\n+ament_package()"
+        },
+        {
+          "sha": "02591794511f24c789aac1efbba12c794943a772",
+          "filename": "external/canboat",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": null,
+          "raw_url": null,
+          "contents_url": "https://api.github.com/repos/robotic-esp/canboat_vendor/contents/external%2Fcanboat?ref=42057cb5cf70c2b394cd13e5a48d627813e895a3",
+          "patch": "@@ -0,0 +1 @@\n+Subproject commit 02591794511f24c789aac1efbba12c794943a772"
+        },
+        {
+          "sha": "2df5195b1cd3c4603cc0dce61fca4ca540c5377c",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 18,
+          "deletions": 0,
+          "changes": 18,
+          "blob_url": "https://github.com/robotic-esp/canboat_vendor/blob/42057cb5cf70c2b394cd13e5a48d627813e895a3/package.xml",
+          "raw_url": "https://github.com/robotic-esp/canboat_vendor/raw/42057cb5cf70c2b394cd13e5a48d627813e895a3/package.xml",
+          "contents_url": "https://api.github.com/repos/robotic-esp/canboat_vendor/contents/package.xml?ref=42057cb5cf70c2b394cd13e5a48d627813e895a3",
+          "patch": "@@ -0,0 +1,18 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n+  <name>ros_canboat</name>\n+  <version>0.0.0</version>\n+  <description>Thin package wrapper for Canboat</description>\n+  <maintainer email=\"severn.lortie@gmail.com\">Severn Lortie</maintainer>\n+  <license>Apache 2.0</license>\n+\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+\n+  <test_depend>ament_lint_auto</test_depend>\n+  <test_depend>ament_lint_common</test_depend>\n+\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n+</package>"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,815 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T03:35:57Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ros-drivers",
+    "repo": "axis_camera"
+  },
+  "data": [
+    {
+      "author": "civerachb-cpr",
+      "date": "2020-05-12T18:20:05Z",
+      "sha": "fc7f900370c0220022fd9270d7456a73f3dc9c80",
+      "message": "Update the maintainer now that Clearpath is officially maintaining this package again",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 2,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "9e18c66a87d2cf5bfd5c1b5df8279a15529f6c3f",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 2,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/fc7f900370c0220022fd9270d7456a73f3dc9c80/package.xml",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/fc7f900370c0220022fd9270d7456a73f3dc9c80/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/package.xml?ref=fc7f900370c0220022fd9270d7456a73f3dc9c80",
+          "patch": "@@ -6,8 +6,7 @@\n     Python ROS drivers for accessing an Axis camera's MJPG\n     stream. Also provides control for PTZ cameras.\n   </description>\n-  <maintainer email=\"sam.pfeiffer@pal-robotics.com\">Sammy Pfeiffer</maintainer>\n-  <maintainer email=\"ros-orphaned-packages@googlegroups.com\">ROS Orphaned Package Maintainers</maintainer>\n+  <maintainer email=\"civerachb@clearpathrobotics.com\">Chris Iverach-Brereton</maintainer>\n   <author>Ryan Gariepy</author>\n   <license>BSD</license>\n "
+        }
+      ]
+    },
+    {
+      "author": "tonybaltovski",
+      "date": "2016-06-24T17:17:49Z",
+      "sha": "c5f2788e4fa9863e74490654bb8df8ff62b1dd78",
+      "message": "Added ROS params for the pan and tilt axis.",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "d1841c515c2fc3236546657139cdc6a72abfdbca",
+          "filename": "nodes/teleop.py",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 3,
+          "changes": 8,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/c5f2788e4fa9863e74490654bb8df8ff62b1dd78/nodes%2Fteleop.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/c5f2788e4fa9863e74490654bb8df8ff62b1dd78/nodes%2Fteleop.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Fteleop.py?ref=c5f2788e4fa9863e74490654bb8df8ff62b1dd78",
+          "patch": "@@ -9,22 +9,24 @@ class Teleop:\n     def __init__(self):\n         rospy.init_node('axis_ptz_teleop')\n         self.enable_button = rospy.get_param('~enable_button', 1)\n+        self.axis_pan = rospy.get_param('~axis_pan', 0)\n+        self.axis_tilt = rospy.get_param('~axis_tilt', 1)\n         self.state = Axis(pan=220)\n         self.joy = None\n \n         self.pub = rospy.Publisher('cmd', Axis)\n         rospy.Subscriber(\"joy\", Joy, self.joy_callback)\n         # rospy.Subscriber(\"state\", Axis, self.state_callback)\n-        \n+\n     def spin(self):\n         self.state.brightness = 5000\n         self.pub.publish(self.state)\n         r = rospy.Rate(5)\n         while not rospy.is_shutdown():\n             if self.joy != None and self.joy.buttons[self.enable_button] == 1:\n                 #and (rospy.Time.now() - self.joy.header.stamp).to_sec() < 0.2:\n-                self.state.pan += self.joy.axes[0]*5\n-                self.state.tilt += self.joy.axes[1]*5\n+                self.state.pan += self.joy.axes[axis_pan]*5\n+                self.state.tilt += self.joy.axes[axis_tilt]*5\n                 if self.state.tilt > 85: self.state.tilt = 85\n                 if self.state.tilt < 0: self.state.tilt = 0\n                 self.pub.publish(self.state)"
+        }
+      ]
+    },
+    {
+      "author": "cclauss",
+      "date": "2020-05-12T19:55:56Z",
+      "sha": "2dabea0e75a7b379219556fbe395b41ecb530117",
+      "message": "Fix Python 3 syntax error\n\n#52 again",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "cab25f45bab25931915c1b4556fda4b22843b482",
+          "filename": "nodes/axis.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/2dabea0e75a7b379219556fbe395b41ecb530117/nodes%2Faxis.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/2dabea0e75a7b379219556fbe395b41ecb530117/nodes%2Faxis.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Faxis.py?ref=2dabea0e75a7b379219556fbe395b41ecb530117",
+          "patch": "@@ -69,7 +69,7 @@ def openURL(self):\n         try:\n             self.fp = urllib2.urlopen(self.url, timeout=self.timeoutSeconds)\n             return(True)\n-        except urllib2.URLError, e:\n+        except urllib2.URLError as e:\n             rospy.logwarn('Error opening URL %s' % (self.url) +\n                             'Possible timeout.  Looping until camera appears')\n             return(False)"
+        }
+      ]
+    },
+    {
+      "author": "k-okada",
+      "date": "2017-11-16T04:14:46Z",
+      "sha": "6ed336992c8e1f05c27575c84614ef94e1b5265d",
+      "message": "add package.xml",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "a4af8369cc3d955969ff8312a78bb49c0d17ed67",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/6ed336992c8e1f05c27575c84614ef94e1b5265d/package.xml",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/6ed336992c8e1f05c27575c84614ef94e1b5265d/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/package.xml?ref=6ed336992c8e1f05c27575c84614ef94e1b5265d",
+          "patch": "@@ -7,6 +7,7 @@\n     stream. Also provides control for PTZ cameras.\n   </description>\n   <maintainer email=\"sam.pfeiffer@pal-robotics.com\">Sammy Pfeiffer</maintainer>\n+  <maintainer email=\"ros-orphaned-packages@googlegroups.com\">ROS Orphaned Package Maintainers</maintainer>\n   <author>Ryan Gariepy</author>\n   <license>BSD</license>\n "
+        }
+      ]
+    },
+    {
+      "author": "Howell",
+      "date": "2019-10-21T12:19:08Z",
+      "sha": "641990af52718194e1f323831a0b78da09c3039a",
+      "message": "add support for quad video",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b08215700e9a5d51128f2bddc32b237159d04510",
+          "filename": "nodes/axis.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/641990af52718194e1f323831a0b78da09c3039a/nodes%2Faxis.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/641990af52718194e1f323831a0b78da09c3039a/nodes%2Faxis.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Faxis.py?ref=641990af52718194e1f323831a0b78da09c3039a",
+          "patch": "@@ -38,7 +38,7 @@ def formURL(self):\n \n         # support for Axis F34 multicamera switch\n         if (self.axis.camera != 0):\n-            self.url += \"&camera=%d\" % self.axis.camera\n+            self.url += \"&camera=%s\" % str(self.axis.camera)\n \n         rospy.logdebug('opening ' + str(self.axis))\n "
+        }
+      ]
+    },
+    {
+      "author": "jeff-o",
+      "date": "2015-02-06T15:47:04Z",
+      "sha": "9e89cbf561e799045f9f50291ba1afe90a2080a3",
+      "message": "Update axis.launch\n\nCorrects an issue where a topic subscribes and publishes to the same node (axis/republish).",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "06f53c3ea9e8d9ca4c3f5994647f52199297f67c",
+          "filename": "launch/axis.launch",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/9e89cbf561e799045f9f50291ba1afe90a2080a3/launch%2Faxis.launch",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/9e89cbf561e799045f9f50291ba1afe90a2080a3/launch%2Faxis.launch",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/launch%2Faxis.launch?ref=9e89cbf561e799045f9f50291ba1afe90a2080a3",
+          "patch": "@@ -15,7 +15,7 @@\n     <node pkg=\"image_transport\" type=\"republish\" name=\"republish\"\n           args=\"compressed\" if=\"$(arg enable_theora)\">\n       <remap from=\"in\" to=\"image_raw\" />\n-      <remap from=\"out\" to=\"image_raw\" />\n+      <remap from=\"out\" to=\"image_raw_out\" />\n     </node>\n \n     <node pkg=\"axis_camera\" type=\"teleop.py\" name=\"teleop\" if=\"$(arg enable_ptz_teleop)\">"
+        }
+      ]
+    },
+    {
+      "author": "Sebastien Gemme",
+      "date": "2019-05-21T13:34:15Z",
+      "sha": "3b70a1a26b031cf87ce82b75b59c9c6b2b751df3",
+      "message": "Fixing connection problem which was causing the telemetry to stall\n\nSigned-off-by: Sebastien Gemme <sebastien.gemme@canada.ca>",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "6c74475685cbb2430035e8313683abfbec02ee0d",
+          "filename": "nodes/axis_ptz.py",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 2,
+          "changes": 6,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/3b70a1a26b031cf87ce82b75b59c9c6b2b751df3/nodes%2Faxis_ptz.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/3b70a1a26b031cf87ce82b75b59c9c6b2b751df3/nodes%2Faxis_ptz.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Faxis_ptz.py?ref=3b70a1a26b031cf87ce82b75b59c9c6b2b751df3",
+          "patch": "@@ -35,9 +35,9 @@ def run(self):\n     def queryCameraPosition(self):\n         '''Using Axis VAPIX protocol, described in the comments at the top of\n         this file, is used to query the state of the camera'''\n-        conn = httplib.HTTPConnection(self.axis.hostname)\n         queryParams = { 'query':'position' }\n         try:\n+            conn = httplib.HTTPConnection(self.axis.hostname)\n             conn.request(\"GET\", \"/axis-cgi/com/ptz.cgi?%s\" % \n                                                 urllib.urlencode(queryParams))\n             response = conn.getresponse()\n@@ -66,6 +66,8 @@ def queryCameraPosition(self):\n             rospy.logwarn(exception_error_str)\n \n             self.cameraPosition = None\n+        finally:\n+            conn.close()\n    \n     def publishCameraState(self):\n         '''Publish camera state to a ROS message'''\n@@ -303,4 +305,4 @@ def main():\n \n if __name__ == \"__main__\":\n     main()\n-    \n\\ No newline at end of file\n+    "
+        }
+      ]
+    },
+    {
+      "author": "awesomebytes",
+      "date": "2015-03-19T12:12:51Z",
+      "sha": "10b71552b45c64123bdcdddcb52fc825a4b2efb2",
+      "message": "Added support for Axis 212 PTZ.\n\nAlso made the exception when something goes wrong in the state grabber clearer.",
+      "files_changed": 1,
+      "additions": 17,
+      "deletions": 7,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "bf54209a804676c3a3baf23e75649141ec8a37c5",
+          "filename": "nodes/axis_ptz.py",
+          "status": "modified",
+          "additions": 17,
+          "deletions": 7,
+          "changes": 24,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/10b71552b45c64123bdcdddcb52fc825a4b2efb2/nodes%2Faxis_ptz.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/10b71552b45c64123bdcdddcb52fc825a4b2efb2/nodes%2Faxis_ptz.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Faxis_ptz.py?ref=10b71552b45c64123bdcdddcb52fc825a4b2efb2",
+          "patch": "@@ -44,19 +44,27 @@ def queryCameraPosition(self):\n             # Response code 200 means there are data to be read:\n             if response.status == 200: \n                 body = response.read()\n-                self.cameraPosition = dict([s.split('=',2) for s in \n-                                                            body.splitlines()])\n+                new_camera_position = dict()\n+                for s in body.splitlines():\n+                    field_and_value = s.split('=', 2)\n+                    if len(field_and_value) == 2:\n+                        # On some PTZ cameras (AXIS 212 PTZ for example)\n+                        # The returning string has a newline at the end\n+                        # so if we don't have a field AND value, don't insert\n+                        new_camera_position[field_and_value[0]] = field_and_value[1]\n+                self.cameraPosition = new_camera_position\n             # Response code 401 means authentication error\n             elif response.status == 401:\n                 rospy.logwarn('You need to enable anonymous PTZ control login' \n                               'at http://%s -> Setup Basic Setup -> Users' % self.hostname)\n             else:\n                 self.cameraPosition = None\n                 rospy.logwarn('Received HTTP response %i from camera, expecting 200' % response.status)\n-        except:\n-            rospy.logwarn('Encountered a problem getting a response from %s.  '\n-                            'Possibly a problem with the network connection.' %\n-                            self.axis.hostname)\n+        except Exception as e:\n+            exception_error_str = \"Exception: '\" + str(e) + \"' when querying the url: http://\" + \\\n+                                  self.axis.hostname + \"/axis-cgi/com/ptz.cgi?%s\" % urllib.urlencode(queryParams)\n+            rospy.logwarn(exception_error_str)\n+\n             self.cameraPosition = None\n    \n     def publishCameraState(self):\n@@ -73,7 +81,8 @@ def publishCameraState(self):\n             self.msg.focus = 0.0\n             if 'focus' in self.cameraPosition:\n                 self.msg.focus = float(self.cameraPosition['focus'])\n-            self.msg.autofocus = (self.cameraPosition['autofocus'] == 'on')\n+            if 'autofocus' in self.cameraPosition:\n+                self.msg.autofocus = (self.cameraPosition['autofocus'] == 'on')\n             self.axis.pub.publish(self.msg)\n             \n     def adjustForFlippedOrientation(self):\n@@ -294,3 +303,4 @@ def main():\n \n if __name__ == \"__main__\":\n     main()\n+    \n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "rossctaylor",
+      "date": "2016-12-27T23:58:09Z",
+      "sha": "dfc75c4678b8ff755bfd07c55a569c649880a21d",
+      "message": "Add: support for Axis F34 multicamera switch",
+      "files_changed": 1,
+      "additions": 9,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "27927e4667215cbc01525bf2f467758b76b9bd1d",
+          "filename": "nodes/axis.py",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 2,
+          "changes": 11,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/dfc75c4678b8ff755bfd07c55a569c649880a21d/nodes%2Faxis.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/dfc75c4678b8ff755bfd07c55a569c649880a21d/nodes%2Faxis.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Faxis.py?ref=dfc75c4678b8ff755bfd07c55a569c649880a21d",
+          "patch": "@@ -35,6 +35,11 @@ def formURL(self):\n         self.url = 'http://%s/mjpg/video.mjpg' % self.axis.hostname\n         self.url += \"?fps=0&resolution=%dx%d\" % (self.axis.width, \n                                                             self.axis.height)\n+\n+        # support for Axis F34 multicamera switch\n+        if (self.axis.camera != 0):\n+            self.url += \"&camera=%d\" % self.axis.camera\n+\n         rospy.logdebug('opening ' + str(self.axis))\n \n     def authenticate(self):\n@@ -137,7 +142,7 @@ def publishCameraInfoMsg(self):\n \n class Axis:\n     def __init__(self, hostname, username, password, width, height, frame_id, \n-                 camera_info_url, use_encrypted_password):\n+                 camera_info_url, use_encrypted_password, camera):\n         self.hostname = hostname\n         self.username = username\n         self.password = password\n@@ -146,6 +151,7 @@ def __init__(self, hostname, username, password, width, height, frame_id,\n         self.frame_id = frame_id\n         self.camera_info_url = camera_info_url\n         self.use_encrypted_password = use_encrypted_password\n+        self.camera = camera\n         \n         # generate a valid camera name based on the hostname\n         self.cname = camera_info_manager.genCameraName(self.hostname)\n@@ -179,7 +185,8 @@ def main():\n         'height': 480,\n         'frame_id': 'axis_camera',\n         'camera_info_url': '',\n-        'use_encrypted_password' : False}\n+        'use_encrypted_password' : False,\n+        'camera' : 0}\n     args = updateArgs(arg_defaults)\n     Axis(**args)\n     rospy.spin()"
+        }
+      ]
+    },
+    {
+      "author": "Sammy Pfeiffer",
+      "date": "2015-05-06T15:35:38Z",
+      "sha": "6863f3ff6cfe3e7d370dcb9786037dfa8bfd05c6",
+      "message": "Merge pull request #29 from negre/master\n\nhandle encrypted password authentication",
+      "files_changed": 1,
+      "additions": 10,
+      "deletions": 5,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "8ada4b9d471ab6abfd153414ebb1252cdb60fef0",
+          "filename": "nodes/axis.py",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 5,
+          "changes": 15,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/6863f3ff6cfe3e7d370dcb9786037dfa8bfd05c6/nodes%2Faxis.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/6863f3ff6cfe3e7d370dcb9786037dfa8bfd05c6/nodes%2Faxis.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Faxis.py?ref=6863f3ff6cfe3e7d370dcb9786037dfa8bfd05c6",
+          "patch": "@@ -33,7 +33,7 @@ def stream(self):\n \n     def formURL(self):\n         self.url = 'http://%s/mjpg/video.mjpg' % self.axis.hostname\n-        self.url += \"?fps=0&resolultion=%dx%d\" % (self.axis.width, \n+        self.url += \"?fps=0&resolution=%dx%d\" % (self.axis.width, \n                                                             self.axis.height)\n         rospy.logdebug('opening ' + str(self.axis))\n \n@@ -48,7 +48,10 @@ def authenticate(self):\n             top_level_url = \"http://\" + self.axis.hostname\n             password_mgr.add_password(None, top_level_url, self.axis.username, \n                                                             self.axis.password)\n-            handler = urllib2.HTTPBasicAuthHandler(password_mgr)\n+            if self.axis.use_encrypted_password :\n+                handler = urllib2.HTTPDigestAuthHandler(password_mgr)\n+            else:\n+                handler = urllib2.HTTPBasicAuthHandler(password_mgr)\n \n             # create \"opener\" (OpenerDirector instance)\n             opener = urllib2.build_opener(handler)\n@@ -133,15 +136,16 @@ def publishCameraInfoMsg(self):\n \n class Axis:\n     def __init__(self, hostname, username, password, width, height, frame_id, \n-                                                            camera_info_url):\n+                 camera_info_url, use_encrypted_password):\n         self.hostname = hostname\n         self.username = username\n         self.password = password\n         self.width = width\n         self.height = height\n         self.frame_id = frame_id\n         self.camera_info_url = camera_info_url\n-\n+        self.use_encrypted_password = use_encrypted_password\n+        \n         # generate a valid camera name based on the hostname\n         self.cname = camera_info_manager.genCameraName(self.hostname)\n         self.cinfo = camera_info_manager.CameraInfoManager(cname = self.cname,\n@@ -173,7 +177,8 @@ def main():\n         'width': 640,\n         'height': 480,\n         'frame_id': 'axis_camera',\n-        'camera_info_url': ''}\n+        'camera_info_url': '',\n+        'use_encrypted_password' : False}\n     args = updateArgs(arg_defaults)\n     Axis(**args)\n     rospy.spin()"
+        }
+      ]
+    },
+    {
+      "author": "wkentaro",
+      "date": "2016-06-19T01:47:16Z",
+      "sha": "2dd2b612d46054dcf0cb15fe1659cd64c7854fca",
+      "message": "Set queue_size to Publishers in axis_camera",
+      "files_changed": 3,
+      "additions": 5,
+      "deletions": 5,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "88567dbaf3342374b8386585dad83c386dd9fa0a",
+          "filename": "nodes/axis.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/2dd2b612d46054dcf0cb15fe1659cd64c7854fca/nodes%2Faxis.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/2dd2b612d46054dcf0cb15fe1659cd64c7854fca/nodes%2Faxis.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Faxis.py?ref=2dd2b612d46054dcf0cb15fe1659cd64c7854fca",
+          "patch": "@@ -153,8 +153,8 @@ def __init__(self, hostname, username, password, width, height, frame_id,\n                                                    url = self.camera_info_url)\n         self.cinfo.loadCameraInfo()         # required before getCameraInfo()\n         self.st = None\n-        self.pub = rospy.Publisher(\"image_raw/compressed\", CompressedImage, self)\n-        self.caminfo_pub = rospy.Publisher(\"camera_info\", CameraInfo, self)\n+        self.pub = rospy.Publisher(\"image_raw/compressed\", CompressedImage, self, queue_size=1)\n+        self.caminfo_pub = rospy.Publisher(\"camera_info\", CameraInfo, self, queue_size=1)\n \n     def __str__(self):\n         \"\"\"Return string representation.\"\"\""
+        },
+        {
+          "sha": "3ba095c2cd1079edfbbc3c80444ac7d1f1514736",
+          "filename": "nodes/axis_ptz.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/2dd2b612d46054dcf0cb15fe1659cd64c7854fca/nodes%2Faxis_ptz.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/2dd2b612d46054dcf0cb15fe1659cd64c7854fca/nodes%2Faxis_ptz.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Faxis_ptz.py?ref=2dd2b612d46054dcf0cb15fe1659cd64c7854fca",
+          "patch": "@@ -109,7 +109,7 @@ def __init__(self, hostname, username, password, flip, speed_control):\n         self.mirror = False\n \n         self.st = None\n-        self.pub = rospy.Publisher(\"state\", Axis, self)\n+        self.pub = rospy.Publisher(\"state\", Axis, self, queue_size=1)\n         self.sub = rospy.Subscriber(\"cmd\", Axis, self.cmd, queue_size=1)\n         self.sub_mirror = rospy.Subscriber(\"mirror\", Bool, self.mirrorCallback,\n                                                                 queue_size=1)"
+        },
+        {
+          "sha": "62fe979a65cd2842d72eb71441394bac69627ed6",
+          "filename": "nodes/teleop_speed_control.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/2dd2b612d46054dcf0cb15fe1659cd64c7854fca/nodes%2Fteleop_speed_control.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/2dd2b612d46054dcf0cb15fe1659cd64c7854fca/nodes%2Fteleop_speed_control.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Fteleop_speed_control.py?ref=2dd2b612d46054dcf0cb15fe1659cd64c7854fca",
+          "patch": "@@ -9,9 +9,9 @@ class Teleop:\n     def __init__(self):\n         rospy.init_node('axis_ptz_speed_controller')\n         self.initialiseVariables()\n-        self.pub = rospy.Publisher('cmd', Axis)\n+        self.pub = rospy.Publisher('cmd', Axis, queue_size=1)\n         rospy.Subscriber(\"joy\", Joy, self.joy_callback, queue_size=1)\n-        self.pub_mirror = rospy.Publisher('mirror', Bool)\n+        self.pub_mirror = rospy.Publisher('mirror', Bool, queue_size=1)\n         \n     def initialiseVariables(self):\n         self.joy = None"
+        }
+      ]
+    },
+    {
+      "author": "mikepurvis",
+      "date": "2012-10-13T14:41:31Z",
+      "sha": "8873d8f629083f8f2361a5f6ae3b1aad4a48b8b0",
+      "message": "Merge pull request #6 from jack-oquin/master\n\nrename `compressed` topic `image_raw/compressed`",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "704852c5389bf1cf8fc0b93f5a9152d733883c58",
+          "filename": "nodes/axis.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/8873d8f629083f8f2361a5f6ae3b1aad4a48b8b0/nodes%2Faxis.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/8873d8f629083f8f2361a5f6ae3b1aad4a48b8b0/nodes%2Faxis.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Faxis.py?ref=8873d8f629083f8f2361a5f6ae3b1aad4a48b8b0",
+          "patch": "@@ -88,7 +88,7 @@ def __init__(self, hostname, username, password, width, height):\n     self.height = height\n \n     self.st = None\n-    self.pub = rospy.Publisher(\"compressed\", CompressedImage, self)\n+    self.pub = rospy.Publisher(\"image_raw/compressed\", CompressedImage, self)\n     self.caminfo_pub = rospy.Publisher(\"camera_info\", CameraInfo, self)\n \n   def peer_subscribe(self, topic_name, topic_publish, peer_publish):"
+        }
+      ]
+    },
+    {
+      "author": "rockie",
+      "date": "2015-06-04T00:28:07Z",
+      "sha": "9e3573bb4b8e95a8340b2cfdca123dc804c7fb3f",
+      "message": "sending camera_info",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "1fe609e8f6a0f76869005dce459656138dbe5957",
+          "filename": "nodes/axis.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/9e3573bb4b8e95a8340b2cfdca123dc804c7fb3f/nodes%2Faxis.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/9e3573bb4b8e95a8340b2cfdca123dc804c7fb3f/nodes%2Faxis.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Faxis.py?ref=9e3573bb4b8e95a8340b2cfdca123dc804c7fb3f",
+          "patch": "@@ -76,6 +76,7 @@ def publishFramesContinuously(self):\n                 self.findBoundary()\n                 self.getImage()\n                 self.publishMsg()\n+                self.publishCameraInfoMsg()\n             except:\n                 rospy.loginfo('Timed out while trying to get message.')\n                 break\n@@ -128,7 +129,7 @@ def publishMsg(self):\n     def publishCameraInfoMsg(self):\n         '''Publish camera info manager message'''\n         cimsg = self.axis.cinfo.getCameraInfo()\n-        cimsg.header.stamp = msg.header.stamp\n+        cimsg.header.stamp = cimsg.header.stamp\n         cimsg.header.frame_id = self.axis.frame_id\n         cimsg.width = self.axis.width\n         cimsg.height = self.axis.height"
+        }
+      ]
+    },
+    {
+      "author": "CreativeEntropy",
+      "date": "2015-02-23T11:25:48Z",
+      "sha": "38280e45c00cf4c5364ecdbb5fed72155d7bc66d",
+      "message": "Create LICENSE (New BSD)\n\nCreate LICENSE file to make copyright clear.",
+      "files_changed": 1,
+      "additions": 29,
+      "deletions": 0,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "0fee5750edd1795198ea5075eb27b84ebe60583d",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 29,
+          "deletions": 0,
+          "changes": 29,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/38280e45c00cf4c5364ecdbb5fed72155d7bc66d/LICENSE",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/38280e45c00cf4c5364ecdbb5fed72155d7bc66d/LICENSE",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/LICENSE?ref=38280e45c00cf4c5364ecdbb5fed72155d7bc66d",
+          "patch": "@@ -0,0 +1,29 @@\n+Copyright (c) 2012, Ryan Gariepy.\n+All rights reserved.\n+\n+Redistribution and use in source and binary forms, with or without\n+modification, are permitted provided that the following conditions\n+are met:\n+\n+ * Redistributions of source code must retain the above copyright\n+   notice, this list of conditions and the following disclaimer.\n+ * Redistributions in binary form must reproduce the above\n+   copyright notice, this list of conditions and the following\n+   disclaimer in the documentation and/or other materials provided\n+   with the distribution.\n+ * Neither the name of Willow Garage, Inc. nor the names of its\n+   contributors may be used to endorse or promote products derived\n+   from this software without specific prior written permission.\n+\n+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n+\"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS\n+FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\n+COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,\n+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,\n+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\n+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN\n+ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+POSSIBILITY OF SUCH DAMAGE."
+        }
+      ]
+    },
+    {
+      "author": "amaury",
+      "date": "2014-09-11T14:22:40Z",
+      "sha": "32e5c2b3fd2eb66caf086cada3e909eb59d2b398",
+      "message": "handle encrypted password authentication",
+      "files_changed": 1,
+      "additions": 10,
+      "deletions": 5,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "8ada4b9d471ab6abfd153414ebb1252cdb60fef0",
+          "filename": "nodes/axis.py",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 5,
+          "changes": 15,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/32e5c2b3fd2eb66caf086cada3e909eb59d2b398/nodes%2Faxis.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/32e5c2b3fd2eb66caf086cada3e909eb59d2b398/nodes%2Faxis.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Faxis.py?ref=32e5c2b3fd2eb66caf086cada3e909eb59d2b398",
+          "patch": "@@ -33,7 +33,7 @@ def stream(self):\n \n     def formURL(self):\n         self.url = 'http://%s/mjpg/video.mjpg' % self.axis.hostname\n-        self.url += \"?fps=0&resolultion=%dx%d\" % (self.axis.width, \n+        self.url += \"?fps=0&resolution=%dx%d\" % (self.axis.width, \n                                                             self.axis.height)\n         rospy.logdebug('opening ' + str(self.axis))\n \n@@ -48,7 +48,10 @@ def authenticate(self):\n             top_level_url = \"http://\" + self.axis.hostname\n             password_mgr.add_password(None, top_level_url, self.axis.username, \n                                                             self.axis.password)\n-            handler = urllib2.HTTPBasicAuthHandler(password_mgr)\n+            if self.axis.use_encrypted_password :\n+                handler = urllib2.HTTPDigestAuthHandler(password_mgr)\n+            else:\n+                handler = urllib2.HTTPBasicAuthHandler(password_mgr)\n \n             # create \"opener\" (OpenerDirector instance)\n             opener = urllib2.build_opener(handler)\n@@ -133,15 +136,16 @@ def publishCameraInfoMsg(self):\n \n class Axis:\n     def __init__(self, hostname, username, password, width, height, frame_id, \n-                                                            camera_info_url):\n+                 camera_info_url, use_encrypted_password):\n         self.hostname = hostname\n         self.username = username\n         self.password = password\n         self.width = width\n         self.height = height\n         self.frame_id = frame_id\n         self.camera_info_url = camera_info_url\n-\n+        self.use_encrypted_password = use_encrypted_password\n+        \n         # generate a valid camera name based on the hostname\n         self.cname = camera_info_manager.genCameraName(self.hostname)\n         self.cinfo = camera_info_manager.CameraInfoManager(cname = self.cname,\n@@ -173,7 +177,8 @@ def main():\n         'width': 640,\n         'height': 480,\n         'frame_id': 'axis_camera',\n-        'camera_info_url': ''}\n+        'camera_info_url': '',\n+        'use_encrypted_password' : False}\n     args = updateArgs(arg_defaults)\n     Axis(**args)\n     rospy.spin()"
+        }
+      ]
+    },
+    {
+      "author": "Administrator",
+      "date": "2014-04-29T21:12:14Z",
+      "sha": "74ef723892e75365f240a14af28dfd3d2c958e61",
+      "message": "New launch file for use with a single axis camera, that also spawns a\ncompressed theora topic.",
+      "files_changed": 1,
+      "additions": 14,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "daf7c8693562a6298132154f4bf61cc689dfc172",
+          "filename": "tests/axis_theora.launch",
+          "status": "added",
+          "additions": 14,
+          "deletions": 0,
+          "changes": 14,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/74ef723892e75365f240a14af28dfd3d2c958e61/tests%2Faxis_theora.launch",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/74ef723892e75365f240a14af28dfd3d2c958e61/tests%2Faxis_theora.launch",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/tests%2Faxis_theora.launch?ref=74ef723892e75365f240a14af28dfd3d2c958e61",
+          "patch": "@@ -0,0 +1,14 @@\n+<launch>\n+  <group ns=\"axis\">\n+    <param name=\"hostname\" value=\"192.168.1.13\" />\n+    <param name=\"width\" value=\"640\" />\n+    <param name=\"height\" value=\"480\" />\n+    <node pkg=\"axis_camera\" type=\"axis.py\" name=\"axis\" />\n+  </group>\n+\n+  <node pkg=\"image_transport\" type=\"republish\" name=\"republish\" args=\"compressed\">\n+        <remap from=\"/in\" to=\"/axis/image_raw\"/>\n+        <remap from=\"/out\" to=\"/axis/image_raw\"/>\n+  </node>\n+\n+</launch>"
+        }
+      ]
+    },
+    {
+      "author": "Kai Franke",
+      "date": "2013-07-18T15:34:40Z",
+      "sha": "a6bd943bde33d684229aeb228e6f2eb0acc53dc2",
+      "message": "added debug output if login to camera was not successful",
+      "files_changed": 1,
+      "additions": 6,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "35f0a8606b6dbe726e82483645dc13373ddce956",
+          "filename": "nodes/axis_ptz.py",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 1,
+          "changes": 7,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/a6bd943bde33d684229aeb228e6f2eb0acc53dc2/nodes%2Faxis_ptz.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/a6bd943bde33d684229aeb228e6f2eb0acc53dc2/nodes%2Faxis_ptz.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Faxis_ptz.py?ref=a6bd943bde33d684229aeb228e6f2eb0acc53dc2",
+          "patch": "@@ -44,10 +44,15 @@ def queryCameraPosition(self):\n                 body = response.read()\n                 self.cameraPosition = dict([s.split('=',2) for s in \n                                                             body.splitlines()])\n+            # Response code 401 means authentication error\n+            elif response.status == 401:\n+                rospy.logwarn('You need to enable anonymous PTZ control login' \n+                              'at http://%s -> Setup Basic Setup -> Users' % self.hostname)\n             else:\n                 self.cameraPosition = None\n+                rospy.logwarn('Received HTTP response %i from camera, expecting 200' % response.status)\n         except:\n-            rospy.logwarn('Encountered a problem getting a repsonse from %s.  '\n+            rospy.logwarn('Encountered a problem getting a response from %s.  '\n                             'Possibly a problem with the network connection.' %\n                             self.axis.hostname)\n             self.cameraPosition = None"
+        }
+      ]
+    },
+    {
+      "author": "Paul Milliken",
+      "date": "2013-05-13T05:00:27Z",
+      "sha": "0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4",
+      "message": "axis.py now enters slow loop if connection to camera is lost.  axis_ptz.py now has option for speed_control or position_control.  teleop_twist.py and axis_twist.py have been removed as they are superceded by speed control option in axis_ptz.py.  Mirror function added to axis_ptz.py in addition to flipped.  A few more test launch files added but more are required.",
+      "files_changed": 15,
+      "additions": 712,
+      "deletions": 554,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "fe5adf0b9a742dcad79773ecbc2a7a94232b0771",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 33,
+          "deletions": 14,
+          "changes": 47,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/CMakeLists.txt?ref=0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4",
+          "patch": "@@ -1,21 +1,39 @@\n-cmake_minimum_required(VERSION 2.4.6)\n-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)\n+cmake_minimum_required(VERSION 2.8.3)\n+project(axis_camera)\n \n-# Set the build type.  Options are:\n-#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage\n-#  Debug          : w/ debug symbols, w/o optimization\n-#  Release        : w/o debug symbols, w/ optimization\n-#  RelWithDebInfo : w/ debug symbols, w/ optimization\n-#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries\n-#set(ROS_BUILD_TYPE RelWithDebInfo)\n+find_package(catkin REQUIRED\n+  COMPONENTS\n+  camera_info_manager_py\n+  geometry_msgs\n+  message_generation\n+  rospy\n+  sensor_msgs\n+  tf\n+)\n+catkin_python_setup()\n \n-rosbuild_init()\n+# ROS message generation\n+add_message_files(DIRECTORY msg FILES Axis.msg)\n+generate_messages(DEPENDENCIES geometry_msgs std_msgs)\n \n-#set the default path for built executables to the \"bin\" directory\n-#set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)\n-#set the default path for built libraries to the \"lib\" directory\n-#set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)\n+catkin_package(\n+  CATKIN_DEPENDS\n+  camera_info_manager_py\n+  geometry_msgs\n+  message_runtime\n+  sensor_msgs\n+  tf\n+)\n \n+<<<<<<< HEAD\n+install(PROGRAMS\n+  nodes/axis.py\n+  nodes/axis_ptz.py\n+  nodes/publish_axis_tf.py\n+  nodes/teleop.py\n+  nodes/teleop_speed_control.py\n+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})\n+=======\n #uncomment if you have defined messages\n rosbuild_genmsg()\n #uncomment if you have defined services\n@@ -29,3 +47,4 @@ rosbuild_genmsg()\n #rosbuild_add_executable(example examples/example.cpp)\n #target_link_libraries(example ${PROJECT_NAME})\n rosbuild_make_distribution(0.0.2)\n+>>>>>>> a0c9da512fdea3ab1d447d7d3f2e3139d6858886"
+        },
+        {
+          "sha": "b75b928f20ef9ea4f509a17db62e4e31b422c27f",
+          "filename": "Makefile",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 1,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/a0c9da512fdea3ab1d447d7d3f2e3139d6858886/Makefile",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/a0c9da512fdea3ab1d447d7d3f2e3139d6858886/Makefile",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/Makefile?ref=a0c9da512fdea3ab1d447d7d3f2e3139d6858886",
+          "patch": "@@ -1 +0,0 @@\n-include $(shell rospack find mk)/cmake.mk\n\\ No newline at end of file"
+        },
+        {
+          "sha": "7a8d1658507935022863ed84795566740b4854f7",
+          "filename": "nodes/axis.py",
+          "status": "modified",
+          "additions": 185,
+          "deletions": 144,
+          "changes": 329,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4/nodes%2Faxis.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4/nodes%2Faxis.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Faxis.py?ref=0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4",
+          "patch": "@@ -1,163 +1,204 @@\n #!/usr/bin/env python\n #\n # Axis camera image driver. Based on:\n-# https://code.ros.org/svn/wg-ros-pkg/branches/trunk_cturtle/sandbox/axis_camera/axis.py\n+# https://code.ros.org/svn/wg-ros-pkg/branches/trunk_cturtle/sandbox/axis_camera\n+# /axis.py\n #\n \n-import os, sys, string, time\n+import threading\n import urllib2\n \n-import roslib; roslib.load_manifest('axis_camera') \n import rospy \n-\n from sensor_msgs.msg import CompressedImage, CameraInfo\n-\n-import threading\n import camera_info_manager\n \n class StreamThread(threading.Thread):\n-  def __init__(self, axis):\n-    threading.Thread.__init__(self)\n-\n-    self.axis = axis\n-    self.daemon = True\n-\n-  def run(self):\n-    while True:\n-      try:\n-        self.stream()\n-      except:\n-        import traceback\n-        traceback.print_exc()\n-      time.sleep(1)\n-\n-  def stream(self):\n-    url = 'http://%s/mjpg/video.mjpg' % self.axis.hostname\n-    url = url + \"?fps=0&resolultion=%dx%d\" % (self.axis.width, self.axis.height)\n-\n-    rospy.logdebug('opening ' + str(self.axis))\n-\n-    # only try to authenticate if user/pass configured\n-    if self.axis.password != '' and self.axis.username != '':\n-      # create a password manager\n-      password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()\n-\n-      # Add the username and password, use default realm.\n-      top_level_url = \"http://\" + self.axis.hostname\n-      password_mgr.add_password(None, top_level_url,\n-                                self.axis.username,\n-                                self.axis.password)\n-      handler = urllib2.HTTPBasicAuthHandler(password_mgr)\n-\n-      # create \"opener\" (OpenerDirector instance)\n-      opener = urllib2.build_opener(handler)\n-\n-      # ...and install it globally so it can be used with urlopen.\n-      urllib2.install_opener(opener)\n-\n-    fp = urllib2.urlopen(url)\n-\n-    while True:\n-      boundary = fp.readline()\n-\n-      header = {}\n-      while 1:\n-        line = fp.readline()\n-        if line == \"\\r\\n\": break\n-        line = line.strip()\n-\n-        parts = line.split(\": \", 1)\n-        header[parts[0]] = parts[1]\n-\n-      content_length = int(header['Content-Length'])\n-\n-      img = fp.read(content_length)\n-      line = fp.readline()\n-      \n-      msg = CompressedImage()\n-      msg.header.stamp = rospy.Time.now()\n-      msg.header.frame_id = self.axis.frame_id\n-      msg.format = \"jpeg\"\n-      msg.data = img\n-\n-      self.axis.pub.publish(msg)\n-\n-      cimsg = self.axis.cinfo.getCameraInfo()\n-      cimsg.header.stamp = msg.header.stamp\n-      cimsg.header.frame_id = self.axis.frame_id\n-      cimsg.width = self.axis.width\n-      cimsg.height = self.axis.height\n-      self.axis.caminfo_pub.publish(cimsg)\n+    def __init__(self, axis):\n+        threading.Thread.__init__(self)\n+        self.axis = axis\n+        self.daemon = True\n+        self.timeoutSeconds = 2.5\n+\n+    def run(self):\n+        while(True):\n+            self.stream()\n+\n+    def stream(self):\n+        while(True):\n+            self.formURL()\n+            self.authenticate()\n+            if self.openURL():\n+                self.publishFramesContinuously()\n+            rospy.sleep(2) # if stream stays intact we shouldn't get to this\n+\n+    def formURL(self):\n+        self.url = 'http://%s/mjpg/video.mjpg' % self.axis.hostname\n+        self.url += \"?fps=0&resolultion=%dx%d\" % (self.axis.width, \n+                                                            self.axis.height)\n+        rospy.logdebug('opening ' + str(self.axis))\n+\n+    def authenticate(self):\n+        '''only try to authenticate if user/pass configured.  I have not\n+        used this method (yet).'''\n+        if self.axis.password != '' and self.axis.username != '':\n+            # create a password manager\n+            password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()\n+\n+            # Add the username and password, use default realm.\n+            top_level_url = \"http://\" + self.axis.hostname\n+            password_mgr.add_password(None, top_level_url, self.axis.username, \n+                                                            self.axis.password)\n+            handler = urllib2.HTTPBasicAuthHandler(password_mgr)\n+\n+            # create \"opener\" (OpenerDirector instance)\n+            opener = urllib2.build_opener(handler)\n+\n+            # ...and install it globally so it can be used with urlopen.\n+            urllib2.install_opener(opener)\n+    \n+    def openURL(self):\n+        '''Open connection to Axis camera using http'''\n+        try:\n+            self.fp = urllib2.urlopen(self.url, timeout=self.timeoutSeconds)\n+            return(True)\n+        except urllib2.URLError, e:\n+            rospy.logwarn('Error opening URL %s' % (self.url) +\n+                            'Possible timeout.  Looping until camera appears')\n+            return(False)\n+\n+    def publishFramesContinuously(self):\n+        '''Continuous loop to publish images'''\n+        while(True):\n+            try:\n+                self.findBoundary()\n+                self.getImage()\n+                self.publishMsg()\n+            except:\n+                rospy.loginfo('Timed out while trying to get message.')\n+                break\n+\n+    def findBoundary(self):\n+        '''The string \"--myboundary\" is used to denote the start of an image in\n+        Axis cameras'''\n+        while(True):\n+            boundary = self.fp.readline()\n+            if boundary=='--myboundary\\r\\n':\n+                break\n+\n+    def getImage(self):\n+        '''Get the image header and image itself'''\n+        self.getHeader()\n+        self.getImageData()\n+\n+    def getHeader(self):\n+        self.header = {}\n+        while(True):\n+            line = self.fp.readline()\n+            if line == \"\\r\\n\":\n+                break\n+            line = line.strip()\n+            parts = line.split(\": \", 1)\n+            try:\n+                self.header[parts[0]] = parts[1]\n+            except:\n+                rospy.logwarn('Problem encountered with image header.  Setting '\n+                                                    'content_length to zero')\n+                self.header['Content-Length'] = 0 # set content_length to zero if \n+                                            # there is a problem reading header\n+        self.content_length = int(self.header['Content-Length'])\n+\n+    def getImageData(self):\n+        '''Get the binary image data itself (ie. without header)'''\n+        if self.content_length>0:\n+            self.img = self.fp.read(self.content_length)\n+            self.fp.readline() # Read terminating \\r\\n and do nothing with it\n+\n+    def publishMsg(self):\n+        '''Publish jpeg image as a ROS message'''\n+        self.msg = CompressedImage()\n+        self.msg.header.stamp = rospy.Time.now()\n+        self.msg.header.frame_id = self.axis.frame_id\n+        self.msg.format = \"jpeg\"\n+        self.msg.data = self.img\n+        self.axis.pub.publish(self.msg)\n+\n+    def publishCameraInfoMsg(self):\n+        '''Publish camera info manager message'''\n+        cimsg = self.axis.cinfo.getCameraInfo()\n+        cimsg.header.stamp = msg.header.stamp\n+        cimsg.header.frame_id = self.axis.frame_id\n+        cimsg.width = self.axis.width\n+        cimsg.height = self.axis.height\n+        self.axis.caminfo_pub.publish(cimsg)\n \n class Axis:\n-  def __init__(self, hostname, username, password,\n-               width, height, frame_id, camera_info_url):\n-    self.hostname = hostname\n-    self.username = username\n-    self.password = password\n-    self.width = width\n-    self.height = height\n-    self.frame_id = frame_id\n-    self.camera_info_url = camera_info_url\n-\n-    # generate a valid camera name based on the hostname\n-    self.cname = camera_info_manager.genCameraName(self.hostname)\n-    self.cinfo = camera_info_manager.CameraInfoManager(cname = self.cname,\n-                                                       url = self.camera_info_url)\n-    self.cinfo.loadCameraInfo()         # required before getCameraInfo()\n-    self.st = None\n-    self.pub = rospy.Publisher(\"image_raw/compressed\", CompressedImage, self)\n-    self.caminfo_pub = rospy.Publisher(\"camera_info\", CameraInfo, self)\n-\n-  def __str__(self):\n-    \"\"\"Return string representation.\"\"\"\n-    return(self.hostname + ',' + self.username + ',' + self.password +\n-           '(' + str(self.width) + 'x' + str(self.height) + ')')\n-\n-  def peer_subscribe(self, topic_name, topic_publish, peer_publish):\n-    # Lazy-start the image-publisher.\n-    if self.st is None:\n-      self.st = StreamThread(self)\n-      self.st.start()\n+    def __init__(self, hostname, username, password, width, height, frame_id, \n+                                                            camera_info_url):\n+        self.hostname = hostname\n+        self.username = username\n+        self.password = password\n+        self.width = width\n+        self.height = height\n+        self.frame_id = frame_id\n+        self.camera_info_url = camera_info_url\n+\n+        # generate a valid camera name based on the hostname\n+        self.cname = camera_info_manager.genCameraName(self.hostname)\n+        self.cinfo = camera_info_manager.CameraInfoManager(cname = self.cname,\n+                                                   url = self.camera_info_url)\n+        self.cinfo.loadCameraInfo()         # required before getCameraInfo()\n+        self.st = None\n+        self.pub = rospy.Publisher(\"image_raw/compressed\", CompressedImage, self)\n+        self.caminfo_pub = rospy.Publisher(\"camera_info\", CameraInfo, self)\n+\n+    def __str__(self):\n+        \"\"\"Return string representation.\"\"\"\n+        return(self.hostname + ',' + self.username + ',' + self.password +\n+                       '(' + str(self.width) + 'x' + str(self.height) + ')')\n+\n+    def peer_subscribe(self, topic_name, topic_publish, peer_publish):\n+        '''Lazy-start the image-publisher.'''\n+        if self.st is None:\n+            self.st = StreamThread(self)\n+            self.st.start()\n \n \n def main():\n-  rospy.init_node(\"axis_driver\")\n-\n-  arg_defaults = {\n-      'hostname': '192.168.0.90',       # default IP address\n-      'username': 'root',               # default login name\n-      'password': '',\n-      'width': 640,\n-      'height': 480,\n-      'frame_id': 'axis_camera',\n-      'camera_info_url': ''}\n-\n-  # Look up parameters starting in the driver's private parameter\n-  # space, but also searching outer namespaces.  Defining them in a\n-  # higher namespace allows the axis_ptz.py script to share parameters\n-  # with the driver.\n-  args = {}\n-  for name, val in arg_defaults.iteritems():\n-    full_name = rospy.search_param(name)\n-    if full_name is None:\n-      args[name] = val\n-    else:\n-      args[name] = rospy.get_param(full_name, val)\n-\n-  # resolve frame_id with tf_prefix (unless already absolute)\n-  if args['frame_id'][0] != '/':        # not absolute?\n-    tf_prefix = rospy.search_param('tf_prefix')\n-    prefix_val = ''\n-    if tf_prefix is not None:           # prefix defined?\n-      prefix_val = rospy.get_param(tf_prefix)\n-      if prefix_val[0] != '/':          # prefix not absolute?\n-        prefix_val = '/' + prefix_val\n-    args['frame_id'] = prefix_val + '/' + args['frame_id']\n-\n-  Axis(**args)\n-  rospy.spin()\n-\n+    rospy.init_node(\"axis_driver\")\n+\n+    arg_defaults = {\n+        'hostname': '192.168.0.90',       # default IP address\n+        'username': 'root',               # default login name\n+        'password': '',\n+        'width': 640,\n+        'height': 480,\n+        'frame_id': 'axis_camera',\n+        'camera_info_url': ''}\n+    args = updateArgs(arg_defaults)\n+    Axis(**args)\n+    rospy.spin()\n+\n+def updateArgs(arg_defaults):\n+    '''Look up parameters starting in the driver's private parameter space, but\n+    also searching outer namespaces.  Defining them in a higher namespace allows\n+    the axis_ptz.py script to share parameters with the driver.'''\n+    args = {}\n+    for name, val in arg_defaults.iteritems():\n+        full_name = rospy.search_param(name)\n+        if full_name is None:\n+            args[name] = val\n+        else:\n+            args[name] = rospy.get_param(full_name, val)\n+    # resolve frame_id with tf_prefix (unless already absolute)\n+    if args['frame_id'][0] != '/':        # not absolute?\n+        tf_prefix = rospy.search_param('tf_prefix')\n+        prefix_val = ''\n+        if tf_prefix is not None:           # prefix defined?\n+            prefix_val = rospy.get_param(tf_prefix)\n+            if prefix_val[0] != '/':          # prefix not absolute?\n+                prefix_val = '/' + prefix_val\n+        args['frame_id'] = prefix_val + '/' + args['frame_id']\n+    return(args)\n \n if __name__ == \"__main__\":\n-  main()\n+    main()"
+        },
+        {
+          "sha": "335c48674200a4dbbb3f4da2777a93a0444a5fe3",
+          "filename": "nodes/axis_all.py",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 141,
+          "changes": 141,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/a0c9da512fdea3ab1d447d7d3f2e3139d6858886/nodes%2Faxis_all.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/a0c9da512fdea3ab1d447d7d3f2e3139d6858886/nodes%2Faxis_all.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Faxis_all.py?ref=a0c9da512fdea3ab1d447d7d3f2e3139d6858886",
+          "patch": "@@ -1,141 +0,0 @@\n-#!/usr/bin/env python\n-#\n-# Basic PTZ node, based on documentation here:\n-#   http://www.axis.com/files/manuals/vapix_ptz_45621_en_1112.pdf\n-#\n-\n-import os, sys, string, time, getopt, threading\n-import httplib, urllib\n-\n-import roslib; roslib.load_manifest('axis_camera') \n-import rospy \n-\n-from axis_camera.msg import Axis\n-from geometry_msgs.msg import Twist\n-import math\n-\n-\n-class StateThread(threading.Thread):\n-  def __init__(self, axis):\n-    threading.Thread.__init__(self)\n-\n-    self.axis = axis\n-    self.daemon = True\n-\n-  def run(self):\n-    r = rospy.Rate(10)\n-    msg = Axis()\n-\n-    while True:\n-      if not self.axis.twist_timeout and ((rospy.Time.now() - self.axis.last_request).to_sec() > 1.0):\n-          self.axis.twist_timeout = True\n-          self.axis.cmd_twist(Twist(),reset_timeout=False)\n-      conn = httplib.HTTPConnection(self.axis.hostname)\n-      params = { 'query':'position' }\n-      conn.request(\"GET\", \"/axis-cgi/com/ptz.cgi?%s\" % urllib.urlencode(params))\n-      response = conn.getresponse()\n-      if response.status == 200:\n-        body = response.read()\n-        params = dict([s.split('=',2) for s in body.splitlines()])\n-        msg.pan = float(params['pan'])\n-        # Flip pan orient if the camera is mounted backwards and facing down\n-        if self.axis.flip:\n-            msg.pan = 180 - msg.pan\n-            if msg.pan > 180:\n-                msg.pan -= 360\n-            if msg.pan < -180:\n-                msg.pan += 360\n-        msg.tilt = float(params['tilt'])\n-        msg.zoom = float(params['zoom'])\n-        msg.iris = float(params['iris'])\n-        msg.focus = 0.0\n-        if 'focus' in params:\n-          msg.focus = float(params['focus'])\n-        msg.autofocus = (params['autofocus'] == 'on')\n-        self.axis.pub.publish(msg)\n-      r.sleep()\n-      \n-\n-class AxisPTZ:\n-  def __init__(self, hostname, username, password, flip):\n-    self.hostname = hostname\n-    self.username = username\n-    self.password = password\n-    self.flip = flip\n-\n-    self.st = None\n-    self.twist_timeout = True\n-    self.pub = rospy.Publisher(\"state\", Axis, self)\n-    self.sub = rospy.Subscriber(\"twist\", Twist, self.cmd_twist)\n-    self.sub = rospy.Subscriber(\"cmd\", Axis, self.cmd_abs)\n-    self.cmd_twist(Twist(),reset_timeout=False)\n-\n-  def peer_subscribe(self, topic_name, topic_publish, peer_publish):\n-    # Lazy-start the state publisher.\n-    if self.st is None:\n-      self.st = StateThread(self)\n-      self.st.start()\n-\n-  def cmd_abs(self, msg):\n-    if not self.twist_timeout:\n-        self.axis.twist_timeout = True\n-        self.axis.cmd_twist(Twist(),reset_timeout=False)\n-    conn = httplib.HTTPConnection(self.hostname)\n-    # Flip pan orient if the camera is mounted backwards and facing down\n-    if self.flip:\n-    \tmsg.pan = 180 - msg.pan\n-        if msg.pan > 180:\n-\t    msg.pan -= 360\n-        if msg.pan < -180:\n-\t    msg.pan += 360\n-    params = { 'pan': msg.pan, 'tilt': msg.tilt, 'zoom': msg.zoom, 'brightness': msg.brightness }\n-    if msg.autofocus:\n-      params['autofocus'] = 'on'\n-    else:\n-      params['autofocus'] = 'off'\n-      params['focus'] = msg.focus\n-    if msg.iris > 0.000001:\n-      rospy.logwarn(\"Iris value is read-only.\")\n-    conn.request(\"GET\", \"/axis-cgi/com/ptz.cgi?%s\" % urllib.urlencode(params))\n-\n-  def cmd_twist(self, msg, reset_timeout=True):\n-    if reset_timeout:\n-        self.twist_timeout = False\n-    self.last_request = rospy.Time.now()\n-    conn = httplib.HTTPConnection(self.hostname)\n-    pan = int(msg.angular.z * 180./math.pi)\n-    tilt = int(msg.angular.y * 180./math.pi)\n-    if pan>100:\n-        pan=100\n-    if pan<-100:\n-        pan=-100\n-    if tilt>100:\n-        tilt=100\n-    if tilt<-100:\n-        tilt=-100\n-    # Flip pan orient if the camera is mounted backwards and facing down\n-    if self.flip:\n-        pan = -pan\n-        tilt = -tilt\n-    conn.request(\"GET\", \"/axis-cgi/com/ptz.cgi?continuouspantiltmove=%d,%d\" % (pan,tilt))\n-\n-\n-def main():\n-  rospy.init_node(\"axis_twist\")\n-\n-  arg_defaults = {\n-      'hostname': '192.168.0.90',\n-      'username': '',\n-      'password': '',\n-      'flip': True,\n-      }\n-  args = {}\n-  for name in arg_defaults:\n-    args[name] = rospy.get_param(rospy.search_param(name), arg_defaults[name])\n-\n-  AxisPTZ(**args)\n-  rospy.spin()\n-\n-\n-if __name__ == \"__main__\":\n-  main()"
+        },
+        {
+          "sha": "463a233aea1db1d098620ec7f30b99a070e80081",
+          "filename": "nodes/axis_ptz.py",
+          "status": "modified",
+          "additions": 236,
+          "deletions": 89,
+          "changes": 325,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4/nodes%2Faxis_ptz.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4/nodes%2Faxis_ptz.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Faxis_ptz.py?ref=0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4",
+          "patch": "@@ -3,107 +3,254 @@\n # Basic PTZ node, based on documentation here:\n #   http://www.axis.com/files/manuals/vapix_ptz_45621_en_1112.pdf\n #\n-\n-import os, sys, string, time, getopt, threading\n+import threading\n import httplib, urllib\n-\n-import roslib; roslib.load_manifest('axis_camera') \n import rospy \n \n from axis_camera.msg import Axis\n-\n+from std_msgs.msg import Bool\n+import math\n \n class StateThread(threading.Thread):\n-  def __init__(self, axis):\n-    threading.Thread.__init__(self)\n-\n-    self.axis = axis\n-    self.daemon = True\n-\n-  def run(self):\n-    r = rospy.Rate(10)\n-    msg = Axis()\n-\n-    while True:\n-      conn = httplib.HTTPConnection(self.axis.hostname)\n-      params = { 'query':'position' }\n-      conn.request(\"GET\", \"/axis-cgi/com/ptz.cgi?%s\" % urllib.urlencode(params))\n-      response = conn.getresponse()\n-      if response.status == 200:\n-        body = response.read()\n-        params = dict([s.split('=',2) for s in body.splitlines()])\n-        msg.pan = float(params['pan'])\n-        # Flip pan orient if the camera is mounted backwards and facing down\n-        if self.axis.flip:\n-            msg.pan = 180 - msg.pan\n-            if msg.pan > 180:\n-                msg.pan -= 360\n-            if msg.pan < -180:\n-                msg.pan += 360\n-        msg.tilt = float(params['tilt'])\n-        msg.zoom = float(params['zoom'])\n-        msg.iris = float(params['iris'])\n-        msg.focus = 0.0\n-        if 'focus' in params:\n-          msg.focus = float(params['focus'])\n-        msg.autofocus = (params['autofocus'] == 'on')\n-        self.axis.pub.publish(msg)\n-      r.sleep()\n-      \n+    '''This class handles the publication of the positional state of the camera \n+    to a ROS message'''\n+    \n+    def __init__(self, axis):\n+        threading.Thread.__init__(self)\n+        self.axis = axis\n+        # Permit program to exit even if threads are still running by flagging\n+        # thread as a daemon:\n+        self.daemon = True \n+\n+    def run(self):\n+        r = rospy.Rate(1)\n+        self.msg = Axis()\n+\n+        while True:\n+            self.queryCameraPosition()\n+            self.publishCameraState()\n+            r.sleep()\n+\n+    def queryCameraPosition(self):\n+        '''Using Axis VAPIX protocol, described in the comments at the top of\n+        this file, is used to query the state of the camera'''\n+        conn = httplib.HTTPConnection(self.axis.hostname)\n+        queryParams = { 'query':'position' }\n+        try:\n+            conn.request(\"GET\", \"/axis-cgi/com/ptz.cgi?%s\" % \n+                                                urllib.urlencode(queryParams))\n+            response = conn.getresponse()\n+            # Response code 200 means there are data to be read:\n+            if response.status == 200: \n+                body = response.read()\n+                self.cameraPosition = dict([s.split('=',2) for s in \n+                                                            body.splitlines()])\n+            else:\n+                self.cameraPosition = None\n+        except:\n+            rospy.logwarn('Encountered a problem getting a repsonse from %s.  '\n+                            'Possibly a problem with the network connection.' %\n+                            self.axis.hostname)\n+            self.cameraPosition = None\n+   \n+    def publishCameraState(self):\n+        '''Publish camera state to a ROS message'''\n+        if self.cameraPosition is not None:\n+            self.msg.pan = float(self.cameraPosition['pan'])\n+            if self.axis.flip:\n+                self.adjustForFlippedOrientation()\n+            self.msg.tilt = float(self.cameraPosition['tilt'])\n+            self.msg.zoom = float(self.cameraPosition['zoom'])\n+            self.msg.iris = 0.0\n+            if 'iris' in self.cameraPosition:\n+                self.msg.iris = float(self.cameraPosition['iris'])\n+            self.msg.focus = 0.0\n+            if 'focus' in self.cameraPosition:\n+                self.msg.focus = float(self.cameraPosition['focus'])\n+            self.msg.autofocus = (self.cameraPosition['autofocus'] == 'on')\n+            self.axis.pub.publish(self.msg)\n+            \n+    def adjustForFlippedOrientation(self):\n+        '''Correct pan and tilt parameters if camera is mounted backwards and \n+        facing down'''\n+        self.msg.pan = 180 - self.msg.pan\n+        if self.msg.pan > 180:\n+            self.msg.pan -= 360\n+        elif self.msg.pan < -180:\n+            self.msg.pan += 360\n+        self.msg.tilt = -self.msg.tilt\n \n class AxisPTZ:\n-  def __init__(self, hostname, username, password, flip):\n-    self.hostname = hostname\n-    self.username = username\n-    self.password = password\n-    self.flip = flip\n-\n-    self.st = None\n-    self.pub = rospy.Publisher(\"state\", Axis, self)\n-    self.sub = rospy.Subscriber(\"cmd\", Axis, self.cmd)\n-\n-  def peer_subscribe(self, topic_name, topic_publish, peer_publish):\n-    # Lazy-start the state publisher.\n-    if self.st is None:\n-      self.st = StateThread(self)\n-      self.st.start()\n-\n-  def cmd(self, msg):\n-    conn = httplib.HTTPConnection(self.hostname)\n-    # Flip pan orient if the camera is mounted backwards and facing down\n-    if self.flip:\n-    \tmsg.pan = 180 - msg.pan\n-        if msg.pan > 180:\n-\t    msg.pan -= 360\n-        if msg.pan < -180:\n-\t    msg.pan += 360\n-    params = { 'pan': msg.pan, 'tilt': msg.tilt, 'zoom': msg.zoom, 'brightness': msg.brightness }\n-    if msg.autofocus:\n-      params['autofocus'] = 'on'\n-    else:\n-      params['autofocus'] = 'off'\n-      params['focus'] = msg.focus\n-    if msg.iris > 0.000001:\n-      rospy.logwarn(\"Iris value is read-only.\")\n-    conn.request(\"GET\", \"/axis-cgi/com/ptz.cgi?%s\" % urllib.urlencode(params))\n+    '''This class creates a node to manage the PTZ functions of an Axis PTZ \n+    camera'''\n+    def __init__(self, hostname, username, password, flip, speed_control):\n+        self.hostname = hostname\n+        self.username = username\n+        self.password = password\n+        self.flip = flip\n+        # speed_control is true for speed control and false for\n+        # position control:\n+        self.speedControl = speed_control\n+        self.mirror = False\n \n+        self.st = None\n+        self.pub = rospy.Publisher(\"state\", Axis, self)\n+        self.sub = rospy.Subscriber(\"cmd\", Axis, self.cmd, queue_size=1)\n+        self.sub_mirror = rospy.Subscriber(\"mirror\", Bool, self.mirrorCallback,\n+                                                                queue_size=1)\n \n-def main():\n-  rospy.init_node(\"axis\")\n+    def peer_subscribe(self, topic_name, topic_publish, peer_publish):\n+        '''Lazy-start the state publisher.'''\n+        if self.st is None:\n+            self.st = StateThread(self)\n+            self.st.start()\n+\n+    def cmd(self, msg):\n+        '''Command the camera with speed control or position control commands'''\n+        self.msg = msg\n+        if self.flip:\n+            self.adjustForFlippedOrientation()\n+        if self.mirror:\n+            self.msg.pan = -self.msg.pan\n+        self.sanitisePTZCommands()\n+        self.applySetpoints()\n+\n+    def adjustForFlippedOrientation(self):\n+        '''If camera is mounted backwards and upside down (ie. self.flip==True\n+        then apply appropriate transforms to pan and tilt'''\n+        self.msg.tilt = -self.msg.tilt\n+        if self.speedControl:\n+            self.msg.pan = -self.msg.pan\n+        else:\n+            self.msg.pan = 180.0 - self.msg.pan\n+    \n+    def sanitisePTZCommands(self):\n+        '''Applies limits to message and corrects for flipped camera if \n+        necessary'''\n+        self.sanitisePan()\n+        self.sanitiseTilt()\n+        self.sanitiseZoom()\n+        self.sanitiseFocus()\n+        self.sanitiseBrightness()\n+        self.sanitiseIris()\n \n-  arg_defaults = {\n-      'hostname': '192.168.0.90',\n-      'username': '',\n-      'password': '',\n-      'flip': True,\n-      }\n-  args = {}\n-  for name in arg_defaults:\n-    args[name] = rospy.get_param(rospy.search_param(name), arg_defaults[name])\n+    def sanitisePan(self):\n+        '''Pan speed (in percent) must be: -100<pan<100'\n+        Pan must be: -180<pan<180 even though the Axis cameras can only achieve \n+        +/-170 degrees rotation.'''\n+        if self.speedControl:\n+            if abs(self.msg.pan)>100.0:\n+                self.msg.pan = math.copysign(100.0, self.msg.pan)\n+        else: # position control so need to ensure -180<pan<180:\n+            self.msg.pan = ((self.msg.pan + 180.0) % 360.0) - 180.0\n+\n+    def sanitiseTilt(self):\n+        '''Similar to self.sanitisePan() but for tilt'''\n+        if self.speedControl:\n+            if abs(self.msg.tilt)>100.0:\n+                self.msg.tilt = math.copysign(100.0, self.msg.tilt)\n+        else: # position control so ensure tilt: -180<tilt<180:\n+            self.msg.tilt = ((self.msg.tilt + 180.0) % 360) - 180.0\n+\n+    def sanitiseZoom(self):\n+        '''Zoom must be: 1<zoom<9999.  continuouszoommove must be: \n+        -100<zoom<100'''\n+        if self.speedControl:\n+            if abs(self.msg.zoom)>100:\n+                self.msg.zoom = math.copysign(100.0, self.msg.zoom)\n+        else: # position control:\n+            if self.msg.zoom>9999.0:\n+                self.msg.zoom = 9999.0\n+            elif self.msg.zoom<1.0:\n+                self.msg.zoom = 1.0\n+        \n+    def sanitiseFocus(self):\n+        '''Focus must be: 1<focus<9999.  continuousfocusmove: -100<rfocus<100'''\n+        if self.speedControl:\n+            if abs(self.msg.focus)>100.0:\n+                self.msg.focus = math.copysign(100.0, self.msg.focus)\n+        else: # position control:\n+            if self.msg.focus>9999.0:\n+                self.msg.focus = 9999.0\n+            elif self.msg.focus < 1.0:\n+                self.msg.focus = 1.0\n+            \n+    def sanitiseBrightness(self):\n+        '''Brightness must be: 1<brightness<9999.  continuousbrightnessmove must\n+        be: -100<rbrightness<100.  Note that it appears that the brightness\n+        cannot be adjusted on the Axis 214PTZ'''\n+        if self.speedControl:\n+            if abs(self.msg.brightness) > 100.0:\n+                self.msg.brightness = math.copysign(100.0, self.msg.brightness)\n+        else: # position control:\n+            if self.msg.brightness>9999.0:\n+                self.msg.brightness = 9999.0\n+            elif self.msg.brightness<1.0:\n+                self.msg.brightness = 1.0\n+\n+    def sanitiseIris(self):\n+        '''Iris value is read only because autoiris has been set to \"on\"'''\n+        if self.msg.iris>0.000001:\n+            rospy.logwarn(\"Iris value is read-only.\")\n+\n+    def applySetpoints(self):\n+        '''Apply set-points to camera via HTTP'''\n+        conn = httplib.HTTPConnection(self.hostname)\n+        self.createCmdString()\n+        try:\n+            conn.request('GET', self.cmdString)\n+        except:\n+            rospy.logwarn('Failed to connect to camera to send command message')\n+            conn.close()\n+\n+    def createCmdString(self):\n+        '''creates http cgi string to command PTZ camera'''\n+        self.cmdString = '/axis-cgi/com/ptz.cgi?'\n+        if self.speedControl:\n+            self.cmdString += 'continuouspantiltmove=%d,%d&' % \\\n+                                    (int(self.msg.pan), int(self.msg.tilt)) \\\n+                    + 'continuouszoommove=%d&' % (int(self.msg.zoom)) \\\n+                    + 'continuousbrightnessmove=%d&' % \\\n+                                                    (int(self.msg.brightness))\n+            # Note that brightness adjustment has no effect for Axis 214PTZ.\n+            if self.msg.autofocus:\n+                self.cmdString += 'autofocus=on&'\n+            else:\n+                self.cmdString += 'autofocus=off&continuousfocusmove=%d&' % \\\n+                                                        (int(self.msg.focus))\n+            self.cmdString += 'autoiris=on'\n+        else: # position control:\n+            self.cmdString += 'pan=%d&tilt=%d&' % (self.msg.pan, self.msg.tilt)\\\n+                        + 'zoom=%d&' % (int(self.msg.zoom)) \\\n+                        + 'brightness=%d&' % (int(self.msg.brightness))\n+            if self.msg.autofocus:\n+                self.cmdString += 'autofocus=on&'\n+            else:\n+                self.cmdString += 'autofocus=off&focus=%d&' % \\\n+                                                        (int(self.msg.focus))\n+            self.cmdString += 'autoiris=on'\n+\n+    def mirrorCallback(self, msg):\n+        '''Command the camera with speed control or position control commands'''\n+        self.mirror = msg.data\n+\n+def main():\n+    rospy.init_node(\"axis_twist\")\n \n-  AxisPTZ(**args)\n-  rospy.spin()\n+    arg_defaults = {\n+        'hostname': '192.168.0.90',\n+        'username': '',\n+        'password': '',\n+        'flip': True,\n+        'speed_control': False\n+        }\n+    args = {}\n+    for name in arg_defaults:\n+        args[name] = rospy.get_param(rospy.search_param(name), \n+                                                            arg_defaults[name])\n \n+    AxisPTZ(**args)\n+    rospy.spin()\n \n if __name__ == \"__main__\":\n-  main()\n+    main()"
+        },
+        {
+          "sha": "ae133ad22d18bb718594d58b9a51a4c816d5e1d8",
+          "filename": "nodes/axis_twist.py",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 118,
+          "changes": 118,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/a0c9da512fdea3ab1d447d7d3f2e3139d6858886/nodes%2Faxis_twist.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/a0c9da512fdea3ab1d447d7d3f2e3139d6858886/nodes%2Faxis_twist.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Faxis_twist.py?ref=a0c9da512fdea3ab1d447d7d3f2e3139d6858886",
+          "patch": "@@ -1,118 +0,0 @@\n-#!/usr/bin/env python\n-#\n-# Basic PTZ node, based on documentation here:\n-#   http://www.axis.com/files/manuals/vapix_ptz_45621_en_1112.pdf\n-#\n-\n-import os, sys, string, time, getopt, threading\n-import httplib, urllib\n-\n-import roslib; roslib.load_manifest('axis_camera') \n-import rospy \n-\n-from axis_camera.msg import Axis\n-from geometry_msgs.msg import Twist\n-import math\n-\n-\n-class StateThread(threading.Thread):\n-  def __init__(self, axis):\n-    threading.Thread.__init__(self)\n-\n-    self.axis = axis\n-    self.daemon = True\n-\n-  def run(self):\n-    r = rospy.Rate(10)\n-    msg = Axis()\n-\n-    while True:\n-      if not self.axis.timeout and ((rospy.Time.now() - self.axis.last_request).to_sec() > 1.0):\n-          self.axis.timeout = True\n-          self.axis.cmd(Twist(),reset_timeout=False)\n-      conn = httplib.HTTPConnection(self.axis.hostname)\n-      params = { 'query':'position' }\n-      conn.request(\"GET\", \"/axis-cgi/com/ptz.cgi?%s\" % urllib.urlencode(params))\n-      response = conn.getresponse()\n-      if response.status == 200:\n-        body = response.read()\n-        params = dict([s.split('=',2) for s in body.splitlines()])\n-        msg.pan = float(params['pan'])\n-        # Flip pan orient if the camera is mounted backwards and facing down\n-        if self.axis.flip:\n-            msg.pan = 180 - msg.pan\n-            if msg.pan > 180:\n-                msg.pan -= 360\n-            if msg.pan < -180:\n-                msg.pan += 360\n-        msg.tilt = float(params['tilt'])\n-        msg.zoom = float(params['zoom'])\n-        msg.iris = float(params['iris'])\n-        msg.focus = 0.0\n-        if 'focus' in params:\n-          msg.focus = float(params['focus'])\n-        msg.autofocus = (params['autofocus'] == 'on')\n-        self.axis.pub.publish(msg)\n-      r.sleep()\n-      \n-\n-class AxisPTZ:\n-  def __init__(self, hostname, username, password, flip):\n-    self.hostname = hostname\n-    self.username = username\n-    self.password = password\n-    self.flip = flip\n-\n-    self.st = None\n-    self.timeout = True\n-    self.pub = rospy.Publisher(\"state\", Axis, self)\n-    self.sub = rospy.Subscriber(\"twist\", Twist, self.cmd)\n-    self.cmd(Twist(),reset_timeout=False)\n-\n-  def peer_subscribe(self, topic_name, topic_publish, peer_publish):\n-    # Lazy-start the state publisher.\n-    if self.st is None:\n-      self.st = StateThread(self)\n-      self.st.start()\n-\n-  def cmd(self, msg, reset_timeout=True):\n-    if reset_timeout:\n-        self.timeout = False\n-    self.last_request = rospy.Time.now()\n-    conn = httplib.HTTPConnection(self.hostname)\n-    pan = int(msg.angular.z * 180./math.pi)\n-    tilt = int(msg.angular.y * 180./math.pi)\n-    if pan>100:\n-        pan=100\n-    if pan<-100:\n-        pan=-100\n-    if tilt>100:\n-        tilt=100\n-    if tilt<-100:\n-        tilt=-100\n-    # Flip pan orient if the camera is mounted backwards and facing down\n-    if self.flip:\n-        pan = -pan\n-        tilt = -tilt\n-    conn.request(\"GET\", \"/axis-cgi/com/ptz.cgi?continuouspantiltmove=%d,%d\" % (pan,tilt))\n-\n-\n-def main():\n-  rospy.init_node(\"axis_twist\")\n-\n-  arg_defaults = {\n-      'hostname': '192.168.0.90',\n-      'username': '',\n-      'password': '',\n-      'flip': True,\n-      }\n-  args = {}\n-  for name in arg_defaults:\n-    args[name] = rospy.get_param(rospy.search_param(name), arg_defaults[name])\n-\n-  AxisPTZ(**args)\n-  rospy.spin()\n-\n-\n-if __name__ == \"__main__\":\n-  main()"
+        },
+        {
+          "sha": "97b1a1ee3e29a22aecb3cf6cf00824774e51dcd6",
+          "filename": "nodes/publish_axis_tf.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4/nodes%2Fpublish_axis_tf.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4/nodes%2Fpublish_axis_tf.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Fpublish_axis_tf.py?ref=0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4",
+          "patch": "@@ -1,5 +1,5 @@\n #!/usr/bin/env python\n-import roslib; roslib.load_manifest('axis_camera')\n+\n import rospy\n import math\n from axis_camera.msg import Axis"
+        },
+        {
+          "sha": "e0dbb41ea26296fd6d4425d91e67da54e8b7eefd",
+          "filename": "nodes/teleop.py",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 2,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4/nodes%2Fteleop.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4/nodes%2Fteleop.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Fteleop.py?ref=0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4",
+          "patch": "@@ -1,8 +1,6 @@\n #!/usr/bin/python\n \n-import roslib; roslib.load_manifest('axis_camera')\n import rospy\n-\n from sensor_msgs.msg import Joy\n from axis_camera.msg import Axis\n "
+        },
+        {
+          "sha": "fc7d6eeda46aa4e53cb3cd2abeeb30d9703eed8e",
+          "filename": "nodes/teleop_speed_control.py",
+          "status": "added",
+          "additions": 75,
+          "deletions": 0,
+          "changes": 75,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4/nodes%2Fteleop_speed_control.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4/nodes%2Fteleop_speed_control.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Fteleop_speed_control.py?ref=0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4",
+          "patch": "@@ -0,0 +1,75 @@\n+#!/usr/bin/python\n+\n+import rospy\n+from sensor_msgs.msg import Joy\n+from axis_camera.msg import Axis\n+from std_msgs.msg import Bool\n+\n+class Teleop:\n+    def __init__(self):\n+        rospy.init_node('axis_ptz_speed_controller')\n+        self.initialiseVariables()\n+        self.pub = rospy.Publisher('cmd', Axis)\n+        rospy.Subscriber(\"joy\", Joy, self.joy_callback, queue_size=1)\n+        self.pub_mirror = rospy.Publisher('mirror', Bool)\n+        \n+    def initialiseVariables(self):\n+        self.joy = None\n+        self.msg = Axis() # instantiate Axis message\n+        self.msg.autofocus = True # autofocus is on by default\n+        # sensitivities[0..5] corresponding to fwd, left, up, tilt right, \n+        # tilt forwards, anticlockwise twist\n+        self.mirror = False\n+        self.mirror_already_actioned = False # to stop mirror flip-flopping\n+        self.sensitivities = [120, -60, 40, 0, 0, 30]\n+        self.deadband = [0.2, 0.2, 0.2, 0.2, 0.4, 0.4]\n+       \n+    def spin(self):\n+        self.pub.publish(self.msg)\n+        r = rospy.Rate(5)\n+        while not rospy.is_shutdown():\n+            if self.joy != None:\n+                self.createCmdMessage()\n+                self.createMirrorMessage()\n+            r.sleep()\n+\n+    def createCmdMessage(self):\n+        '''Creates and publishes message to command the camera.  Spacenav axes\n+        are: [fwd, left, up, tilt_right, tilt_forward, twist_anticlockwise'''\n+        self.applyThresholds()\n+        self.msg.pan = self.axes_thresholded[1] * self.sensitivities[1]\n+        self.msg.tilt = self.axes_thresholded[2] * self.sensitivities[2]\n+        self.msg.zoom = self.axes_thresholded[0] * self.sensitivities[0]\n+        if self.joy.buttons[0]==1:\n+            self.msg.autofocus = True\n+        else:\n+            self.msg.focus = self.axes_thresholded[5] * self.sensitivities[5]\n+            if (abs(self.msg.focus)>0.00001):\n+                # Only turn autofocus off if msg.focus!=0\n+                self.msg.autofocus = False\n+        self.pub.publish(self.msg)\n+\n+    def applyThresholds(self):\n+        '''apply deadband to joystick output'''\n+        n = len(self.joy.axes)\n+        self.axes_thresholded = n * [0.0]\n+        for i in range(n):\n+            if (abs(self.joy.axes[i])>self.deadband[i]):\n+                self.axes_thresholded[i] = self.joy.axes[i]\n+                \n+    def joy_callback(self, data):\n+        self.joy = data\n+\n+    def createMirrorMessage(self):\n+        '''Creates and publishes message to indicate image should be mirrored'''\n+        if self.joy.buttons[1]==1:\n+            if not self.mirror_already_actioned:\n+                self.mirror = not self.mirror\n+                self.mirror_already_actioned = True\n+        else:\n+            self.mirror_already_actioned = False\n+        self.pub_mirror.publish(Bool(self.mirror))\n+    \n+if __name__ == \"__main__\":\n+    teleop = Teleop()\n+    teleop.spin()"
+        },
+        {
+          "sha": "ec2e452c86133dd9eed472c9ae3884e30d152c34",
+          "filename": "nodes/teleop_twist.py",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 44,
+          "changes": 44,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/a0c9da512fdea3ab1d447d7d3f2e3139d6858886/nodes%2Fteleop_twist.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/a0c9da512fdea3ab1d447d7d3f2e3139d6858886/nodes%2Fteleop_twist.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Fteleop_twist.py?ref=a0c9da512fdea3ab1d447d7d3f2e3139d6858886",
+          "patch": "@@ -1,44 +0,0 @@\n-#!/usr/bin/python\n-\n-import roslib; roslib.load_manifest('axis_camera')\n-import rospy\n-\n-import math\n-from sensor_msgs.msg import Joy\n-from axis_camera.msg import Axis\n-from geometry_msgs.msg import Twist\n-\n-\n-class Teleop:\n-    def __init__(self):\n-        rospy.init_node('axis_twist_teleop')\n-        self.enable_button = rospy.get_param('~enable_button', 1)\n-        self.zero_button = rospy.get_param('~zero_button', 2)\n-        self.scale_pan = rospy.get_param('~scale_pan_deg', 10)\n-        self.scale_tilt = rospy.get_param('~scale_tilt_deg', 10)\n-        self.state = Axis(pan=180,tilt=0,zoom=1)\n-        self.joy = None\n-\n-        self.cmd_pub = rospy.Publisher('cmd', Axis)\n-        self.twist_pub = rospy.Publisher('twist', Twist)\n-        rospy.Subscriber(\"/joy\", Joy, self.joy_callback)\n-        # rospy.Subscriber(\"state\", Axis, self.state_callback)\n-        \n-    def spin(self):\n-        twist = Twist()\n-        self.cmd_pub.publish(self.state)\n-        r = rospy.Rate(5)\n-        while not rospy.is_shutdown():\n-            if self.joy != None and self.joy.buttons[self.enable_button] == 1:\n-                twist.angular.z = self.joy.axes[0]*self.scale_pan*math.pi/180.\n-                twist.angular.y = -self.joy.axes[1]*self.scale_tilt*math.pi/180.\n-                self.twist_pub.publish(twist)\n-            if self.joy != None and self.joy.buttons[self.zero_button] == 1:\n-                self.cmd_pub.publish(self.state)\n-            r.sleep()\n-\n-    def joy_callback(self, data):\n-        self.joy = data\n-\n-\n-if __name__ == \"__main__\": Teleop().spin()"
+        },
+        {
+          "sha": "ff06e93d8a34f96df213e423687ea34344b51e1d",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 37,
+          "deletions": 0,
+          "changes": 37,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4/package.xml",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/package.xml?ref=0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4",
+          "patch": "@@ -0,0 +1,37 @@\n+<package>\n+\n+  <name>axis_camera</name>\n+  <version>0.2.0</version>\n+  <description>\n+    Python ROS drivers for accessing an Axis camera's MJPG\n+    stream. Also provides control for PTZ cameras.\n+  </description>\n+  <maintainer email=\"mpurvis@clearpathrobotics.com\">Mike Purvis</maintainer>\n+  <author>Ryan Gariepy</author>\n+  <license>BSD</license>\n+\n+  <url type=\"website\">http://ros.org/wiki/axis_camera</url>\n+  <url type=\"repository\">https://github.com/clearpathrobotics/axis_camera</url>\n+  <url type=\"bugtracker\">https://github.com/clearpathrobotics/axis_camera/issues</url>\n+\n+  <buildtool_depend>catkin</buildtool_depend>\n+\n+  <build_depend>camera_info_manager_py</build_depend>\n+  <build_depend>geometry_msgs</build_depend>\n+  <build_depend>message_generation</build_depend>\n+  <build_depend>rospy</build_depend>\n+  <build_depend>sensor_msgs</build_depend>\n+  <build_depend>tf</build_depend>\n+\n+  <run_depend>camera_info_manager_py</run_depend>\n+  <run_depend>geometry_msgs</run_depend>\n+  <run_depend>message_runtime</run_depend>\n+  <run_depend>rospy</run_depend>\n+  <run_depend>sensor_msgs</run_depend>\n+  <run_depend>tf</run_depend>\n+\n+  <export>\n+    <rosdoc config=\"rosdoc.yaml\" />\n+  </export>\n+\n+</package>"
+        },
+        {
+          "sha": "6317e60d5e728309212212f168bb811d9acdda23",
+          "filename": "setup.py",
+          "status": "added",
+          "additions": 10,
+          "deletions": 0,
+          "changes": 10,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4/setup.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4/setup.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/setup.py?ref=0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4",
+          "patch": "@@ -0,0 +1,10 @@\n+#!/usr/bin/env python\n+\n+from distutils.core import setup\n+from catkin_pkg.python_setup import generate_distutils_setup\n+\n+d = generate_distutils_setup(\n+    install_requires=['rospy', 'urllib2'],\n+    )\n+\n+setup(**d)"
+        },
+        {
+          "sha": "c0ce787615e1d71f5418e6e665bd8ff2af6039c5",
+          "filename": "tests/test_absolute.launch",
+          "status": "added",
+          "additions": 45,
+          "deletions": 0,
+          "changes": 45,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4/tests%2Ftest_absolute.launch",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4/tests%2Ftest_absolute.launch",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/tests%2Ftest_absolute.launch?ref=0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4",
+          "patch": "@@ -0,0 +1,45 @@\n+<launch>\n+  <group ns=\"axis\">\n+    <param name=\"hostname\" value=\"192.168.1.90\" />\n+    <param name=\"width\" value=\"704\" />\n+    <param name=\"height\" value=\"480\" />\n+    <param name=\"flip\" value=\"false\" />\n+    <param name=\"speed_control\" value=\"false\" />\n+    <node pkg=\"axis_camera\" type=\"axis_paul.py\" name=\"axis_paul\" />\n+    <node pkg=\"axis_camera\" type=\"teleop_speed_control.py\" name=\"teleop\" />\n+    <node pkg=\"spacenav_node\" type=\"spacenav_node\" name=\"joystick\" >\n+      <remap from=\"/axis/spacenav/joy\" to=\"/axis/joy\" />\n+    </node>\n+    <node pkg=\"axis_camera\" type=\"axis.py\" name=\"axis\" >\n+    </node>\n+    <node pkg=\"image_view\" type=\"image_view\" name=\"image_view\">\n+      <remap from=\"image\" to=\"image_raw\" />\n+      <param name=\"image_transport\" value=\"compressed\" />\n+    </node>\n+  </group>\n+</launch>\n+\n+<!--\n+<arg name=\"camera\" default=\"axis_camera\" />                                    \n+  <arg name=\"hostname\" default=\"192.168.0.90\" />                                 \n+  <arg name=\"username\" default=\"root\" />                                         \n+  <arg name=\"password\" />                                                        \n+  <arg name=\"camera_info_url\"                                                    \n+       default=\"package://axis_camera/tests/default_calibration.yaml\" />         \n+  <group ns=\"$(arg camera)\">                                                     \n+                                                                                 \n+    <node pkg=\"axis_camera\" type=\"axis.py\" name=\"axis\">                          \n+      <param name=\"hostname\" value=\"$(arg hostname)\" />                          \n+      <param name=\"username\" value=\"$(arg username)\" />                          \n+      <param name=\"password\" value=\"$(arg password)\" />                          \n+      <param name=\"frame_id\" value=\"$(arg camera)\" />                            \n+      <param name=\"camera_info_url\" value=\"$(arg camera_info_url)\" />            \n+    </node>                                                                      \n+  -->                                                                               \n+  <!-- Viewer window -->                                                         \n+<!--  <node pkg=\"image_view\" type=\"image_view\" name=\"image_view\">                    \n+    <remap from=\"image\" to=\"image_raw\" />                                        \n+    <param name=\"image_transport\" value=\"compressed\" />                          \n+  </node>                                                                        \n+                                                                                 \n+  </group>                  -->"
+        },
+        {
+          "sha": "074c84aac50cc49a03ee75a7864e616e7fb1c76e",
+          "filename": "tests/test_flipped_speed_control.launch",
+          "status": "added",
+          "additions": 45,
+          "deletions": 0,
+          "changes": 45,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4/tests%2Ftest_flipped_speed_control.launch",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4/tests%2Ftest_flipped_speed_control.launch",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/tests%2Ftest_flipped_speed_control.launch?ref=0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4",
+          "patch": "@@ -0,0 +1,45 @@\n+<launch>\n+  <group ns=\"axis\">\n+    <param name=\"hostname\" value=\"192.168.1.90\" />\n+    <param name=\"width\" value=\"704\" />\n+    <param name=\"height\" value=\"480\" />\n+    <param name=\"flip\" value=\"true\" />\n+    <param name=\"speed_control\" value=\"true\" />\n+    <node pkg=\"axis_camera\" type=\"axis_paul.py\" name=\"axis_paul\" />\n+    <node pkg=\"axis_camera\" type=\"teleop_speed_control.py\" name=\"teleop\" />\n+    <node pkg=\"spacenav_node\" type=\"spacenav_node\" name=\"joystick\" >\n+      <remap from=\"/axis/spacenav/joy\" to=\"/axis/joy\" />\n+    </node>\n+    <node pkg=\"axis_camera\" type=\"axis.py\" name=\"axis\" >\n+    </node>\n+    <node pkg=\"image_view\" type=\"image_view\" name=\"image_view\">\n+      <remap from=\"image\" to=\"image_raw\" />\n+      <param name=\"image_transport\" value=\"compressed\" />\n+    </node>\n+  </group>\n+</launch>\n+\n+<!--\n+<arg name=\"camera\" default=\"axis_camera\" />                                    \n+  <arg name=\"hostname\" default=\"192.168.0.90\" />                                 \n+  <arg name=\"username\" default=\"root\" />                                         \n+  <arg name=\"password\" />                                                        \n+  <arg name=\"camera_info_url\"                                                    \n+       default=\"package://axis_camera/tests/default_calibration.yaml\" />         \n+  <group ns=\"$(arg camera)\">                                                     \n+                                                                                 \n+    <node pkg=\"axis_camera\" type=\"axis.py\" name=\"axis\">                          \n+      <param name=\"hostname\" value=\"$(arg hostname)\" />                          \n+      <param name=\"username\" value=\"$(arg username)\" />                          \n+      <param name=\"password\" value=\"$(arg password)\" />                          \n+      <param name=\"frame_id\" value=\"$(arg camera)\" />                            \n+      <param name=\"camera_info_url\" value=\"$(arg camera_info_url)\" />            \n+    </node>                                                                      \n+  -->                                                                               \n+  <!-- Viewer window -->                                                         \n+<!--  <node pkg=\"image_view\" type=\"image_view\" name=\"image_view\">                    \n+    <remap from=\"image\" to=\"image_raw\" />                                        \n+    <param name=\"image_transport\" value=\"compressed\" />                          \n+  </node>                                                                        \n+                                                                                 \n+  </group>                  -->"
+        },
+        {
+          "sha": "4d181a9e96453783a6ba6c8159483ad98283f16e",
+          "filename": "tests/test_speed_control.launch",
+          "status": "added",
+          "additions": 45,
+          "deletions": 0,
+          "changes": 45,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4/tests%2Ftest_speed_control.launch",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4/tests%2Ftest_speed_control.launch",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/tests%2Ftest_speed_control.launch?ref=0f0c4c9088d2541c7f4b10c481b5042f6cf9c8e4",
+          "patch": "@@ -0,0 +1,45 @@\n+<launch>\n+  <group ns=\"axis\">\n+    <param name=\"hostname\" value=\"192.168.1.90\" />\n+    <param name=\"width\" value=\"704\" />\n+    <param name=\"height\" value=\"480\" />\n+    <param name=\"flip\" value=\"false\" />\n+    <param name=\"speed_control\" value=\"true\" />\n+    <node pkg=\"axis_camera\" type=\"axis_ptz.py\" name=\"axis_ptz\" />\n+    <node pkg=\"axis_camera\" type=\"teleop_speed_control.py\" name=\"teleop\" />\n+    <node pkg=\"spacenav_node\" type=\"spacenav_node\" name=\"joystick\" >\n+      <remap from=\"/axis/spacenav/joy\" to=\"/axis/joy\" />\n+    </node>\n+    <node pkg=\"axis_camera\" type=\"axis.py\" name=\"axis\" >\n+    </node>\n+    <node pkg=\"teleop_view\" type=\"teleop_view\" name=\"teleop_view\">\n+      <remap from=\"image\" to=\"image_raw\" />\n+      <param name=\"image_transport\" value=\"compressed\" />\n+    </node>\n+  </group>\n+</launch>\n+\n+<!--\n+<arg name=\"camera\" default=\"axis_camera\" />                                    \n+  <arg name=\"hostname\" default=\"192.168.0.90\" />                                 \n+  <arg name=\"username\" default=\"root\" />                                         \n+  <arg name=\"password\" />                                                        \n+  <arg name=\"camera_info_url\"                                                    \n+       default=\"package://axis_camera/tests/default_calibration.yaml\" />         \n+  <group ns=\"$(arg camera)\">                                                     \n+                                                                                 \n+    <node pkg=\"axis_camera\" type=\"axis.py\" name=\"axis\">                          \n+      <param name=\"hostname\" value=\"$(arg hostname)\" />                          \n+      <param name=\"username\" value=\"$(arg username)\" />                          \n+      <param name=\"password\" value=\"$(arg password)\" />                          \n+      <param name=\"frame_id\" value=\"$(arg camera)\" />                            \n+      <param name=\"camera_info_url\" value=\"$(arg camera_info_url)\" />            \n+    </node>                                                                      \n+  -->                                                                               \n+  <!-- Viewer window -->                                                         \n+<!--  <node pkg=\"image_view\" type=\"image_view\" name=\"image_view\">                    \n+    <remap from=\"image\" to=\"image_raw\" />                                        \n+    <param name=\"image_transport\" value=\"compressed\" />                          \n+  </node>                                                                        \n+                                                                                 \n+  </group>                  -->"
+        }
+      ]
+    },
+    {
+      "author": "jack-oquin",
+      "date": "2012-10-13T12:47:18Z",
+      "sha": "1bc67ed6b3b612af0a0837eb3fc54a740934b57f",
+      "message": "rename compressed image topic (issue #5)",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "58e68ca3d7d39d670a488e61bffd9b481f44f0c2",
+          "filename": "nodes/axis.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/1bc67ed6b3b612af0a0837eb3fc54a740934b57f/nodes%2Faxis.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/1bc67ed6b3b612af0a0837eb3fc54a740934b57f/nodes%2Faxis.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Faxis.py?ref=1bc67ed6b3b612af0a0837eb3fc54a740934b57f",
+          "patch": "@@ -72,7 +72,7 @@ def stream(self):\n \n       # Adding the best calibration we have for these cameras\n       cimsg.D = [-0.26129794156876202, 0.053510647147691104, -0.004329961180682111, 0.0002979023290858089, 0]\n-      cimsg.K = [259.79888071407669, 0.0, 332.0316187674498, 0.0, 258.00868558667878, 252.46066959143357, 0.0, 0.0, 1.0]\n+      cimsg.K = [259.79888071407669, 0.0, 332.0316187674498, 0.0, 258.008685586678p78, 252.46066959143357, 0.0, 0.0, 1.0]\n       cimsg.R = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]\n       cimsg.P = [259.79888071407669, 0.0, 332.0316187674498, 0.0, 0.0, 258.00868558667878, 252.46066959143357, 0.0, 0.0, 0.0, 1.0, 0.0]\n \n@@ -88,7 +88,7 @@ def __init__(self, hostname, username, password, width, height):\n     self.height = height\n \n     self.st = None\n-    self.pub = rospy.Publisher(\"compressed\", CompressedImage, self)\n+    self.pub = rospy.Publisher(\"image_raw/compressed\", CompressedImage, self)\n     self.caminfo_pub = rospy.Publisher(\"camera_info\", CameraInfo, self)\n \n   def peer_subscribe(self, topic_name, topic_publish, peer_publish):"
+        }
+      ]
+    },
+    {
+      "author": "Alex Bencz",
+      "date": "2012-10-03T19:55:12Z",
+      "sha": "634d792ba5c295b8057fac282dd85c4f60abf361",
+      "message": "Added stack.xml to make this a unary stack.",
+      "files_changed": 1,
+      "additions": 12,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "b39d3d2d0fd1eb7c8307484d4e2e906a8bdf76b0",
+          "filename": "stack.xml",
+          "status": "added",
+          "additions": 12,
+          "deletions": 0,
+          "changes": 12,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/634d792ba5c295b8057fac282dd85c4f60abf361/stack.xml",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/634d792ba5c295b8057fac282dd85c4f60abf361/stack.xml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/stack.xml?ref=634d792ba5c295b8057fac282dd85c4f60abf361",
+          "patch": "@@ -0,0 +1,12 @@\n+<stack>\n+  <version>0.0.1</version>\n+  <description brief=\"axis_camera\">\n+    Contains basic Python drivers for accessing an Axis camera's MJPG stream. Also provides control for PTZ cameras.\n+  </description>\n+  <author>Maintained by Ryan Gariepy</author>\n+  <license>BSD</license>\n+  <review status=\"unreviewed\" notes=\"\"/>\n+  <url>http://ros.org/wiki/axis_camera</url>\n+  <depend stack=\"ros\" />\n+  <depend stack=\"ros_comm\" />\n+</stack>"
+        }
+      ]
+    },
+    {
+      "author": "cedricpradalier",
+      "date": "2013-04-09T15:15:44Z",
+      "sha": "e7273ccded73379071ad5564bce46d649b0d976f",
+      "message": "Added fps=0 in command line to force unlimited framerate",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "978d121808bfc1d9f39b7bf831de11abeaa3c94c",
+          "filename": "nodes/axis.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/e7273ccded73379071ad5564bce46d649b0d976f/nodes%2Faxis.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/e7273ccded73379071ad5564bce46d649b0d976f/nodes%2Faxis.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Faxis.py?ref=e7273ccded73379071ad5564bce46d649b0d976f",
+          "patch": "@@ -33,7 +33,7 @@ def run(self):\n \n   def stream(self):\n     url = 'http://%s/mjpg/video.mjpg' % self.axis.hostname\n-    url = url + \"?resolultion=%dx%d\" % (self.axis.width, self.axis.height)\n+    url = url + \"?fps=0&resolultion=%dx%d\" % (self.axis.width, self.axis.height)\n \n     rospy.logdebug('opening ' + str(self.axis))\n "
+        }
+      ]
+    },
+    {
+      "author": "rgariepy",
+      "date": "2012-10-03T19:23:35Z",
+      "sha": "0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4",
+      "message": "Copying out from internal deprecated package.",
+      "files_changed": 8,
+      "additions": 316,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "530ac6afdc74dd548b1bcf773982bd37b2fde12d",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 30,
+          "deletions": 0,
+          "changes": 30,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/CMakeLists.txt?ref=0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4",
+          "patch": "@@ -0,0 +1,30 @@\n+cmake_minimum_required(VERSION 2.4.6)\n+include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)\n+\n+# Set the build type.  Options are:\n+#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage\n+#  Debug          : w/ debug symbols, w/o optimization\n+#  Release        : w/o debug symbols, w/ optimization\n+#  RelWithDebInfo : w/ debug symbols, w/ optimization\n+#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries\n+#set(ROS_BUILD_TYPE RelWithDebInfo)\n+\n+rosbuild_init()\n+\n+#set the default path for built executables to the \"bin\" directory\n+#set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)\n+#set the default path for built libraries to the \"lib\" directory\n+#set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)\n+\n+#uncomment if you have defined messages\n+rosbuild_genmsg()\n+#uncomment if you have defined services\n+#rosbuild_gensrv()\n+\n+#common commands for building c++ executables and libraries\n+#rosbuild_add_library(${PROJECT_NAME} src/example.cpp)\n+#target_link_libraries(${PROJECT_NAME} another_library)\n+#rosbuild_add_boost_directories()\n+#rosbuild_link_boost(${PROJECT_NAME} thread)\n+#rosbuild_add_executable(example examples/example.cpp)\n+#target_link_libraries(example ${PROJECT_NAME})"
+        },
+        {
+          "sha": "b75b928f20ef9ea4f509a17db62e4e31b422c27f",
+          "filename": "Makefile",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4/Makefile",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4/Makefile",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/Makefile?ref=0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4",
+          "patch": "@@ -0,0 +1 @@\n+include $(shell rospack find mk)/cmake.mk\n\\ No newline at end of file"
+        },
+        {
+          "sha": "27a20383f4b6e17c628da732fd9f2b5c46046d7e",
+          "filename": "axis.launch",
+          "status": "added",
+          "additions": 15,
+          "deletions": 0,
+          "changes": 15,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4/axis.launch",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4/axis.launch",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/axis.launch?ref=0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4",
+          "patch": "@@ -0,0 +1,15 @@\n+<launch>\n+  <group ns=\"axis\">\n+    <node pkg=\"clearpath_sensors\" type=\"axis.py\" name=\"axis\">\n+      <param name=\"hostname\" value=\"192.168.0.90\" />\n+      <param name=\"width\" value=\"800\" />\n+      <param name=\"height\" value=\"600\" />\n+    </node>\n+  </group>\n+\n+  <!-- Viewer window -->\n+  <node pkg=\"image_view\" type=\"image_view\" name=\"image_view\">\n+    <remap from=\"image\" to=\"axis\" />\n+    <param name=\"image_transport\" value=\"compressed\" />\n+  </node>\n+</launch>"
+        },
+        {
+          "sha": "be745ec7cb2cc15a3121207efe5fc470cf99b9a4",
+          "filename": "axis_ptz.launch",
+          "status": "added",
+          "additions": 21,
+          "deletions": 0,
+          "changes": 21,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4/axis_ptz.launch",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4/axis_ptz.launch",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/axis_ptz.launch?ref=0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4",
+          "patch": "@@ -0,0 +1,21 @@\n+<launch>\n+  <group ns=\"axis\">\n+    <param name=\"hostname\" value=\"192.168.2.4\" />\n+    <param name=\"width\" value=\"704\" />\n+    <param name=\"height\" value=\"480\" />\n+    <node pkg=\"clearpath_sensors\" type=\"axis.py\" name=\"axis\" />\n+    <node pkg=\"clearpath_sensors\" type=\"axis_ptz.py\" name=\"axis_ptz\" />\n+  </group>\n+\n+  <!-- Viewer window -->\n+  <node pkg=\"image_view\" type=\"image_view\" name=\"image_view\">\n+    <remap from=\"image\" to=\"axis\" />\n+    <param name=\"image_transport\" value=\"compressed\" />\n+  </node>\n+\n+  <!-- To control the PTZ, issue commands like so:\n+  rostopic pub /axis/cmd clearpath_sensors/Axis '{ brightness: 5000, pan: 100, tilt: 10, zoom: 0, autofocus: True }'\n+  NOTE: Don't forget to populate the brightness field, or\n+        you'll get very dark images.\n+  -->\n+</launch>"
+        },
+        {
+          "sha": "23dcc874a4fc1498a02f6a70da29cd6f8131e6d2",
+          "filename": "manifest.xml",
+          "status": "added",
+          "additions": 13,
+          "deletions": 0,
+          "changes": 13,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4/manifest.xml",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4/manifest.xml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/manifest.xml?ref=0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4",
+          "patch": "@@ -0,0 +1,13 @@\n+<package>\n+  <description brief=\"axis_camera\">\n+    Contains basic Python drivers for accessing an Axis camera's MJPG stream. Also provides control for PTZ cameras.\n+  </description>\n+  <author>Ryan Gariepy</author>\n+  <license>BSD</license>\n+  <review status=\"unreviewed\" notes=\"\"/>\n+  <url>http://ros.org/wiki/axis_camera</url>\n+  <depend package=\"rospy\"/>\n+  <depend package=\"sensor_msgs\"/>\n+</package>\n+\n+"
+        },
+        {
+          "sha": "12994e6e65550ef1928d3f77e2d5a1723eb405df",
+          "filename": "msg/Axis.msg",
+          "status": "added",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4/msg%2FAxis.msg",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4/msg%2FAxis.msg",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/msg%2FAxis.msg?ref=0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4",
+          "patch": "@@ -0,0 +1,7 @@\n+float32 pan\n+float32 tilt\n+float32 zoom\n+float32 focus\n+float32 brightness\n+float32 iris\n+bool autofocus"
+        },
+        {
+          "sha": "fbcbd8673a5632926ff278fc9ad2182a2ab8243c",
+          "filename": "nodes/axis.py",
+          "status": "added",
+          "additions": 120,
+          "deletions": 0,
+          "changes": 120,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4/nodes%2Faxis.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4/nodes%2Faxis.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Faxis.py?ref=0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4",
+          "patch": "@@ -0,0 +1,120 @@\n+#!/usr/bin/env python\n+#\n+# Axis camera image driver. Based on:\n+# https://code.ros.org/svn/wg-ros-pkg/branches/trunk_cturtle/sandbox/axis_camera/axis.py\n+#\n+\n+import os, sys, string, time, getopt\n+import urllib\n+\n+import roslib; roslib.load_manifest('axis_camera') \n+import rospy \n+\n+from sensor_msgs.msg import CompressedImage, CameraInfo\n+\n+import threading\n+\n+\n+class StreamThread(threading.Thread):\n+  def __init__(self, axis):\n+    threading.Thread.__init__(self)\n+\n+    self.axis = axis\n+    self.daemon = True\n+\n+    self.axis_frame_id = \"axis_camera_optical_frame\"\n+\n+  def run(self):\n+    while True:\n+      try:\n+        self.stream()\n+      except:\n+        import traceback\n+        traceback.print_exc()\n+      time.sleep(1)\n+\n+  def stream(self):\n+    url = 'http://%s/mjpg/video.mjpg' % self.axis.hostname\n+    url = url + \"?resolultion=%dx%d\" % (self.axis.width, self.axis.height)\n+    fp = urllib.urlopen(url)\n+\n+    while True:\n+      boundary = fp.readline()\n+\n+      header = {}\n+      while 1:\n+        line = fp.readline()\n+        if line == \"\\r\\n\": break\n+        line = line.strip()\n+\n+        parts = line.split(\": \", 1)\n+        header[parts[0]] = parts[1]\n+\n+      content_length = int(header['Content-Length'])\n+\n+      img = fp.read(content_length)\n+      line = fp.readline()\n+      \n+      msg = CompressedImage()\n+      msg.header.stamp = rospy.Time.now()\n+      msg.header.frame_id = self.axis_frame_id\n+      msg.format = \"jpeg\"\n+      msg.data = img\n+\n+      self.axis.pub.publish(msg)\n+\n+      \"\"\"\n+      cimsg = CameraInfo()\n+      cimsg.header.stamp = msg.header.stamp\n+      cimsg.header.frame_id = self.axis_frame_id\n+      cimsg.width = self.axis.width\n+      cimsg.height = self.axis.height\n+\n+      # Adding the best calibration we have for these cameras\n+      cimsg.D = [-0.26129794156876202, 0.053510647147691104, -0.004329961180682111, 0.0002979023290858089, 0]\n+      cimsg.K = [259.79888071407669, 0.0, 332.0316187674498, 0.0, 258.00868558667878, 252.46066959143357, 0.0, 0.0, 1.0]\n+      cimsg.R = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]\n+      cimsg.P = [259.79888071407669, 0.0, 332.0316187674498, 0.0, 0.0, 258.00868558667878, 252.46066959143357, 0.0, 0.0, 0.0, 1.0, 0.0]\n+\n+      self.axis.caminfo_pub.publish(cimsg)\n+      \"\"\"\n+\n+class Axis:\n+  def __init__(self, hostname, username, password, width, height):\n+    self.hostname = hostname\n+    self.username = username\n+    self.password = password\n+    self.width = width\n+    self.height = height\n+\n+    self.st = None\n+    self.pub = rospy.Publisher(\"compressed\", CompressedImage, self)\n+    self.caminfo_pub = rospy.Publisher(\"camera_info\", CameraInfo, self)\n+\n+  def peer_subscribe(self, topic_name, topic_publish, peer_publish):\n+    # Lazy-start the image-publisher.\n+    if self.st is None:\n+      self.st = StreamThread(self)\n+      self.st.start()\n+\n+\n+def main():\n+  rospy.init_node(\"axis\")\n+\n+  arg_defaults = {\n+      'hostname': '192.168.0.90',\n+      'username': '',\n+      'password': '',\n+      'width': 640,\n+      'height': 480\n+      }\n+  args = {}\n+  for name in arg_defaults:\n+    args[name] = rospy.get_param(rospy.search_param(name), arg_defaults[name])\n+\n+  Axis(**args)\n+  rospy.spin()\n+\n+\n+if __name__ == \"__main__\":\n+  main()"
+        },
+        {
+          "sha": "756f44c93e2cd6a553781d5a4eee4b6a37769a5b",
+          "filename": "nodes/axis_ptz.py",
+          "status": "added",
+          "additions": 109,
+          "deletions": 0,
+          "changes": 109,
+          "blob_url": "https://github.com/ros-drivers/axis_camera/blob/0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4/nodes%2Faxis_ptz.py",
+          "raw_url": "https://github.com/ros-drivers/axis_camera/raw/0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4/nodes%2Faxis_ptz.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/axis_camera/contents/nodes%2Faxis_ptz.py?ref=0ec5eeaa1a5ea50aa8fef67f9965aac4a2e15ce4",
+          "patch": "@@ -0,0 +1,109 @@\n+#!/usr/bin/env python\n+#\n+# Basic PTZ node, based on documentation here:\n+#   http://www.axis.com/files/manuals/vapix_ptz_45621_en_1112.pdf\n+#\n+\n+import os, sys, string, time, getopt, threading\n+import httplib, urllib\n+\n+import roslib; roslib.load_manifest('axis_camera') \n+import rospy \n+\n+from axis_camera.msg import Axis\n+\n+\n+class StateThread(threading.Thread):\n+  def __init__(self, axis):\n+    threading.Thread.__init__(self)\n+\n+    self.axis = axis\n+    self.daemon = True\n+\n+  def run(self):\n+    r = rospy.Rate(10)\n+    msg = Axis()\n+\n+    while True:\n+      conn = httplib.HTTPConnection(self.axis.hostname)\n+      params = { 'query':'position' }\n+      conn.request(\"GET\", \"/axis-cgi/com/ptz.cgi?%s\" % urllib.urlencode(params))\n+      response = conn.getresponse()\n+      if response.status == 200:\n+        body = response.read()\n+        params = dict([s.split('=',2) for s in body.splitlines()])\n+        msg.pan = float(params['pan'])\n+        # Flip pan orient if the camera is mounted backwards and facing down\n+        if self.axis.flip:\n+            msg.pan = 180 - msg.pan\n+            if msg.pan > 180:\n+                msg.pan -= 360\n+            if msg.pan < -180:\n+                msg.pan += 360\n+        msg.tilt = float(params['tilt'])\n+        msg.zoom = float(params['zoom'])\n+        msg.iris = float(params['iris'])\n+        msg.focus = 0.0\n+        if 'focus' in params:\n+          msg.focus = float(params['focus'])\n+        msg.autofocus = (params['autofocus'] == 'on')\n+        self.axis.pub.publish(msg)\n+      r.sleep()\n+      \n+\n+class AxisPTZ:\n+  def __init__(self, hostname, username, password, flip):\n+    self.hostname = hostname\n+    self.username = username\n+    self.password = password\n+    self.flip = flip\n+\n+    self.st = None\n+    self.pub = rospy.Publisher(\"state\", Axis, self)\n+    self.sub = rospy.Subscriber(\"cmd\", Axis, self.cmd)\n+\n+  def peer_subscribe(self, topic_name, topic_publish, peer_publish):\n+    # Lazy-start the state publisher.\n+    if self.st is None:\n+      self.st = StateThread(self)\n+      self.st.start()\n+\n+  def cmd(self, msg):\n+    conn = httplib.HTTPConnection(self.hostname)\n+    # Flip pan orient if the camera is mounted backwards and facing down\n+    if self.flip:\n+    \tmsg.pan = 180 - msg.pan\n+        if msg.pan > 180:\n+\t    msg.pan -= 360\n+        if msg.pan < -180:\n+\t    msg.pan += 360\n+    params = { 'pan': msg.pan, 'tilt': msg.tilt, 'zoom': msg.zoom, 'brightness': msg.brightness }\n+    if msg.autofocus:\n+      params['autofocus'] = 'on'\n+    else:\n+      params['autofocus'] = 'off'\n+      params['focus'] = msg.focus\n+    if msg.iris > 0.000001:\n+      rospy.logwarn(\"Iris value is read-only.\")\n+    conn.request(\"GET\", \"/axis-cgi/com/ptz.cgi?%s\" % urllib.urlencode(params))\n+\n+\n+def main():\n+  rospy.init_node(\"axis\")\n+\n+  arg_defaults = {\n+      'hostname': '192.168.0.90',\n+      'username': '',\n+      'password': '',\n+      'flip': True,\n+      }\n+  args = {}\n+  for name in arg_defaults:\n+    args[name] = rospy.get_param(rospy.search_param(name), arg_defaults[name])\n+\n+  AxisPTZ(**args)\n+  rospy.spin()\n+\n+\n+if __name__ == \"__main__\":\n+  main()"
+        }
+      ]
+    }
+  ]
+}

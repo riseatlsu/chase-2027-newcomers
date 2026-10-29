@@ -1,0 +1,333 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T06:30:17Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ros-visualization",
+    "repo": "rqt_moveit"
+  },
+  "data": [
+    {
+      "author": "130s",
+      "date": "2025-05-09T17:27:37Z",
+      "sha": "43d095666103825f8b6737fdbdaba0c1811797a3",
+      "message": "0.5.12",
+      "files_changed": 2,
+      "additions": 5,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "4e51aec9ef13195652380902537b4ac9d31e0abe",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-visualization/rqt_moveit/blob/43d095666103825f8b6737fdbdaba0c1811797a3/CHANGELOG.rst",
+          "raw_url": "https://github.com/ros-visualization/rqt_moveit/raw/43d095666103825f8b6737fdbdaba0c1811797a3/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ros-visualization/rqt_moveit/contents/CHANGELOG.rst?ref=43d095666103825f8b6737fdbdaba0c1811797a3",
+          "patch": "@@ -2,6 +2,10 @@\n Changelog for package rqt_moveit\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+0.5.12 (2025-05-09)\n+-------------------\n+* Potentially the final release for ROS1 Noetic\n+\n 0.5.11 (2023-04-14)\n -------------------\n * Import setup from setuptools instead of distutils.core"
+        },
+        {
+          "sha": "7c0cf3a8c30206feef9dded78b3891bdf9f8d15d",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-visualization/rqt_moveit/blob/43d095666103825f8b6737fdbdaba0c1811797a3/package.xml",
+          "raw_url": "https://github.com/ros-visualization/rqt_moveit/raw/43d095666103825f8b6737fdbdaba0c1811797a3/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-visualization/rqt_moveit/contents/package.xml?ref=43d095666103825f8b6737fdbdaba0c1811797a3",
+          "patch": "@@ -4,7 +4,7 @@\n   schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"3\">\n   <name>rqt_moveit</name>\n-  <version>0.5.11</version>\n+  <version>0.5.12</version>\n   <description>\n    An rqt-based tool that assists monitoring tasks\n    for <a href = \"http://ros.org/wiki/moveit\">MoveIt!</a> motion planner"
+        }
+      ]
+    },
+    {
+      "author": "arne48",
+      "date": "2016-12-16T04:46:15Z",
+      "sha": "044de8c7cabcd854e4091c577ecdc16f285522c3",
+      "message": "added new threaded updater for topics using the rosmaster api and switched to check ros nodes by list instead of pinging",
+      "files_changed": 1,
+      "additions": 91,
+      "deletions": 38,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "07415b006afab3f238f0da44fdaaafc013e30045",
+          "filename": "rqt_moveit/src/rqt_moveit/moveit_widget.py",
+          "status": "modified",
+          "additions": 91,
+          "deletions": 38,
+          "changes": 129,
+          "blob_url": "https://github.com/ros-visualization/rqt_moveit/blob/044de8c7cabcd854e4091c577ecdc16f285522c3/rqt_moveit%2Fsrc%2Frqt_moveit%2Fmoveit_widget.py",
+          "raw_url": "https://github.com/ros-visualization/rqt_moveit/raw/044de8c7cabcd854e4091c577ecdc16f285522c3/rqt_moveit%2Fsrc%2Frqt_moveit%2Fmoveit_widget.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/rqt_moveit/contents/rqt_moveit%2Fsrc%2Frqt_moveit%2Fmoveit_widget.py?ref=044de8c7cabcd854e4091c577ecdc16f285522c3",
+          "patch": "@@ -36,16 +36,14 @@\n import sys\n from threading import Thread\n import time\n+import xmlrpclib\n \n from python_qt_binding import loadUi\n from python_qt_binding.QtCore import QModelIndex, QTimer, Signal\n from python_qt_binding.QtGui import QStandardItem, QStandardItemModel\n from python_qt_binding.QtWidgets import QWidget\n import rospkg\n-#from rosnode import rosnode_ping, ROSNodeIOException\n-#from rosnode import ROSNodeIOException\n import rospy\n-import rostopic\n from rqt_py_common.rqt_roscomm_util import RqtRoscommUtil\n from rqt_topic.topic_widget import TopicWidget\n \n@@ -54,9 +52,10 @@ class MoveitWidget(QWidget):\n     \"\"\"#TODO: comment\n     \"\"\"\n     # To be connected to PluginContainerWidget\n-    sig_sysmsg = None\n+    sig_sysmsg = Signal(bool, str)\n     sig_param = Signal(bool, str)  # param name emitted\n-    sig_node = Signal(bool, str)  # param name emitted\n+    sig_node = Signal(bool, str)  # node name emitted\n+    sig_topic = Signal(list)  # topic name emitted\n \n     _SPLITTER_H = 'splitter_horizontal'\n \n@@ -65,6 +64,8 @@ def __init__(self, parent, plugin_context):\n         @type parent: MoveitMain\n         \"\"\"\n \n+        self._ros_master = xmlrpclib.ServerProxy(os.environ['ROS_MASTER_URI'])\n+\n         self._nodes_monitored = ['/move_group']\n         self._selected_topics = [('/pointcloud', 'sensor_msgs/PointCloud'),\n                                  ('/pointcloud2', 'sensor_msgs/PointCloud2'),\n@@ -88,28 +89,29 @@ def __init__(self, parent, plugin_context):\n         # this is a workaround.\n         self._splitter.addWidget(self._widget_topic)\n \n-        self._spinbox_refreshrate.valueChanged.connect(\n-                                                      self._update_refreshrate)\n+        self._spinbox_refreshrate.valueChanged.connect(self._update_refreshrate)\n+\n         # Show default ref rate on QSpinbox\n         self._spinbox_refreshrate.setValue(self._refresh_rate)\n \n         # Monitor node\n         self._is_checking_nodes = True\n         self._node_qitems = {}\n-        self._node_monitor_thread = self._init_monitor_nodes(\n-                                                         self._nodes_monitored)\n+        self._node_monitor_thread = self._init_monitor_nodes()\n         self._node_monitor_thread.start()\n-        #TODO: connect sys msg for nodes.\n \n         # topic to show\n+        self._is_checking_topics = True\n+        self._registered_topics = None\n+        self._topic_monitor_thread = self._init_monitor_topics()\n+        self._topic_monitor_thread.start()\n+\n         # Delegate GUI functionality to rqt_topic.TopicWidget.\n-        self._widget_topic.set_selected_topics(self._selected_topics)\n-        self._widget_topic.set_topic_specifier(TopicWidget.SELECT_BY_MSGTYPE)\n-        self._widget_topic.start()\n         # To connect signal in a widget to PluginContainerWidget.\n-        #TODO: In this way, Signal from only one instance is hooked.\n+        # TODO: In this way, Signal from only one instance is hooked.\n         # Not a good design at all.\n-        self.sig_sysmsg = self._widget_topic.sig_sysmsg\n+        # FIXME connect sys msg for nodes.\n+        # self.sig_sysmsg = self._widget_topic.sig_sysmsg\n \n         # Init monitoring parameters.\n         self._is_checking_params = True\n@@ -120,9 +122,9 @@ def __init__(self, parent, plugin_context):\n                                                       _col_names_paramtable)\n         self._param_check_thread.start()\n \n-    def _init_monitor_nodes(self, nodes_monitored):\n+    def _init_monitor_nodes(self):\n         \"\"\"\n-        @type params_monitored: str[]\n+        @type nodes_monitored: str[]\n         @rtype: Thread\n         \"\"\"\n         self._node_datamodel = QStandardItemModel(0, 2)\n@@ -132,8 +134,7 @@ def _init_monitor_nodes(self, nodes_monitored):\n         node_monitor_thread = Thread(target=self._check_nodes_alive,\n                                            args=(self.sig_node,\n                                                  self._nodes_monitored))\n-#        self._node_monitor_thread = NodeMonitorThread(self, self.sig_node,\n-#                                                      nodes_monitored)\n+\n         self.sig_node.connect(self._update_output_nodes)\n         return node_monitor_thread\n \n@@ -153,17 +154,16 @@ def _check_nodes_alive(self, signal, nodes_monitored):\n         \"\"\"\n         while self._is_checking_nodes:\n             rosnode_dynamically_loaded = __import__('rosnode')\n-            #from rosnode import rosnode_ping\n             for nodename in nodes_monitored:\n-                #TODO: rosnode_ping prints when the node is not found.\n-                # Currently I have no idea how to capture that from here.\n+                is_node_running = False\n                 try:\n-                    #is_node_running = rosnode_ping(nodename, 1)\n-                    is_node_running = rosnode_dynamically_loaded.rosnode_ping(\n-                                                                 nodename, 1)\n+                    registered_nodes = rosnode_dynamically_loaded.get_node_names()\n+                    if nodename in registered_nodes:\n+                        is_node_running = True\n+\n                 except rosnode_dynamically_loaded.ROSNodeIOException as e:\n-                    #TODO: Needs to be indicated on GUI\n-                    #      (eg. PluginContainerWidget)\n+                    # TODO: Needs to be indicated on GUI\n+                    # (eg. PluginContainerWidget)\n                     rospy.logerr(e.message)\n                     is_node_running = False\n \n@@ -172,6 +172,40 @@ def _check_nodes_alive(self, signal, nodes_monitored):\n             del rosnode_dynamically_loaded\n             time.sleep(self._refresh_rate)\n \n+    def _init_monitor_topics(self):\n+        \"\"\"\n+        @type topics_monitored: str[]\n+        @rtype: Thread\n+        \"\"\"\n+        topic_monitor_thread = Thread(target=self._check_topics_alive, args=(self.sig_topic, self._selected_topics))\n+        self.sig_topic.connect(self._update_output_topics)\n+        return topic_monitor_thread\n+\n+    def _check_topics_alive(self, signal, topics_monitored):\n+        \"\"\"\n+        Working as a callback of Thread class, this method keeps looping to\n+        watch if the topics whose names are passed exist and emits signal per\n+        each node.\n+\n+        @param signal: Signal()\n+        @type topics_monitored: str[]\n+        \"\"\"\n+        while self._is_checking_topics:\n+            code, msg, val = self._ros_master.getPublishedTopics('/rqt_moveit_update_script', \"\")\n+            if code == 1:\n+                published_topics = dict(val)\n+            else:\n+                rospy.logerr(\"Communication with rosmaster failed\")\n+\n+            registered_topics = []\n+            for topic in topics_monitored:\n+                if topic[0] in published_topics and topic[1] == published_topics.get(topic[0]):\n+                    registered_topics.append((topic[0], published_topics.get(topic[0])))\n+\n+            signal.emit(list(registered_topics))\n+            rospy.logdebug('_update_output_topics')\n+            time.sleep(self._refresh_rate)\n+\n     def _init_monitor_parameters(self, params_monitored,\n                                  _col_names_paramtable=None):\n         \"\"\"\n@@ -203,14 +237,13 @@ def _update_output_nodes(self, is_node_running, node_name):\n         @type is_node_running: bool\n         @type node_name: str\n         \"\"\"\n-        #TODO: What this method does is exactly the same with\n+        # TODO: What this method does is exactly the same with\n         # monitor_parameters. Unify them.\n \n-        rospy.logdebug('is_node_running={} par_name={}'.format(is_node_running,\n-                                                              node_name))\n+        rospy.logdebug('is_node_running={} par_name={}'.format(is_node_running, node_name))\n         node_name = str(node_name)\n         node_qitem = None\n-        if not node_name in self._node_qitems:\n+        if node_name not in self._node_qitems:\n             node_qitem = QStandardItem(node_name)\n             self._node_qitems[node_name] = node_qitem\n             self._node_datamodel.appendRow(node_qitem)\n@@ -224,6 +257,26 @@ def _update_output_nodes(self, is_node_running, node_name):\n         qitem_node_status = QStandardItem(_str_node_running)\n         self._node_datamodel.setItem(qindex.row(), 1, qitem_node_status)\n \n+    def _update_output_topics(self, registered_topics):\n+        \"\"\"\n+        Slot for signals that tell topic's existence.\n+\n+        @type registered_topics: list\n+        \"\"\"\n+        rospy.logerr(\"Update\")\n+        # This branch will cause that once a selected topic was found the topic view will\n+        # never be empty again.\n+        if len(registered_topics) > 0:\n+\n+            if self._registered_topics is None:\n+                self._widget_topic.set_selected_topics(registered_topics)\n+                self._widget_topic.set_topic_specifier(TopicWidget.SELECT_BY_NAME)\n+                self._widget_topic.start()\n+            elif self._registered_topics is not None and set(self._registered_topics) != set(registered_topics):\n+                self._widget_topic.set_selected_topics(registered_topics)\n+\n+            self._registered_topics = registered_topics\n+\n     def _check_params_alive(self, signal, params_monitored):\n         \"\"\"\n         Working as a callback of Thread class, this method keeps looping to\n@@ -255,11 +308,10 @@ def _check_params_alive(self, signal, params_monitored):\n                         # exists or not.\n                         has_param = rospy.has_param(param_name)\n                 except rospy.exceptions.ROSException as e:\n-                    self.sig_sysmsg.emit(\n-                         'Exception upon rospy.has_param {}'.format(e.message))\n+                    rospy.logerr('Exception upon rospy.has_param {}'.format(e.message))\n+                    # self.sig_sysmsg.emit('Exception upon rospy.has_param {}'.format(e.message))\n                 signal.emit(has_param, param_name)\n-                rospy.loginfo('has_param {}, check_param_alive: {}'.format(\n-                                                      has_param, param_name))\n+                rospy.logdebug('has_param {}, check_param_alive: {}'.format(has_param, param_name))\n             time.sleep(self._refresh_rate)\n \n     def _update_output_parameters(self, has_param, param_name):\n@@ -273,7 +325,7 @@ def _update_output_parameters(self, has_param, param_name):\n                                                          param_name))\n         param_name = str(param_name)\n         param_qitem = None\n-        if not param_name in self._param_qitems:\n+        if param_name not in self._param_qitems:\n             param_qitem = QStandardItem(param_name)\n             self._param_qitems[param_name] = param_qitem\n             self._param_datamodel.appendRow(param_qitem)\n@@ -317,13 +369,14 @@ def shutdown(self):\n         @raise RuntimeError:\n         \"\"\"\n         try:\n-            #self._node_monitor_thread.join()  # No effect\n             self._is_checking_nodes = False\n             self._node_monitor_thread = None\n-            #self._param_check_thread.join()\n \n             self._is_checking_params = False\n             self._param_check_thread = None\n+\n+            self._is_checking_topics = False\n+            self._topic_monitor_thread = None\n         except RuntimeError as e:\n             rospy.logerr(e)\n             raise e"
+        }
+      ]
+    },
+    {
+      "author": "MatthijsBurgh",
+      "date": "2021-04-01T08:25:59Z",
+      "sha": "ba0d8e6df4ec46c948a6f18d015d8be1e0310edb",
+      "message": "xmlrpclib is renamed in python3\n\nSource of solution: https://stackoverflow.com/a/43750316",
+      "files_changed": 1,
+      "additions": 7,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "79b0a3e031362a158458676195510e9af97235da",
+          "filename": "src/rqt_moveit/moveit_widget.py",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 2,
+          "changes": 9,
+          "blob_url": "https://github.com/ros-visualization/rqt_moveit/blob/ba0d8e6df4ec46c948a6f18d015d8be1e0310edb/src%2Frqt_moveit%2Fmoveit_widget.py",
+          "raw_url": "https://github.com/ros-visualization/rqt_moveit/raw/ba0d8e6df4ec46c948a6f18d015d8be1e0310edb/src%2Frqt_moveit%2Fmoveit_widget.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/rqt_moveit/contents/src%2Frqt_moveit%2Fmoveit_widget.py?ref=ba0d8e6df4ec46c948a6f18d015d8be1e0310edb",
+          "patch": "@@ -35,7 +35,6 @@\n import os\n import sys\n import threading\n-import xmlrpclib\n \n from python_qt_binding import loadUi\n from python_qt_binding.QtCore import QModelIndex, QTimer, Signal\n@@ -45,6 +44,12 @@\n import rospy\n from rqt_py_common.rqt_roscomm_util import RqtRoscommUtil\n from rqt_topic.topic_widget import TopicWidget\n+try:\n+    # Python 2\n+    from xmlrpclib import ServerProxy as XMLServerProxy\n+except ModuleNotFoundError:\n+    # Python 3\n+    from xmlrpc.client import ServerProxy as XMLServerProxy\n \n \n class MoveitWidget(QWidget):\n@@ -64,7 +69,7 @@ def __init__(self, parent, plugin_context):\n         @type parent: MoveitMain\n         \"\"\"\n \n-        self._ros_master = xmlrpclib.ServerProxy(os.environ['ROS_MASTER_URI'])\n+        self._ros_master = XMLServerProxy(os.environ['ROS_MASTER_URI'])\n         self._stop_event = threading.Event()\n \n         self._nodes_monitored = ['/move_group']"
+        }
+      ]
+    },
+    {
+      "author": "mikaelarguedas",
+      "date": "2020-06-01T17:14:58Z",
+      "sha": "86588e8eb1d9bc72f37ede8d19e227a4d40e71f9",
+      "message": "fix shebang line for python3\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "6fba94a1914fe10eb722b65a54a7d3f506cb4f6b",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-visualization/rqt_moveit/blob/86588e8eb1d9bc72f37ede8d19e227a4d40e71f9/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-visualization/rqt_moveit/raw/86588e8eb1d9bc72f37ede8d19e227a4d40e71f9/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-visualization/rqt_moveit/contents/CMakeLists.txt?ref=86588e8eb1d9bc72f37ede8d19e227a4d40e71f9",
+          "patch": "@@ -13,6 +13,6 @@ install(DIRECTORY resource\n   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}\n )\n \n-install(PROGRAMS scripts/rqt_moveit\n+catkin_install_python(PROGRAMS scripts/rqt_moveit\n   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n )"
+        }
+      ]
+    },
+    {
+      "author": "dirk-thomas",
+      "date": "2011-10-01T10:16:18Z",
+      "sha": "6f6f9208f1e88e67f66c2e5f6b119f82a84e9ae2",
+      "message": "added yet empty ros_gui stack",
+      "files_changed": 0,
+      "additions": 0,
+      "deletions": 0,
+      "commit_type": "other",
+      "files": []
+    },
+    {
+      "author": "ablasdel",
+      "date": "2014-11-21T17:08:16Z",
+      "sha": "62332e189bb6c07abd22501fe592fc395c098292",
+      "message": "Marking plugin as experimental",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "e7b41f357d3878ede67aa619c935c6adb5a562c4",
+          "filename": "rqt_moveit/plugin.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-visualization/rqt_moveit/blob/62332e189bb6c07abd22501fe592fc395c098292/rqt_moveit%2Fplugin.xml",
+          "raw_url": "https://github.com/ros-visualization/rqt_moveit/raw/62332e189bb6c07abd22501fe592fc395c098292/rqt_moveit%2Fplugin.xml",
+          "contents_url": "https://api.github.com/repos/ros-visualization/rqt_moveit/contents/rqt_moveit%2Fplugin.xml?ref=62332e189bb6c07abd22501fe592fc395c098292",
+          "patch": "@@ -10,7 +10,7 @@\n         <icon type=\"theme\">folder</icon>\n         <statustip>Plugins related to robot tools.</statustip>\n       </group>\n-      <label>Moveit! Monitor</label>\n+      <label>Moveit! Monitor (experimental)</label>\n       <icon type=\"theme\">accessories-text-editor</icon>\n       <statustip>GUI to support monitoring during Moveit! runtime.</statustip>\n     </qtgui>"
+        }
+      ]
+    },
+    {
+      "author": "Isaac Saito",
+      "date": "2013-04-01T00:46:25Z",
+      "sha": "9dc00a9b3935ecf8a1f7a3f3895b41a38091a018",
+      "message": "rqt_moveit) initial commit. (by accident rqt_marble's minor cleaning gets included too).",
+      "files_changed": 12,
+      "additions": 551,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "7adfdcbc90149de8d77142eac109de2b1af589f1",
+          "filename": "rqt_moveit/CMakeLists.txt",
+          "status": "added",
+          "additions": 18,
+          "deletions": 0,
+          "changes": 18,
+          "blob_url": "https://github.com/ros-visualization/rqt_moveit/blob/9dc00a9b3935ecf8a1f7a3f3895b41a38091a018/rqt_moveit%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros-visualization/rqt_moveit/raw/9dc00a9b3935ecf8a1f7a3f3895b41a38091a018/rqt_moveit%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-visualization/rqt_moveit/contents/rqt_moveit%2FCMakeLists.txt?ref=9dc00a9b3935ecf8a1f7a3f3895b41a38091a018",
+          "patch": "@@ -0,0 +1,18 @@\n+cmake_minimum_required(VERSION 2.8.3)\n+project(rqt_moveit)\n+# Load catkin and all dependencies required for this package\n+find_package(catkin REQUIRED)\n+catkin_package()\n+catkin_python_setup()\n+\n+install(FILES plugin.xml\n+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}\n+)\n+\n+install(DIRECTORY resource\n+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}\n+)\n+\n+install(PROGRAMS scripts/rqt_moveit\n+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n+)"
+        },
+        {
+          "sha": "b75b928f20ef9ea4f509a17db62e4e31b422c27f",
+          "filename": "rqt_moveit/Makefile",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-visualization/rqt_moveit/blob/9dc00a9b3935ecf8a1f7a3f3895b41a38091a018/rqt_moveit%2FMakefile",
+          "raw_url": "https://github.com/ros-visualization/rqt_moveit/raw/9dc00a9b3935ecf8a1f7a3f3895b41a38091a018/rqt_moveit%2FMakefile",
+          "contents_url": "https://api.github.com/repos/ros-visualization/rqt_moveit/contents/rqt_moveit%2FMakefile?ref=9dc00a9b3935ecf8a1f7a3f3895b41a38091a018",
+          "patch": "@@ -0,0 +1 @@\n+include $(shell rospack find mk)/cmake.mk\n\\ No newline at end of file"
+        },
+        {
+          "sha": "34f616644242e39048bc21c3d28bcb679687efe2",
+          "filename": "rqt_moveit/package.xml",
+          "status": "added",
+          "additions": 30,
+          "deletions": 0,
+          "changes": 30,
+          "blob_url": "https://github.com/ros-visualization/rqt_moveit/blob/9dc00a9b3935ecf8a1f7a3f3895b41a38091a018/rqt_moveit%2Fpackage.xml",
+          "raw_url": "https://github.com/ros-visualization/rqt_moveit/raw/9dc00a9b3935ecf8a1f7a3f3895b41a38091a018/rqt_moveit%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ros-visualization/rqt_moveit/contents/rqt_moveit%2Fpackage.xml?ref=9dc00a9b3935ecf8a1f7a3f3895b41a38091a018",
+          "patch": "@@ -0,0 +1,30 @@\n+<?xml version=\"1.0\"?>\n+<package>\n+  <name>rqt_moveit</name>\n+  <version>0.0.0</version>\n+  <description>The rqt_moveit package</description>\n+\n+  <maintainer email=\"130s@alumni.smu.edu\">Isaac Saito</maintainer>\n+  <author email=\"isaito@willowgarage.com\">Isaac Saito</author>\n+\n+  <license>BSD</license>\n+  <url type=\"website\">http://ros.org/wiki/rqt_moveit</url>\n+  <url type=\"repository\">https://github.com/ros-visualization/rqt_robot_plugins/rqt_moveit</url>\n+  <url type=\"bugtracker\">https://github.com/ros-visualization/rqt_robot_plugins/issues</url>\n+\n+  <buildtool_depend>catkin</buildtool_depend>\n+  <build_depend>moveit_ros_move_group</build_depend>\n+  <run_depend>moveit_msgs</run_depend>\n+  <run_depend>moveit_ros_move_group</run_depend>\n+  <run_depend>rospy</run_depend>\n+  <run_depend>rostopic</run_depend>\n+  <run_depend>rqt_gui</run_depend>\n+  <run_depend>rqt_gui_py</run_depend>\n+  <run_depend>rqt_py_common</run_depend>\n+  <run_depend>rqt_topic</run_depend>\n+  \n+  <!-- The export tag contains other, unspecified, tags -->\n+  <export>\n+    <rqt_gui plugin=\"${prefix}/plugin.xml\" />\n+  </export>\n+</package>\n\\ No newline at end of file"
+        },
+        {
+          "sha": "89baaac53e5592f4c410940e0a1b5f278ca3f982",
+          "filename": "rqt_moveit/plugin.xml",
+          "status": "added",
+          "additions": 12,
+          "deletions": 0,
+          "changes": 12,
+          "blob_url": "https://github.com/ros-visualization/rqt_moveit/blob/9dc00a9b3935ecf8a1f7a3f3895b41a38091a018/rqt_moveit%2Fplugin.xml",
+          "raw_url": "https://github.com/ros-visualization/rqt_moveit/raw/9dc00a9b3935ecf8a1f7a3f3895b41a38091a018/rqt_moveit%2Fplugin.xml",
+          "contents_url": "https://api.github.com/repos/ros-visualization/rqt_moveit/contents/rqt_moveit%2Fplugin.xml?ref=9dc00a9b3935ecf8a1f7a3f3895b41a38091a018",
+          "patch": "@@ -0,0 +1,12 @@\n+<library path=\"src\">\n+  <class name=\"Moveit\" type=\"rqt_moveit.moveit_plugin.MoveitPlugin\" base_class_type=\"rqt_gui_py::Plugin\">\n+    <description>\n+      GUI to support monitoring during Moveit! runtime.\n+    </description>\n+    <qtgui>\n+      <label>Moveit!</label>\n+      <icon type=\"theme\">accessories-text-editor</icon>\n+      <statustip>GUI to support monitoring during Moveit! runtime.</statustip>\n+    </qtgui>\n+  </class>\n+</library>"
+        },
+        {
+          "sha": "67f9c92452811bc2d68f34d8b809bb0575b683eb",
+          "filename": "rqt_moveit/resource/moveit_top (btt's conflicted copy 2013-03-31).ui",
+          "status": "added",
+          "additions": 117,
+          "deletions": 0,
+          "changes": 117,
+          "blob_url": "https://github.com/ros-visualization/rqt_moveit/blob/9dc00a9b3935ecf8a1f7a3f3895b41a38091a018/rqt_moveit%2Fresource%2Fmoveit_top%20(btt's%20conflicted%20copy%202013-03-31).ui",
+          "raw_url": "https://github.com/ros-visualization/rqt_moveit/raw/9dc00a9b3935ecf8a1f7a3f3895b41a38091a018/rqt_moveit%2Fresource%2Fmoveit_top%20(btt's%20conflicted%20copy%202013-03-31).ui",
+          "contents_url": "https://api.github.com/repos/ros-visualization/rqt_moveit/contents/rqt_moveit%2Fresource%2Fmoveit_top%20(btt's%20conflicted%20copy%202013-03-31).ui?ref=9dc00a9b3935ecf8a1f7a3f3895b41a38091a018",
+          "patch": "@@ -0,0 +1,117 @@\n+<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n+<ui version=\"4.0\">\n+ <class>MoveitWidget</class>\n+ <widget class=\"QWidget\" name=\"MoveitWidget\">\n+  <property name=\"geometry\">\n+   <rect>\n+    <x>0</x>\n+    <y>0</y>\n+    <width>464</width>\n+    <height>335</height>\n+   </rect>\n+  </property>\n+  <property name=\"sizePolicy\">\n+   <sizepolicy hsizetype=\"Maximum\" vsizetype=\"Maximum\">\n+    <horstretch>0</horstretch>\n+    <verstretch>0</verstretch>\n+   </sizepolicy>\n+  </property>\n+  <property name=\"minimumSize\">\n+   <size>\n+    <width>300</width>\n+    <height>200</height>\n+   </size>\n+  </property>\n+  <property name=\"windowTitle\">\n+   <string>Moveit rqt plugin</string>\n+  </property>\n+  <layout class=\"QHBoxLayout\" name=\"_hlayout_top\">\n+   <property name=\"spacing\">\n+    <number>0</number>\n+   </property>\n+   <property name=\"margin\">\n+    <number>0</number>\n+   </property>\n+   <item>\n+    <widget class=\"QSplitter\" name=\"_splitter\">\n+     <property name=\"sizePolicy\">\n+      <sizepolicy hsizetype=\"Maximum\" vsizetype=\"Maximum\">\n+       <horstretch>0</horstretch>\n+       <verstretch>0</verstretch>\n+      </sizepolicy>\n+     </property>\n+     <property name=\"frameShape\">\n+      <enum>QFrame::Panel</enum>\n+     </property>\n+     <property name=\"orientation\">\n+      <enum>Qt::Horizontal</enum>\n+     </property>\n+     <property name=\"handleWidth\">\n+      <number>2</number>\n+     </property>\n+    </widget>\n+   </item>\n+   <item>\n+    <layout class=\"QVBoxLayout\" name=\"verticalLayout\">\n+     <item>\n+      <layout class=\"QHBoxLayout\" name=\"horizontalLayout\">\n+       <item>\n+        <widget class=\"QLabel\" name=\"_label_moveit\">\n+         <property name=\"text\">\n+          <string>move_group</string>\n+         </property>\n+         <property name=\"alignment\">\n+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>\n+         </property>\n+        </widget>\n+       </item>\n+       <item>\n+        <widget class=\"QLabel\" name=\"_label_status\">\n+         <property name=\"text\">\n+          <string>RUNNING</string>\n+         </property>\n+        </widget>\n+       </item>\n+      </layout>\n+     </item>\n+     <item>\n+      <widget class=\"QTreeWidget\" name=\"_widget_topic\">\n+       <property name=\"alternatingRowColors\">\n+        <bool>true</bool>\n+       </property>\n+       <column>\n+        <property name=\"text\">\n+         <string>Topic name</string>\n+        </property>\n+       </column>\n+       <column>\n+        <property name=\"text\">\n+         <string>Type</string>\n+        </property>\n+       </column>\n+       <column>\n+        <property name=\"text\">\n+         <string>hz</string>\n+        </property>\n+       </column>\n+       <column>\n+        <property name=\"text\">\n+         <string>bandwidth</string>\n+        </property>\n+       </column>\n+      </widget>\n+     </item>\n+     <item>\n+      <widget class=\"QTreeView\" name=\"_treeview_reconf\">\n+       <property name=\"allColumnsShowFocus\">\n+        <bool>true</bool>\n+       </property>\n+      </widget>\n+     </item>\n+    </layout>\n+   </item>\n+  </layout>\n+ </widget>\n+ <resources/>\n+ <connections/>\n+</ui>"
+        },
+        {
+          "sha": "58028e8bb67713ed89491177cc3217a9edbf15e6",
+          "filename": "rqt_moveit/resource/moveit_top.ui",
+          "status": "added",
+          "additions": 100,
+          "deletions": 0,
+          "changes": 100,
+          "blob_url": "https://github.com/ros-visualization/rqt_moveit/blob/9dc00a9b3935ecf8a1f7a3f3895b41a38091a018/rqt_moveit%2Fresource%2Fmoveit_top.ui",
+          "raw_url": "https://github.com/ros-visualization/rqt_moveit/raw/9dc00a9b3935ecf8a1f7a3f3895b41a38091a018/rqt_moveit%2Fresource%2Fmoveit_top.ui",
+          "contents_url": "https://api.github.com/repos/ros-visualization/rqt_moveit/contents/rqt_moveit%2Fresource%2Fmoveit_top.ui?ref=9dc00a9b3935ecf8a1f7a3f3895b41a38091a018",
+          "patch": "@@ -0,0 +1,100 @@\n+<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n+<ui version=\"4.0\">\n+ <class>MoveitWidget</class>\n+ <widget class=\"QWidget\" name=\"MoveitWidget\">\n+  <property name=\"geometry\">\n+   <rect>\n+    <x>0</x>\n+    <y>0</y>\n+    <width>464</width>\n+    <height>335</height>\n+   </rect>\n+  </property>\n+  <property name=\"sizePolicy\">\n+   <sizepolicy hsizetype=\"Maximum\" vsizetype=\"Maximum\">\n+    <horstretch>0</horstretch>\n+    <verstretch>0</verstretch>\n+   </sizepolicy>\n+  </property>\n+  <property name=\"minimumSize\">\n+   <size>\n+    <width>300</width>\n+    <height>200</height>\n+   </size>\n+  </property>\n+  <property name=\"windowTitle\">\n+   <string>Moveit rqt plugin</string>\n+  </property>\n+  <layout class=\"QHBoxLayout\" name=\"_hlayout_top\">\n+   <property name=\"spacing\">\n+    <number>0</number>\n+   </property>\n+   <property name=\"margin\">\n+    <number>0</number>\n+   </property>\n+   <item>\n+    <widget class=\"QSplitter\" name=\"_splitter\">\n+     <property name=\"sizePolicy\">\n+      <sizepolicy hsizetype=\"Maximum\" vsizetype=\"Maximum\">\n+       <horstretch>0</horstretch>\n+       <verstretch>0</verstretch>\n+      </sizepolicy>\n+     </property>\n+     <property name=\"frameShape\">\n+      <enum>QFrame::Panel</enum>\n+     </property>\n+     <property name=\"orientation\">\n+      <enum>Qt::Horizontal</enum>\n+     </property>\n+     <property name=\"handleWidth\">\n+      <number>2</number>\n+     </property>\n+    </widget>\n+   </item>\n+   <item>\n+    <layout class=\"QVBoxLayout\" name=\"verticalLayout\">\n+     <item>\n+      <layout class=\"QHBoxLayout\" name=\"horizontalLayout\">\n+       <item>\n+        <widget class=\"QLabel\" name=\"_label_moveit\">\n+         <property name=\"text\">\n+          <string>move_group</string>\n+         </property>\n+         <property name=\"alignment\">\n+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>\n+         </property>\n+        </widget>\n+       </item>\n+       <item>\n+        <widget class=\"QLabel\" name=\"_label_status\">\n+         <property name=\"text\">\n+          <string>RUNNING</string>\n+         </property>\n+        </widget>\n+       </item>\n+      </layout>\n+     </item>\n+     <item>\n+      <widget class=\"TopicWidget\" name=\"_widget_topic\" />\n+     </item>\n+     <item>\n+      <widget class=\"QTreeView\" name=\"_treeview_reconf\">\n+       <property name=\"allColumnsShowFocus\">\n+        <bool>true</bool>\n+       </property>\n+      </widget>\n+     </item>\n+    </layout>\n+   </item>\n+  </layout>\n+ </widget>\n+ <customwidgets>\n+  <customwidget>\n+   <class>TopicWidget</class>\n+   <extends>QWidget</extends>\n+   <header>rqt_topic.topic_widget</header>\n+  </customwidget>\n+ </customwidgets>\n+ <resources/>\n+ <connections/>\n+</ui>"
+        },
+        {
+          "sha": "03c3122721502fa6418f2529a5428b933938b5ea",
+          "filename": "rqt_moveit/scripts/rqt_moveit",
+          "status": "added",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/ros-visualization/rqt_moveit/blob/9dc00a9b3935ecf8a1f7a3f3895b41a38091a018/rqt_moveit%2Fscripts%2Frqt_moveit",
+          "raw_url": "https://github.com/ros-visualization/rqt_moveit/raw/9dc00a9b3935ecf8a1f7a3f3895b41a38091a018/rqt_moveit%2Fscripts%2Frqt_moveit",
+          "contents_url": "https://api.github.com/repos/ros-visualization/rqt_moveit/contents/rqt_moveit%2Fscripts%2Frqt_moveit?ref=9dc00a9b3935ecf8a1f7a3f3895b41a38091a018",
+          "patch": "@@ -0,0 +1,8 @@\n+#!/usr/bin/env python\n+\n+import sys\n+\n+from rqt_gui.main import Main\n+\n+main = Main()\n+sys.exit(main.main(sys.argv, standalone='rqt_moveit'))"
+        },
+        {
+          "sha": "311b16622b21019a8987494f63fffa01cec86a80",
+          "filename": "rqt_moveit/scripts/rqt_reconfigure",
+          "status": "added",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/ros-visualization/rqt_moveit/blob/9dc00a9b3935ecf8a1f7a3f3895b41a38091a018/rqt_moveit%2Fscripts%2Frqt_reconfigure",
+          "raw_url": "https://github.com/ros-visualization/rqt_moveit/raw/9dc00a9b3935ecf8a1f7a3f3895b41a38091a018/rqt_moveit%2Fscripts%2Frqt_reconfigure",
+          "contents_url": "https://api.github.com/repos/ros-visualization/rqt_moveit/contents/rqt_moveit%2Fscripts%2Frqt_reconfigure?ref=9dc00a9b3935ecf8a1f7a3f3895b41a38091a018",
+          "patch": "@@ -0,0 +1,8 @@\n+#!/usr/bin/env python\n+\n+import sys\n+\n+from rqt_gui.main import Main\n+\n+main = Main()\n+sys.exit(main.main(sys.argv, standalone='rqt_reconfigure'))"
+        },
+        {
+          "sha": "e72d7845f37d8cb45973f9ce1f8f5db98e15b6c0",
+          "filename": "rqt_moveit/setup.py",
+          "status": "added",
+          "additions": 11,
+          "deletions": 0,
+          "changes": 11,
+          "blob_url": "https://github.com/ros-visualization/rqt_moveit/blob/9dc00a9b3935ecf8a1f7a3f3895b41a38091a018/rqt_moveit%2Fsetup.py",
+          "raw_url": "https://github.com/ros-visualization/rqt_moveit/raw/9dc00a9b3935ecf8a1f7a3f3895b41a38091a018/rqt_moveit%2Fsetup.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/rqt_moveit/contents/rqt_moveit%2Fsetup.py?ref=9dc00a9b3935ecf8a1f7a3f3895b41a38091a018",
+          "patch": "@@ -0,0 +1,11 @@\n+#!/usr/bin/env python\n+\n+from distutils.core import setup\n+from catkin_pkg.python_setup import generate_distutils_setup\n+\n+d = generate_distutils_setup(\n+    packages=['rqt_moveit'],\n+    package_dir={'': 'src'}\n+)\n+\n+setup(**d)"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "rqt_moveit/src/rqt_moveit/__init__.py",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/ros-visualization/rqt_moveit/blob/9dc00a9b3935ecf8a1f7a3f3895b41a38091a018/rqt_moveit%2Fsrc%2Frqt_moveit%2F__init__.py",
+          "raw_url": "https://github.com/ros-visualization/rqt_moveit/raw/9dc00a9b3935ecf8a1f7a3f3895b41a38091a018/rqt_moveit%2Fsrc%2Frqt_moveit%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/rqt_moveit/contents/rqt_moveit%2Fsrc%2Frqt_moveit%2F__init__.py?ref=9dc00a9b3935ecf8a1f7a3f3895b41a38091a018"
+        },
+        {
+          "sha": "0c19a0f0b0e22f33d5309d4ff9f54f70af000f15",
+          "filename": "rqt_moveit/src/rqt_moveit/moveit_plugin.py",
+          "status": "added",
+          "additions": 85,
+          "deletions": 0,
+          "changes": 85,
+          "blob_url": "https://github.com/ros-visualization/rqt_moveit/blob/9dc00a9b3935ecf8a1f7a3f3895b41a38091a018/rqt_moveit%2Fsrc%2Frqt_moveit%2Fmoveit_plugin.py",
+          "raw_url": "https://github.com/ros-visualization/rqt_moveit/raw/9dc00a9b3935ecf8a1f7a3f3895b41a38091a018/rqt_moveit%2Fsrc%2Frqt_moveit%2Fmoveit_plugin.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/rqt_moveit/contents/rqt_moveit%2Fsrc%2Frqt_moveit%2Fmoveit_plugin.py?ref=9dc00a9b3935ecf8a1f7a3f3895b41a38091a018",
+          "patch": "@@ -0,0 +1,85 @@\n+# Software License Agreement (BSD License)\n+#\n+# Copyright (c) 2012, Willow Garage, Inc.\n+# All rights reserved.\n+#\n+# Redistribution and use in source and binary forms, with or without\n+# modification, are permitted provided that the following conditions\n+# are met:\n+#\n+#  * Redistributions of source code must retain the above copyright\n+#    notice, this list of conditions and the following disclaimer.\n+#  * Redistributions in binary form must reproduce the above\n+#    copyright notice, this list of conditions and the following\n+#    disclaimer in the documentation and/or other materials provided\n+#    with the distribution.\n+#  * Neither the name of Willow Garage, Inc. nor the names of its\n+#    contributors may be used to endorse or promote products derived\n+#    from this software without specific prior written permission.\n+#\n+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n+# \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS\n+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\n+# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,\n+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,\n+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\n+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN\n+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+# POSSIBILITY OF SUCH DAMAGE.\n+#\n+# Author: Isaac Saito\n+\n+import sys\n+\n+from python_qt_binding.QtCore import QTimer, Signal\n+import rospy\n+from rqt_py_common.plugin_container_widget import PluginContainerWidget\n+from rqt_gui_py.plugin import Plugin\n+\n+from rqt_moveit.moveit_widget import MoveitWidget\n+\n+\n+class MoveitPlugin(Plugin):\n+\n+    def __init__(self, plugin_context):\n+        super(MoveitPlugin, self).__init__(plugin_context)\n+        self._plugin_context = plugin_context\n+\n+        self._moveit_widget = MoveitWidget(self, plugin_context)\n+        self._mainwidget = PluginContainerWidget(self._moveit_widget,\n+                                                 True, False)\n+\n+        if self._plugin_context.serial_number() > 1:\n+            self._mainwidget.setWindowTitle(self._mainwidget.windowTitle() +\n+                                   (' (%d)' % plugin_context.serial_number()))\n+\n+        plugin_context.add_widget(self._mainwidget)\n+\n+    def get_widget(self):\n+        return self._mainwidget\n+\n+    def shutdown_plugin(self):\n+        self._mainwidget.shutdown()\n+\n+    def save_settings(self, plugin_settings, instance_settings):\n+        self._mainwidget.save_settings(plugin_settings, instance_settings)\n+\n+    def restore_settings(self, plugin_settings, instance_settings):\n+        self._mainwidget.restore_settings(plugin_settings, instance_settings)\n+\n+    def _update_msg(self):\n+        \"\"\"\n+        Update necessary components (per topic) regularly\n+        \"\"\"\n+        self._moveit_widget.update_topic_table()\n+\n+\n+if __name__ == '__main__':\n+    # main should be used only for debug purpose.\n+    # This moveites this QWidget as a standalone rqt gui.\n+    from rqt_gui.main import Main\n+    main = Main()\n+    sys.exit(main.main(sys.argv, standalone='rqt_moveit'))"
+        },
+        {
+          "sha": "1cccc64a505fae3f01ed00ff4ff0173126586be2",
+          "filename": "rqt_moveit/src/rqt_moveit/moveit_widget.py",
+          "status": "added",
+          "additions": 161,
+          "deletions": 0,
+          "changes": 161,
+          "blob_url": "https://github.com/ros-visualization/rqt_moveit/blob/9dc00a9b3935ecf8a1f7a3f3895b41a38091a018/rqt_moveit%2Fsrc%2Frqt_moveit%2Fmoveit_widget.py",
+          "raw_url": "https://github.com/ros-visualization/rqt_moveit/raw/9dc00a9b3935ecf8a1f7a3f3895b41a38091a018/rqt_moveit%2Fsrc%2Frqt_moveit%2Fmoveit_widget.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/rqt_moveit/contents/rqt_moveit%2Fsrc%2Frqt_moveit%2Fmoveit_widget.py?ref=9dc00a9b3935ecf8a1f7a3f3895b41a38091a018",
+          "patch": "@@ -0,0 +1,161 @@\n+# Software License Agreement (BSD License)\n+#\n+# Copyright (c) 2012, Willow Garage, Inc.\n+# All rights reserved.\n+#\n+# Redistribution and use in source and binary forms, with or without\n+# modification, are permitted provided that the following conditions\n+# are met:\n+#\n+#  * Redistributions of source code must retain the above copyright\n+#    notice, this list of conditions and the following disclaimer.\n+#  * Redistributions in binary form must reproduce the above\n+#    copyright notice, this list of conditions and the following\n+#    disclaimer in the documentation and/or other materials provided\n+#    with the distribution.\n+#  * Neither the name of Willow Garage, Inc. nor the names of its\n+#    contributors may be used to endorse or promote products derived\n+#    from this software without specific prior written permission.\n+#\n+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n+# \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS\n+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\n+# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,\n+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,\n+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\n+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN\n+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+# POSSIBILITY OF SUCH DAMAGE.\n+#\n+# Author: Isaac Saito\n+\n+import os\n+import sys\n+\n+from python_qt_binding import loadUi\n+from python_qt_binding.QtCore import QModelIndex, Signal\n+from python_qt_binding.QtGui import QStandardItem, QStandardItemModel, QWidget\n+from rqt_py_common.data_items import ReadonlyItem\n+\n+import rospkg\n+import rospy\n+from rostopic import get_topic_class, ROSTopicHz\n+from rqt_topic import topic_info, topic_widget\n+\n+\n+class MoveitWidget(QWidget):\n+    \"\"\"#TODO: comment\n+    \"\"\"\n+\n+    # To be connected to PluginContainerWidget\n+    sig_sysmsg = Signal(str)\n+\n+    def __init__(self, parent, plugin_context):\n+        \"\"\"\n+        @type parent: MoveitMain\n+        \"\"\"\n+        super(MoveitWidget, self).__init__()\n+        self._parent = parent\n+        self._plugin_context = plugin_context\n+\n+        self._rospack = rospkg.RosPack()\n+        ui_file = os.path.join(self._rospack.get_path('rqt_moveit'),\n+                               'resource', 'moveit_top.ui')\n+        loadUi(ui_file, self)\n+\n+        # topic to show\n+        self._selected_topics = [('/pointcloud', 'sensor_msgs/PointCloud'),\n+                                 ('/pointcloud2', 'sensor_msgs/PointCloud2'),\n+                                 ('/image', 'sensor_msgs/Image'),\n+                                 ('/camera_info', 'sensor_msgs/CameraInfo')]\n+        self._widget_topic.set_selected_topics(self._selected_topics)\n+        self._widget_topic.start()\n+        #TODO: Indicate on sys msg pane if capturing these topics fails.\n+        # That might be because those topics are not published\n+\n+        self.show()\n+\n+    def save_settings(self, plugin_settings, instance_settings):\n+        # instance_settings.set_value('splitter', self._splitter.saveState())\n+        pass\n+\n+    def restore_settings(self, plugin_settings, instance_settings):\n+#        if instance_settings.contains('splitter'):\n+#            self._splitter.restoreState(instance_settings.value('splitter'))\n+#        else:\n+#            self._splitter.setSizes([100, 100, 200])\n+        pass\n+\n+    def shutdown(self):\n+        # TODO: impl\n+        pass\n+\n+#    def _init_topic_table(self):\n+#        # name_topic_pointcloud = '/wide_stereo/points'\n+#        # name_topic_pointcloud2 = '/wide_stereo/points2'\n+#\n+#        row = 0\n+#        for name_topic in self._name_topics:\n+#            # Create widget for topic.\n+#            _qitem = ReadonlyItem(name_topic)\n+#            self._datamodel.setItem(row, 0, _qitem)\n+#\n+#            # Create subscriber\n+#            topic_info = TopicInfo(name_topic)\n+#            self._topic_obj_dict[name_topic] = topic_info\n+#\n+#            row += 1\n+#\n+#    def _update_topics_data(self):\n+#        \"\"\"\n+#        Originally copied from rqt_topic.topic_widget._update_topics_data\n+#        \"\"\"\n+#        for topic in self._topic_obj_dict.values():\n+#            topic_info = topic['info']\n+#            if topic_info.monitoring:\n+#                # update rate\n+#                rate, _, _, _ = topic_info.get_hz()\n+#                rate_text = '%1.2f' % rate if rate != None else 'unknown'\n+#\n+#                # update bandwidth\n+#                bytes_per_s, _, _, _ = topic_info.get_bw()\n+#                if bytes_per_s is None:\n+#                    bandwidth_text = 'unknown'\n+#                elif bytes_per_s < 1000:\n+#                    bandwidth_text = '%.2fB/s' % bytes_per_s\n+#                elif bytes_per_s < 1000000:\n+#                    bandwidth_text = '%.2fKB/s' % (bytes_per_s / 1000.)\n+#                else:\n+#                    bandwidth_text = '%.2fMB/s' % (bytes_per_s / 1000000.)\n+#\n+#                # update values\n+#                value_text = ''\n+#                self.update_value(topic_info._topic_name,\n+#                                  topic_info.last_message)\n+#\n+#            else:\n+#                rate_text = ''\n+#                bandwidth_text = ''\n+#                value_text = 'not monitored'\n+#\n+#            self._topic_obj_dict[topic_info._topic_name].setText(\n+#                                         self._column_index['rate'], rate_text)\n+#            self._topic_obj_dict[topic_info._topic_name].setText(\n+#                               self._column_index['bandwidth'], bandwidth_text)\n+#            self._topic_obj_dict[topic_info._topic_name].setText(\n+#                                       self._column_index['value'], value_text)\n+#\n+#    def update_topic_table(self):\n+#        self._update_topics_data()\n+\n+\n+if __name__ == '__main__':\n+    # main should be used only for debug purpose.\n+    # This moveites this QWidget as a standalone rqt gui.\n+    from rqt_gui.main import Main\n+\n+    main = Main()\n+    sys.exit(main.main(sys.argv, standalone='rqt_moveit'))"
+        }
+      ]
+    },
+    {
+      "author": "davetcoleman",
+      "date": "2013-05-08T05:00:19Z",
+      "sha": "9c81c292d9a9e08fd553b744733c8e4808c051d8",
+      "message": "MoveIt! has a capital I :)",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 3,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "a698c52d6f58102f708ab47f35fe12f0be75e3c7",
+          "filename": "rqt_moveit/package.xml",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/ros-visualization/rqt_moveit/blob/9c81c292d9a9e08fd553b744733c8e4808c051d8/rqt_moveit%2Fpackage.xml",
+          "raw_url": "https://github.com/ros-visualization/rqt_moveit/raw/9c81c292d9a9e08fd553b744733c8e4808c051d8/rqt_moveit%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ros-visualization/rqt_moveit/contents/rqt_moveit%2Fpackage.xml?ref=9c81c292d9a9e08fd553b744733c8e4808c051d8",
+          "patch": "@@ -4,7 +4,7 @@\n   <version>0.2.15</version>\n   <description>\n    An rqt-based tool that assists monitoring tasks\n-   for <a href = \"http://ros.org/wiki/moveit\">Moveit!</a> motion planner\n+   for <a href = \"http://ros.org/wiki/moveit\">MoveIt!</a> motion planner\n    developers and users. Currently the following items are monitored if they\n    are either running, existing or published:\n    <ul>\n@@ -14,9 +14,9 @@\n        [sensor_msgs/PointCloud, sensor_msgs/PointCloud2,\n         sensor_msgs/Image, sensor_msgs/CameraInfo]</li>\n    </ul>\n-   Since this package is made not by Moveit! development team (although with\n+   Since this package is not made by the MoveIt! development team (although with\n    assistance from the them), please post issue reports to the designated \n-   tracker (not the one of Moveit!). \n+   tracker (not MoveIt!'s main tracker). \n   </description>\n \n   <maintainer email=\"130s@alumni.smu.edu\">Isaac Isao Saito</maintainer>"
+        }
+      ]
+    }
+  ]
+}

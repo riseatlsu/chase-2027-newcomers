@@ -1,0 +1,1102 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T05:19:17Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "pal-robotics",
+    "repo": "launch_pal"
+  },
+  "data": [
+    {
+      "author": "Noel215",
+      "date": "2022-09-05T07:44:45Z",
+      "sha": "085c124cd76c6842e7435dd65e70f2fbf986ce07",
+      "message": "fix slash warns",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "6979e1eda0957f5243b93d95ad0df46b899452ac",
+          "filename": "setup.cfg",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/085c124cd76c6842e7435dd65e70f2fbf986ce07/setup.cfg",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/085c124cd76c6842e7435dd65e70f2fbf986ce07/setup.cfg",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/setup.cfg?ref=085c124cd76c6842e7435dd65e70f2fbf986ce07",
+          "patch": "@@ -1,4 +1,4 @@\n [develop]\n-script-dir=$base/lib/launch_pal\n+script_dir=$base/lib/launch_pal\n [install]\n-install-scripts=$base/lib/launch_pal\n+install_scripts=$base/lib/launch_pal"
+        }
+      ]
+    },
+    {
+      "author": "doterkuile",
+      "date": "2023-10-17T13:39:11Z",
+      "sha": "872a538de45110707623d858c3b4ded60c31c670",
+      "message": "Create initial version of robot configuration",
+      "files_changed": 4,
+      "additions": 148,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "774815e11d5a0a94eb2fe28b72f08c38980ce6b3",
+          "filename": "config/tiago_configuration.yaml",
+          "status": "added",
+          "additions": 33,
+          "deletions": 0,
+          "changes": 33,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/872a538de45110707623d858c3b4ded60c31c670/config%2Ftiago_configuration.yaml",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/872a538de45110707623d858c3b4ded60c31c670/config%2Ftiago_configuration.yaml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/config%2Ftiago_configuration.yaml?ref=872a538de45110707623d858c3b4ded60c31c670",
+          "patch": "@@ -0,0 +1,33 @@\n+robot_configuration:\n+  wheel_model:\n+    description: \"Wheel model\"\n+    values: [\"nadia\", \"moog\"]\n+    default: \"moog\"\n+  arm:\n+    description: \"Arm\"\n+    values: [true, false]\n+    default: true\n+  laser_model:\n+    description: \"Base laser model\"\n+    values: [\"no-laser\", \"sick-571\", \"sick-561\", \"sick-551\", \"hokuyo\"]\n+    default: sick-571\n+  courier_rgbd_sensors:\n+    description: \"Whether the base has RGBD sensors or not\"\n+    values: [true, false]\n+    default: false\n+  wrist_model:\n+    description: \"Wrist model\"\n+    values: [\"wrist-2010\", \"wrist-2017\"]\n+    default: \"wrist-2010\"\n+  end_effector:\n+    description: \"End effector model\"\n+    values: [\"pal-gripper\", \"pal-hey5\", \"custom\", false]\n+    default: \"pal-gripper\"\n+  ft_sensor:\n+    description: \"FT sensor model\"\n+    values: [\"schunk-ft\", false]\n+    default: \"schunk-ft\"\n+  camera_model:\n+    description: \"Head camera model\"\n+    values: [\"orbbec-astra\", \"orbbec-astra-pro\", \"asus-xtion\", false]\n+    default: \"orbbec-astra\""
+        },
+        {
+          "sha": "166636dbb7de83b3d5ae4788d2c64321fdf08020",
+          "filename": "launch_pal/robot_config.py",
+          "status": "added",
+          "additions": 67,
+          "deletions": 0,
+          "changes": 67,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/872a538de45110707623d858c3b4ded60c31c670/launch_pal%2Frobot_config.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/872a538de45110707623d858c3b4ded60c31c670/launch_pal%2Frobot_config.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2Frobot_config.py?ref=872a538de45110707623d858c3b4ded60c31c670",
+          "patch": "@@ -0,0 +1,67 @@\n+# Copyright (c) 2023 PAL Robotics S.L. All rights reserved.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+\n+import yaml\n+from dataclasses import dataclass\n+from typing import List, Union, Dict\n+from launch_ros.substitutions import FindPackageShare\n+\n+\n+@dataclass\n+class RobotSetting:\n+    name: str\n+    description: str\n+    values: List[Union[str, bool]]\n+    default: Union[str, bool]\n+\n+\n+class RobotConfiguration:\n+    def __init__(self, robot_name: str):\n+        self.robot_name: str = robot_name\n+        self.configuration: Dict[str, RobotSetting] = self.load_configuration(\n+            robot_name)\n+\n+    def load_configuration(self, robot_name: str) -> Dict[str, RobotSetting]:\n+\n+        pkg_dir = FindPackageShare(\"launch_pal\").find(\"launch_pal\")\n+\n+        config_file = f\"{pkg_dir}/config/{robot_name}_configuration.yaml\"\n+\n+        configurations_raw = yaml.load(open(config_file), Loader=yaml.FullLoader)[\n+            'robot_configuration']\n+\n+        configuration = {}\n+        for setting_name in configurations_raw.keys():\n+            description = configurations_raw[setting_name][\"description\"]\n+            values = configurations_raw[setting_name][\"values\"]\n+            default_value = configurations_raw[setting_name][\"default\"]\n+            setting = RobotSetting(\n+                setting_name, description, values, default_value)\n+            configuration[setting_name] = setting\n+\n+        return configuration\n+\n+    def has_setting(self, setting_name: str) -> bool:\n+\n+        setting_exists = setting_name in self.configuration.keys()\n+        return setting_exists\n+\n+    def get_setting(self, setting_name: str) -> RobotSetting:\n+\n+        if not self.has_setting(setting_name):\n+            raise ValueError(f'The robot {self.robot_name} \\\n+                             does not have the setting {setting_name}')\n+\n+        return self.configuration[setting_name]"
+        },
+        {
+          "sha": "59954963026f1c2a53e3b7c950ae7e432b83c59c",
+          "filename": "setup.py",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "changes": 4,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/872a538de45110707623d858c3b4ded60c31c670/setup.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/872a538de45110707623d858c3b4ded60c31c670/setup.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/setup.py?ref=872a538de45110707623d858c3b4ded60c31c670",
+          "patch": "@@ -1,6 +1,7 @@\n from setuptools import find_packages\n from setuptools import setup\n-\n+from glob import glob\n+import os\n package_name = 'launch_pal'\n \n setup(\n@@ -11,6 +12,7 @@\n         ('share/ament_index/resource_index/packages',\n             ['resource/' + package_name]),\n         ('share/' + package_name, ['package.xml']),\n+        (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),\n     ],\n     install_requires=['setuptools'],\n     zip_safe=True,"
+        },
+        {
+          "sha": "0bf4be5d4b61f054ebbbff7e0756c295953cce90",
+          "filename": "test/test_robot_config.py",
+          "status": "added",
+          "additions": 45,
+          "deletions": 0,
+          "changes": 45,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/872a538de45110707623d858c3b4ded60c31c670/test%2Ftest_robot_config.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/872a538de45110707623d858c3b4ded60c31c670/test%2Ftest_robot_config.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/test%2Ftest_robot_config.py?ref=872a538de45110707623d858c3b4ded60c31c670",
+          "patch": "@@ -0,0 +1,45 @@\n+# Copyright (c) 2023 PAL Robotics S.L. All rights reserved.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+\n+import unittest\n+from launch_pal.robot_config import RobotSetting, RobotConfiguration\n+from typing import List\n+\n+\n+class TestRobotConfiguration(unittest.TestCase):\n+    def test_load_configuration(self):\n+        robot_name = \"tiago\"\n+        RobotConfiguration(robot_name)\n+\n+        faulty_robot_name = \"ogait\"\n+\n+        with self.assertRaises(FileNotFoundError):\n+            RobotConfiguration(faulty_robot_name)\n+\n+    def test_find_setting(self):\n+        robot_name = \"tiago\"\n+        robot_config = RobotConfiguration(robot_name)\n+\n+        setting_name = \"wheel_model\"\n+        robot_setting = robot_config.get_setting(setting_name)\n+        self.assertIsInstance(robot_setting, RobotSetting)\n+        self.assertEqual(robot_setting.name, setting_name)\n+        self.assertIsInstance(robot_setting.default, str)\n+        self.assertIsInstance(robot_setting.description, str)\n+        self.assertIsInstance(robot_setting.values, List)\n+\n+        invalid_setting_name = \"can_fly\"\n+        with self.assertRaises(ValueError):\n+            robot_setting = robot_config.get_setting(invalid_setting_name)"
+        }
+      ]
+    },
+    {
+      "author": "antoniobrandi",
+      "date": "2023-04-03T12:26:11Z",
+      "sha": "1c9b70853e63f068166aaaf702b9911be1a758eb",
+      "message": "added parse_parametric_yaml utils",
+      "files_changed": 4,
+      "additions": 211,
+      "deletions": 4,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "23d51905b588de3e9e52a734711396153ca8d9d1",
+          "filename": "launch_pal/param_utils.py",
+          "status": "modified",
+          "additions": 130,
+          "deletions": 4,
+          "changes": 134,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/1c9b70853e63f068166aaaf702b9911be1a758eb/launch_pal%2Fparam_utils.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/1c9b70853e63f068166aaaf702b9911be1a758eb/launch_pal%2Fparam_utils.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2Fparam_utils.py?ref=1c9b70853e63f068166aaaf702b9911be1a758eb",
+          "patch": "@@ -14,9 +14,11 @@\n \n import copy\n import tempfile\n-\n+import re\n import yaml\n \n+from typing import Dict, List, Text\n+\n \n def _merge_dictionaries(dict1, dict2):\n     \"\"\"\n@@ -42,7 +44,7 @@ def insert_ros_param_prefix(data, prefix):\n         return data\n \n     for k in data.keys():\n-        if k == 'ros__parameters':\n+        if k == \"ros__parameters\":\n             d = {}\n             d[prefix] = copy.deepcopy(data[k])\n             data[k] = d\n@@ -70,14 +72,138 @@ def merge_param_files(yaml_files):\n         else:\n             yaml_file = e[0]\n             prefix = e[1]\n-        data = yaml.safe_load(open(yaml_file, 'r'))\n+        data = yaml.safe_load(open(yaml_file, \"r\"))\n         if prefix:\n             data = insert_ros_param_prefix(data, prefix)\n \n         _merge_dictionaries(concatenated_dict, data)\n         # Second arg takes precedence on merge, and result is stored there\n         concatenated_dict = data\n-    rewritten_yaml = tempfile.NamedTemporaryFile(mode='w', delete=False)\n+    rewritten_yaml = tempfile.NamedTemporaryFile(mode=\"w\", delete=False)\n     yaml.dump(concatenated_dict, rewritten_yaml)\n     rewritten_yaml.close()\n     return rewritten_yaml.name\n+\n+\n+def _parse_config(path, param_rewrites):\n+    \"\"\"\n+    Load a yaml configuration file and resolve any variables.\n+\n+    The variables must be in this format to be parsed:\n+    ${VAR_NAME}.\n+    E.g.:\n+    host: ${HOST}\n+\n+    Parameters\n+    ----------\n+    path : Text\n+        The path to the yaml file.\n+    param_rewrites : Dict\n+        Substitutions parameters.\n+\n+    Returns\n+    -------\n+    __var__ : Dict\n+        The dict configuration.\n+\n+    \"\"\"\n+    # pattern for global vars: look for ${word}\n+    pattern = re.compile(r\".*?\\${(\\w+)}.*?\")\n+    loader = yaml.SafeLoader\n+\n+    # the tag will be used to mark where to start searching for the pattern\n+    # e.g. somekey: somestring${MYVAR}blah blah blah\n+    loader.add_implicit_resolver(None, pattern, None)\n+\n+    def constructor_variables(loader, node):\n+        \"\"\"\n+        Extract the variable from the node's value.\n+\n+        Parameters\n+        ----------\n+        loader : yaml.Loader\n+            The yaml loader.\n+        node : _type_\n+            The current node in the yaml.\n+\n+        Returns\n+        -------\n+        value : Dict\n+            the parsed string that contains the value of the variable\n+\n+        \"\"\"\n+        value = loader.construct_scalar(node)\n+        match = pattern.findall(value)  # to find all variables in line\n+        if match:\n+            full_value = value\n+            for g in match:\n+                full_value = re.sub(\n+                    r\".*?\\${(\" + re.escape(g) + \")}.*?\",\n+                    str(param_rewrites[g]),\n+                    full_value,\n+                )\n+\n+            if (\n+                full_value == \"True\"\n+                or full_value == \"true\"\n+                or full_value == \"False\"\n+                or full_value == \"false\"\n+            ):\n+                return bool(full_value)\n+\n+            try:\n+                return int(full_value)\n+            except ValueError:\n+                try:\n+                    return float(full_value)\n+                except ValueError:\n+                    return full_value\n+\n+        return value\n+\n+    loader.add_constructor(None, constructor_variables)\n+\n+    if path:\n+        with open(path) as conf_data:\n+            return yaml.load(conf_data, Loader=loader)\n+    else:\n+        raise ValueError(\"A path should be defined as input\")\n+\n+\n+def parse_parametric_yaml(source_files: List[Text], param_rewrites: Dict):\n+    \"\"\"\n+    Parse a list of Parametric YAML files into a single one.\n+\n+    Substitutes parameters into several different YAML files in the form\n+\n+    parameter_node:\n+        ros__parameters:\n+            parameter_name: ${PARAMETER_VALUE}\n+\n+    by taking the value of the ${PARAMETER_VALUE} variable from the\n+    param_rewrites Dictionary\n+\n+    Parameters\n+    ----------\n+    source_files : List[Text]\n+        List of paths of Parametric YAML files.\n+    param_rewrites : Dict\n+        Dictionary with the name and the value of\n+        each variable.\n+\n+    Returns\n+    -------\n+        rewritten_yaml: Text\n+        Path to the Full YAML file containing all the parameters.\n+\n+    \"\"\"\n+    rewritten_yaml = tempfile.NamedTemporaryFile(mode=\"w\", delete=False)\n+    full_yaml = {}\n+\n+    for source_file in source_files:\n+        data = _parse_config(source_file, param_rewrites)\n+        full_yaml.update(data)\n+\n+    yaml.dump(full_yaml, rewritten_yaml)\n+    rewritten_yaml.close()\n+    return rewritten_yaml.name"
+        },
+        {
+          "sha": "4639be472145fa1d56ff007464048b1ae9ad27db",
+          "filename": "test/other_parametric.yaml",
+          "status": "added",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/1c9b70853e63f068166aaaf702b9911be1a758eb/test%2Fother_parametric.yaml",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/1c9b70853e63f068166aaaf702b9911be1a758eb/test%2Fother_parametric.yaml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/test%2Fother_parametric.yaml?ref=1c9b70853e63f068166aaaf702b9911be1a758eb",
+          "patch": "@@ -0,0 +1,3 @@\n+surname: ${surname}\n+birthday: \"01/01/1970\"\n+weight: ${weight}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "91f2f0c9911f95bf59f621c5bbd88f151831d5b6",
+          "filename": "test/parametric.yaml",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/1c9b70853e63f068166aaaf702b9911be1a758eb/test%2Fparametric.yaml",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/1c9b70853e63f068166aaaf702b9911be1a758eb/test%2Fparametric.yaml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/test%2Fparametric.yaml?ref=1c9b70853e63f068166aaaf702b9911be1a758eb",
+          "patch": "@@ -0,0 +1,4 @@\n+name: ${name}\n+surname: \"Doe\"\n+age: ${age}\n+married: ${married}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "5e2909242bbfbffc36db649d781a53899a715ffe",
+          "filename": "test/test_param_utils.py",
+          "status": "added",
+          "additions": 74,
+          "deletions": 0,
+          "changes": 74,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/1c9b70853e63f068166aaaf702b9911be1a758eb/test%2Ftest_param_utils.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/1c9b70853e63f068166aaaf702b9911be1a758eb/test%2Ftest_param_utils.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/test%2Ftest_param_utils.py?ref=1c9b70853e63f068166aaaf702b9911be1a758eb",
+          "patch": "@@ -0,0 +1,74 @@\n+# Copyright (c) 2023 PAL Robotics S.L. All rights reserved.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+import unittest\n+import yaml\n+import os\n+from typing import Dict\n+from launch_pal.param_utils import parse_parametric_yaml\n+\n+\n+class TestParseParametricYaml(unittest.TestCase):\n+    def test_param_substitution(self):\n+        parametric_yaml = os.path.join(os.getcwd(), \"test\", \"parametric.yaml\")\n+        parametric_variables = {\"name\": \"John\", \"age\": 42, \"married\": True}\n+        rewritten_yaml = parse_parametric_yaml(\n+            [parametric_yaml], parametric_variables\n+        )\n+        self.assertTrue(rewritten_yaml)\n+\n+        with open(rewritten_yaml, \"r\") as params_yaml:\n+            params: Dict = yaml.safe_load(params_yaml)\n+            self.assertEqual(len(params), 4)\n+            self.assertTrue(\"name\" in params)\n+            self.assertTrue(\"surname\" in params)\n+            self.assertTrue(\"age\" in params)\n+            self.assertTrue(\"married\" in params)\n+            self.assertEqual(params[\"name\"], parametric_variables[\"name\"])\n+            self.assertEqual(params[\"surname\"], \"Doe\")\n+            self.assertEqual(params[\"age\"], parametric_variables[\"age\"])\n+            self.assertEqual(params[\"married\"], parametric_variables[\"married\"])\n+\n+    def test_params_merge(self):\n+        parametric_yaml = os.path.join(os.getcwd(), \"test\", \"parametric.yaml\")\n+        other_parametric_yaml = os.path.join(\n+            os.getcwd(), \"test\", \"other_parametric.yaml\"\n+        )\n+        parametric_variables = {\n+            \"name\": \"John\",\n+            \"surname\": \"Black\",\n+            \"age\": 42,\n+            \"married\": True,\n+            \"weight\": 70.3,\n+        }\n+        rewritten_yaml = parse_parametric_yaml(\n+            [parametric_yaml, other_parametric_yaml], parametric_variables\n+        )\n+        self.assertTrue(rewritten_yaml)\n+\n+        with open(rewritten_yaml, \"r\") as params_yaml:\n+            params: Dict = yaml.safe_load(params_yaml)\n+            self.assertEqual(len(params), 6)\n+            self.assertTrue(\"name\" in params)\n+            self.assertTrue(\"surname\" in params)\n+            self.assertTrue(\"age\" in params)\n+            self.assertTrue(\"married\" in params)\n+            self.assertTrue(\"birthday\" in params)\n+            self.assertTrue(\"weight\" in params)\n+            self.assertEqual(params[\"name\"], parametric_variables[\"name\"])\n+            self.assertEqual(params[\"surname\"], parametric_variables[\"surname\"])\n+            self.assertEqual(params[\"age\"], parametric_variables[\"age\"])\n+            self.assertEqual(params[\"married\"], parametric_variables[\"married\"])\n+            self.assertEqual(params[\"birthday\"], \"01/01/1970\")\n+            self.assertEqual(params[\"weight\"], parametric_variables[\"weight\"])"
+        }
+      ]
+    },
+    {
+      "author": "martinaannicelli",
+      "date": "2025-08-22T11:37:19Z",
+      "sha": "d79abb26b7328d7f7d39f069ebc4e8c89eb1d90a",
+      "message": "added stockbot to list of robots name",
+      "files_changed": 2,
+      "additions": 7,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "2b5960c5ecfd82795736f3dc45d1592dae6ff95a",
+          "filename": "launch_pal/robot_arguments/common.py",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/d79abb26b7328d7f7d39f069ebc4e8c89eb1d90a/launch_pal%2Frobot_arguments%2Fcommon.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/d79abb26b7328d7f7d39f069ebc4e8c89eb1d90a/launch_pal%2Frobot_arguments%2Fcommon.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2Frobot_arguments%2Fcommon.py?ref=d79abb26b7328d7f7d39f069ebc4e8c89eb1d90a",
+          "patch": "@@ -41,6 +41,7 @@ class CommonArgs:\n             \"pmb3\",\n             \"ari\",\n             \"omni_base\",\n+            \"stockbot\",\n             \"tiago_pro\",\n             \"talos\",\n             \"kangaroo\",\n@@ -79,6 +80,10 @@ class CommonArgs:\n         name='world_name',\n         default_value='pal_office',\n         description=\"Specify world name, will be converted to full path.\")\n+    map_name: DeclareLaunchArgument = DeclareLaunchArgument(\n+        name='map_name',\n+        default_value='',\n+        description=\"Specify map name, will be converted to full path.\")\n     is_public_sim: DeclareLaunchArgument = DeclareLaunchArgument(\n         name='is_public_sim',\n         default_value='False',"
+        },
+        {
+          "sha": "b13b182a7c97421e3bb38584d6343bd791e03ba4",
+          "filename": "launch_pal/robot_utils.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/d79abb26b7328d7f7d39f069ebc4e8c89eb1d90a/launch_pal%2Frobot_utils.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/d79abb26b7328d7f7d39f069ebc4e8c89eb1d90a/launch_pal%2Frobot_utils.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2Frobot_utils.py?ref=d79abb26b7328d7f7d39f069ebc4e8c89eb1d90a",
+          "patch": "@@ -34,7 +34,8 @@ def get_robot_name(default_robot_name='pmb2'):\n         'robot_name',\n         default_value=default_robot_name,\n         description='Name of the robot. ',\n-        choices=['pmb2', 'tiago', 'tiago_dual', 'pmb3', 'ari', 'omni_base', 'tiago_pro'])\n+        choices=['pmb2', 'tiago', 'tiago_dual', 'pmb3', 'ari', 'omni_base',\n+                 'tiago_pro', 'stockbot'])\n \n     return declare_robot_name\n "
+        }
+      ]
+    },
+    {
+      "author": "Ortisa",
+      "date": "2025-08-18T15:39:38Z",
+      "sha": "a866c2e2fff7b3a977097112a4142468d54a9760",
+      "message": "added mujoco arguments",
+      "files_changed": 1,
+      "additions": 15,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e9d72c8f893ba4f250ed324e4ace6472db4219b6",
+          "filename": "launch_pal/robot_arguments/common.py",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 0,
+          "changes": 15,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/a866c2e2fff7b3a977097112a4142468d54a9760/launch_pal%2Frobot_arguments%2Fcommon.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/a866c2e2fff7b3a977097112a4142468d54a9760/launch_pal%2Frobot_arguments%2Fcommon.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2Frobot_arguments%2Fcommon.py?ref=a866c2e2fff7b3a977097112a4142468d54a9760",
+          "patch": "@@ -123,3 +123,18 @@ class CommonArgs:\n         name=\"yaw\",\n         description=\"Yaw pose of the robot\",\n         default_value=\"0.0\")\n+    mujoco: DeclareLaunchArgument = DeclareLaunchArgument(\n+        name=\"mujoco\", \n+        default_value=\"false\", \n+        choices=[\"true\", \"false\"], \n+        description=\"Mujoco simulation\")\n+    mj_control: DeclareLaunchArgument = DeclareLaunchArgument(\n+        name=\"mj_control\", \n+        default_value=\"position\", \n+        choices=[\"false\", \"position\", \"motor\"], \n+        description='Mujoco control')\n+    mj_simulate: DeclareLaunchArgument = DeclareLaunchArgument(\n+        name=\"mj_simulate\", \n+        default_value=\"true\", \n+        choices=[\"true\", \"false\"], \n+        description=\"Mujoco simulation tool\")"
+        }
+      ]
+    },
+    {
+      "author": "andreacapodacqua",
+      "date": "2023-10-20T10:29:25Z",
+      "sha": "0136beae23ea637f5f00fbb343307d51af4db632",
+      "message": "added support for omni_base",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "1df93945a188adff29d7e229087dc5d8d7e387b3",
+          "filename": "launch_pal/robot_utils.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/0136beae23ea637f5f00fbb343307d51af4db632/launch_pal%2Frobot_utils.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/0136beae23ea637f5f00fbb343307d51af4db632/launch_pal%2Frobot_utils.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2Frobot_utils.py?ref=0136beae23ea637f5f00fbb343307d51af4db632",
+          "patch": "@@ -20,7 +20,7 @@ def get_robot_name(default_robot_name='pmb2'):\n         'robot_name',\n         default_value=default_robot_name,\n         description='Name of the robot. ',\n-        choices=['pmb2', 'tiago', 'pmb3', 'ari'])\n+        choices=['pmb2', 'tiago', 'pmb3', 'ari', 'omni_base'])\n \n     return declare_robot_name\n \n@@ -41,7 +41,7 @@ def get_wheel_model(robot):\n \n \n def get_laser_model(robot):\n-    if (robot == 'pmb2') or (robot == 'tiago') or (robot == 'pmb3'):\n+    if (robot == 'pmb2') or (robot == 'tiago') or (robot == 'pmb3') or (robot == 'omni_base'):\n         declare_laser_model = DeclareLaunchArgument(\n             'laser_model',\n             default_value='sick-571',"
+        }
+      ]
+    },
+    {
+      "author": "OscarMrZ",
+      "date": "2024-03-11T15:32:07Z",
+      "sha": "521bf40dcf2d17792b434d1b8019d59a6d38ecf6",
+      "message": "Tiago sea params",
+      "files_changed": 2,
+      "additions": 40,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e3d53e3022ca4520060f4e3c56e10c8b613204aa",
+          "filename": "config/tiago_sea_configuration.yaml",
+          "status": "modified",
+          "additions": 29,
+          "deletions": 0,
+          "changes": 29,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/521bf40dcf2d17792b434d1b8019d59a6d38ecf6/config%2Ftiago_sea_configuration.yaml",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/521bf40dcf2d17792b434d1b8019d59a6d38ecf6/config%2Ftiago_sea_configuration.yaml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/config%2Ftiago_sea_configuration.yaml?ref=521bf40dcf2d17792b434d1b8019d59a6d38ecf6",
+          "patch": "@@ -0,0 +1,29 @@\n+tiago_sea_configuration:\n+  arm_type:\n+    description: 'Arm type'\n+    choices: ['tiago-arm', 'no-arm']\n+    default_value: 'tiago-arm'\n+  end_effector:\n+    description: 'End effector model'\n+    choices: ['pal-gripper', 'pal-hey5', 'custom', 'no-end-effector', 'robotiq-2f-85','robotiq-2f-140', 'pal-pro-gripper']\n+    default_value: 'pal-pro-gripper'\n+  ft_sensor:\n+    description: 'FT sensor model'\n+    choices: ['schunk-ft', 'no-ft-sensor']\n+    default_value: 'schunk-ft'\n+  laser_model:\n+    description: 'Base laser model'\n+    choices: ['no-laser', 'sick-571', 'sick-561', 'sick-551', 'hokuyo']\n+    default_value: 'sick-571'\n+  camera_model:\n+    description: 'Head camera model'\n+    choices: ['orbbec-astra', 'orbbec-astra-pro', 'asus-xtion', 'no-camera']\n+    default_value: 'orbbec-astra'\n+  base_type:\n+    description: 'Base type'\n+    choices: ['pmb2', 'omni_base']\n+    default_value: 'pmb2'\n+  has_screen:\n+    description: 'Has screen at torso'\n+    choices: ['false', 'true']\n+    default_value: 'false'"
+        },
+        {
+          "sha": "fc9c72f5b8a793db4de801a27029e720329fbb52",
+          "filename": "launch_pal/robot_arguments/tiago_sea.py",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 1,
+          "changes": 12,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/521bf40dcf2d17792b434d1b8019d59a6d38ecf6/launch_pal%2Frobot_arguments%2Ftiago_sea.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/521bf40dcf2d17792b434d1b8019d59a6d38ecf6/launch_pal%2Frobot_arguments%2Ftiago_sea.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2Frobot_arguments%2Ftiago_sea.py?ref=521bf40dcf2d17792b434d1b8019d59a6d38ecf6",
+          "patch": "@@ -14,6 +14,9 @@\n \n \n from dataclasses import dataclass\n+from launch.actions import DeclareLaunchArgument as DLA\n+from .robot import create_robot_arg\n+\n # from launch.actions import DeclareLaunchArgument as DLA\n # from .robot import create_robot_arg\n \n@@ -25,4 +28,11 @@\n class TiagoSEAArgs:\n     \"\"\"This dataclass contains launch arguments for TIAGo SEA.\"\"\"\n \n-    pass\n+    base_type: DLA = create_robot_arg(\"base_type\", ROBOT_NAME)\n+    arm_type: DLA = create_robot_arg(\"arm_type\", ROBOT_NAME)\n+    end_effector: DLA = create_robot_arg(\"end_effector\", ROBOT_NAME)\n+    ft_sensor: DLA = create_robot_arg(\"ft_sensor\", ROBOT_NAME)\n+    base_type: DLA = create_robot_arg(\"base_type\", ROBOT_NAME)\n+    camera_model: DLA = create_robot_arg(\"camera_model\", ROBOT_NAME)\n+    laser_model: DLA = create_robot_arg(\"laser_model\", ROBOT_NAME)\n+    has_screen: DLA = create_robot_arg(\"has_screen\", ROBOT_NAME)"
+        }
+      ]
+    },
+    {
+      "author": "LukaJuricic",
+      "date": "2025-01-28T11:26:32Z",
+      "sha": "a696c6b86ec5348af33b3143dca2e052b67cc18d",
+      "message": "add template support; rework test_pal_parameters",
+      "files_changed": 16,
+      "additions": 236,
+      "deletions": 145,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "0d20b6487c61e7d1bde93acf4a14b7a89083a16d",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/a696c6b86ec5348af33b3143dca2e052b67cc18d/.gitignore",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/a696c6b86ec5348af33b3143dca2e052b67cc18d/.gitignore",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/.gitignore?ref=a696c6b86ec5348af33b3143dca2e052b67cc18d",
+          "patch": "@@ -0,0 +1 @@\n+*.pyc"
+        },
+        {
+          "sha": "ca836f75fcf794c8e9c411da8889b308e69d77de",
+          "filename": "launch_pal/pal_parameters.py",
+          "status": "modified",
+          "additions": 118,
+          "deletions": 53,
+          "changes": 171,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/a696c6b86ec5348af33b3143dca2e052b67cc18d/launch_pal%2Fpal_parameters.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/a696c6b86ec5348af33b3143dca2e052b67cc18d/launch_pal%2Fpal_parameters.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2Fpal_parameters.py?ref=a696c6b86ec5348af33b3143dca2e052b67cc18d",
+          "patch": "@@ -13,19 +13,21 @@\n # limitations under the License.\n \n import os\n-import collections.abc\n+from pathlib import Path\n import yaml\n+\n import ament_index_python as aip\n-from launch.actions import DeclareLaunchArgument\n-from launch.substitutions import LaunchConfiguration\n+from launch import LaunchDescription\n+from launch.actions import DeclareLaunchArgument, LogInfo\n from launch.launch_context import LaunchContext\n-from launch.actions import LogInfo\n-from pathlib import Path\n+from launch.substitutions import LaunchConfiguration\n \n-DEFAULT_USER_PARAMETER_PATH = Path(os.environ[\"HOME\"]) / \".pal\" / \"config\"\n+from launch_pal.param_utils import _merge_dictionaries\n \n+DEFAULT_USER_PARAMETER_PATH = Path(os.environ[\"HOME\"], \".pal\", \"config\")\n \n-def get_dotted_value(dotted_arg, d):\n+\n+def get_dotted_value(dotted_arg: str, d: dict):\n     \"\"\"Access a nested dictionary member using a dotted string.\"\"\"\n     for key in dotted_arg.split('.'):\n         if key in d:\n@@ -35,6 +37,54 @@ def get_dotted_value(dotted_arg, d):\n     return d\n \n \n+def merge_template(d: dict[str, dict], templates: dict[str, Path], ld: LaunchDescription = None):\n+    \"\"\"\n+    For each node in the dictionary merge, if existing, the template into the node.\n+    \n+    The template is indicated by the 'template' key in the node dictionary,\n+    which is removed after the merge.\n+    First the template is applied, then the node dictionary elements override the template ones.\n+    \"\"\"\n+    tmpl_used_per_node: dict[str, str] = {}\n+    for node_name, node_data in d.items():\n+        if 'template' in node_data.keys():\n+            t = node_data['template']\n+            if isinstance(t, str) and t in templates:\n+                with open(templates[t], 'r') as f:\n+                    node_data = _merge_dictionaries(yaml.load(f, yaml.Loader), node_data)\n+                    node_data.pop('template')\n+                d[node_name] = node_data\n+                tmpl_used_per_node[node_name] = t\n+            else:\n+                if ld:\n+                    ld.add_action(LogInfo(msg=f'WARN: template {t} not found. Skipping it.'))\n+    return d, tmpl_used_per_node\n+\n+\n+def merge_configs(config: dict[str, dict], srcs: dict[str, Path], templates: dict[str, Path],\n+                  ld: LaunchDescription = None):\n+    \"\"\"\n+    Merge YAML files into a single config dictionary.\n+    \n+    The configuration files are merged in the order they are provided in the srcs dictionary.\n+    The single elements of the later ones override the previous ones.\n+    \"\"\"\n+    src_used: dict[str, list[Path]] = {}\n+    tmpl_used: dict[Path, dict[str, str]] = {}\n+    for cfg_file in sorted(srcs.keys()):\n+        cfg_path = srcs[cfg_file]\n+        with open(cfg_path, 'r') as f:\n+            data = yaml.load(f, yaml.Loader)\n+            data, tmpl_used[cfg_path] = merge_template(data, templates, ld)\n+            for node in data.keys():\n+                if node not in src_used:\n+                    src_used[node] = [cfg_path]\n+                else:\n+                    src_used[node].append(cfg_path)\n+            config = _merge_dictionaries(config, data)\n+    return config, src_used, tmpl_used\n+\n+\n def get_pal_configuration(pkg, node, ld=None, cmdline_args=True):\n     \"\"\"\n     Get the configuration for a node from the PAL configuration files.\n@@ -59,20 +109,31 @@ def get_pal_configuration(pkg, node, ld=None, cmdline_args=True):\n                 f'{PAL_USER_PARAMETERS_PATH} does not exist. '\n                 'User overrides will not be available.'))\n \n-    # code for recursive dictionary update\n-    # taken from https://stackoverflow.com/a/3233356\n-    def update(d, u):\n-        for k, v in u.items():\n-            if isinstance(v, collections.abc.Mapping):\n-                d[k] = update(d.get(k, {}), v)\n-            else:\n-                d[k] = v\n-        return d\n-\n-    # first, use ament_index to retrieve all configuration files pertaining to a node\n-    cfg_srcs_pkgs = aip.get_resources(f'pal_configuration.{pkg}')\n+    # load the package templates\n+    tmpl_srcs_pkgs = aip.get_resources(f'pal_configuration_templates.{pkg}')\n+    tmpl_srcs = {}\n+    for tmpl_srcs_pkg, _ in tmpl_srcs_pkgs.items():\n+        tmpl_files, _ = aip.get_resource(\n+            f'pal_configuration_templates.{pkg}', tmpl_srcs_pkg)\n+        for tmpl_file in tmpl_files.strip().split('\\n'):\n+            share_path = aip.get_package_share_path(tmpl_srcs_pkg)\n+            path = share_path / tmpl_file\n+            if not path.exists():\n+                if ld:\n+                    ld.add_action(LogInfo(msg=f'WARNING: template file {path} does not exist.'\n+                                          ' Skipping it.'))\n+                continue\n+            if path.name in tmpl_srcs:\n+                if ld:\n+                    ld.add_action(LogInfo(msg='WARNING: two packages provide the same'\n+                                          f' template {path.name} for {pkg}:'\n+                                          f' {tmpl_srcs[path.name]} and {path}. Skipping {path}'))\n+                continue\n+            tmpl_srcs[path.name] = path\n \n+    # use ament_index to retrieve all configuration files pertaining to a pkg\n     cfg_srcs = {}\n+    cfg_srcs_pkgs = aip.get_resources(f'pal_configuration.{pkg}')\n     for cfg_srcs_pkg, _ in cfg_srcs_pkgs.items():\n         cfg_files, _ = aip.get_resource(\n             f'pal_configuration.{pkg}', cfg_srcs_pkg)\n@@ -92,32 +153,29 @@ def update(d, u):\n                 continue\n             cfg_srcs[path.name] = path\n \n-    config = {}\n-    for cfg_file in sorted(cfg_srcs.keys()):\n-        with open(cfg_srcs[cfg_file], 'r') as f:\n-            config = update(config, yaml.load(f, yaml.Loader))\n-\n-    if not config:\n-        return {'parameters': [], 'remappings': [], 'arguments': []}\n-\n-    # next, look for the user configuration files\n-    user_cfg_srcs = []\n+    # retrieve all user configuration files\n+    user_cfg_srcs = {}\n     if PAL_USER_PARAMETERS_PATH.exists():\n         # list of (*.yml, *.yaml) in any subdirectory under PAL_USER_PARAMETERS_PATH:\n-        all_user_cfg_srcs = sorted([f for e in [\"*.yml\", \"*.yaml\"]\n-                                    for f in PAL_USER_PARAMETERS_PATH.glob(\"**/\" + e)])\n-        for cfg_file in all_user_cfg_srcs:\n-            with open(cfg_file, 'r') as f:\n+        all_user_cfg_paths = {(e, f) for e in [\"*.yml\", \"*.yaml\"]\n+                              for f in PAL_USER_PARAMETERS_PATH.glob(\"**/\" + e)}\n+        for _, path in all_user_cfg_paths:\n+            with open(path, 'r') as f:\n                 content = yaml.load(f, yaml.Loader)\n                 if not content or not isinstance(content, dict):\n                     if ld:\n-                        ld.add_action(LogInfo(msg=f'WARN: configuration file {cfg_file} is empty'\n+                        ld.add_action(LogInfo(msg=f'WARN: configuration file {path.name} is empty'\n                                               ' or not a dictionary. Skipping it.'))\n                     continue\n-                for k in content.keys():\n-                    if node in k:\n-                        user_cfg_srcs.append(cfg_file)\n-                        config = update(config, content)\n+                user_cfg_srcs[path.name] = path\n+\n+    # load and merge the configuration files\n+    config = {}\n+    config, sys_used_src, sys_used_tmpl = merge_configs(config, cfg_srcs, tmpl_srcs, ld)\n+    config, user_used_src, user_used_tmpl = merge_configs(config, user_cfg_srcs, tmpl_srcs, ld)\n+\n+    if not config:\n+        return {'parameters': [], 'remappings': [], 'arguments': []}\n \n     # finally, return the configuration for the specific node\n     node_fqn = None\n@@ -169,9 +227,8 @@ def update(d, u):\n                 default_value=str(default)))\n             config[node_fqn][\"ros__parameters\"][arg] = LaunchConfiguration(arg, default=[default])\n \n-    res = {'parameters': [{k: v} for k, v in config[node_fqn].setdefault('ros__parameters', {})\n-                          .items()],\n-           'remappings': config[node_fqn].setdefault('remappings', {}).items(),\n+    res = {'parameters': [dict(config[node_fqn].setdefault('ros__parameters', {}))],\n+           'remappings': list(config[node_fqn].setdefault('remappings', {}).items()),\n            'arguments': config[node_fqn].setdefault('arguments', []),\n            }\n \n@@ -182,27 +239,35 @@ def update(d, u):\n                                   f' for node {node} must be a _list_ of arguments'\n                                   ' to be passed to the node. Ignoring it.'))\n \n+    def str_config(used_srcs: dict[str, list[Path]], used_tmpl: dict[Path, dict[str, str]],\n+                   node_fqn: str):\n+        return ('\\n'.join([f'\\t- {src}'\n+                          + (('\\n' + '\\n'.join([f\"\\t\\t- {t}\"\n+                              for t in used_tmpl[src].values()])\n+                              ) if node_fqn in used_tmpl[src] else '')\n+                          for src in reversed(used_srcs[node_fqn])]\n+                          ) if node_fqn in used_srcs else \"\\t- (none)\")\n+\n     if ld:\n         ld.add_action(\n             LogInfo(msg=f'Loaded configuration for <{node}>:'\n-                    '\\n- System configuration (from higher to lower precedence):\\n'\n-                    + (\"\\n\".join([\"\\t- \" + str(p) for p in sorted(cfg_srcs.values(), reverse=True)]\n-                                 ) if cfg_srcs else \"\\t\\t- (none)\") +\n-                    '\\n- User overrides (from higher to lower precedence):\\n'\n-                    + (\"\\n\".join([\"\\t- \" + str(p) for p in sorted(user_cfg_srcs, reverse=True)]\n-                                 ) if user_cfg_srcs else \"\\t- (none)\")\n+                    '\\n- User overrides '\n+                    '(from higher to lower precedence, listing the used templates indented):\\n'\n+                    + str_config(user_used_src, user_used_tmpl, node_fqn) +\n+                    '\\n- System configuration '\n+                    '(from higher to lower precedence, listing the used templates indented):\\n'\n+                    + str_config(sys_used_src, sys_used_tmpl, node_fqn)\n                     ))\n         if res['parameters']:\n             # create an empty launch context to get the default values of the parameters\n             lc = LaunchContext()\n \n             param_list = \"\"\n-            for d in res['parameters']:\n-                for k, v in d.items():\n-                    if isinstance(v, LaunchConfiguration):\n-                        param_list += f'- {k}: {v.perform(lc)} (can be overridden with {k}:=...)\\n'\n-                    else:\n-                        param_list += f'- {k}: {v}\\n'\n+            for k, v in res['parameters'][0].items():\n+                if isinstance(v, LaunchConfiguration):\n+                    param_list += f'- {k}: {v.perform(lc)} (can be overridden with {k}:=...)\\n'\n+                else:\n+                    param_list += f'- {k}: {v}\\n'\n             ld.add_action(LogInfo(msg='Parameters:\\n' + param_list))\n         if res['remappings']:\n             ld.add_action(LogInfo(msg='Remappings:\\n' +"
+        },
+        {
+          "sha": "29b233e3e1a52cd2f496d89836b57565e46aa182",
+          "filename": "test/mock_rosroot_pal_parameters/home/.pal/config/00-user_config.yaml",
+          "status": "added",
+          "additions": 13,
+          "deletions": 0,
+          "changes": 13,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/a696c6b86ec5348af33b3143dca2e052b67cc18d/test%2Fmock_rosroot_pal_parameters%2Fhome%2F.pal%2Fconfig%2F00-user_config.yaml",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/a696c6b86ec5348af33b3143dca2e052b67cc18d/test%2Fmock_rosroot_pal_parameters%2Fhome%2F.pal%2Fconfig%2F00-user_config.yaml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/test%2Fmock_rosroot_pal_parameters%2Fhome%2F.pal%2Fconfig%2F00-user_config.yaml?ref=a696c6b86ec5348af33b3143dca2e052b67cc18d",
+          "patch": "@@ -0,0 +1,13 @@\n+/test_node:\n+  ros__parameters:\n+    param_user: \"user\"\n+  arguments:\n+    - \"--arg_user\"\n+\n+\n+# should not impact test_node parameters\n+/test_node2:\n+  template: \"template.yml\"\n+  ros__parameters:\n+    param_user: \"user\"\n+"
+        },
+        {
+          "sha": "0d0af096fb28d9669d9f4c67a8d4ac9bd4b089f2",
+          "filename": "test/mock_rosroot_pal_parameters/home/.pal/config/subdir/20-user_config.yml",
+          "status": "added",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/a696c6b86ec5348af33b3143dca2e052b67cc18d/test%2Fmock_rosroot_pal_parameters%2Fhome%2F.pal%2Fconfig%2Fsubdir%2F20-user_config.yml",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/a696c6b86ec5348af33b3143dca2e052b67cc18d/test%2Fmock_rosroot_pal_parameters%2Fhome%2F.pal%2Fconfig%2Fsubdir%2F20-user_config.yml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/test%2Fmock_rosroot_pal_parameters%2Fhome%2F.pal%2Fconfig%2Fsubdir%2F20-user_config.yml?ref=a696c6b86ec5348af33b3143dca2e052b67cc18d",
+          "patch": "@@ -0,0 +1,3 @@\n+/test_node:\n+  remappings:\n+    remap_user: \"user_subdir\""
+        },
+        {
+          "sha": "c56968d446459045ee9c75fe15d68723ab6f56c5",
+          "filename": "test/mock_rosroot_pal_parameters/home/pal/00-user_config.yaml",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 11,
+          "changes": 11,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/2ec4873a867358682728bdc7a3e855864828a9fa/test%2Fmock_rosroot_pal_parameters%2Fhome%2Fpal%2F00-user_config.yaml",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/2ec4873a867358682728bdc7a3e855864828a9fa/test%2Fmock_rosroot_pal_parameters%2Fhome%2Fpal%2F00-user_config.yaml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/test%2Fmock_rosroot_pal_parameters%2Fhome%2Fpal%2F00-user_config.yaml?ref=2ec4873a867358682728bdc7a3e855864828a9fa",
+          "patch": "@@ -1,11 +0,0 @@\n-/test_node:\n-  ros__parameters:\n-    param1: \"test_node user param1 value\"\n-  remappings:\n-    remap1: /user-robot-remap\n-\n-# should not impact test_node parameters\n-/test_node2:\n-  ros__parameters:\n-    param1: \"test_node2 user param1 value\"\n-"
+        },
+        {
+          "sha": "229be4526c11fb55f33c18a70c3f9acf390eda74",
+          "filename": "test/mock_rosroot_pal_parameters/home/pal/subdir/20-user_config.yml",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 3,
+          "changes": 3,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/2ec4873a867358682728bdc7a3e855864828a9fa/test%2Fmock_rosroot_pal_parameters%2Fhome%2Fpal%2Fsubdir%2F20-user_config.yml",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/2ec4873a867358682728bdc7a3e855864828a9fa/test%2Fmock_rosroot_pal_parameters%2Fhome%2Fpal%2Fsubdir%2F20-user_config.yml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/test%2Fmock_rosroot_pal_parameters%2Fhome%2Fpal%2Fsubdir%2F20-user_config.yml?ref=2ec4873a867358682728bdc7a3e855864828a9fa",
+          "patch": "@@ -1,3 +0,0 @@\n-/test_node:\n-  ros__parameters:\n-    param1: \"test_node user param1 value high precedence\""
+        },
+        {
+          "sha": "a65022803fdd7c45ce1cab09a1316f67ebc55d74",
+          "filename": "test/mock_rosroot_pal_parameters/share/ament_index/resource_index/pal_configuration.test_node/test_node",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/a696c6b86ec5348af33b3143dca2e052b67cc18d/test%2Fmock_rosroot_pal_parameters%2Fshare%2Fament_index%2Fresource_index%2Fpal_configuration.test_node%2Ftest_node",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/a696c6b86ec5348af33b3143dca2e052b67cc18d/test%2Fmock_rosroot_pal_parameters%2Fshare%2Fament_index%2Fresource_index%2Fpal_configuration.test_node%2Ftest_node",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/test%2Fmock_rosroot_pal_parameters%2Fshare%2Fament_index%2Fresource_index%2Fpal_configuration.test_node%2Ftest_node?ref=a696c6b86ec5348af33b3143dca2e052b67cc18d",
+          "patch": "@@ -1,2 +1,2 @@\n 00-defaults.yml\n-01-test-cfg.yml\n+01-base-cfg.yml"
+        },
+        {
+          "sha": "c22ae86a42fe499cdd26dc234bff753ac94d2be0",
+          "filename": "test/mock_rosroot_pal_parameters/share/ament_index/resource_index/pal_configuration_templates.test_node/test_node",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/a696c6b86ec5348af33b3143dca2e052b67cc18d/test%2Fmock_rosroot_pal_parameters%2Fshare%2Fament_index%2Fresource_index%2Fpal_configuration_templates.test_node%2Ftest_node",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/a696c6b86ec5348af33b3143dca2e052b67cc18d/test%2Fmock_rosroot_pal_parameters%2Fshare%2Fament_index%2Fresource_index%2Fpal_configuration_templates.test_node%2Ftest_node",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/test%2Fmock_rosroot_pal_parameters%2Fshare%2Fament_index%2Fresource_index%2Fpal_configuration_templates.test_node%2Ftest_node?ref=a696c6b86ec5348af33b3143dca2e052b67cc18d",
+          "patch": "@@ -0,0 +1 @@\n+template.yml\n\\ No newline at end of file"
+        },
+        {
+          "sha": "c848862033d40e4b924ee67815d9f10b97dbea98",
+          "filename": "test/mock_rosroot_pal_parameters/share/robot_cfg/10-robot-cfg.yml",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 10,
+          "changes": 10,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/2ec4873a867358682728bdc7a3e855864828a9fa/test%2Fmock_rosroot_pal_parameters%2Fshare%2Frobot_cfg%2F10-robot-cfg.yml",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/2ec4873a867358682728bdc7a3e855864828a9fa/test%2Fmock_rosroot_pal_parameters%2Fshare%2Frobot_cfg%2F10-robot-cfg.yml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/test%2Fmock_rosroot_pal_parameters%2Fshare%2Frobot_cfg%2F10-robot-cfg.yml?ref=2ec4873a867358682728bdc7a3e855864828a9fa",
+          "patch": "@@ -1,10 +0,0 @@\n-/test_node:\n-  ros__parameters:\n-    param2: \"robot-cfg value\"\n-  remappings:\n-    remap1: /robot-remap\n-    remap3: /robot-remap\n-  arguments:\n-    - \"-arg3\"\n-\n-"
+        },
+        {
+          "sha": "29dd25965d5e11bac5508ef01cc3ecf53543ada6",
+          "filename": "test/mock_rosroot_pal_parameters/share/robot_tiago_cfg/10-robot-tiago-cfg.yml",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 2,
+          "changes": 2,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/2ec4873a867358682728bdc7a3e855864828a9fa/test%2Fmock_rosroot_pal_parameters%2Fshare%2Frobot_tiago_cfg%2F10-robot-tiago-cfg.yml",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/2ec4873a867358682728bdc7a3e855864828a9fa/test%2Fmock_rosroot_pal_parameters%2Fshare%2Frobot_tiago_cfg%2F10-robot-tiago-cfg.yml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/test%2Fmock_rosroot_pal_parameters%2Fshare%2Frobot_tiago_cfg%2F10-robot-tiago-cfg.yml?ref=2ec4873a867358682728bdc7a3e855864828a9fa",
+          "patch": "@@ -1,2 +0,0 @@\n-- @robot tiago\n-"
+        },
+        {
+          "sha": "c978a1f5135cc78ceb205477ea408cfa634c64ad",
+          "filename": "test/mock_rosroot_pal_parameters/share/test_node/00-defaults.yml",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 6,
+          "changes": 17,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/a696c6b86ec5348af33b3143dca2e052b67cc18d/test%2Fmock_rosroot_pal_parameters%2Fshare%2Ftest_node%2F00-defaults.yml",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/a696c6b86ec5348af33b3143dca2e052b67cc18d/test%2Fmock_rosroot_pal_parameters%2Fshare%2Ftest_node%2F00-defaults.yml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/test%2Fmock_rosroot_pal_parameters%2Fshare%2Ftest_node%2F00-defaults.yml?ref=a696c6b86ec5348af33b3143dca2e052b67cc18d",
+          "patch": "@@ -1,10 +1,15 @@\n /test_node:\n   ros__parameters:\n-    param1: \"base value\"\n-    param2: \"base value\"\n+    param_default: \"default\"\n+    param_template: \"default\"\n+    param_base: \"default\"\n+    param_robot: \"default\"\n+    param_user: \"default\"\n   remappings:\n-    remap1: /default\n+    remap_default: \"default\"\n+    remap_template: \"default\"\n+    remap_base: \"default\"\n+    remap_robot: \"default\"\n+    remap_user: \"default\"\n   arguments:\n-    - \"-arg1\"\n-\n-\n+    - \"--arg_default\""
+        },
+        {
+          "sha": "ea952026e8c3c9139cb5d85844efd02bfe223b2f",
+          "filename": "test/mock_rosroot_pal_parameters/share/test_node/01-base-cfg.yml",
+          "status": "added",
+          "additions": 12,
+          "deletions": 0,
+          "changes": 12,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/a696c6b86ec5348af33b3143dca2e052b67cc18d/test%2Fmock_rosroot_pal_parameters%2Fshare%2Ftest_node%2F01-base-cfg.yml",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/a696c6b86ec5348af33b3143dca2e052b67cc18d/test%2Fmock_rosroot_pal_parameters%2Fshare%2Ftest_node%2F01-base-cfg.yml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/test%2Fmock_rosroot_pal_parameters%2Fshare%2Ftest_node%2F01-base-cfg.yml?ref=a696c6b86ec5348af33b3143dca2e052b67cc18d",
+          "patch": "@@ -0,0 +1,12 @@\n+/test_node:\n+  template: \"template.yml\"\n+  ros__parameters:\n+    param_base: \"base\"\n+    param_robot: \"base\"\n+    param_user: \"base\"\n+  remappings:\n+    remap_base: \"base\"\n+    remap_robot: \"base\"\n+    remap_user: \"base\"\n+  arguments:\n+    - \"--arg_base\""
+        },
+        {
+          "sha": "c74f7fe4c684da4479f0f97464377ec8d320b2db",
+          "filename": "test/mock_rosroot_pal_parameters/share/test_node/01-test-cfg.yml",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 13,
+          "changes": 13,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/2ec4873a867358682728bdc7a3e855864828a9fa/test%2Fmock_rosroot_pal_parameters%2Fshare%2Ftest_node%2F01-test-cfg.yml",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/2ec4873a867358682728bdc7a3e855864828a9fa/test%2Fmock_rosroot_pal_parameters%2Fshare%2Ftest_node%2F01-test-cfg.yml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/test%2Fmock_rosroot_pal_parameters%2Fshare%2Ftest_node%2F01-test-cfg.yml?ref=2ec4873a867358682728bdc7a3e855864828a9fa",
+          "patch": "@@ -1,13 +0,0 @@\n-/test_node:\n-  ros__parameters:\n-    param1: \"base value\"\n-    param2: \"test-cfg value\"\n-    param3: \"test-cfg value\"\n-  remappings:\n-    remap1: /default\n-    remap2: /test-remap\n-  arguments:\n-    - \"-arg1\"\n-    - \"-arg2\"\n-\n-"
+        },
+        {
+          "sha": "48cb4ff28c3bc461657ddd5eb6968dd3ce3f8709",
+          "filename": "test/mock_rosroot_pal_parameters/share/test_node/template.yml",
+          "status": "added",
+          "additions": 12,
+          "deletions": 0,
+          "changes": 12,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/a696c6b86ec5348af33b3143dca2e052b67cc18d/test%2Fmock_rosroot_pal_parameters%2Fshare%2Ftest_node%2Ftemplate.yml",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/a696c6b86ec5348af33b3143dca2e052b67cc18d/test%2Fmock_rosroot_pal_parameters%2Fshare%2Ftest_node%2Ftemplate.yml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/test%2Fmock_rosroot_pal_parameters%2Fshare%2Ftest_node%2Ftemplate.yml?ref=a696c6b86ec5348af33b3143dca2e052b67cc18d",
+          "patch": "@@ -0,0 +1,12 @@\n+ros__parameters:\n+  param_template: \"template\"\n+  param_base: \"template\"\n+  param_robot: \"template\"\n+  param_user: \"template\"\n+remappings:\n+  remap_template: \"template\"\n+  remap_base: \"template\"\n+  remap_robot: \"template\"\n+  remap_user: \"template\"\n+arguments:\n+  - \"--arg_template\"\n\\ No newline at end of file"
+        },
+        {
+          "sha": "c6a66f95adfe1ce7d43d811c0b67035163a07f8c",
+          "filename": "test/mock_rosroot_pal_parameters/share/test_node_robot_cfg/10-robot-cfg.yml",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 6,
+          "changes": 12,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/a696c6b86ec5348af33b3143dca2e052b67cc18d/test%2Fmock_rosroot_pal_parameters%2Fshare%2Ftest_node_robot_cfg%2F10-robot-cfg.yml",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/a696c6b86ec5348af33b3143dca2e052b67cc18d/test%2Fmock_rosroot_pal_parameters%2Fshare%2Ftest_node_robot_cfg%2F10-robot-cfg.yml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/test%2Fmock_rosroot_pal_parameters%2Fshare%2Ftest_node_robot_cfg%2F10-robot-cfg.yml?ref=a696c6b86ec5348af33b3143dca2e052b67cc18d",
+          "patch": "@@ -1,10 +1,10 @@\n /test_node:\n   ros__parameters:\n-    param2: \"robot-cfg value\"\n+    param_robot: \"robot\"\n+    param_user: \"robot\"\n   remappings:\n-    remap1: /robot-remap\n-    remap3: /robot-remap\n+    remap_robot: \"robot\"\n+    remap_user: \"robot\"\n   arguments:\n-    - \"-arg3\"\n-\n-\n+    - \"--arg_robot_1\"\n+    - \"--arg_robot_2\""
+        },
+        {
+          "sha": "dff90c66f26d3a4e94faf30f3a2d598fc0ca5439",
+          "filename": "test/test_pal_parameters.py",
+          "status": "modified",
+          "additions": 58,
+          "deletions": 40,
+          "changes": 98,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/a696c6b86ec5348af33b3143dca2e052b67cc18d/test%2Ftest_pal_parameters.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/a696c6b86ec5348af33b3143dca2e052b67cc18d/test%2Ftest_pal_parameters.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/test%2Ftest_pal_parameters.py?ref=a696c6b86ec5348af33b3143dca2e052b67cc18d",
+          "patch": "@@ -12,12 +12,13 @@\n # See the License for the specific language governing permissions and\n # limitations under the License.\n \n-import unittest\n import os\n-from launch_pal.pal_parameters import get_pal_configuration\n-from launch.substitutions import LaunchConfiguration\n-from launch.launch_context import LaunchContext\n+import unittest\n+\n from launch import LaunchDescription\n+from launch.launch_context import LaunchContext\n+from launch.substitutions import LaunchConfiguration\n+from launch_pal.pal_parameters import get_pal_configuration\n \n \n class TestPalGetConfiguration(unittest.TestCase):\n@@ -41,76 +42,94 @@ def test_get_configuration(self):\n \n         config = get_pal_configuration(pkg='test_node', node='test_node', cmdline_args=False)\n \n-        self.assertCountEqual(\n-            config['parameters'],\n-            [\n-                {'param1': 'base value'},\n-                {'param2': 'robot-cfg value'},\n-                {'param3': 'test-cfg value'},\n-            ]\n+        self.assertEqual(len(config['parameters']), 1)\n+        self.assertDictEqual(\n+            config['parameters'][0],\n+            {\n+                'param_default': 'default',\n+                'param_template': 'template',\n+                'param_base': 'base',\n+                'param_robot': 'robot',\n+                'param_user': 'robot',\n+            }\n         )\n \n         self.assertCountEqual(\n             config['remappings'],\n             [\n-                ('remap1', '/robot-remap'),\n-                ('remap2', '/test-remap'),\n-                ('remap3', '/robot-remap'),\n+                ('remap_default', 'default'),\n+                ('remap_template', 'template'),\n+                ('remap_base', 'base'),\n+                ('remap_robot', 'robot'),\n+                ('remap_user', 'robot'),\n             ]\n         )\n \n+        self.assertCountEqual(\n+            config['arguments'],\n+            ['--arg_robot_1', '--arg_robot_2']\n+        )\n+\n     def test_get_configuration_user_overrides(self):\n \n         os.environ['PAL_USER_PARAMETERS_PATH'] = os.path.join(\n-            os.getcwd(), 'test', 'mock_rosroot_pal_parameters', 'home', 'pal')\n+            os.getcwd(), 'test', 'mock_rosroot_pal_parameters', 'home', '.pal', 'config')\n \n         config = get_pal_configuration(pkg='test_node', node='test_node', cmdline_args=False)\n \n-        self.assertCountEqual(\n-            config['parameters'],\n-            [\n-                {'param1': 'test_node user param1 value high precedence'},\n-                {'param2': 'robot-cfg value'},\n-                {'param3': 'test-cfg value'},\n-            ]\n+        self.assertEqual(len(config['parameters']), 1)\n+        self.assertDictEqual(\n+            config['parameters'][0],\n+            {\n+                'param_default': 'default',\n+                'param_template': 'template',\n+                'param_base': 'base',\n+                'param_robot': 'robot',\n+                'param_user': 'user',\n+            }\n         )\n \n         self.assertCountEqual(\n             config['remappings'],\n             [\n-                ('remap1', '/user-robot-remap'),\n-                ('remap2', '/test-remap'),\n-                ('remap3', '/robot-remap'),\n+                ('remap_default', 'default'),\n+                ('remap_template', 'template'),\n+                ('remap_base', 'base'),\n+                ('remap_robot', 'robot'),\n+                ('remap_user', 'user_subdir'),\n             ]\n         )\n \n+        self.assertCountEqual(\n+            config['arguments'],\n+            ['--arg_user']\n+        )\n+\n     def test_get_configuration_cmdline_overrides_single_param(self):\n \n         ld = LaunchDescription()\n+        lc = LaunchContext()\n \n         config = get_pal_configuration(pkg='test_node',\n                                        node='test_node',\n-                                       cmdline_args=['param1'],\n+                                       cmdline_args=['param_default'],\n                                        ld=ld)\n \n-        self.assertTrue(isinstance(config['parameters'][0]['param1'], LaunchConfiguration))\n-\n-        lc = LaunchContext()\n-\n-        self.assertEquals(config['parameters'][0]['param1'].perform(lc), 'base value')\n-\n-        self.assertFalse(isinstance(config['parameters'][1]['param2'], LaunchConfiguration))\n-        self.assertFalse(isinstance(config['parameters'][2]['param3'], LaunchConfiguration))\n+        for k, v in config['parameters'][0].items():\n+            if k == 'param_default':\n+                self.assertTrue(isinstance(v, LaunchConfiguration))\n+                self.assertEquals(v.perform(lc), 'default')\n+            else:\n+                self.assertFalse(isinstance(v, LaunchConfiguration))\n \n     def test_get_configuration_cmdline_overrides_all_params(self):\n \n         ld = LaunchDescription()\n \n         config = get_pal_configuration(pkg='test_node', node='test_node', ld=ld)\n \n-        self.assertTrue(isinstance(config['parameters'][0]['param1'], LaunchConfiguration))\n-        self.assertTrue(isinstance(config['parameters'][1]['param2'], LaunchConfiguration))\n-        self.assertTrue(isinstance(config['parameters'][2]['param3'], LaunchConfiguration))\n+        for v in config['parameters'][0].values():\n+            self.assertTrue(isinstance(v, LaunchConfiguration))\n \n     def test_get_configuration_cmdline_overrides_no_params(self):\n \n@@ -121,9 +140,8 @@ def test_get_configuration_cmdline_overrides_no_params(self):\n                                        ld=ld,\n                                        cmdline_args=False)\n \n-        self.assertFalse(isinstance(config['parameters'][0]['param1'], LaunchConfiguration))\n-        self.assertFalse(isinstance(config['parameters'][1]['param2'], LaunchConfiguration))\n-        self.assertFalse(isinstance(config['parameters'][2]['param3'], LaunchConfiguration))\n+        for v in config['parameters'][0].values():\n+            self.assertFalse(isinstance(v, LaunchConfiguration))\n \n \n if __name__ == '__main__':"
+        }
+      ]
+    },
+    {
+      "author": "tomkimsour",
+      "date": "2024-08-26T14:31:21Z",
+      "sha": "26a4203710701cf3377130ddf083008a607d9e54",
+      "message": "add namespaces option when including launch file",
+      "files_changed": 1,
+      "additions": 8,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "807747d24c0a662ac58628ebeca2cb9a47f45de7",
+          "filename": "launch_pal/include_utils.py",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/26a4203710701cf3377130ddf083008a607d9e54/launch_pal%2Finclude_utils.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/26a4203710701cf3377130ddf083008a607d9e54/launch_pal%2Finclude_utils.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2Finclude_utils.py?ref=26a4203710701cf3377130ddf083008a607d9e54",
+          "patch": "@@ -17,6 +17,7 @@\n from launch import SomeSubstitutionsType\n from launch.actions import IncludeLaunchDescription, GroupAction, DeclareLaunchArgument\n from launch.actions import SetEnvironmentVariable\n+from launch_ros.actions import PushRosNamespace\n \n from launch import Action\n from launch import Condition\n@@ -53,6 +54,7 @@ def include_scoped_launch_py_description(\n         launch_arguments: Dict = {},\n         env_vars: List[SetEnvironmentVariable] = [],\n         condition: Optional[Condition] = None,\n+        namespace: Optional[str] = None,\n         **kwargs) -> Action:\n     \"\"\"\n     Return a GroupAction for the launch file inside pkg at paths.\n@@ -74,6 +76,8 @@ def include_scoped_launch_py_description(\n         Environment variables required for the launch file\n     condition: Optional[Condition]\n         Conditionally include this launch file\n+    namespace: Optional[str]\n+        Add a namespace to this launch file\n     **kwargs:\n         Any other required function arguments\n \n@@ -93,6 +97,7 @@ def include_scoped_launch_py_description(\n                     'arg_d': \"some_value' }\n     env_vars= [SetEnvironmentVariable(\"VAR_NAME\", 'value)]\n     condition=IfCondition(LaunchConfiguration('arg_a')))\n+    namespace='my_namespace'\n \n     \"\"\"\n     # Note: In case the argument name is remapped and the argument value type is\n@@ -124,6 +129,9 @@ def include_scoped_launch_py_description(\n \n     actions = []\n \n+    # Add namespace to launched node (needs to be run first)\n+    if namespace != None:\n+        actions.append(PushRosNamespace(namespace))\n     # Add environment variables\n     actions.extend(env_vars)\n     # If a declared launch argument is remapped it has to be declared in the new scope as well."
+        }
+      ]
+    },
+    {
+      "author": "severin-lemaignan",
+      "date": "2023-10-16T12:35:53Z",
+      "sha": "81d21b091d46f54ff2b66ca67829b60588472079",
+      "message": "Initial ARI support",
+      "files_changed": 1,
+      "additions": 37,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "3a1a1b2bdb769eee14c21ea6fe94cc6c690153df",
+          "filename": "launch_pal/robot_utils.py",
+          "status": "modified",
+          "additions": 37,
+          "deletions": 1,
+          "changes": 38,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/81d21b091d46f54ff2b66ca67829b60588472079/launch_pal%2Frobot_utils.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/81d21b091d46f54ff2b66ca67829b60588472079/launch_pal%2Frobot_utils.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2Frobot_utils.py?ref=81d21b091d46f54ff2b66ca67829b60588472079",
+          "patch": "@@ -20,7 +20,7 @@ def get_robot_name(default_robot_name='pmb2'):\n         'robot_name',\n         default_value=default_robot_name,\n         description='Name of the robot. ',\n-        choices=['pmb2', 'tiago', 'pmb3'])\n+        choices=['pmb2', 'tiago', 'pmb3', 'ari'])\n \n     return declare_robot_name\n \n@@ -47,6 +47,13 @@ def get_laser_model(robot):\n             default_value='sick-571',\n             description='Base laser model. ',\n             choices=['no-laser', 'sick-571', 'sick-561', 'sick-551', 'hokuyo'])\n+    elif robot == 'ari':\n+        declare_laser_model = DeclareLaunchArgument(\n+            'laser_model',\n+            default_value='ydlidar-tg15',\n+            description='Base laser model.',\n+            choices=['no-laser', 'sick-571', 'ydlidar-tg15', 'ydlidar-tg30'],\n+        )\n \n     else:\n         raise ValueError('The robot ' + robot +\n@@ -107,6 +114,13 @@ def get_end_effector(robot):\n             description='End effector model.',\n             choices=['pal-gripper', 'pal-hey5', 'custom', 'no-end-effector'])\n \n+    elif robot == 'ari':\n+        declare_end_effector = DeclareLaunchArgument(\n+            'end_effector',\n+            default_value='no-hand',\n+            description='End effector model. ',\n+            choices=['ari-hand', 'no-hand'],  # ARIv2 does not have a hand DoF\n+        )\n     else:\n         raise ValueError('The robot ' + robot +\n                          ' has not the argument end_effector')\n@@ -142,8 +156,30 @@ def get_camera_model(robot):\n             default_value='realsense-d435',\n             description='Base cameras model',\n             choices=['realsense-d435'])\n+    elif robot == 'ari':\n+        declare_camera_model = DeclareLaunchArgument(\n+            'camera_model',\n+            default_value='realsense-d435',\n+            description='Head camera model. ',\n+            choices=['raspi', 'realsense-d435'],\n+        )\n     else:\n         raise ValueError('The robot ' + robot +\n                          ' has not the argument camera_model')\n \n     return declare_camera_model\n+\n+\n+def get_robot_model(robot):\n+    if robot == 'ari':\n+        declare_robot_model = DeclareLaunchArgument(\n+            'robot_model',\n+            default_value='v2',\n+            description='ARI\\'s version. ',\n+            choices=['v1', 'v2'],\n+        )\n+    else:\n+        raise ValueError('The robot ' + robot +\n+                         ' has not the argument robot_model')\n+\n+    return declare_robot_model"
+        }
+      ]
+    },
+    {
+      "author": "mathias-luedtke",
+      "date": "2024-09-17T11:05:45Z",
+      "sha": "df2840600091af697004808e5fe7964be25dbb6a",
+      "message": "Merge branch 'add/deprecation/note' into 'master'\n\nadd deprecation note to the robot_utils methods\n\nSee merge request common/launch_pal!67",
+      "files_changed": 1,
+      "additions": 23,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e2cf2254406556b216b9d8b09a45883214b892f7",
+          "filename": "launch_pal/robot_utils.py",
+          "status": "modified",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/df2840600091af697004808e5fe7964be25dbb6a/launch_pal%2Frobot_utils.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/df2840600091af697004808e5fe7964be25dbb6a/launch_pal%2Frobot_utils.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2Frobot_utils.py?ref=df2840600091af697004808e5fe7964be25dbb6a",
+          "patch": "@@ -13,8 +13,22 @@\n # limitations under the License.\n \n from launch.actions import DeclareLaunchArgument\n+import warnings\n \n \n+def deprecated(func):\n+    def wrapper(*args, **kwargs):\n+        warnings.filterwarnings(\"always\")\n+        warnings.warn(\n+            f\"{func.__name__} is deprecated and will be removed in a future release. \"\n+            \"Please use libraries inside the 'robot_arguments' module instead.\",\n+            DeprecationWarning,\n+        )\n+        return func(*args, **kwargs)\n+    return wrapper\n+\n+\n+@deprecated\n def get_robot_name(default_robot_name='pmb2'):\n     declare_robot_name = DeclareLaunchArgument(\n         'robot_name',\n@@ -25,6 +39,7 @@ def get_robot_name(default_robot_name='pmb2'):\n     return declare_robot_name\n \n \n+@deprecated\n def get_wheel_model(robot):\n     if (robot == 'pmb2') or (robot == 'tiago'):\n         declare_wheel_model = DeclareLaunchArgument(\n@@ -40,6 +55,7 @@ def get_wheel_model(robot):\n     return declare_wheel_model\n \n \n+@deprecated\n def get_laser_model(robot):\n     if (robot == 'pmb2') or (robot == 'tiago') or (robot == 'pmb3') or (robot == 'omni_base'):\n         declare_laser_model = DeclareLaunchArgument(\n@@ -62,6 +78,7 @@ def get_laser_model(robot):\n     return declare_laser_model\n \n \n+@deprecated\n def get_courier_rgbd_sensors(robot):\n     if (robot == 'pmb2'):\n         declare_courier_rgbd_sensors = DeclareLaunchArgument(\n@@ -77,6 +94,7 @@ def get_courier_rgbd_sensors(robot):\n     return declare_courier_rgbd_sensors\n \n \n+@deprecated\n def get_arm(robot):\n     if (robot == 'tiago'):\n         declare_arm = DeclareLaunchArgument(\n@@ -91,6 +109,7 @@ def get_arm(robot):\n     return declare_arm\n \n \n+@deprecated\n def get_wrist_model(robot):\n     if (robot == 'tiago'):\n         declare_wrist_model = DeclareLaunchArgument(\n@@ -106,6 +125,7 @@ def get_wrist_model(robot):\n     return declare_wrist_model\n \n \n+@deprecated\n def get_end_effector(robot):\n     if (robot == 'tiago'):\n         declare_end_effector = DeclareLaunchArgument(\n@@ -129,6 +149,7 @@ def get_end_effector(robot):\n     return declare_end_effector\n \n \n+@deprecated\n def get_ft_sensor(robot):\n     if (robot == 'tiago'):\n         declare_ft_sensor = DeclareLaunchArgument(\n@@ -144,6 +165,7 @@ def get_ft_sensor(robot):\n     return declare_ft_sensor\n \n \n+@deprecated\n def get_camera_model(robot):\n     if (robot == 'tiago'):\n         declare_camera_model = DeclareLaunchArgument(\n@@ -171,6 +193,7 @@ def get_camera_model(robot):\n     return declare_camera_model\n \n \n+@deprecated\n def get_robot_model(robot):\n     if robot == 'ari':\n         declare_robot_model = DeclareLaunchArgument("
+        }
+      ]
+    },
+    {
+      "author": "thomaspeyrucain",
+      "date": "2024-06-05T09:05:16Z",
+      "sha": "54238f1b14f2c83e6f1c5ca3b770b344100205ec",
+      "message": "update lauch args for the omni base",
+      "files_changed": 2,
+      "additions": 11,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "9d809cea61528c33d9a84a28559c86ec389a32df",
+          "filename": "config/omni_base_configuration.yaml",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 1,
+          "changes": 10,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/54238f1b14f2c83e6f1c5ca3b770b344100205ec/config%2Fomni_base_configuration.yaml",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/54238f1b14f2c83e6f1c5ca3b770b344100205ec/config%2Fomni_base_configuration.yaml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/config%2Fomni_base_configuration.yaml?ref=54238f1b14f2c83e6f1c5ca3b770b344100205ec",
+          "patch": "@@ -1,5 +1,13 @@\n omni_base_configuration:\n+  wheel_model:\n+    description: 'Wheel model'\n+    choices: ['moog']\n+    default_value: 'moog'\n   laser_model:\n     description: 'Base laser model'\n     choices: ['no-laser', 'sick-571', 'sick-561', 'sick-551', 'hokuyo']\n-    default_value: 'sick-571'\n\\ No newline at end of file\n+    default_value: 'sick-571'\n+  rgbd_sensors:\n+    description: 'Whether the base has RGBD sensors or not'\n+    choices: ['True', 'False']\n+    default_value: 'False'"
+        },
+        {
+          "sha": "d4e6b58e7bfc8e5e8eec5954eb5cae3f2e0a5fdc",
+          "filename": "launch_pal/robot_arguments/omni_base.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/54238f1b14f2c83e6f1c5ca3b770b344100205ec/launch_pal%2Frobot_arguments%2Fomni_base.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/54238f1b14f2c83e6f1c5ca3b770b344100205ec/launch_pal%2Frobot_arguments%2Fomni_base.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2Frobot_arguments%2Fomni_base.py?ref=54238f1b14f2c83e6f1c5ca3b770b344100205ec",
+          "patch": "@@ -25,4 +25,6 @@\n class OmniBaseArgs:\n     \"\"\"This dataclass contains launch arguments for Omni Base.\"\"\"\n \n+    wheel_model: DLA = create_robot_arg('wheel_model', ROBOT_NAME)\n     laser_model: DLA = create_robot_arg('laser_model', ROBOT_NAME)\n+    rgbd_sensors: DLA = create_robot_arg('rgbd_sensors', ROBOT_NAME)"
+        }
+      ]
+    },
+    {
+      "author": "saikishor",
+      "date": "2024-09-17T09:47:08Z",
+      "sha": "fb7ed7bd25df5814d1e1f6b8e1afa266879e00d0",
+      "message": "add deprecation note to the robot_utils methods",
+      "files_changed": 1,
+      "additions": 23,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e2cf2254406556b216b9d8b09a45883214b892f7",
+          "filename": "launch_pal/robot_utils.py",
+          "status": "modified",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/fb7ed7bd25df5814d1e1f6b8e1afa266879e00d0/launch_pal%2Frobot_utils.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/fb7ed7bd25df5814d1e1f6b8e1afa266879e00d0/launch_pal%2Frobot_utils.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2Frobot_utils.py?ref=fb7ed7bd25df5814d1e1f6b8e1afa266879e00d0",
+          "patch": "@@ -13,8 +13,22 @@\n # limitations under the License.\n \n from launch.actions import DeclareLaunchArgument\n+import warnings\n \n \n+def deprecated(func):\n+    def wrapper(*args, **kwargs):\n+        warnings.filterwarnings(\"always\")\n+        warnings.warn(\n+            f\"{func.__name__} is deprecated and will be removed in a future release. \"\n+            \"Please use libraries inside the 'robot_arguments' module instead.\",\n+            DeprecationWarning,\n+        )\n+        return func(*args, **kwargs)\n+    return wrapper\n+\n+\n+@deprecated\n def get_robot_name(default_robot_name='pmb2'):\n     declare_robot_name = DeclareLaunchArgument(\n         'robot_name',\n@@ -25,6 +39,7 @@ def get_robot_name(default_robot_name='pmb2'):\n     return declare_robot_name\n \n \n+@deprecated\n def get_wheel_model(robot):\n     if (robot == 'pmb2') or (robot == 'tiago'):\n         declare_wheel_model = DeclareLaunchArgument(\n@@ -40,6 +55,7 @@ def get_wheel_model(robot):\n     return declare_wheel_model\n \n \n+@deprecated\n def get_laser_model(robot):\n     if (robot == 'pmb2') or (robot == 'tiago') or (robot == 'pmb3') or (robot == 'omni_base'):\n         declare_laser_model = DeclareLaunchArgument(\n@@ -62,6 +78,7 @@ def get_laser_model(robot):\n     return declare_laser_model\n \n \n+@deprecated\n def get_courier_rgbd_sensors(robot):\n     if (robot == 'pmb2'):\n         declare_courier_rgbd_sensors = DeclareLaunchArgument(\n@@ -77,6 +94,7 @@ def get_courier_rgbd_sensors(robot):\n     return declare_courier_rgbd_sensors\n \n \n+@deprecated\n def get_arm(robot):\n     if (robot == 'tiago'):\n         declare_arm = DeclareLaunchArgument(\n@@ -91,6 +109,7 @@ def get_arm(robot):\n     return declare_arm\n \n \n+@deprecated\n def get_wrist_model(robot):\n     if (robot == 'tiago'):\n         declare_wrist_model = DeclareLaunchArgument(\n@@ -106,6 +125,7 @@ def get_wrist_model(robot):\n     return declare_wrist_model\n \n \n+@deprecated\n def get_end_effector(robot):\n     if (robot == 'tiago'):\n         declare_end_effector = DeclareLaunchArgument(\n@@ -129,6 +149,7 @@ def get_end_effector(robot):\n     return declare_end_effector\n \n \n+@deprecated\n def get_ft_sensor(robot):\n     if (robot == 'tiago'):\n         declare_ft_sensor = DeclareLaunchArgument(\n@@ -144,6 +165,7 @@ def get_ft_sensor(robot):\n     return declare_ft_sensor\n \n \n+@deprecated\n def get_camera_model(robot):\n     if (robot == 'tiago'):\n         declare_camera_model = DeclareLaunchArgument(\n@@ -171,6 +193,7 @@ def get_camera_model(robot):\n     return declare_camera_model\n \n \n+@deprecated\n def get_robot_model(robot):\n     if robot == 'ari':\n         declare_robot_model = DeclareLaunchArgument("
+        }
+      ]
+    },
+    {
+      "author": "adriaroig",
+      "date": "2024-08-06T15:12:00Z",
+      "sha": "8b8a951b3d42c37f63996d922f9a77133ee1e6d8",
+      "message": "Add talos and kangaroo as robots",
+      "files_changed": 1,
+      "additions": 15,
+      "deletions": 4,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "8684f3595b3d91b6aeba412697cb5c08e259a2c1",
+          "filename": "launch_pal/robot_arguments/common.py",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 4,
+          "changes": 19,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/8b8a951b3d42c37f63996d922f9a77133ee1e6d8/launch_pal%2Frobot_arguments%2Fcommon.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/8b8a951b3d42c37f63996d922f9a77133ee1e6d8/launch_pal%2Frobot_arguments%2Fcommon.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2Frobot_arguments%2Fcommon.py?ref=8b8a951b3d42c37f63996d922f9a77133ee1e6d8",
+          "patch": "@@ -31,10 +31,21 @@ class CommonArgs:\n         default_value='',\n         description='Define namespace of the robot.')\n     robot_name: DeclareLaunchArgument = DeclareLaunchArgument(\n-        'robot_name',\n-        default_value='pmb2',\n-        description='Name of the robot. ',\n-        choices=['pmb2', 'tiago', 'tiago_dual', 'pmb3', 'ari', 'omni_base', 'tiago_pro'])\n+        \"robot_name\",\n+        default_value=\"pmb2\",\n+        description=\"Name of the robot. \",\n+        choices=[\n+            \"pmb2\",\n+            \"tiago\",\n+            \"tiago_dual\",\n+            \"pmb3\",\n+            \"ari\",\n+            \"omni_base\",\n+            \"tiago_pro\",\n+            \"talos\",\n+            \"kangaroo\",\n+        ],\n+    )\n     navigation: DeclareLaunchArgument = DeclareLaunchArgument(\n         name='navigation',\n         default_value='False',"
+        }
+      ]
+    },
+    {
+      "author": "Oscar",
+      "date": "2024-03-20T08:39:17Z",
+      "sha": "fcc9ae25d8baacb1290b0ede42e9c0d0b413202f",
+      "message": "Suggested changess",
+      "files_changed": 2,
+      "additions": 10,
+      "deletions": 10,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "d95fa8357e6cb3a1d3b8ad56b08ed7b9cb6a161a",
+          "filename": "config/tiago_sea_configuration.yaml",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 6,
+          "changes": 12,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/fcc9ae25d8baacb1290b0ede42e9c0d0b413202f/config%2Ftiago_sea_configuration.yaml",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/fcc9ae25d8baacb1290b0ede42e9c0d0b413202f/config%2Ftiago_sea_configuration.yaml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/config%2Ftiago_sea_configuration.yaml?ref=fcc9ae25d8baacb1290b0ede42e9c0d0b413202f",
+          "patch": "@@ -1,6 +1,6 @@\n tiago_sea_configuration:\n-  arm_model:\n-    description: 'Arm model'\n+  arm_type:\n+    description: 'Arm type'\n     choices: ['tiago-sea', 'no-arm']\n     default_value: 'tiago-sea'\n   end_effector:\n@@ -19,8 +19,8 @@ tiago_sea_configuration:\n     description: 'Head camera model'\n     choices: ['orbbec-astra', 'orbbec-astra-pro', 'asus-xtion', 'no-camera']\n     default_value: 'orbbec-astra'\n-  base_model:\n-    description: 'Base model'\n+  base_type:\n+    description: 'Base type'\n     choices: ['pmb2', 'omni_base']\n     default_value: 'omni_base'\n   wrist_model:\n@@ -33,5 +33,5 @@ tiago_sea_configuration:\n     default_value: 'moog'\n   has_velodyne:\n     description: 'Has velodyne sensor'\n-    choices: ['false', 'true']\n-    default_value: 'false'\n+    choices: ['False', 'True']\n+    default_value: 'False'"
+        },
+        {
+          "sha": "ce17857c41ca19d10564683690ec2a41843ae0d9",
+          "filename": "config/tiago_sea_dual_configuration.yaml",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 4,
+          "changes": 8,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/fcc9ae25d8baacb1290b0ede42e9c0d0b413202f/config%2Ftiago_sea_dual_configuration.yaml",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/fcc9ae25d8baacb1290b0ede42e9c0d0b413202f/config%2Ftiago_sea_dual_configuration.yaml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/config%2Ftiago_sea_dual_configuration.yaml?ref=fcc9ae25d8baacb1290b0ede42e9c0d0b413202f",
+          "patch": "@@ -41,8 +41,8 @@ tiago_sea_dual_configuration:\n     default_value: 'rokubi'\n   has_screen:\n     description: 'Has screen at torso'\n-    choices: ['false', 'true']\n-    default_value: 'false'\n+    choices: ['False', 'True']\n+    default_value: 'False'\n   base_type:\n     description: 'Base type'\n     choices: ['pmb2', 'omni_base']\n@@ -53,5 +53,5 @@ tiago_sea_dual_configuration:\n     default_value: 'orbbec-astra'\n   has_velodyne:\n     description: 'Has velodyne sensor'\n-    choices: ['false', 'true']\n-    default_value: 'false'\n+    choices: ['False', 'True']\n+    default_value: 'False'"
+        }
+      ]
+    },
+    {
+      "author": "ainairisarri",
+      "date": "2023-12-14T16:45:27Z",
+      "sha": "030117b9c894ec6b8c0e80ccc9eb8b37419ae7cd",
+      "message": "Adding pal_robotiq grippers as part of choises for the end_effector in ros2",
+      "files_changed": 2,
+      "additions": 3,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "2f6a9c8290de14bcc8a09bc717263f90046968b1",
+          "filename": "config/tiago_configuration.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/030117b9c894ec6b8c0e80ccc9eb8b37419ae7cd/config%2Ftiago_configuration.yaml",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/030117b9c894ec6b8c0e80ccc9eb8b37419ae7cd/config%2Ftiago_configuration.yaml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/config%2Ftiago_configuration.yaml?ref=030117b9c894ec6b8c0e80ccc9eb8b37419ae7cd",
+          "patch": "@@ -17,7 +17,7 @@ tiago_configuration:\n     default_value: 'wrist-2010'\n   end_effector:\n     description: 'End effector model'\n-    choices: ['pal-gripper', 'pal-hey5', 'custom', 'no-end-effector']\n+    choices: ['pal-gripper', 'pal-hey5', 'custom', 'no-end-effector', 'robotiq-2f-85','robotiq-2f-140', 'robotiq-epick']\n     default_value: 'pal-gripper'\n   ft_sensor:\n     description: 'FT sensor model'"
+        },
+        {
+          "sha": "411847d2d055dcd054268b49ed731d0f5bb4aa6f",
+          "filename": "launch_pal/robot_utils.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/030117b9c894ec6b8c0e80ccc9eb8b37419ae7cd/launch_pal%2Frobot_utils.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/030117b9c894ec6b8c0e80ccc9eb8b37419ae7cd/launch_pal%2Frobot_utils.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2Frobot_utils.py?ref=030117b9c894ec6b8c0e80ccc9eb8b37419ae7cd",
+          "patch": "@@ -112,7 +112,8 @@ def get_end_effector(robot):\n             'end_effector',\n             default_value='pal-gripper',\n             description='End effector model.',\n-            choices=['pal-gripper', 'pal-hey5', 'custom', 'no-end-effector'])\n+            choices=['pal-gripper', 'pal-hey5', 'custom', 'no-end-effector', 'robotiq-2f-85',\n+                     'robotiq-2f-140', 'robotiq-epick'])\n \n     elif robot == 'ari':\n         declare_end_effector = DeclareLaunchArgument("
+        }
+      ]
+    },
+    {
+      "author": "josegarcia",
+      "date": "2024-06-27T15:48:57Z",
+      "sha": "3d51c92b6d63db1fc9bdbfc59b1068fe73e808fb",
+      "message": "feat: tiago dual support",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "7c9a70febb9d62a10ce2eb2205b2d11d6b19f301",
+          "filename": "launch_pal/robot_utils.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/3d51c92b6d63db1fc9bdbfc59b1068fe73e808fb/launch_pal%2Frobot_utils.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/3d51c92b6d63db1fc9bdbfc59b1068fe73e808fb/launch_pal%2Frobot_utils.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2Frobot_utils.py?ref=3d51c92b6d63db1fc9bdbfc59b1068fe73e808fb",
+          "patch": "@@ -20,7 +20,7 @@ def get_robot_name(default_robot_name='pmb2'):\n         'robot_name',\n         default_value=default_robot_name,\n         description='Name of the robot. ',\n-        choices=['pmb2', 'tiago', 'pmb3', 'ari', 'omni_base', 'tiago_pro'])\n+        choices=['pmb2', 'tiago', 'tiago_dual', 'pmb3', 'ari', 'omni_base', 'tiago_pro'])\n \n     return declare_robot_name\n "
+        }
+      ]
+    },
+    {
+      "author": "Vamsi GUDA",
+      "date": "2024-05-15T16:31:44Z",
+      "sha": "6c3b49e03cf198ccc4fd62083a89585f7f650e1d",
+      "message": "fixed screen parameters, edited configuration and robot argument files",
+      "files_changed": 2,
+      "additions": 5,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "3f2535307928fb80289230296c015a8678e6814f",
+          "filename": "config/tiago_sea_configuration.yaml",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/6c3b49e03cf198ccc4fd62083a89585f7f650e1d/config%2Ftiago_sea_configuration.yaml",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/6c3b49e03cf198ccc4fd62083a89585f7f650e1d/config%2Ftiago_sea_configuration.yaml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/config%2Ftiago_sea_configuration.yaml?ref=6c3b49e03cf198ccc4fd62083a89585f7f650e1d",
+          "patch": "@@ -31,6 +31,10 @@ tiago_sea_configuration:\n     description: 'Wheel model'\n     choices: ['nadia', 'moog']\n     default_value: 'moog'\n+  has_screen:\n+    description: 'Has screen'\n+    choices: ['False', 'True']\n+    default_value: 'False'git \n   has_velodyne:\n     description: 'Has velodyne sensor'\n     choices: ['False', 'True']"
+        },
+        {
+          "sha": "42d5ab424aabe9f4dddf970efb6bafe7c962aaa2",
+          "filename": "launch_pal/robot_arguments/tiago_sea.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/6c3b49e03cf198ccc4fd62083a89585f7f650e1d/launch_pal%2Frobot_arguments%2Ftiago_sea.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/6c3b49e03cf198ccc4fd62083a89585f7f650e1d/launch_pal%2Frobot_arguments%2Ftiago_sea.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2Frobot_arguments%2Ftiago_sea.py?ref=6c3b49e03cf198ccc4fd62083a89585f7f650e1d",
+          "patch": "@@ -36,4 +36,5 @@ class TiagoSEAArgs:\n     laser_model: DLA = create_robot_arg(\"laser_model\", ROBOT_NAME)\n     wrist_model: DLA = create_robot_arg(\"wrist_model\", ROBOT_NAME)\n     wheel_model: DLA = create_robot_arg(\"wheel_model\", ROBOT_NAME)\n+    has_screen: DLA = create_robot_arg('has_screen', ROBOT_NAME)\n     has_velodyne: DLA = create_robot_arg(\"has_velodyne\", ROBOT_NAME)"
+        }
+      ]
+    },
+    {
+      "author": "SergiAcosta",
+      "date": "2024-05-07T13:25:42Z",
+      "sha": "913fa82de792bd6cf838e57a682e279b3b169159",
+      "message": "added tuck arm parameter",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b144f9badd0ee1d17d592e35c4b76726e0da1247",
+          "filename": "launch_pal/arg_utils.py",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/913fa82de792bd6cf838e57a682e279b3b169159/launch_pal%2Farg_utils.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/913fa82de792bd6cf838e57a682e279b3b169159/launch_pal%2Farg_utils.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2Farg_utils.py?ref=913fa82de792bd6cf838e57a682e279b3b169159",
+          "patch": "@@ -56,6 +56,11 @@ class CommonArgs:\n         default_value='False',\n         choices=['True', 'False'],\n         description='Use moveit_sensor_manager for octomap')\n+    tuck_arm: DeclareLaunchArgument = DeclareLaunchArgument(\n+        name='tuck_arm',\n+        default_value='True',\n+        choices=['True', 'False'],\n+        description='Launches tuck arm node')\n \n \n @dataclass(frozen=True, kw_only=True)"
+        }
+      ]
+    },
+    {
+      "author": "Oscar Martinez",
+      "date": "2024-03-18T08:43:17Z",
+      "sha": "c58574624510ca62009ce2b86e4d650c0edbc483",
+      "message": "Standarized config names",
+      "files_changed": 2,
+      "additions": 9,
+      "deletions": 9,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b16bf1265f212a7a14a4ade1a7f3534b33b93dfc",
+          "filename": "config/tiago_sea_configuration.yaml",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 7,
+          "changes": 14,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/c58574624510ca62009ce2b86e4d650c0edbc483/config%2Ftiago_sea_configuration.yaml",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/c58574624510ca62009ce2b86e4d650c0edbc483/config%2Ftiago_sea_configuration.yaml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/config%2Ftiago_sea_configuration.yaml?ref=c58574624510ca62009ce2b86e4d650c0edbc483",
+          "patch": "@@ -1,8 +1,8 @@\n tiago_sea_configuration:\n-  arm_type:\n-    description: 'Arm type'\n-    choices: ['sea', 'no-arm']\n-    default_value: 'sea'\n+  arm_model:\n+    description: 'Arm model'\n+    choices: ['tiago-sea', 'no-arm']\n+    default_value: 'tiago-sea'\n   end_effector:\n     description: 'End effector model'\n     choices: ['custom', 'no-end-effector', 'pal-pro-gripper']\n@@ -19,10 +19,10 @@ tiago_sea_configuration:\n     description: 'Head camera model'\n     choices: ['orbbec-astra', 'orbbec-astra-pro', 'asus-xtion', 'no-camera']\n     default_value: 'orbbec-astra'\n-  base_type:\n-    description: 'Base type'\n+  base_model:\n+    description: 'Base model'\n     choices: ['pmb2', 'omni_base']\n-    default_value: 'pmb2'\n+    default_value: 'omni_base'\n   wrist_model:\n     description: \"Wrist model\"\n     choices: ['spherical-wrist']"
+        },
+        {
+          "sha": "243f68dc8d7749c6892f3c9cca1ebb6a505f7712",
+          "filename": "launch_pal/robot_arguments/tiago_sea.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/c58574624510ca62009ce2b86e4d650c0edbc483/launch_pal%2Frobot_arguments%2Ftiago_sea.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/c58574624510ca62009ce2b86e4d650c0edbc483/launch_pal%2Frobot_arguments%2Ftiago_sea.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2Frobot_arguments%2Ftiago_sea.py?ref=c58574624510ca62009ce2b86e4d650c0edbc483",
+          "patch": "@@ -28,8 +28,8 @@\n class TiagoSEAArgs:\n     \"\"\"This dataclass contains launch arguments for TIAGo SEA.\"\"\"\n \n-    base_type: DLA = create_robot_arg(\"base_type\", ROBOT_NAME)\n-    arm_type: DLA = create_robot_arg(\"arm_type\", ROBOT_NAME)\n+    base_model: DLA = create_robot_arg(\"base_model\", ROBOT_NAME)\n+    arm_model: DLA = create_robot_arg(\"arm_model\", ROBOT_NAME)\n     end_effector: DLA = create_robot_arg(\"end_effector\", ROBOT_NAME)\n     ft_sensor: DLA = create_robot_arg(\"ft_sensor\", ROBOT_NAME)\n     camera_model: DLA = create_robot_arg(\"camera_model\", ROBOT_NAME)"
+        }
+      ]
+    },
+    {
+      "author": "ileniaperrella",
+      "date": "2024-01-17T15:03:46Z",
+      "sha": "e9366ba898420384a452f88904473f2b1faa2050",
+      "message": "tiago_pro robot_name added in the possible choices",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b68fd34e3b44a484d0798392e4d734700456434f",
+          "filename": "launch_pal/robot_utils.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/e9366ba898420384a452f88904473f2b1faa2050/launch_pal%2Frobot_utils.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/e9366ba898420384a452f88904473f2b1faa2050/launch_pal%2Frobot_utils.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2Frobot_utils.py?ref=e9366ba898420384a452f88904473f2b1faa2050",
+          "patch": "@@ -20,7 +20,7 @@ def get_robot_name(default_robot_name='pmb2'):\n         'robot_name',\n         default_value=default_robot_name,\n         description='Name of the robot. ',\n-        choices=['pmb2', 'tiago', 'pmb3', 'ari', 'omni_base'])\n+        choices=['pmb2', 'tiago', 'pmb3', 'ari', 'omni_base', 'tiago_pro'])\n \n     return declare_robot_name\n "
+        }
+      ]
+    },
+    {
+      "author": "jordan-palacios",
+      "date": "2021-03-15T14:25:16Z",
+      "sha": "a7945478a9c98d7e7f4cc633779cf88cd95e55e3",
+      "message": "Added changelog",
+      "files_changed": 1,
+      "additions": 11,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "4ea9929e832db8b8a71089efe1ce12049704caac",
+          "filename": "CHANGELOG.rst",
+          "status": "added",
+          "additions": 11,
+          "deletions": 0,
+          "changes": 11,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/a7945478a9c98d7e7f4cc633779cf88cd95e55e3/CHANGELOG.rst",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/a7945478a9c98d7e7f4cc633779cf88cd95e55e3/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/CHANGELOG.rst?ref=a7945478a9c98d7e7f4cc633779cf88cd95e55e3",
+          "patch": "@@ -0,0 +1,11 @@\n+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n+Changelog for package launch_pal\n+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n+\n+Forthcoming\n+-----------\n+* Add CONTRIBUTING and LICENSE\n+* Apply linter fixes\n+* Add param_utils\n+* PAL utils for ROS2 launch files\n+* Contributors: Victor Lopez"
+        }
+      ]
+    },
+    {
+      "author": "YueErro",
+      "date": "2023-10-05T11:03:13Z",
+      "sha": "427e0ffdb4a048427c422a7f0a3debfc3af03aef",
+      "message": "feat: Add pmb3 utils",
+      "files_changed": 1,
+      "additions": 8,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "72082e04cc4139a1ab4370cdf225c2700cf5d898",
+          "filename": "launch_pal/robot_utils.py",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 3,
+          "changes": 11,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/427e0ffdb4a048427c422a7f0a3debfc3af03aef/launch_pal%2Frobot_utils.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/427e0ffdb4a048427c422a7f0a3debfc3af03aef/launch_pal%2Frobot_utils.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2Frobot_utils.py?ref=427e0ffdb4a048427c422a7f0a3debfc3af03aef",
+          "patch": "@@ -20,7 +20,7 @@ def get_robot_name(default_robot_name='pmb2'):\n         'robot_name',\n         default_value=default_robot_name,\n         description='Name of the robot. ',\n-        choices=['pmb2', 'tiago'])\n+        choices=['pmb2', 'tiago', 'pmb3'])\n \n     return declare_robot_name\n \n@@ -40,7 +40,7 @@ def get_wheel_model(robot):\n \n \n def get_laser_model(robot):\n-    if (robot == 'pmb2') or (robot == 'tiago'):\n+    if (robot == 'pmb2') or (robot == 'tiago') or (robot == 'pmb3'):\n         declare_laser_model = DeclareLaunchArgument(\n             'laser_model',\n             default_value='sick-571',\n@@ -130,7 +130,12 @@ def get_camera_model(robot):\n             default_value='orbbec-astra',\n             description='Head camera model. ',\n             choices=['no-camera', 'orbbec-astra', 'orbbec-astra-pro', 'asus-xtion'])\n-\n+    elif (robot == 'pmb3'):\n+        declare_camera_model = DeclareLaunchArgument(\n+            'camera_model',\n+            default_value='realsense-d435',\n+            description='Base cameras model',\n+            choices=['realsense-d435'])\n     else:\n         raise ValueError('The robot ' + robot + ' has not the argument camera_model')\n "
+        }
+      ]
+    },
+    {
+      "author": "Victor Lopez",
+      "date": "2021-02-15T13:30:31Z",
+      "sha": "5ef3f063fec8fcf3f274b19e138a69ba2507a6cc",
+      "message": "Initial commit",
+      "files_changed": 10,
+      "additions": 182,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "950c4f3ec70bdbda2d2536c24a26d4c0fc7dfa03",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/5ef3f063fec8fcf3f274b19e138a69ba2507a6cc/README.md",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/5ef3f063fec8fcf3f274b19e138a69ba2507a6cc/README.md",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/README.md?ref=5ef3f063fec8fcf3f274b19e138a69ba2507a6cc",
+          "patch": "@@ -0,0 +1,3 @@\n+# launch_pal\n+\n+Utilities for simplifying some  common ROS2 launch operations.\n\\ No newline at end of file"
+        },
+        {
+          "sha": "13be9947e21c87938fe2d2f676f2a3295f5c0504",
+          "filename": "launch_pal/__init__.py",
+          "status": "added",
+          "additions": 19,
+          "deletions": 0,
+          "changes": 19,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/5ef3f063fec8fcf3f274b19e138a69ba2507a6cc/launch_pal%2F__init__.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/5ef3f063fec8fcf3f274b19e138a69ba2507a6cc/launch_pal%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2F__init__.py?ref=5ef3f063fec8fcf3f274b19e138a69ba2507a6cc",
+          "patch": "@@ -0,0 +1,19 @@\n+# Copyright (c) 2021 PAL Robotics S.L.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from . import include_utils \n+\n+__all__ = [\n+    'include_utils',\n+]"
+        },
+        {
+          "sha": "2ae04638ab4e44fc7e81b9d6d285cc23e85602ee",
+          "filename": "launch_pal/include_utils.py",
+          "status": "added",
+          "additions": 42,
+          "deletions": 0,
+          "changes": 42,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/5ef3f063fec8fcf3f274b19e138a69ba2507a6cc/launch_pal%2Finclude_utils.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/5ef3f063fec8fcf3f274b19e138a69ba2507a6cc/launch_pal%2Finclude_utils.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2Finclude_utils.py?ref=5ef3f063fec8fcf3f274b19e138a69ba2507a6cc",
+          "patch": "@@ -0,0 +1,42 @@\n+# Copyright (c) 2021 PAL Robotics S.L.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_index_python.packages import get_package_share_directory\n+\n+from launch.actions import IncludeLaunchDescription\n+from launch.substitutions import PathJoinSubstitution\n+from launch.launch_description_sources import PythonLaunchDescriptionSource\n+\n+import os\n+\n+from typing import List\n+from typing import Text\n+\n+def include_launch_py_description(\n+        pkg_name: Text,\n+        paths: List[Text],\n+        **kwargs) -> Text:\n+    \"\"\" \n+    Return IncludeLaunchDescription for the file inside pkg at paths\n+    example:\n+     include_launch_py_description('my_pkg', ['launch', 'my_file.launch.py'])\n+     returns file IncludeLaunchDescription from PATH_TO_MY_PKG_SHARE/launch/my_file.launch.py\n+    \"\"\"\n+    pkg_dir = get_package_share_directory(pkg_name)\n+    full_path = os.path.join(pkg_dir, *paths)\n+\n+    return IncludeLaunchDescription(\n+        PythonLaunchDescriptionSource(\n+            full_path),\n+        **kwargs)"
+        },
+        {
+          "sha": "bea4a663270c202b27f85f1b5d74f5de865df8e0",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 18,
+          "deletions": 0,
+          "changes": 18,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/5ef3f063fec8fcf3f274b19e138a69ba2507a6cc/package.xml",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/5ef3f063fec8fcf3f274b19e138a69ba2507a6cc/package.xml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/package.xml?ref=5ef3f063fec8fcf3f274b19e138a69ba2507a6cc",
+          "patch": "@@ -0,0 +1,18 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n+  <name>launch_pal</name>\n+  <version>0.0.0</version>\n+  <description>Utilities for launch files</description>\n+  <maintainer email=\"victor.lopez@pal-robotics.com\">user</maintainer>\n+  <license>Apache</license>\n+\n+  <test_depend>ament_copyright</test_depend>\n+  <test_depend>ament_flake8</test_depend>\n+  <test_depend>ament_pep257</test_depend>\n+  <test_depend>python3-pytest</test_depend>\n+\n+  <export>\n+    <build_type>ament_python</build_type>\n+  </export>\n+</package>"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "resource/launch_pal",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/5ef3f063fec8fcf3f274b19e138a69ba2507a6cc/resource%2Flaunch_pal",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/5ef3f063fec8fcf3f274b19e138a69ba2507a6cc/resource%2Flaunch_pal",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/resource%2Flaunch_pal?ref=5ef3f063fec8fcf3f274b19e138a69ba2507a6cc"
+        },
+        {
+          "sha": "79593d3c11b65be03258b7cdeb93f31b9c30e130",
+          "filename": "setup.cfg",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/5ef3f063fec8fcf3f274b19e138a69ba2507a6cc/setup.cfg",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/5ef3f063fec8fcf3f274b19e138a69ba2507a6cc/setup.cfg",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/setup.cfg?ref=5ef3f063fec8fcf3f274b19e138a69ba2507a6cc",
+          "patch": "@@ -0,0 +1,4 @@\n+[develop]\n+script-dir=$base/lib/launch_pal\n+[install]\n+install-scripts=$base/lib/launch_pal"
+        },
+        {
+          "sha": "98a4f3116e2e4654e2f6f314a67d8db1d94bee87",
+          "filename": "setup.py",
+          "status": "added",
+          "additions": 25,
+          "deletions": 0,
+          "changes": 25,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/5ef3f063fec8fcf3f274b19e138a69ba2507a6cc/setup.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/5ef3f063fec8fcf3f274b19e138a69ba2507a6cc/setup.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/setup.py?ref=5ef3f063fec8fcf3f274b19e138a69ba2507a6cc",
+          "patch": "@@ -0,0 +1,25 @@\n+from setuptools import setup\n+\n+package_name = 'launch_pal'\n+\n+setup(\n+    name=package_name,\n+    version='0.0.0',\n+    packages=[package_name],\n+    data_files=[\n+        ('share/ament_index/resource_index/packages',\n+            ['resource/' + package_name]),\n+        ('share/' + package_name, ['package.xml']),\n+    ],\n+    install_requires=['setuptools'],\n+    zip_safe=True,\n+    maintainer='user',\n+    maintainer_email='victor.lopez@pal-robotics.com',\n+    description='TODO: Package description',\n+    license='TODO: License declaration',\n+    tests_require=['pytest'],\n+    entry_points={\n+        'console_scripts': [\n+        ],\n+    },\n+)"
+        },
+        {
+          "sha": "cc8ff03f79abb8eb061827a24f2a331e052c5c37",
+          "filename": "test/test_copyright.py",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/5ef3f063fec8fcf3f274b19e138a69ba2507a6cc/test%2Ftest_copyright.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/5ef3f063fec8fcf3f274b19e138a69ba2507a6cc/test%2Ftest_copyright.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/test%2Ftest_copyright.py?ref=5ef3f063fec8fcf3f274b19e138a69ba2507a6cc",
+          "patch": "@@ -0,0 +1,23 @@\n+# Copyright 2015 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_copyright.main import main\n+import pytest\n+\n+\n+@pytest.mark.copyright\n+@pytest.mark.linter\n+def test_copyright():\n+    rc = main(argv=['.', 'test'])\n+    assert rc == 0, 'Found errors'"
+        },
+        {
+          "sha": "27ee1078ff077cc3a0fec75b7d023101a68164d1",
+          "filename": "test/test_flake8.py",
+          "status": "added",
+          "additions": 25,
+          "deletions": 0,
+          "changes": 25,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/5ef3f063fec8fcf3f274b19e138a69ba2507a6cc/test%2Ftest_flake8.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/5ef3f063fec8fcf3f274b19e138a69ba2507a6cc/test%2Ftest_flake8.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/test%2Ftest_flake8.py?ref=5ef3f063fec8fcf3f274b19e138a69ba2507a6cc",
+          "patch": "@@ -0,0 +1,25 @@\n+# Copyright 2017 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_flake8.main import main_with_errors\n+import pytest\n+\n+\n+@pytest.mark.flake8\n+@pytest.mark.linter\n+def test_flake8():\n+    rc, errors = main_with_errors(argv=[])\n+    assert rc == 0, \\\n+        'Found %d code style errors / warnings:\\n' % len(errors) + \\\n+        '\\n'.join(errors)"
+        },
+        {
+          "sha": "b234a3840f4c5bd38f043638c8622b8f240e1185",
+          "filename": "test/test_pep257.py",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/5ef3f063fec8fcf3f274b19e138a69ba2507a6cc/test%2Ftest_pep257.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/5ef3f063fec8fcf3f274b19e138a69ba2507a6cc/test%2Ftest_pep257.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/test%2Ftest_pep257.py?ref=5ef3f063fec8fcf3f274b19e138a69ba2507a6cc",
+          "patch": "@@ -0,0 +1,23 @@\n+# Copyright 2015 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_pep257.main import main\n+import pytest\n+\n+\n+@pytest.mark.linter\n+@pytest.mark.pep257\n+def test_pep257():\n+    rc = main(argv=['.', 'test'])\n+    assert rc == 0, 'Found code style errors / warnings'"
+        }
+      ]
+    },
+    {
+      "author": "victor",
+      "date": "2021-08-10T08:36:03Z",
+      "sha": "cc82071754b8e89950f3d346bf1dcd499214e6d1",
+      "message": "Merge branch 'change_include_utils_to_substitutions' into 'master'\n\nChange Text type to substitutions for include utils\n\nSee merge request common/launch_pal!1",
+      "files_changed": 2,
+      "additions": 8,
+      "deletions": 4,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "2916fbf5c31b57502ba5917768af969473c29de4",
+          "filename": "launch_pal/include_utils.py",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 4,
+          "changes": 11,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/cc82071754b8e89950f3d346bf1dcd499214e6d1/launch_pal%2Finclude_utils.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/cc82071754b8e89950f3d346bf1dcd499214e6d1/launch_pal%2Finclude_utils.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2Finclude_utils.py?ref=cc82071754b8e89950f3d346bf1dcd499214e6d1",
+          "patch": "@@ -16,6 +16,9 @@\n \n from launch.actions import IncludeLaunchDescription\n from launch.launch_description_sources import PythonLaunchDescriptionSource\n+from launch.substitutions import PathJoinSubstitution\n+from launch import SomeSubstitutionsType\n+from launch_ros.substitutions import FindPackageShare\n \n import os\n \n@@ -24,8 +27,8 @@\n \n \n def include_launch_py_description(\n-        pkg_name: Text,\n-        paths: List[Text],\n+        pkg_name: SomeSubstitutionsType,\n+        paths: List[SomeSubstitutionsType],\n         **kwargs) -> Text:\n     \"\"\"\n     Return IncludeLaunchDescription for the file inside pkg at paths.\n@@ -34,8 +37,8 @@ def include_launch_py_description(\n      include_launch_py_description('my_pkg', ['launch', 'my_file.launch.py'])\n      returns file IncludeLaunchDescription from PATH_TO_MY_PKG_SHARE/launch/my_file.launch.py\n     \"\"\"\n-    pkg_dir = get_package_share_directory(pkg_name)\n-    full_path = os.path.join(pkg_dir, *paths)\n+    pkg_dir = FindPackageShare(pkg_name)\n+    full_path = PathJoinSubstitution([pkg_dir] + paths)\n \n     return IncludeLaunchDescription(\n         PythonLaunchDescriptionSource("
+        },
+        {
+          "sha": "021f4dee11576733a871294964b19808c25c6745",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/cc82071754b8e89950f3d346bf1dcd499214e6d1/package.xml",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/cc82071754b8e89950f3d346bf1dcd499214e6d1/package.xml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/package.xml?ref=cc82071754b8e89950f3d346bf1dcd499214e6d1",
+          "patch": "@@ -9,6 +9,7 @@\n \n   <depend>ament_index_python</depend>\n   <depend>launch</depend>\n+  <depend>launch_ros</depend>\n   <depend>python3-yaml</depend>\n \n   <test_depend>ament_copyright</test_depend>"
+        }
+      ]
+    },
+    {
+      "author": "cesc-folch",
+      "date": "2021-07-30T09:54:07Z",
+      "sha": "2ac7c2a24e4bcb4491c7aff0ae9a250e7f057024",
+      "message": "change Text type to substitutions",
+      "files_changed": 2,
+      "additions": 8,
+      "deletions": 4,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "2916fbf5c31b57502ba5917768af969473c29de4",
+          "filename": "launch_pal/include_utils.py",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 4,
+          "changes": 11,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/2ac7c2a24e4bcb4491c7aff0ae9a250e7f057024/launch_pal%2Finclude_utils.py",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/2ac7c2a24e4bcb4491c7aff0ae9a250e7f057024/launch_pal%2Finclude_utils.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/launch_pal%2Finclude_utils.py?ref=2ac7c2a24e4bcb4491c7aff0ae9a250e7f057024",
+          "patch": "@@ -16,6 +16,9 @@\n \n from launch.actions import IncludeLaunchDescription\n from launch.launch_description_sources import PythonLaunchDescriptionSource\n+from launch.substitutions import PathJoinSubstitution\n+from launch import SomeSubstitutionsType\n+from launch_ros.substitutions import FindPackageShare\n \n import os\n \n@@ -24,8 +27,8 @@\n \n \n def include_launch_py_description(\n-        pkg_name: Text,\n-        paths: List[Text],\n+        pkg_name: SomeSubstitutionsType,\n+        paths: List[SomeSubstitutionsType],\n         **kwargs) -> Text:\n     \"\"\"\n     Return IncludeLaunchDescription for the file inside pkg at paths.\n@@ -34,8 +37,8 @@ def include_launch_py_description(\n      include_launch_py_description('my_pkg', ['launch', 'my_file.launch.py'])\n      returns file IncludeLaunchDescription from PATH_TO_MY_PKG_SHARE/launch/my_file.launch.py\n     \"\"\"\n-    pkg_dir = get_package_share_directory(pkg_name)\n-    full_path = os.path.join(pkg_dir, *paths)\n+    pkg_dir = FindPackageShare(pkg_name)\n+    full_path = PathJoinSubstitution([pkg_dir] + paths)\n \n     return IncludeLaunchDescription(\n         PythonLaunchDescriptionSource("
+        },
+        {
+          "sha": "021f4dee11576733a871294964b19808c25c6745",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/pal-robotics/launch_pal/blob/2ac7c2a24e4bcb4491c7aff0ae9a250e7f057024/package.xml",
+          "raw_url": "https://github.com/pal-robotics/launch_pal/raw/2ac7c2a24e4bcb4491c7aff0ae9a250e7f057024/package.xml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/launch_pal/contents/package.xml?ref=2ac7c2a24e4bcb4491c7aff0ae9a250e7f057024",
+          "patch": "@@ -9,6 +9,7 @@\n \n   <depend>ament_index_python</depend>\n   <depend>launch</depend>\n+  <depend>launch_ros</depend>\n   <depend>python3-yaml</depend>\n \n   <test_depend>ament_copyright</test_depend>"
+        }
+      ]
+    }
+  ]
+}

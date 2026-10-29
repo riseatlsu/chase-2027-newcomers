@@ -1,0 +1,229 @@
+{
+  "_meta": {
+    "fetched_at": "2026-09-24T14:51:29Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "bdaiinstitute",
+    "repo": "proto2ros",
+    "refreshed_at": "2026-09-24T14:51:29Z",
+    "refresh_note": "incrementally added 1 author(s) missing from a prior stale cache"
+  },
+  "data": [
+    {
+      "author": "adamwhats",
+      "date": "2025-11-25T13:45:46Z",
+      "sha": "0cc24714f99d1538d20fc25c9312d6199c3ce662",
+      "message": "Fix optional fields in proto3 (#16)\n\n* Initial fix for optional field handling\n\nSigned-off-by: adamwhats <adamlwatts@msn.com>\n\n* Whitespace fix\n\nSigned-off-by: adamwhats <adamlwatts@msn.com>\n\n* Slight tidy up and add Python test\n\nSigned-off-by: adamwhats <adamlwatts@msn.com>\n\n* Update proto2ros_tests/proto/CMakeLists.txt to support optional fields on humble\n\nSigned-off-by: adamwhats <adamlwatts@msn.com>\n\n* Use bitmask for better tests\n\nSigned-off-by: adamwhats <adamlwatts@msn.com>\n\n---------\n\nSigned-off-by: adamwhats <adamlwatts@msn.com>",
+      "files_changed": 8,
+      "additions": 104,
+      "deletions": 19,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "bb62a5f8d4495849c3b6416856d7a9fa381f7f56",
+          "filename": "proto2ros/README.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 2,
+          "changes": 3,
+          "blob_url": "https://github.com/bdaiinstitute/proto2ros/blob/0cc24714f99d1538d20fc25c9312d6199c3ce662/proto2ros%2FREADME.md",
+          "raw_url": "https://github.com/bdaiinstitute/proto2ros/raw/0cc24714f99d1538d20fc25c9312d6199c3ce662/proto2ros%2FREADME.md",
+          "contents_url": "https://api.github.com/repos/bdaiinstitute/proto2ros/contents/proto2ros%2FREADME.md?ref=0cc24714f99d1538d20fc25c9312d6199c3ce662",
+          "patch": "@@ -711,8 +711,7 @@ ament_export_targets(${PROJECT_NAME})\n \n ament_package()\n ```\n-\n-[`proto2ros_tests`](https://github.com/bdaiinstitute/proto2ros/tree/main/proto2ros_tests) is a good example of this.\n+__NOTE__: proto3 optional fields require the `--experimental_allow_proto3_optional` flag for protobuf versions 3.12-3.14. `proto2ros_generate()` handles this automatically. However, if you use `protobuf_generate()` directly in your own code, note that it does not support passing this flag in CMake < 3.28. See [`proto2ros_tests`](https://github.com/bdaiinstitute/proto2ros/tree/main/proto2ros_tests) for an example of calling `protoc` directly as a workaround.\n \n ### ROS 2 vendored Protobuf messages\n "
+        },
+        {
+          "sha": "bb956f3b5e376944998daa850694fd1be195c710",
+          "filename": "proto2ros/cmake/proto2ros_generate.cmake",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/bdaiinstitute/proto2ros/blob/0cc24714f99d1538d20fc25c9312d6199c3ce662/proto2ros%2Fcmake%2Fproto2ros_generate.cmake",
+          "raw_url": "https://github.com/bdaiinstitute/proto2ros/raw/0cc24714f99d1538d20fc25c9312d6199c3ce662/proto2ros%2Fcmake%2Fproto2ros_generate.cmake",
+          "contents_url": "https://api.github.com/repos/bdaiinstitute/proto2ros/contents/proto2ros%2Fcmake%2Fproto2ros_generate.cmake?ref=0cc24714f99d1538d20fc25c9312d6199c3ce662",
+          "patch": "@@ -62,6 +62,9 @@ function(proto2ros_generate target)\n \n   if(ARG_PROTOS)\n     set(protoc_options --include_source_info)\n+    if(Protobuf_VERSION VERSION_GREATER_EQUAL \"3.12\" AND Protobuf_VERSION VERSION_LESS \"3.15\")\n+      list(APPEND protoc_options --experimental_allow_proto3_optional)\n+    endif()\n     set(proto_descriptor \"${CMAKE_CURRENT_BINARY_DIR}/${target}.desc\")\n     foreach(proto ${ARG_PROTOS})\n       get_filename_component(proto_path \"${proto}\" ABSOLUTE)"
+        },
+        {
+          "sha": "38ec77c4a9ebeee3824273f22e3ca90900d5a0dd",
+          "filename": "proto2ros/proto2ros/equivalences.py",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 1,
+          "changes": 8,
+          "blob_url": "https://github.com/bdaiinstitute/proto2ros/blob/0cc24714f99d1538d20fc25c9312d6199c3ce662/proto2ros%2Fproto2ros%2Fequivalences.py",
+          "raw_url": "https://github.com/bdaiinstitute/proto2ros/raw/0cc24714f99d1538d20fc25c9312d6199c3ce662/proto2ros%2Fproto2ros%2Fequivalences.py",
+          "contents_url": "https://api.github.com/repos/bdaiinstitute/proto2ros/contents/proto2ros%2Fproto2ros%2Fequivalences.py?ref=0cc24714f99d1538d20fc25c9312d6199c3ce662",
+          "patch": "@@ -362,7 +362,8 @@ def compute_equivalence_for_message(\n             field = translate_field(field_descriptor, source, field_location, config)\n             if field_descriptor.HasField(\"oneof_index\"):\n                 oneof_field_sets[field_descriptor.oneof_index].append(field)\n-                continue\n+                if not field_descriptor.proto3_optional:\n+                    continue\n \n             if field.annotations[\"optional\"]:\n                 mask_name = field.name.upper() + \"_FIELD_SET\"\n@@ -374,6 +375,11 @@ def compute_equivalence_for_message(\n             locate_repeated(\"oneof_decl\", descriptor),\n             oneof_field_sets,\n         ):\n+\n+            # Skip synthetic oneofs\n+            if oneof_decl.name.startswith(\"_\"):\n+                continue\n+\n             oneof_name = inflection.underscore(oneof_decl.name)\n             oneof_type_name = inflection.camelize(f\"{name}_one_of_{oneof_name}\")\n             oneof_type = Type(f\"{ros_package_name}/{oneof_type_name}\")"
+        },
+        {
+          "sha": "e65cef38c31b473693ca5199e5e21db7ce6d95dd",
+          "filename": "proto2ros_tests/proto/CMakeLists.txt",
+          "status": "modified",
+          "additions": 44,
+          "deletions": 16,
+          "changes": 60,
+          "blob_url": "https://github.com/bdaiinstitute/proto2ros/blob/0cc24714f99d1538d20fc25c9312d6199c3ce662/proto2ros_tests%2Fproto%2FCMakeLists.txt",
+          "raw_url": "https://github.com/bdaiinstitute/proto2ros/raw/0cc24714f99d1538d20fc25c9312d6199c3ce662/proto2ros_tests%2Fproto%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/bdaiinstitute/proto2ros/contents/proto2ros_tests%2Fproto%2FCMakeLists.txt?ref=0cc24714f99d1538d20fc25c9312d6199c3ce662",
+          "patch": "@@ -1,30 +1,58 @@\n # Copyright (c) 2023 Robotics and AI Institute LLC dba RAI Institute. All rights reserved.\n find_package(Protobuf REQUIRED)\n \n+get_executable_path(PROTOC_EXECUTABLE protobuf::protoc CONFIGURE)\n+\n+set(protoc_options -I${CMAKE_CURRENT_SOURCE_DIR})\n+if(Protobuf_VERSION VERSION_GREATER_EQUAL \"3.12\" AND Protobuf_VERSION VERSION_LESS \"3.15\")\n+  list(APPEND protoc_options --experimental_allow_proto3_optional)\n+endif()\n+\n file(MAKE_DIRECTORY \"${CMAKE_CURRENT_BINARY_DIR}/bosdyn/api\")\n file(TOUCH \"${CMAKE_CURRENT_BINARY_DIR}/bosdyn/__init__.py\")\n file(TOUCH \"${CMAKE_CURRENT_BINARY_DIR}/bosdyn/api/__init__.py\")\n \n-protobuf_generate(\n-  LANGUAGE python\n-  OUT_VAR bosdyn_proto_py_sources\n-  PROTOS bosdyn/api/geometry.proto\n+set(bosdyn_proto_py_sources \"${CMAKE_CURRENT_BINARY_DIR}/bosdyn/api/geometry_pb2.py\")\n+set(proto_py_sources \"${CMAKE_CURRENT_BINARY_DIR}/test_pb2.py\")\n+set(bosdyn_proto_cpp_sources\n+  \"${CMAKE_CURRENT_BINARY_DIR}/bosdyn/api/geometry.pb.cc\"\n+  \"${CMAKE_CURRENT_BINARY_DIR}/bosdyn/api/geometry.pb.h\"\n )\n-protobuf_generate(\n-  LANGUAGE python\n-  OUT_VAR proto_py_sources\n-  PROTOS test.proto\n+set(proto_cpp_sources\n+  \"${CMAKE_CURRENT_BINARY_DIR}/test.pb.cc\"\n+  \"${CMAKE_CURRENT_BINARY_DIR}/test.pb.h\"\n+)\n+\n+add_custom_command(\n+  OUTPUT ${bosdyn_proto_py_sources}\n+  COMMAND ${PROTOC_EXECUTABLE} ${protoc_options} --python_out=${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/bosdyn/api/geometry.proto\n+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/bosdyn/api/geometry.proto\n+  COMMENT \"Generate Python protobuf for bosdyn/api/geometry.proto\"\n+  VERBATIM\n )\n \n-protobuf_generate(\n-  LANGUAGE cpp\n-  OUT_VAR bosdyn_proto_cpp_sources\n-  PROTOS bosdyn/api/geometry.proto\n+add_custom_command(\n+  OUTPUT ${proto_py_sources}\n+  COMMAND ${PROTOC_EXECUTABLE} ${protoc_options} --python_out=${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/test.proto\n+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/test.proto\n+  COMMENT \"Generate Python protobuf for test.proto\"\n+  VERBATIM\n )\n-protobuf_generate(\n-  LANGUAGE cpp\n-  OUT_VAR proto_cpp_sources\n-  PROTOS test.proto\n+\n+add_custom_command(\n+  OUTPUT ${bosdyn_proto_cpp_sources}\n+  COMMAND ${PROTOC_EXECUTABLE} ${protoc_options} --cpp_out=${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/bosdyn/api/geometry.proto\n+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/bosdyn/api/geometry.proto\n+  COMMENT \"Generate C++ protobuf for bosdyn/api/geometry.proto\"\n+  VERBATIM\n+)\n+\n+add_custom_command(\n+  OUTPUT ${proto_cpp_sources}\n+  COMMAND ${PROTOC_EXECUTABLE} ${protoc_options} --cpp_out=${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/test.proto\n+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/test.proto\n+  COMMENT \"Generate C++ protobuf for test.proto\"\n+  VERBATIM\n )\n \n add_library(${PROJECT_NAME}_proto SHARED ${proto_cpp_sources} ${bosdyn_proto_cpp_sources})"
+        },
+        {
+          "sha": "fb37e156e09332ef0ffda328e565b48b486df3c7",
+          "filename": "proto2ros_tests/proto/test.proto",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/bdaiinstitute/proto2ros/blob/0cc24714f99d1538d20fc25c9312d6199c3ce662/proto2ros_tests%2Fproto%2Ftest.proto",
+          "raw_url": "https://github.com/bdaiinstitute/proto2ros/raw/0cc24714f99d1538d20fc25c9312d6199c3ce662/proto2ros_tests%2Fproto%2Ftest.proto",
+          "contents_url": "https://api.github.com/repos/bdaiinstitute/proto2ros/contents/proto2ros_tests%2Fproto%2Ftest.proto?ref=0cc24714f99d1538d20fc25c9312d6199c3ce662",
+          "patch": "@@ -35,6 +35,7 @@ message Temperature {\n message HVACControlRequest {\n     double air_flow_rate = 1;\n     Temperature temperature_setpoint = 2;\n+    optional double humidity_setpoint = 3;\n }\n \n // Binary recursive fragment."
+        },
+        {
+          "sha": "4e350a884a29db4a5651c048447691e3299f91b0",
+          "filename": "proto2ros_tests/test/generated/HVACControlRequest.msg",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/bdaiinstitute/proto2ros/blob/0cc24714f99d1538d20fc25c9312d6199c3ce662/proto2ros_tests%2Ftest%2Fgenerated%2FHVACControlRequest.msg",
+          "raw_url": "https://github.com/bdaiinstitute/proto2ros/raw/0cc24714f99d1538d20fc25c9312d6199c3ce662/proto2ros_tests%2Ftest%2Fgenerated%2FHVACControlRequest.msg",
+          "contents_url": "https://api.github.com/repos/bdaiinstitute/proto2ros/contents/proto2ros_tests%2Ftest%2Fgenerated%2FHVACControlRequest.msg?ref=0cc24714f99d1538d20fc25c9312d6199c3ce662",
+          "patch": "@@ -1,7 +1,9 @@\n # A control request for an HVAC system.\n \n uint8 TEMPERATURE_SETPOINT_FIELD_SET=2\n+uint8 HUMIDITY_SETPOINT_FIELD_SET=4\n \n float64 air_flow_rate\n sensor_msgs/Temperature temperature_setpoint\n+float64 humidity_setpoint\n uint8 has_field 255"
+        },
+        {
+          "sha": "0f2a09daf07073fd574393ed22c12e8531e4a196",
+          "filename": "proto2ros_tests/test/test_proto2ros.cpp",
+          "status": "modified",
+          "additions": 25,
+          "deletions": 0,
+          "changes": 25,
+          "blob_url": "https://github.com/bdaiinstitute/proto2ros/blob/0cc24714f99d1538d20fc25c9312d6199c3ce662/proto2ros_tests%2Ftest%2Ftest_proto2ros.cpp",
+          "raw_url": "https://github.com/bdaiinstitute/proto2ros/raw/0cc24714f99d1538d20fc25c9312d6199c3ce662/proto2ros_tests%2Ftest%2Ftest_proto2ros.cpp",
+          "contents_url": "https://api.github.com/repos/bdaiinstitute/proto2ros/contents/proto2ros_tests%2Ftest%2Ftest_proto2ros.cpp?ref=0cc24714f99d1538d20fc25c9312d6199c3ce662",
+          "patch": "@@ -440,6 +440,31 @@ TEST(Proto2RosTesting, MessagesWithSubMessageMapField) {\n   EXPECT_EQ(other_proto_fragment.grid(), proto_fragment.grid());\n }\n \n+TEST(Proto2RosTesting, MessagesWithOptionalFields) {\n+  auto proto_request = proto2ros_tests::HVACControlRequest();\n+\n+  auto ros_request_none_set = proto2ros_tests::msg::HVACControlRequest();\n+  Convert(proto_request, &ros_request_none_set);\n+\n+  proto_request.set_humidity_setpoint(60.0);\n+  auto ros_request_one_set = proto2ros_tests::msg::HVACControlRequest();\n+  Convert(proto_request, &ros_request_one_set);\n+\n+  auto *setpoint = proto_request.mutable_temperature_setpoint();\n+  setpoint->set_value(25.0);\n+  setpoint->set_scale(proto2ros_tests::Temperature::CELSIUS);\n+  auto ros_request_two_set = proto2ros_tests::msg::HVACControlRequest();\n+  Convert(proto_request, &ros_request_two_set);\n+\n+  EXPECT_EQ(ros_request_none_set.has_field, 0);\n+  EXPECT_TRUE(ros_request_one_set.has_field &\n+              ros_request_one_set.HUMIDITY_SETPOINT_FIELD_SET);\n+  EXPECT_TRUE(ros_request_two_set.has_field &\n+              ros_request_two_set.HUMIDITY_SETPOINT_FIELD_SET);\n+  EXPECT_TRUE(ros_request_two_set.has_field &\n+              ros_request_two_set.TEMPERATURE_SETPOINT_FIELD_SET);\n+}\n+\n TEST(Proto2RosTesting, MessagesWithAnyFields) {\n   auto proto_matrix = proto2ros_tests::Matrix();\n   proto_matrix.set_rows(1);"
+        },
+        {
+          "sha": "3119280a5f03df44d3a56386a1766cfe20eaaeb2",
+          "filename": "proto2ros_tests/test/test_proto2ros.py",
+          "status": "modified",
+          "additions": 21,
+          "deletions": 0,
+          "changes": 21,
+          "blob_url": "https://github.com/bdaiinstitute/proto2ros/blob/0cc24714f99d1538d20fc25c9312d6199c3ce662/proto2ros_tests%2Ftest%2Ftest_proto2ros.py",
+          "raw_url": "https://github.com/bdaiinstitute/proto2ros/raw/0cc24714f99d1538d20fc25c9312d6199c3ce662/proto2ros_tests%2Ftest%2Ftest_proto2ros.py",
+          "contents_url": "https://api.github.com/repos/bdaiinstitute/proto2ros/contents/proto2ros_tests%2Ftest%2Ftest_proto2ros.py?ref=0cc24714f99d1538d20fc25c9312d6199c3ce662",
+          "patch": "@@ -300,6 +300,27 @@ def test_messages_with_submessage_map_field() -> None:\n     assert other_proto_fragment.grid == proto_fragment.grid\n \n \n+def test_messages_with_optional_fields() -> None:\n+    proto_request = test_pb2.HVACControlRequest()\n+\n+    ros_request_none_set = proto2ros_tests.msg.HVACControlRequest()\n+    convert(proto_request, ros_request_none_set)\n+\n+    proto_request.humidity_setpoint = 60.0\n+    ros_request_one_set = proto2ros_tests.msg.HVACControlRequest()\n+    convert(proto_request, ros_request_one_set)\n+\n+    proto_request.temperature_setpoint.value = 25.0\n+    proto_request.temperature_setpoint.scale = test_pb2.Temperature.Scale.CELSIUS\n+    ros_request_two_set = proto2ros_tests.msg.HVACControlRequest()\n+    convert(proto_request, ros_request_two_set)\n+\n+    assert ros_request_none_set.has_field == 0\n+    assert ros_request_one_set.has_field & ros_request_one_set.HUMIDITY_SETPOINT_FIELD_SET\n+    assert ros_request_two_set.has_field & ros_request_one_set.HUMIDITY_SETPOINT_FIELD_SET\n+    assert ros_request_two_set.has_field & ros_request_one_set.TEMPERATURE_SETPOINT_FIELD_SET\n+\n+\n def test_messages_with_any_fields() -> None:\n     proto_matrix = test_pb2.Matrix()\n     proto_matrix.rows = 1"
+        }
+      ]
+    },
+    {
+      "author": "mhidalgo-rai",
+      "date": "2024-10-31T13:43:50Z",
+      "sha": "34283bc20e9ee346189ad8ce3b1a35cedb023b73",
+      "message": "Add LICENSE to repository\n\nSigned-off-by: Michel Hidalgo <mhidalgo@theaiinstitute.com>",
+      "files_changed": 1,
+      "additions": 21,
+      "deletions": 0,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "aa696ca443f3709cc908ef81ffd1df9b14e23aed",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 21,
+          "deletions": 0,
+          "changes": 21,
+          "blob_url": "https://github.com/bdaiinstitute/proto2ros/blob/34283bc20e9ee346189ad8ce3b1a35cedb023b73/LICENSE",
+          "raw_url": "https://github.com/bdaiinstitute/proto2ros/raw/34283bc20e9ee346189ad8ce3b1a35cedb023b73/LICENSE",
+          "contents_url": "https://api.github.com/repos/bdaiinstitute/proto2ros/contents/LICENSE?ref=34283bc20e9ee346189ad8ce3b1a35cedb023b73",
+          "patch": "@@ -0,0 +1,21 @@\n+MIT License\n+\n+Copyright (c) 2023 Boston Dynamics AI Institute\n+\n+Permission is hereby granted, free of charge, to any person obtaining a copy\n+of this software and associated documentation files (the \"Software\"), to deal\n+in the Software without restriction, including without limitation the rights\n+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n+copies of the Software, and to permit persons to whom the Software is\n+furnished to do so, subject to the following conditions:\n+\n+The above copyright notice and this permission notice shall be included in all\n+copies or substantial portions of the Software.\n+\n+THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n+SOFTWARE."
+        }
+      ]
+    },
+    {
+      "author": "baxelrod-bdai",
+      "date": "2025-01-09T20:36:15Z",
+      "sha": "e770cbc5f23b6bf29fe78682e270d9da7119af72",
+      "message": "pin ubuntu version in workflows (#9)\n\nSigned-off-by: Ben Axelrod <baxelrod@theaiinstitute.com>",
+      "files_changed": 2,
+      "additions": 4,
+      "deletions": 4,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "20d1112c8b39f804c60d05de7e5b737e619dc7b7",
+          "filename": ".github/workflows/ci.yml",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/bdaiinstitute/proto2ros/blob/e770cbc5f23b6bf29fe78682e270d9da7119af72/.github%2Fworkflows%2Fci.yml",
+          "raw_url": "https://github.com/bdaiinstitute/proto2ros/raw/e770cbc5f23b6bf29fe78682e270d9da7119af72/.github%2Fworkflows%2Fci.yml",
+          "contents_url": "https://api.github.com/repos/bdaiinstitute/proto2ros/contents/.github%2Fworkflows%2Fci.yml?ref=e770cbc5f23b6bf29fe78682e270d9da7119af72",
+          "patch": "@@ -21,7 +21,7 @@ concurrency:\n jobs:\n   lint:\n     name: Lint proto2ros packages\n-    runs-on: ubuntu-latest\n+    runs-on: ubuntu-22.04\n     steps:\n       - name: Checkout repository\n         uses: actions/checkout@v3\n@@ -30,7 +30,7 @@ jobs:\n         uses: pre-commit/action@v3.0.0\n   prepare_container:\n     name: Prepare Humble container for tests\n-    runs-on: ubuntu-latest\n+    runs-on: ubuntu-22.04\n     needs: lint\n     permissions:\n       contents: read\n@@ -72,7 +72,7 @@ jobs:\n           cache-to: type=gha,mode=max\n   build_and_test:\n     name: Build and test proto2ros packages\n-    runs-on: ubuntu-latest\n+    runs-on: ubuntu-22.04\n     needs: prepare_container\n     container:\n       image: ${{ needs.prepare_container.outputs.image }}"
+        },
+        {
+          "sha": "e09447c4fb96cbd6c7084cda3b152759bf746eb6",
+          "filename": ".github/workflows/maintenance.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/bdaiinstitute/proto2ros/blob/e770cbc5f23b6bf29fe78682e270d9da7119af72/.github%2Fworkflows%2Fmaintenance.yaml",
+          "raw_url": "https://github.com/bdaiinstitute/proto2ros/raw/e770cbc5f23b6bf29fe78682e270d9da7119af72/.github%2Fworkflows%2Fmaintenance.yaml",
+          "contents_url": "https://api.github.com/repos/bdaiinstitute/proto2ros/contents/.github%2Fworkflows%2Fmaintenance.yaml?ref=e770cbc5f23b6bf29fe78682e270d9da7119af72",
+          "patch": "@@ -11,7 +11,7 @@ env:\n jobs:\n   clean-ghcr:\n     name: Prune old images from Github Container Registry\n-    runs-on: ubuntu-latest\n+    runs-on: ubuntu-22.04\n     steps:\n       - name: Delete old pull request images\n         uses: snok/container-retention-policy@v2"
+        }
+      ]
+    },
+    {
+      "author": "jbarry-bdai",
+      "date": "2026-04-28T19:57:35Z",
+      "sha": "4c414831ea42781e1daee26050fa54946e55918c",
+      "message": "Update for migration to new org (#18)\n\n* Update for migration to new org\n\n* Apply suggestion from @tcappellari-bdai\n\nCo-authored-by: Tiffany Cappellari <156013635+tcappellari-bdai@users.noreply.github.com>\nSigned-off-by: Jenny Barry <116907872+jbarry-bdai@users.noreply.github.com>\n\n---------\n\nSigned-off-by: Jenny Barry <116907872+jbarry-bdai@users.noreply.github.com>\nCo-authored-by: Tiffany Cappellari <156013635+tcappellari-bdai@users.noreply.github.com>",
+      "files_changed": 3,
+      "additions": 25,
+      "deletions": 8,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "442a4117c2e5817dd602ae57b0629995ee07e3e7",
+          "filename": "CONTRIBUTING.md",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 6,
+          "changes": 12,
+          "blob_url": "https://github.com/rai-opensource/proto2ros/blob/4c414831ea42781e1daee26050fa54946e55918c/CONTRIBUTING.md",
+          "raw_url": "https://github.com/rai-opensource/proto2ros/raw/4c414831ea42781e1daee26050fa54946e55918c/CONTRIBUTING.md",
+          "contents_url": "https://api.github.com/repos/rai-opensource/proto2ros/contents/CONTRIBUTING.md?ref=4c414831ea42781e1daee26050fa54946e55918c",
+          "patch": "@@ -23,11 +23,11 @@ All types of contributions are encouraged and valued. See the [Table of Contents\n \n ## I Have a Question\n \n-Before you ask a question, it is best to search for existing [issues](https://github.com/bdaiinstitute/proto2ros/issues) that might help you. In case you have found a suitable issue and still need clarification, you can write your question in this issue. It is also advisable to search the internet for answers first.\n+Before you ask a question, it is best to search for existing [issues](https://github.com/rai-opensource/proto2ros/issues) that might help you. In case you have found a suitable issue and still need clarification, you can write your question in this issue. It is also advisable to search the internet for answers first.\n \n If you then still feel the need to ask a question and need clarification, we recommend the following:\n \n-- Open an [issue](https://github.com/bdaiinstitute/proto2ros/issues/new).\n+- Open an [issue](https://github.com/rai-opensource/proto2ros/issues/new).\n - Provide as much context as you can about what you're running into.\n - Provide project and platform versions (nodejs, npm, etc), depending on what seems relevant.\n \n@@ -47,7 +47,7 @@ A good bug report shouldn't leave others needing to chase you up for more inform\n \n - Make sure that you are using the latest version.\n - Determine if your bug is really a bug and not an error on your side. If you are looking for support, you might want to check [this section](#i-have-a-question)).\n-- To see if other users have experienced (and potentially already solved) the same issue you are having, check if there is not already a bug report existing for your bug or error in the [bug tracker](https://github.com/bdaiinstitute/proto2ros/issues?q=label%3Abug).\n+- To see if other users have experienced (and potentially already solved) the same issue you are having, check if there is not already a bug report existing for your bug or error in the [bug tracker](https://github.com/rai-opensource/proto2ros/issues?q=label%3Abug).\n - Collect information about the bug:\n   - Stack trace (Traceback)\n   - OS, ROS, Platform and Version (Windows, Linux, macOS, x86, ARM)\n@@ -60,7 +60,7 @@ A good bug report shouldn't leave others needing to chase you up for more inform\n \n We use GitHub issues to track bugs and errors. If you run into an issue with the project:\n \n-- Open an [issue](https://github.com/bdaiinstitute/proto2ros/issues/new).\n+- Open an [issue](https://github.com/rai-opensource/proto2ros/issues/new).\n - Explain the behavior you would expect and the actual behavior.\n - Please provide as much context as possible and describe the *reproduction steps* that someone else can follow to recreate the issue on their own. This usually includes your code. For good bug reports you should isolate the problem and create a reduced test case.\n - Provide the information you collected in the previous section.\n@@ -78,13 +78,13 @@ Once it's filed:\n \n - Make sure that you are using the latest version.\n - Read the documentation carefully and ensure the functionality is indeed missing.\n-- Perform a [search](https://github.com/bdaiinstitute/proto2ros/issues) to see if the feature has already been requested. If it has, add a comment to the existing issue instead of opening a new one.\n+- Perform a [search](https://github.com/rai-opensource/proto2ros/issues) to see if the feature has already been requested. If it has, add a comment to the existing issue instead of opening a new one.\n - Find out whether your idea fits with the scope and aims of the project. It's up to you to make a strong case to convince the project's developers of the merits of this feature. Keep in mind that we want features that will be useful to the majority of our users and not just a small subset. If you're just targeting a minority of users, consider writing an add-on/plugin library.\n \n <!-- omit in toc -->\n #### How Do I Submit a Good Feature Request?\n \n-Feature requests are tracked as [GitHub issues](https://github.com/bdaiinstitute/proto2ros/issues).\n+Feature requests are tracked as [GitHub issues](https://github.com/rai-opensource/proto2ros/issues).\n \n - Use a **clear and descriptive title** for the issue to identify the suggestion.\n - Provide a **step-by-step description of the suggested enhancement** in as many details as possible."
+        },
+        {
+          "sha": "3a20a36fa9d924da855e1971085dda50557389f5",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 17,
+          "deletions": 0,
+          "changes": 17,
+          "blob_url": "https://github.com/rai-opensource/proto2ros/blob/4c414831ea42781e1daee26050fa54946e55918c/README.md",
+          "raw_url": "https://github.com/rai-opensource/proto2ros/raw/4c414831ea42781e1daee26050fa54946e55918c/README.md",
+          "contents_url": "https://api.github.com/repos/rai-opensource/proto2ros/contents/README.md?ref=4c414831ea42781e1daee26050fa54946e55918c",
+          "patch": "@@ -3,6 +3,23 @@\n ![Python Support](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)\n ![ROS Support](https://img.shields.io/badge/ROS-humble%20%7C%20jazzy-blue)\n \n+# Repository Migration Notice\n+\n+> [!IMPORTANT]\n+> This repository has moved to the **RAI-Opensource** GitHub organization!\n+>\n+> Current status: **Migrated**.\n+> - Migration target org: https://github.com/RAI-Opensource\n+> - Previous target org: https://github.com/bdaiinstitute\n+>\n+> What to do now:\n+> - Update your git remote:\n+>   ```bash\n+>   git remote set-url origin https://github.com/RAI-Opensource/proto2ros\n+>   ```\n+> - If you maintain downstream docs/scripts, update links from this repository to the new org.\n+\n+\n ## Overview\n \n `proto2ros` helps maintain an interoperability layer between Protobuf dependent and ROS 2 aware code by generating equivalent ROS 2 message definitions given source Protobuf message definitions, as well bi-directional conversion APIs in relevant languages such as C++ and Python. To date, Protobuf syntax versions 2 and 3 are supported but only syntax version 3 has been extensively tested."
+        },
+        {
+          "sha": "e4c6718048fd07333dcbf19af4982201d8813660",
+          "filename": "proto2ros/README.md",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/rai-opensource/proto2ros/blob/4c414831ea42781e1daee26050fa54946e55918c/proto2ros%2FREADME.md",
+          "raw_url": "https://github.com/rai-opensource/proto2ros/raw/4c414831ea42781e1daee26050fa54946e55918c/proto2ros%2FREADME.md",
+          "contents_url": "https://api.github.com/repos/rai-opensource/proto2ros/contents/proto2ros%2FREADME.md?ref=4c414831ea42781e1daee26050fa54946e55918c",
+          "patch": "@@ -711,7 +711,7 @@ ament_export_targets(${PROJECT_NAME})\n \n ament_package()\n ```\n-__NOTE__: proto3 optional fields require the `--experimental_allow_proto3_optional` flag for protobuf versions 3.12-3.14. `proto2ros_generate()` handles this automatically. However, if you use `protobuf_generate()` directly in your own code, note that it does not support passing this flag in CMake < 3.28. See [`proto2ros_tests`](https://github.com/bdaiinstitute/proto2ros/tree/main/proto2ros_tests) for an example of calling `protoc` directly as a workaround.\n+__NOTE__: proto3 optional fields require the `--experimental_allow_proto3_optional` flag for protobuf versions 3.12-3.14. `proto2ros_generate()` handles this automatically. However, if you use `protobuf_generate()` directly in your own code, note that it does not support passing this flag in CMake < 3.28. See [`proto2ros_tests`](https://github.com/rai-opensource/proto2ros/tree/main/proto2ros_tests) for an example of calling `protoc` directly as a workaround.\n \n ### ROS 2 vendored Protobuf messages\n \n@@ -748,4 +748,4 @@ proto2ros_vendor_package(${PROJECT_NAME}\n ament_package()\n ```\n \n-[`bosdyn_msgs`](https://github.com/bdaiinstitute/bosdyn_msgs) is a good example of this.\n+[`bosdyn_msgs`](https://github.com/rai-opensource/bosdyn_msgs) is a good example of this."
+        }
+      ]
+    }
+  ]
+}

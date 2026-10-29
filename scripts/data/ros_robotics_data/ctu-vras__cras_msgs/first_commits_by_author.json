@@ -1,0 +1,71 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T07:01:35Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ctu-vras",
+    "repo": "cras_msgs"
+  },
+  "data": [
+    {
+      "author": "peci1",
+      "date": "2021-09-05T20:00:51Z",
+      "sha": "38616f061cea90c9926ff5d6937c64b9b5c6f5ea",
+      "message": "Initial commit",
+      "files_changed": 4,
+      "additions": 72,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "05e249a227200726e30cf3150495a841b22bdb83",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 29,
+          "deletions": 0,
+          "changes": 29,
+          "blob_url": "https://github.com/ctu-vras/cras_msgs/blob/38616f061cea90c9926ff5d6937c64b9b5c6f5ea/CMakeLists.txt",
+          "raw_url": "https://github.com/ctu-vras/cras_msgs/raw/38616f061cea90c9926ff5d6937c64b9b5c6f5ea/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ctu-vras/cras_msgs/contents/CMakeLists.txt?ref=38616f061cea90c9926ff5d6937c64b9b5c6f5ea",
+          "patch": "@@ -0,0 +1,29 @@\n+cmake_minimum_required(VERSION 3.0.2)\n+project(cras_msgs)\n+\n+find_package(catkin REQUIRED COMPONENTS\n+  message_generation\n+  sensor_msgs\n+  std_msgs\n+)\n+\n+find_package(Boost REQUIRED)\n+\n+add_message_files(FILES\n+  Heartbeat.msg\n+)\n+\n+generate_messages(DEPENDENCIES\n+  std_msgs\n+)\n+\n+catkin_package(\n+  INCLUDE_DIRS include\n+  CATKIN_DEPENDS message_runtime sensor_msgs std_msgs\n+  DEPENDS Boost\n+)\n+\n+install(DIRECTORY include/${PROJECT_NAME}/\n+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}\n+  FILES_MATCHING PATTERN \"*.h\"\n+)"
+        },
+        {
+          "sha": "b52f6a9e5907542705850688a7d41b08b507a97e",
+          "filename": "include/cras_msgs/pool_allocated_sensor_msgs.h",
+          "status": "added",
+          "additions": 17,
+          "deletions": 0,
+          "changes": 17,
+          "blob_url": "https://github.com/ctu-vras/cras_msgs/blob/38616f061cea90c9926ff5d6937c64b9b5c6f5ea/include%2Fcras_msgs%2Fpool_allocated_sensor_msgs.h",
+          "raw_url": "https://github.com/ctu-vras/cras_msgs/raw/38616f061cea90c9926ff5d6937c64b9b5c6f5ea/include%2Fcras_msgs%2Fpool_allocated_sensor_msgs.h",
+          "contents_url": "https://api.github.com/repos/ctu-vras/cras_msgs/contents/include%2Fcras_msgs%2Fpool_allocated_sensor_msgs.h?ref=38616f061cea90c9926ff5d6937c64b9b5c6f5ea",
+          "patch": "@@ -0,0 +1,17 @@\n+#pragma once\n+\n+#include <boost/pool/pool_alloc.hpp>\n+\n+#include <sensor_msgs/LaserScan.h>\n+#include <sensor_msgs/PointCloud2.h>\n+\n+#include <ros/message_forward.h>\n+\n+//! Use this message type to allocate messages' buffers (vectors) from a shared pool of memory,\n+//! which should result in much lower cost of frequent allocations.\n+\n+namespace sensor_msgs // we cannot change the namespace to cras_msgs :(\n+{\n+ROS_DECLARE_MESSAGE_WITH_ALLOCATOR(LaserScan, LaserScanPoolAllocated, boost::pool_allocator)\n+ROS_DECLARE_MESSAGE_WITH_ALLOCATOR(PointCloud2, PointCloud2PoolAllocated, boost::pool_allocator)\n+}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "1f83c0ba237834e1617d94e6800f66d30b3cbd49",
+          "filename": "msg/Heartbeat.msg",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ctu-vras/cras_msgs/blob/38616f061cea90c9926ff5d6937c64b9b5c6f5ea/msg%2FHeartbeat.msg",
+          "raw_url": "https://github.com/ctu-vras/cras_msgs/raw/38616f061cea90c9926ff5d6937c64b9b5c6f5ea/msg%2FHeartbeat.msg",
+          "contents_url": "https://api.github.com/repos/ctu-vras/cras_msgs/contents/msg%2FHeartbeat.msg?ref=38616f061cea90c9926ff5d6937c64b9b5c6f5ea",
+          "patch": "@@ -0,0 +1 @@\n+Header header\n\\ No newline at end of file"
+        },
+        {
+          "sha": "c9d2fe9254b8c98133c87f291e8e7d0da4280aeb",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 25,
+          "deletions": 0,
+          "changes": 25,
+          "blob_url": "https://github.com/ctu-vras/cras_msgs/blob/38616f061cea90c9926ff5d6937c64b9b5c6f5ea/package.xml",
+          "raw_url": "https://github.com/ctu-vras/cras_msgs/raw/38616f061cea90c9926ff5d6937c64b9b5c6f5ea/package.xml",
+          "contents_url": "https://api.github.com/repos/ctu-vras/cras_msgs/contents/package.xml?ref=38616f061cea90c9926ff5d6937c64b9b5c6f5ea",
+          "patch": "@@ -0,0 +1,25 @@\n+<?xml version=\"1.0\"?>\n+<package format=\"2\">\n+  <name>cras_msgs</name>\n+  <version>1.0.0</version>\n+  <description>Common messages used by CRAS</description>\n+\n+  <author email=\"peckama2@fel.cvut.cz\">Martin Pecka</author>\n+  <maintainer email=\"peckama2@fel.cvut.cz\">Martin Pecka</maintainer>\n+\n+  <license>BSD</license>\n+\n+  <buildtool_depend>catkin</buildtool_depend>\n+  \n+  <build_depend>message_generation</build_depend>\n+  <build_export_depend>message_runtime</build_export_depend>\n+  <exec_depend>message_runtime</exec_depend>\n+  \n+  <build_depend>libboost-dev</build_depend>\n+  <build_export_depend>libboost-dev</build_export_depend>\n+  \n+  <build_depend>sensor_msgs</build_depend>\n+  <build_export_depend>sensor_msgs</build_export_depend>\n+  \n+  <depend>std_msgs</depend>\n+</package>"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T06:50:14Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "joshnewans",
+    "repo": "twist_stamper"
+  },
+  "data": [
+    {
+      "author": "Josh Newans",
+      "date": "2024-11-16T01:57:20Z",
+      "sha": "373acc013b8559d4d5dadf686649d5238b812f3d",
+      "message": "Further improvements to shutdown handling",
+      "files_changed": 2,
+      "additions": 18,
+      "deletions": 4,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "828281f5b08518d7cfe42f954d56f61c9d7b1957",
+          "filename": "twist_stamper/twist_stamper.py",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 2,
+          "changes": 11,
+          "blob_url": "https://github.com/joshnewans/twist_stamper/blob/373acc013b8559d4d5dadf686649d5238b812f3d/twist_stamper%2Ftwist_stamper.py",
+          "raw_url": "https://github.com/joshnewans/twist_stamper/raw/373acc013b8559d4d5dadf686649d5238b812f3d/twist_stamper%2Ftwist_stamper.py",
+          "contents_url": "https://api.github.com/repos/joshnewans/twist_stamper/contents/twist_stamper%2Ftwist_stamper.py?ref=373acc013b8559d4d5dadf686649d5238b812f3d",
+          "patch": "@@ -14,6 +14,7 @@\n \n import rclpy\n from rclpy.node import Node\n+from rclpy.executors import ExternalShutdownException\n \n from std_msgs.msg import Header\n from geometry_msgs.msg import Twist\n@@ -37,6 +38,8 @@ def __init__(self):\n             10)\n         self.subscription  # prevent unused variable warning\n \n+        print(f\"Started twist_stamper!\")\n+\n     def listener_callback(self, inMsg):\n         outMsg = TwistStamped()\n         outMsg.header = Header()\n@@ -55,10 +58,14 @@ def main(args=None):\n     try:\n         rclpy.spin(twist_stamper)\n     except KeyboardInterrupt:\n-        pass\n+        print(\"Recieved keyboard interrupt!\")\n+    except ExternalShutdownException:\n+        print(\"Recieved external shutdown request!\")\n+\n+    print(f\"Exiting...\")\n \n     twist_stamper.destroy_node()\n-    rclpy.shutdown()\n+    rclpy.try_shutdown()\n \n \n if __name__ == '__main__':"
+        },
+        {
+          "sha": "cbc2ad3f8fec519f0f133b864eb8dd84cf944111",
+          "filename": "twist_stamper/twist_unstamper.py",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 2,
+          "changes": 11,
+          "blob_url": "https://github.com/joshnewans/twist_stamper/blob/373acc013b8559d4d5dadf686649d5238b812f3d/twist_stamper%2Ftwist_unstamper.py",
+          "raw_url": "https://github.com/joshnewans/twist_stamper/raw/373acc013b8559d4d5dadf686649d5238b812f3d/twist_stamper%2Ftwist_unstamper.py",
+          "contents_url": "https://api.github.com/repos/joshnewans/twist_stamper/contents/twist_stamper%2Ftwist_unstamper.py?ref=373acc013b8559d4d5dadf686649d5238b812f3d",
+          "patch": "@@ -14,6 +14,7 @@\n \n import rclpy\n from rclpy.node import Node\n+from rclpy.executors import ExternalShutdownException\n \n from geometry_msgs.msg import Twist\n from geometry_msgs.msg import TwistStamped\n@@ -33,6 +34,8 @@ def __init__(self):\n             10)\n         self.subscription  # prevent unused variable warning\n \n+        print(f\"Started twist_unstamper!\")\n+\n     def listener_callback(self, inMsg):\n \n         self.publisher_.publish(inMsg.twist)\n@@ -46,10 +49,14 @@ def main(args=None):\n     try:\n         rclpy.spin(twist_unstamper)\n     except KeyboardInterrupt:\n-        pass\n+        print(\"Recieved keyboard interrupt!\")\n+    except ExternalShutdownException:\n+        print(\"Recieved external shutdown request!\")\n+\n+    print(f\"Exiting...\")\n \n     twist_unstamper.destroy_node()\n-    rclpy.shutdown()\n+    rclpy.try_shutdown()\n \n \n if __name__ == '__main__':"
+        }
+      ]
+    },
+    {
+      "author": "reinzor",
+      "date": "2024-11-16T01:25:47Z",
+      "sha": "da9e4b9c040f4107cb97d295fcbb87dc937e2766",
+      "message": "fix(shutdown): clean shutdown on keyboard interrupt (#6)",
+      "files_changed": 2,
+      "additions": 8,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e85f66e873ade8558c1a1bf6dbd01d5f4f342c54",
+          "filename": "twist_stamper/twist_stamper.py",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 1,
+          "changes": 5,
+          "blob_url": "https://github.com/joshnewans/twist_stamper/blob/da9e4b9c040f4107cb97d295fcbb87dc937e2766/twist_stamper%2Ftwist_stamper.py",
+          "raw_url": "https://github.com/joshnewans/twist_stamper/raw/da9e4b9c040f4107cb97d295fcbb87dc937e2766/twist_stamper%2Ftwist_stamper.py",
+          "contents_url": "https://api.github.com/repos/joshnewans/twist_stamper/contents/twist_stamper%2Ftwist_stamper.py?ref=da9e4b9c040f4107cb97d295fcbb87dc937e2766",
+          "patch": "@@ -52,7 +52,10 @@ def main(args=None):\n     rclpy.init(args=args)\n \n     twist_stamper = TwistStamper()\n-    rclpy.spin(twist_stamper)\n+    try:\n+        rclpy.spin(twist_stamper)\n+    except KeyboardInterrupt:\n+        pass\n \n     twist_stamper.destroy_node()\n     rclpy.shutdown()"
+        },
+        {
+          "sha": "abfbc813f5a44ce66e331ea89b85e29d5c4e613f",
+          "filename": "twist_stamper/twist_unstamper.py",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 1,
+          "changes": 5,
+          "blob_url": "https://github.com/joshnewans/twist_stamper/blob/da9e4b9c040f4107cb97d295fcbb87dc937e2766/twist_stamper%2Ftwist_unstamper.py",
+          "raw_url": "https://github.com/joshnewans/twist_stamper/raw/da9e4b9c040f4107cb97d295fcbb87dc937e2766/twist_stamper%2Ftwist_unstamper.py",
+          "contents_url": "https://api.github.com/repos/joshnewans/twist_stamper/contents/twist_stamper%2Ftwist_unstamper.py?ref=da9e4b9c040f4107cb97d295fcbb87dc937e2766",
+          "patch": "@@ -43,7 +43,10 @@ def main(args=None):\n     rclpy.init(args=args)\n \n     twist_unstamper = TwistUnstamper()\n-    rclpy.spin(twist_unstamper)\n+    try:\n+        rclpy.spin(twist_unstamper)\n+    except KeyboardInterrupt:\n+        pass\n \n     twist_unstamper.destroy_node()\n     rclpy.shutdown()"
+        }
+      ]
+    },
+    {
+      "author": "Rick-v-E",
+      "date": "2024-04-16T11:02:17Z",
+      "sha": "50f4b5604e72b4bf1bf81e27d86d94b14353668d",
+      "message": "Fix deprecation warning (#3)",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "c14f41b8a132e15fa5df5fced414efd4dcc6b513",
+          "filename": "twist_stamper/twist_stamper.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/joshnewans/twist_stamper/blob/50f4b5604e72b4bf1bf81e27d86d94b14353668d/twist_stamper%2Ftwist_stamper.py",
+          "raw_url": "https://github.com/joshnewans/twist_stamper/raw/50f4b5604e72b4bf1bf81e27d86d94b14353668d/twist_stamper%2Ftwist_stamper.py",
+          "contents_url": "https://api.github.com/repos/joshnewans/twist_stamper/contents/twist_stamper%2Ftwist_stamper.py?ref=50f4b5604e72b4bf1bf81e27d86d94b14353668d",
+          "patch": "@@ -25,8 +25,8 @@ class TwistStamper(Node):\n     def __init__(self):\n         super().__init__('twist_stamper')\n \n-        self.declare_parameter(\"frame_id\")\n-        self.frame_id = self.get_parameter(\"frame_id\").get_parameter_value().string_value\n+        self.declare_parameter(\"frame_id\", \"\")\n+        self.frame_id = str(self.get_parameter(\"frame_id\").value)\n \n         self.publisher_ = self.create_publisher(TwistStamped, 'cmd_vel_out', 10)\n "
+        }
+      ]
+    },
+    {
+      "author": "joshnewans",
+      "date": "2021-01-23T04:59:35Z",
+      "sha": "9ef42ab6223fa48bd716da6eb158a6f1624c3950",
+      "message": "Initial commit",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "cc9462aa46c35fcd851fa2962b80270461b9e17b",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/joshnewans/twist_stamper/blob/9ef42ab6223fa48bd716da6eb158a6f1624c3950/README.md",
+          "raw_url": "https://github.com/joshnewans/twist_stamper/raw/9ef42ab6223fa48bd716da6eb158a6f1624c3950/README.md",
+          "contents_url": "https://api.github.com/repos/joshnewans/twist_stamper/contents/README.md?ref=9ef42ab6223fa48bd716da6eb158a6f1624c3950",
+          "patch": "@@ -0,0 +1,2 @@\n+# twist_stamper\n+ROS2 package for converting Twist messages to TwistStamped"
+        }
+      ]
+    },
+    {
+      "author": "niemsoen",
+      "date": "2022-07-26T23:29:44Z",
+      "sha": "32e0eed68c76d9d3fa64b54e8313aa9a6d6bd99d",
+      "message": "fix python setuptools install error (#1)\n\nCo-authored-by: Sönke Niemann <soenke.niemann@ipk.fraunhofer.de>",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "4ac1aa06f4a45052cd9b9be9ff12f7457b283068",
+          "filename": "setup.cfg",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/joshnewans/twist_stamper/blob/32e0eed68c76d9d3fa64b54e8313aa9a6d6bd99d/setup.cfg",
+          "raw_url": "https://github.com/joshnewans/twist_stamper/raw/32e0eed68c76d9d3fa64b54e8313aa9a6d6bd99d/setup.cfg",
+          "contents_url": "https://api.github.com/repos/joshnewans/twist_stamper/contents/setup.cfg?ref=32e0eed68c76d9d3fa64b54e8313aa9a6d6bd99d",
+          "patch": "@@ -1,4 +1,4 @@\n [develop]\n-script-dir=$base/lib/twist_stamper\n+script_dir=$base/lib/twist_stamper\n [install]\n-install-scripts=$base/lib/twist_stamper\n+install_scripts=$base/lib/twist_stamper"
+        }
+      ]
+    }
+  ]
+}

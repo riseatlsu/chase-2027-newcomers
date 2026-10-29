@@ -1,0 +1,973 @@
+{
+  "_meta": {
+    "fetched_at": "2026-09-24T14:51:51Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ament",
+    "repo": "ament_package",
+    "refreshed_at": "2026-09-24T14:51:51Z",
+    "refresh_note": "incrementally added 2 author(s) missing from a prior stale cache"
+  },
+  "data": [
+    {
+      "author": "ahcorde",
+      "date": "2025-11-28T12:49:19Z",
+      "sha": "4c7ac8fbd61d769f840371264535e2e5bef01f35",
+      "message": "Changelog\n\nSigned-off-by: Alejandro Hernandez Cordero <ahcorde@gmail.com>",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "477148398830d4173f4717b97da8937c147448c3",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/ament/ament_package/blob/4c7ac8fbd61d769f840371264535e2e5bef01f35/CHANGELOG.rst",
+          "raw_url": "https://github.com/ament/ament_package/raw/4c7ac8fbd61d769f840371264535e2e5bef01f35/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/CHANGELOG.rst?ref=4c7ac8fbd61d769f840371264535e2e5bef01f35",
+          "patch": "@@ -2,6 +2,11 @@\n Changelog for package ament_package\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+0.18.2 (2025-11-28)\n+-------------------\n+* Remove unneeded deps (`#161 <https://github.com/ament/ament_package/issues/161>`_)\n+* Contributors: Michael Carlstrom\n+\n 0.18.1 (2025-07-30)\n -------------------\n * fix setuptools deprecations (`#156 <https://github.com/ament/ament_package/issues/156>`_)"
+        }
+      ]
+    },
+    {
+      "author": "InvincibleRMC",
+      "date": "2025-11-27T18:24:21Z",
+      "sha": "3f57000a570f262b84228cb40889cf395b97e54d",
+      "message": "Remove unneeded deps (#161)\n\nSigned-off-by: Michael Carlstrom <rmc@carlstrom.com>",
+      "files_changed": 3,
+      "additions": 5,
+      "deletions": 26,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "88637056b8db52e05f34857a8c949ad55b4d0549",
+          "filename": "ament_package/__init__.py",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 13,
+          "changes": 16,
+          "blob_url": "https://github.com/ament/ament_package/blob/3f57000a570f262b84228cb40889cf395b97e54d/ament_package%2F__init__.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/3f57000a570f262b84228cb40889cf395b97e54d/ament_package%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2F__init__.py?ref=3f57000a570f262b84228cb40889cf395b97e54d",
+          "patch": "@@ -15,16 +15,6 @@\n \"\"\"Package providing the templates for various shell scripts.\"\"\"\n \n # set version number\n-try:\n-    try:\n-        import importlib.metadata as importlib_metadata\n-    except ModuleNotFoundError:\n-        import importlib_metadata\n-    try:\n-        __version__ = importlib_metadata.version('ament_package')\n-    except importlib_metadata.PackageNotFoundError:\n-        __version__ = 'unset'\n-    finally:\n-        del importlib_metadata\n-except ImportError:\n-    __version__ = 'unset'\n+\n+from importlib import metadata\n+__version__ = metadata.version('ament_package')"
+        },
+        {
+          "sha": "584863d4b13ede8da367855dd6d923c2d46d89af",
+          "filename": "ament_package/templates.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 10,
+          "changes": 12,
+          "blob_url": "https://github.com/ament/ament_package/blob/3f57000a570f262b84228cb40889cf395b97e54d/ament_package%2Ftemplates.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/3f57000a570f262b84228cb40889cf395b97e54d/ament_package%2Ftemplates.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2Ftemplates.py?ref=3f57000a570f262b84228cb40889cf395b97e54d",
+          "patch": "@@ -12,23 +12,15 @@\n # See the License for the specific language governing permissions and\n # limitations under the License.\n \n+from importlib import resources\n import os\n import re\n \n-try:\n-    import importlib.resources as importlib_resources\n-except ModuleNotFoundError:\n-    import importlib_resources\n-\n IS_WINDOWS = os.name == 'nt'\n \n \n def _get_path(template, name):\n-    if hasattr(importlib_resources, 'files'):\n-        return importlib_resources.files(template).joinpath(name)\n-    else:\n-        with importlib_resources.path(template, name) as path:\n-            return str(path)\n+    return resources.files(template).joinpath(name)\n \n \n def get_environment_hook_template_path(name):"
+        },
+        {
+          "sha": "5725c0b81c11a413f2b8bbc6060c625d84280865",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 3,
+          "changes": 3,
+          "blob_url": "https://github.com/ament/ament_package/blob/3f57000a570f262b84228cb40889cf395b97e54d/package.xml",
+          "raw_url": "https://github.com/ament/ament_package/raw/3f57000a570f262b84228cb40889cf395b97e54d/package.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/package.xml?ref=3f57000a570f262b84228cb40889cf395b97e54d",
+          "patch": "@@ -15,9 +15,6 @@\n \n   <buildtool_export_depend>python3-setuptools</buildtool_export_depend>\n \n-  <exec_depend>python3-importlib-metadata</exec_depend>\n-  <exec_depend>python3-importlib-resources</exec_depend>\n-\n   <test_depend>python3-flake8</test_depend>\n   <test_depend>python3-pytest</test_depend>\n "
+        }
+      ]
+    },
+    {
+      "author": "clalancette",
+      "date": "2020-06-19T14:55:18Z",
+      "sha": "130b1e25fefd3cdd43b44496b72dc09a00a8325a",
+      "message": "Add pytest.ini so local tests don't display warning (#117)\n\nSigned-off-by: Chris Lalancette <clalancette@openrobotics.org>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "37904c3d21a3507e6d84f7aabd63411112aff495",
+          "filename": "pytest.ini",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ament/ament_package/blob/130b1e25fefd3cdd43b44496b72dc09a00a8325a/pytest.ini",
+          "raw_url": "https://github.com/ament/ament_package/raw/130b1e25fefd3cdd43b44496b72dc09a00a8325a/pytest.ini",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/pytest.ini?ref=130b1e25fefd3cdd43b44496b72dc09a00a8325a",
+          "patch": "@@ -2,3 +2,4 @@\n markers =\n     flake8: marks tests checking for flake8 compliance\n     linter: marks tests as linter checks\n+junit_family=xunit2"
+        }
+      ]
+    },
+    {
+      "author": "mosfet80",
+      "date": "2025-07-17T07:56:43Z",
+      "sha": "7b5dea841784a511e275ac0d12a8a4036d943838",
+      "message": "fix setuptools deprecations (#156)\n\nSigned-off-by: mosfet80 <10235105+mosfet80@users.noreply.github.com>\nCo-authored-by: Alejandro Hernández Cordero <ahcorde@gmail.com>",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "465cf01b5e02a956432cbcb84012300e5bd571dd",
+          "filename": "setup.py",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 2,
+          "changes": 7,
+          "blob_url": "https://github.com/ament/ament_package/blob/7b5dea841784a511e275ac0d12a8a4036d943838/setup.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/7b5dea841784a511e275ac0d12a8a4036d943838/setup.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/setup.py?ref=7b5dea841784a511e275ac0d12a8a4036d943838",
+          "patch": "@@ -22,7 +22,6 @@\n     keywords=['ROS'],\n     classifiers=[\n         'Intended Audience :: Developers',\n-        'License :: OSI Approved :: Apache Software License',\n         'Programming Language :: Python',\n         'Topic :: Software Development',\n     ],\n@@ -31,7 +30,11 @@\n Ament defines metainformation for packages, their dependencies,\n and provides tooling to build these federated packages together.\"\"\",\n     license='Apache License, Version 2.0',\n-    tests_require=['flake8', 'pytest'],\n+    extras_require={\n+        'test': [\n+            'pytest', 'flake8',\n+        ],\n+    },\n     package_data={\n         'ament_package': [\n             'template/environment_hook/*',"
+        }
+      ]
+    },
+    {
+      "author": "cottsay",
+      "date": "2021-01-20T00:23:31Z",
+      "sha": "9f3c29454a9aed2a373b7dae5e9e78d28e0ef2d2",
+      "message": "Declare missing dependency on python3-importlib-resources (#123)\n\nSigned-off-by: Scott K Logan <logans@cottsay.net>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "78055b2b4d872b1af5eecc68742cc8beb147cb26",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ament/ament_package/blob/9f3c29454a9aed2a373b7dae5e9e78d28e0ef2d2/package.xml",
+          "raw_url": "https://github.com/ament/ament_package/raw/9f3c29454a9aed2a373b7dae5e9e78d28e0ef2d2/package.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/package.xml?ref=9f3c29454a9aed2a373b7dae5e9e78d28e0ef2d2",
+          "patch": "@@ -10,6 +10,7 @@\n   <author email=\"dthomas@osrfoundation.org\">Dirk Thomas</author>\n \n   <depend>python3-importlib-metadata</depend>\n+  <depend>python3-importlib-resources</depend>\n   <depend>python3-setuptools</depend>\n \n   <test_depend>python3-flake8</test_depend>"
+        }
+      ]
+    },
+    {
+      "author": "robwoolley",
+      "date": "2025-03-14T00:37:27Z",
+      "sha": "9b09d9471f8bf77d5c847a6cd973da79d18d2e11",
+      "message": "Simplify removing leading and trailing separators (#152)\n\nPreviously, we checked if the leading or trailing character was a colon\nand then used a wildcard to remove it.\n\nIt is simpler to just remove a leading or trailing colon. This has the\nadded benefit of only using shell built-in functions.\n\nSigned-off-by: Rob Woolley <rob.woolley@windriver.com>",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 4,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "bcb30403a779259c1f49824fbb03055fa176272c",
+          "filename": "ament_package/template/prefix_level/_local_setup_util.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 4,
+          "changes": 6,
+          "blob_url": "https://github.com/ament/ament_package/blob/9b09d9471f8bf77d5c847a6cd973da79d18d2e11/ament_package%2Ftemplate%2Fprefix_level%2F_local_setup_util.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/9b09d9471f8bf77d5c847a6cd973da79d18d2e11/ament_package%2Ftemplate%2Fprefix_level%2F_local_setup_util.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2Ftemplate%2Fprefix_level%2F_local_setup_util.py?ref=9b09d9471f8bf77d5c847a6cd973da79d18d2e11",
+          "patch": "@@ -48,10 +48,8 @@ def main(argv=sys.argv[1:]):  # noqa: D103\n         FORMAT_STR_USE_ENV_VAR = '${name}'\n         FORMAT_STR_INVOKE_SCRIPT = 'AMENT_CURRENT_PREFIX=\"{prefix}\" ' \\\n             '_ament_prefix_sh_source_script \"{script_path}\"'\n-        FORMAT_STR_REMOVE_LEADING_SEPARATOR = 'if [ \"$(echo -n ${name} | ' \\\n-            'head -c 1)\" = \":\" ]; then export {name}=${{{name}#?}} ; fi'\n-        FORMAT_STR_REMOVE_TRAILING_SEPARATOR = 'if [ \"$(echo -n ${name} | ' \\\n-            'tail -c 1)\" = \":\" ]; then export {name}=${{{name}%?}} ; fi'\n+        FORMAT_STR_REMOVE_LEADING_SEPARATOR = 'export {name}=${{{name}#:}}'\n+        FORMAT_STR_REMOVE_TRAILING_SEPARATOR = 'export {name}=${{{name}%:}}'\n     elif args.primary_extension == 'bat':\n         FORMAT_STR_COMMENT_LINE = ':: {comment}'\n         FORMAT_STR_SET_ENV_VAR = 'set \"{name}={value}\"'"
+        }
+      ]
+    },
+    {
+      "author": "azeey",
+      "date": "2024-04-28T12:49:18Z",
+      "sha": "01592eb7c227ec12304635e530984d29055463d7",
+      "message": "Always consider .dsv files, even when no shell specific script exists (#147)\n\nCopy of https://github.com/colcon/colcon-core/pull/244/commits/3697164b248d578ec15e9f0d369d005cf1d9894a\r\n\r\nSigned-off-by: Addisu Z. Taddese <addisu@openrobotics.org>",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "813bd8a6224d4a51a21767bd032396eacf84c9ea",
+          "filename": "ament_package/template/prefix_level/_local_setup_util.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ament/ament_package/blob/01592eb7c227ec12304635e530984d29055463d7/ament_package%2Ftemplate%2Fprefix_level%2F_local_setup_util.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/01592eb7c227ec12304635e530984d29055463d7/ament_package%2Ftemplate%2Fprefix_level%2F_local_setup_util.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2Ftemplate%2Fprefix_level%2F_local_setup_util.py?ref=01592eb7c227ec12304635e530984d29055463d7",
+          "patch": "@@ -252,11 +252,11 @@ def process_dsv_file(\n         else:\n             # group remaining source lines by basename\n             path_without_ext, ext = os.path.splitext(remainder)\n+            if path_without_ext not in basenames:\n+                basenames[path_without_ext] = set()\n             assert ext.startswith('.')\n             ext = ext[1:]\n             if ext in (primary_extension, additional_extension):\n-                if path_without_ext not in basenames:\n-                    basenames[path_without_ext] = set()\n                 basenames[path_without_ext].add(ext)\n \n     # add the dsv extension to each basename if the file exists"
+        }
+      ]
+    },
+    {
+      "author": "marcoag",
+      "date": "2024-04-26T10:57:30Z",
+      "sha": "9336b5d936a4da3bc011dc6229847a56101c8b16",
+      "message": "Changelog.\n\nSigned-off-by: Marco A. Gutierrez <marcogg@marcogg.com>",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "19f38a0360fb1c364d45650a5f788617dc639e8b",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ament/ament_package/blob/9336b5d936a4da3bc011dc6229847a56101c8b16/CHANGELOG.rst",
+          "raw_url": "https://github.com/ament/ament_package/raw/9336b5d936a4da3bc011dc6229847a56101c8b16/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/CHANGELOG.rst?ref=9336b5d936a4da3bc011dc6229847a56101c8b16",
+          "patch": "@@ -2,6 +2,9 @@\n Changelog for package ament_package\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+Forthcoming\n+-----------\n+\n 0.16.3 (2024-01-24)\n -------------------\n * Migrate from legacy importlib-resources (`#143 <https://github.com/ament/ament_package/issues/143>`_)"
+        }
+      ]
+    },
+    {
+      "author": "IsabelParedes",
+      "date": "2023-12-31T19:28:25Z",
+      "sha": "64c97af886b704a1dcb4c8368329e5611bcab3ed",
+      "message": "Migrate from legacy importlib-resources (#143)\n\n* Migrate from legacy importlib-resources\r\n\r\nThe path() function is deprecated.\r\nhttps://importlib-resources.readthedocs.io/en/latest/using.html#migrating-from-legacy\r\nFor Python>=3.9, use files() instead.\r\n\r\n* Use path() when files() is not available\r\n\r\nSigned-off-by: Isabel Paredes <isabel.paredes@quantstack.net>\r\nCo-authored-by: Chris Lalancette <clalancette@gmail.com>",
+      "files_changed": 1,
+      "additions": 11,
+      "deletions": 6,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e617448246fd41629f6d5cc69c558fc87ecc8d51",
+          "filename": "ament_package/templates.py",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 6,
+          "changes": 17,
+          "blob_url": "https://github.com/ament/ament_package/blob/64c97af886b704a1dcb4c8368329e5611bcab3ed/ament_package%2Ftemplates.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/64c97af886b704a1dcb4c8368329e5611bcab3ed/ament_package%2Ftemplates.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2Ftemplates.py?ref=64c97af886b704a1dcb4c8368329e5611bcab3ed",
+          "patch": "@@ -23,9 +23,16 @@\n IS_WINDOWS = os.name == 'nt'\n \n \n+def _get_path(template, name):\n+    if hasattr(importlib_resources, 'files'):\n+        return importlib_resources.files(template).joinpath(name)\n+    else:\n+        with importlib_resources.path(template, name) as path:\n+            return str(path)\n+\n+\n def get_environment_hook_template_path(name):\n-    with importlib_resources.path('ament_package.template.environment_hook', name) as path:\n-        return str(path)\n+    return _get_path('ament_package.template.environment_hook', name)\n \n \n def get_package_level_template_names(all_platforms=False):\n@@ -41,8 +48,7 @@ def get_package_level_template_names(all_platforms=False):\n \n \n def get_package_level_template_path(name):\n-    with importlib_resources.path('ament_package.template.package_level', name) as path:\n-        return str(path)\n+    return _get_path('ament_package.template.package_level', name)\n \n \n def get_prefix_level_template_names(*, all_platforms=False):\n@@ -61,8 +67,7 @@ def get_prefix_level_template_names(*, all_platforms=False):\n \n \n def get_prefix_level_template_path(name):\n-    with importlib_resources.path('ament_package.template.prefix_level', name) as path:\n-        return str(path)\n+    return _get_path('ament_package.template.prefix_level', name)\n \n \n def configure_file(template_file, environment):"
+        }
+      ]
+    },
+    {
+      "author": "Yadunund",
+      "date": "2023-04-27T00:39:32Z",
+      "sha": "1a54411c6b10eba4931e7611df0927382c28025d",
+      "message": "Update changelogs in preparation of minor bump\n\nSigned-off-by: Yadunund <yadunund@openrobotics.org>",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "c4033b7b09ec47577e709cd31807b5fa34ffe3d4",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ament/ament_package/blob/1a54411c6b10eba4931e7611df0927382c28025d/CHANGELOG.rst",
+          "raw_url": "https://github.com/ament/ament_package/raw/1a54411c6b10eba4931e7611df0927382c28025d/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/CHANGELOG.rst?ref=1a54411c6b10eba4931e7611df0927382c28025d",
+          "patch": "@@ -2,6 +2,9 @@\n Changelog for package ament_package\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+Forthcoming\n+-----------\n+\n 0.15.3 (2023-04-11)\n -------------------\n * Add support for comment lines in dsv files (`#139 <https://github.com/ament/ament_package/issues/139>`_)"
+        }
+      ]
+    },
+    {
+      "author": "audrow",
+      "date": "2022-11-28T19:47:35Z",
+      "sha": "ff6bebb0f00add20d0776ad1ef586565ef8b932c",
+      "message": "[rolling] Update maintainers - 2022-11-07 (#138)\n\n* Add Dharini Dutia to CODEOWNERs file\r\n\r\n* Update maintainers to Dharini Dutia\r\n\r\nSigned-off-by: Audrow Nash <audrow@openrobotics.org>",
+      "files_changed": 3,
+      "additions": 6,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "d490d00da2c7988ae7b06b9785d3cc3aee4d0df0",
+          "filename": "CODEOWNERS",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_package/blob/ff6bebb0f00add20d0776ad1ef586565ef8b932c/CODEOWNERS",
+          "raw_url": "https://github.com/ament/ament_package/raw/ff6bebb0f00add20d0776ad1ef586565ef8b932c/CODEOWNERS",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/CODEOWNERS?ref=ff6bebb0f00add20d0776ad1ef586565ef8b932c",
+          "patch": "@@ -0,0 +1,2 @@\n+# This file was generated by https://github.com/audrow/update-ros2-repos\n+* @quarkytale"
+        },
+        {
+          "sha": "1da0dd1e055875bcab4fe64121d99f2aab0cf71d",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/ament/ament_package/blob/ff6bebb0f00add20d0776ad1ef586565ef8b932c/package.xml",
+          "raw_url": "https://github.com/ament/ament_package/raw/ff6bebb0f00add20d0776ad1ef586565ef8b932c/package.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/package.xml?ref=ff6bebb0f00add20d0776ad1ef586565ef8b932c",
+          "patch": "@@ -5,10 +5,11 @@\n   <version>0.15.1</version>\n   <description>The parser for the manifest files in the ament buildsystem.</description>\n \n-  <maintainer email=\"audrow@openrobotics.org\">Audrow Nash</maintainer>\n+  <maintainer email=\"dharini@openrobotics.org\">Dharini Dutia</maintainer>\n \n   <license>Apache License 2.0</license>\n \n+  <author email=\"audrow@openrobotics.org\">Audrow Nash</author>\n   <author email=\"dthomas@osrfoundation.org\">Dirk Thomas</author>\n   <author email=\"mabel@openrobotics.org\">Mabel Zhang</author>\n "
+        },
+        {
+          "sha": "40e45c0e177f619e02e6fbcef7bbd15226972dc9",
+          "filename": "setup.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ament/ament_package/blob/ff6bebb0f00add20d0776ad1ef586565ef8b932c/setup.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/ff6bebb0f00add20d0776ad1ef586565ef8b932c/setup.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/setup.py?ref=ff6bebb0f00add20d0776ad1ef586565ef8b932c",
+          "patch": "@@ -15,8 +15,8 @@\n     zip_safe=True,\n     author='Dirk Thomas',\n     author_email='dthomas@osrfoundation.org',\n-    maintainer='Audrow Nash',\n-    maintainer_email='audrow@openrobotics.org',\n+    maintainer='Dharini Dutia',\n+    maintainer_email='dharini@openrobotics.org',\n     url='https://github.com/ament/ament_package/wiki',\n     download_url='https://github.com/ament/ament_package/releases',\n     keywords=['ROS'],"
+        }
+      ]
+    },
+    {
+      "author": "paudrow",
+      "date": "2021-02-02T21:53:47Z",
+      "sha": "1765b0981e1dc7c111d3ed73abaa147c3932f945",
+      "message": "Add Audrow as a maintainer (#127)\n\nSigned-off-by: Audrow Nash <audrow.nash@gmail.com>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "1d1c3dd66281d1e913e001186376736589b1c539",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ament/ament_package/blob/1765b0981e1dc7c111d3ed73abaa147c3932f945/package.xml",
+          "raw_url": "https://github.com/ament/ament_package/raw/1765b0981e1dc7c111d3ed73abaa147c3932f945/package.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/package.xml?ref=1765b0981e1dc7c111d3ed73abaa147c3932f945",
+          "patch": "@@ -5,6 +5,7 @@\n   <version>0.10.1</version>\n   <description>The parser for the manifest files in the ament buildsystem.</description>\n   <maintainer email=\"mabel@openrobotics.org\">Mabel Zhang</maintainer>\n+  <maintainer email=\"audrow@openrobotics.org\">Audrow Nash</maintainer>\n   <license>Apache License 2.0</license>\n \n   <author email=\"dthomas@osrfoundation.org\">Dirk Thomas</author>"
+        }
+      ]
+    },
+    {
+      "author": "sloretz",
+      "date": "2019-10-23T17:56:29Z",
+      "sha": "63d64f6b55847aaf20c54a69ed6cedbf5dc328eb",
+      "message": "0.8.4\n\nSigned-off-by: Shane Loretz <sloretz@osrfoundation.org>",
+      "files_changed": 2,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "7e3bb3eb9dd77260b9e42afc3041145329b2f80a",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_package/blob/63d64f6b55847aaf20c54a69ed6cedbf5dc328eb/package.xml",
+          "raw_url": "https://github.com/ament/ament_package/raw/63d64f6b55847aaf20c54a69ed6cedbf5dc328eb/package.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/package.xml?ref=63d64f6b55847aaf20c54a69ed6cedbf5dc328eb",
+          "patch": "@@ -2,7 +2,7 @@\n <?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"2\">\n   <name>ament_package</name>\n-  <version>0.8.3</version>\n+  <version>0.8.4</version>\n   <description>The parser for the manifest files in the ament buildsystem.</description>\n   <maintainer email=\"dthomas@osrfoundation.org\">Dirk Thomas</maintainer>\n   <license>Apache License 2.0</license>"
+        },
+        {
+          "sha": "70741329ada352fdbbb8d4490ca26e2b8aab212b",
+          "filename": "setup.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_package/blob/63d64f6b55847aaf20c54a69ed6cedbf5dc328eb/setup.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/63d64f6b55847aaf20c54a69ed6cedbf5dc328eb/setup.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/setup.py?ref=63d64f6b55847aaf20c54a69ed6cedbf5dc328eb",
+          "patch": "@@ -5,7 +5,7 @@\n \n setup(\n     name=package_name,\n-    version='0.8.2',\n+    version='0.8.4',\n     packages=find_packages(exclude=['test']),\n     data_files=[\n         ('share/' + package_name, ['package.xml']),"
+        }
+      ]
+    },
+    {
+      "author": "DLu",
+      "date": "2021-03-01T21:58:24Z",
+      "sha": "b9a50edae6707bd648da23f6cc80f077dd1fc52b",
+      "message": "Generate Setuptools Dict Helper Method (#126)\n\n* Generate Setuptools Dict Helper Method\r\n\r\nSigned-off-by: David V. Lu <davidvlu@gmail.com>\r\n\r\n* Add license\r\n\r\nSigned-off-by: David V. Lu <davidvlu@gmail.com>\r\n\r\n* Leading underscores for 'private' functions\r\n\r\nSigned-off-by: David V. Lu <davidvlu@gmail.com>\r\n\r\n* Basic Tests\r\n\r\nSigned-off-by: David V. Lu <davidvlu@gmail.com>\r\n\r\n* Test Cleanup\r\n\r\nSigned-off-by: David V. Lu <davidvlu@gmail.com>",
+      "files_changed": 3,
+      "additions": 173,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "8726a9cd9e7fb1aace13657db258288b2b9fd885",
+          "filename": "ament_package/generate_setuptools_dict.py",
+          "status": "added",
+          "additions": 113,
+          "deletions": 0,
+          "changes": 113,
+          "blob_url": "https://github.com/ament/ament_package/blob/b9a50edae6707bd648da23f6cc80f077dd1fc52b/ament_package%2Fgenerate_setuptools_dict.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/b9a50edae6707bd648da23f6cc80f077dd1fc52b/ament_package%2Fgenerate_setuptools_dict.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2Fgenerate_setuptools_dict.py?ref=b9a50edae6707bd648da23f6cc80f077dd1fc52b",
+          "patch": "@@ -0,0 +1,113 @@\n+# Copyright 2021 PickNik Robotics\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+import collections\n+import os.path\n+import xml.dom.minidom as dom\n+\n+\n+Person = collections.namedtuple('Person', ['name', 'email'])\n+\n+\n+def _get_single_element(document, tag_name):\n+    \"\"\"Return the text contained with the first tag with the specified tag_name.\"\"\"\n+    return document.getElementsByTagName(tag_name)[0].firstChild.nodeValue\n+\n+\n+def _get_elements(document, tag_name):\n+    \"\"\"Return the text contained with the tags with the specified tag_name.\"\"\"\n+    for tag in document.getElementsByTagName(tag_name):\n+        yield tag.firstChild.nodeValue\n+\n+\n+def _get_elements_and_attributes(document, tag_name, attribute_name):\n+    \"\"\"Return the text contained with the matching tags and the value of an attribute.\"\"\"\n+    for tag in document.getElementsByTagName(tag_name):\n+        yield tag.firstChild.nodeValue, tag.getAttribute(attribute_name)\n+\n+\n+def _update_people_info(document, tag_name, data):\n+    \"\"\"Set the author or maintainer field in data.\"\"\"\n+    people = [Person(*ea) for ea in _get_elements_and_attributes(document, tag_name, 'email')]\n+\n+    # either set one person with one email or join all in a single field\n+    if len(people) == 1 and people[0].email:\n+        data[tag_name] = people[0].name\n+        data[f'{tag_name}_email'] = people[0].email\n+    else:\n+        arr = [(f'{p.name} {p.email}' if p.email else p.name) for p in people]\n+        data[tag_name] = ', '.join(arr)\n+\n+\n+def generate_setuptools_dict(package_xml_path=os.path.curdir, **kwargs):\n+    \"\"\"\n+    Extract the information relevant for setuptools from the package manifest.\n+\n+    The following keys will be set:\n+    The \"name\" and \"version\" are taken from the eponymous tags.\n+    A single maintainer will set the keys \"maintainer\" and\n+    \"maintainer_email\" while multiple maintainers are merged into the\n+    \"maintainer\" fields (including their emails). Authors are handled\n+    likewise.\n+    The first URL of type \"website\" (or without a type) is used for\n+    the \"url\" field.\n+    The \"description\" is taken from the eponymous tag if it does not\n+    exceed 200 characters. If it does \"description\" contains the\n+    truncated text while \"description_long\" contains the complete.\n+    All licenses are merged into the \"license\" field.\n+    :param kwargs: All keyword arguments are passed through. The above\n+        mentioned keys are verified to be identical if passed as a\n+        keyword argument\n+    :returns: return dict populated with parsed fields and passed\n+        keyword arguments\n+    :raises: :exc:`RuntimeError`\n+    :raises: :exc:`IOError`\n+    \"\"\"\n+    filename = os.path.join(package_xml_path, 'package.xml')\n+    with open(filename) as f:\n+        package_xml = dom.parse(f)\n+\n+    data = {}\n+    data['name'] = _get_single_element(package_xml, 'name')\n+    data['version'] = _get_single_element(package_xml, 'version')\n+\n+    _update_people_info(package_xml, 'author', data)\n+    _update_people_info(package_xml, 'maintainer', data)\n+\n+    # either set the first URL with the type 'website' or the first URL of any type\n+    urls = list(_get_elements_and_attributes(package_xml, 'url', 'type'))\n+    websites = [url[0] for url in urls if url[1] == 'website']\n+    if websites:\n+        data['url'] = websites[0]\n+    elif urls:\n+        data['url'] = list(urls)[0][0]\n+\n+    description = _get_single_element(package_xml, 'description')\n+    if len(description) <= 200:\n+        data['description'] = description\n+    else:\n+        data['description'] = description[:197] + '...'\n+        data['long_description'] = description\n+\n+    data['license'] = ', '.join(_get_elements(package_xml, 'license'))\n+\n+    # pass keyword arguments and verify equality if generated and passed in\n+    for k, v in kwargs.items():\n+        if k in data:\n+            if v != data[k]:\n+                raise RuntimeError(f'The keyword argument \"{k}\" does not match the information '\n+                                   f'from package.xml in {package_xml_path}: \"{v}\" != \"{data[k]}\"')\n+        else:\n+            data[k] = v\n+\n+    return data"
+        },
+        {
+          "sha": "3b0dab6d45d932144e42a623f7ad7e8bda9e1892",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_package/blob/b9a50edae6707bd648da23f6cc80f077dd1fc52b/package.xml",
+          "raw_url": "https://github.com/ament/ament_package/raw/b9a50edae6707bd648da23f6cc80f077dd1fc52b/package.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/package.xml?ref=b9a50edae6707bd648da23f6cc80f077dd1fc52b",
+          "patch": "@@ -1,6 +1,8 @@\n <?xml version=\"1.0\"?>\n <?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"2\">\n+  <!-- Note that changing values in this file may break the tests.\n+       Tests shall be changed to match the values in this file. -->\n   <name>ament_package</name>\n   <version>0.10.1</version>\n   <description>The parser for the manifest files in the ament buildsystem.</description>"
+        },
+        {
+          "sha": "db49ad420f3c30571eba7af1a69eace5bcbe2c52",
+          "filename": "test/test_generate_setuptools_dict.py",
+          "status": "added",
+          "additions": 58,
+          "deletions": 0,
+          "changes": 58,
+          "blob_url": "https://github.com/ament/ament_package/blob/b9a50edae6707bd648da23f6cc80f077dd1fc52b/test%2Ftest_generate_setuptools_dict.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/b9a50edae6707bd648da23f6cc80f077dd1fc52b/test%2Ftest_generate_setuptools_dict.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/test%2Ftest_generate_setuptools_dict.py?ref=b9a50edae6707bd648da23f6cc80f077dd1fc52b",
+          "patch": "@@ -0,0 +1,58 @@\n+# Copyright 2021 PickNik Robotics\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+import pathlib\n+\n+from ament_package.generate_setuptools_dict import generate_setuptools_dict\n+import pytest\n+\n+AMENT_PACKAGE_FOLDER = str(pathlib.Path(__file__).parent.parent.resolve())\n+\n+\n+def common_info_check(result):\n+    assert result.get('name') == 'ament_package'\n+    assert result.get('author') == 'Dirk Thomas'\n+    assert result.get('author_email') == 'dthomas@osrfoundation.org'\n+    assert result.get('maintainer') == 'Mabel Zhang mabel@openrobotics.org, ' + \\\n+                                       'Audrow Nash audrow@openrobotics.org'\n+    assert result.get('maintainer_email') is None\n+    assert result.get('description') == \\\n+        'The parser for the manifest files in the ament buildsystem.'\n+    assert result.get('license') == 'Apache License 2.0'\n+\n+    # Instead of checking the exact value, just make sure it has two periods in it\n+    # so that we don't have to change the test everytime a new version is released\n+    version = result.get('version', '')\n+    assert len(version.split('.')) == 3\n+\n+\n+def test_basic_info():\n+    common_info_check(generate_setuptools_dict(AMENT_PACKAGE_FOLDER))\n+\n+\n+def test_additional_fields():\n+    url_value = 'https://github.com/ament/ament_package/wiki'\n+    result = generate_setuptools_dict(AMENT_PACKAGE_FOLDER,\n+                                      zip_safe=True,\n+                                      url=url_value)\n+    common_info_check(result)\n+    assert result.get('zip_safe') is True\n+    assert result.get('url') == url_value\n+\n+\n+def test_conflicting_info():\n+    # We should not be able to override an existing value\n+    with pytest.raises(RuntimeError):\n+        generate_setuptools_dict(AMENT_PACKAGE_FOLDER,\n+                                 license='conflicting license')"
+        }
+      ]
+    },
+    {
+      "author": "dirk-thomas",
+      "date": "2014-05-19T03:38:18Z",
+      "sha": "d2c60cf252c025d570376c0df14339107857afbd",
+      "message": "add license",
+      "files_changed": 1,
+      "additions": 202,
+      "deletions": 0,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "d645695673349e3947e8e5ae42332d0ac3164cd7",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 202,
+          "deletions": 0,
+          "changes": 202,
+          "blob_url": "https://github.com/ament/ament_package/blob/d2c60cf252c025d570376c0df14339107857afbd/LICENSE",
+          "raw_url": "https://github.com/ament/ament_package/raw/d2c60cf252c025d570376c0df14339107857afbd/LICENSE",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/LICENSE?ref=d2c60cf252c025d570376c0df14339107857afbd",
+          "patch": "@@ -0,0 +1,202 @@\n+\n+                                 Apache License\n+                           Version 2.0, January 2004\n+                        http://www.apache.org/licenses/\n+\n+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION\n+\n+   1. Definitions.\n+\n+      \"License\" shall mean the terms and conditions for use, reproduction,\n+      and distribution as defined by Sections 1 through 9 of this document.\n+\n+      \"Licensor\" shall mean the copyright owner or entity authorized by\n+      the copyright owner that is granting the License.\n+\n+      \"Legal Entity\" shall mean the union of the acting entity and all\n+      other entities that control, are controlled by, or are under common\n+      control with that entity. For the purposes of this definition,\n+      \"control\" means (i) the power, direct or indirect, to cause the\n+      direction or management of such entity, whether by contract or\n+      otherwise, or (ii) ownership of fifty percent (50%) or more of the\n+      outstanding shares, or (iii) beneficial ownership of such entity.\n+\n+      \"You\" (or \"Your\") shall mean an individual or Legal Entity\n+      exercising permissions granted by this License.\n+\n+      \"Source\" form shall mean the preferred form for making modifications,\n+      including but not limited to software source code, documentation\n+      source, and configuration files.\n+\n+      \"Object\" form shall mean any form resulting from mechanical\n+      transformation or translation of a Source form, including but\n+      not limited to compiled object code, generated documentation,\n+      and conversions to other media types.\n+\n+      \"Work\" shall mean the work of authorship, whether in Source or\n+      Object form, made available under the License, as indicated by a\n+      copyright notice that is included in or attached to the work\n+      (an example is provided in the Appendix below).\n+\n+      \"Derivative Works\" shall mean any work, whether in Source or Object\n+      form, that is based on (or derived from) the Work and for which the\n+      editorial revisions, annotations, elaborations, or other modifications\n+      represent, as a whole, an original work of authorship. For the purposes\n+      of this License, Derivative Works shall not include works that remain\n+      separable from, or merely link (or bind by name) to the interfaces of,\n+      the Work and Derivative Works thereof.\n+\n+      \"Contribution\" shall mean any work of authorship, including\n+      the original version of the Work and any modifications or additions\n+      to that Work or Derivative Works thereof, that is intentionally\n+      submitted to Licensor for inclusion in the Work by the copyright owner\n+      or by an individual or Legal Entity authorized to submit on behalf of\n+      the copyright owner. For the purposes of this definition, \"submitted\"\n+      means any form of electronic, verbal, or written communication sent\n+      to the Licensor or its representatives, including but not limited to\n+      communication on electronic mailing lists, source code control systems,\n+      and issue tracking systems that are managed by, or on behalf of, the\n+      Licensor for the purpose of discussing and improving the Work, but\n+      excluding communication that is conspicuously marked or otherwise\n+      designated in writing by the copyright owner as \"Not a Contribution.\"\n+\n+      \"Contributor\" shall mean Licensor and any individual or Legal Entity\n+      on behalf of whom a Contribution has been received by Licensor and\n+      subsequently incorporated within the Work.\n+\n+   2. Grant of Copyright License. Subject to the terms and conditions of\n+      this License, each Contributor hereby grants to You a perpetual,\n+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n+      copyright license to reproduce, prepare Derivative Works of,\n+      publicly display, publicly perform, sublicense, and distribute the\n+      Work and such Derivative Works in Source or Object form.\n+\n+   3. Grant of Patent License. Subject to the terms and conditions of\n+      this License, each Contributor hereby grants to You a perpetual,\n+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n+      (except as stated in this section) patent license to make, have made,\n+      use, offer to sell, sell, import, and otherwise transfer the Work,\n+      where such license applies only to those patent claims licensable\n+      by such Contributor that are necessarily infringed by their\n+      Contribution(s) alone or by combination of their Contribution(s)\n+      with the Work to which such Contribution(s) was submitted. If You\n+      institute patent litigation against any entity (including a\n+      cross-claim or counterclaim in a lawsuit) alleging that the Work\n+      or a Contribution incorporated within the Work constitutes direct\n+      or contributory patent infringement, then any patent licenses\n+      granted to You under this License for that Work shall terminate\n+      as of the date such litigation is filed.\n+\n+   4. Redistribution. You may reproduce and distribute copies of the\n+      Work or Derivative Works thereof in any medium, with or without\n+      modifications, and in Source or Object form, provided that You\n+      meet the following conditions:\n+\n+      (a) You must give any other recipients of the Work or\n+          Derivative Works a copy of this License; and\n+\n+      (b) You must cause any modified files to carry prominent notices\n+          stating that You changed the files; and\n+\n+      (c) You must retain, in the Source form of any Derivative Works\n+          that You distribute, all copyright, patent, trademark, and\n+          attribution notices from the Source form of the Work,\n+          excluding those notices that do not pertain to any part of\n+          the Derivative Works; and\n+\n+      (d) If the Work includes a \"NOTICE\" text file as part of its\n+          distribution, then any Derivative Works that You distribute must\n+          include a readable copy of the attribution notices contained\n+          within such NOTICE file, excluding those notices that do not\n+          pertain to any part of the Derivative Works, in at least one\n+          of the following places: within a NOTICE text file distributed\n+          as part of the Derivative Works; within the Source form or\n+          documentation, if provided along with the Derivative Works; or,\n+          within a display generated by the Derivative Works, if and\n+          wherever such third-party notices normally appear. The contents\n+          of the NOTICE file are for informational purposes only and\n+          do not modify the License. You may add Your own attribution\n+          notices within Derivative Works that You distribute, alongside\n+          or as an addendum to the NOTICE text from the Work, provided\n+          that such additional attribution notices cannot be construed\n+          as modifying the License.\n+\n+      You may add Your own copyright statement to Your modifications and\n+      may provide additional or different license terms and conditions\n+      for use, reproduction, or distribution of Your modifications, or\n+      for any such Derivative Works as a whole, provided Your use,\n+      reproduction, and distribution of the Work otherwise complies with\n+      the conditions stated in this License.\n+\n+   5. Submission of Contributions. Unless You explicitly state otherwise,\n+      any Contribution intentionally submitted for inclusion in the Work\n+      by You to the Licensor shall be under the terms and conditions of\n+      this License, without any additional terms or conditions.\n+      Notwithstanding the above, nothing herein shall supersede or modify\n+      the terms of any separate license agreement you may have executed\n+      with Licensor regarding such Contributions.\n+\n+   6. Trademarks. This License does not grant permission to use the trade\n+      names, trademarks, service marks, or product names of the Licensor,\n+      except as required for reasonable and customary use in describing the\n+      origin of the Work and reproducing the content of the NOTICE file.\n+\n+   7. Disclaimer of Warranty. Unless required by applicable law or\n+      agreed to in writing, Licensor provides the Work (and each\n+      Contributor provides its Contributions) on an \"AS IS\" BASIS,\n+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or\n+      implied, including, without limitation, any warranties or conditions\n+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A\n+      PARTICULAR PURPOSE. You are solely responsible for determining the\n+      appropriateness of using or redistributing the Work and assume any\n+      risks associated with Your exercise of permissions under this License.\n+\n+   8. Limitation of Liability. In no event and under no legal theory,\n+      whether in tort (including negligence), contract, or otherwise,\n+      unless required by applicable law (such as deliberate and grossly\n+      negligent acts) or agreed to in writing, shall any Contributor be\n+      liable to You for damages, including any direct, indirect, special,\n+      incidental, or consequential damages of any character arising as a\n+      result of this License or out of the use or inability to use the\n+      Work (including but not limited to damages for loss of goodwill,\n+      work stoppage, computer failure or malfunction, or any and all\n+      other commercial damages or losses), even if such Contributor\n+      has been advised of the possibility of such damages.\n+\n+   9. Accepting Warranty or Additional Liability. While redistributing\n+      the Work or Derivative Works thereof, You may choose to offer,\n+      and charge a fee for, acceptance of support, warranty, indemnity,\n+      or other liability obligations and/or rights consistent with this\n+      License. However, in accepting such obligations, You may act only\n+      on Your own behalf and on Your sole responsibility, not on behalf\n+      of any other Contributor, and only if You agree to indemnify,\n+      defend, and hold each Contributor harmless for any liability\n+      incurred by, or claims asserted against, such Contributor by reason\n+      of your accepting any such warranty or additional liability.\n+\n+   END OF TERMS AND CONDITIONS\n+\n+   APPENDIX: How to apply the Apache License to your work.\n+\n+      To apply the Apache License to your work, attach the following\n+      boilerplate notice, with the fields enclosed by brackets \"[]\"\n+      replaced with your own identifying information. (Don't include\n+      the brackets!)  The text should be enclosed in the appropriate\n+      comment syntax for the file format. We also recommend that a\n+      file or class name and description of purpose be included on the\n+      same \"printed page\" as the copyright notice for easier\n+      identification within third-party archives.\n+\n+   Copyright [yyyy] [name of copyright owner]\n+\n+   Licensed under the Apache License, Version 2.0 (the \"License\");\n+   you may not use this file except in compliance with the License.\n+   You may obtain a copy of the License at\n+\n+       http://www.apache.org/licenses/LICENSE-2.0\n+\n+   Unless required by applicable law or agreed to in writing, software\n+   distributed under the License is distributed on an \"AS IS\" BASIS,\n+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+   See the License for the specific language governing permissions and\n+   limitations under the License."
+        }
+      ]
+    },
+    {
+      "author": "mabelzhang",
+      "date": "2020-10-15T23:09:41Z",
+      "sha": "4d834c6fb1984b5dd8b410266bb7e0553f1984ec",
+      "message": "update maintainers\n\nSigned-off-by: Mabel Zhang <mabel@openrobotics.org>",
+      "files_changed": 2,
+      "additions": 5,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "0b67577453f2baa98e3855c6daba52f46d1769ef",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "changes": 4,
+          "blob_url": "https://github.com/ament/ament_package/blob/4d834c6fb1984b5dd8b410266bb7e0553f1984ec/package.xml",
+          "raw_url": "https://github.com/ament/ament_package/raw/4d834c6fb1984b5dd8b410266bb7e0553f1984ec/package.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/package.xml?ref=4d834c6fb1984b5dd8b410266bb7e0553f1984ec",
+          "patch": "@@ -4,9 +4,11 @@\n   <name>ament_package</name>\n   <version>0.9.2</version>\n   <description>The parser for the manifest files in the ament buildsystem.</description>\n-  <maintainer email=\"dthomas@osrfoundation.org\">Dirk Thomas</maintainer>\n+  <maintainer email=\"mabel@openrobotics.org\">Mabel Zhang</maintainer>\n   <license>Apache License 2.0</license>\n \n+  <author email=\"dthomas@osrfoundation.org\">Dirk Thomas</author>\n+\n   <depend>python3-importlib-metadata</depend>\n   <depend>python3-setuptools</depend>\n "
+        },
+        {
+          "sha": "9c3dd1af2ae19a57166a9e28823367946dd8dfe7",
+          "filename": "setup.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ament/ament_package/blob/4d834c6fb1984b5dd8b410266bb7e0553f1984ec/setup.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/4d834c6fb1984b5dd8b410266bb7e0553f1984ec/setup.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/setup.py?ref=4d834c6fb1984b5dd8b410266bb7e0553f1984ec",
+          "patch": "@@ -15,8 +15,8 @@\n     zip_safe=True,\n     author='Dirk Thomas',\n     author_email='dthomas@osrfoundation.org',\n-    maintainer='Dirk Thomas',\n-    maintainer_email='dthomas@osrfoundation.org',\n+    maintainer='Mabel Zhang',\n+    maintainer_email='mabel@openrobotics.org',\n     url='https://github.com/ament/ament_package/wiki',\n     download_url='https://github.com/ament/ament_package/releases',\n     keywords=['ROS'],"
+        }
+      ]
+    },
+    {
+      "author": "nuclearsandwich",
+      "date": "2017-06-09T01:01:23Z",
+      "sha": "d040eef874504bfb6ad74214214e83fe0558d66a",
+      "message": "Add setuptools dependency for pkg_resources (#50)",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "9791873d58143cff7d45752aae9511e4769a064a",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_package/blob/d040eef874504bfb6ad74214214e83fe0558d66a/package.xml",
+          "raw_url": "https://github.com/ament/ament_package/raw/d040eef874504bfb6ad74214214e83fe0558d66a/package.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/package.xml?ref=d040eef874504bfb6ad74214214e83fe0558d66a",
+          "patch": "@@ -10,6 +10,8 @@\n   <buildtool_depend>python3</buildtool_depend>\n \n   <buildtool_export_depend>python3</buildtool_export_depend>\n+  \n+  <depend>python3-setuptools</depend>\n \n   <export>\n     <build_type>ament_python</build_type>"
+        }
+      ]
+    },
+    {
+      "author": "mjcarroll",
+      "date": "2019-11-08T21:14:17Z",
+      "sha": "347b10ad65886b204e76cf689d2aa67f931146c8",
+      "message": "0.8.5\n\nSigned-off-by: Michael Carroll <michael@openrobotics.org>",
+      "files_changed": 2,
+      "additions": 85,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "af3cdb35d48d508e6bc1fe85b61938216f5f494e",
+          "filename": "CHANGELOG.rst",
+          "status": "added",
+          "additions": 84,
+          "deletions": 0,
+          "changes": 84,
+          "blob_url": "https://github.com/ament/ament_package/blob/347b10ad65886b204e76cf689d2aa67f931146c8/CHANGELOG.rst",
+          "raw_url": "https://github.com/ament/ament_package/raw/347b10ad65886b204e76cf689d2aa67f931146c8/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/CHANGELOG.rst?ref=347b10ad65886b204e76cf689d2aa67f931146c8",
+          "patch": "@@ -0,0 +1,84 @@\n+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n+Changelog for package ament_package\n+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n+\n+0.8.5 (2019-11-08)\n+------------------\n+* Fix sh command to remove trailing separator (`#105 <https://github.com/ament/ament_package/issues/105>`_)\n+* Always prepend with a trailing separator (`#104 <https://github.com/ament/ament_package/issues/104>`_)\n+* Contributors: Jacob Perron\n+\n+0.8.4 (2019-10-23)\n+------------------\n+* add dsv type set-if-unset (`#102 <https://github.com/ament/ament_package/issues/102>`_)\n+* Add support for prepending multiple values to env variables from .dsv files (`#101 <https://github.com/ament/ament_package/issues/101>`_)\n+* Contributors: Dirk Thomas, Jacob Perron, Shane Loretz\n+\n+0.8.3 (2019-10-11)\n+------------------\n+* add type 'set' for dsv files (`#95 <https://github.com/ament/ament_package/issues/95>`_)\n+* keep using default ignore list (`#96 <https://github.com/ament/ament_package/issues/96>`_)\n+* Contributors: Dirk Thomas\n+\n+0.8.2 (2019-10-04 15:45)\n+------------------------\n+* provide ament_prepend_unique_value function in prefix level sh script (`#94 <https://github.com/ament/ament_package/issues/94>`_)\n+* Contributors: Dirk Thomas\n+\n+0.8.1 (2019-10-04 14:34)\n+------------------------\n+* fix reading the package run dependencies (`#93 <https://github.com/ament/ament_package/issues/93>`_)\n+* if no package.dsv is available fallback to a local_setup file (`#92 <https://github.com/ament/ament_package/issues/92>`_)\n+* Contributors: Dirk Thomas\n+\n+0.8.0 (2019-10-04 10:32)\n+------------------------\n+* perform environment calculation in Python (`#89 <https://github.com/ament/ament_package/issues/89>`_)\n+* escape closing parenthesis in local_setup.bat file (`#91 <https://github.com/ament/ament_package/issues/91>`_)\n+* add quotes around ament_python_executable variable in local_setup.bat (`#90 <https://github.com/ament/ament_package/issues/90>`_)\n+* fix pytest warning about unknown markers (`#88 <https://github.com/ament/ament_package/issues/88>`_)\n+* install resource marker file for package (`#87 <https://github.com/ament/ament_package/issues/87>`_)\n+* Contributors: Dirk Thomas\n+\n+0.7.2 (2019-09-18)\n+------------------\n+* install package manifest (`#86 <https://github.com/ament/ament_package/issues/86>`_)\n+* Contributors: Dirk Thomas\n+\n+0.7.1 (2019-08-21)\n+------------------\n+* add warning/fallback for AMENT_CURRENT_PREFIX if relocated (`#85 <https://github.com/ament/ament_package/issues/85>`_)\n+* Contributors: Dirk Thomas\n+\n+0.7.0 (2019-04-08)\n+------------------\n+* add section about DCO to CONTRIBUTING.md\n+* Contributors: Dirk Thomas\n+\n+0.6.0 (2018-11-13)\n+------------------\n+* Fix lint warnings from invalid escape sequences (`#82 <https://github.com/ament/ament_package/issues/82>`_)\n+* Contributors: Jacob Perron\n+\n+0.5.2 (2018-07-19)\n+------------------\n+* fix custom zsh logic for handling arrays (`#80 <https://github.com/ament/ament_package/issues/80>`_)\n+* Contributors: Dirk Thomas\n+\n+0.5.1 (2018-06-14)\n+------------------\n+* Use flake8 directly (`#77 <https://github.com/ament/ament_package/issues/77>`_)\n+* Drop dependency on pyparsing. (`#78 <https://github.com/ament/ament_package/issues/78>`_)\n+* Contributors: Steven! Ragnarök\n+\n+0.5.0 (2018-06-13)\n+------------------\n+* remove all Python modules by the templates (`#75 <https://github.com/ament/ament_package/issues/75>`_)\n+* add pytest markers to linter tests\n+* support file attribution of license tag (`#73 <https://github.com/ament/ament_package/issues/73>`_)\n+* set zip_safe to avoid warning during installation (`#72 <https://github.com/ament/ament_package/issues/72>`_)\n+* Revert \"Revert \"consider condition for group membership (`#69 <https://github.com/ament/ament_package/issues/69>`_)\" (`#70 <https://github.com/ament/ament_package/issues/70>`_)\" (`#71 <https://github.com/ament/ament_package/issues/71>`_)\n+* Revert \"consider condition for group membership (`#69 <https://github.com/ament/ament_package/issues/69>`_)\" (`#70 <https://github.com/ament/ament_package/issues/70>`_)\n+* consider condition for group membership (`#69 <https://github.com/ament/ament_package/issues/69>`_)\n+* fix copyright year\n+* Contributors: Dirk Thomas, Mikael Arguedas, Tamaki Nishino"
+        },
+        {
+          "sha": "bf1a0da60d6befce3434f323113051f5163d5310",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_package/blob/347b10ad65886b204e76cf689d2aa67f931146c8/package.xml",
+          "raw_url": "https://github.com/ament/ament_package/raw/347b10ad65886b204e76cf689d2aa67f931146c8/package.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/package.xml?ref=347b10ad65886b204e76cf689d2aa67f931146c8",
+          "patch": "@@ -2,7 +2,7 @@\n <?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"2\">\n   <name>ament_package</name>\n-  <version>0.8.4</version>\n+  <version>0.8.5</version>\n   <description>The parser for the manifest files in the ament buildsystem.</description>\n   <maintainer email=\"dthomas@osrfoundation.org\">Dirk Thomas</maintainer>\n   <license>Apache License 2.0</license>"
+        }
+      ]
+    },
+    {
+      "author": "jacobperron",
+      "date": "2018-10-25T20:14:07Z",
+      "sha": "c2635ea39919f8572037b9551a23b45f4606098b",
+      "message": "Fix lint warnings from invalid escape sequences (#82)\n\nUse raw strings for regex patterns to avoid warnings.",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "fe84a17c714cb215b19c8ba8ddddd49e5d1296db",
+          "filename": "ament_package/templates.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_package/blob/c2635ea39919f8572037b9551a23b45f4606098b/ament_package%2Ftemplates.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/c2635ea39919f8572037b9551a23b45f4606098b/ament_package%2Ftemplates.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2Ftemplates.py?ref=c2635ea39919f8572037b9551a23b45f4606098b",
+          "patch": "@@ -111,7 +111,7 @@ def substitute(match):\n         if var in environment:\n             return environment[var]\n         return ''\n-    return re.sub('\\@[a-zA-Z0-9_]+\\@', substitute, template)\n+    return re.sub(r'\\@[a-zA-Z0-9_]+\\@', substitute, template)\n \n \n def _is_platform_specific_extension(filename):"
+        }
+      ]
+    },
+    {
+      "author": "mikaelarguedas",
+      "date": "2017-06-23T13:52:28Z",
+      "sha": "e17b3bde518fe4dc61e2e897cfcdfb0b9ee73acf",
+      "message": "add blankline between summary line and description (#54)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "2ced24e498dbfd257fbd944c3faf8123f446eabe",
+          "filename": "ament_package/package.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ament/ament_package/blob/e17b3bde518fe4dc61e2e897cfcdfb0b9ee73acf/ament_package%2Fpackage.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/e17b3bde518fe4dc61e2e897cfcdfb0b9ee73acf/ament_package%2Fpackage.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2Fpackage.py?ref=e17b3bde518fe4dc61e2e897cfcdfb0b9ee73acf",
+          "patch": "@@ -86,6 +86,7 @@ def __str__(self):\n     def get_build_type(self):\n         \"\"\"\n         Return value of export/build_type element, or 'catkin' if unspecified.\n+\n         :returns: package build type\n         :rtype: str\n         :raises: :exc:`InvalidPackage`"
+        }
+      ]
+    },
+    {
+      "author": "otamachan",
+      "date": "2018-04-03T17:50:45Z",
+      "sha": "28308125089b607f2797abee577371d7ee9a0934",
+      "message": "support file attribution of license tag (#73)\n\n* support file attribution of license tag\r\n\r\n* use file_ instead of file",
+      "files_changed": 3,
+      "additions": 30,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "cc317c468310f2d178a406acca754801f82ff088",
+          "filename": "ament_package/__init__.py",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 1,
+          "changes": 5,
+          "blob_url": "https://github.com/ament/ament_package/blob/28308125089b607f2797abee577371d7ee9a0934/ament_package%2F__init__.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/28308125089b607f2797abee577371d7ee9a0934/ament_package%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2F__init__.py?ref=28308125089b607f2797abee577371d7ee9a0934",
+          "patch": "@@ -94,6 +94,7 @@ def parse_package_string(data, *, filename=None):\n \n     from .exceptions import InvalidPackage\n     from .export import Export\n+    from .license import License\n     from .package import Package\n     from .person import Person\n     from .url import Url\n@@ -166,7 +167,9 @@ def parse_package_string(data, *, filename=None):\n     # at least one license\n     licenses = _get_nodes(root, 'license')\n     for node in licenses:\n-        pkg.licenses.append(_get_node_value(node))\n+        pkg.licenses.append(License(\n+            _get_node_value(node),\n+            file_=_get_node_attr(node, 'file', default=None)))\n \n     errors = []\n     # dependencies and relationships"
+        },
+        {
+          "sha": "05e79c10071de494684e61952464059b6aa0a654",
+          "filename": "ament_package/license.py",
+          "status": "added",
+          "additions": 24,
+          "deletions": 0,
+          "changes": 24,
+          "blob_url": "https://github.com/ament/ament_package/blob/28308125089b607f2797abee577371d7ee9a0934/ament_package%2Flicense.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/28308125089b607f2797abee577371d7ee9a0934/ament_package%2Flicense.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2Flicense.py?ref=28308125089b607f2797abee577371d7ee9a0934",
+          "patch": "@@ -0,0 +1,24 @@\n+# Copyright 2018 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+\n+class License:\n+    __slots__ = ['name', 'file']\n+\n+    def __init__(self, name, *, file_=None):\n+        self.name = name\n+        self.file = file_\n+\n+    def __str__(self):\n+        return self.name"
+        },
+        {
+          "sha": "acd993c7324f44b714f3dc431774cb0346ef52bf",
+          "filename": "test/test_package.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/ament/ament_package/blob/28308125089b607f2797abee577371d7ee9a0934/test%2Ftest_package.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/28308125089b607f2797abee577371d7ee9a0934/test%2Ftest_package.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/test%2Ftest_package.py?ref=28308125089b607f2797abee577371d7ee9a0934",
+          "patch": "@@ -17,6 +17,7 @@\n \n from ament_package.dependency import Dependency\n from ament_package.exceptions import InvalidPackage\n+from ament_package.license import License\n from ament_package.package import Package\n from ament_package.person import Person\n from mock import Mock\n@@ -112,7 +113,7 @@ def test_init_kwargs_string(self):\n \n     def test_init_kwargs_object(self):\n         mmain = [self.get_maintainer(), self.get_maintainer()]\n-        mlis = ['MIT', 'BSD']\n+        mlis = [License('MIT'), License('BSD', file_='LICENSE')]\n         mauth = [self.get_maintainer(), self.get_maintainer()]\n         murl = [Mock(), Mock()]\n         mbuilddep = [Mock(), Mock()]"
+        }
+      ]
+    },
+    {
+      "author": "geoffviola",
+      "date": "2016-10-28T22:56:56Z",
+      "sha": "91520ebda0074b50a45bcf8f77ad43a749646546",
+      "message": "added better features for finding python (#45)\n\n* added better features for finding python\r\n\r\n* Updated error message\r\n\r\n* removed extra variable",
+      "files_changed": 1,
+      "additions": 12,
+      "deletions": 3,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "45ea09b0c3599556056ddeb639aa915158c4afc9",
+          "filename": "ament_package/template/isolated_prefix_level/local_setup.bat.in",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 3,
+          "changes": 15,
+          "blob_url": "https://github.com/ament/ament_package/blob/91520ebda0074b50a45bcf8f77ad43a749646546/ament_package%2Ftemplate%2Fisolated_prefix_level%2Flocal_setup.bat.in",
+          "raw_url": "https://github.com/ament/ament_package/raw/91520ebda0074b50a45bcf8f77ad43a749646546/ament_package%2Ftemplate%2Fisolated_prefix_level%2Flocal_setup.bat.in",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2Ftemplate%2Fisolated_prefix_level%2Flocal_setup.bat.in?ref=91520ebda0074b50a45bcf8f77ad43a749646546",
+          "patch": "@@ -24,14 +24,23 @@ goto:eof\n   setlocal enabledelayedexpansion\n \n   :: use the Python executable known at configure time\n-  set \"ament_python_executable=@PYTHON_EXECUTABLE@\"\n+  set \"_ament_python_executable=@PYTHON_EXECUTABLE@\"\n   :: allow overriding it with a custom location\n   if \"%AMENT_PYTHON_EXECUTABLE%\" NEQ \"\" (\n-    set \"ament_python_executable=%AMENT_PYTHON_EXECUTABLE%\"\n+    set \"_ament_python_executable=%AMENT_PYTHON_EXECUTABLE%\"\n+  )\n+  if NOT exist %_ament_python_executable% (\n+    for %%I in (python.exe) do (\n+      if \"%%~$PATH:I\" NEQ \"\" set \"_ament_python_executable=%%~$PATH:I\"\n+    )\n+  )\n+  if NOT exist %_ament_python_executable% (\n+    echo Could not find Python executable: either add the folder of the Python executable (e.g. installed with Chocolatey) to the PATH variable or explicitly set the environment variable AMENT_PYTHON_EXECUTABLE to the full path of the Python executable\n+    goto:eof\n   )\n \n   set \"ordered_packages=\"\n-  for /f %%p in ('\"\"%ament_python_executable%\" \"%~dp0_order_isolated_packages.py\" \"%~2\\\"\"') do (\n+  for /f %%p in ('\"\"%_ament_python_executable%\" \"%~dp0_order_isolated_packages.py\" \"%~2\\\"\"') do (\n     if \"!ordered_packages!\" NEQ \"\" set \"ordered_packages=!ordered_packages!;\"\n     set \"ordered_packages=!ordered_packages!%%p\"\n   )"
+        }
+      ]
+    },
+    {
+      "author": "esteve",
+      "date": "2015-08-29T01:13:38Z",
+      "sha": "7735db9622d7c3dbb84d56be89e33f2d34ff3374",
+      "message": "Update local_setup.bat.in to use %~dp0 (folder in which the .bat file resides)",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 7,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "25b3039565622ffa7d546503f2e2a0551986792e",
+          "filename": "ament_package/template/prefix_level/local_setup.bat.in",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 7,
+          "changes": 10,
+          "blob_url": "https://github.com/ament/ament_package/blob/7735db9622d7c3dbb84d56be89e33f2d34ff3374/ament_package%2Ftemplate%2Fprefix_level%2Flocal_setup.bat.in",
+          "raw_url": "https://github.com/ament/ament_package/raw/7735db9622d7c3dbb84d56be89e33f2d34ff3374/ament_package%2Ftemplate%2Fprefix_level%2Flocal_setup.bat.in",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2Ftemplate%2Fprefix_level%2Flocal_setup.bat.in?ref=7735db9622d7c3dbb84d56be89e33f2d34ff3374",
+          "patch": "@@ -2,13 +2,9 @@\n @echo off\n if defined AMENT_TRACE_SETUP_FILES echo Inside \"%~0\"\n \n-:: since this file is sourced use either the provided AMENT_CURRENT_PREFIX\n-:: or fall back to the destination set at configure time\n-set \"AMENT_CURRENT_PREFIX=\"\n-if not defined AMENT_CURRENT_PREFIX (\n-  set \"AMENT_CURRENT_PREFIX=@CMAKE_INSTALL_PREFIX@\"\n-  call:convert_forwardslash_to_backslash AMENT_CURRENT_PREFIX\n-)\n+:: use the directory in which the .bat file resides, more info about %~dp0 at:\n+:: http://stackoverflow.com/a/112135\n+set \"AMENT_CURRENT_PREFIX=%~dp0\"\n \n :: set type of shell if not already set\n if not defined AMENT_SHELL ("
+        }
+      ]
+    },
+    {
+      "author": "wjwwood",
+      "date": "2014-05-19T21:42:03Z",
+      "sha": "19e4268f3426d8f9341666750a538833333845a5",
+      "message": "update LICENSE and put license stanza in files",
+      "files_changed": 8,
+      "additions": 105,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "fdd9c106cf5cf877e3d4249d973db32a5f454593",
+          "filename": "LICENSE",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_package/blob/19e4268f3426d8f9341666750a538833333845a5/LICENSE",
+          "raw_url": "https://github.com/ament/ament_package/raw/19e4268f3426d8f9341666750a538833333845a5/LICENSE",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/LICENSE?ref=19e4268f3426d8f9341666750a538833333845a5",
+          "patch": "@@ -187,7 +187,7 @@\n       same \"printed page\" as the copyright notice for easier\n       identification within third-party archives.\n \n-   Copyright [yyyy] [name of copyright owner]\n+   Copyright 2014 Open Source Robotics Foundation, Inc.\n \n    Licensed under the Apache License, Version 2.0 (the \"License\");\n    you may not use this file except in compliance with the License."
+        },
+        {
+          "sha": "a62f1cb9e5098c574a5ded7069cbbf2ed3ad1e2f",
+          "filename": "ament_package/__init__.py",
+          "status": "modified",
+          "additions": 14,
+          "deletions": 0,
+          "changes": 14,
+          "blob_url": "https://github.com/ament/ament_package/blob/19e4268f3426d8f9341666750a538833333845a5/ament_package%2F__init__.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/19e4268f3426d8f9341666750a538833333845a5/ament_package%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2F__init__.py?ref=19e4268f3426d8f9341666750a538833333845a5",
+          "patch": "@@ -1,3 +1,17 @@\n+# Copyright 2014 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#    http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n \"\"\"Library for parsing package.xml and providing an object representation.\"\"\"\n \n from copy import deepcopy"
+        },
+        {
+          "sha": "85e2063f22722e85cc8bd2a3d77637c839e697e7",
+          "filename": "ament_package/dependency.py",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 0,
+          "changes": 15,
+          "blob_url": "https://github.com/ament/ament_package/blob/19e4268f3426d8f9341666750a538833333845a5/ament_package%2Fdependency.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/19e4268f3426d8f9341666750a538833333845a5/ament_package%2Fdependency.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2Fdependency.py?ref=19e4268f3426d8f9341666750a538833333845a5",
+          "patch": "@@ -1,3 +1,18 @@\n+# Copyright 2014 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#    http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+\n class Dependency(object):\n     __slots__ = [\n         'name',"
+        },
+        {
+          "sha": "1a6bbc8592ca9b7a2c58fa10e3cee9edd1558388",
+          "filename": "ament_package/exceptions.py",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 0,
+          "changes": 15,
+          "blob_url": "https://github.com/ament/ament_package/blob/19e4268f3426d8f9341666750a538833333845a5/ament_package%2Fexceptions.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/19e4268f3426d8f9341666750a538833333845a5/ament_package%2Fexceptions.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2Fexceptions.py?ref=19e4268f3426d8f9341666750a538833333845a5",
+          "patch": "@@ -1,2 +1,17 @@\n+# Copyright 2014 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#    http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+\n class InvalidPackage(Exception):\n     pass"
+        },
+        {
+          "sha": "2456ba083cfc3fde65234359c5f69c086ecb2555",
+          "filename": "ament_package/export.py",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 0,
+          "changes": 15,
+          "blob_url": "https://github.com/ament/ament_package/blob/19e4268f3426d8f9341666750a538833333845a5/ament_package%2Fexport.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/19e4268f3426d8f9341666750a538833333845a5/ament_package%2Fexport.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2Fexport.py?ref=19e4268f3426d8f9341666750a538833333845a5",
+          "patch": "@@ -1,3 +1,18 @@\n+# Copyright 2014 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#    http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+\n class Export(object):\n     __slots__ = ['tagname', 'attributes', 'content']\n "
+        },
+        {
+          "sha": "530b274f8b3c4bf7aea53bb23c32140bcb410a45",
+          "filename": "ament_package/package.py",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 0,
+          "changes": 15,
+          "blob_url": "https://github.com/ament/ament_package/blob/19e4268f3426d8f9341666750a538833333845a5/ament_package%2Fpackage.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/19e4268f3426d8f9341666750a538833333845a5/ament_package%2Fpackage.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2Fpackage.py?ref=19e4268f3426d8f9341666750a538833333845a5",
+          "patch": "@@ -1,3 +1,18 @@\n+# Copyright 2014 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#    http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+\n from copy import deepcopy\n from .exceptions import InvalidPackage\n import re"
+        },
+        {
+          "sha": "e482c575de2a3ea760c65928175f03ac0a9db464",
+          "filename": "ament_package/person.py",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 0,
+          "changes": 15,
+          "blob_url": "https://github.com/ament/ament_package/blob/19e4268f3426d8f9341666750a538833333845a5/ament_package%2Fperson.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/19e4268f3426d8f9341666750a538833333845a5/ament_package%2Fperson.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2Fperson.py?ref=19e4268f3426d8f9341666750a538833333845a5",
+          "patch": "@@ -1,3 +1,18 @@\n+# Copyright 2014 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#    http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+\n from .exceptions import InvalidPackage\n import re\n "
+        },
+        {
+          "sha": "011707abbb672194f492890ac1c9f67ca3832c7d",
+          "filename": "ament_package/url.py",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 0,
+          "changes": 15,
+          "blob_url": "https://github.com/ament/ament_package/blob/19e4268f3426d8f9341666750a538833333845a5/ament_package%2Furl.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/19e4268f3426d8f9341666750a538833333845a5/ament_package%2Furl.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2Furl.py?ref=19e4268f3426d8f9341666750a538833333845a5",
+          "patch": "@@ -1,3 +1,18 @@\n+# Copyright 2014 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#    http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+\n class Url(object):\n     __slots__ = ['url', 'type']\n "
+        }
+      ]
+    },
+    {
+      "author": "gerkey",
+      "date": "2015-08-27T23:57:32Z",
+      "sha": "9b5b6483aa23df915b3090af978b04e10fb41271",
+      "message": "Merge pull request #16 from ament/prefix_setup_bat\n\nmake the prefix level setup.bat file actually .bat",
+      "files_changed": 2,
+      "additions": 39,
+      "deletions": 123,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "0aac70207685ab4c0517881876282a63c9a4e3a0",
+          "filename": "ament_package/template/prefix_level/local_setup.bat.in",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_package/blob/9b5b6483aa23df915b3090af978b04e10fb41271/ament_package%2Ftemplate%2Fprefix_level%2Flocal_setup.bat.in",
+          "raw_url": "https://github.com/ament/ament_package/raw/9b5b6483aa23df915b3090af978b04e10fb41271/ament_package%2Ftemplate%2Fprefix_level%2Flocal_setup.bat.in",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2Ftemplate%2Fprefix_level%2Flocal_setup.bat.in?ref=9b5b6483aa23df915b3090af978b04e10fb41271",
+          "patch": "@@ -23,7 +23,7 @@ call:list_files _PACKAGES \"%AMENT_CURRENT_PREFIX%\\share\\ament_index\\resource_ind\n :: source local_setup.bat files for each package to collect environment hooks\n call:call_local_setups _PACKAGES\n \n-:: no call the environment hooks in order\n+:: now call the environment hooks in order\n call:call_ament_environment_hooks\n call:clear_ament_environment_hook_vars\n set \"AMENT_CUR_ENV_HOOKS=\""
+        },
+        {
+          "sha": "1ce461547ab4822a31227bf04553f6a711c47cdc",
+          "filename": "ament_package/template/prefix_level/setup.bat.in",
+          "status": "modified",
+          "additions": 38,
+          "deletions": 122,
+          "changes": 160,
+          "blob_url": "https://github.com/ament/ament_package/blob/9b5b6483aa23df915b3090af978b04e10fb41271/ament_package%2Ftemplate%2Fprefix_level%2Fsetup.bat.in",
+          "raw_url": "https://github.com/ament/ament_package/raw/9b5b6483aa23df915b3090af978b04e10fb41271/ament_package%2Ftemplate%2Fprefix_level%2Fsetup.bat.in",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2Ftemplate%2Fprefix_level%2Fsetup.bat.in?ref=9b5b6483aa23df915b3090af978b04e10fb41271",
+          "patch": "@@ -1,128 +1,44 @@\n-# generated from ament_package/template/prefix_level/setup.sh.in\n+:: generated from ament_package/template/prefix_level/setup.bat.in\n+@echo off\n \n-# since this file is sourced use either the provided AMENT_CURRENT_PREFIX\n-# or fall back to the destination set at configure time\n-: ${AMENT_CURRENT_PREFIX:=@CMAKE_INSTALL_PREFIX@}\n+:: set the same directory as this file\n+set \"AMENT_CURRENT_PREFIX=%~dp0\"\n \n-# set type of shell if not already set\n-: ${AMENT_SHELL:=sh}\n+:: set type of shell if not already set\n+if not defined AMENT_SHELL (\n+  set \"AMENT_SHELL=bat\"\n+)\n \n-# find parent prefix path files for all packages under the current prefix\n-_RESOURCES=\"$(\\find \"$AMENT_CURRENT_PREFIX/share/ament_index/resource_index/parent_prefix_path\" -mindepth 1 -maxdepth 1 2> /dev/null | \\sort)\"\n+:: find parent prefix path files for all packages under the current prefix\n+call:list_files_sorted _RESOURCES \"%AMENT_CURRENT_PREFIX%\\share\\ament_index\\resource_index\\parent_prefix_path\"\n \n-# function to append non-duplicate values to environment variables\n-# using colons as separators and avoiding leading separators\n-ament_append_unique_value() {\n-  # arguments\n-  _listname=$1\n-  _value=$2\n-  #echo \"listname $_listname\"\n-  #eval echo \"list value \\$$_listname\"\n-  #echo \"value $_value\"\n-\n-  # check if the list contains the value\n-  eval _values=\\$$_listname\n-  _duplicate=\n-  _ament_append_unique_value_IFS=$IFS\n-  IFS=\":\"\n-  if [ \"$AMENT_SHELL\" = \"zsh\" ]; then\n-    ament_zsh_to_array _values\n-  fi\n-  for _item in $_values; do\n-    # ignore empty strings\n-    if [ -z \"$_item\" ]; then\n-      continue\n-    fi\n-    if [ $_item = $_value ]; then\n-      _duplicate=1\n-    fi\n-  done\n-  unset _item\n-\n-  # append only non-duplicates\n-  if [ -z \"$_duplicate\" ]; then\n-    # avoid leading separator\n-    if [ -z \"$_values\" ]; then\n-      eval $_listname=$_value\n-      #eval echo \"set list \\$$_listname\"\n-    else\n-      # field separator must not be a colon\n-      unset IFS\n-      eval $_listname=\\$$_listname:$_value\n-      #eval echo \"append list \\$$_listname\"\n-    fi\n-  fi\n-  IFS=$_ament_append_unique_value_IFS\n-  unset _ament_append_unique_value_IFS\n-  unset _duplicate\n-  unset _values\n-\n-  unset _value\n-  unset _listname\n+if \"%_RESOURCES%\" NEQ \"\" (\n+  for %%a in (\"%_RESOURCES:;=\";\"%\") do (\n+    echo To do: call local setup files for the parent workspaces listed in \"%%~a\"\n+  }\n }\n \n-# iterate over all parent_prefix_path files\n-_prefix_setup_IFS=$IFS\n-IFS=\"\n-\"\n-# this variable contains the concatenated prefix paths in reverse order\n-_UNIQUE_PREFIX_PATH=\"\"\n-if [ \"$AMENT_SHELL\" = \"zsh\" ]; then\n-  ament_zsh_to_array _RESOURCES\n-fi\n-for _resource in $_RESOURCES; do\n-  # read the content of the parent_prefix_path file\n-  _PARENT_PREFIX_PATH=\"$(\\cat \"$_resource\")\"\n-  # reverse the list\n-  _REVERSED_PARENT_PREFIX_PATH=\"\"\n-  IFS=\":\"\n-  if [ \"$AMENT_SHELL\" = \"zsh\" ]; then\n-    ament_zsh_to_array _PARENT_PREFIX_PATH\n-  fi\n-  for _path in $_PARENT_PREFIX_PATH; do\n-    # avoid leading separator\n-    if [ -z \"$_REVERSED_PARENT_PREFIX_PATH\" ]; then\n-      _REVERSED_PARENT_PREFIX_PATH=$_path\n-    else\n-      _REVERSED_PARENT_PREFIX_PATH=$_path:$_REVERSED_PARENT_PREFIX_PATH\n-    fi\n-  done\n-  unset _PARENT_PREFIX_PATH\n-  # collect all unique parent prefix path\n-  if [ \"$AMENT_SHELL\" = \"zsh\" ]; then\n-    ament_zsh_to_array _REVERSED_PARENT_PREFIX_PATH\n-  fi\n-  for _path in $_REVERSED_PARENT_PREFIX_PATH; do\n-    ament_append_unique_value _UNIQUE_PREFIX_PATH \"$_path\"\n-  done\n-  unset _REVERSED_PARENT_PREFIX_PATH\n-done\n-unset _resource\n-unset _RESOURCES\n-\n-# append this directory to the prefix path\n-ament_append_unique_value _UNIQUE_PREFIX_PATH \"$AMENT_CURRENT_PREFIX\"\n-unset AMENT_CURRENT_PREFIX\n-\n-# source local_setup.EXT or local_setup.sh file for each prefix path\n-IFS=\":\"\n-if [ \"$AMENT_SHELL\" = \"zsh\" ]; then\n-  ament_zsh_to_array _UNIQUE_PREFIX_PATH\n-fi\n-for _path in $_UNIQUE_PREFIX_PATH; do\n-  # trace output\n-  if [ -n \"$AMENT_TRACE_SETUP_FILES\" ]; then\n-    echo \". \\\"$_path/local_setup.$AMENT_SHELL\\\"\"\n-  fi\n-  if [ -f \"$_path/local_setup.$AMENT_SHELL\" ]; then\n-    if [ \"$AMENT_SHELL\" = \"sh\" ]; then\n-      # provide AMENT_CURRENT_PREFIX to .sh files\n-      AMENT_CURRENT_PREFIX=$_path\n-    fi\n-    . \"$_path/local_setup.$AMENT_SHELL\"\n-  fi\n-done\n-unset _path\n-IFS=$_prefix_setup_IFS\n-unset _prefix_setup_IFS\n-unset _UNIQUE_PREFIX_PATH\n+echo To do: call local setup files for this workspace\n+goto:eof\n+\n+:: function to list the files in a directory in numerical order\n+:: http://stackoverflow.com/a/18749126\n+:list_files_sorted\n+  setlocal enabledelayedexpansion\n+  :: create an array with filenames in right order\n+  for /f %%f in ('dir /b \"%~2\"') do (\n+     for /F \"delims=-\" %%n in (\"%%f\") do (\n+        set \"number=00000%%n\"\n+        set \"file[!number:~-6!]=%%f\"\n+     )\n+  )\n+  :: process the filenames in right order\n+  set \"_files=\"\n+  for /F \"tokens=2 delims==\" %%f in ('set file[') do (\n+    if \"%_files%\" NEQ \"\" set \"_files=%_files%;\"\n+    set \"_files=%_files%%f%\"\n+  )\n+  :: return result by reference\n+  (endlocal\n+    set \"%~1=%_files%\")\n+goto:eof"
+        }
+      ]
+    },
+    {
+      "author": "tfoote",
+      "date": "2015-04-01T00:57:52Z",
+      "sha": "caefb813dde29e17a86e5b44391d9cf7504df409",
+      "message": "adding more quotes to work with paths including whitespaces",
+      "files_changed": 1,
+      "additions": 12,
+      "deletions": 12,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "842be67e156e6cd457f5170b05338fa5d696abfa",
+          "filename": "ament_package/template/package_level/local_setup.sh.in",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 12,
+          "changes": 24,
+          "blob_url": "https://github.com/ament/ament_package/blob/caefb813dde29e17a86e5b44391d9cf7504df409/ament_package%2Ftemplate%2Fpackage_level%2Flocal_setup.sh.in",
+          "raw_url": "https://github.com/ament/ament_package/raw/caefb813dde29e17a86e5b44391d9cf7504df409/ament_package%2Ftemplate%2Fpackage_level%2Flocal_setup.sh.in",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2Ftemplate%2Fpackage_level%2Flocal_setup.sh.in?ref=caefb813dde29e17a86e5b44391d9cf7504df409",
+          "patch": "@@ -2,28 +2,28 @@\n \n # since this file is sourced use either the provided AMENT_CURRENT_PREFIX\n # or fall back to the destination set at configure time\n-: ${AMENT_CURRENT_PREFIX:=@CMAKE_INSTALL_PREFIX@}\n+: ${AMENT_CURRENT_PREFIX:=\"@CMAKE_INSTALL_PREFIX@\"}\n \n # function to append values to environment variables\n # using colons as separators and avoiding leading separators\n ament_append_value() {\n   # arguments\n-  _listname=$1\n-  _value=$2\n+  _listname=\"$1\"\n+  _value=\"$2\"\n   #echo \"listname $_listname\"\n   #eval echo \"list value \\$$_listname\"\n   #echo \"value $_value\"\n \n   # avoid leading separator\n-  eval _values=\\$$_listname\n+  eval _values=\\\"\\$$_listname\\\"\n   if [ -z \"$_values\" ]; then\n-    eval export $_listname=$_value\n+    eval export $_listname=\\\"$_value\\\"\n     #eval echo \"set list \\$$_listname\"\n   else\n     # field separator must not be a colon\n     _ament_append_value_IFS=$IFS\n     unset IFS\n-    eval export $_listname=\\$$_listname:$_value\n+    eval export $_listname=\\\"\\$$_listname:$_value\\\"\n     #eval echo \"append list \\$$_listname\"\n     IFS=$_ament_append_value_IFS\n     unset _ament_append_value_IFS\n@@ -38,14 +38,14 @@ ament_append_value() {\n # using colons as separators and avoiding trailing separators\n ament_prepend_unique_value() {\n   # arguments\n-  _listname=$1\n-  _value=$2\n+  _listname=\"$1\"\n+  _value=\"$2\"\n   #echo \"listname $_listname\"\n   #eval echo \"list value \\$$_listname\"\n   #echo \"value $_value\"\n \n   # check if the list contains the value\n-  eval _values=\\$$_listname\n+  eval _values=\\\"\\$$_listname\\\"\n   _duplicate=\n   _ament_prepend_unique_value_IFS=$IFS\n   IFS=\":\"\n@@ -57,7 +57,7 @@ ament_prepend_unique_value() {\n     if [ -z \"$_item\" ]; then\n       continue\n     fi\n-    if [ $_item = $_value ]; then\n+    if [ \"$_item\" = \"$_value\" ]; then\n       _duplicate=1\n     fi\n   done\n@@ -67,12 +67,12 @@ ament_prepend_unique_value() {\n   if [ -z \"$_duplicate\" ]; then\n     # avoid trailing separator\n     if [ -z \"$_values\" ]; then\n-      eval export $_listname=$_value\n+      eval export $_listname=\\\"$_value\\\"\n       #eval echo \"set list \\$$_listname\"\n     else\n       # field separator must not be a colon\n       unset IFS\n-      eval export $_listname=$_value:\\$$_listname\n+      eval export $_listname=\\\"$_value:\\$$_listname\\\"\n       #eval echo \"prepend list \\$$_listname\"\n     fi\n   fi"
+        }
+      ]
+    },
+    {
+      "author": "Sunrisepeak",
+      "date": "2026-03-25T17:15:42Z",
+      "sha": "26dc815b5de66ab47941ad7e4ddbe211b2d398f6",
+      "message": "feat: add support for fish (#164)\n\n- https://github.com/ament/ament_package/pull/164\n- https://github.com/ros2/ros2cli/pull/1211\n\nSigned-off-by: sunrisepeak <speakshen@163.com>",
+      "files_changed": 5,
+      "additions": 245,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "fb13cbaf0d5d93cb7340d257125bc023b672cd06",
+          "filename": "ament_package/template/package_level/local_setup.fish.in",
+          "status": "added",
+          "additions": 64,
+          "deletions": 0,
+          "changes": 64,
+          "blob_url": "https://github.com/ament/ament_package/blob/26dc815b5de66ab47941ad7e4ddbe211b2d398f6/ament_package%2Ftemplate%2Fpackage_level%2Flocal_setup.fish.in",
+          "raw_url": "https://github.com/ament/ament_package/raw/26dc815b5de66ab47941ad7e4ddbe211b2d398f6/ament_package%2Ftemplate%2Fpackage_level%2Flocal_setup.fish.in",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2Ftemplate%2Fpackage_level%2Flocal_setup.fish.in?ref=26dc815b5de66ab47941ad7e4ddbe211b2d398f6",
+          "patch": "@@ -0,0 +1,64 @@\n+# generated from ament_package/template/package_level/local_setup.fish.in\n+\n+# since this file is sourced use the destination set at configure time\n+# and override it with COLCON_CURRENT_PREFIX when provided\n+set -l AMENT_CURRENT_PREFIX \"@CMAKE_INSTALL_PREFIX@\"\n+if test -n \"$COLCON_CURRENT_PREFIX\"\n+    set AMENT_CURRENT_PREFIX \"$COLCON_CURRENT_PREFIX\"\n+end\n+if not test -d \"$AMENT_CURRENT_PREFIX\"\n+    echo \"The compile-time prefix path '$AMENT_CURRENT_PREFIX' doesn't exist. \\\n+Consider sourcing a different shell extension.\" 1>&2\n+    set -e AMENT_CURRENT_PREFIX\n+    return 1\n+end\n+set -l _package_local_setup_AMENT_CURRENT_PREFIX \"$AMENT_CURRENT_PREFIX\"\n+\n+# function to append values to environment variables\n+# using colons as separators and avoiding leading separators\n+function ament_append_value\n+    set -l _name $argv[1]\n+    set -l _val $argv[2]\n+    if set -q $_name; and test -n \"$$_name\"\n+        set -gx $_name \"$$_name:$_val\"\n+    else\n+        set -gx $_name \"$_val\"\n+    end\n+end\n+\n+# unset AMENT_ENVIRONMENT_HOOKS\n+# if not appending to them for return\n+if not set -q AMENT_RETURN_ENVIRONMENT_HOOKS\n+    set -e AMENT_ENVIRONMENT_HOOKS\n+end\n+\n+# restore AMENT_CURRENT_PREFIX before evaluating environment hooks\n+set AMENT_CURRENT_PREFIX \"$_package_local_setup_AMENT_CURRENT_PREFIX\"\n+\n+# list all environment hooks of this package\n+@ENVIRONMENT_HOOKS@\n+\n+functions -e ament_append_value\n+\n+# source all shell-specific environment hooks of this package\n+# if not returning them\n+if not set -q AMENT_RETURN_ENVIRONMENT_HOOKS\n+    for _hook in (string split \":\" -- \"$AMENT_ENVIRONMENT_HOOKS\")\n+        if string match -q -- \"*.fish\" \"$_hook\"\n+            set -gx AMENT_CURRENT_PREFIX \\\n+                \"$_package_local_setup_AMENT_CURRENT_PREFIX\"\n+            if test -f \"$_hook\"\n+                if test -n \"$AMENT_TRACE_SETUP_FILES\"\n+                    echo \"# source \\\"$_hook\\\"\"\n+                end\n+                source \"$_hook\"\n+            end\n+        end\n+    end\n+    set -e AMENT_ENVIRONMENT_HOOKS\n+end\n+\n+set -e _package_local_setup_AMENT_CURRENT_PREFIX\n+# reset AMENT_CURRENT_PREFIX after each package\n+# allowing to source multiple package-level setup files\n+set -e AMENT_CURRENT_PREFIX"
+        },
+        {
+          "sha": "0ff4f0ee778540d8335ba8b365775eeb84ef3f15",
+          "filename": "ament_package/template/prefix_level/_local_setup_util.py",
+          "status": "modified",
+          "additions": 79,
+          "deletions": 2,
+          "changes": 81,
+          "blob_url": "https://github.com/ament/ament_package/blob/26dc815b5de66ab47941ad7e4ddbe211b2d398f6/ament_package%2Ftemplate%2Fprefix_level%2F_local_setup_util.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/26dc815b5de66ab47941ad7e4ddbe211b2d398f6/ament_package%2Ftemplate%2Fprefix_level%2F_local_setup_util.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2Ftemplate%2Fprefix_level%2F_local_setup_util.py?ref=26dc815b5de66ab47941ad7e4ddbe211b2d398f6",
+          "patch": "@@ -15,13 +15,20 @@\n FORMAT_STR_INVOKE_SCRIPT = None\n FORMAT_STR_REMOVE_TRAILING_SEPARATOR = None\n \n+# Track primary extension so helpers can apply shell-specific behavior.\n+PRIMARY_EXTENSION = None\n+\n DSV_TYPE_APPEND_NON_DUPLICATE = 'append-non-duplicate'\n DSV_TYPE_PREPEND_NON_DUPLICATE = 'prepend-non-duplicate'\n DSV_TYPE_PREPEND_NON_DUPLICATE_IF_EXISTS = 'prepend-non-duplicate-if-exists'\n DSV_TYPE_SET = 'set'\n DSV_TYPE_SET_IF_UNSET = 'set-if-unset'\n DSV_TYPE_SOURCE = 'source'\n \n+# Fish treats PATH / MANPATH / CDPATH as list variables.\n+# Use fish list prepend/append syntax for these vars.\n+_FISH_LIST_VARS = {'PATH', 'MANPATH', 'CDPATH'}\n+\n \n def main(argv=sys.argv[1:]):  # noqa: D103\n     global FORMAT_STR_COMMENT_LINE\n@@ -30,6 +37,7 @@ def main(argv=sys.argv[1:]):  # noqa: D103\n     global FORMAT_STR_INVOKE_SCRIPT\n     global FORMAT_STR_REMOVE_LEADING_SEPARATOR\n     global FORMAT_STR_REMOVE_TRAILING_SEPARATOR\n+    global PRIMARY_EXTENSION\n \n     parser = argparse.ArgumentParser(\n         description='Output shell commands for the packages in topological '\n@@ -42,6 +50,8 @@ def main(argv=sys.argv[1:]):  # noqa: D103\n         help='The additional file extension to be considered')\n     args = parser.parse_args(argv)\n \n+    PRIMARY_EXTENSION = args.primary_extension\n+\n     if args.primary_extension == 'sh':\n         FORMAT_STR_COMMENT_LINE = '# {comment}'\n         FORMAT_STR_SET_ENV_VAR = 'export {name}=\"{value}\"'\n@@ -61,6 +71,31 @@ def main(argv=sys.argv[1:]):  # noqa: D103\n             'call:_ament_prefix_bat_strip_leading_semicolon \"{name}\"'\n         FORMAT_STR_REMOVE_TRAILING_SEPARATOR = \\\n             'call:_ament_prefix_bat_strip_trailing_semicolon \"{name}\"'\n+    elif args.primary_extension == 'fish':\n+        FORMAT_STR_COMMENT_LINE = '# {comment}'\n+        FORMAT_STR_SET_ENV_VAR = 'set -gx {name} \"{value}\"'\n+        FORMAT_STR_USE_ENV_VAR = '${name}'\n+        # Keep AMENT_CURRENT_PREFIX local to this begin/end block\n+        # so that it doesn't affect other scripts that are sourced.\n+        FORMAT_STR_INVOKE_SCRIPT = (\n+            'begin\\n'\n+            '    set -lx AMENT_CURRENT_PREFIX \"{prefix}\"\\n'\n+            '    if test -f \"{script_path}\"\\n'\n+            '        if test -n \"$AMENT_TRACE_SETUP_FILES\"\\n'\n+            '            echo \"# source \\\\\"{script_path}\\\\\"\"\\n'\n+            '        end\\n'\n+            '        source \"{script_path}\"\\n'\n+            '    else\\n'\n+            '        echo \"not found: \\\\\"{script_path}\\\\\"\" 1>&2\\n'\n+            '    end\\n'\n+            'end'\n+        )\n+        FORMAT_STR_REMOVE_LEADING_SEPARATOR = (\n+            \"set -gx {name} (string replace --regex '^:' '' -- \\\"${name}\\\")\"\n+        )\n+        FORMAT_STR_REMOVE_TRAILING_SEPARATOR = (\n+            \"set -gx {name} (string replace --regex ':$' '' -- \\\"${name}\\\")\"\n+        )\n     else:\n         assert False, 'Unknown primary extension: ' + args.primary_extension\n \n@@ -352,6 +387,22 @@ def _append_unique_value(name, value):\n             env_state[name] = set(os.environ[name].split(os.pathsep))\n         else:\n             env_state[name] = set()\n+\n+    if PRIMARY_EXTENSION == 'fish' and name in _FISH_LIST_VARS:\n+        # Fish list variables: use list-append syntax to avoid space-joining.\n+        if value not in env_state[name]:\n+            env_state[name].add(value)\n+            line = (\n+                'contains -- \"{value}\" ${name}; '\n+                'or set -gx {name} ${name} \"{value}\"'\n+            ).format(name=name, value=value)\n+        else:\n+            if not _include_comments():\n+                return []\n+            line = FORMAT_STR_COMMENT_LINE.format_map(\n+                {'comment': 'already in {}: {}'.format(name, value)})\n+        return [line]\n+\n     # append even if the variable has not been set yet, in case a shell script sets the\n     # same variable without the knowledge of this Python script.\n     # later _remove_ending_separators() will cleanup any unintentional trailing separator\n@@ -373,6 +424,22 @@ def _prepend_unique_value(name, value):\n             env_state[name] = set(os.environ[name].split(os.pathsep))\n         else:\n             env_state[name] = set()\n+\n+    if PRIMARY_EXTENSION == 'fish' and name in _FISH_LIST_VARS:\n+        # Fish list variables: use list-prepend syntax to avoid space-joining.\n+        if value not in env_state[name]:\n+            env_state[name].add(value)\n+            line = (\n+                'contains -- \"{value}\" ${name}; '\n+                'or set -gx {name} \"{value}\" ${name}'\n+            ).format(name=name, value=value)\n+        else:\n+            if not _include_comments():\n+                return []\n+            line = FORMAT_STR_COMMENT_LINE.format_map(\n+                {'comment': 'already in {}: {}'.format(name, value)})\n+        return [line]\n+\n     # prepend even if the variable has not been set yet, in case a shell script sets the\n     # same variable without the knowledge of this Python script.\n     # later _remove_ending_separators() will cleanup any unintentional trailing separator\n@@ -394,6 +461,10 @@ def _remove_ending_separators():\n         # skip variables that already had values before this script started prepending\n         if name in os.environ:\n             continue\n+        # Fish list variables don't use the colon-string approach so they\n+        # never accumulate stray separators.\n+        if PRIMARY_EXTENSION == 'fish' and name in _FISH_LIST_VARS:\n+            continue\n         commands += [\n             FORMAT_STR_REMOVE_LEADING_SEPARATOR.format_map({'name': name}),\n             FORMAT_STR_REMOVE_TRAILING_SEPARATOR.format_map({'name': name})]\n@@ -408,8 +479,14 @@ def _set(name, value):\n \n \n def _set_if_unset(name, value):\n-    line = FORMAT_STR_SET_ENV_VAR.format_map(\n-        {'name': name, 'value': value})\n+    if PRIMARY_EXTENSION == 'fish':\n+        # Fish: only set when NAME is unset or empty.\n+        # `set -q` checks existence; `test -n` checks non-empty value.\n+        line = 'set -q {name}; and test -n \"${name}\"; or set -gx {name} \"{value}\"'.format(\n+            name=name, value=value)\n+    else:\n+        line = FORMAT_STR_SET_ENV_VAR.format_map(\n+            {'name': name, 'value': value})\n     if env_state.get(name, os.environ.get(name)):\n         line = FORMAT_STR_COMMENT_LINE.format_map({'comment': line})\n     return [line]"
+        },
+        {
+          "sha": "b1cb2865743c659a3421415d587b5d17371c67f8",
+          "filename": "ament_package/template/prefix_level/local_setup.fish.in",
+          "status": "added",
+          "additions": 44,
+          "deletions": 0,
+          "changes": 44,
+          "blob_url": "https://github.com/ament/ament_package/blob/26dc815b5de66ab47941ad7e4ddbe211b2d398f6/ament_package%2Ftemplate%2Fprefix_level%2Flocal_setup.fish.in",
+          "raw_url": "https://github.com/ament/ament_package/raw/26dc815b5de66ab47941ad7e4ddbe211b2d398f6/ament_package%2Ftemplate%2Fprefix_level%2Flocal_setup.fish.in",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2Ftemplate%2Fprefix_level%2Flocal_setup.fish.in?ref=26dc815b5de66ab47941ad7e4ddbe211b2d398f6",
+          "patch": "@@ -0,0 +1,44 @@\n+# generated from ament_package/template/prefix_level/local_setup.fish.in\n+\n+# Prefer AMENT_CURRENT_PREFIX (set by setup.fish); otherwise use install-time prefix.\n+set -l _ament_prefix_fish_AMENT_CURRENT_PREFIX \"@CMAKE_INSTALL_PREFIX@\"\n+if test -n \"$AMENT_CURRENT_PREFIX\"\n+    set _ament_prefix_fish_AMENT_CURRENT_PREFIX \"$AMENT_CURRENT_PREFIX\"\n+end\n+\n+if not test -d \"$_ament_prefix_fish_AMENT_CURRENT_PREFIX\"\n+    echo \"The build-time prefix \\\"$_ament_prefix_fish_AMENT_CURRENT_PREFIX\\\" \\\n+doesn't exist. Either source a script for a different shell or set \\\n+AMENT_CURRENT_PREFIX explicitly.\" 1>&2\n+    set -e _ament_prefix_fish_AMENT_CURRENT_PREFIX\n+    return 1\n+end\n+\n+# Locate a Python interpreter.\n+set -l _ament_python_executable \"@ament_package_PYTHON_EXECUTABLE@\"\n+if test -n \"$AMENT_PYTHON_EXECUTABLE\"\n+    set _ament_python_executable \"$AMENT_PYTHON_EXECUTABLE\"\n+end\n+if not test -f \"$_ament_python_executable\"\n+    if command -v python3 > /dev/null 2>&1\n+        set _ament_python_executable (python3 -c \"import sys; print(sys.executable)\")\n+    else\n+        echo \"error: unable to find a python3 executable\" 1>&2\n+        set -e _ament_prefix_fish_AMENT_CURRENT_PREFIX\n+        return 1\n+    end\n+end\n+\n+# Generate fish setup commands in topological order and source them.\n+# psub turns Python stdout into a real file path for source.\n+# Generated commands use fish-native env handling (set -gx and list PATH).\n+if test -n \"$AMENT_TRACE_SETUP_FILES\"\n+    echo \"# source (\\\"$_ament_python_executable\\\" \\\n+\\\"$_ament_prefix_fish_AMENT_CURRENT_PREFIX/_local_setup_util.py\\\" fish | psub)\"\n+end\n+\n+source (command \"$_ament_python_executable\" \\\n+    \"$_ament_prefix_fish_AMENT_CURRENT_PREFIX/_local_setup_util.py\" fish | psub)\n+\n+set -e _ament_python_executable\n+set -e _ament_prefix_fish_AMENT_CURRENT_PREFIX"
+        },
+        {
+          "sha": "069dbdcb0a82ed14960789eef9b0ff0881264c50",
+          "filename": "ament_package/template/prefix_level/setup.fish",
+          "status": "added",
+          "additions": 56,
+          "deletions": 0,
+          "changes": 56,
+          "blob_url": "https://github.com/ament/ament_package/blob/26dc815b5de66ab47941ad7e4ddbe211b2d398f6/ament_package%2Ftemplate%2Fprefix_level%2Fsetup.fish",
+          "raw_url": "https://github.com/ament/ament_package/raw/26dc815b5de66ab47941ad7e4ddbe211b2d398f6/ament_package%2Ftemplate%2Fprefix_level%2Fsetup.fish",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2Ftemplate%2Fprefix_level%2Fsetup.fish?ref=26dc815b5de66ab47941ad7e4ddbe211b2d398f6",
+          "patch": "@@ -0,0 +1,56 @@\n+# copied from ament_package/template/prefix_level/setup.fish\n+\n+# Determine prefix from this script's location at runtime.\n+# 'status -f' gives the path of the currently sourced file in fish.\n+set -l AMENT_CURRENT_PREFIX (builtin realpath (dirname (status -f)))\n+\n+# trace output\n+if test -n \"$AMENT_TRACE_SETUP_FILES\"\n+    echo \"# source \\\"$AMENT_CURRENT_PREFIX/local_setup.fish\\\"\"\n+end\n+\n+# Build ordered prefixes (same order as setup.sh.in) for overlay workspaces.\n+# Keep dedup inline: fish functions can't update caller local vars.\n+set -l _UNIQUE_PREFIX_PATH\n+set -l _parent_index \\\n+    \"$AMENT_CURRENT_PREFIX/share/ament_index/resource_index/parent_prefix_path\"\n+\n+if test -d \"$_parent_index\"\n+    for _resource in (command ls \"$_parent_index\" 2>/dev/null | command sort)\n+        read -z _content < \"$_parent_index/$_resource\" 2>/dev/null; or set _content \"\"\n+        set -l _paths (string split \":\" -- \"$_content\")\n+        # Reverse the list (similar to setup.sh)\n+        set -l _reversed\n+        for _p in $_paths\n+            if test \"$_p\" = \"{prefix}\"\n+                set _p \"$AMENT_CURRENT_PREFIX\"\n+            end\n+            set _reversed \"$_p\" $_reversed\n+        end\n+        for _p in $_reversed\n+            if not contains -- \"$_p\" $_UNIQUE_PREFIX_PATH\n+                set -a _UNIQUE_PREFIX_PATH \"$_p\"\n+            end\n+        end\n+    end\n+end\n+\n+# Always include the current prefix last (highest priority).\n+if not contains -- \"$AMENT_CURRENT_PREFIX\" $_UNIQUE_PREFIX_PATH\n+    set -a _UNIQUE_PREFIX_PATH \"$AMENT_CURRENT_PREFIX\"\n+end\n+\n+# Source local_setup.fish for each prefix in order.\n+for _prefix_path in $_UNIQUE_PREFIX_PATH\n+    set -gx AMENT_CURRENT_PREFIX \"$_prefix_path\"\n+    if test -f \"$_prefix_path/local_setup.fish\"\n+        if test -n \"$AMENT_TRACE_SETUP_FILES\"\n+            echo \"# source \\\"$_prefix_path/local_setup.fish\\\"\"\n+        end\n+        source \"$_prefix_path/local_setup.fish\"\n+    end\n+end\n+\n+set -e AMENT_CURRENT_PREFIX\n+set -e _UNIQUE_PREFIX_PATH\n+set -e _parent_index"
+        },
+        {
+          "sha": "c1f8465c0adc290b9b01d2216af3e169cbd8b2bd",
+          "filename": "ament_package/templates.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_package/blob/26dc815b5de66ab47941ad7e4ddbe211b2d398f6/ament_package%2Ftemplates.py",
+          "raw_url": "https://github.com/ament/ament_package/raw/26dc815b5de66ab47941ad7e4ddbe211b2d398f6/ament_package%2Ftemplates.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/ament_package%2Ftemplates.py?ref=26dc815b5de66ab47941ad7e4ddbe211b2d398f6",
+          "patch": "@@ -31,6 +31,7 @@ def get_package_level_template_names(all_platforms=False):\n     names = ['local_setup.%s.in' % ext for ext in [\n         'bash',\n         'bat',\n+        'fish',\n         'sh',\n         'zsh',\n     ]]\n@@ -52,6 +53,7 @@ def get_prefix_level_template_names(*, all_platforms=False):\n     ]\n     names = ['local_setup.%s' % ext for ext in extensions] + \\\n         ['setup.%s' % ext for ext in extensions] + \\\n+        ['local_setup.fish.in', 'setup.fish'] + \\\n         ['_local_setup_util.py']\n     if not all_platforms:\n         names = [name for name in names if _is_platform_specific_extension(name)]"
+        }
+      ]
+    },
+    {
+      "author": "Michael Carroll",
+      "date": "2019-11-08T21:14:17Z",
+      "sha": "347b10ad65886b204e76cf689d2aa67f931146c8",
+      "message": "0.8.5\n\nSigned-off-by: Michael Carroll <michael@openrobotics.org>",
+      "files_changed": 2,
+      "additions": 85,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "af3cdb35d48d508e6bc1fe85b61938216f5f494e",
+          "filename": "CHANGELOG.rst",
+          "status": "added",
+          "additions": 84,
+          "deletions": 0,
+          "changes": 84,
+          "blob_url": "https://github.com/ament/ament_package/blob/347b10ad65886b204e76cf689d2aa67f931146c8/CHANGELOG.rst",
+          "raw_url": "https://github.com/ament/ament_package/raw/347b10ad65886b204e76cf689d2aa67f931146c8/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/CHANGELOG.rst?ref=347b10ad65886b204e76cf689d2aa67f931146c8",
+          "patch": "@@ -0,0 +1,84 @@\n+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n+Changelog for package ament_package\n+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n+\n+0.8.5 (2019-11-08)\n+------------------\n+* Fix sh command to remove trailing separator (`#105 <https://github.com/ament/ament_package/issues/105>`_)\n+* Always prepend with a trailing separator (`#104 <https://github.com/ament/ament_package/issues/104>`_)\n+* Contributors: Jacob Perron\n+\n+0.8.4 (2019-10-23)\n+------------------\n+* add dsv type set-if-unset (`#102 <https://github.com/ament/ament_package/issues/102>`_)\n+* Add support for prepending multiple values to env variables from .dsv files (`#101 <https://github.com/ament/ament_package/issues/101>`_)\n+* Contributors: Dirk Thomas, Jacob Perron, Shane Loretz\n+\n+0.8.3 (2019-10-11)\n+------------------\n+* add type 'set' for dsv files (`#95 <https://github.com/ament/ament_package/issues/95>`_)\n+* keep using default ignore list (`#96 <https://github.com/ament/ament_package/issues/96>`_)\n+* Contributors: Dirk Thomas\n+\n+0.8.2 (2019-10-04 15:45)\n+------------------------\n+* provide ament_prepend_unique_value function in prefix level sh script (`#94 <https://github.com/ament/ament_package/issues/94>`_)\n+* Contributors: Dirk Thomas\n+\n+0.8.1 (2019-10-04 14:34)\n+------------------------\n+* fix reading the package run dependencies (`#93 <https://github.com/ament/ament_package/issues/93>`_)\n+* if no package.dsv is available fallback to a local_setup file (`#92 <https://github.com/ament/ament_package/issues/92>`_)\n+* Contributors: Dirk Thomas\n+\n+0.8.0 (2019-10-04 10:32)\n+------------------------\n+* perform environment calculation in Python (`#89 <https://github.com/ament/ament_package/issues/89>`_)\n+* escape closing parenthesis in local_setup.bat file (`#91 <https://github.com/ament/ament_package/issues/91>`_)\n+* add quotes around ament_python_executable variable in local_setup.bat (`#90 <https://github.com/ament/ament_package/issues/90>`_)\n+* fix pytest warning about unknown markers (`#88 <https://github.com/ament/ament_package/issues/88>`_)\n+* install resource marker file for package (`#87 <https://github.com/ament/ament_package/issues/87>`_)\n+* Contributors: Dirk Thomas\n+\n+0.7.2 (2019-09-18)\n+------------------\n+* install package manifest (`#86 <https://github.com/ament/ament_package/issues/86>`_)\n+* Contributors: Dirk Thomas\n+\n+0.7.1 (2019-08-21)\n+------------------\n+* add warning/fallback for AMENT_CURRENT_PREFIX if relocated (`#85 <https://github.com/ament/ament_package/issues/85>`_)\n+* Contributors: Dirk Thomas\n+\n+0.7.0 (2019-04-08)\n+------------------\n+* add section about DCO to CONTRIBUTING.md\n+* Contributors: Dirk Thomas\n+\n+0.6.0 (2018-11-13)\n+------------------\n+* Fix lint warnings from invalid escape sequences (`#82 <https://github.com/ament/ament_package/issues/82>`_)\n+* Contributors: Jacob Perron\n+\n+0.5.2 (2018-07-19)\n+------------------\n+* fix custom zsh logic for handling arrays (`#80 <https://github.com/ament/ament_package/issues/80>`_)\n+* Contributors: Dirk Thomas\n+\n+0.5.1 (2018-06-14)\n+------------------\n+* Use flake8 directly (`#77 <https://github.com/ament/ament_package/issues/77>`_)\n+* Drop dependency on pyparsing. (`#78 <https://github.com/ament/ament_package/issues/78>`_)\n+* Contributors: Steven! Ragnarök\n+\n+0.5.0 (2018-06-13)\n+------------------\n+* remove all Python modules by the templates (`#75 <https://github.com/ament/ament_package/issues/75>`_)\n+* add pytest markers to linter tests\n+* support file attribution of license tag (`#73 <https://github.com/ament/ament_package/issues/73>`_)\n+* set zip_safe to avoid warning during installation (`#72 <https://github.com/ament/ament_package/issues/72>`_)\n+* Revert \"Revert \"consider condition for group membership (`#69 <https://github.com/ament/ament_package/issues/69>`_)\" (`#70 <https://github.com/ament/ament_package/issues/70>`_)\" (`#71 <https://github.com/ament/ament_package/issues/71>`_)\n+* Revert \"consider condition for group membership (`#69 <https://github.com/ament/ament_package/issues/69>`_)\" (`#70 <https://github.com/ament/ament_package/issues/70>`_)\n+* consider condition for group membership (`#69 <https://github.com/ament/ament_package/issues/69>`_)\n+* fix copyright year\n+* Contributors: Dirk Thomas, Mikael Arguedas, Tamaki Nishino"
+        },
+        {
+          "sha": "bf1a0da60d6befce3434f323113051f5163d5310",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_package/blob/347b10ad65886b204e76cf689d2aa67f931146c8/package.xml",
+          "raw_url": "https://github.com/ament/ament_package/raw/347b10ad65886b204e76cf689d2aa67f931146c8/package.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_package/contents/package.xml?ref=347b10ad65886b204e76cf689d2aa67f931146c8",
+          "patch": "@@ -2,7 +2,7 @@\n <?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"2\">\n   <name>ament_package</name>\n-  <version>0.8.4</version>\n+  <version>0.8.5</version>\n   <description>The parser for the manifest files in the ament buildsystem.</description>\n   <maintainer email=\"dthomas@osrfoundation.org\">Dirk Thomas</maintainer>\n   <license>Apache License 2.0</license>"
+        }
+      ]
+    }
+  ]
+}

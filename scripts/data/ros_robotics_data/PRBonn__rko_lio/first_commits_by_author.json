@@ -1,0 +1,217 @@
+{
+  "_meta": {
+    "fetched_at": "2026-09-24T14:53:07Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "PRBonn",
+    "repo": "rko_lio",
+    "refreshed_at": "2026-09-24T14:53:07Z",
+    "refresh_note": "incrementally added 1 author(s) missing from a prior stale cache"
+  },
+  "data": [
+    {
+      "author": "dependabot[bot]",
+      "date": "2025-09-09T12:53:03Z",
+      "sha": "807e1b36eccf0ff773c02807ab45e87f960d0a96",
+      "message": "Bump actions/checkout from 3 to 5 (#18)\n\nBumps [actions/checkout](https://github.com/actions/checkout) from 3 to 5.\n- [Release notes](https://github.com/actions/checkout/releases)\n- [Changelog](https://github.com/actions/checkout/blob/main/CHANGELOG.md)\n- [Commits](https://github.com/actions/checkout/compare/v3...v5)\n\n---\nupdated-dependencies:\n- dependency-name: actions/checkout\n  dependency-version: '5'\n  dependency-type: direct:production\n  update-type: version-update:semver-major\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "fe1e356aef90c5bd30f97921da2f6d5b164fc5a4",
+          "filename": ".github/workflows/ros_build_reusable.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/PRBonn/rko_lio/blob/807e1b36eccf0ff773c02807ab45e87f960d0a96/.github%2Fworkflows%2Fros_build_reusable.yaml",
+          "raw_url": "https://github.com/PRBonn/rko_lio/raw/807e1b36eccf0ff773c02807ab45e87f960d0a96/.github%2Fworkflows%2Fros_build_reusable.yaml",
+          "contents_url": "https://api.github.com/repos/PRBonn/rko_lio/contents/.github%2Fworkflows%2Fros_build_reusable.yaml?ref=807e1b36eccf0ff773c02807ab45e87f960d0a96",
+          "patch": "@@ -11,7 +11,7 @@ jobs:\n     container:\n       image: ${{ inputs.ros_distro == 'humble' && 'alexsilener/ros_humble_desktop_cmake_328_ninja' || (inputs.ros_distro == 'jazzy' && 'osrf/ros:jazzy-desktop') || (inputs.ros_distro == 'kilted' && 'osrf/ros:kilted-desktop') || (inputs.ros_distro == 'rolling' && 'osrf/ros:rolling-desktop') }}\n     steps:\n-      - uses: actions/checkout@v3\n+      - uses: actions/checkout@v5\n       - name: Install build tools\n         run: |\n           apt-get update"
+        }
+      ]
+    },
+    {
+      "author": "mehermvr",
+      "date": "2025-09-03T14:20:35Z",
+      "sha": "5feaf7f0633089282a55f6753cf71321262ec70d",
+      "message": "add an initial readme",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "d327e2052d679d37dd3b9bb128135c803db436e8",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/PRBonn/rko_lio/blob/5feaf7f0633089282a55f6753cf71321262ec70d/README.md",
+          "raw_url": "https://github.com/PRBonn/rko_lio/raw/5feaf7f0633089282a55f6753cf71321262ec70d/README.md",
+          "contents_url": "https://api.github.com/repos/PRBonn/rko_lio/contents/README.md?ref=5feaf7f0633089282a55f6753cf71321262ec70d",
+          "patch": "@@ -0,0 +1,3 @@\n+# Under construction\n+\n+Please check back a day or two later. It won't take long."
+        }
+      ]
+    },
+    {
+      "author": "l00p3",
+      "date": "2025-12-05T15:51:42Z",
+      "sha": "3456c21300e039912fcd6d8bb6915a56d7341f51",
+      "message": "Some code refactoring and execution time improvement. (#93)\n\n---------\n\nCo-authored-by: Meher Malladi <rm.meher97@gmail.com>",
+      "files_changed": 1,
+      "additions": 46,
+      "deletions": 68,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "59a853e3613ea134fbd65d712605caee912c0bdb",
+          "filename": "rko_lio/core/lio.cpp",
+          "status": "modified",
+          "additions": 46,
+          "deletions": 68,
+          "changes": 114,
+          "blob_url": "https://github.com/PRBonn/rko_lio/blob/3456c21300e039912fcd6d8bb6915a56d7341f51/rko_lio%2Fcore%2Flio.cpp",
+          "raw_url": "https://github.com/PRBonn/rko_lio/raw/3456c21300e039912fcd6d8bb6915a56d7341f51/rko_lio%2Fcore%2Flio.cpp",
+          "contents_url": "https://api.github.com/repos/PRBonn/rko_lio/contents/rko_lio%2Fcore%2Flio.cpp?ref=3456c21300e039912fcd6d8bb6915a56d7341f51",
+          "patch": "@@ -32,7 +32,7 @@\n #include <tbb/blocked_range.h>\n #include <tbb/concurrent_vector.h>\n #include <tbb/global_control.h>\n-#include <tbb/parallel_for.h>\n+#include <tbb/parallel_reduce.h>\n #include <tbb/task_arena.h>\n // stl\n #include <algorithm>\n@@ -41,36 +41,6 @@\n #include <numeric>\n #include <stdexcept>\n \n-namespace {\n-// The only parallel part. taken from kiss-icp\n-// correspondence - original point and corresponding map point, in that order\n-using OneCorrespondence = std::pair<Eigen::Vector3d, Eigen::Vector3d>;\n-using Correspondences = tbb::concurrent_vector<OneCorrespondence>;\n-Correspondences data_association(const Sophus::SE3d& pose,\n-                                 const rko_lio::core::Vector3dVector& points,\n-                                 const rko_lio::core::SparseVoxelGrid& voxel_map,\n-                                 const rko_lio::core::LIO::Config& config) {\n-  const int max_threads = config.max_num_threads > 0 ? config.max_num_threads : tbb::this_task_arena::max_concurrency();\n-  static const auto tbb_control_settings =\n-      tbb::global_control(tbb::global_control::max_allowed_parallelism, static_cast<size_t>(max_threads));\n-  using points_iterator = std::vector<Eigen::Vector3d>::const_iterator;\n-  Correspondences correspondences;\n-  correspondences.reserve(points.size());\n-  tbb::parallel_for(tbb::blocked_range<points_iterator>{points.cbegin(), points.cend()},\n-                    [&](const tbb::blocked_range<points_iterator>& r) {\n-                      std::for_each(r.begin(), r.end(), [&](const auto& point) {\n-                        // TODO: left jacobian means we can reduce some compute here\n-                        // transform the source point here and get the corresponding map point\n-                        const auto& [closest_neighbor, distance] = voxel_map.GetClosestNeighbor(pose * point);\n-                        if (distance < config.max_correspondance_distance) {\n-                          correspondences.emplace_back(point, closest_neighbor);\n-                        }\n-                      });\n-                    });\n-  return correspondences;\n-}\n-} // namespace\n-\n namespace {\n constexpr double EPSILON = 1e-8;\n constexpr auto EPSILON_TIME = std::chrono::nanoseconds(10);\n@@ -80,13 +50,6 @@ inline void transform_points(const Sophus::SE3d& T, Vector3dVector& points) {\n   std::transform(points.begin(), points.end(), points.begin(), [&](const auto& point) { return T * point; });\n }\n \n-inline Eigen::Vector3d compute_point_to_point_residual(const Sophus::SE3d& pose,\n-                                                       const OneCorrespondence& correspondence) {\n-  const auto& [source, target] = correspondence;\n-  const Eigen::Vector3d residual = (pose * source) - target;\n-  return residual;\n-}\n-\n inline Eigen::Vector3d compute_acceleration_cost_residual(const Eigen::Vector3d& local_gravity_estimate,\n                                                           const Sophus::SO3d& current_rotation) {\n   const Eigen::Vector3d predicted_gravity =\n@@ -96,7 +59,10 @@ inline Eigen::Vector3d compute_acceleration_cost_residual(const Eigen::Vector3d&\n }\n \n using LinearSystem = std::tuple<Eigen::Matrix6d, Eigen::Vector6d, double>;\n-LinearSystem build_icp_linear_system(const Sophus::SE3d& current_pose, const Correspondences& correspondences) {\n+LinearSystem build_icp_linear_system(const Sophus::SE3d& current_pose,\n+                                     const rko_lio::core::Vector3dVector& frame,\n+                                     const rko_lio::core::SparseVoxelGrid& voxel_map,\n+                                     const double& max_correspondance_distance) {\n   auto linear_system_reduce = [](LinearSystem lhs, const LinearSystem& rhs) {\n     auto& [lhs_H, lhs_b, lhs_chi] = lhs;\n     const auto& [rhs_H, rhs_b, rhs_chi] = rhs;\n@@ -106,28 +72,46 @@ LinearSystem build_icp_linear_system(const Sophus::SE3d& current_pose, const Cor\n     return lhs;\n   };\n \n-  auto calculate_icp_jacobian = [](const Sophus::SE3d& current_pose, const OneCorrespondence& correspondence) {\n-    const auto& [source, _] = correspondence;\n-    Eigen::Matrix3_6d J_icp_l = Eigen::Matrix3_6d::Zero();\n-    J_icp_l.block<3, 3>(0, 0) = Eigen::Matrix3d::Identity();\n-    J_icp_l.block<3, 3>(0, 3) = -1 * Sophus::SO3d::hat(current_pose * source);\n-    return J_icp_l;\n+  auto linear_system_for_one_point = [](const Eigen::Vector3d& source, const Eigen::Vector3d& target) {\n+    Eigen::Matrix3_6d J_r;\n+    J_r.block<3, 3>(0, 0) = Eigen::Matrix3d::Identity();\n+    J_r.block<3, 3>(0, 3) = -1.0 * Sophus::SO3d::hat(source);\n+    const Eigen::Vector3d residual = source - target;\n+    return LinearSystem(J_r.transpose() * J_r,      // JTJ\n+                        J_r.transpose() * residual, // JTr\n+                        residual.squaredNorm());    // chi\n   };\n \n-  const auto& [H_icp, b_icp, chi_icp] =\n-      std::transform_reduce(correspondences.cbegin(), correspondences.cend(),\n-                            LinearSystem(Eigen::Matrix6d::Zero(), Eigen::Vector6d::Zero(), 0.0), linear_system_reduce,\n-                            // transform\n-                            [&](const auto& correspondence) {\n-                              const Eigen::Vector3d residual =\n-                                  compute_point_to_point_residual(current_pose, correspondence);\n-                              const auto J = calculate_icp_jacobian(current_pose, correspondence);\n-                              return LinearSystem(J.transpose() * J,        // JT * R.inv() * J\n-                                                  J.transpose() * residual, // JT * R.inv() * r\n-                                                  residual.squaredNorm());  // chi\n-                            });\n-\n-  return {H_icp / correspondences.size(), b_icp / correspondences.size(), 0.5 * chi_icp};\n+  // The only parallel part\n+  using points_iterator = std::vector<Eigen::Vector3d>::const_iterator;\n+  std::atomic<int> correspondances_counter = 0;\n+  const auto& [H_icp, b_icp, chi_icp] = tbb::parallel_reduce(\n+      // Range\n+      tbb::blocked_range<points_iterator>{frame.cbegin(), frame.cend()},\n+      // Identity\n+      LinearSystem(Eigen::Matrix6d::Zero(), Eigen::Vector6d::Zero(), 0.0),\n+      // 1st Lambda: Parallel computation\n+      [&](const tbb::blocked_range<points_iterator>& r, LinearSystem J) -> LinearSystem {\n+        return std::transform_reduce(r.begin(), r.end(), J, linear_system_reduce, [&](const auto& point) {\n+          // Compute data association and linear system\n+          const Eigen::Vector3d transformed_point = current_pose * point;\n+          const auto& [closest_neighbor, distance] = voxel_map.GetClosestNeighbor(transformed_point);\n+          if (distance < max_correspondance_distance) {\n+            correspondances_counter++;\n+            return linear_system_for_one_point(transformed_point, closest_neighbor);\n+          }\n+          // TODO (meher): additional 0 add flops, which may hurt single threaded perf slightly\n+          return LinearSystem(Eigen::Matrix6d::Zero(), Eigen::Vector6d::Zero(), 0.0);\n+        });\n+      },\n+      // 2nd Lambda: Parallel reduction of the private Jacobians\n+      linear_system_reduce);\n+\n+  if (correspondances_counter == 0) {\n+    throw std::runtime_error(\"Number of correspondences are 0.\");\n+  }\n+\n+  return {H_icp / correspondances_counter, b_icp / correspondances_counter, 0.5 * chi_icp};\n }\n \n LinearSystem build_orientation_linear_system(const Sophus::SE3d& current_pose,\n@@ -160,21 +144,15 @@ Sophus::SE3d icp(const Vector3dVector& frame,\n   Sophus::SE3d current_pose = initial_guess;\n \n   for (size_t i = 0; i < config.max_iterations; ++i) {\n-\n-    const Correspondences& correspondences = data_association(current_pose, frame, voxel_map, config);\n-    if (correspondences.empty()) {\n-      throw std::runtime_error(\"Number of correspondences are 0.\");\n-    }\n-\n     const auto& [H, b, chi] = std::invoke([&]() -> LinearSystem {\n+      const auto& [H_icp, b_icp, chi_icp] =\n+          build_icp_linear_system(current_pose, frame, voxel_map, config.max_correspondance_distance);\n       if (beta >= 0) {\n-        const auto& [H_icp, b_icp, chi_icp] = build_icp_linear_system(current_pose, correspondences);\n         const auto& [H_ori, b_ori, chi_ori] =\n             build_orientation_linear_system(current_pose, optional_accel_info->local_gravity_estimate);\n         return {H_icp + H_ori / beta, b_icp + b_ori / beta, chi_icp + chi_ori / beta};\n-      } else {\n-        return build_icp_linear_system(current_pose, correspondences);\n       }\n+      return {H_icp, b_icp, chi_icp};\n     });\n \n     const Eigen::Vector6d dx = H.ldlt().solve(-b);"
+        }
+      ]
+    },
+    {
+      "author": "anthonytec2",
+      "date": "2025-11-23T13:21:10Z",
+      "sha": "814175d3e442b75a7d2160b2f003c512fbb810ee",
+      "message": "Rename published_deskewed_cloud to publish_deskewed_scan (#81)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "8fcf171b2be887ebe4f3c81ee410371f10dc6663",
+          "filename": "config/ros_default.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/PRBonn/rko_lio/blob/814175d3e442b75a7d2160b2f003c512fbb810ee/config%2Fros_default.yaml",
+          "raw_url": "https://github.com/PRBonn/rko_lio/raw/814175d3e442b75a7d2160b2f003c512fbb810ee/config%2Fros_default.yaml",
+          "contents_url": "https://api.github.com/repos/PRBonn/rko_lio/contents/config%2Fros_default.yaml?ref=814175d3e442b75a7d2160b2f003c512fbb810ee",
+          "patch": "@@ -15,7 +15,7 @@ odom_frame: odom\n invert_odom_tf: false\n publish_local_map: true\n map_topic: /rko_lio/local_map\n-published_deskewed_cloud: true\n+publish_deskewed_scan: true\n # lio config\n deskew: true\n voxel_size: 1.0"
+        }
+      ]
+    },
+    {
+      "author": "github-actions[bot]",
+      "date": "2025-10-04T00:53:13Z",
+      "sha": "37c58ebe473a5f8af295c04533bcebb2653ae919",
+      "message": "Bump FetchContent dependencies (#49)\n\n* bump Eigen FetchContent to 5.0\n\n* change dependabot freq to monthly\n\n* switch pypi publish to trusted publishing\n\n---------\n\nCo-authored-by: github-actions[bot] <github-actions[bot]@users.noreply.github.com>\nCo-authored-by: Meher Malladi <rm.meher97@gmail.com>",
+      "files_changed": 4,
+      "additions": 6,
+      "deletions": 6,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "8ac6b8c4984dcd382e54c7923325af6d226ca3df",
+          "filename": ".github/dependabot.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/PRBonn/rko_lio/blob/37c58ebe473a5f8af295c04533bcebb2653ae919/.github%2Fdependabot.yaml",
+          "raw_url": "https://github.com/PRBonn/rko_lio/raw/37c58ebe473a5f8af295c04533bcebb2653ae919/.github%2Fdependabot.yaml",
+          "contents_url": "https://api.github.com/repos/PRBonn/rko_lio/contents/.github%2Fdependabot.yaml?ref=37c58ebe473a5f8af295c04533bcebb2653ae919",
+          "patch": "@@ -3,4 +3,4 @@ updates:\n   - package-ecosystem: \"github-actions\"\n     directory: \"/\"\n     schedule:\n-      interval: \"weekly\"\n+      interval: \"monthly\""
+        },
+        {
+          "sha": "71f2db870b12af9852fe45df18d82eba30c5fb1a",
+          "filename": ".github/workflows/bump_fetchcontent.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/PRBonn/rko_lio/blob/37c58ebe473a5f8af295c04533bcebb2653ae919/.github%2Fworkflows%2Fbump_fetchcontent.yaml",
+          "raw_url": "https://github.com/PRBonn/rko_lio/raw/37c58ebe473a5f8af295c04533bcebb2653ae919/.github%2Fworkflows%2Fbump_fetchcontent.yaml",
+          "contents_url": "https://api.github.com/repos/PRBonn/rko_lio/contents/.github%2Fworkflows%2Fbump_fetchcontent.yaml?ref=37c58ebe473a5f8af295c04533bcebb2653ae919",
+          "patch": "@@ -9,4 +9,4 @@ jobs:\n     steps:\n       - uses: mehermvr/bump_fetchcontent@v0.0.1\n         with:\n-          github_token: ${{ secrets.GITHUB_TOKEN }}\n+          github_token: ${{ secrets.BUMP_FETCHCONTENT_TOKEN }}"
+        },
+        {
+          "sha": "2bffd007ad6d61a7f54cd9a3d49b3e459a2ed6c9",
+          "filename": ".github/workflows/pypi.yaml",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/PRBonn/rko_lio/blob/37c58ebe473a5f8af295c04533bcebb2653ae919/.github%2Fworkflows%2Fpypi.yaml",
+          "raw_url": "https://github.com/PRBonn/rko_lio/raw/37c58ebe473a5f8af295c04533bcebb2653ae919/.github%2Fworkflows%2Fpypi.yaml",
+          "contents_url": "https://api.github.com/repos/PRBonn/rko_lio/contents/.github%2Fworkflows%2Fpypi.yaml?ref=37c58ebe473a5f8af295c04533bcebb2653ae919",
+          "patch": "@@ -38,13 +38,13 @@ jobs:\n     if: github.event_name == 'release'\n     needs: [cibuildwheel]\n     runs-on: ubuntu-latest\n+    environment: pypi\n+    permissions:\n+      id-token: write\n     steps:\n       - uses: actions/download-artifact@v5\n         with:\n           pattern: artifact*\n           path: dist\n           merge-multiple: true\n       - uses: pypa/gh-action-pypi-publish@release/v1\n-        with:\n-          password: ${{ secrets.PYPI_API_TOKEN }}\n-          # TODO: switch to trusted publishing"
+        },
+        {
+          "sha": "94bf97a1beb91a6539597501e54003e0a1b1857f",
+          "filename": "cmake/dependencies/eigen/eigen.cmake",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/PRBonn/rko_lio/blob/37c58ebe473a5f8af295c04533bcebb2653ae919/cmake%2Fdependencies%2Feigen%2Feigen.cmake",
+          "raw_url": "https://github.com/PRBonn/rko_lio/raw/37c58ebe473a5f8af295c04533bcebb2653ae919/cmake%2Fdependencies%2Feigen%2Feigen.cmake",
+          "contents_url": "https://api.github.com/repos/PRBonn/rko_lio/contents/cmake%2Fdependencies%2Feigen%2Feigen.cmake?ref=37c58ebe473a5f8af295c04533bcebb2653ae919",
+          "patch": "@@ -19,6 +19,6 @@ set(EIGEN_BUILD_LAPACK\n \n FetchContent_Declare(\n   Eigen3\n-  URL https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz\n+  URL https://gitlab.com/libeigen/eigen/-/archive/5.0.0/eigen-5.0.0.tar.gz\n       SYSTEM EXCLUDE_FROM_ALL OVERRIDE_FIND_PACKAGE)\n FetchContent_MakeAvailable(Eigen3)"
+        }
+      ]
+    },
+    {
+      "author": "tianyilim",
+      "date": "2025-09-26T07:11:58Z",
+      "sha": "b20d1d5c160576a36777c7db6a2664d16203b78c",
+      "message": "Add self qualifer to __iter__ function (#39)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "f58d8515b0512ea54bd70e21e8121d60e8f9a4c3",
+          "filename": "python/rko_lio/dataloaders/raw.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/PRBonn/rko_lio/blob/b20d1d5c160576a36777c7db6a2664d16203b78c/python%2Frko_lio%2Fdataloaders%2Fraw.py",
+          "raw_url": "https://github.com/PRBonn/rko_lio/raw/b20d1d5c160576a36777c7db6a2664d16203b78c/python%2Frko_lio%2Fdataloaders%2Fraw.py",
+          "contents_url": "https://api.github.com/repos/PRBonn/rko_lio/contents/python%2Frko_lio%2Fdataloaders%2Fraw.py?ref=b20d1d5c160576a36777c7db6a2664d16203b78c",
+          "patch": "@@ -130,7 +130,7 @@ def extrinsics(self):\n         return self.T_imu_to_base, self.T_lidar_to_base\n \n     def __iter__(self):\n-        self._iter = iter(entries)\n+        self._iter = iter(self.entries)\n         return self\n \n     def __next__(self):"
+        }
+      ]
+    },
+    {
+      "author": "ExpectedArgument",
+      "date": "2026-03-17T07:17:07Z",
+      "sha": "f09dc8ae0e65103173c9015336a116ac3e9772fa",
+      "message": "Fix rosbag typestore initialization (#117)",
+      "files_changed": 1,
+      "additions": 7,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "bfab9d5673ba2cca82571da6c86bd185de9f33e6",
+          "filename": "rko_lio/python/rko_lio/dataloaders/rosbag.py",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 3,
+          "changes": 10,
+          "blob_url": "https://github.com/PRBonn/rko_lio/blob/f09dc8ae0e65103173c9015336a116ac3e9772fa/rko_lio%2Fpython%2Frko_lio%2Fdataloaders%2Frosbag.py",
+          "raw_url": "https://github.com/PRBonn/rko_lio/raw/f09dc8ae0e65103173c9015336a116ac3e9772fa/rko_lio%2Fpython%2Frko_lio%2Fdataloaders%2Frosbag.py",
+          "contents_url": "https://api.github.com/repos/PRBonn/rko_lio/contents/rko_lio%2Fpython%2Frko_lio%2Fdataloaders%2Frosbag.py?ref=f09dc8ae0e65103173c9015336a116ac3e9772fa",
+          "patch": "@@ -57,6 +57,7 @@\n \n try:\n     from rosbags.highlevel import AnyReader\n+    from rosbags.typesys import Stores, get_typestore\n except ModuleNotFoundError:\n     error_and_exit(\n         'rosbags library not installed for using rosbag dataloader, please install with \"pip install -U rosbags\"'\n@@ -91,12 +92,14 @@ def __init__(\n         if ros1_bagfiles:\n             self.bag_type = \"ROS1\"  # for logging\n             bagfiles = ros1_bagfiles\n+            default_typestore = get_typestore(Stores.ROS1_NOETIC)\n         else:\n             self.bag_type = \"ROS2\"\n             bagfiles = [data_path]\n+            default_typestore = get_typestore(Stores.LATEST)\n \n         self.first_bag_path = bagfiles[0]  # for logging\n-        self.bag = AnyReader(bagfiles)\n+        self.bag = AnyReader(bagfiles, default_typestore=default_typestore)\n         if len(bagfiles) > 1:\n             print(\"Reading multiple .bag files in directory:\")\n             print(\"\\n\".join(sorted([path.name for path in bagfiles])))\n@@ -280,5 +283,6 @@ def __repr__(self):\n         return f\"RosbagDataLoader({bag_type}, {path_info}, {imu_info}, {lidar_info}, {msg_counts})\"\n \n     def __del__(self):\n-        if hasattr(self, \"bag\"):\n-            self.bag.close()\n+        bag = getattr(self, \"bag\", None)\n+        if bag is not None and getattr(bag, \"isopen\", False):\n+            bag.close()"
+        }
+      ]
+    }
+  ]
+}

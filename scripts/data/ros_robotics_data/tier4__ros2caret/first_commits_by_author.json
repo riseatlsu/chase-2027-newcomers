@@ -1,0 +1,901 @@
+{
+  "_meta": {
+    "fetched_at": "2026-09-24T14:53:16Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "tier4",
+    "repo": "ros2caret",
+    "refreshed_at": "2026-09-24T14:53:16Z",
+    "refresh_note": "incrementally added 1 author(s) missing from a prior stale cache"
+  },
+  "data": [
+    {
+      "author": "github-actions[bot]",
+      "date": "2023-06-19T09:34:23Z",
+      "sha": "71e7a1ae60f59ba76b3b017580f88314810eec2b",
+      "message": "chore: update version to v0.4.10.1 (#75)\n\nSigned-off-by: github-actions <github-actions@github.com>\r\nCo-authored-by: github-actions <github-actions@github.com>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "47ea95043cc1b17069b4c653bd6592162dbd37ce",
+          "filename": "ros2caret/__version__.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/71e7a1ae60f59ba76b3b017580f88314810eec2b/ros2caret%2F__version__.py",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/71e7a1ae60f59ba76b3b017580f88314810eec2b/ros2caret%2F__version__.py",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/ros2caret%2F__version__.py?ref=71e7a1ae60f59ba76b3b017580f88314810eec2b",
+          "patch": "@@ -12,4 +12,4 @@\n # See the License for the specific language governing permissions and\n # limitations under the License.\n \n-__version__ = 'v0.4.10'\n+__version__ = 'v0.4.10.1'"
+        }
+      ]
+    },
+    {
+      "author": "atsushi421",
+      "date": "2022-04-15T06:39:41Z",
+      "sha": "2cb022db7c7e7b690dd4eb6e099581d595f58cba",
+      "message": "feat: CLI to check whether caret-rclcpp is used",
+      "files_changed": 3,
+      "additions": 121,
+      "deletions": 4,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "fdbdb8513982a45f5bc55f3345e3a25d94044763",
+          "filename": "ros2caret/verb/__init__.py",
+          "status": "modified",
+          "additions": 14,
+          "deletions": 0,
+          "changes": 14,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/2cb022db7c7e7b690dd4eb6e099581d595f58cba/ros2caret%2Fverb%2F__init__.py",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/2cb022db7c7e7b690dd4eb6e099581d595f58cba/ros2caret%2Fverb%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/ros2caret%2Fverb%2F__init__.py?ref=2cb022db7c7e7b690dd4eb6e099581d595f58cba",
+          "patch": "@@ -12,6 +12,7 @@\n # See the License for the specific language governing permissions and\n # limitations under the License.from caret_analyze import Application, Lttng\n \n+from logging import DEBUG, Formatter, getLogger, StreamHandler, INFO\n from ros2cli.plugin_system import PLUGIN_SYSTEM_VERSION\n from ros2cli.plugin_system import satisfies_version\n \n@@ -37,6 +38,19 @@ def __init__(self):\n         super(VerbExtension, self).__init__()\n         satisfies_version(PLUGIN_SYSTEM_VERSION, '^0.1')\n \n+        handler = StreamHandler()\n+        handler.setLevel(INFO)\n+\n+        fmt = '%(levelname)-8s: %(asctime)s | %(message)s'\n+        formatter = Formatter(\n+            fmt,\n+            datefmt='%Y-%m-%d %H:%M:%S')\n+        handler.setFormatter(formatter)\n+\n+        logger = getLogger()\n+        logger.setLevel(DEBUG)\n+        logger.addHandler(handler)\n+\n     def add_arguments(self, parser, cli_name):\n         pass\n "
+        },
+        {
+          "sha": "e49e93f4a7c71c775259d3948b9d1a3402d7fff7",
+          "filename": "ros2caret/verb/check_caret_rclcpp.py",
+          "status": "added",
+          "additions": 102,
+          "deletions": 0,
+          "changes": 102,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/2cb022db7c7e7b690dd4eb6e099581d595f58cba/ros2caret%2Fverb%2Fcheck_caret_rclcpp.py",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/2cb022db7c7e7b690dd4eb6e099581d595f58cba/ros2caret%2Fverb%2Fcheck_caret_rclcpp.py",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/ros2caret%2Fverb%2Fcheck_caret_rclcpp.py?ref=2cb022db7c7e7b690dd4eb6e099581d595f58cba",
+          "patch": "@@ -0,0 +1,102 @@\n+# Copyright 2021 Research Institute of Systems Planning, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.from caret_analyze import Application, Lttng\n+\n+from logging import getLogger\n+import os\n+import subprocess\n+\n+from ros2caret.verb import VerbExtension\n+\n+logger = getLogger(__name__)\n+\n+\n+galactic_tp_symbol_names = [\n+    'ros_trace_rclcpp_publish'\n+    'ros_trace_rclcpp_subscription_init',\n+    'ros_trace_rclcpp_subscription_callback_added',\n+]\n+\n+caret_fork_tp_symbol_names = [\n+    'ros_trace_dispatch_intra_process_subscription_callback',\n+    'ros_trace_dispatch_subscription_callback',\n+    'ros_trace_message_construct',\n+    'ros_trace_rclcpp_intra_publish'\n+]\n+\n+\n+class CheckCaretRclcppVerb(VerbExtension):\n+\n+    def add_arguments(self, parser, cli_name):\n+        parser.add_argument(\n+            '-d', '--check_directory', dest='check_directory', type=str,\n+            help='the path to the directory to be checked', required=True)\n+\n+    def get_package_name_from_path(self, path: str) -> str:\n+        package_name = path.replace(self.root_dir_path, '').split('/')[0]\n+\n+        return package_name\n+\n+    def main(self, *, args):\n+        root_dir_path = args.check_directory + '/build/'\n+        if(os.path.exists(root_dir_path)):\n+            self.root_dir_path = root_dir_path\n+        else:\n+            logger.error('Specify the path to the directory where the build command completed.')\n+            exit(1)\n+\n+        cmd = f'find {self.root_dir_path} -type f ! -size 0 -executable \\\n+                ! -name \"*.o\"            ! -name \"*.cpp\"    ! -name \"*.make\" \\\n+                ! -name \"*.cmake\"        ! -name \"Makefile\" ! -name \"*.internal\" \\\n+                ! -name \"*.includecache\" ! -name \"*.in\"     ! -name \"*.txt\" \\\n+                ! -name \"*.a\"            ! -name \"*.stamp\"  ! -name \"*.genexp\" \\\n+                ! -name \"*.sample\"       ! -name \"*.py\"'\n+        filtered_file_paths = (subprocess.Popen(cmd,\n+                                                stdout=subprocess.PIPE,\n+                                                shell=True).communicate()[0]\n+                               ).decode('utf-8').split('\\n')\n+\n+        # Check whether at least one galactic implementation trace point exists\n+        exists_galactic_tp_file_paths = []\n+        for file_path in filtered_file_paths[:-1]:\n+            cmd = f'nm -D {file_path} | grep -e {\" -e \".join(galactic_tp_symbol_names)}'\n+            out_str = (subprocess.Popen(cmd,\n+                                        stdout=subprocess.PIPE,\n+                                        shell=True).communicate()[0]\n+                       ).decode('utf-8')\n+            if(out_str):\n+                exists_galactic_tp_file_paths.append(file_path)\n+\n+        # Check whether at least one CARET fork implementation trace point exists\n+        all_packages = set()\n+        ok_packages = set()\n+        for file_path in exists_galactic_tp_file_paths:\n+            all_packages.add(self.get_package_name_from_path(file_path))\n+            cmd = f'nm -D {file_path} | grep -e {\" -e \".join(caret_fork_tp_symbol_names)}'\n+            out_str = (subprocess.Popen(cmd,\n+                                        stdout=subprocess.PIPE,\n+                                        shell=True\n+                                        ).communicate()[0]\n+                       ).decode('utf-8')\n+            if(out_str):\n+                ok_packages.add(self.get_package_name_from_path(file_path))\n+\n+        # Logging\n+        ng_packages = all_packages - ok_packages\n+        if(ng_packages):\n+            msg = 'The following packages have not been built using caret-rclcpp:\\n'\n+            for ng_packages in all_packages - ok_packages:\n+                msg += f'\\t{ng_packages}\\n'\n+            logger.warning(msg)\n+        else:\n+            logger.info('All packages are built using caret-rclcpp.')"
+        },
+        {
+          "sha": "210b6165ee57522fcfb50cd97b8ec535e7b18dc6",
+          "filename": "setup.py",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 4,
+          "changes": 9,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/2cb022db7c7e7b690dd4eb6e099581d595f58cba/setup.py",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/2cb022db7c7e7b690dd4eb6e099581d595f58cba/setup.py",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/setup.py?ref=2cb022db7c7e7b690dd4eb6e099581d595f58cba",
+          "patch": "@@ -26,10 +26,11 @@\n             'ros2caret.verb = ros2caret.verb:VerbExtension'\n         ],\n         'ros2caret.verb': [\n-            'architecture = ros2caret.verb.architecture:ArchitectureVerb',\n-            'callback_graph = ros2caret.verb.callback_graph:CallbackGraphVerb',\n-            'chain_latency = ros2caret.verb.chain_latency:ChainLatencyVerb',\n-            'message_flow = ros2caret.verb.message_flow:MessageFlowVerb',\n+            'check_caret_rclcpp = ros2caret.verb.check_caret_rclcpp:CheckCaretRclcppVerb'\n+            # 'architecture = ros2caret.verb.architecture:ArchitectureVerb',\n+            # 'callback_graph = ros2caret.verb.callback_graph:CallbackGraphVerb',\n+            # 'chain_latency = ros2caret.verb.chain_latency:ChainLatencyVerb',\n+            # 'message_flow = ros2caret.verb.message_flow:MessageFlowVerb',\n         ]\n     },\n )"
+        }
+      ]
+    },
+    {
+      "author": "xygyo77",
+      "date": "2023-12-12T02:57:31Z",
+      "sha": "023c0dbd49b1d428f924c605f80e073c52cdde84",
+      "message": "Enable sim_time trace point in light mode. (#152)\n\nSigned-off-by: ISP akm <akm@isp.co.jp>",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "471a96712e8b220a4dadec2aa7b2a941c5ca4d10",
+          "filename": "ros2caret/verb/record.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/023c0dbd49b1d428f924c605f80e073c52cdde84/ros2caret%2Fverb%2Frecord.py",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/023c0dbd49b1d428f924c605f80e073c52cdde84/ros2caret%2Fverb%2Frecord.py",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/ros2caret%2Fverb%2Frecord.py?ref=023c0dbd49b1d428f924c605f80e073c52cdde84",
+          "patch": "@@ -171,7 +171,8 @@ def main(self, *, args):\n                     'ros2_caret:dds_bind*',\n                     'ros2:rcl_*init',\n                     'ros2_caret:rcl_*init',\n-                    'ros2_caret:caret_init']\n+                    'ros2_caret:caret_init',\n+                    'ros2_caret:sim_time']\n             if os.environ['ROS_DISTRO'] in ['iron' or 'rolling']:\n                 events_ust.append('ros2:rcl_publish')\n         else:"
+        }
+      ]
+    },
+    {
+      "author": "ymski",
+      "date": "2023-10-04T06:31:21Z",
+      "sha": "ecf5d3a5e9c6257e301aa427de94db7be5867232",
+      "message": "feat: support non-optional argument `append-trace` (#84)\n\n* add append arg\r\n\r\nSigned-off-by: yamasaki <114902604+ymski@users.noreply.github.com>\r\n\r\n* delete blank lines\r\n\r\nSigned-off-by: yamasaki <114902604+ymski@users.noreply.github.com>\r\n\r\n* pass test\r\n\r\nSigned-off-by: yamasaki <114902604+ymski@users.noreply.github.com>\r\n\r\n* fix wrong import order\r\n\r\nSigned-off-by: yamasaki <114902604+ymski@users.noreply.github.com>\r\n\r\n* add ros2_tracing copyright\r\n\r\nSigned-off-by: yamasaki <114902604+ymski@users.noreply.github.com>\r\n\r\n* fix comment for copyright\r\n\r\nSigned-off-by: yamasaki <114902604+ymski@users.noreply.github.com>\r\n\r\n* fix comment for copyright\r\n\r\nSigned-off-by: yamasaki <114902604+ymski@users.noreply.github.com>\r\n\r\n* fix link (rolling to humble)\r\n\r\nSigned-off-by: yamasaki <114902604+ymski@users.noreply.github.com>\r\n\r\n---------\r\n\r\nSigned-off-by: yamasaki <114902604+ymski@users.noreply.github.com>",
+      "files_changed": 2,
+      "additions": 127,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "37248501fb8ff9ea2d2cf215a4d400f1dbe18234",
+          "filename": "ros2caret/verb/caret_record_init.py",
+          "status": "added",
+          "additions": 125,
+          "deletions": 0,
+          "changes": 125,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/ecf5d3a5e9c6257e301aa427de94db7be5867232/ros2caret%2Fverb%2Fcaret_record_init.py",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/ecf5d3a5e9c6257e301aa427de94db7be5867232/ros2caret%2Fverb%2Fcaret_record_init.py",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/ros2caret%2Fverb%2Fcaret_record_init.py?ref=ecf5d3a5e9c6257e301aa427de94db7be5867232",
+          "patch": "@@ -0,0 +1,125 @@\n+# Copyright 2023 Research Institute of Systems Planning, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+# Many parts of this file have been reused from the following file.\n+#   https://github.com/ros2/ros2_tracing/blob/236e4b90a5ff6cdffa5a881717c473563370c0fc/\n+#   tracetools_trace/tracetools_trace/trace.py\n+# The copyright of original code is as follows:\n+\n+# Copyright 2019 Robert Bosch GmbH\n+# Copyright 2021 Christophe Bedard\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+import os\n+import sys\n+from typing import List\n+from typing import Optional\n+\n+from tracetools_trace.tools import lttng\n+from tracetools_trace.tools import path\n+from tracetools_trace.tools import print_names_list\n+\n+\n+def init(\n+    *,\n+    session_name: str,\n+    base_path: Optional[str],\n+    ros_events: List[str],\n+    kernel_events: List[str],\n+    context_fields: List[str],\n+    display_list: bool = False,\n+    append_trace: bool = True,\n+) -> bool:\n+    \"\"\"\n+    Init and start tracing.\n+\n+    Raises RuntimeError on failure, in which case the tracing session might still exist.\n+\n+    :param session_name: the name of the session\n+    :param base_path: the path to the directory in which to create the tracing session directory,\n+        or `None` for default\n+    :param append_trace: whether to append to the trace directory if it already exists, otherwise\n+        an error is reported\n+    :param ros_events: list of ROS events to enable\n+    :param kernel_events: list of kernel events to enable\n+    :param context_fields: list of context fields to enable\n+    :param display_list: whether to display list(s) of enabled events and context names\n+    :return: True if successful, False otherwise\n+    \"\"\"\n+    # Check if LTTng is installed right away before printing anything\n+    if not lttng.is_lttng_installed():\n+        sys.exit(2)\n+\n+    ust_enabled = len(ros_events) > 0\n+    kernel_enabled = len(kernel_events) > 0\n+    if ust_enabled:\n+        print(f'UST tracing enabled ({len(ros_events)} events)')\n+        if display_list:\n+            print_names_list(ros_events)\n+    else:\n+        print('UST tracing disabled')\n+    if kernel_enabled:\n+        print(f'kernel tracing enabled ({len(kernel_events)} events)')\n+        if display_list:\n+            print_names_list(kernel_events)\n+    else:\n+        print('kernel tracing disabled')\n+    if len(context_fields) > 0:\n+        print(f'context ({len(context_fields)} fields)')\n+        if display_list:\n+            print_names_list(context_fields)\n+\n+    if not base_path:\n+        base_path = path.get_tracing_directory()\n+    full_session_path = os.path.join(base_path, session_name)\n+\n+    print(f'writing tracing session to: {full_session_path}')\n+\n+    input('press enter to start...')\n+    # for iron, rolling\n+    if os.environ['ROS_DISTRO'] in ['iron', 'rolling']:\n+        trace_directory = lttng.lttng_init(\n+            session_name=session_name,\n+            base_path=base_path,\n+            append_trace=append_trace,\n+            ros_events=ros_events,\n+            kernel_events=kernel_events,\n+            context_fields=context_fields,\n+        )\n+    # for humble\n+    else:\n+        trace_directory = lttng.lttng_init(\n+            session_name=session_name,\n+            base_path=base_path,\n+            ros_events=ros_events,\n+            kernel_events=kernel_events,\n+            context_fields=context_fields,\n+        )\n+\n+    if trace_directory is None:\n+        return False\n+    # Simple sanity check\n+    assert trace_directory == full_session_path\n+    return True"
+        },
+        {
+          "sha": "0c104b2dbe410a66e0a60bb4e3cf9bd875be1a44",
+          "filename": "ros2caret/verb/record.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/ecf5d3a5e9c6257e301aa427de94db7be5867232/ros2caret%2Fverb%2Frecord.py",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/ecf5d3a5e9c6257e301aa427de94db7be5867232/ros2caret%2Fverb%2Frecord.py",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/ros2caret%2Fverb%2Frecord.py?ref=ecf5d3a5e9c6257e301aa427de94db7be5867232",
+          "patch": "@@ -23,11 +23,12 @@\n from rclpy.node import Node\n \n from ros2caret.verb import VerbExtension\n+from ros2caret.verb.caret_record_init import init\n+\n from tqdm import tqdm\n \n from tracetools_trace.tools import lttng, names, path\n from tracetools_trace.tools.signals import execute_and_handle_sigint\n-from tracetools_trace.trace import init\n \n \n class CaretSessionNode(Node):"
+        }
+      ]
+    },
+    {
+      "author": "iwatake2222",
+      "date": "2024-01-15T07:55:27Z",
+      "sha": "48c034f763de5d2379bb263460d93e17fab8d562",
+      "message": "fix: support environment without std::input to stop recording (#164)\n\n* fix: support environment without std::input to stop recording\r\n\r\nSigned-off-by: takeshi.iwanari <take.iwiw2222@gmail.com>\r\n\r\n* fix flake8\r\n\r\nSigned-off-by: takeshi.iwanari <take.iwiw2222@gmail.com>\r\n\r\n---------\r\n\r\nSigned-off-by: takeshi.iwanari <take.iwiw2222@gmail.com>",
+      "files_changed": 1,
+      "additions": 7,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "77761d5a9c08a34006ac2a1dc4285c326f60234e",
+          "filename": "ros2caret/verb/record.py",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 1,
+          "changes": 8,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/48c034f763de5d2379bb263460d93e17fab8d562/ros2caret%2Fverb%2Frecord.py",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/48c034f763de5d2379bb263460d93e17fab8d562/ros2caret%2Fverb%2Frecord.py",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/ros2caret%2Fverb%2Frecord.py?ref=48c034f763de5d2379bb263460d93e17fab8d562",
+          "patch": "@@ -15,6 +15,7 @@\n import os\n import signal\n import subprocess\n+import time\n \n from typing import Optional\n \n@@ -219,7 +220,12 @@ def _run():\n             recordable_node_num = node.start(args.verbose, args.recording_frequency)\n             while not node.started and recordable_node_num > 0:\n                 rclpy.spin_once(node)\n-            input('press enter to stop...')\n+            try:\n+                input('press enter to stop...')\n+            except EOFError:\n+                print('\\nstd::input is not supported in this system. press ctrl-c to stop...')\n+                while True:\n+                    time.sleep(10)\n \n         def _fini():\n             node.stop_progress()"
+        }
+      ]
+    },
+    {
+      "author": "miyakoshi-dev",
+      "date": "2024-07-09T23:15:43Z",
+      "sha": "1ee3eff03cf426930e965a6d19b22246998c87df",
+      "message": "fix: total number of processes becomes None (#193)\n\n* total number of processes becomes None\r\n\r\n* reflected review results\r\n\r\n* reflected the review results again",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "9e11099837980d576bb714bb13011a84859d8043",
+          "filename": "ros2caret/verb/record.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 3,
+          "changes": 5,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/1ee3eff03cf426930e965a6d19b22246998c87df/ros2caret%2Fverb%2Frecord.py",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/1ee3eff03cf426930e965a6d19b22246998c87df/ros2caret%2Fverb%2Frecord.py",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/ros2caret%2Fverb%2Frecord.py?ref=1ee3eff03cf426930e965a6d19b22246998c87df",
+          "patch": "@@ -66,9 +66,8 @@ def subscription_callback(self, msg):\n \n         if msg.caret_node_name in self._caret_node_names:\n             self._caret_node_names.remove(msg.caret_node_name)\n-\n-        if self._progress:\n-            self._progress.update()\n+            if self._progress:\n+                self._progress.update()\n \n         if len(self._caret_node_names) == 0:\n             self.stop_progress()"
+        }
+      ]
+    },
+    {
+      "author": "pre-commit-ci[bot]",
+      "date": "2022-07-13T09:16:01Z",
+      "sha": "a93584b47afadf38124c16f15dbeb1d481079298",
+      "message": "ci(pre-commit): autoupdate (#21)\n\n* ci(pre-commit): autoupdate\r\n\r\nupdates:\r\n- [github.com/pre-commit/pre-commit-hooks: v4.2.0 → v4.3.0](https://github.com/pre-commit/pre-commit-hooks/compare/v4.2.0...v4.3.0)\r\n- [github.com/pre-commit/mirrors-prettier: v2.6.2 → v2.7.1](https://github.com/pre-commit/mirrors-prettier/compare/v2.6.2...v2.7.1)\r\n- [github.com/adrienverge/yamllint: v1.26.3 → v1.27.1](https://github.com/adrienverge/yamllint/compare/v1.26.3...v1.27.1)\r\n- [github.com/scop/pre-commit-shfmt: v3.4.3-1 → v3.5.1-1](https://github.com/scop/pre-commit-shfmt/compare/v3.4.3-1...v3.5.1-1)\r\n\r\n* ci(pre-commit): autofix\r\n\r\nCo-authored-by: pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com>",
+      "files_changed": 5,
+      "additions": 8,
+      "deletions": 9,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "c493282c69ffe07ad26de85518c392929f7d9245",
+          "filename": ".github/sync-files.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/a93584b47afadf38124c16f15dbeb1d481079298/.github%2Fsync-files.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/a93584b47afadf38124c16f15dbeb1d481079298/.github%2Fsync-files.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.github%2Fsync-files.yaml?ref=a93584b47afadf38124c16f15dbeb1d481079298",
+          "patch": "@@ -17,4 +17,4 @@\n - repository: autowarefoundation/autoware-github-actions\n   files:\n     - source: .github/workflows/github-release.yaml\n-    - source: cliff.toml\n\\ No newline at end of file\n+    - source: cliff.toml"
+        },
+        {
+          "sha": "7bd4938be978938ccdcf3b0014fdc2d587caf728",
+          "filename": ".github/workflows/pytest.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/a93584b47afadf38124c16f15dbeb1d481079298/.github%2Fworkflows%2Fpytest.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/a93584b47afadf38124c16f15dbeb1d481079298/.github%2Fworkflows%2Fpytest.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.github%2Fworkflows%2Fpytest.yaml?ref=a93584b47afadf38124c16f15dbeb1d481079298",
+          "patch": "@@ -46,4 +46,4 @@ jobs:\n       - name: Run pytest\n         run: |\n           . /opt/ros/galactic/setup.sh\n-          python3 -m pytest\n\\ No newline at end of file\n+          python3 -m pytest"
+        },
+        {
+          "sha": "02f7ebe3cd1f64eee5b4d2013d1619034548d0d5",
+          "filename": ".pre-commit-config.yaml",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 4,
+          "changes": 8,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/a93584b47afadf38124c16f15dbeb1d481079298/.pre-commit-config.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/a93584b47afadf38124c16f15dbeb1d481079298/.pre-commit-config.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.pre-commit-config.yaml?ref=a93584b47afadf38124c16f15dbeb1d481079298",
+          "patch": "@@ -4,7 +4,7 @@ ci:\n \n repos:\n   - repo: https://github.com/pre-commit/pre-commit-hooks\n-    rev: v4.2.0\n+    rev: v4.3.0\n     hooks:\n       - id: check-json\n       - id: check-merge-conflict\n@@ -25,12 +25,12 @@ repos:\n         args: [-c, .markdownlint.yaml, --fix]\n \n   - repo: https://github.com/pre-commit/mirrors-prettier\n-    rev: v2.6.2\n+    rev: v2.7.1\n     hooks:\n       - id: prettier\n \n   - repo: https://github.com/adrienverge/yamllint\n-    rev: v1.26.3\n+    rev: v1.27.1\n     hooks:\n       - id: yamllint\n \n@@ -40,7 +40,7 @@ repos:\n       - id: shellcheck\n \n   - repo: https://github.com/scop/pre-commit-shfmt\n-    rev: v3.4.3-1\n+    rev: v3.5.1-1\n     hooks:\n       - id: shfmt\n         args: [-w, -s, -i=4]"
+        },
+        {
+          "sha": "72d033014568f49d7ffddf9a2a8ae1ba13c8daab",
+          "filename": "CONTRIBUTING.md",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/a93584b47afadf38124c16f15dbeb1d481079298/CONTRIBUTING.md",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/a93584b47afadf38124c16f15dbeb1d481079298/CONTRIBUTING.md",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/CONTRIBUTING.md?ref=a93584b47afadf38124c16f15dbeb1d481079298",
+          "patch": "@@ -2,15 +2,15 @@ Any contribution that you make to this repository will\n be under the Apache 2 License, as dictated by that\n [license](http://www.apache.org/licenses/LICENSE-2.0.html):\n \n-~~~\n+```\n 5. Submission of Contributions. Unless You explicitly state otherwise,\n    any Contribution intentionally submitted for inclusion in the Work\n    by You to the Licensor shall be under the terms and conditions of\n    this License, without any additional terms or conditions.\n    Notwithstanding the above, nothing herein shall supersede or modify\n    the terms of any separate license agreement you may have executed\n    with Licensor regarding such Contributions.\n-~~~\n+```\n \n Contributors must sign-off each commit by adding a `Signed-off-by: ...`\n line to commit messages to certify that they have the right to submit"
+        },
+        {
+          "sha": "31295bb67189fadf717e7bb1749bc56f043653d7",
+          "filename": "pytest.ini",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 1,
+          "changes": 1,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/a93584b47afadf38124c16f15dbeb1d481079298/pytest.ini",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/a93584b47afadf38124c16f15dbeb1d481079298/pytest.ini",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/pytest.ini?ref=a93584b47afadf38124c16f15dbeb1d481079298",
+          "patch": "@@ -1,3 +1,2 @@\n [pytest]\n addopts = -p no:launch -p no:launch_ros\n-"
+        }
+      ]
+    },
+    {
+      "author": "system-tools-actions-public[bot]",
+      "date": "2022-05-09T06:53:51Z",
+      "sha": "b638c83e1a5198e8fa3352a41911f3e55c236ca3",
+      "message": "chore: sync files (#5)\n\nSigned-off-by: GitHub <noreply@github.com>\r\n\r\nCo-authored-by: takam5f2 <takam5f2@users.noreply.github.com>",
+      "files_changed": 13,
+      "additions": 304,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "3f3bf243f639d342ddaf52fb79cc464caa95b6bf",
+          "filename": ".github/dependabot.yaml",
+          "status": "added",
+          "additions": 10,
+          "deletions": 0,
+          "changes": 10,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/b638c83e1a5198e8fa3352a41911f3e55c236ca3/.github%2Fdependabot.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/b638c83e1a5198e8fa3352a41911f3e55c236ca3/.github%2Fdependabot.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.github%2Fdependabot.yaml?ref=b638c83e1a5198e8fa3352a41911f3e55c236ca3",
+          "patch": "@@ -0,0 +1,10 @@\n+version: 2\n+updates:\n+  - package-ecosystem: github-actions\n+    directory: /\n+    schedule:\n+      interval: daily\n+    open-pull-requests-limit: 1\n+    labels:\n+      - bot\n+      - github-actions"
+        },
+        {
+          "sha": "23508e63bc43d7281132c68a3e494ac1d53c304f",
+          "filename": ".github/workflows/github-release.yaml",
+          "status": "added",
+          "additions": 77,
+          "deletions": 0,
+          "changes": 77,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/b638c83e1a5198e8fa3352a41911f3e55c236ca3/.github%2Fworkflows%2Fgithub-release.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/b638c83e1a5198e8fa3352a41911f3e55c236ca3/.github%2Fworkflows%2Fgithub-release.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.github%2Fworkflows%2Fgithub-release.yaml?ref=b638c83e1a5198e8fa3352a41911f3e55c236ca3",
+          "patch": "@@ -0,0 +1,77 @@\n+name: github-release\n+\n+on:\n+  push:\n+    branches:\n+      - beta/v*\n+    tags:\n+      - v*\n+  workflow_dispatch:\n+    inputs:\n+      beta-branch-or-tag-name:\n+        type: string\n+        required: true\n+\n+jobs:\n+  github-release:\n+    runs-on: ubuntu-latest\n+    steps:\n+      - name: Set tag name\n+        id: set-tag-name\n+        run: |\n+          if [ \"${{ github.event_name }}\" = \"workflow_dispatch\" ]; then\n+            REF_NAME=\"${{ github.event.inputs.beta-branch-or-tag-name }}\"\n+          else\n+            REF_NAME=\"${{ github.ref_name }}\"\n+          fi\n+\n+          echo ::set-output name=ref-name::\"$REF_NAME\"\n+          echo ::set-output name=tag-name::\"${REF_NAME#beta/}\"\n+\n+      - name: Check out repository\n+        uses: actions/checkout@v3\n+        with:\n+          fetch-depth: 0\n+          ref: ${{ steps.set-tag-name.outputs.ref-name }}\n+\n+      - name: Set target name for beta branches\n+        id: set-target-name\n+        run: |\n+          if [[ \"${{ steps.set-tag-name.outputs.ref-name }}\" =~ \"beta/\" ]]; then\n+            echo ::set-output name=target-name::\"${{ steps.set-tag-name.outputs.ref-name }}\"\n+          fi\n+\n+      - name: Create a local tag for beta branches\n+        run: |\n+          if [ \"${{ steps.set-target-name.outputs.target-name }}\" != \"\" ]; then\n+            git tag \"${{ steps.set-tag-name.outputs.tag-name }}\"\n+          fi\n+\n+      - name: Run generate-changelog\n+        id: generate-changelog\n+        uses: autowarefoundation/autoware-github-actions/generate-changelog@v1\n+\n+      - name: Select verb\n+        id: select-verb\n+        run: |\n+          has_previous_draft=$(gh release view --json isDraft -q \".isDraft\" \"${{ steps.set-tag-name.outputs.tag-name }}\")\n+\n+          verb=create\n+          if [ \"$has_previous_draft\" = \"true\" ]; then\n+            verb=edit\n+          fi\n+\n+          echo ::set-output name=verb::\"$verb\"\n+        env:\n+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n+\n+      - name: Release to GitHub\n+        run: |\n+          gh release ${{ steps.select-verb.outputs.verb }} \"${{ steps.set-tag-name.outputs.tag-name }}\" \\\n+            --draft \\\n+            --target \"${{ steps.set-target-name.outputs.target-name }}\" \\\n+            --title \"Release ${{ steps.set-tag-name.outputs.tag-name }}\" \\\n+            --notes \"$NOTES\"\n+        env:\n+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n+          NOTES: ${{ steps.generate-changelog.outputs.changelog }}"
+        },
+        {
+          "sha": "93e05dc2c79e5b9d7ec792125264628e3b51a086",
+          "filename": ".github/workflows/pre-commit-optional.yaml",
+          "status": "added",
+          "additions": 16,
+          "deletions": 0,
+          "changes": 16,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/b638c83e1a5198e8fa3352a41911f3e55c236ca3/.github%2Fworkflows%2Fpre-commit-optional.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/b638c83e1a5198e8fa3352a41911f3e55c236ca3/.github%2Fworkflows%2Fpre-commit-optional.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.github%2Fworkflows%2Fpre-commit-optional.yaml?ref=b638c83e1a5198e8fa3352a41911f3e55c236ca3",
+          "patch": "@@ -0,0 +1,16 @@\n+name: pre-commit-optional\n+\n+on:\n+  pull_request:\n+\n+jobs:\n+  pre-commit-optional:\n+    runs-on: ubuntu-latest\n+    steps:\n+      - name: Check out repository\n+        uses: actions/checkout@v3\n+\n+      - name: Run pre-commit\n+        uses: autowarefoundation/autoware-github-actions/pre-commit@v1\n+        with:\n+          pre-commit-config: .pre-commit-config-optional.yaml"
+        },
+        {
+          "sha": "7fd1cc90fe97dcfdabf63fb38871aa64469cab23",
+          "filename": ".github/workflows/pre-commit.yaml",
+          "status": "added",
+          "additions": 32,
+          "deletions": 0,
+          "changes": 32,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/b638c83e1a5198e8fa3352a41911f3e55c236ca3/.github%2Fworkflows%2Fpre-commit.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/b638c83e1a5198e8fa3352a41911f3e55c236ca3/.github%2Fworkflows%2Fpre-commit.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.github%2Fworkflows%2Fpre-commit.yaml?ref=b638c83e1a5198e8fa3352a41911f3e55c236ca3",
+          "patch": "@@ -0,0 +1,32 @@\n+name: pre-commit\n+\n+on:\n+  pull_request:\n+\n+jobs:\n+  pre-commit:\n+    if: ${{ github.event.repository.private }}\n+    runs-on: ubuntu-latest\n+    steps:\n+      - name: Generate token\n+        id: generate-token\n+        uses: tibdex/github-app-token@v1\n+        with:\n+          app_id: ${{ secrets.APP_ID }}\n+          private_key: ${{ secrets.PRIVATE_KEY }}\n+\n+      - name: Check out repository\n+        uses: actions/checkout@v3\n+        with:\n+          ref: ${{ github.event.pull_request.head.ref }}\n+\n+      - name: Set git config\n+        uses: autowarefoundation/autoware-github-actions/set-git-config@v1\n+        with:\n+          token: ${{ steps.generate-token.outputs.token }}\n+\n+      - name: Run pre-commit\n+        uses: autowarefoundation/autoware-github-actions/pre-commit@v1\n+        with:\n+          pre-commit-config: .pre-commit-config.yaml\n+          token: ${{ steps.generate-token.outputs.token }}"
+        },
+        {
+          "sha": "71224c224ec0ff85731a651012ff831d906650e1",
+          "filename": ".github/workflows/semantic-pull-request.yaml",
+          "status": "added",
+          "additions": 12,
+          "deletions": 0,
+          "changes": 12,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/b638c83e1a5198e8fa3352a41911f3e55c236ca3/.github%2Fworkflows%2Fsemantic-pull-request.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/b638c83e1a5198e8fa3352a41911f3e55c236ca3/.github%2Fworkflows%2Fsemantic-pull-request.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.github%2Fworkflows%2Fsemantic-pull-request.yaml?ref=b638c83e1a5198e8fa3352a41911f3e55c236ca3",
+          "patch": "@@ -0,0 +1,12 @@\n+name: semantic-pull-request\n+\n+on:\n+  pull_request_target:\n+    types:\n+      - opened\n+      - edited\n+      - synchronize\n+\n+jobs:\n+  semantic-pull-request:\n+    uses: autowarefoundation/autoware-github-actions/.github/workflows/semantic-pull-request.yaml@v1"
+        },
+        {
+          "sha": "eb18ccdba38d02aa392d1f9294ef07cedcd6cf57",
+          "filename": ".github/workflows/spell-check-differential.yaml",
+          "status": "added",
+          "additions": 16,
+          "deletions": 0,
+          "changes": 16,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/b638c83e1a5198e8fa3352a41911f3e55c236ca3/.github%2Fworkflows%2Fspell-check-differential.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/b638c83e1a5198e8fa3352a41911f3e55c236ca3/.github%2Fworkflows%2Fspell-check-differential.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.github%2Fworkflows%2Fspell-check-differential.yaml?ref=b638c83e1a5198e8fa3352a41911f3e55c236ca3",
+          "patch": "@@ -0,0 +1,16 @@\n+name: spell-check-differential\n+\n+on:\n+  pull_request:\n+\n+jobs:\n+  spell-check-differential:\n+    runs-on: ubuntu-latest\n+    steps:\n+      - name: Check out repository\n+        uses: actions/checkout@v3\n+\n+      - name: Run spell-check\n+        uses: autowarefoundation/autoware-github-actions/spell-check@v1\n+        with:\n+          cspell-json-url: https://raw.githubusercontent.com/tier4/autoware-spell-check-dict/main/.cspell.json"
+        },
+        {
+          "sha": "dec3db1ad1c8d2b8b705dcfb7f81da8fbba6d9bf",
+          "filename": ".markdown-link-check.json",
+          "status": "added",
+          "additions": 13,
+          "deletions": 0,
+          "changes": 13,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/b638c83e1a5198e8fa3352a41911f3e55c236ca3/.markdown-link-check.json",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/b638c83e1a5198e8fa3352a41911f3e55c236ca3/.markdown-link-check.json",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.markdown-link-check.json?ref=b638c83e1a5198e8fa3352a41911f3e55c236ca3",
+          "patch": "@@ -0,0 +1,13 @@\n+{\n+  \"aliveStatusCodes\": [200, 206, 403],\n+  \"ignorePatterns\": [\n+    {\n+      \"pattern\": \"^http://localhost\"\n+    },\n+    {\n+      \"pattern\": \"^https://github.com/.*/discussions/new\"\n+    }\n+  ],\n+  \"retryOn429\": true,\n+  \"retryCount\": 10\n+}"
+        },
+        {
+          "sha": "df1f518dc0d48e84467343824418f6726e7f4f83",
+          "filename": ".markdownlint.yaml",
+          "status": "added",
+          "additions": 9,
+          "deletions": 0,
+          "changes": 9,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/b638c83e1a5198e8fa3352a41911f3e55c236ca3/.markdownlint.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/b638c83e1a5198e8fa3352a41911f3e55c236ca3/.markdownlint.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.markdownlint.yaml?ref=b638c83e1a5198e8fa3352a41911f3e55c236ca3",
+          "patch": "@@ -0,0 +1,9 @@\n+# See https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md for all rules.\n+default: true\n+MD013: false\n+MD024:\n+  siblings_only: true\n+MD033: false\n+MD041: false\n+MD046: false\n+MD049: false"
+        },
+        {
+          "sha": "a805f1201c414dbcd0b74f41a140204c8cdc3052",
+          "filename": ".pre-commit-config-optional.yaml",
+          "status": "added",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/b638c83e1a5198e8fa3352a41911f3e55c236ca3/.pre-commit-config-optional.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/b638c83e1a5198e8fa3352a41911f3e55c236ca3/.pre-commit-config-optional.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.pre-commit-config-optional.yaml?ref=b638c83e1a5198e8fa3352a41911f3e55c236ca3",
+          "patch": "@@ -0,0 +1,6 @@\n+repos:\n+  - repo: https://github.com/tcort/markdown-link-check\n+    rev: v3.10.0\n+    hooks:\n+      - id: markdown-link-check\n+        args: [--config=.markdown-link-check.json]"
+        },
+        {
+          "sha": "a3c34d00a1377105c663dd854119ede8a5a9cf92",
+          "filename": ".prettierignore",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/b638c83e1a5198e8fa3352a41911f3e55c236ca3/.prettierignore",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/b638c83e1a5198e8fa3352a41911f3e55c236ca3/.prettierignore",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.prettierignore?ref=b638c83e1a5198e8fa3352a41911f3e55c236ca3",
+          "patch": "@@ -0,0 +1,2 @@\n+*.param.yaml\n+*.rviz"
+        },
+        {
+          "sha": "e29bf327627690daaa737d00e0c67e04e1cd74fc",
+          "filename": ".prettierrc.yaml",
+          "status": "added",
+          "additions": 20,
+          "deletions": 0,
+          "changes": 20,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/b638c83e1a5198e8fa3352a41911f3e55c236ca3/.prettierrc.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/b638c83e1a5198e8fa3352a41911f3e55c236ca3/.prettierrc.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.prettierrc.yaml?ref=b638c83e1a5198e8fa3352a41911f3e55c236ca3",
+          "patch": "@@ -0,0 +1,20 @@\n+printWidth: 100\n+tabWidth: 2\n+overrides:\n+  - files: package.xml\n+    options:\n+      printWidth: 1000\n+      xmlSelfClosingSpace: false\n+      xmlWhitespaceSensitivity: ignore\n+\n+  - files: \"*.launch.xml\"\n+    options:\n+      printWidth: 200\n+      xmlSelfClosingSpace: false\n+      xmlWhitespaceSensitivity: ignore\n+\n+  - files: \"*.xacro\"\n+    options:\n+      printWidth: 200\n+      xmlSelfClosingSpace: false\n+      xmlWhitespaceSensitivity: ignore"
+        },
+        {
+          "sha": "6228c70f02da95660f4cf12ce65f568c2ab6b092",
+          "filename": ".yamllint.yaml",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/b638c83e1a5198e8fa3352a41911f3e55c236ca3/.yamllint.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/b638c83e1a5198e8fa3352a41911f3e55c236ca3/.yamllint.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.yamllint.yaml?ref=b638c83e1a5198e8fa3352a41911f3e55c236ca3",
+          "patch": "@@ -0,0 +1,23 @@\n+extends: default\n+\n+ignore: |\n+  .clang-tidy\n+  *.param.yaml\n+\n+rules:\n+  braces:\n+    level: error\n+    max-spaces-inside: 1 # To format with Prettier\n+  comments:\n+    level: error\n+    min-spaces-from-content: 1 # To be compatible with C++ and Python\n+  document-start:\n+    level: error\n+    present: false # Don't need document start markers\n+  line-length: disable # Delegate to Prettier\n+  truthy:\n+    level: error\n+    check-keys: false # To allow 'on' of GitHub Actions\n+  quoted-strings:\n+    level: error\n+    required: only-when-needed # To keep consistent style"
+        },
+        {
+          "sha": "339e48ec0317da1d6fd02826563d17ad7dac1928",
+          "filename": "cliff.toml",
+          "status": "added",
+          "additions": 68,
+          "deletions": 0,
+          "changes": 68,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/b638c83e1a5198e8fa3352a41911f3e55c236ca3/cliff.toml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/b638c83e1a5198e8fa3352a41911f3e55c236ca3/cliff.toml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/cliff.toml?ref=b638c83e1a5198e8fa3352a41911f3e55c236ca3",
+          "patch": "@@ -0,0 +1,68 @@\n+# configuration file for git-cliff (0.1.0)\n+\n+[changelog]\n+# changelog header\n+header = \"\"\"\n+# Changelog\\n\n+All notable changes to this project will be documented in this file.\\n\n+\"\"\"\n+# template for the changelog body\n+# https://tera.netlify.app/docs/#introduction\n+body = \"\"\"\n+{% if version %}\\\n+    ## [{{ version | trim_start_matches(pat=\"v\") }}] - {{ timestamp | date(format=\"%Y-%m-%d\") }}\n+{% else %}\\\n+    ## [unreleased]\n+{% endif %}\\\n+{% for group, commits in commits | group_by(attribute=\"group\") %}\n+    ### {{ group | upper_first }}\n+    {% for commit in commits %}\n+        {% if commit.scope %}\\\n+            - [{{ commit.scope }}] {{ commit.message | upper_first }}\\\n+        {% else %}\\\n+            - {{ commit.message | upper_first }}\\\n+        {% endif %}\\\n+    {% endfor %}\n+{% endfor %}\\n\n+\"\"\"\n+# remove the leading and trailing whitespace from the template\n+trim = true\n+# changelog footer\n+footer = \"\"\"\n+<!-- generated by git-cliff -->\n+\"\"\"\n+\n+[git]\n+# allow only conventional commits\n+# https://www.conventionalcommits.org\n+conventional_commits = true\n+# regex for parsing and grouping commits\n+commit_parsers = [\n+    # Skip\n+    { message = \"^chore\\\\(release\\\\)\", skip = true},\n+    # Comply with https://github.com/commitizen/conventional-commit-types/blob/c3a9be4c73e47f2e8197de775f41d981701407fb/index.json\n+    # Why adding numbers to groups is in https://github.com/orhun/git-cliff/issues/9#issuecomment-914521594\n+    { message = \"^feat\", group = \"<!-- 00 -->Features\"},\n+    { message = \"^fix\", group = \"<!-- 01 -->Bug Fixes\"},\n+    { message = \"^doc\", group = \"<!-- 02 -->Documentation\"},\n+    { message = \"^style\", group = \"<!-- 03 -->Styles\"},\n+    { message = \"^refactor\", group = \"<!-- 04 -->Code Refactoring\"},\n+    { message = \"^perf\", group = \"<!-- 05 -->Performance Improvements\"},\n+    { message = \"^test\", group = \"<!-- 06 -->Tests\"},\n+    { message = \"^build\", group = \"<!-- 07 -->Builds\"},\n+    { message = \"^ci\", group = \"<!-- 08 -->Continuous Integrations\"},\n+    { message = \"^chore\", group = \"<!-- 09 -->Chores\"},\n+    { message = \"^revert\", group = \"<!-- 10 -->Reverts\"},\n+]\n+# filter out the commits that are not matched by commit parsers\n+filter_commits = false\n+# glob pattern for matching git tags\n+tag_pattern = \"v[0-9]*.[0-9]*.[0-9]*\"\n+# regex for skipping tags\n+skip_tags = \"v0.0.0\"\n+# regex for ignoring tags\n+ignore_tags = \"v.*-beta.*\"\n+# sort the tags chronologically\n+date_order = false\n+# sort the commits inside sections by oldest/newest order\n+sort_commits = \"oldest\""
+        }
+      ]
+    },
+    {
+      "author": "h-suzuki-isp",
+      "date": "2023-12-15T09:16:36Z",
+      "sha": "cef668e005e38852670dee64d39530423bea41c2",
+      "message": "refactor: upgrade xml version (#159)\n\nSigned-off-by: h-suzuki <h-suzuki@isp.co.jp>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "c2269663f4a6bee522fe9774392886cce5565b6a",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/cef668e005e38852670dee64d39530423bea41c2/package.xml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/cef668e005e38852670dee64d39530423bea41c2/package.xml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/package.xml?ref=cef668e005e38852670dee64d39530423bea41c2",
+          "patch": "@@ -2,7 +2,7 @@\n <?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"3\">\n   <name>ros2caret</name>\n-  <version>0.2.1</version>\n+  <version>0.4.22</version>\n   <description>ROS 2 CLI package for caret</description>\n   <maintainer email=\"yamasaki@isp.co.jp\">ymski</maintainer>\n   <maintainer email=\"uetsuki@isp.co.jp\">isp-uetsuki</maintainer>"
+        }
+      ]
+    },
+    {
+      "author": "dependabot[bot]",
+      "date": "2023-09-05T06:38:49Z",
+      "sha": "51e11bcac967873379d7050f1a891338afb4aff8",
+      "message": "chore(deps): bump actions/checkout from 3 to 4 (#90)\n\nBumps [actions/checkout](https://github.com/actions/checkout) from 3 to 4.\r\n- [Release notes](https://github.com/actions/checkout/releases)\r\n- [Changelog](https://github.com/actions/checkout/blob/main/CHANGELOG.md)\r\n- [Commits](https://github.com/actions/checkout/compare/v3...v4)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: actions/checkout\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-major\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+      "files_changed": 6,
+      "additions": 6,
+      "deletions": 6,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "b426d0cba6614d9f4492296784f78d5b408673ca",
+          "filename": ".github/workflows/github-release.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/51e11bcac967873379d7050f1a891338afb4aff8/.github%2Fworkflows%2Fgithub-release.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/51e11bcac967873379d7050f1a891338afb4aff8/.github%2Fworkflows%2Fgithub-release.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.github%2Fworkflows%2Fgithub-release.yaml?ref=51e11bcac967873379d7050f1a891338afb4aff8",
+          "patch": "@@ -30,7 +30,7 @@ jobs:\n           echo \"tag-name=${REF_NAME#beta/}\" >> $GITHUB_OUTPUT\n \n       - name: Check out repository\n-        uses: actions/checkout@v3\n+        uses: actions/checkout@v4\n         with:\n           fetch-depth: 0\n           ref: ${{ steps.set-tag-name.outputs.ref-name }}"
+        },
+        {
+          "sha": "38738196a0bd33f401b69d7f6ac776c94ff385e4",
+          "filename": ".github/workflows/pre-commit-optional.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/51e11bcac967873379d7050f1a891338afb4aff8/.github%2Fworkflows%2Fpre-commit-optional.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/51e11bcac967873379d7050f1a891338afb4aff8/.github%2Fworkflows%2Fpre-commit-optional.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.github%2Fworkflows%2Fpre-commit-optional.yaml?ref=51e11bcac967873379d7050f1a891338afb4aff8",
+          "patch": "@@ -8,7 +8,7 @@ jobs:\n     runs-on: ubuntu-latest\n     steps:\n       - name: Check out repository\n-        uses: actions/checkout@v3\n+        uses: actions/checkout@v4\n         with:\n           fetch-depth: 0\n "
+        },
+        {
+          "sha": "33c00ee1066aeb98c93f9ba0e3a21d53087a3114",
+          "filename": ".github/workflows/pre-commit.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/51e11bcac967873379d7050f1a891338afb4aff8/.github%2Fworkflows%2Fpre-commit.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/51e11bcac967873379d7050f1a891338afb4aff8/.github%2Fworkflows%2Fpre-commit.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.github%2Fworkflows%2Fpre-commit.yaml?ref=51e11bcac967873379d7050f1a891338afb4aff8",
+          "patch": "@@ -16,7 +16,7 @@ jobs:\n           private_key: ${{ secrets.PRIVATE_KEY }}\n \n       - name: Check out repository\n-        uses: actions/checkout@v3\n+        uses: actions/checkout@v4\n         with:\n           ref: ${{ github.event.pull_request.head.ref }}\n "
+        },
+        {
+          "sha": "6d33e1ade0f60e2eb74e12dc980714bb6bcf662a",
+          "filename": ".github/workflows/pytest.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/51e11bcac967873379d7050f1a891338afb4aff8/.github%2Fworkflows%2Fpytest.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/51e11bcac967873379d7050f1a891338afb4aff8/.github%2Fworkflows%2Fpytest.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.github%2Fworkflows%2Fpytest.yaml?ref=51e11bcac967873379d7050f1a891338afb4aff8",
+          "patch": "@@ -9,7 +9,7 @@ jobs:\n     container: ghcr.io/autowarefoundation/autoware-universe:latest\n     steps:\n       - name: Check out repository\n-        uses: actions/checkout@v3\n+        uses: actions/checkout@v4\n \n       - name: Install LTTng\n         run: |"
+        },
+        {
+          "sha": "1fbf2ff46925ca8895bd47881bf27043ba840f64",
+          "filename": ".github/workflows/spell-check-differential.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/51e11bcac967873379d7050f1a891338afb4aff8/.github%2Fworkflows%2Fspell-check-differential.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/51e11bcac967873379d7050f1a891338afb4aff8/.github%2Fworkflows%2Fspell-check-differential.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.github%2Fworkflows%2Fspell-check-differential.yaml?ref=51e11bcac967873379d7050f1a891338afb4aff8",
+          "patch": "@@ -8,7 +8,7 @@ jobs:\n     runs-on: ubuntu-latest\n     steps:\n       - name: Check out repository\n-        uses: actions/checkout@v3\n+        uses: actions/checkout@v4\n \n       - name: Run spell-check\n         uses: autowarefoundation/autoware-github-actions/spell-check@v1"
+        },
+        {
+          "sha": "0587fa2b1d2ad87d8100541cb94604038182b111",
+          "filename": ".github/workflows/update-caret-version.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/51e11bcac967873379d7050f1a891338afb4aff8/.github%2Fworkflows%2Fupdate-caret-version.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/51e11bcac967873379d7050f1a891338afb4aff8/.github%2Fworkflows%2Fupdate-caret-version.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.github%2Fworkflows%2Fupdate-caret-version.yaml?ref=51e11bcac967873379d7050f1a891338afb4aff8",
+          "patch": "@@ -37,7 +37,7 @@ jobs:\n           echo \"BRANCH_NAME=$branch\" >> \"$GITHUB_OUTPUT\"\n \n       - name: Checkout repository2\n-        uses: actions/checkout@v3\n+        uses: actions/checkout@v4\n         with:\n           ref: ${{ steps.tag.outputs.BRANCH_NAME }}\n "
+        }
+      ]
+    },
+    {
+      "author": "bopeng-saitama",
+      "date": "2023-10-27T07:03:17Z",
+      "sha": "ce91b23399d38df3fb34b76cd1b6c6d210852739",
+      "message": "refactor: remove -d for ros2 caret command  (#129)\n\n* refactor: remove -d from ros2 caret command\r\n\r\nSigned-off-by: bopeng-saitama <peng.b.203@ms.saitama-u.ac.jp>\r\n\r\n* fix: flake8 error\r\n\r\nSigned-off-by: bopeng-saitama <peng.b.203@ms.saitama-u.ac.jp>\r\n\r\n* refactor: remove -w for ros2 caret command\r\n\r\nSigned-off-by: bopeng-saitama <peng.b.203@ms.saitama-u.ac.jp>\r\n\r\n---------\r\n\r\nSigned-off-by: bopeng-saitama <peng.b.203@ms.saitama-u.ac.jp>",
+      "files_changed": 5,
+      "additions": 11,
+      "deletions": 14,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "7a5025c769d0048c5395f56c90a47835668ea5d0",
+          "filename": "ros2caret/verb/check_caret_rclcpp.py",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 2,
+          "changes": 5,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/ce91b23399d38df3fb34b76cd1b6c6d210852739/ros2caret%2Fverb%2Fcheck_caret_rclcpp.py",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/ce91b23399d38df3fb34b76cd1b6c6d210852739/ros2caret%2Fverb%2Fcheck_caret_rclcpp.py",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/ros2caret%2Fverb%2Fcheck_caret_rclcpp.py?ref=ce91b23399d38df3fb34b76cd1b6c6d210852739",
+          "patch": "@@ -41,8 +41,9 @@ class CheckCaretRclcppVerb(VerbExtension):\n \n     def add_arguments(self, parser, cli_name):\n         parser.add_argument(\n-            '-w', '--workspace', dest='workspace', type=str,\n-            help='the path to the workspace to be checked', required=True)\n+            'workspace', type=str,\n+            help='the path to the workspace to be checked'\n+        )\n \n     def main(self, *, args):\n         root_dir_path = args.workspace + '/build/'"
+        },
+        {
+          "sha": "f65a5bbf656d09922d968fa08b5fd2799e1a3307",
+          "filename": "ros2caret/verb/check_ctf.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 4,
+          "changes": 6,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/ce91b23399d38df3fb34b76cd1b6c6d210852739/ros2caret%2Fverb%2Fcheck_ctf.py",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/ce91b23399d38df3fb34b76cd1b6c6d210852739/ros2caret%2Fverb%2Fcheck_ctf.py",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/ros2caret%2Fverb%2Fcheck_ctf.py?ref=ce91b23399d38df3fb34b76cd1b6c6d210852739",
+          "patch": "@@ -26,10 +26,8 @@ class CheckCTFVerb(VerbExtension):\n \n     def add_arguments(self, parser, cli_name):\n         parser.add_argument(\n-            '-d', '--trace_dir', dest='trace_dir', type=str,\n-            help='the path to the trace directory to be checked',\n-            required=True\n-        )\n+            'trace_dir', type=str,\n+            help='the path to the trace directory to be checked')\n \n     def main(self, *, args):\n         try:"
+        },
+        {
+          "sha": "61a4e273f29705002887da8d832f905e0b95b6f7",
+          "filename": "ros2caret/verb/node_summary.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 4,
+          "changes": 6,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/ce91b23399d38df3fb34b76cd1b6c6d210852739/ros2caret%2Fverb%2Fnode_summary.py",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/ce91b23399d38df3fb34b76cd1b6c6d210852739/ros2caret%2Fverb%2Fnode_summary.py",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/ros2caret%2Fverb%2Fnode_summary.py?ref=ce91b23399d38df3fb34b76cd1b6c6d210852739",
+          "patch": "@@ -20,11 +20,9 @@\n class NodeSummaryVerb(VerbExtension):\n \n     def add_arguments(self, parser, cli_name):\n-        # NOTE: It looks good to remove '-d', '--trace_dir',\n-        # since the argument is required.\n         parser.add_argument(\n-            '-d', '--trace_dir', dest='trace_dir', type=str,\n-            help='the path to the trace directory', required=True\n+            'trace_dir', type=str,\n+            help='the path to the trace directory'\n         )\n         parser.add_argument(\n             '--duration_filter', dest='d_filter_args',"
+        },
+        {
+          "sha": "db169ef7f36709fa4ea6c82fa3898d922bd76c71",
+          "filename": "ros2caret/verb/topic_summary.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/ce91b23399d38df3fb34b76cd1b6c6d210852739/ros2caret%2Fverb%2Ftopic_summary.py",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/ce91b23399d38df3fb34b76cd1b6c6d210852739/ros2caret%2Fverb%2Ftopic_summary.py",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/ros2caret%2Fverb%2Ftopic_summary.py?ref=ce91b23399d38df3fb34b76cd1b6c6d210852739",
+          "patch": "@@ -21,8 +21,8 @@ class TopicSummaryVerb(VerbExtension):\n \n     def add_arguments(self, parser, cli_name):\n         parser.add_argument(\n-            '-d', '--trace_dir', dest='trace_dir', type=str,\n-            help='the path to the trace directory', required=True\n+            'trace_dir', type=str,\n+            help='the path to the trace directory'\n         )\n         parser.add_argument(\n             '--duration_filter', dest='d_filter_args',"
+        },
+        {
+          "sha": "46540d021785f7a843921683e0ebaaaeed817fc6",
+          "filename": "ros2caret/verb/trace_point_summary.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/ce91b23399d38df3fb34b76cd1b6c6d210852739/ros2caret%2Fverb%2Ftrace_point_summary.py",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/ce91b23399d38df3fb34b76cd1b6c6d210852739/ros2caret%2Fverb%2Ftrace_point_summary.py",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/ros2caret%2Fverb%2Ftrace_point_summary.py?ref=ce91b23399d38df3fb34b76cd1b6c6d210852739",
+          "patch": "@@ -21,8 +21,8 @@ class TracePointSummaryVerb(VerbExtension):\n \n     def add_arguments(self, parser, cli_name):\n         parser.add_argument(\n-            '-d', '--trace_dir', dest='trace_dir', type=str,\n-            help='the path to the trace directory', required=True\n+            'trace_dir', type=str,\n+            help='the path to the trace directory'\n         )\n         parser.add_argument(\n             '--duration_filter', dest='d_filter_args',"
+        }
+      ]
+    },
+    {
+      "author": "takeshi-iwanari",
+      "date": "2022-12-13T04:39:34Z",
+      "sha": "567292b4f1c2d14558e22af8e0515a1449495006",
+      "message": "docs: add issue template and PR template (#57)\n\nSigned-off-by: takeshi.iwanari <takeshi.iwanari@tier4.jp>\r\n\r\nSigned-off-by: takeshi.iwanari <takeshi.iwanari@tier4.jp>",
+      "files_changed": 2,
+      "additions": 52,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "fdc56b753a3adda1d6e49e05047bb604de3b0606",
+          "filename": ".github/ISSUE_TEMPLATE/issue.yaml",
+          "status": "added",
+          "additions": 20,
+          "deletions": 0,
+          "changes": 20,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/567292b4f1c2d14558e22af8e0515a1449495006/.github%2FISSUE_TEMPLATE%2Fissue.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/567292b4f1c2d14558e22af8e0515a1449495006/.github%2FISSUE_TEMPLATE%2Fissue.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.github%2FISSUE_TEMPLATE%2Fissue.yaml?ref=567292b4f1c2d14558e22af8e0515a1449495006",
+          "patch": "@@ -0,0 +1,20 @@\n+name: Issue\n+description: Create a new issue\n+body:\n+  - type: checkboxes\n+    attributes:\n+      label: Checklist\n+      description: Confirm the following items before proceeding.\n+      options:\n+        - label: I've read the [contribution guidelines](https://github.com/tier4/caret/blob/main/.github/CONTRIBUTING.md).\n+          required: true\n+        - label: I've confirmed the issue is certainly related to this repository. If not, please consider to make a new issue in https://github.com/tier4/caret/issues\n+          required: true\n+\n+  - type: textarea\n+    id: description\n+    attributes:\n+      label: Description\n+      description: Describe the issue.\n+    validations:\n+      required: true"
+        },
+        {
+          "sha": "889b56f177fccddbd8f4120d65b0f274e9475b96",
+          "filename": ".github/pull_request_template.md",
+          "status": "added",
+          "additions": 32,
+          "deletions": 0,
+          "changes": 32,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/567292b4f1c2d14558e22af8e0515a1449495006/.github%2Fpull_request_template.md",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/567292b4f1c2d14558e22af8e0515a1449495006/.github%2Fpull_request_template.md",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.github%2Fpull_request_template.md?ref=567292b4f1c2d14558e22af8e0515a1449495006",
+          "patch": "@@ -0,0 +1,32 @@\n+## Description\n+\n+<!-- Write a brief description of this PR. -->\n+\n+## Related links\n+\n+<!-- Write the links related to this PR. Private links should be clearly marked as private, for example, '[FOO COMPANY INTERNAL LINK](https://example.com)'. -->\n+\n+## Notes for reviewers\n+\n+<!-- Write additional information if necessary. It should be written if there are related PRs that should be merged at the same time. -->\n+\n+## Pre-review checklist for the PR author\n+\n+- [ ] I've confirmed the [contribution guidelines](https://github.com/tier4/caret/blob/main/.github/CONTRIBUTING.md).\n+- [ ] The PR is ready for review.\n+\n+## In-review checklist for the PR reviewers\n+\n+The PR reviewers **must** check the checkboxes below before approval.\n+\n+- [ ] The PR has been properly tested.\n+- [ ] The PR has been reviewed.\n+\n+## Post-review checklist for the PR author\n+\n+The PR author **must** check the checkboxes below before merging.\n+\n+- [ ] There are no open discussions or they are tracked via tickets.\n+- [ ] The PR is ready for merge.\n+\n+After all checkboxes are checked, anyone who has write access can merge the PR."
+        }
+      ]
+    },
+    {
+      "author": "taro-yu",
+      "date": "2023-06-13T10:02:21Z",
+      "sha": "cd8617a1f9ef3353fc545dee683ebdbc8d4b305d",
+      "message": "feat: add caret version CLI (#69)\n\n* feat: added tentative version command\r\n\r\nSigned-off-by: yu-taro- <milktea1621@gmail.com>\r\n\r\n* feat: added new workflow\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* feat: added new github actions\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* refactor: added some changes\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed: removed pre-commit.ci error\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed: removed pre-commit.ci error\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed: removed pre-commit.ci error\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed: removed pre-commit.ci error\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* docs: restored the contents of version.py to their original state\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* refactor: changed the contents in vrsion.py\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed: removed flake8 error\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* refactor: changed version.py\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* test\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* test2\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* reverted to the first state\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* feat: creat the github actions to create PR and change version info  -s\r\n\r\n* feat: creat the github actions to create PR and change version info  -s\r\n\r\n* fixed: removed pytest erorrs\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* docs: added copyright to __version__.py\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* docs: yml -> yaml\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* delated update-caret-version.yml\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed: pre-commit ci erorrs\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed: pytest erorr\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed: pytest erorr\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed: pre-commit ci erorrs\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed sed cmd erorr\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed checkout erorr\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed pre-commit erorr\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed pre-commit erorr\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed pre-commit erorr\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed pre-commit erorr\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed: changed to *\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed: changed to *\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed: changed script to to accurately compare version information\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* refactor: changed the way to get branch name\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* refactor: changed the way to get branch name\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* refactor: changed the way to get branch name\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* refactor: changed the way to get branch name\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed: changed the dictionary's keyword in setup.py\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed: added if condition to the create PR step\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed: added if condition to the create PR step\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed: added if condition to the create PR step\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed: added if condition to the create PR step\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed: added if condition to the create PR step\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed: added if condition to the create PR step\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* docs: changed the PR-create step name\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* docs: added few changes\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n* fixed: changed version to v0.4.10\r\n\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\n\r\n---------\r\n\r\nSigned-off-by: yu-taro- <milktea1621@gmail.com>\r\nSigned-off-by: taro-yu <milktea1621@gmai.com>\r\nCo-authored-by: taro-yu <milktea1621@gmai.com>",
+      "files_changed": 4,
+      "additions": 116,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "a018f0f84a6aa1e7fb208443ae4ee3d18307fcdb",
+          "filename": ".github/workflows/update-caret-version.yaml",
+          "status": "added",
+          "additions": 66,
+          "deletions": 0,
+          "changes": 66,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/cd8617a1f9ef3353fc545dee683ebdbc8d4b305d/.github%2Fworkflows%2Fupdate-caret-version.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/cd8617a1f9ef3353fc545dee683ebdbc8d4b305d/.github%2Fworkflows%2Fupdate-caret-version.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.github%2Fworkflows%2Fupdate-caret-version.yaml?ref=cd8617a1f9ef3353fc545dee683ebdbc8d4b305d",
+          "patch": "@@ -0,0 +1,66 @@\n+name: Update Version and Create PR\n+\n+on:\n+  push:\n+    tags:\n+      - v*\n+\n+jobs:\n+  update-version-and-create-pr:\n+    permissions:\n+      actions: write\n+      checks: write\n+      contents: write\n+      deployments: write\n+      issues: write\n+      packages: write\n+      pull-requests: write\n+      repository-projects: write\n+      security-events: write\n+      statuses: write\n+\n+    runs-on: ubuntu-latest\n+    steps:\n+      - name: Set up Git\n+        run: |\n+          git config --global user.name github-actions\n+          git config --global user.email github-actions@github.com\n+\n+      - name: Get New Branch and Tag\n+        id: tag\n+        run: |\n+          latest_tag=$(curl -s https://api.github.com/repos/${GITHUB_REPOSITORY}/tags | jq -r .[0].name)\n+          current_tag=${{ github.ref_name }}\n+          branch=rc/$current_tag\n+          echo \"LATEST_TAG_NAME=$latest_tag\" >> \"$GITHUB_OUTPUT\"\n+          echo \"TAG_NAME=$current_tag\" >> \"$GITHUB_OUTPUT\"\n+          echo \"BRANCH_NAME=$branch\" >> \"$GITHUB_OUTPUT\"\n+\n+      - name: Checkout repository2\n+        uses: actions/checkout@v3\n+        with:\n+          ref: ${{ steps.tag.outputs.BRANCH_NAME }}\n+\n+      - name: Commit and push changes\n+        run: |\n+          sed -i \"s/__version__ =.*/__version__ = '${{ steps.tag.outputs.TAG_NAME }}'/\" ros2caret/__version__.py\n+          git add ros2caret/__version__.py\n+          git commit -m \"chore: update version to ${{ steps.tag.outputs.TAG_NAME }}\" -s\n+          git push origin ${{ steps.tag.outputs.BRANCH_NAME }}\n+\n+      - name: Re-create tag\n+        run: |\n+          git push -d origin ${{ steps.tag.outputs.TAG_NAME }}\n+          git tag ${{ steps.tag.outputs.TAG_NAME }}\n+          git push origin ${{ steps.tag.outputs.TAG_NAME }}\n+\n+      - name: Create PR to main branch if the created tag is the latest\n+        run: |\n+          if [ ${{ steps.tag.outputs.LATEST_TAG_NAME }} == ${{ steps.tag.outputs.TAG_NAME }} ]; then\n+            gh pr create --title \"chore: update version to ${{ steps.tag.outputs.TAG_NAME }}\" \\\n+                         --body \"This pull request updates the version in __version__.py to ${{ steps.tag.outputs.TAG_NAME }}\" \\\n+                         --base main \\\n+                         --head ${{ steps.tag.outputs.BRANCH_NAME }}\n+          fi\n+        env:\n+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}"
+        },
+        {
+          "sha": "4990c8fba3bd1f90df3b2dbf66ac518c5fe40535",
+          "filename": "ros2caret/__version__.py",
+          "status": "added",
+          "additions": 15,
+          "deletions": 0,
+          "changes": 15,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/cd8617a1f9ef3353fc545dee683ebdbc8d4b305d/ros2caret%2F__version__.py",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/cd8617a1f9ef3353fc545dee683ebdbc8d4b305d/ros2caret%2F__version__.py",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/ros2caret%2F__version__.py?ref=cd8617a1f9ef3353fc545dee683ebdbc8d4b305d",
+          "patch": "@@ -0,0 +1,15 @@\n+# Copyright 2021 Research Institute of Systems Planning, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+__version__ = 'v0.4.10'"
+        },
+        {
+          "sha": "938cb1d1761e239198bcd6b694be4362cff99b3c",
+          "filename": "ros2caret/verb/version.py",
+          "status": "added",
+          "additions": 24,
+          "deletions": 0,
+          "changes": 24,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/cd8617a1f9ef3353fc545dee683ebdbc8d4b305d/ros2caret%2Fverb%2Fversion.py",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/cd8617a1f9ef3353fc545dee683ebdbc8d4b305d/ros2caret%2Fverb%2Fversion.py",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/ros2caret%2Fverb%2Fversion.py?ref=cd8617a1f9ef3353fc545dee683ebdbc8d4b305d",
+          "patch": "@@ -0,0 +1,24 @@\n+# Copyright 2021 Research Institute of Systems Planning, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ros2caret.verb import VerbExtension\n+\n+from ..__version__ import __version__\n+\n+\n+class CaretVersionVerb(VerbExtension):\n+\n+    def main(self, *, args):\n+        version = __version__\n+        print(version)"
+        },
+        {
+          "sha": "dcdb3c38bf86d5a2701214f6841b8918274d556a",
+          "filename": "setup.py",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 1,
+          "changes": 12,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/cd8617a1f9ef3353fc545dee683ebdbc8d4b305d/setup.py",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/cd8617a1f9ef3353fc545dee683ebdbc8d4b305d/setup.py",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/setup.py?ref=cd8617a1f9ef3353fc545dee683ebdbc8d4b305d",
+          "patch": "@@ -1,10 +1,18 @@\n+import os\n+\n from setuptools import setup\n \n+\n package_name = 'ros2caret'\n+ns: dict[str, str] = {}\n+\n+version_path = f'{os.path.dirname(os.path.realpath(__file__))}/ros2caret/__version__.py'\n+with open(version_path, 'r') as f:\n+    eval(compile(f.read(), version_path, 'exec'), ns)\n \n setup(\n     name=package_name,\n-    version='0.2.1',\n+    version=ns['__version__'],\n     packages=[package_name],\n     data_files=[\n         ('share/ament_index/resource_index/packages',\n@@ -39,6 +47,8 @@\n                     ros2caret.verb.verify_paths:VerifyPathsVerb',\n             'record = \\\n                     ros2caret.verb.record:RecordVerb',\n+            'version = \\\n+                    ros2caret.verb.version:CaretVersionVerb',\n             # 'callback_graph = \\\n             #       ros2caret.verb.callback_graph:CallbackGraphVerb',\n             # 'chain_latency = ros2caret.verb.chain_latency:ChainLatencyVerb',"
+        }
+      ]
+    },
+    {
+      "author": "hsgwa",
+      "date": "2021-05-14T06:40:22Z",
+      "sha": "9d8e2ffb026fd81732148ca6b5e18b8f0ec2461c",
+      "message": "first commit",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "6908e370e949e917c5628e9ffbbb270ab4a21ec3",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/9d8e2ffb026fd81732148ca6b5e18b8f0ec2461c/README.md",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/9d8e2ffb026fd81732148ca6b5e18b8f0ec2461c/README.md",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/README.md?ref=9d8e2ffb026fd81732148ca6b5e18b8f0ec2461c",
+          "patch": "@@ -0,0 +1 @@\n+# trace_analysis"
+        }
+      ]
+    },
+    {
+      "author": "takam5f2",
+      "date": "2022-05-09T02:18:34Z",
+      "sha": "c0ab3e69633aede2c6547de37add672bac97c7c8",
+      "message": "fix(actions): fixed source branch",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "89426d4b7bfda200f18e19076514eba6f334e79d",
+          "filename": ".github/workflows/sync-files.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/c0ab3e69633aede2c6547de37add672bac97c7c8/.github%2Fworkflows%2Fsync-files.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/c0ab3e69633aede2c6547de37add672bac97c7c8/.github%2Fworkflows%2Fsync-files.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.github%2Fworkflows%2Fsync-files.yaml?ref=c0ab3e69633aede2c6547de37add672bac97c7c8",
+          "patch": "@@ -17,6 +17,6 @@ jobs:\n           private_key: ${{ secrets.PRIVATE_KEY }}\n \n       - name: Run sync-files\n-        uses: autowarefoundation/autoware-github-actions/sync-files@tier4/proposal\n+        uses: autowarefoundation/autoware-github-actions/sync-files@main\n         with:\n           token: ${{ steps.generate-token.outputs.token }}"
+        }
+      ]
+    },
+    {
+      "author": "keita1523",
+      "date": "2022-04-28T00:53:08Z",
+      "sha": "dd64e639875bf38708517f52e538687a3265ed38",
+      "message": "Feat/add sync file (#4)\n\n* Create sync-files.yaml\r\n\r\n* Create sync-files.yaml\r\n\r\n* Update sync-files.yaml\r\n\r\n* fix: sync-files.yaml\r\n\r\n* feat: add pytest.yaml",
+      "files_changed": 3,
+      "additions": 59,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "4186309ca12af6def470a55c96d592a5b260b111",
+          "filename": ".github/sync-files.yaml",
+          "status": "added",
+          "additions": 20,
+          "deletions": 0,
+          "changes": 20,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/dd64e639875bf38708517f52e538687a3265ed38/.github%2Fsync-files.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/dd64e639875bf38708517f52e538687a3265ed38/.github%2Fsync-files.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.github%2Fsync-files.yaml?ref=dd64e639875bf38708517f52e538687a3265ed38",
+          "patch": "@@ -0,0 +1,20 @@\n+- repository: autowarefoundation/autoware\n+  files:\n+    - source: .github/dependabot.yaml\n+    - source: .github/workflows/pre-commit.yaml\n+    - source: .github/workflows/pre-commit-optional.yaml\n+    - source: .github/workflows/semantic-pull-request.yaml\n+    - source: .github/workflows/spell-check-differential.yaml\n+    # - source: .github/workflows/sync-files.yaml\n+    # - source: .clang-format\n+    - source: .markdown-link-check.json\n+    - source: .markdownlint.yaml\n+    - source: .pre-commit-config-optional.yaml\n+    - source: .prettierignore\n+    - source: .prettierrc.yaml\n+    - source: .yamllint.yaml\n+\n+- repository: autowarefoundation/autoware-github-actions\n+  files:\n+    - source: .github/workflows/github-release.yaml\n+    - source: cliff.toml\n\\ No newline at end of file"
+        },
+        {
+          "sha": "7c343103490f5645cbef14b4895f5c59cc2e7e0a",
+          "filename": ".github/workflows/pytest.yaml",
+          "status": "added",
+          "additions": 17,
+          "deletions": 0,
+          "changes": 17,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/dd64e639875bf38708517f52e538687a3265ed38/.github%2Fworkflows%2Fpytest.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/dd64e639875bf38708517f52e538687a3265ed38/.github%2Fworkflows%2Fpytest.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.github%2Fworkflows%2Fpytest.yaml?ref=dd64e639875bf38708517f52e538687a3265ed38",
+          "patch": "@@ -0,0 +1,17 @@\n+name: pytest\n+\n+on:\n+  pull_request:\n+\n+jobs:\n+  pytest:\n+    runs-on: ubuntu-latest\n+    steps:\n+      - name: Check out repository\n+        uses: actions/checkout@v3\n+\n+      - name: Install dependent packages\n+        run: python3 -m pip install -r requirements.txt\n+\n+      - name: Run pytest\n+        run: python3 -m pytest\n\\ No newline at end of file"
+        },
+        {
+          "sha": "0c5b4b04fa08440e90ae19747d93605247d22d7d",
+          "filename": ".github/workflows/sync-files.yaml",
+          "status": "added",
+          "additions": 22,
+          "deletions": 0,
+          "changes": 22,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/dd64e639875bf38708517f52e538687a3265ed38/.github%2Fworkflows%2Fsync-files.yaml",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/dd64e639875bf38708517f52e538687a3265ed38/.github%2Fworkflows%2Fsync-files.yaml",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/.github%2Fworkflows%2Fsync-files.yaml?ref=dd64e639875bf38708517f52e538687a3265ed38",
+          "patch": "@@ -0,0 +1,22 @@\n+name: sync-files\n+\n+on:\n+  schedule:\n+    - cron: 0 19 * * * # run at 4 AM JST\n+  workflow_dispatch:\n+\n+jobs:\n+  sync-files:\n+    runs-on: ubuntu-latest\n+    steps:\n+      - name: Generate token\n+        id: generate-token\n+        uses: tibdex/github-app-token@v1\n+        with:\n+          app_id: ${{ secrets.APP_ID }}\n+          private_key: ${{ secrets.PRIVATE_KEY }}\n+\n+      - name: Run sync-files\n+        uses: autowarefoundation/autoware-github-actions/sync-files@tier4/proposal\n+        with:\n+          token: ${{ steps.generate-token.outputs.token }}"
+        }
+      ]
+    },
+    {
+      "author": "nabetetsu",
+      "date": "2022-06-03T05:09:11Z",
+      "sha": "91356f39e373e18a9229f0b36330a4019a8df9dd",
+      "message": "add nbconvert and nbformat with version (#16)",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "73de2851d2f701b4029cdfc2f880bc6bc094dfbc",
+          "filename": "requirements.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/91356f39e373e18a9229f0b36330a4019a8df9dd/requirements.txt",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/91356f39e373e18a9229f0b36330a4019a8df9dd/requirements.txt",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/requirements.txt?ref=91356f39e373e18a9229f0b36330a4019a8df9dd",
+          "patch": "@@ -16,6 +16,8 @@ pybind11\n pandas>=1.4.0\n bokeh\n pandas-bokeh\n+nbformat>=5.4.0\n+nbconvert>=6.4.4\n jupyterlab\n graphviz\n "
+        }
+      ]
+    },
+    {
+      "author": "ver033",
+      "date": "2023-10-27T07:03:17Z",
+      "sha": "ce91b23399d38df3fb34b76cd1b6c6d210852739",
+      "message": "refactor: remove -d for ros2 caret command  (#129)\n\n* refactor: remove -d from ros2 caret command\r\n\r\nSigned-off-by: bopeng-saitama <peng.b.203@ms.saitama-u.ac.jp>\r\n\r\n* fix: flake8 error\r\n\r\nSigned-off-by: bopeng-saitama <peng.b.203@ms.saitama-u.ac.jp>\r\n\r\n* refactor: remove -w for ros2 caret command\r\n\r\nSigned-off-by: bopeng-saitama <peng.b.203@ms.saitama-u.ac.jp>\r\n\r\n---------\r\n\r\nSigned-off-by: bopeng-saitama <peng.b.203@ms.saitama-u.ac.jp>",
+      "files_changed": 5,
+      "additions": 11,
+      "deletions": 14,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "7a5025c769d0048c5395f56c90a47835668ea5d0",
+          "filename": "ros2caret/verb/check_caret_rclcpp.py",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 2,
+          "changes": 5,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/ce91b23399d38df3fb34b76cd1b6c6d210852739/ros2caret%2Fverb%2Fcheck_caret_rclcpp.py",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/ce91b23399d38df3fb34b76cd1b6c6d210852739/ros2caret%2Fverb%2Fcheck_caret_rclcpp.py",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/ros2caret%2Fverb%2Fcheck_caret_rclcpp.py?ref=ce91b23399d38df3fb34b76cd1b6c6d210852739",
+          "patch": "@@ -41,8 +41,9 @@ class CheckCaretRclcppVerb(VerbExtension):\n \n     def add_arguments(self, parser, cli_name):\n         parser.add_argument(\n-            '-w', '--workspace', dest='workspace', type=str,\n-            help='the path to the workspace to be checked', required=True)\n+            'workspace', type=str,\n+            help='the path to the workspace to be checked'\n+        )\n \n     def main(self, *, args):\n         root_dir_path = args.workspace + '/build/'"
+        },
+        {
+          "sha": "f65a5bbf656d09922d968fa08b5fd2799e1a3307",
+          "filename": "ros2caret/verb/check_ctf.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 4,
+          "changes": 6,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/ce91b23399d38df3fb34b76cd1b6c6d210852739/ros2caret%2Fverb%2Fcheck_ctf.py",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/ce91b23399d38df3fb34b76cd1b6c6d210852739/ros2caret%2Fverb%2Fcheck_ctf.py",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/ros2caret%2Fverb%2Fcheck_ctf.py?ref=ce91b23399d38df3fb34b76cd1b6c6d210852739",
+          "patch": "@@ -26,10 +26,8 @@ class CheckCTFVerb(VerbExtension):\n \n     def add_arguments(self, parser, cli_name):\n         parser.add_argument(\n-            '-d', '--trace_dir', dest='trace_dir', type=str,\n-            help='the path to the trace directory to be checked',\n-            required=True\n-        )\n+            'trace_dir', type=str,\n+            help='the path to the trace directory to be checked')\n \n     def main(self, *, args):\n         try:"
+        },
+        {
+          "sha": "61a4e273f29705002887da8d832f905e0b95b6f7",
+          "filename": "ros2caret/verb/node_summary.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 4,
+          "changes": 6,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/ce91b23399d38df3fb34b76cd1b6c6d210852739/ros2caret%2Fverb%2Fnode_summary.py",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/ce91b23399d38df3fb34b76cd1b6c6d210852739/ros2caret%2Fverb%2Fnode_summary.py",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/ros2caret%2Fverb%2Fnode_summary.py?ref=ce91b23399d38df3fb34b76cd1b6c6d210852739",
+          "patch": "@@ -20,11 +20,9 @@\n class NodeSummaryVerb(VerbExtension):\n \n     def add_arguments(self, parser, cli_name):\n-        # NOTE: It looks good to remove '-d', '--trace_dir',\n-        # since the argument is required.\n         parser.add_argument(\n-            '-d', '--trace_dir', dest='trace_dir', type=str,\n-            help='the path to the trace directory', required=True\n+            'trace_dir', type=str,\n+            help='the path to the trace directory'\n         )\n         parser.add_argument(\n             '--duration_filter', dest='d_filter_args',"
+        },
+        {
+          "sha": "db169ef7f36709fa4ea6c82fa3898d922bd76c71",
+          "filename": "ros2caret/verb/topic_summary.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/ce91b23399d38df3fb34b76cd1b6c6d210852739/ros2caret%2Fverb%2Ftopic_summary.py",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/ce91b23399d38df3fb34b76cd1b6c6d210852739/ros2caret%2Fverb%2Ftopic_summary.py",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/ros2caret%2Fverb%2Ftopic_summary.py?ref=ce91b23399d38df3fb34b76cd1b6c6d210852739",
+          "patch": "@@ -21,8 +21,8 @@ class TopicSummaryVerb(VerbExtension):\n \n     def add_arguments(self, parser, cli_name):\n         parser.add_argument(\n-            '-d', '--trace_dir', dest='trace_dir', type=str,\n-            help='the path to the trace directory', required=True\n+            'trace_dir', type=str,\n+            help='the path to the trace directory'\n         )\n         parser.add_argument(\n             '--duration_filter', dest='d_filter_args',"
+        },
+        {
+          "sha": "46540d021785f7a843921683e0ebaaaeed817fc6",
+          "filename": "ros2caret/verb/trace_point_summary.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/tier4/ros2caret/blob/ce91b23399d38df3fb34b76cd1b6c6d210852739/ros2caret%2Fverb%2Ftrace_point_summary.py",
+          "raw_url": "https://github.com/tier4/ros2caret/raw/ce91b23399d38df3fb34b76cd1b6c6d210852739/ros2caret%2Fverb%2Ftrace_point_summary.py",
+          "contents_url": "https://api.github.com/repos/tier4/ros2caret/contents/ros2caret%2Fverb%2Ftrace_point_summary.py?ref=ce91b23399d38df3fb34b76cd1b6c6d210852739",
+          "patch": "@@ -21,8 +21,8 @@ class TracePointSummaryVerb(VerbExtension):\n \n     def add_arguments(self, parser, cli_name):\n         parser.add_argument(\n-            '-d', '--trace_dir', dest='trace_dir', type=str,\n-            help='the path to the trace directory', required=True\n+            'trace_dir', type=str,\n+            help='the path to the trace directory'\n         )\n         parser.add_argument(\n             '--duration_filter', dest='d_filter_args',"
+        }
+      ]
+    }
+  ]
+}

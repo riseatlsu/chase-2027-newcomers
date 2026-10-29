@@ -1,0 +1,227 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T05:50:16Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "OUXT-Polaris",
+    "repo": "nmea_hardware_interface"
+  },
+  "data": [
+    {
+      "author": "github-actions[bot]",
+      "date": "2023-06-14T12:22:10Z",
+      "sha": "05a0a4562176541f4360cb5f9ff662e61a9b0721",
+      "message": "Merge pull request #17 from OUXT-Polaris/workflow/sync\n\n[Bot] Update workflow",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "bacafe0db941a09637af43c34f490642b3ad2687",
+          "filename": ".github/workflows/BuildTest.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/blob/05a0a4562176541f4360cb5f9ff662e61a9b0721/.github%2Fworkflows%2FBuildTest.yaml",
+          "raw_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/raw/05a0a4562176541f4360cb5f9ff662e61a9b0721/.github%2Fworkflows%2FBuildTest.yaml",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/nmea_hardware_interface/contents/.github%2Fworkflows%2FBuildTest.yaml?ref=05a0a4562176541f4360cb5f9ff662e61a9b0721",
+          "patch": "@@ -113,7 +113,7 @@ jobs:\n     needs: build\n     steps:\n       - name: merge PR\n-        if : ${{ github.event_name == 'pull_request' }} && ${{ github.actor != 'wam-v-tan' }}\n+        if : ${{ (github.event_name == 'pull_request') && (github.actor == 'wam-v-tan') }}\n         env:\n           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n         run: gh pr merge ${{ github.event.pull_request.html_url }} --merge"
+        }
+      ]
+    },
+    {
+      "author": "wam-v-tan",
+      "date": "2022-01-01T02:00:46Z",
+      "sha": "a6ee9a47af6b277c54e905af90ed8e76c3fbf72e",
+      "message": "Setup workflow",
+      "files_changed": 3,
+      "additions": 183,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "f6218aecc0101ceec343f2b5340d18649a809a90",
+          "filename": ".github/workflows/BuildTest.yaml",
+          "status": "added",
+          "additions": 96,
+          "deletions": 0,
+          "changes": 96,
+          "blob_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/blob/a6ee9a47af6b277c54e905af90ed8e76c3fbf72e/.github%2Fworkflows%2FBuildTest.yaml",
+          "raw_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/raw/a6ee9a47af6b277c54e905af90ed8e76c3fbf72e/.github%2Fworkflows%2FBuildTest.yaml",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/nmea_hardware_interface/contents/.github%2Fworkflows%2FBuildTest.yaml?ref=a6ee9a47af6b277c54e905af90ed8e76c3fbf72e",
+          "patch": "@@ -0,0 +1,96 @@\n+name: BuildTest\n+\n+on:\n+  schedule:\n+    - cron: 0 0 * * *\n+  pull_request:\n+  workflow_dispatch:\n+\n+jobs:\n+  build_and_test:\n+    name: Build\n+    runs-on: ubuntu-20.04\n+    strategy:\n+      fail-fast: false\n+      matrix:\n+        rosdistro : [foxy,galactic]\n+    steps:\n+      - uses: actions/checkout@v2-beta\n+      - name: Check dependency-${{ matrix.rosdistro }}.repos existence\n+        id: check_rosdistro_repos_files\n+        uses: andstor/file-existence-action@v1\n+        with:\n+          files: dependency-${{ matrix.rosdistro }}.repos\n+          allow_failure: false\n+      - name: Check dependency.repos existence\n+        id: check_repos_files\n+        uses: andstor/file-existence-action@v1\n+        with:\n+          files: dependency.repos\n+          allow_failure: false\n+      - name: Setup ROS2 ${{ matrix.rosdistro }} environment\n+        uses: ros-tooling/setup-ros@v0.2\n+        with:\n+          required-ros-distributions: ${{ matrix.rosdistro }}\n+      - name: Search packages in this repository\n+        id: list_packages\n+        run: |\n+          echo ::set-output name=package_list::$(colcon list --names-only | sed -e ':loop; N; $!b loop; s/\\n/ /g')\n+      - name: Show target packages\n+        run: |\n+          echo \"Target packages: ${{ steps.list_packages.outputs.package_list }}\"\n+      - name: Run ros-tooling/action-ros-ci@v0.2 with dependency-${{ matrix.rosdistro }}.repos\n+        uses: ros-tooling/action-ros-ci@v0.2\n+        if: steps.check_rosdistro_repos_files.outputs.files_exists == 'true'\n+        with:\n+          package-name: ${{ steps.list_packages.outputs.package_list }}\n+          target-ros2-distro: ${{ matrix.rosdistro }}\n+          colcon-defaults: |\n+            {\n+              \"build\": {\n+                \"mixin\": [\"coverage-gcc\"]\n+              }\n+            }\n+          # If possible, pin the repository in the workflow to a specific commit to avoid\n+          # changes in colcon-mixin-repository from breaking your tests.\n+          colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/1ddb69bedfd1f04c2f000e95452f7c24a4d6176b/index.yaml\n+          vcs-repo-file-url: dependency-${{ matrix.rosdistro }}.repos\n+      - name: Run ros-tooling/action-ros-ci@v0.2 with dependency.repos\n+        uses: ros-tooling/action-ros-ci@v0.2\n+        if: steps.check_rosdistro_repos_files.outputs.files_exists == 'false' && steps.check_repos_files.outputs.files_exists == 'true'\n+        with:\n+          package-name: ${{ steps.list_packages.outputs.package_list }}\n+          target-ros2-distro: ${{ matrix.rosdistro }}\n+          colcon-defaults: |\n+            {\n+              \"build\": {\n+                \"mixin\": [\"coverage-gcc\"]\n+              }\n+            }\n+          # If possible, pin the repository in the workflow to a specific commit to avoid\n+          # changes in colcon-mixin-repository from breaking your tests.\n+          colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/1ddb69bedfd1f04c2f000e95452f7c24a4d6176b/index.yaml\n+          vcs-repo-file-url: dependency.repos\n+      - name: Run ros-tooling/action-ros-ci@v0.2 without repos\n+        uses: ros-tooling/action-ros-ci@v0.2\n+        if: steps.check_rosdistro_repos_files.outputs.files_exists == 'false' && steps.check_repos_files.outputs.files_exists == 'false'\n+        with:\n+          package-name: ${{ steps.list_packages.outputs.package_list }}\n+          target-ros2-distro: ${{ matrix.rosdistro }}\n+          colcon-defaults: |\n+            {\n+              \"build\": {\n+                \"mixin\": [\"coverage-gcc\"]\n+              }\n+            }\n+          # If possible, pin the repository in the workflow to a specific commit to avoid\n+          # changes in colcon-mixin-repository from breaking your tests.\n+          colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/1ddb69bedfd1f04c2f000e95452f7c24a4d6176b/index.yaml\n+      - name: Notify Slack\n+        uses: 8398a7/action-slack@v2\n+        if: failure()\n+        with:\n+          status: ${{ job.status }}\n+        env:\n+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "39b4218b3d9e9e922f237f2d87df13db17c745ed",
+          "filename": ".github/workflows/Release.yaml",
+          "status": "added",
+          "additions": 68,
+          "deletions": 0,
+          "changes": 68,
+          "blob_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/blob/a6ee9a47af6b277c54e905af90ed8e76c3fbf72e/.github%2Fworkflows%2FRelease.yaml",
+          "raw_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/raw/a6ee9a47af6b277c54e905af90ed8e76c3fbf72e/.github%2Fworkflows%2FRelease.yaml",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/nmea_hardware_interface/contents/.github%2Fworkflows%2FRelease.yaml?ref=a6ee9a47af6b277c54e905af90ed8e76c3fbf72e",
+          "patch": "@@ -0,0 +1,68 @@\n+# This file is automatically deployed from https://github.com/at-wat/.rospkg-assets.\n+# Please don't directly edit; update at-wat/.rospkg-assets instead.\n+\n+name: Release\n+on:\n+  issues:\n+    types: [opened, edited]\n+\n+jobs:\n+  release:\n+    runs-on: ubuntu-latest\n+    if: startsWith(github.event.issue.title, 'Release ')\n+    steps:\n+      - name: checkout\n+        uses: actions/checkout@v2\n+      - name: create release\n+        id: create_release\n+        uses: at-wat/catkin-release-action@v1\n+        with:\n+          issue_title: ${{ github.event.issue.title }}\n+          git_user: wam-v-tan\n+          git_email: ouxt.share@gmail.com\n+          github_token: ${{ secrets.GITHUB_TOKEN }}\n+      - name: open pull-request\n+        uses: repo-sync/pull-request@v2\n+        id: create_pull_request\n+        with:\n+          source_branch: ${{ steps.create_release.outputs.created_branch }}\n+          destination_branch: ${{ github.event.repository.default_branch }}\n+          pr_title: Release ${{ steps.create_release.outputs.version}}\n+          pr_body: close \\#${{ github.event.issue.number }}\n+          pr_assignee: wam-v-tan\n+          github_token: ${{ secrets.WAMV_TAN_BOT_SECRET }}\n+      - name: Enable Pull Request Automerge\n+        uses: peter-evans/enable-pull-request-automerge@v1\n+        with:\n+          token: ${{ secrets.WAMV_TAN_BOT_SECRET }}\n+          pull-request-number: ${{ steps.create_pull_request.outputs.pr_number }}\n+          merge-method: squash\n+      - name: create GitHub release\n+        uses: actions/create-release@v1\n+        continue-on-error: true\n+        env:\n+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n+        with:\n+          tag_name: ${{ steps.create_release.outputs.version}}\n+          release_name: Release ${{ steps.create_release.outputs.version}}\n+      - name: bloom release\n+        if: github.event.label.name == 'bloom'\n+        id: bloom\n+        uses: at-wat/bloom-release-action@v0\n+        with:\n+          ros_distro: foxy galactic rolling\n+          github_token_bloom: ${{ secrets.WAMV_TAN_BOT_SECRET }}\n+          github_user: wam-v-tan\n+          git_user: wam-v-tan\n+          git_email: ouxt.share@gmail.com\n+          release_repository_push_url: https://github.com/${{ github.repository }}-release.git\n+          tag_and_release: true\n+          open_pr: true\n+      - name: Notify Slack\n+        uses: 8398a7/action-slack@v2\n+        if: failure()\n+        with:\n+          status: ${{ job.status }}\n+        env:\n+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "68115b27ef1ced1ba18b80442bc8eff311876488",
+          "filename": ".github/workflows/UpdateWorkflowStatus.yaml",
+          "status": "added",
+          "additions": 19,
+          "deletions": 0,
+          "changes": 19,
+          "blob_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/blob/a6ee9a47af6b277c54e905af90ed8e76c3fbf72e/.github%2Fworkflows%2FUpdateWorkflowStatus.yaml",
+          "raw_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/raw/a6ee9a47af6b277c54e905af90ed8e76c3fbf72e/.github%2Fworkflows%2FUpdateWorkflowStatus.yaml",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/nmea_hardware_interface/contents/.github%2Fworkflows%2FUpdateWorkflowStatus.yaml?ref=a6ee9a47af6b277c54e905af90ed8e76c3fbf72e",
+          "patch": "@@ -0,0 +1,19 @@\n+name: UpdateDashboard\n+on:\n+  pull_request:\n+    paths-ignore:\n+    - \".github/workflows/UpdateWorkflowStatus.yaml\"\n+  workflow_dispatch:\n+\n+jobs:\n+  build:\n+    name: UpdateDashboard\n+    runs-on: ubuntu-latest\n+    steps:\n+      - uses: benc-uk/workflow-dispatch@v1\n+        with:\n+          # You should create a personal access token and store it in your repository\n+          token: ${{ secrets.WAMV_TAN_BOT_SECRET }}\n+          repo: OUXT-Polaris/ouxt_automation\n+          workflow: document\n+          ref: master\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "hakuturu583",
+      "date": "2022-01-01T02:15:46Z",
+      "sha": "fafa7edcb301bbe602d6f41f0008b86de4c5e605",
+      "message": "Merge pull request #4 from OUXT-Polaris/workflow/sync\n\n[Bot] Update workflow",
+      "files_changed": 3,
+      "additions": 183,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "f6218aecc0101ceec343f2b5340d18649a809a90",
+          "filename": ".github/workflows/BuildTest.yaml",
+          "status": "added",
+          "additions": 96,
+          "deletions": 0,
+          "changes": 96,
+          "blob_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/blob/fafa7edcb301bbe602d6f41f0008b86de4c5e605/.github%2Fworkflows%2FBuildTest.yaml",
+          "raw_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/raw/fafa7edcb301bbe602d6f41f0008b86de4c5e605/.github%2Fworkflows%2FBuildTest.yaml",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/nmea_hardware_interface/contents/.github%2Fworkflows%2FBuildTest.yaml?ref=fafa7edcb301bbe602d6f41f0008b86de4c5e605",
+          "patch": "@@ -0,0 +1,96 @@\n+name: BuildTest\n+\n+on:\n+  schedule:\n+    - cron: 0 0 * * *\n+  pull_request:\n+  workflow_dispatch:\n+\n+jobs:\n+  build_and_test:\n+    name: Build\n+    runs-on: ubuntu-20.04\n+    strategy:\n+      fail-fast: false\n+      matrix:\n+        rosdistro : [foxy,galactic]\n+    steps:\n+      - uses: actions/checkout@v2-beta\n+      - name: Check dependency-${{ matrix.rosdistro }}.repos existence\n+        id: check_rosdistro_repos_files\n+        uses: andstor/file-existence-action@v1\n+        with:\n+          files: dependency-${{ matrix.rosdistro }}.repos\n+          allow_failure: false\n+      - name: Check dependency.repos existence\n+        id: check_repos_files\n+        uses: andstor/file-existence-action@v1\n+        with:\n+          files: dependency.repos\n+          allow_failure: false\n+      - name: Setup ROS2 ${{ matrix.rosdistro }} environment\n+        uses: ros-tooling/setup-ros@v0.2\n+        with:\n+          required-ros-distributions: ${{ matrix.rosdistro }}\n+      - name: Search packages in this repository\n+        id: list_packages\n+        run: |\n+          echo ::set-output name=package_list::$(colcon list --names-only | sed -e ':loop; N; $!b loop; s/\\n/ /g')\n+      - name: Show target packages\n+        run: |\n+          echo \"Target packages: ${{ steps.list_packages.outputs.package_list }}\"\n+      - name: Run ros-tooling/action-ros-ci@v0.2 with dependency-${{ matrix.rosdistro }}.repos\n+        uses: ros-tooling/action-ros-ci@v0.2\n+        if: steps.check_rosdistro_repos_files.outputs.files_exists == 'true'\n+        with:\n+          package-name: ${{ steps.list_packages.outputs.package_list }}\n+          target-ros2-distro: ${{ matrix.rosdistro }}\n+          colcon-defaults: |\n+            {\n+              \"build\": {\n+                \"mixin\": [\"coverage-gcc\"]\n+              }\n+            }\n+          # If possible, pin the repository in the workflow to a specific commit to avoid\n+          # changes in colcon-mixin-repository from breaking your tests.\n+          colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/1ddb69bedfd1f04c2f000e95452f7c24a4d6176b/index.yaml\n+          vcs-repo-file-url: dependency-${{ matrix.rosdistro }}.repos\n+      - name: Run ros-tooling/action-ros-ci@v0.2 with dependency.repos\n+        uses: ros-tooling/action-ros-ci@v0.2\n+        if: steps.check_rosdistro_repos_files.outputs.files_exists == 'false' && steps.check_repos_files.outputs.files_exists == 'true'\n+        with:\n+          package-name: ${{ steps.list_packages.outputs.package_list }}\n+          target-ros2-distro: ${{ matrix.rosdistro }}\n+          colcon-defaults: |\n+            {\n+              \"build\": {\n+                \"mixin\": [\"coverage-gcc\"]\n+              }\n+            }\n+          # If possible, pin the repository in the workflow to a specific commit to avoid\n+          # changes in colcon-mixin-repository from breaking your tests.\n+          colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/1ddb69bedfd1f04c2f000e95452f7c24a4d6176b/index.yaml\n+          vcs-repo-file-url: dependency.repos\n+      - name: Run ros-tooling/action-ros-ci@v0.2 without repos\n+        uses: ros-tooling/action-ros-ci@v0.2\n+        if: steps.check_rosdistro_repos_files.outputs.files_exists == 'false' && steps.check_repos_files.outputs.files_exists == 'false'\n+        with:\n+          package-name: ${{ steps.list_packages.outputs.package_list }}\n+          target-ros2-distro: ${{ matrix.rosdistro }}\n+          colcon-defaults: |\n+            {\n+              \"build\": {\n+                \"mixin\": [\"coverage-gcc\"]\n+              }\n+            }\n+          # If possible, pin the repository in the workflow to a specific commit to avoid\n+          # changes in colcon-mixin-repository from breaking your tests.\n+          colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/1ddb69bedfd1f04c2f000e95452f7c24a4d6176b/index.yaml\n+      - name: Notify Slack\n+        uses: 8398a7/action-slack@v2\n+        if: failure()\n+        with:\n+          status: ${{ job.status }}\n+        env:\n+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "39b4218b3d9e9e922f237f2d87df13db17c745ed",
+          "filename": ".github/workflows/Release.yaml",
+          "status": "added",
+          "additions": 68,
+          "deletions": 0,
+          "changes": 68,
+          "blob_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/blob/fafa7edcb301bbe602d6f41f0008b86de4c5e605/.github%2Fworkflows%2FRelease.yaml",
+          "raw_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/raw/fafa7edcb301bbe602d6f41f0008b86de4c5e605/.github%2Fworkflows%2FRelease.yaml",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/nmea_hardware_interface/contents/.github%2Fworkflows%2FRelease.yaml?ref=fafa7edcb301bbe602d6f41f0008b86de4c5e605",
+          "patch": "@@ -0,0 +1,68 @@\n+# This file is automatically deployed from https://github.com/at-wat/.rospkg-assets.\n+# Please don't directly edit; update at-wat/.rospkg-assets instead.\n+\n+name: Release\n+on:\n+  issues:\n+    types: [opened, edited]\n+\n+jobs:\n+  release:\n+    runs-on: ubuntu-latest\n+    if: startsWith(github.event.issue.title, 'Release ')\n+    steps:\n+      - name: checkout\n+        uses: actions/checkout@v2\n+      - name: create release\n+        id: create_release\n+        uses: at-wat/catkin-release-action@v1\n+        with:\n+          issue_title: ${{ github.event.issue.title }}\n+          git_user: wam-v-tan\n+          git_email: ouxt.share@gmail.com\n+          github_token: ${{ secrets.GITHUB_TOKEN }}\n+      - name: open pull-request\n+        uses: repo-sync/pull-request@v2\n+        id: create_pull_request\n+        with:\n+          source_branch: ${{ steps.create_release.outputs.created_branch }}\n+          destination_branch: ${{ github.event.repository.default_branch }}\n+          pr_title: Release ${{ steps.create_release.outputs.version}}\n+          pr_body: close \\#${{ github.event.issue.number }}\n+          pr_assignee: wam-v-tan\n+          github_token: ${{ secrets.WAMV_TAN_BOT_SECRET }}\n+      - name: Enable Pull Request Automerge\n+        uses: peter-evans/enable-pull-request-automerge@v1\n+        with:\n+          token: ${{ secrets.WAMV_TAN_BOT_SECRET }}\n+          pull-request-number: ${{ steps.create_pull_request.outputs.pr_number }}\n+          merge-method: squash\n+      - name: create GitHub release\n+        uses: actions/create-release@v1\n+        continue-on-error: true\n+        env:\n+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n+        with:\n+          tag_name: ${{ steps.create_release.outputs.version}}\n+          release_name: Release ${{ steps.create_release.outputs.version}}\n+      - name: bloom release\n+        if: github.event.label.name == 'bloom'\n+        id: bloom\n+        uses: at-wat/bloom-release-action@v0\n+        with:\n+          ros_distro: foxy galactic rolling\n+          github_token_bloom: ${{ secrets.WAMV_TAN_BOT_SECRET }}\n+          github_user: wam-v-tan\n+          git_user: wam-v-tan\n+          git_email: ouxt.share@gmail.com\n+          release_repository_push_url: https://github.com/${{ github.repository }}-release.git\n+          tag_and_release: true\n+          open_pr: true\n+      - name: Notify Slack\n+        uses: 8398a7/action-slack@v2\n+        if: failure()\n+        with:\n+          status: ${{ job.status }}\n+        env:\n+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "68115b27ef1ced1ba18b80442bc8eff311876488",
+          "filename": ".github/workflows/UpdateWorkflowStatus.yaml",
+          "status": "added",
+          "additions": 19,
+          "deletions": 0,
+          "changes": 19,
+          "blob_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/blob/fafa7edcb301bbe602d6f41f0008b86de4c5e605/.github%2Fworkflows%2FUpdateWorkflowStatus.yaml",
+          "raw_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/raw/fafa7edcb301bbe602d6f41f0008b86de4c5e605/.github%2Fworkflows%2FUpdateWorkflowStatus.yaml",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/nmea_hardware_interface/contents/.github%2Fworkflows%2FUpdateWorkflowStatus.yaml?ref=fafa7edcb301bbe602d6f41f0008b86de4c5e605",
+          "patch": "@@ -0,0 +1,19 @@\n+name: UpdateDashboard\n+on:\n+  pull_request:\n+    paths-ignore:\n+    - \".github/workflows/UpdateWorkflowStatus.yaml\"\n+  workflow_dispatch:\n+\n+jobs:\n+  build:\n+    name: UpdateDashboard\n+    runs-on: ubuntu-latest\n+    steps:\n+      - uses: benc-uk/workflow-dispatch@v1\n+        with:\n+          # You should create a personal access token and store it in your repository\n+          token: ${{ secrets.WAMV_TAN_BOT_SECRET }}\n+          repo: OUXT-Polaris/ouxt_automation\n+          workflow: document\n+          ref: master\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "HansRobo",
+      "date": "2022-07-02T15:51:06Z",
+      "sha": "2be11b31820ce85e62bd08891117212e86bc4a1e",
+      "message": "prepare humble",
+      "files_changed": 5,
+      "additions": 15,
+      "deletions": 11,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "9624069273016f6f5bf3eeb1e80529e58c2af359",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/blob/2be11b31820ce85e62bd08891117212e86bc4a1e/CMakeLists.txt",
+          "raw_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/raw/2be11b31820ce85e62bd08891117212e86bc4a1e/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/nmea_hardware_interface/contents/CMakeLists.txt?ref=2be11b31820ce85e62bd08891117212e86bc4a1e",
+          "patch": "@@ -15,6 +15,10 @@ if($ENV{ROS_DISTRO} STREQUAL \"galactic\")\n   add_definitions(-DGALACTIC)\n endif()\n \n+if($ENV{ROS_DISTRO} STREQUAL \"humble\")\n+  add_definitions(-DHUMBLE)\n+endif()\n+\n # find dependencies\n \n find_package(ament_cmake REQUIRED)"
+        },
+        {
+          "sha": "a09b6b751118348907b7cd4b1f1c31e30404e18b",
+          "filename": "include/nmea_hardware_interface/geopose_publisher.hpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/blob/2be11b31820ce85e62bd08891117212e86bc4a1e/include%2Fnmea_hardware_interface%2Fgeopose_publisher.hpp",
+          "raw_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/raw/2be11b31820ce85e62bd08891117212e86bc4a1e/include%2Fnmea_hardware_interface%2Fgeopose_publisher.hpp",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/nmea_hardware_interface/contents/include%2Fnmea_hardware_interface%2Fgeopose_publisher.hpp?ref=2be11b31820ce85e62bd08891117212e86bc4a1e",
+          "patch": "@@ -46,7 +46,7 @@ class GeoPosePublisher : public controller_interface::ControllerInterface\n \n   controller_interface::InterfaceConfiguration state_interface_configuration() const override;\n \n-#if GALACTIC\n+#if defined(GALACTIC) || defined(HUMBLE)\n   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_init()\n   {\n     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;\n@@ -68,7 +68,7 @@ class GeoPosePublisher : public controller_interface::ControllerInterface\n     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;\n   }\n \n-#if GALACTIC\n+#if defined(GALACTIC) || defined(HUMBLE)\n   controller_interface::return_type update(\n     const rclcpp::Time & time, const rclcpp::Duration & period) override;\n #else"
+        },
+        {
+          "sha": "5a088950c02aeaae322975684b93f1a4868a3095",
+          "filename": "include/nmea_hardware_interface/gps_hardware_interface.hpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 4,
+          "changes": 8,
+          "blob_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/blob/2be11b31820ce85e62bd08891117212e86bc4a1e/include%2Fnmea_hardware_interface%2Fgps_hardware_interface.hpp",
+          "raw_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/raw/2be11b31820ce85e62bd08891117212e86bc4a1e/include%2Fnmea_hardware_interface%2Fgps_hardware_interface.hpp",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/nmea_hardware_interface/contents/include%2Fnmea_hardware_interface%2Fgps_hardware_interface.hpp?ref=2be11b31820ce85e62bd08891117212e86bc4a1e",
+          "patch": "@@ -18,7 +18,7 @@\n // Headers in ROS\n #include <quaternion_operation/quaternion_operation.h>\n \n-#if GALACTIC\n+#if defined(GALACTIC) || defined(HUMBLE)\n #include <hardware_interface/system_interface.hpp>\n #else\n #include <hardware_interface/base_interface.hpp>\n@@ -27,7 +27,7 @@\n #include <hardware_interface/hardware_info.hpp>\n #include <hardware_interface/sensor_interface.hpp>\n #include <hardware_interface/types/hardware_interface_return_values.hpp>\n-#if GALACTIC\n+#if defined(GALACTIC) || defined(HUMBLE)\n #include <hardware_interface/types/hardware_interface_type_values.hpp>\n #else\n #include <hardware_interface/types/hardware_interface_status_values.hpp>\n@@ -48,7 +48,7 @@\n namespace nmea_hardware_interface\n {\n class GPSHardwareInterface\n-#if GALACTIC\n+#if defined(GALACTIC) || defined(HUMBLE)\n : public hardware_interface::SensorInterface\n #else\n : public hardware_interface::BaseInterface<hardware_interface::SensorInterface>\n@@ -57,7 +57,7 @@ class GPSHardwareInterface\n public:\n   RCLCPP_SHARED_PTR_DEFINITIONS(GPSHardwareInterface)\n \n-#if GALACTIC\n+#if defined(GALACTIC) || defined(HUMBLE)\n \n   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_init(\n     const hardware_interface::HardwareInfo & info) override;"
+        },
+        {
+          "sha": "8af842cab5cee82e93a29172b60e61b21a98ffbc",
+          "filename": "src/geopose_publisher.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/blob/2be11b31820ce85e62bd08891117212e86bc4a1e/src%2Fgeopose_publisher.cpp",
+          "raw_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/raw/2be11b31820ce85e62bd08891117212e86bc4a1e/src%2Fgeopose_publisher.cpp",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/nmea_hardware_interface/contents/src%2Fgeopose_publisher.cpp?ref=2be11b31820ce85e62bd08891117212e86bc4a1e",
+          "patch": "@@ -93,15 +93,15 @@ GeoPosePublisher::on_configure(const rclcpp_lifecycle::State & /*previous_state*\n   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;\n }\n \n-#if GALACTIC\n+#if defined(GALACTIC) || defined(HUMBLE)\n controller_interface::return_type GeoPosePublisher::update(\n   const rclcpp::Time & time, const rclcpp::Duration &)\n #else\n controller_interface::return_type GeoPosePublisher::update()\n #endif\n {\n   auto node = get_node();\n-#if GALACTIC\n+#if defined(GALACTIC) || defined(HUMBLE)\n   const auto now = time;\n #else\n   const auto now = node->get_clock()->now();"
+        },
+        {
+          "sha": "9fab428050b9615b979b841dc851ff8ca62437e5",
+          "filename": "src/gps_hardware_interface.cpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/blob/2be11b31820ce85e62bd08891117212e86bc4a1e/src%2Fgps_hardware_interface.cpp",
+          "raw_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/raw/2be11b31820ce85e62bd08891117212e86bc4a1e/src%2Fgps_hardware_interface.cpp",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/nmea_hardware_interface/contents/src%2Fgps_hardware_interface.cpp?ref=2be11b31820ce85e62bd08891117212e86bc4a1e",
+          "patch": "@@ -22,7 +22,7 @@\n \n namespace nmea_hardware_interface\n {\n-#if GALACTIC\n+#if defined(GALACTIC) || defined(HUMBLE)\n rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn\n GPSHardwareInterface::on_init(const hardware_interface::HardwareInfo & info)\n #else\n@@ -37,7 +37,7 @@ hardware_interface::return_type GPSHardwareInterface::configure(\n   using namespace std::chrono_literals;\n // timer_ = rclcpp::create_wall_timer(\n //        1000ms, std::bind(&GPSHardwareInterface::timerCallback, this));\n-#if GALACTIC\n+#if defined(GALACTIC) || defined(HUMBLE)\n   if (\n     SensorInterface::on_init(info) !=\n     rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS) {\n@@ -53,7 +53,7 @@ hardware_interface::return_type GPSHardwareInterface::configure(\n   }\n   joint_ = info.joints[0].name;\n \n-#if GALACTIC\n+#if defined(GALACTIC) || defined(HUMBLE)\n   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;\n #else\n   status_ = hardware_interface::status::CONFIGURED;"
+        }
+      ]
+    },
+    {
+      "author": "kentaokamoto",
+      "date": "2021-09-15T09:17:38Z",
+      "sha": "5bb82f1ee1570274da1ccb53e2732a3faa3b8cc8",
+      "message": "Initial commit",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "4f0f70f88610e568242d3c5b7e52dd5ded725c0a",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/blob/5bb82f1ee1570274da1ccb53e2732a3faa3b8cc8/README.md",
+          "raw_url": "https://github.com/OUXT-Polaris/nmea_hardware_interface/raw/5bb82f1ee1570274da1ccb53e2732a3faa3b8cc8/README.md",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/nmea_hardware_interface/contents/README.md?ref=5bb82f1ee1570274da1ccb53e2732a3faa3b8cc8",
+          "patch": "@@ -0,0 +1,2 @@\n+# nmea_hardware_interface\n+mea_to_geopose with ros2_control"
+        }
+      ]
+    }
+  ]
+}

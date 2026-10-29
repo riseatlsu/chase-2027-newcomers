@@ -1,0 +1,119 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T06:39:58Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "snt-arg",
+    "repo": "situational_graphs_reasoning"
+  },
+  "data": [
+    {
+      "author": "hridaybavle",
+      "date": "2024-01-12T16:48:57Z",
+      "sha": "605333aab20a7cb6207e3bf1b36dd75c2e80b68e",
+      "message": "[Feat] Change room detection thres and add plane points chekc",
+      "files_changed": 2,
+      "additions": 7,
+      "deletions": 6,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "f88d0ace48b924a2c951f078eb93166f0d4c17bd",
+          "filename": "config/same_room_training.json",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/snt-arg/situational_graphs_reasoning/blob/605333aab20a7cb6207e3bf1b36dd75c2e80b68e/config%2Fsame_room_training.json",
+          "raw_url": "https://github.com/snt-arg/situational_graphs_reasoning/raw/605333aab20a7cb6207e3bf1b36dd75c2e80b68e/config%2Fsame_room_training.json",
+          "contents_url": "https://api.github.com/repos/snt-arg/situational_graphs_reasoning/contents/config%2Fsame_room_training.json?ref=605333aab20a7cb6207e3bf1b36dd75c2e80b68e",
+          "patch": "@@ -47,7 +47,7 @@\n             \"hidden_channels\": [128,64]\n         },\n         \"use_cuda\" : true,\n-        \"classification_thr\": 0.5,\n+        \"classification_thr\": -20,\n         \"lr\" : 0.01\n     },\n     \"training\": {"
+        },
+        {
+          "sha": "25845b31ad5bb1b81b615b5334fcb86ea2befb19",
+          "filename": "graph_reasoning/graph_reasoning_node.py",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 5,
+          "changes": 11,
+          "blob_url": "https://github.com/snt-arg/situational_graphs_reasoning/blob/605333aab20a7cb6207e3bf1b36dd75c2e80b68e/graph_reasoning%2Fgraph_reasoning_node.py",
+          "raw_url": "https://github.com/snt-arg/situational_graphs_reasoning/raw/605333aab20a7cb6207e3bf1b36dd75c2e80b68e/graph_reasoning%2Fgraph_reasoning_node.py",
+          "contents_url": "https://api.github.com/repos/snt-arg/situational_graphs_reasoning/contents/graph_reasoning%2Fgraph_reasoning_node.py?ref=605333aab20a7cb6207e3bf1b36dd75c2e80b68e",
+          "patch": "@@ -144,11 +144,12 @@ def infer(self, target_concept, msg):\n         planes_dict = []\n         # self.get_logger().info(f\"Graph Reasoning: characterizing wall surfaces for {target_concept}\")\n         for i, plane_msg in enumerate(planes_msgs):\n-            plane_dict = {\"id\": plane_msg.id, \"normal\" : np.array([plane_msg.nx,plane_msg.ny,plane_msg.nz])}\n-            plane_dict[\"xy_type\"] = \"x\" if i<len(msg.x_planes) else \"y\" \n-            plane_dict[\"msg\"] = plane_msg\n-            plane_dict[\"center\"], plane_dict[\"segment\"], plane_dict[\"length\"] = self.characterize_ws(plane_msg.plane_points)\n-            planes_dict.append(plane_dict)\n+            if len(plane_msg.plane_points) != 0:\n+                plane_dict = {\"id\": plane_msg.id, \"normal\" : np.array([plane_msg.nx,plane_msg.ny,plane_msg.nz])}\n+                plane_dict[\"xy_type\"] = \"x\" if i<len(msg.x_planes) else \"y\"\n+                plane_dict[\"msg\"] = plane_msg\n+                plane_dict[\"center\"], plane_dict[\"segment\"], plane_dict[\"length\"] = self.characterize_ws(plane_msg.plane_points)\n+                planes_dict.append(plane_dict)\n \n         filtered_planes_dict = self.filter_overlapped_ws(planes_dict)\n         splitted_planes_dict = self.split_ws(filtered_planes_dict)"
+        }
+      ]
+    },
+    {
+      "author": "JoseAndresMR",
+      "date": "2023-05-05T11:34:12Z",
+      "sha": "d1d2fc2399ee638357aed20aa71cc0cf60cfe364",
+      "message": "Initial commit",
+      "files_changed": 3,
+      "additions": 183,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "68bc17f9ff2104a9d7b6777058bb4c343ca72609",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 160,
+          "deletions": 0,
+          "changes": 160,
+          "blob_url": "https://github.com/snt-arg/situational_graphs_reasoning/blob/d1d2fc2399ee638357aed20aa71cc0cf60cfe364/.gitignore",
+          "raw_url": "https://github.com/snt-arg/situational_graphs_reasoning/raw/d1d2fc2399ee638357aed20aa71cc0cf60cfe364/.gitignore",
+          "contents_url": "https://api.github.com/repos/snt-arg/situational_graphs_reasoning/contents/.gitignore?ref=d1d2fc2399ee638357aed20aa71cc0cf60cfe364",
+          "patch": "@@ -0,0 +1,160 @@\n+# Byte-compiled / optimized / DLL files\n+__pycache__/\n+*.py[cod]\n+*$py.class\n+\n+# C extensions\n+*.so\n+\n+# Distribution / packaging\n+.Python\n+build/\n+develop-eggs/\n+dist/\n+downloads/\n+eggs/\n+.eggs/\n+lib/\n+lib64/\n+parts/\n+sdist/\n+var/\n+wheels/\n+share/python-wheels/\n+*.egg-info/\n+.installed.cfg\n+*.egg\n+MANIFEST\n+\n+# PyInstaller\n+#  Usually these files are written by a python script from a template\n+#  before PyInstaller builds the exe, so as to inject date/other infos into it.\n+*.manifest\n+*.spec\n+\n+# Installer logs\n+pip-log.txt\n+pip-delete-this-directory.txt\n+\n+# Unit test / coverage reports\n+htmlcov/\n+.tox/\n+.nox/\n+.coverage\n+.coverage.*\n+.cache\n+nosetests.xml\n+coverage.xml\n+*.cover\n+*.py,cover\n+.hypothesis/\n+.pytest_cache/\n+cover/\n+\n+# Translations\n+*.mo\n+*.pot\n+\n+# Django stuff:\n+*.log\n+local_settings.py\n+db.sqlite3\n+db.sqlite3-journal\n+\n+# Flask stuff:\n+instance/\n+.webassets-cache\n+\n+# Scrapy stuff:\n+.scrapy\n+\n+# Sphinx documentation\n+docs/_build/\n+\n+# PyBuilder\n+.pybuilder/\n+target/\n+\n+# Jupyter Notebook\n+.ipynb_checkpoints\n+\n+# IPython\n+profile_default/\n+ipython_config.py\n+\n+# pyenv\n+#   For a library or package, you might want to ignore these files since the code is\n+#   intended to run in multiple environments; otherwise, check them in:\n+# .python-version\n+\n+# pipenv\n+#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.\n+#   However, in case of collaboration, if having platform-specific dependencies or dependencies\n+#   having no cross-platform support, pipenv may install dependencies that don't work, or not\n+#   install all needed dependencies.\n+#Pipfile.lock\n+\n+# poetry\n+#   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.\n+#   This is especially recommended for binary packages to ensure reproducibility, and is more\n+#   commonly ignored for libraries.\n+#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control\n+#poetry.lock\n+\n+# pdm\n+#   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.\n+#pdm.lock\n+#   pdm stores project-wide configurations in .pdm.toml, but it is recommended to not include it\n+#   in version control.\n+#   https://pdm.fming.dev/#use-with-ide\n+.pdm.toml\n+\n+# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm\n+__pypackages__/\n+\n+# Celery stuff\n+celerybeat-schedule\n+celerybeat.pid\n+\n+# SageMath parsed files\n+*.sage.py\n+\n+# Environments\n+.env\n+.venv\n+env/\n+venv/\n+ENV/\n+env.bak/\n+venv.bak/\n+\n+# Spyder project settings\n+.spyderproject\n+.spyproject\n+\n+# Rope project settings\n+.ropeproject\n+\n+# mkdocs documentation\n+/site\n+\n+# mypy\n+.mypy_cache/\n+.dmypy.json\n+dmypy.json\n+\n+# Pyre type checker\n+.pyre/\n+\n+# pytype static type analyzer\n+.pytype/\n+\n+# Cython debug symbols\n+cython_debug/\n+\n+# PyCharm\n+#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can\n+#  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore\n+#  and can be added to the global gitignore or merged into this file.  For a more nuclear\n+#  option (not recommended) you can uncomment the following to ignore the entire idea folder.\n+#.idea/"
+        },
+        {
+          "sha": "ad4fdcac6e49dfe51a0bbd6a7c0a47dea4f79dd0",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 21,
+          "deletions": 0,
+          "changes": 21,
+          "blob_url": "https://github.com/snt-arg/situational_graphs_reasoning/blob/d1d2fc2399ee638357aed20aa71cc0cf60cfe364/LICENSE",
+          "raw_url": "https://github.com/snt-arg/situational_graphs_reasoning/raw/d1d2fc2399ee638357aed20aa71cc0cf60cfe364/LICENSE",
+          "contents_url": "https://api.github.com/repos/snt-arg/situational_graphs_reasoning/contents/LICENSE?ref=d1d2fc2399ee638357aed20aa71cc0cf60cfe364",
+          "patch": "@@ -0,0 +1,21 @@\n+MIT License\n+\n+Copyright (c) 2023 Automation and Robotics Research Group (ARG)\n+\n+Permission is hereby granted, free of charge, to any person obtaining a copy\n+of this software and associated documentation files (the \"Software\"), to deal\n+in the Software without restriction, including without limitation the rights\n+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n+copies of the Software, and to permit persons to whom the Software is\n+furnished to do so, subject to the following conditions:\n+\n+The above copyright notice and this permission notice shall be included in all\n+copies or substantial portions of the Software.\n+\n+THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n+SOFTWARE."
+        },
+        {
+          "sha": "82d6d9e41787b48fc0d60b6f4de64f09a53af4f9",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/snt-arg/situational_graphs_reasoning/blob/d1d2fc2399ee638357aed20aa71cc0cf60cfe364/README.md",
+          "raw_url": "https://github.com/snt-arg/situational_graphs_reasoning/raw/d1d2fc2399ee638357aed20aa71cc0cf60cfe364/README.md",
+          "contents_url": "https://api.github.com/repos/snt-arg/situational_graphs_reasoning/contents/README.md?ref=d1d2fc2399ee638357aed20aa71cc0cf60cfe364",
+          "patch": "@@ -0,0 +1,2 @@\n+# graph_reasoning\n+Reasoning on S-Graph for the automatic generation of high-level entities"
+        }
+      ]
+    },
+    {
+      "author": "shaheer34mts",
+      "date": "2024-01-18T12:59:35Z",
+      "sha": "d92819952fd2d5844c4fce879e8124581fdba032",
+      "message": "[fix] - add deepcopies of everything for reasoning",
+      "files_changed": 1,
+      "additions": 15,
+      "deletions": 7,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "d5a081cc8c5e7815591305b4f4d53fb09e631560",
+          "filename": "graph_reasoning/graph_reasoning_node.py",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 7,
+          "changes": 22,
+          "blob_url": "https://github.com/snt-arg/situational_graphs_reasoning/blob/d92819952fd2d5844c4fce879e8124581fdba032/graph_reasoning%2Fgraph_reasoning_node.py",
+          "raw_url": "https://github.com/snt-arg/situational_graphs_reasoning/raw/d92819952fd2d5844c4fce879e8124581fdba032/graph_reasoning%2Fgraph_reasoning_node.py",
+          "contents_url": "https://api.github.com/repos/snt-arg/situational_graphs_reasoning/contents/graph_reasoning%2Fgraph_reasoning_node.py?ref=d92819952fd2d5844c4fce879e8124581fdba032",
+          "patch": "@@ -360,27 +360,32 @@ def generate_wall_subgraph_msg(self, inferred_walls):\n     #                                        \"linewidth\": 2.0, \"limits\": plane_dict[\"segment\"]})])\n     #         splitting_mapping[plane_dict[\"id\"]] = {\"old_id\" : plane_dict[\"old_id\"], \"xy_type\" : plane_dict[\"xy_type\"], \"msg\" : plane_dict[\"msg\"]}\n \n-    def compute_wall_center(self, wall_point, planes):\n+    def compute_wall_center(self, wall_point_inp, planes_inp):\n+        planes=copy.deepcopy(planes_inp)\n         plane1 = planes[0]\n         plane2 = planes[1]\n-\n+        wall_point = copy.deepcopy(wall_point_inp)\n         final_wall_center = self.compute_center(wall_point, plane1, plane2)\n \n         return final_wall_center\n \n        \n-    def compute_infinite_room_center(self, cluster_point, planes):\n+    def compute_infinite_room_center(self, cluster_point_inp, planes_inp):\n+        planes = copy.deepcopy(planes_inp)\n         plane1 = planes[0]\n         plane2 = planes[1]\n-\n+        cluster_point = copy.deepcopy(cluster_point_inp)\n         final_room_center = self.compute_center(cluster_point, plane1, plane2)\n         return final_room_center\n     \n \n-    def compute_room_center(self, x_planes, y_planes):\n+    def compute_room_center(self, x_planes_inp, y_planes_inp):\n+\n+        x_planes = copy.deepcopy(x_planes_inp)\n+        y_planes = copy.deepcopy(y_planes_inp)\n         x_plane1 = x_planes[0]\n         x_plane2 = x_planes[1]\n-\n+        \n         y_plane1 = y_planes[0]\n         y_plane2 = y_planes[1]\n \n@@ -406,7 +411,10 @@ def compute_room_center(self, x_planes, y_planes):\n         return final_room_center\n \n \n-    def compute_center(self, wall_point, plane1, plane2):\n+    def compute_center(self, wall_point_inp, plane1_inp, plane2_inp):\n+        wall_point = copy.deepcopy(wall_point_inp)\n+        plane1 = copy.deepcopy(plane1_inp)\n+        plane2 = copy.deepcopy(plane2_inp)\n         plane1 = self.correct_plane_direction(plane1)        \n         plane2 = self.correct_plane_direction(plane2)        \n         "
+        }
+      ]
+    }
+  ]
+}

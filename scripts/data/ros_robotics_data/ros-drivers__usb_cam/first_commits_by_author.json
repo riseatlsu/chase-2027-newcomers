@@ -1,0 +1,1788 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T06:57:04Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ros-drivers",
+    "repo": "usb_cam"
+  },
+  "data": [
+    {
+      "author": "flynneva",
+      "date": "2020-10-26T23:31:54Z",
+      "sha": "67e6b857755e3a6106836fe41d31bb5412e92e2c",
+      "message": "minor updates to foxy",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "1e96283103328869d5c43cee9da823fee6ac869c",
+          "filename": "nodes/usb_cam_node.cpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/67e6b857755e3a6106836fe41d31bb5412e92e2c/nodes%2Fusb_cam_node.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/67e6b857755e3a6106836fe41d31bb5412e92e2c/nodes%2Fusb_cam_node.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/nodes%2Fusb_cam_node.cpp?ref=67e6b857755e3a6106836fe41d31bb5412e92e2c",
+          "patch": "@@ -57,7 +57,7 @@ class UsbCamNode : public rclcpp::Node\n   // shared image message\n   sensor_msgs::msg::Image::SharedPtr img_;\n   rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr image_pub_;\n-\n+  \n   // parameters\n   std::string video_device_name_ = \"/dev/video0\";\n   std::string frame_id_ = \"map\";\n@@ -110,7 +110,7 @@ class UsbCamNode : public rclcpp::Node\n     // demos/intra_process_demo/include/image_pipeline/camera_node.hpp\n     img_ = std::make_shared<sensor_msgs::msg::Image>();\n     // advertise the main image topic\n-    image_pub_ = this->create_publisher<sensor_msgs::msg::Image>(\"image_raw\");\n+    image_pub_ = this->create_publisher<sensor_msgs::msg::Image>(\"image_raw\", 100);\n   }\n \n   void init()\n@@ -299,7 +299,7 @@ class UsbCamNode : public rclcpp::Node\n     image_pub_.publish(img_, *ci);\n #endif\n     // INFO(img_->data.size() << \" \" << img_->width << \" \" << img_->height << \" \" << img_->step);\n-    image_pub_->publish(img_);\n+    image_pub_->publish(*img_);\n \n     return true;\n   }"
+        }
+      ]
+    },
+    {
+      "author": "threeal",
+      "date": "2025-10-09T10:05:56Z",
+      "sha": "19e40d02770a0ee5add40a784b92869c552cb1b7",
+      "message": "Remove unused properties in `UsbCam` class\n\nSigned-off-by: Alfi Maulana <alfi.maulana.f@gmail.com>",
+      "files_changed": 3,
+      "additions": 2,
+      "deletions": 33,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "fce989afb79102f351defb597862be19c7a9f955",
+          "filename": "include/usb_cam/formats/mjpeg.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/19e40d02770a0ee5add40a784b92869c552cb1b7/include%2Fusb_cam%2Fformats%2Fmjpeg.hpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/19e40d02770a0ee5add40a784b92869c552cb1b7/include%2Fusb_cam%2Fformats%2Fmjpeg.hpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/include%2Fusb_cam%2Fformats%2Fmjpeg.hpp?ref=19e40d02770a0ee5add40a784b92869c552cb1b7",
+          "patch": "@@ -41,6 +41,7 @@\n \n extern \"C\" {\n #define __STDC_CONSTANT_MACROS  // Required for libavutil\n+#include <libavcodec/avcodec.h>\n #include \"libavutil/imgutils.h\"\n #include \"libavformat/avformat.h\"\n #include \"libavutil/error.h\"\n@@ -49,7 +50,6 @@ extern \"C\" {\n #include \"libswscale/swscale.h\"\n }\n \n-#include \"usb_cam/usb_cam.hpp\"\n #include \"usb_cam/formats/pixel_format_base.hpp\"\n #include \"usb_cam/formats/utils.hpp\"\n #include \"usb_cam/formats/av_pixel_format_helper.hpp\""
+        },
+        {
+          "sha": "2210702dc94393d63e01b810236b500f648f6fb4",
+          "filename": "include/usb_cam/usb_cam.hpp",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 30,
+          "changes": 30,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/19e40d02770a0ee5add40a784b92869c552cb1b7/include%2Fusb_cam%2Fusb_cam.hpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/19e40d02770a0ee5add40a784b92869c552cb1b7/include%2Fusb_cam%2Fusb_cam.hpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/include%2Fusb_cam%2Fusb_cam.hpp?ref=19e40d02770a0ee5add40a784b92869c552cb1b7",
+          "patch": "@@ -30,11 +30,6 @@\n #ifndef USB_CAM__USB_CAM_HPP_\n #define USB_CAM__USB_CAM_HPP_\n \n-extern \"C\" {\n-#include <libavcodec/avcodec.h>\n-#include <linux/videodev2.h>\n-}\n-\n #include <chrono>\n #include <memory>\n #include <algorithm>\n@@ -290,26 +285,6 @@ class UsbCam\n     return m_number_of_buffers;\n   }\n \n-  inline AVCodec * get_avcodec()\n-  {\n-    return m_avcodec;\n-  }\n-\n-  inline AVDictionary * get_avoptions()\n-  {\n-    return m_avoptions;\n-  }\n-\n-  inline AVCodecContext * get_avcodec_context()\n-  {\n-    return m_avcodec_context;\n-  }\n-\n-  inline AVFrame * get_avframe()\n-  {\n-    return m_avframe;\n-  }\n-\n   inline bool is_capturing()\n   {\n     return m_is_capturing;\n@@ -422,11 +397,6 @@ class UsbCam\n   std::shared_ptr<usb_cam::utils::buffer[]> m_buffers;\n   image_t m_image;\n \n-  AVFrame * m_avframe;\n-  AVCodec * m_avcodec;\n-  AVDictionary * m_avoptions;\n-  AVCodecContext * m_avcodec_context;\n-\n   bool m_is_capturing;\n   int m_framerate;\n   const time_t m_epoch_time_shift_us;"
+        },
+        {
+          "sha": "979a857af08186846aafe692a718d0f4d4912dea",
+          "filename": "src/usb_cam.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 2,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/19e40d02770a0ee5add40a784b92869c552cb1b7/src%2Fusb_cam.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/19e40d02770a0ee5add40a784b92869c552cb1b7/src%2Fusb_cam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam.cpp?ref=19e40d02770a0ee5add40a784b92869c552cb1b7",
+          "patch": "@@ -60,8 +60,7 @@ using utils::io_method_t;\n UsbCam::UsbCam()\n : m_device_name(), m_io(io_method_t::IO_METHOD_MMAP), m_fd(-1),\n   m_number_of_buffers(4), m_buffers(new usb_cam::utils::buffer[m_number_of_buffers]), m_image(),\n-  m_avframe(NULL), m_avcodec(NULL), m_avoptions(NULL),\n-  m_avcodec_context(NULL), m_is_capturing(false), m_framerate(0),\n+  m_is_capturing(false), m_framerate(0),\n   m_epoch_time_shift_us(usb_cam::utils::get_epoch_time_shift_us()), m_supported_formats()\n {}\n "
+        }
+      ]
+    },
+    {
+      "author": "yanxke",
+      "date": "2025-09-18T13:13:12Z",
+      "sha": "3b94011a040b83d9395258a4db7056eceb1d3672",
+      "message": "Option to skip device check",
+      "files_changed": 2,
+      "additions": 26,
+      "deletions": 16,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "dcf6c873ea3e6dfab3e0ceadd12c36837e6f4ef8",
+          "filename": "include/usb_cam/usb_cam.hpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 1,
+          "changes": 5,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/3b94011a040b83d9395258a4db7056eceb1d3672/include%2Fusb_cam%2Fusb_cam.hpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/3b94011a040b83d9395258a4db7056eceb1d3672/include%2Fusb_cam%2Fusb_cam.hpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/include%2Fusb_cam%2Fusb_cam.hpp?ref=3b94011a040b83d9395258a4db7056eceb1d3672",
+          "patch": "@@ -125,6 +125,8 @@ typedef struct parameters_t\n   bool auto_white_balance;\n   bool autoexposure;\n   bool autofocus;\n+  // When true, UsbCamNode will not validate the device exists in available V4L2 devices\n+  bool skip_device_check;\n \n   parameters_t()\n // *INDENT-OFF*\n@@ -148,7 +150,8 @@ typedef struct parameters_t\n     focus(-1),\n     auto_white_balance(true),\n     autoexposure(true),\n-    autofocus(false)\n+    autofocus(false),\n+    skip_device_check(false)\n   {\n   }\n // *INDENT-ON*"
+        },
+        {
+          "sha": "b8d75b8d4719c7dae398343ff31f620e98508f46",
+          "filename": "src/usb_cam_node.cpp",
+          "status": "modified",
+          "additions": 22,
+          "deletions": 15,
+          "changes": 37,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/3b94011a040b83d9395258a4db7056eceb1d3672/src%2Fusb_cam_node.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/3b94011a040b83d9395258a4db7056eceb1d3672/src%2Fusb_cam_node.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam_node.cpp?ref=3b94011a040b83d9395258a4db7056eceb1d3672",
+          "patch": "@@ -83,6 +83,7 @@ UsbCamNode::UsbCamNode(const rclcpp::NodeOptions & node_options)\n   this->declare_parameter(\"exposure\", 100);\n   this->declare_parameter(\"autofocus\", false);\n   this->declare_parameter(\"focus\", -1);  // 0-255, -1 \"leave alone\"\n+  this->declare_parameter(\"skip_device_check\", false);  // allow bypassing V4L2 device list check\n \n   get_params();\n   init();\n@@ -159,21 +160,25 @@ void UsbCamNode::init()\n     m_camera_info->setCameraInfo(*m_camera_info_msg);\n   }\n \n-  // Check if given device name is an available v4l2 device\n-  auto available_devices = usb_cam::utils::available_devices();\n-  if (available_devices.find(m_parameters.device_name) == available_devices.end()) {\n-    RCLCPP_ERROR_STREAM(\n-      this->get_logger(),\n-      \"Device specified is not available or is not a vaild V4L2 device: `\" <<\n-        m_parameters.device_name << \"`\"\n-    );\n-    RCLCPP_INFO(this->get_logger(), \"Available V4L2 devices are:\");\n-    for (const auto & device : available_devices) {\n-      RCLCPP_INFO_STREAM(this->get_logger(), \"    \" << device.first);\n-      RCLCPP_INFO_STREAM(this->get_logger(), \"        \" << device.second.card);\n+  // Check if given device name is an available v4l2 device (unless skipped)\n+  if (!m_parameters.skip_device_check) {\n+    auto available_devices = usb_cam::utils::available_devices();\n+    if (available_devices.find(m_parameters.device_name) == available_devices.end()) {\n+      RCLCPP_ERROR_STREAM(\n+        this->get_logger(),\n+        \"Device specified is not available or is not a vaild V4L2 device: `\" <<\n+          m_parameters.device_name << \"`\"\n+      );\n+      RCLCPP_INFO(this->get_logger(), \"Available V4L2 devices are:\");\n+      for (const auto & device : available_devices) {\n+        RCLCPP_INFO_STREAM(this->get_logger(), \"    \" << device.first);\n+        RCLCPP_INFO_STREAM(this->get_logger(), \"        \" << device.second.card);\n+      }\n+      rclcpp::shutdown();\n+      return;\n     }\n-    rclcpp::shutdown();\n-    return;\n+  } else {\n+    RCLCPP_WARN(this->get_logger(), \"Skipping V4L2 device availability check by request.\");\n   }\n \n   // if pixel format is equal to 'mjpeg', i.e. raw mjpeg stream, initialize compressed image message\n@@ -231,7 +236,7 @@ void UsbCamNode::get_params()\n       \"camera_name\", \"camera_info_url\", \"frame_id\", \"framerate\", \"image_height\", \"image_width\",\n       \"io_method\", \"pixel_format\", \"av_device_format\", \"video_device\", \"brightness\", \"contrast\",\n       \"saturation\", \"sharpness\", \"gain\", \"auto_white_balance\", \"white_balance\", \"autoexposure\",\n-      \"exposure\", \"autofocus\", \"focus\"\n+      \"exposure\", \"autofocus\", \"focus\", \"skip_device_check\"\n     }\n   );\n \n@@ -285,6 +290,8 @@ void UsbCamNode::assign_params(const std::vector<rclcpp::Parameter> & parameters\n       m_parameters.autofocus = parameter.as_bool();\n     } else if (parameter.get_name() == \"focus\") {\n       m_parameters.focus = parameter.as_int();\n+    } else if (parameter.get_name() == \"skip_device_check\") {\n+      m_parameters.skip_device_check = parameter.as_bool();\n     } else {\n       RCLCPP_WARN(this->get_logger(), \"Invalid parameter name: %s\", parameter.get_name().c_str());\n     }"
+        }
+      ]
+    },
+    {
+      "author": "Tacha-S",
+      "date": "2025-03-05T07:47:51Z",
+      "sha": "12a0b1c6de3eac73f75875e77b434966bbc2369d",
+      "message": "Read images from buffer at normal speed, adjust publish rate via param",
+      "files_changed": 4,
+      "additions": 77,
+      "deletions": 5,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "7517e913eb1604cc7032d4ec9094de94d9a98eba",
+          "filename": "include/usb_cam/usb_cam.hpp",
+          "status": "modified",
+          "additions": 49,
+          "deletions": 0,
+          "changes": 49,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/12a0b1c6de3eac73f75875e77b434966bbc2369d/include%2Fusb_cam%2Fusb_cam.hpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/12a0b1c6de3eac73f75875e77b434966bbc2369d/include%2Fusb_cam%2Fusb_cam.hpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/include%2Fusb_cam%2Fusb_cam.hpp?ref=12a0b1c6de3eac73f75875e77b434966bbc2369d",
+          "patch": "@@ -238,6 +238,11 @@ class UsbCam\n     return m_image.height;\n   }\n \n+  inline size_t get_frame_rate()\n+  {\n+    return m_framerate;\n+  }\n+\n   inline size_t get_image_size_in_bytes()\n   {\n     return m_image.size_in_bytes;\n@@ -401,6 +406,50 @@ class UsbCam\n     return m_image.pixel_format;\n   }\n \n+  inline size_t set_frame_rate(const parameters_t & parameters)\n+  {\n+    std::shared_ptr<pixel_format_base> found_driver_format = nullptr;\n+\n+    formats::format_arguments_t args({\n+        parameters.pixel_format_name,\n+        parameters.image_width,\n+        parameters.image_height,\n+        m_image.number_of_pixels,\n+        parameters.av_device_format,\n+      });\n+    // First check if given format is supported by this driver\n+    for (auto driver_fmt : driver_supported_formats(args)) {\n+      if (driver_fmt->name() == args.name) {\n+        found_driver_format = driver_fmt;\n+      }\n+    }\n+\n+    if (found_driver_format == nullptr) {\n+      // List the supported formats of this driver for the user before throwing\n+      std::cerr << \"This driver supports the following formats:\" << std::endl;\n+      for (auto driver_fmt : driver_supported_formats(args)) {\n+        std::cerr << \"\\t\" << driver_fmt->name() << std::endl;\n+      }\n+      throw std::invalid_argument(\n+              \"Specified format `\" + args.name + \"` is unsupported by this ROS driver\"\n+      );\n+    }\n+\n+    for (auto fmt : this->supported_formats()) {\n+      if (fmt.v4l2_fmt.width == static_cast<size_t>(parameters.image_width) &&\n+        fmt.v4l2_fmt.height == static_cast<size_t>(parameters.image_height) &&\n+        fmt.v4l2_fmt.pixel_format == found_driver_format->v4l2()) {\n+        return fmt.v4l2_fmt.discrete.denominator / fmt.v4l2_fmt.discrete.numerator;\n+      }\n+    }\n+\n+    throw std::invalid_argument(\n+      \"Specified resolution `\" + std::to_string(parameters.image_width) +\n+      \"x\" + std::to_string(parameters.image_height) +\n+      \"` is unsupported by `\" + parameters.device_name + \"`\"\n+    );\n+  }\n+\n private:\n   void init_read();\n   void init_mmap();"
+        },
+        {
+          "sha": "f4d2400ed7098d9dc39ca2632c44702ad2710e38",
+          "filename": "include/usb_cam/usb_cam_node.hpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/12a0b1c6de3eac73f75875e77b434966bbc2369d/include%2Fusb_cam%2Fusb_cam_node.hpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/12a0b1c6de3eac73f75875e77b434966bbc2369d/include%2Fusb_cam%2Fusb_cam_node.hpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/include%2Fusb_cam%2Fusb_cam_node.hpp?ref=12a0b1c6de3eac73f75875e77b434966bbc2369d",
+          "patch": "@@ -66,6 +66,7 @@ class UsbCamNode : public rclcpp::Node\n   void assign_params(const std::vector<rclcpp::Parameter> & parameters);\n   void set_v4l2_params();\n   void update();\n+  void publish();\n   bool take_and_send_image();\n   bool take_and_send_image_mjpeg();\n \n@@ -91,6 +92,7 @@ class UsbCamNode : public rclcpp::Node\n   std::shared_ptr<camera_info_manager::CameraInfoManager> m_camera_info;\n \n   rclcpp::TimerBase::SharedPtr m_timer;\n+  rclcpp::TimerBase::SharedPtr m_publish_timer;\n \n   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr m_service_capture;\n   rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr m_parameters_callback_handle;"
+        },
+        {
+          "sha": "3306ec61f9581d266ea265b872ab1866412cf73e",
+          "filename": "src/usb_cam.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/12a0b1c6de3eac73f75875e77b434966bbc2369d/src%2Fusb_cam.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/12a0b1c6de3eac73f75875e77b434966bbc2369d/src%2Fusb_cam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam.cpp?ref=12a0b1c6de3eac73f75875e77b434966bbc2369d",
+          "patch": "@@ -524,7 +524,7 @@ void UsbCam::configure(\n   m_image.pixel_format = set_pixel_format(parameters);\n   m_image.set_bytes_per_line();\n   m_image.set_size_in_bytes();\n-  m_framerate = parameters.framerate;\n+  m_framerate = set_frame_rate(parameters);\n \n   init_device();\n }"
+        },
+        {
+          "sha": "37a88a001f2615751241819b59381ec8b3ace827",
+          "filename": "src/usb_cam_node.cpp",
+          "status": "modified",
+          "additions": 25,
+          "deletions": 4,
+          "changes": 29,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/12a0b1c6de3eac73f75875e77b434966bbc2369d/src%2Fusb_cam_node.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/12a0b1c6de3eac73f75875e77b434966bbc2369d/src%2Fusb_cam_node.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam_node.cpp?ref=12a0b1c6de3eac73f75875e77b434966bbc2369d",
+          "patch": "@@ -100,6 +100,7 @@ UsbCamNode::~UsbCamNode()\n   m_camera_info_msg.reset();\n   m_camera_info.reset();\n   m_timer.reset();\n+  m_publish_timer.reset();\n   m_service_capture.reset();\n   m_parameters_callback_handle.reset();\n \n@@ -214,13 +215,26 @@ void UsbCamNode::init()\n   // start the camera\n   m_camera->start();\n \n+  auto frame_rate = m_camera->get_frame_rate();\n+  if (static_cast<size_t>(m_parameters.framerate) > frame_rate) {\n+    RCLCPP_WARN_STREAM(\n+      this->get_logger(),\n+      \"Desired framerate \" << m_parameters.framerate << \" is higher than the camera's capability \" <<\n+        frame_rate << \" fps\");\n+    m_parameters.framerate = frame_rate;\n+  }\n+\n   // TODO(lucasw) should this check a little faster than expected frame rate?\n   // TODO(lucasw) how to do small than ms, or fractional ms- std::chrono::nanoseconds?\n-  const int period_ms = 1000.0 / m_parameters.framerate;\n+  const int period_ms = 1000.0 / frame_rate;\n   m_timer = this->create_wall_timer(\n     std::chrono::milliseconds(static_cast<int64_t>(period_ms)),\n     std::bind(&UsbCamNode::update, this));\n   RCLCPP_INFO_STREAM(this->get_logger(), \"Timer triggering every \" << period_ms << \" ms\");\n+  const int publish_period_ms = 1000.0 / m_parameters.framerate;\n+  m_publish_timer = this->create_wall_timer(\n+    std::chrono::milliseconds(static_cast<int64_t>(publish_period_ms)),\n+    std::bind(&UsbCamNode::publish, this));\n }\n \n void UsbCamNode::get_params()\n@@ -384,7 +398,6 @@ bool UsbCamNode::take_and_send_image()\n \n   *m_camera_info_msg = m_camera_info->getCameraInfo();\n   m_camera_info_msg->header = m_image_msg->header;\n-  m_image_publisher->publish(*m_image_msg, *m_camera_info_msg);\n   return true;\n }\n \n@@ -406,8 +419,6 @@ bool UsbCamNode::take_and_send_image_mjpeg()\n   *m_camera_info_msg = m_camera_info->getCameraInfo();\n   m_camera_info_msg->header = m_compressed_img_msg->header;\n \n-  m_compressed_image_publisher->publish(*m_compressed_img_msg);\n-  m_compressed_cam_info_publisher->publish(*m_camera_info_msg);\n   return true;\n }\n \n@@ -438,6 +449,16 @@ void UsbCamNode::update()\n     }\n   }\n }\n+\n+void UsbCamNode::publish()\n+{\n+  if (m_parameters.pixel_format_name == \"mjpeg\") {\n+    m_compressed_image_publisher->publish(*m_compressed_img_msg);\n+    m_compressed_cam_info_publisher->publish(*m_camera_info_msg);\n+  } else {\n+    m_image_publisher->publish(*m_image_msg, *m_camera_info_msg);\n+  }\n+}\n }  // namespace usb_cam\n \n "
+        }
+      ]
+    },
+    {
+      "author": "FranzAlbers",
+      "date": "2025-02-04T13:16:10Z",
+      "sha": "c62771c2792b11e29b4f1af7e3ae4e27ba0ac4ca",
+      "message": "Correctly resolve symlinks to device paths",
+      "files_changed": 1,
+      "additions": 9,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "05785875a7eb578089d8c54acba1fc0b091b7f9d",
+          "filename": "src/usb_cam_node.cpp",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 2,
+          "changes": 11,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/c62771c2792b11e29b4f1af7e3ae4e27ba0ac4ca/src%2Fusb_cam_node.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/c62771c2792b11e29b4f1af7e3ae4e27ba0ac4ca/src%2Fusb_cam_node.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam_node.cpp?ref=c62771c2792b11e29b4f1af7e3ae4e27ba0ac4ca",
+          "patch": "@@ -124,8 +124,15 @@ void UsbCamNode::service_capture(\n std::string resolve_device_path(const std::string & path)\n {\n   if (std::filesystem::is_symlink(path)) {\n-    // For some reason read_symlink only returns videox\n-    return \"/dev/\" + std::string(std::filesystem::read_symlink(path));\n+    std::filesystem::path target_path = std::filesystem::read_symlink(path);\n+\n+    // if the target path is relative, resolve it\n+    if (target_path.is_relative()) {\n+      target_path = std::filesystem::absolute(path).parent_path() / target_path;\n+      target_path = std::filesystem::canonical(target_path);\n+    }\n+\n+    return target_path.string();\n   }\n   return path;\n }"
+        }
+      ]
+    },
+    {
+      "author": "IamTheCarl",
+      "date": "2024-10-25T05:27:55Z",
+      "sha": "1f751290ea45ca4993e5c0959a21b68407462775",
+      "message": "Add missing pkg-config build dependency.",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "703ad60f7fd6dffe43a153ab6b221ac100360e38",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/1f751290ea45ca4993e5c0959a21b68407462775/package.xml",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/1f751290ea45ca4993e5c0959a21b68407462775/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/package.xml?ref=1f751290ea45ca4993e5c0959a21b68407462775",
+          "patch": "@@ -15,7 +15,8 @@\n \n   <!-- Required so ROS build farms properly set ROS_VERSION -->\n   <build_depend>ros_environment</build_depend>\n-\n+  \n+  <buildtool_depend>pkg-config</buildtool_depend>\n   <buildtool_depend condition=\"$ROS_VERSION == 1\">catkin</buildtool_depend>\n \n   <buildtool_depend condition=\"$ROS_VERSION == 2\">ament_cmake_auto</buildtool_depend>"
+        }
+      ]
+    },
+    {
+      "author": "Pleune",
+      "date": "2024-08-23T13:58:56Z",
+      "sha": "41805f7eb50f31e16839bb302df1bb5c6f30cb50",
+      "message": "Remove deprecared avcodec_close()\n\nFrom [docs](https://ffmpeg.org/doxygen/trunk/deprecated.html) see that\nthis function call is not needed:\n\n\"Do not use this function. Use avcodec_free_context() to destroy a codec\ncontext (either open or closed). Opening and closing a codec context\nmultiple times is not supported anymore – use multiple codec contexts instead.\"\n\navcodec_free_context is already called.",
+      "files_changed": 1,
+      "additions": 0,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b8d87f77e9aa9e4fcbc0d41ddae9fbf5eae0aec7",
+          "filename": "include/usb_cam/formats/mjpeg.hpp",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 1,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/41805f7eb50f31e16839bb302df1bb5c6f30cb50/include%2Fusb_cam%2Fformats%2Fmjpeg.hpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/41805f7eb50f31e16839bb302df1bb5c6f30cb50/include%2Fusb_cam%2Fformats%2Fmjpeg.hpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/include%2Fusb_cam%2Fformats%2Fmjpeg.hpp?ref=41805f7eb50f31e16839bb302df1bb5c6f30cb50",
+          "patch": "@@ -164,7 +164,6 @@ class MJPEG2RGB : public pixel_format_base\n       free(m_avoptions);\n     }\n     if (m_avcodec_context) {\n-      avcodec_close(m_avcodec_context);\n       avcodec_free_context(&m_avcodec_context);\n     }\n     if (m_avframe_device) {"
+        }
+      ]
+    },
+    {
+      "author": "evan-flynn-apexai",
+      "date": "2022-04-25T18:13:12Z",
+      "sha": "d486eb5598179ee461da5c915c4172cb26bd1db6",
+      "message": "Minor bump for release\n\nSigned-off-by: Evan Flynn <evan.flynn@apex.ai>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "4d645eb1e8f75a51f0e68353def291326980410c",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/d486eb5598179ee461da5c915c4172cb26bd1db6/package.xml",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/d486eb5598179ee461da5c915c4172cb26bd1db6/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/package.xml?ref=d486eb5598179ee461da5c915c4172cb26bd1db6",
+          "patch": "@@ -2,7 +2,7 @@\n <?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"3\">\n   <name>usb_cam</name>\n-  <version>0.4.1</version>\n+  <version>0.4.2</version>\n   <description>A ROS2 Driver for V4L USB Cameras</description>\n \n   <maintainer email=\"evanflynn.msu@gmail.com\">Evan Flynn</maintainer>"
+        }
+      ]
+    },
+    {
+      "author": "clalancette",
+      "date": "2022-04-13T15:02:12Z",
+      "sha": "a358547ed33501ac04b7b4dcf894b64361a4dcc2",
+      "message": "Use uint32_t to store image sizes.\n\nThis matches the v4l2 structures, and ensures we don't get\nsign warnings when compiling.\n\nSigned-off-by: Chris Lalancette <clalancette@openrobotics.org>",
+      "files_changed": 2,
+      "additions": 6,
+      "deletions": 6,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e3a34594105fafac2fe0d83a88d993de4253d07f",
+          "filename": "include/usb_cam/usb_cam.hpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 4,
+          "changes": 8,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/a358547ed33501ac04b7b4dcf894b64361a4dcc2/include%2Fusb_cam%2Fusb_cam.hpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/a358547ed33501ac04b7b4dcf894b64361a4dcc2/include%2Fusb_cam%2Fusb_cam.hpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/include%2Fusb_cam%2Fusb_cam.hpp?ref=a358547ed33501ac04b7b4dcf894b64361a4dcc2",
+          "patch": "@@ -87,7 +87,7 @@ class UsbCam\n   // start camera\n   bool start(\n     const std::string & dev, io_method io, pixel_format pf,\n-    int image_width, int image_height, int framerate);\n+    uint32_t image_width, uint32_t image_height, int framerate);\n   // shutdown camera\n   bool shutdown(void);\n \n@@ -117,8 +117,8 @@ class UsbCam\n   // TODO(lucasw) just store an Image shared_ptr here\n   typedef struct\n   {\n-    int width;\n-    int height;\n+    uint32_t width;\n+    uint32_t height;\n     int bytes_per_pixel;\n     int image_size;\n     builtin_interfaces::msg::Time stamp;\n@@ -141,7 +141,7 @@ class UsbCam\n   bool init_read(unsigned int buffer_size);\n   bool init_mmap(void);\n   bool init_userp(unsigned int buffer_size);\n-  bool init_device(int image_width, int image_height, int framerate);\n+  bool init_device(uint32_t image_width, uint32_t image_height, int framerate);\n   bool close_device(void);\n   bool open_device(void);\n   bool grab_image();"
+        },
+        {
+          "sha": "3a34d6a474955d752f489230069fd704843990a2",
+          "filename": "src/usb_cam.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/a358547ed33501ac04b7b4dcf894b64361a4dcc2/src%2Fusb_cam.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/a358547ed33501ac04b7b4dcf894b64361a4dcc2/src%2Fusb_cam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam.cpp?ref=a358547ed33501ac04b7b4dcf894b64361a4dcc2",
+          "patch": "@@ -616,7 +616,7 @@ bool UsbCam::init_userp(unsigned int buffer_size)\n   return true;\n }\n \n-bool UsbCam::init_device(int image_width, int image_height, int framerate)\n+bool UsbCam::init_device(uint32_t image_width, uint32_t image_height, int framerate)\n {\n   struct v4l2_capability cap;\n   struct v4l2_cropcap cropcap;\n@@ -825,7 +825,7 @@ bool UsbCam::open_device(void)\n \n bool UsbCam::start(\n   const std::string & dev, io_method io_method, pixel_format pixel_format,\n-  int image_width, int image_height, int framerate)\n+  uint32_t image_width, uint32_t image_height, int framerate)\n {\n   camera_dev_ = dev;\n "
+        }
+      ]
+    },
+    {
+      "author": "firesurfer",
+      "date": "2024-01-17T06:39:11Z",
+      "sha": "ca58339a407fa0d95d24ec28f2acb7fe057fe9e4",
+      "message": "Update usb_cam_node.cpp\n\nFix formatting",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "f8e8deda864ac24b9d7f3c1386668155c9f81844",
+          "filename": "src/ros2/usb_cam_node.cpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 2,
+          "changes": 5,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/ca58339a407fa0d95d24ec28f2acb7fe057fe9e4/src%2Fros2%2Fusb_cam_node.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/ca58339a407fa0d95d24ec28f2acb7fe057fe9e4/src%2Fros2%2Fusb_cam_node.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fros2%2Fusb_cam_node.cpp?ref=ca58339a407fa0d95d24ec28f2acb7fe057fe9e4",
+          "patch": "@@ -121,8 +121,9 @@ void UsbCamNode::service_capture(\n   }\n }\n \n-std::string resolve_device_path(const std::string& path){\n-  if(std::filesystem::is_symlink(path)){\n+std::string resolve_device_path(const std::string & path)\n+{\n+  if (std::filesystem::is_symlink(path)) {\n     // For some reason read_symlink only returns videox\n     return \"/dev/\" + std::string(std::filesystem::read_symlink(path));\n   }"
+        }
+      ]
+    },
+    {
+      "author": "Lennart Nachtigall",
+      "date": "2024-01-15T09:34:20Z",
+      "sha": "85c6f9628ed20c74b9b70c736df5a34b37e1f5a1",
+      "message": "resolve symlinks",
+      "files_changed": 1,
+      "additions": 10,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "f5a487d2b650d20d31dd56b1c7b5a472737cee45",
+          "filename": "src/ros2/usb_cam_node.cpp",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 2,
+          "changes": 12,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/85c6f9628ed20c74b9b70c736df5a34b37e1f5a1/src%2Fros2%2Fusb_cam_node.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/85c6f9628ed20c74b9b70c736df5a34b37e1f5a1/src%2Fros2%2Fusb_cam_node.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fros2%2Fusb_cam_node.cpp?ref=85c6f9628ed20c74b9b70c736df5a34b37e1f5a1",
+          "patch": "@@ -30,7 +30,7 @@\n #include <sstream>\n #include <string>\n #include <vector>\n-\n+#include <filesystem>\n #include \"usb_cam/usb_cam_node.hpp\"\n #include \"usb_cam/utils.hpp\"\n \n@@ -121,6 +121,14 @@ void UsbCamNode::service_capture(\n   }\n }\n \n+std::string resolve_device_path(const std::string& path){\n+  if(std::filesystem::is_symlink(path)){\n+    //For some reason read_symlink only returns videox\n+    return \"/dev/\" + std::string(std::filesystem::read_symlink(path));\n+  }\n+  return path;\n+}\n+\n void UsbCamNode::init()\n {\n   while (m_parameters.frame_id == \"\") {\n@@ -246,7 +254,7 @@ void UsbCamNode::assign_params(const std::vector<rclcpp::Parameter> & parameters\n     } else if (parameter.get_name() == \"av_device_format\") {\n       m_parameters.av_device_format = parameter.value_to_string();\n     } else if (parameter.get_name() == \"video_device\") {\n-      m_parameters.device_name = parameter.value_to_string();\n+      m_parameters.device_name = resolve_device_path(parameter.value_to_string());\n     } else if (parameter.get_name() == \"brightness\") {\n       m_parameters.brightness = parameter.as_int();\n     } else if (parameter.get_name() == \"contrast\") {"
+        }
+      ]
+    },
+    {
+      "author": "boitumeloruf",
+      "date": "2023-07-21T13:46:28Z",
+      "sha": "d9e5f09444482bfbedefeb97a377b888e7ca6c65",
+      "message": "Fixed wring image timestamp due to missing handling of microseconds in epoch time shift.",
+      "files_changed": 4,
+      "additions": 34,
+      "deletions": 24,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "05515bcd7654e62d916e05f9585b0bb91424bd5b",
+          "filename": "include/usb_cam/usb_cam.hpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 4,
+          "changes": 8,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/d9e5f09444482bfbedefeb97a377b888e7ca6c65/include%2Fusb_cam%2Fusb_cam.hpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/d9e5f09444482bfbedefeb97a377b888e7ca6c65/include%2Fusb_cam%2Fusb_cam.hpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/include%2Fusb_cam%2Fusb_cam.hpp?ref=d9e5f09444482bfbedefeb97a377b888e7ca6c65",
+          "patch": "@@ -256,9 +256,9 @@ class UsbCam\n     return m_is_capturing;\n   }\n \n-  inline time_t get_epoch_time_shift()\n+  inline time_t get_epoch_time_shift_us()\n   {\n-    return m_epoch_time_shift;\n+    return m_epoch_time_shift_us;\n   }\n \n   inline std::vector<capture_format_t> supported_formats()\n@@ -347,10 +347,10 @@ class UsbCam\n   AVDictionary * m_avoptions;\n   AVCodecContext * m_avcodec_context;\n \n-  int64_t m_buffer_time_s;\n+  int64_t m_buffer_time_us;\n   bool m_is_capturing;\n   int m_framerate;\n-  const time_t m_epoch_time_shift;\n+  const time_t m_epoch_time_shift_us;\n   std::vector<capture_format_t> m_supported_formats;\n };\n "
+        },
+        {
+          "sha": "5a439eca94080eb0d27e16660bb7ce8f152be232",
+          "filename": "include/usb_cam/utils.hpp",
+          "status": "modified",
+          "additions": 24,
+          "deletions": 9,
+          "changes": 33,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/d9e5f09444482bfbedefeb97a377b888e7ca6c65/include%2Fusb_cam%2Futils.hpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/d9e5f09444482bfbedefeb97a377b888e7ca6c65/include%2Fusb_cam%2Futils.hpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/include%2Fusb_cam%2Futils.hpp?ref=d9e5f09444482bfbedefeb97a377b888e7ca6c65",
+          "patch": "@@ -65,27 +65,42 @@ struct buffer\n };\n \n \n-/// @brief Get epoch time shift\n+/// @brief Get epoch time shift in microseconds\n /// @details Run this at start of process to calculate epoch time shift\n /// @ref https://stackoverflow.com/questions/10266451/where-does-v4l2-buffer-timestamp-value-starts-counting\n-inline time_t get_epoch_time_shift()\n+inline time_t get_epoch_time_shift_us()\n {\n   struct timeval epoch_time;\n   struct timespec monotonic_time;\n \n   gettimeofday(&epoch_time, NULL);\n   clock_gettime(CLOCK_MONOTONIC, &monotonic_time);\n \n-  const int64_t uptime_ms =\n-    monotonic_time.tv_sec * 1000 + static_cast<int64_t>(\n-    std::round(monotonic_time.tv_nsec / 1000000.0));\n-  const int64_t epoch_ms =\n-    epoch_time.tv_sec * 1000 + static_cast<int64_t>(\n-    std::round(epoch_time.tv_usec / 1000.0));\n+  const int64_t uptime_us =\n+    monotonic_time.tv_sec * 1000000 + static_cast<int64_t>(\n+    std::round(monotonic_time.tv_nsec / 1000.0));\n+  const int64_t epoch_us =\n+    epoch_time.tv_sec * 1000000 + epoch_time.tv_usec / 1000.0;\n \n-  return static_cast<time_t>((epoch_ms - uptime_ms) / 1000);\n+  return static_cast<time_t>(epoch_us - uptime_us);\n }\n \n+/// @brief Calculate image timestamp from buffer time and epoch time shift.\n+/// In this, the buffer time is first converted into microseconds before the epoch time shift,\n+/// which is to be given in microseconds is added to it. Afterwards it is split into seconds\n+/// and nanoseconds for the image timestamp.\n+inline timespec calc_img_timestamp(const timeval & buffer_time, const time_t & epoch_time_shift_us)\n+{\n+  timespec img_timestamp;\n+\n+  int64_t buffer_time_us = (buffer_time.tv_sec * 1000000) + buffer_time.tv_usec;\n+  buffer_time_us += epoch_time_shift_us;\n+\n+  img_timestamp.tv_sec = (buffer_time_us / 1000000);\n+  img_timestamp.tv_nsec = (buffer_time_us % 1000000) * 1000;\n+\n+  return img_timestamp;\n+}\n \n inline int xioctl(int fd, uint64_t request, void * arg)\n {"
+        },
+        {
+          "sha": "f8a0b738b4949126f426047cebddfd7cafe2859f",
+          "filename": "src/usb_cam.cpp",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 10,
+          "changes": 15,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/d9e5f09444482bfbedefeb97a377b888e7ca6c65/src%2Fusb_cam.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/d9e5f09444482bfbedefeb97a377b888e7ca6c65/src%2Fusb_cam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam.cpp?ref=d9e5f09444482bfbedefeb97a377b888e7ca6c65",
+          "patch": "@@ -63,7 +63,7 @@ UsbCam::UsbCam()\n   m_avframe(NULL), m_avcodec(NULL), m_avoptions(NULL),\n   m_avcodec_context(NULL),\n   m_is_capturing(false), m_framerate(0),\n-  m_epoch_time_shift(usb_cam::utils::get_epoch_time_shift()), m_supported_formats()\n+  m_epoch_time_shift_us(usb_cam::utils::get_epoch_time_shift_us()), m_supported_formats()\n {}\n \n UsbCam::~UsbCam()\n@@ -133,11 +133,9 @@ void UsbCam::read_frame()\n       }\n \n       // Get timestamp from V4L2 image buffer\n-      m_buffer_time_s =\n-        buf.timestamp.tv_sec + static_cast<int64_t>(round(buf.timestamp.tv_usec / 1000000.0));\n+      m_image.stamp = usb_cam::utils::calc_img_timestamp(buf.timestamp, m_epoch_time_shift_us);\n \n-      m_image.stamp.tv_sec = static_cast<time_t>(round(m_buffer_time_s)) + m_epoch_time_shift;\n-      m_image.stamp.tv_nsec = static_cast<int64_t>(buf.timestamp.tv_usec * 1000.0);\n+      std::cout << \"sec: \" << m_image.stamp.tv_sec << \" nsec: \" << m_image.stamp.tv_nsec << std::endl;\n \n       assert(buf.index < m_number_of_buffers);\n       process_image(m_buffers[buf.index].start, m_image.data, buf.bytesused);\n@@ -162,11 +160,8 @@ void UsbCam::read_frame()\n         }\n       }\n \n-      m_buffer_time_s =\n-        buf.timestamp.tv_sec + static_cast<int64_t>(round(buf.timestamp.tv_usec / 1000000.0));\n-\n-      m_image.stamp.tv_sec = static_cast<time_t>(round(m_buffer_time_s)) + m_epoch_time_shift;\n-      m_image.stamp.tv_nsec = static_cast<int64_t>(buf.timestamp.tv_usec / 1000.0);\n+      // Get timestamp from V4L2 image buffer\n+      m_image.stamp = usb_cam::utils::calc_img_timestamp(buf.timestamp, m_epoch_time_shift_us);\n \n       for (i = 0; i < m_number_of_buffers; ++i) {\n         if (buf.m.userptr == reinterpret_cast<uint64_t>(m_buffers[i].start) && \\"
+        },
+        {
+          "sha": "a0ac6fcbbbec9a34514fc1916633f1425b2b0a87",
+          "filename": "test/test_usb_cam_utils.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/d9e5f09444482bfbedefeb97a377b888e7ca6c65/test%2Ftest_usb_cam_utils.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/d9e5f09444482bfbedefeb97a377b888e7ca6c65/test%2Ftest_usb_cam_utils.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/test%2Ftest_usb_cam_utils.cpp?ref=d9e5f09444482bfbedefeb97a377b888e7ca6c65",
+          "patch": "@@ -77,7 +77,7 @@ TEST(test_usb_cam_utils, test_clip_value) {\n TEST(test_usb_cam_utils, test_monotonic_to_real_time) {\n   // Get timeval to use for test\n \n-  const time_t test_time_t = usb_cam::utils::get_epoch_time_shift();\n+  const time_t test_time_t = usb_cam::utils::get_epoch_time_shift_us();\n \n   EXPECT_NE(test_time_t, 0);\n }"
+        }
+      ]
+    },
+    {
+      "author": "astrodoobs",
+      "date": "2023-05-15T19:52:16Z",
+      "sha": "2d5564631af001fd319032ef2c8beef4a880eb22",
+      "message": "Multiple cameras + compression",
+      "files_changed": 4,
+      "additions": 79,
+      "deletions": 14,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "fd363c0e59a7f75d501580c04cd09a892201328f",
+          "filename": "config/params_1.yaml",
+          "status": "renamed",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/2d5564631af001fd319032ef2c8beef4a880eb22/config%2Fparams_1.yaml",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/2d5564631af001fd319032ef2c8beef4a880eb22/config%2Fparams_1.yaml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/config%2Fparams_1.yaml?ref=2d5564631af001fd319032ef2c8beef4a880eb22",
+          "patch": "@@ -1,7 +1,7 @@\n /**:\n     ros__parameters:\n       video_device: \"/dev/video0\"\n-      framerate: 30.0\n+      framerate: 15.0\n       io_method: \"mmap\"\n       frame_id: \"camera\"\n       pixel_format: \"mjpeg2rgb\"  # see usb_cam/supported_formats for list of supported formats",
+          "previous_filename": "config/params.yaml"
+        },
+        {
+          "sha": "7dd5ad3b33fb794cdc96beb8d7a957fe1a44732a",
+          "filename": "config/params_2.yaml",
+          "status": "added",
+          "additions": 22,
+          "deletions": 0,
+          "changes": 22,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/2d5564631af001fd319032ef2c8beef4a880eb22/config%2Fparams_2.yaml",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/2d5564631af001fd319032ef2c8beef4a880eb22/config%2Fparams_2.yaml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/config%2Fparams_2.yaml?ref=2d5564631af001fd319032ef2c8beef4a880eb22",
+          "patch": "@@ -0,0 +1,22 @@\n+/**:\n+    ros__parameters:\n+      video_device: \"/dev/video2\"\n+      framerate: 15.0\n+      io_method: \"mmap\"\n+      frame_id: \"camera\"\n+      pixel_format: \"mjpeg2rgb\"  # see usb_cam/supported_formats for list of supported formats\n+      image_width: 640\n+      image_height: 480\n+      camera_name: \"test_camera\"\n+      camera_info_url: \"package://usb_cam/config/camera_info.yaml\"\n+      brightness: -1\n+      contrast: -1\n+      saturation: -1\n+      sharpness: -1\n+      gain: -1\n+      auto_white_balance: true\n+      white_balance: 4000\n+      autoexposure: true\n+      exposure: 100\n+      autofocus: false\n+      focus: -1\n\\ No newline at end of file"
+        },
+        {
+          "sha": "f00e27a81f8a6822576dec7adfe90540ef03f0a3",
+          "filename": "launch/camera.launch.py",
+          "status": "renamed",
+          "additions": 56,
+          "deletions": 13,
+          "changes": 69,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/2d5564631af001fd319032ef2c8beef4a880eb22/launch%2Fcamera.launch.py",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/2d5564631af001fd319032ef2c8beef4a880eb22/launch%2Fcamera.launch.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/launch%2Fcamera.launch.py?ref=2d5564631af001fd319032ef2c8beef4a880eb22",
+          "patch": "@@ -38,6 +38,11 @@\n from ament_index_python.packages import get_package_share_directory\n from launch import LaunchDescription\n from launch_ros.actions import Node\n+from launch.actions import GroupAction\n+from launch.substitutions import LaunchConfiguration\n+from launch.actions import DeclareLaunchArgument\n+from launch.conditions import IfCondition\n+\n \n \n def generate_launch_description():\n@@ -52,26 +57,64 @@ def generate_launch_description():\n     usb_cam_dir = get_package_share_directory('usb_cam')\n \n     # get path to params file\n-    params_path = os.path.join(\n+    params_path_1 = os.path.join(\n         usb_cam_dir,\n         'config',\n-        'params.yaml'\n+        'params_1.yaml'\n     )\n+   \n+    params_path_2 = os.path.join(\n+        usb_cam_dir,\n+        'config',\n+        'params_2.yaml'\n+    )\n+\n+   # params_path = os.path.join(\n+   #     usb_cam_dir,\n+   #     'config',\n+   #     'params_3.yaml'\n+   # )\n+   # params_path = os.path.join(\n+   #     usb_cam_dir,\n+   #     'config',\n+   #     'params_4.yaml'\n+   # )\n \n-    node_name = args.node_name\n+    camera_group = GroupAction([\n+\n+\n+        Node(\n+        package='usb_cam', executable='usb_cam_node_exe', output='screen',\n+        name=\"usb_cam_1\",\n+        # namespace=ns,\n+        parameters=[params_path_1],\n+        remappings=[('image_raw', 'camera1/image_raw'), \n+                    ('image_raw/compressed', 'camera1/image_compressed')]\n+        ),\n \n-    print(params_path)\n-    ld.add_action(Node(\n+        Node(\n         package='usb_cam', executable='usb_cam_node_exe', output='screen',\n-        name=node_name,\n+        name='usb_cam_2',\n         # namespace=ns,\n-        parameters=[params_path]\n-        ))\n-    ld.add_action(Node(\n-        package='usb_cam', executable='show_image.py', output='screen',\n+        parameters=[params_path_2],\n+        remappings=[('image_raw', 'camera2/image_raw'), \n+                    ('image_raw/compressed', 'camera2/image_compressed')]\n+        )\n+        \n+    #    Node(\n+    #    package='usb_cam', executable='usb_cam_node_exe', output='screen',\n+    #    name=node_name,\n+    #    # namespace=ns,\n+    #    parameters=[params_path_3],\n+    #    ),\n+    \n+    #    Node(\n+    #    package='usb_cam', executable='usb_cam_node_exe', output='screen',\n+    #    name=node_name,\n         # namespace=ns,\n-        # arguments=[image_manip_dir + \"/data/mosaic.jpg\"])\n-        # remappings=[('image_in', 'image_raw')]\n-        ))\n+    #    parameters=[params_path_4],\n+    #    )\n+    ])\n \n+    ld.add_action(camera_group)\n     return ld",
+          "previous_filename": "launch/demo_launch.py"
+        },
+        {
+          "sha": null,
+          "filename": "scripts/show_image.py",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/2d5564631af001fd319032ef2c8beef4a880eb22/scripts%2Fshow_image.py",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/2d5564631af001fd319032ef2c8beef4a880eb22/scripts%2Fshow_image.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/scripts%2Fshow_image.py?ref=2d5564631af001fd319032ef2c8beef4a880eb22"
+        }
+      ]
+    },
+    {
+      "author": "johnjamesmiller",
+      "date": "2023-01-26T06:11:19Z",
+      "sha": "90ff4e02855ad564ac289363802b862eae71a97d",
+      "message": "use v4l2  for \"brightness\", \"contrast\", \"saturation\", \"sharpness\", \"gain\", \"auto_white_balance\",\n      \"white_balance\", \"autoexposure\", \"exposure\", \"autofocus\", \"focus\"",
+      "files_changed": 3,
+      "additions": 120,
+      "deletions": 6,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "3d40c7db3c3c53a17b11cd7ed2cf3cf6fd8875d7",
+          "filename": "config/params.yaml",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 0,
+          "changes": 11,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/90ff4e02855ad564ac289363802b862eae71a97d/config%2Fparams.yaml",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/90ff4e02855ad564ac289363802b862eae71a97d/config%2Fparams.yaml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/config%2Fparams.yaml?ref=90ff4e02855ad564ac289363802b862eae71a97d",
+          "patch": "@@ -10,3 +10,14 @@\n       image_height: 480\n       camera_name: \"test_camera\"\n       camera_info_url: \"package://usb_cam/config/camera_info.yaml\"\n+      brightness: 50\n+      contrast: -1\n+      saturation: -1\n+      sharpness: -1\n+      gain: -1\n+      auto_white_balance: true\n+      white_balance: 4000\n+      autoexposure: true\n+      exposure: 100\n+      autofocus: false\n+      focus: -1\n\\ No newline at end of file"
+        },
+        {
+          "sha": "244b01b30cc629386f78220281ccdc8b1ab92928",
+          "filename": "include/usb_cam/usb_cam_node.hpp",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 5,
+          "changes": 16,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/90ff4e02855ad564ac289363802b862eae71a97d/include%2Fusb_cam%2Fusb_cam_node.hpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/90ff4e02855ad564ac289363802b862eae71a97d/include%2Fusb_cam%2Fusb_cam_node.hpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/include%2Fusb_cam%2Fusb_cam_node.hpp?ref=90ff4e02855ad564ac289363802b862eae71a97d",
+          "patch": "@@ -95,11 +95,17 @@ class UsbCamNode : public rclcpp::Node\n   int image_width_;\n   int image_height_;\n   int framerate_;\n-\n-  // TODO(lucasw) use v4l2ucp for these?\n-  // int exposure_, brightness_, contrast_, saturation_, sharpness_, focus_,\n-  //    white_balance_, gain_;\n-  // bool autofocus_, autoexposure_, auto_white_balance_;\n+  int brightness_;\n+  int contrast_;\n+  int saturation_;\n+  int sharpness_;\n+  int gain_;\n+  int white_balance_;\n+  int exposure_;\n+  int focus_;\n+  bool auto_white_balance_;\n+  bool autoexposure_;\n+  bool autofocus_;\n \n   std::string camera_name_;\n   std::string camera_info_url_;"
+        },
+        {
+          "sha": "e597a441e4844e2222012b47996ca4c1efd61ac7",
+          "filename": "src/usb_cam_node.cpp",
+          "status": "modified",
+          "additions": 98,
+          "deletions": 1,
+          "changes": 99,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/90ff4e02855ad564ac289363802b862eae71a97d/src%2Fusb_cam_node.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/90ff4e02855ad564ac289363802b862eae71a97d/src%2Fusb_cam_node.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam_node.cpp?ref=90ff4e02855ad564ac289363802b862eae71a97d",
+          "patch": "@@ -65,6 +65,17 @@ UsbCamNode::UsbCamNode(const rclcpp::NodeOptions & node_options)\n   this->declare_parameter(\"pixel_format\", \"yuyv\");\n   this->declare_parameter(\"color_format\", \"yuv422p\");\n   this->declare_parameter(\"video_device\", \"/dev/video0\");\n+  this->declare_parameter(\"brightness\", 50); //0-255, -1 \"leave alone\"\n+  this->declare_parameter(\"contrast\", -1); //0-255, -1 \"leave alone\"\n+  this->declare_parameter(\"saturation\", -1); //0-255, -1 \"leave alone\"\n+  this->declare_parameter(\"sharpness\", -1); //0-255, -1 \"leave alone\"\n+  this->declare_parameter(\"gain\", -1); //0-100?, -1 \"leave alone\"\n+  this->declare_parameter(\"auto_white_balance\", true);\n+  this->declare_parameter(\"white_balance\", 4000);\n+  this->declare_parameter(\"autoexposure\", true);\n+  this->declare_parameter(\"exposure\", 100);\n+  this->declare_parameter(\"autofocus\", false);\n+  this->declare_parameter(\"focus\", -1); //0-255, -1 \"leave alone\"\n \n   get_params();\n   init();\n@@ -160,6 +171,67 @@ void UsbCamNode::init()\n       fmt.interval.discrete.denominator / fmt.interval.discrete.numerator);\n   }\n \n+\n+  // set camera parameters\n+  if (brightness_ >= 0) {\n+    RCLCPP_INFO(this->get_logger(), \"Setting 'brightness' to %d\", brightness_);\n+    cam_.set_v4l_parameter(\"brightness\", brightness_);\n+  }\n+\n+  if (contrast_ >= 0) {\n+    RCLCPP_INFO(this->get_logger(), \"Setting 'contrast' to %d\", contrast_);\n+    cam_.set_v4l_parameter(\"contrast\", contrast_);\n+  }\n+\n+  if (saturation_ >= 0) {\n+    RCLCPP_INFO(this->get_logger(), \"Setting 'saturation' to %d\", saturation_);\n+    cam_.set_v4l_parameter(\"saturation\", saturation_);\n+  }\n+\n+  if (sharpness_ >= 0) {\n+    RCLCPP_INFO(this->get_logger(), \"Setting 'sharpness' to %d\", sharpness_);\n+    cam_.set_v4l_parameter(\"sharpness\", sharpness_);\n+  }\n+\n+  if (gain_ >= 0) {\n+    RCLCPP_INFO(this->get_logger(), \"Setting 'gain' to %d\", gain_);\n+    cam_.set_v4l_parameter(\"gain\", gain_);\n+  }\n+\n+  // check auto white balance\n+  if (auto_white_balance_) {\n+    cam_.set_v4l_parameter(\"white_balance_temperature_auto\", 1);\n+    RCLCPP_INFO(this->get_logger(), \"Setting 'white_balance_temperature_auto' to %d\", 1);\n+  } else {\n+    RCLCPP_INFO(this->get_logger(), \"Setting 'white_balance' to %d\", white_balance_);\n+    cam_.set_v4l_parameter(\"white_balance_temperature_auto\", 0);\n+    cam_.set_v4l_parameter(\"white_balance_temperature\", white_balance_);\n+  }\n+\n+  // check auto exposure\n+  if (!autoexposure_) {\n+    RCLCPP_INFO(this->get_logger(), \"Setting 'exposure_auto' to %d\", 1);\n+    RCLCPP_INFO(this->get_logger(), \"Setting 'exposure' to %d\", exposure_);\n+    // turn down exposure control (from max of 3)\n+    cam_.set_v4l_parameter(\"exposure_auto\", 1);\n+    // change the exposure level\n+    cam_.set_v4l_parameter(\"exposure_absolute\", exposure_);\n+  }\n+\n+  // check auto focus\n+  if (autofocus_) {\n+    cam_.set_auto_focus(1);\n+    RCLCPP_INFO(this->get_logger(), \"Setting 'focus_auto' to %d\", 1);\n+    cam_.set_v4l_parameter(\"focus_auto\", 1);\n+  } else {\n+    RCLCPP_INFO(this->get_logger(), \"Setting 'focus_auto' to %d\", 0);\n+    cam_.set_v4l_parameter(\"focus_auto\", 0);\n+    if (focus_ >= 0) {\n+      RCLCPP_INFO(this->get_logger(), \"Setting 'focus_absolute' to %d\", focus_);\n+      cam_.set_v4l_parameter(\"focus_absolute\", focus_);\n+    }\n+  }\n+\n   // TODO(lucasw) should this check a little faster than expected frame rate?\n   // TODO(lucasw) how to do small than ms, or fractional ms- std::chrono::nanoseconds?\n   const int period_ms = 1000.0 / framerate_;\n@@ -174,7 +246,10 @@ void UsbCamNode::get_params()\n   auto parameters_client = std::make_shared<rclcpp::SyncParametersClient>(this);\n   auto parameters = parameters_client->get_parameters(\n     {\"camera_name\", \"camera_info_url\", \"frame_id\", \"framerate\",\n-      \"image_height\", \"image_width\", \"io_method\", \"pixel_format\", \"color_format\", \"video_device\"});\n+      \"image_height\", \"image_width\", \"io_method\", \"pixel_format\", \"color_format\", \"video_device\", \n+      \"brightness\", \"contrast\", \"saturation\", \"sharpness\", \"gain\", \"auto_white_balance\",\n+      \"white_balance\", \"autoexposure\", \"exposure\", \"autofocus\", \"focus\"});\n+\n   assign_params(parameters);\n }\n \n@@ -203,6 +278,28 @@ void UsbCamNode::assign_params(const std::vector<rclcpp::Parameter> & parameters\n       color_format_name_ = parameter.value_to_string();\n     } else if (parameter.get_name() == \"video_device\") {\n       video_device_name_ = parameter.value_to_string();\n+    } else if (parameter.get_name() == \"brightness\") {\n+      brightness_ = parameter.as_int();\n+    } else if (parameter.get_name() == \"contrast\") {\n+      contrast_ = parameter.as_int();\n+    } else if (parameter.get_name() == \"saturation\") {\n+      saturation_ = parameter.as_int();\n+    } else if (parameter.get_name() == \"sharpness\") {\n+      sharpness_ = parameter.as_int();\n+    } else if (parameter.get_name() == \"gain\") {\n+      gain_ = parameter.as_int();\n+    } else if (parameter.get_name() == \"auto_white_balance\") {\n+      auto_white_balance_ = parameter.as_bool();\n+    } else if (parameter.get_name() == \"white_balance\") {\n+      white_balance_ = parameter.as_int();\n+    } else if (parameter.get_name() == \"autoexposure\") {\n+      autoexposure_ = parameter.as_bool();\n+    } else if (parameter.get_name() == \"exposure\") {\n+      exposure_ = parameter.as_int();\n+    } else if (parameter.get_name() == \"autofocus\") {\n+      autofocus_ = parameter.as_bool();\n+    } else if (parameter.get_name() == \"focus\") {\n+      focus_ = parameter.as_int();\n     } else {\n       RCLCPP_WARN(this->get_logger(), \"Invalid parameter name: %s\", parameter.get_name().c_str());\n     }"
+        }
+      ]
+    },
+    {
+      "author": "twdragon",
+      "date": "2022-12-06T11:24:42Z",
+      "sha": "0772f5c11fcc08833abc882fb374da2e6ceaf301",
+      "message": "Merge pull request #210 from revanthsenthil/ros2\n\nROS 2 installation instruction typo fix",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "efb4509f5520a82dc9044288057d2e90a9bafcdc",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/0772f5c11fcc08833abc882fb374da2e6ceaf301/README.md",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/0772f5c11fcc08833abc882fb374da2e6ceaf301/README.md",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/README.md?ref=0772f5c11fcc08833abc882fb374da2e6ceaf301",
+          "patch": "@@ -19,7 +19,7 @@ For either MacOS or Windows - if you would like to try and get it working please\n Assuming you have a supported ROS2 distro installed, run the following command to install the binary release:\n \n ```bash\n-sudo apt get install ros-<ros2-distro>-usb-cam\n+sudo apt-get install ros-<ros2-distro>-usb-cam\n ```\n \n As of today this package should be available for binary installation on all active ROS2 distros."
+        }
+      ]
+    },
+    {
+      "author": "revanthsenthil",
+      "date": "2022-12-04T03:57:33Z",
+      "sha": "c39af3dd535f63fc7be8f4649513152cff8ad26c",
+      "message": "Update README.md\n\nresolved error with `apt-get` from `apt get`",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "efb4509f5520a82dc9044288057d2e90a9bafcdc",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/c39af3dd535f63fc7be8f4649513152cff8ad26c/README.md",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/c39af3dd535f63fc7be8f4649513152cff8ad26c/README.md",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/README.md?ref=c39af3dd535f63fc7be8f4649513152cff8ad26c",
+          "patch": "@@ -19,7 +19,7 @@ For either MacOS or Windows - if you would like to try and get it working please\n Assuming you have a supported ROS2 distro installed, run the following command to install the binary release:\n \n ```bash\n-sudo apt get install ros-<ros2-distro>-usb-cam\n+sudo apt-get install ros-<ros2-distro>-usb-cam\n ```\n \n As of today this package should be available for binary installation on all active ROS2 distros."
+        }
+      ]
+    },
+    {
+      "author": "mad0x60",
+      "date": "2022-09-02T16:05:54Z",
+      "sha": "e160a00705ca6bb2381fdf72ac37459fb5cef846",
+      "message": "update the deprecated uncompressed command\n\nThe current ros2 image decompression command produces the following warning because it is deprecated:\r\n[WARN] [1662133933.155713605] [rcl]: Found remap rule 'in/compressed:=image_raw/compressed'. This syntax is deprecated. Use '--ros-args --remap in/compressed:=image_raw/compressed' instead.\r\n[WARN] [1662133933.155877454] [rcl]: Found remap rule 'out:=image_raw/uncompressed'. This syntax is deprecated. Use '--ros-args --remap out:=image_raw/uncompressed' instead.\r\n\r\nThis change update to match the most recent ROS2 format",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "28368a6c87d4e1a0c024c13a90c3030dcf16bd33",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/e160a00705ca6bb2381fdf72ac37459fb5cef846/README.md",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/e160a00705ca6bb2381fdf72ac37459fb5cef846/README.md",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/README.md?ref=e160a00705ca6bb2381fdf72ac37459fb5cef846",
+          "patch": "@@ -97,7 +97,7 @@ The `usb_cam` should support compression by default since it uses `image_transpo\n Unfortunately `rviz2` and `show_image.py` do not support visualizing the compressed images just yet so you will need to republish the compressed image downstream to uncompress it:\n \n ```\n-ros2 run image_transport republish compressed in/compressed:=image_raw/compressed raw out:=image_raw/uncompressed\n+ros2 run image_transport republish compressed raw --ros-args --remap in/compressed:=image_raw/compressed --remap out:=image_raw/uncompressed\n ```\n \n #### Documentation"
+        }
+      ]
+    },
+    {
+      "author": "krsche",
+      "date": "2022-05-23T14:29:59Z",
+      "sha": "74bff843df570de40037a2c4bc78df3e81081d9d",
+      "message": "feat: add h264 support",
+      "files_changed": 2,
+      "additions": 28,
+      "deletions": 5,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "8b9c962a70f29eab7e24ddcf3cef267232ef2b2f",
+          "filename": "include/usb_cam/usb_cam.hpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/74bff843df570de40037a2c4bc78df3e81081d9d/include%2Fusb_cam%2Fusb_cam.hpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/74bff843df570de40037a2c4bc78df3e81081d9d/include%2Fusb_cam%2Fusb_cam.hpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/include%2Fusb_cam%2Fusb_cam.hpp?ref=74bff843df570de40037a2c4bc78df3e81081d9d",
+          "patch": "@@ -78,6 +78,7 @@ class UsbCam\n     PIXEL_FORMAT_YUVMONO10,\n     PIXEL_FORMAT_RGB24,\n     PIXEL_FORMAT_GREY,\n+    PIXEL_FORMAT_H264,\n     PIXEL_FORMAT_UNKNOWN\n   } pixel_format;\n \n@@ -133,6 +134,8 @@ class UsbCam\n   };\n \n \n+  int init_decoder(int image_width, int image_height, AVCodecID codec_id, const char *codec_name);\n+  int init_h264_decoder(int image_width, int image_height);\n   int init_mjpeg_decoder(int image_width, int image_height);\n   bool mjpeg2rgb(char * MJPEG, int len, char * RGB, int NumPixels);\n   bool process_image(const void * src, int len, camera_image_t * dest);"
+        },
+        {
+          "sha": "cdf122ba7da789a1e7998afbf30b76c207ebcd50",
+          "filename": "src/usb_cam.cpp",
+          "status": "modified",
+          "additions": 25,
+          "deletions": 5,
+          "changes": 30,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/74bff843df570de40037a2c4bc78df3e81081d9d/src%2Fusb_cam.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/74bff843df570de40037a2c4bc78df3e81081d9d/src%2Fusb_cam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam.cpp?ref=74bff843df570de40037a2c4bc78df3e81081d9d",
+          "patch": "@@ -70,13 +70,13 @@ UsbCam::~UsbCam()\n   shutdown();\n }\n \n-int UsbCam::init_mjpeg_decoder(int image_width, int image_height)\n+int UsbCam::init_decoder(int image_width, int image_height, AVCodecID codec_id, const char *codec_name)\n {\n   avcodec_register_all();\n \n-  avcodec_ = avcodec_find_decoder(AV_CODEC_ID_MJPEG);\n+  avcodec_ = avcodec_find_decoder(codec_id);\n   if (!avcodec_) {\n-    RCLCPP_ERROR(rclcpp::get_logger(\"usb_cam\"), \"Could not find MJPEG decoder\");\n+    RCLCPP_ERROR(rclcpp::get_logger(\"usb_cam\"), \"Could not find %s decoder\", codec_name);\n     return 0;\n   }\n \n@@ -92,7 +92,7 @@ int UsbCam::init_mjpeg_decoder(int image_width, int image_height)\n   avpicture_alloc(\n     reinterpret_cast<AVPicture *>(avframe_rgb_), AV_PIX_FMT_RGB24, image_width, image_height);\n \n-  avcodec_context_->codec_id = AV_CODEC_ID_MJPEG;\n+  avcodec_context_->codec_id = codec_id;\n   avcodec_context_->width = image_width;\n   avcodec_context_->height = image_height;\n \n@@ -110,7 +110,7 @@ int UsbCam::init_mjpeg_decoder(int image_width, int image_height)\n \n   /* open it */\n   if (avcodec_open2(avcodec_context_, avcodec_, &avoptions_) < 0) {\n-    RCLCPP_ERROR(rclcpp::get_logger(\"usb_cam\"), \"Could not open MJPEG Decoder\");\n+    RCLCPP_ERROR(rclcpp::get_logger(\"usb_cam\"), \"Could not open %s Decoder\", codec_name);\n     return 0;\n   }\n   RCLCPP_INFO_STREAM(\n@@ -119,6 +119,14 @@ int UsbCam::init_mjpeg_decoder(int image_width, int image_height)\n   return 1;\n }\n \n+int UsbCam::init_mjpeg_decoder(int image_width, int image_height) {\n+  return init_decoder(image_width, image_height, AV_CODEC_ID_MJPEG, \"MJPEG\");\n+}\n+\n+int UsbCam::init_h264_decoder(int image_width, int image_height) {\n+  return init_decoder(image_width, image_height, AV_CODEC_ID_H264, \"H264\");\n+}\n+\n bool UsbCam::mjpeg2rgb(char * MJPEG, int len, char * RGB, int /* NumPixels */)\n {\n   // RCLCPP_INFO_STREAM(\n@@ -217,6 +225,11 @@ bool UsbCam::process_image(const void * src, int len, camera_image_t * dest)\n     return mjpeg2rgb(\n       const_cast<char *>(\n         reinterpret_cast<const char *>(src)), len, dest->image, dest->width * dest->height);\n+  } else if (pixelformat_ == V4L2_PIX_FMT_H264) {\n+    // libav handles the decoding, so reusing the same function is fine\n+    return mjpeg2rgb(\n+      const_cast<char *>(\n+        reinterpret_cast<const char *>(src)), len, dest->image, dest->width * dest->height);\n   } else if (pixelformat_ == V4L2_PIX_FMT_RGB24) {\n     rgb242rgb(\n       const_cast<char *>(\n@@ -862,6 +875,9 @@ bool UsbCam::start(\n   } else if (pixel_format == PIXEL_FORMAT_MJPEG) {\n     pixelformat_ = V4L2_PIX_FMT_MJPEG;\n     init_mjpeg_decoder(image_width, image_height);\n+  } else if (pixel_format == PIXEL_FORMAT_H264) {\n+    pixelformat_ = V4L2_PIX_FMT_H264;\n+    init_h264_decoder(image_width, image_height);\n   } else if (pixel_format == PIXEL_FORMAT_YUVMONO10) {\n     // actually format V4L2_PIX_FMT_Y16 (10-bit mono expresed as 16-bit pixels)\n     // but we need to use the advertised type (yuyv)\n@@ -1148,6 +1164,8 @@ UsbCam::pixel_format UsbCam::pixel_format_from_string(const std::string & str)\n     return PIXEL_FORMAT_UYVY;\n   } else if (str == \"mjpeg\") {\n     return PIXEL_FORMAT_MJPEG;\n+  } else if (str == \"h264\") {\n+    return PIXEL_FORMAT_H264;\n   } else if (str == \"yuvmono10\") {\n     return PIXEL_FORMAT_YUVMONO10;\n   } else if (str == \"rgb24\") {\n@@ -1168,6 +1186,8 @@ std::string UsbCam::pixel_format_to_string(__u32 pixelformat)\n     return PIXEL_FORMAT_UYVY;\n   } else if (str == \"mjpeg\") {\n     return PIXEL_FORMAT_MJPEG;\n+  } else if (str == \"h264\") {\n+    return PIXEL_FORMAT_H264;\n   } else if (str == \"yuvmono10\") {\n     return PIXEL_FORMAT_YUVMONO10;\n   } else if (str == \"rgb24\") {"
+        }
+      ]
+    },
+    {
+      "author": "progtologist",
+      "date": "2022-04-24T20:02:37Z",
+      "sha": "39e5e358b85eb06f1d6ef24705ae5b41e3db9bd6",
+      "message": "Enabled dynamic reconfiguration of usb_cam_node",
+      "files_changed": 2,
+      "additions": 31,
+      "deletions": 4,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "da6026a885854785259662c3d77cd0491106735c",
+          "filename": "include/usb_cam/usb_cam_node.hpp",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/39e5e358b85eb06f1d6ef24705ae5b41e3db9bd6/include%2Fusb_cam%2Fusb_cam_node.hpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/39e5e358b85eb06f1d6ef24705ae5b41e3db9bd6/include%2Fusb_cam%2Fusb_cam_node.hpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/include%2Fusb_cam%2Fusb_cam_node.hpp?ref=39e5e358b85eb06f1d6ef24705ae5b41e3db9bd6",
+          "patch": "@@ -61,9 +61,13 @@ class UsbCamNode : public rclcpp::Node\n \n   void init();\n   void get_params();\n+  void assign_params(const std::vector<rclcpp::Parameter> & parameters);\n   void update();\n   bool take_and_send_image();\n \n+  rcl_interfaces::msg::SetParametersResult parametersCallback(\n+    const std::vector<rclcpp::Parameter> & parameters);\n+\n   void service_capture(\n     const std::shared_ptr<rmw_request_id_t> request_header,\n     const std::shared_ptr<std_srvs::srv::SetBool::Request> request,\n@@ -101,6 +105,7 @@ class UsbCamNode : public rclcpp::Node\n   rclcpp::TimerBase::SharedPtr timer_;\n \n   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr service_capture_;\n+  rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr parameters_callback_handle_;\n };\n }  // namespace usb_cam\n #endif  // USB_CAM__USB_CAM_NODE_HPP_"
+        },
+        {
+          "sha": "c5ed008a05ff86072fd56654e0c3213d943c17b7",
+          "filename": "src/usb_cam_node.cpp",
+          "status": "modified",
+          "additions": 26,
+          "deletions": 4,
+          "changes": 30,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/39e5e358b85eb06f1d6ef24705ae5b41e3db9bd6/src%2Fusb_cam_node.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/39e5e358b85eb06f1d6ef24705ae5b41e3db9bd6/src%2Fusb_cam_node.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam_node.cpp?ref=39e5e358b85eb06f1d6ef24705ae5b41e3db9bd6",
+          "patch": "@@ -67,6 +67,10 @@ UsbCamNode::UsbCamNode(const rclcpp::NodeOptions & node_options)\n \n   get_params();\n   init();\n+  parameters_callback_handle_ = add_on_set_parameters_callback(\n+    std::bind(\n+      &UsbCamNode::parametersCallback, this,\n+      std::placeholders::_1));\n }\n \n UsbCamNode::~UsbCamNode()\n@@ -149,11 +153,15 @@ void UsbCamNode::init()\n void UsbCamNode::get_params()\n {\n   auto parameters_client = std::make_shared<rclcpp::SyncParametersClient>(this);\n+  auto parameters = parameters_client->get_parameters(\n+    {\"camera_name\", \"camera_info_url\", \"frame_id\", \"framerate\",\n+      \"image_height\", \"image_width\", \"io_method\", \"pixel_format\", \"video_device\"});\n+  assign_params(parameters);\n+}\n \n-  for (auto & parameter : parameters_client->get_parameters(\n-      {\"camera_name\", \"camera_info_url\", \"frame_id\", \"framerate\",\n-        \"image_height\", \"image_width\", \"io_method\", \"pixel_format\", \"video_device\"}))\n-  {\n+void UsbCamNode::assign_params(const std::vector<rclcpp::Parameter> & parameters)\n+{\n+  for (auto & parameter : parameters) {\n     if (parameter.get_name() == \"camera_name\") {\n       RCLCPP_INFO(this->get_logger(), \"camera_name value: %s\", parameter.value_to_string().c_str());\n       camera_name_ = parameter.value_to_string();\n@@ -198,6 +206,20 @@ bool UsbCamNode::take_and_send_image()\n   return true;\n }\n \n+rcl_interfaces::msg::SetParametersResult UsbCamNode::parametersCallback(\n+  const std::vector<rclcpp::Parameter> & parameters)\n+{\n+  RCLCPP_INFO(get_logger(), \"Callback called!\");\n+  timer_->reset();\n+  cam_.shutdown();\n+  assign_params(parameters);\n+  init();\n+  rcl_interfaces::msg::SetParametersResult result;\n+  result.successful = true;\n+  result.reason = \"success\";\n+  return result;\n+}\n+\n void UsbCamNode::update()\n {\n   if (cam_.is_capturing()) {"
+        }
+      ]
+    },
+    {
+      "author": "benmaidel",
+      "date": "2021-11-25T19:08:18Z",
+      "sha": "75d242ee491309bf5ce699ec794cbb27da9232da",
+      "message": "add support for YUV420 (yu12) pixel format",
+      "files_changed": 5,
+      "additions": 26,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "eed32378bb1e4170b2438ad229bc8c586bf719c5",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/75d242ee491309bf5ce699ec794cbb27da9232da/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/75d242ee491309bf5ce699ec794cbb27da9232da/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/CMakeLists.txt?ref=75d242ee491309bf5ce699ec794cbb27da9232da",
+          "patch": "@@ -13,6 +13,8 @@ endif()\n find_package(ament_cmake_auto REQUIRED)\n ament_auto_find_build_dependencies()\n \n+find_package(OpenCV REQUIRED)\n+\n ## pkg-config libraries\n find_package(PkgConfig REQUIRED)\n pkg_check_modules(avcodec libavcodec REQUIRED)\n@@ -37,6 +39,7 @@ target_link_libraries(${PROJECT_NAME}_node\n   ${PROJECT_NAME}\n   ${avcodec_LIBRARIES}\n   ${swscale_LIBRARIES}\n+  ${OpenCV_LIBRARIES}\n   # TODO(lucasw) should this have been in libavcodec?\n   #avutil\n )"
+        },
+        {
+          "sha": "2859132edd69248a30c68fa8c598d7068d7784cb",
+          "filename": "include/usb_cam/usb_cam.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/75d242ee491309bf5ce699ec794cbb27da9232da/include%2Fusb_cam%2Fusb_cam.hpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/75d242ee491309bf5ce699ec794cbb27da9232da/include%2Fusb_cam%2Fusb_cam.hpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/include%2Fusb_cam%2Fusb_cam.hpp?ref=75d242ee491309bf5ce699ec794cbb27da9232da",
+          "patch": "@@ -78,6 +78,7 @@ class UsbCam\n     PIXEL_FORMAT_YUVMONO10,\n     PIXEL_FORMAT_RGB24,\n     PIXEL_FORMAT_GREY,\n+    PIXEL_FORMAT_YU12,\n     PIXEL_FORMAT_UNKNOWN\n   } pixel_format;\n "
+        },
+        {
+          "sha": "8f93b3fe68ba9d618eb0a41e42844c97dedda5c3",
+          "filename": "include/usb_cam/usb_cam_utils.hpp",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 0,
+          "changes": 11,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/75d242ee491309bf5ce699ec794cbb27da9232da/include%2Fusb_cam%2Fusb_cam_utils.hpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/75d242ee491309bf5ce699ec794cbb27da9232da/include%2Fusb_cam%2Fusb_cam_utils.hpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/include%2Fusb_cam%2Fusb_cam_utils.hpp?ref=75d242ee491309bf5ce699ec794cbb27da9232da",
+          "patch": "@@ -33,6 +33,7 @@\n \n #include <cstring>\n #include <sstream>\n+#include <opencv2/opencv.hpp>\n \n \n namespace usb_cam\n@@ -363,5 +364,15 @@ void rgb242rgb(char * YUV, char * RGB, int NumPixels)\n {\n   memcpy(RGB, YUV, NumPixels * 3);\n }\n+\n+inline void yuv4202rgb(char * YUV, char * RGB, int width, int height)\n+{\n+  cv::Size size(height, width);\n+  cv::Mat cv_img(height * 1.5, width, CV_8UC1, YUV);\n+  cv::Mat cv_out(height, width, CV_8UC3, RGB);\n+\n+  cvtColor(cv_img, cv_out, cv::COLOR_YUV420p2BGR);\n+\n+}\n }  // namespace usb_cam\n #endif  // USB_CAM__USB_CAM_UTILS_HPP_"
+        },
+        {
+          "sha": "1be8986a9cf5d8b53ab0c3408c8c7db9e534896c",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/75d242ee491309bf5ce699ec794cbb27da9232da/package.xml",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/75d242ee491309bf5ce699ec794cbb27da9232da/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/package.xml?ref=75d242ee491309bf5ce699ec794cbb27da9232da",
+          "patch": "@@ -15,6 +15,7 @@\n \n   <buildtool_depend>ament_cmake_auto</buildtool_depend>\n \n+  <depend>cv_bridge</depend>\n   <depend>rclcpp</depend>\n   <depend>rclcpp_components</depend>\n   <depend>std_msgs</depend>"
+        },
+        {
+          "sha": "42e0635fd07df6d5eb12658491873e171c31785d",
+          "filename": "src/usb_cam.cpp",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 0,
+          "changes": 10,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/75d242ee491309bf5ce699ec794cbb27da9232da/src%2Fusb_cam.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/75d242ee491309bf5ce699ec794cbb27da9232da/src%2Fusb_cam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam.cpp?ref=75d242ee491309bf5ce699ec794cbb27da9232da",
+          "patch": "@@ -225,6 +225,10 @@ bool UsbCam::process_image(const void * src, int len, camera_image_t * dest)\n     memcpy(\n       dest->image,\n       const_cast<char *>(reinterpret_cast<const char *>(src)), dest->width * dest->height);\n+  } else if (pixelformat_ == V4L2_PIX_FMT_YUV420) {\n+    yuv4202rgb(\n+        const_cast<char *>(\n+          reinterpret_cast<const char *>(src)), dest->image, dest->width, dest->height);\n   }\n \n   return true;\n@@ -828,6 +832,8 @@ bool UsbCam::start(\n   } else if (pixel_format == PIXEL_FORMAT_GREY) {\n     pixelformat_ = V4L2_PIX_FMT_GREY;\n     monochrome_ = true;\n+  } else if (pixel_format == PIXEL_FORMAT_YU12) {\n+    pixelformat_ = V4L2_PIX_FMT_YUV420;\n   } else {\n     RCLCPP_ERROR(rclcpp::get_logger(\"usb_cam\"), \"Unknown pixel format.\");\n     return false;  // (EXIT_FAILURE);\n@@ -1110,6 +1116,8 @@ UsbCam::pixel_format UsbCam::pixel_format_from_string(const std::string & str)\n     return PIXEL_FORMAT_RGB24;\n   } else if (str == \"grey\") {\n     return PIXEL_FORMAT_GREY;\n+  } else if (str == \"yu12\") {\n+    return PIXEL_FORMAT_YU12;\n   } else {\n     return PIXEL_FORMAT_UNKNOWN;\n   }\n@@ -1130,6 +1138,8 @@ std::string UsbCam::pixel_format_to_string(__u32 pixelformat)\n     return PIXEL_FORMAT_RGB24;\n   } else if (str == \"grey\") {\n     return PIXEL_FORMAT_GREY;\n+  } else if (str == \"yu12\") {\n+    return PIXEL_FORMAT_YU12;\n   } else {\n     return PIXEL_FORMAT_UNKNOWN;\n   }"
+        }
+      ]
+    },
+    {
+      "author": "Kenji Miyake",
+      "date": "2021-09-12T15:15:20Z",
+      "sha": "9c116ac9d14bc4097e74fe3155eda13358f4d073",
+      "message": "Fix -Wformat\n\nSigned-off-by: Kenji Miyake <kenji.miyake@tier4.jp>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "66e9268a284770abd6837ba56550bf7a09fb8882",
+          "filename": "src/usb_cam_node.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/9c116ac9d14bc4097e74fe3155eda13358f4d073/src%2Fusb_cam_node.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/9c116ac9d14bc4097e74fe3155eda13358f4d073/src%2Fusb_cam_node.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam_node.cpp?ref=9c116ac9d14bc4097e74fe3155eda13358f4d073",
+          "patch": "@@ -175,7 +175,7 @@ void UsbCamNode::get_params()\n     } else if (parameter.get_name() == \"video_device\") {\n       video_device_name_ = parameter.value_to_string();\n     } else {\n-      RCLCPP_WARN(this->get_logger(), \"Invalid parameter name: %s\", parameter.get_name());\n+      RCLCPP_WARN(this->get_logger(), \"Invalid parameter name: %s\", parameter.get_name().c_str());\n     }\n   }\n }"
+        }
+      ]
+    },
+    {
+      "author": "wep21",
+      "date": "2021-06-18T18:45:58Z",
+      "sha": "d7c782303d2256a1cbd25b152da10efab8fe8a5b",
+      "message": "Make usb_cam_node composable\n\nSigned-off-by: wep21 <border_goldenmarket@yahoo.co.jp>",
+      "files_changed": 5,
+      "additions": 22,
+      "deletions": 30,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "6c7abf31d33672a6cef5bbb98e65f51ddc60e5d2",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 11,
+          "changes": 24,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/d7c782303d2256a1cbd25b152da10efab8fe8a5b/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/d7c782303d2256a1cbd25b152da10efab8fe8a5b/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/CMakeLists.txt?ref=d7c782303d2256a1cbd25b152da10efab8fe8a5b",
+          "patch": "@@ -29,7 +29,10 @@ ament_auto_add_library(${PROJECT_NAME} SHARED\n )\n \n ## Declare a cpp executable\n-ament_auto_add_executable(${PROJECT_NAME}_node src/usb_cam_node.cpp)\n+ament_auto_add_library(${PROJECT_NAME}_node SHARED\n+  src/usb_cam_node.cpp\n+)\n+\n target_link_libraries(${PROJECT_NAME}_node\n   ${PROJECT_NAME}\n   ${avcodec_LIBRARIES}\n@@ -38,18 +41,17 @@ target_link_libraries(${PROJECT_NAME}_node\n   #avutil\n )\n \n+rclcpp_components_register_node(${PROJECT_NAME}_node\n+  PLUGIN \"usb_cam::UsbCamNode\"\n+  EXECUTABLE ${PROJECT_NAME}_node_exe\n+)\n+\n install(\n   PROGRAMS scripts/show_image.py\n   DESTINATION lib/${PROJECT_NAME})\n \n-install(\n-  DIRECTORY launch\n-  DESTINATION share/${PROJECT_NAME}\n+ament_auto_package(\n+  INSTALL_TO_SHARE\n+    launch\n+    config\n )\n-\n-install(\n-  DIRECTORY config\n-  DESTINATION share/${PROJECT_NAME}\n-)\n-\n-ament_auto_package()"
+        },
+        {
+          "sha": "7a7e3b2b7a7fcc25112af26961304964ef23a0b7",
+          "filename": "include/usb_cam/usb_cam_node.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/d7c782303d2256a1cbd25b152da10efab8fe8a5b/include%2Fusb_cam%2Fusb_cam_node.hpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/d7c782303d2256a1cbd25b152da10efab8fe8a5b/include%2Fusb_cam%2Fusb_cam_node.hpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/include%2Fusb_cam%2Fusb_cam_node.hpp?ref=d7c782303d2256a1cbd25b152da10efab8fe8a5b",
+          "patch": "@@ -56,7 +56,7 @@ namespace usb_cam\n class UsbCamNode : public rclcpp::Node\n {\n public:\n-  UsbCamNode();\n+  UsbCamNode(const rclcpp::NodeOptions & node_options);\n   ~UsbCamNode();\n \n   void init();"
+        },
+        {
+          "sha": "a071d131c2d70bc54cbcce914f65c0bb4bcced72",
+          "filename": "launch/demo_launch.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/d7c782303d2256a1cbd25b152da10efab8fe8a5b/launch%2Fdemo_launch.py",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/d7c782303d2256a1cbd25b152da10efab8fe8a5b/launch%2Fdemo_launch.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/launch%2Fdemo_launch.py?ref=d7c782303d2256a1cbd25b152da10efab8fe8a5b",
+          "patch": "@@ -32,7 +32,7 @@ def generate_launch_description():\n \n     print(params_path)\n     ld.add_action(Node(\n-        package='usb_cam', executable='usb_cam_node', output='screen',\n+        package='usb_cam', executable='usb_cam_node_exe', output='screen',\n         name=node_name,\n         # namespace=ns,\n         parameters=[params_path]"
+        },
+        {
+          "sha": "76f87b6123590144414635856536ad52dc61e355",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/d7c782303d2256a1cbd25b152da10efab8fe8a5b/package.xml",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/d7c782303d2256a1cbd25b152da10efab8fe8a5b/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/package.xml?ref=d7c782303d2256a1cbd25b152da10efab8fe8a5b",
+          "patch": "@@ -16,6 +16,7 @@\n   <buildtool_depend>ament_cmake_auto</buildtool_depend>\n \n   <depend>rclcpp</depend>\n+  <depend>rclcpp_components</depend>\n   <depend>std_msgs</depend>\n   <depend>std_srvs</depend>\n   <depend>sensor_msgs</depend>"
+        },
+        {
+          "sha": "f1405bbac9edaf176595fdad904563e15b73ff34",
+          "filename": "src/usb_cam_node.cpp",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 17,
+          "changes": 23,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/d7c782303d2256a1cbd25b152da10efab8fe8a5b/src%2Fusb_cam_node.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/d7c782303d2256a1cbd25b152da10efab8fe8a5b/src%2Fusb_cam_node.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam_node.cpp?ref=d7c782303d2256a1cbd25b152da10efab8fe8a5b",
+          "patch": "@@ -39,8 +39,8 @@\n namespace usb_cam\n {\n \n-UsbCamNode::UsbCamNode()\n-: Node(\"usb_cam\"),\n+UsbCamNode::UsbCamNode(const rclcpp::NodeOptions & node_options)\n+: Node(\"usb_cam\", node_options),\n   img_(new sensor_msgs::msg::Image()),\n   image_pub_(this->create_publisher<sensor_msgs::msg::Image>(\"image_raw\", 100)),\n   service_capture_(\n@@ -65,6 +65,7 @@ UsbCamNode::UsbCamNode()\n   this->declare_parameter(\"video_device\", \"/dev/video0\");\n \n   get_params();\n+  init();\n }\n \n UsbCamNode::~UsbCamNode()\n@@ -209,18 +210,6 @@ void UsbCamNode::update()\n }\n }  // namespace usb_cam\n \n-int main(int argc, char ** argv)\n-{\n-  rclcpp::init(argc, argv);\n-\n-  // Force flush of the stdout buffer.\n-  // This ensures a correct sync of all prints\n-  // even when executed simultaneously within a launch file.\n-  setvbuf(stdout, NULL, _IONBF, BUFSIZ);\n-  auto usb_cam_node = std::make_shared<usb_cam::UsbCamNode>();\n-  usb_cam_node->init();\n-  rclcpp::spin(usb_cam_node);\n-  RCLCPP_INFO(rclcpp::get_logger(\"usb_cam_node\"), \"node done\");\n-  rclcpp::shutdown();\n-  return 0;\n-}\n+\n+#include \"rclcpp_components/register_node_macro.hpp\"\n+RCLCPP_COMPONENTS_REGISTER_NODE(usb_cam::UsbCamNode)"
+        }
+      ]
+    },
+    {
+      "author": "lucasw",
+      "date": "2017-07-02T03:24:29Z",
+      "sha": "ddc19f26fed47ab4ff4e9c626ef1b3ae2cfeb753",
+      "message": "move the timestamping closer to when the image was acquired. #75",
+      "files_changed": 2,
+      "additions": 3,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "2aa360612966fb57cf555c43c514708ded9c1a45",
+          "filename": "include/usb_cam/usb_cam.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/ddc19f26fed47ab4ff4e9c626ef1b3ae2cfeb753/include%2Fusb_cam%2Fusb_cam.h",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/ddc19f26fed47ab4ff4e9c626ef1b3ae2cfeb753/include%2Fusb_cam%2Fusb_cam.h",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/include%2Fusb_cam%2Fusb_cam.h?ref=ddc19f26fed47ab4ff4e9c626ef1b3ae2cfeb753",
+          "patch": "@@ -104,6 +104,7 @@ class UsbCam {\n     int height;\n     int bytes_per_pixel;\n     int image_size;\n+    ros::Time stamp;\n     char *image;\n     int is_new;\n   } camera_image_t;"
+        },
+        {
+          "sha": "d34598b70c521900efb3fe0cd4017ff85622922d",
+          "filename": "src/usb_cam.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/ddc19f26fed47ab4ff4e9c626ef1b3ae2cfeb753/src%2Fusb_cam.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/ddc19f26fed47ab4ff4e9c626ef1b3ae2cfeb753/src%2Fusb_cam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam.cpp?ref=ddc19f26fed47ab4ff4e9c626ef1b3ae2cfeb753",
+          "patch": "@@ -1084,7 +1084,7 @@ void UsbCam::grab_image(sensor_msgs::Image* msg)\n   // grab the image\n   grab_image();\n   // stamp the image\n-  msg->header.stamp = ros::Time::now();\n+  msg->header.stamp = image_->stamp;\n   // fill the info\n   if (monochrome_)\n   {\n@@ -1112,6 +1112,7 @@ void UsbCam::grab_image()\n   tv.tv_usec = 0;\n \n   r = select(fd_ + 1, &fds, NULL, NULL, &tv);\n+  image_->stamp = ros::Time::now();\n \n   if (-1 == r)\n   {"
+        }
+      ]
+    },
+    {
+      "author": "k-okada",
+      "date": "2017-05-14T09:28:24Z",
+      "sha": "f354a05138595e7467d0c23c481baec70547cbf8",
+      "message": "add ROS Orphaned Package Maintainers to maintainer tag",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "256978488d7bb03c3e0de3256f7b4eec0de05104",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/f354a05138595e7467d0c23c481baec70547cbf8/package.xml",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/f354a05138595e7467d0c23c481baec70547cbf8/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/package.xml?ref=f354a05138595e7467d0c23c481baec70547cbf8",
+          "patch": "@@ -4,6 +4,7 @@\n   <description>A ROS Driver for V4L USB Cameras</description>\n \n   <maintainer email=\"rctoris@wpi.edu\">Russell Toris</maintainer>\n+  <maintainer email=\"ros-orphaned-packages@googlegroups.com\">ROS Orphaned Package Maintainers</maintainer>\n   <author email=\"benjamin.pitzer@bosch.com\">Benjamin Pitzer</author>\n \n   <license>BSD</license>"
+        }
+      ]
+    },
+    {
+      "author": "rctoris",
+      "date": "2014-05-28T15:49:20Z",
+      "sha": "8e414f8b7e88beade7ddd6cc89e013020ab43f92",
+      "message": "Merge pull request #5 from FriedCircuits/hydro-devel\n\nRemove requirments for self_test",
+      "files_changed": 3,
+      "additions": 2,
+      "deletions": 6,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e441e68068e5a98d00f3a87d20309def239499bf",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 2,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/8e414f8b7e88beade7ddd6cc89e013020ab43f92/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/8e414f8b7e88beade7ddd6cc89e013020ab43f92/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/CMakeLists.txt?ref=8e414f8b7e88beade7ddd6cc89e013020ab43f92",
+          "patch": "@@ -6,7 +6,6 @@ find_package(catkin\n \t\troscpp \n \t\tstd_msgs \n \t\tsensor_msgs \n-\t\tself_test\n         camera_info_manager)\n \n \n@@ -21,7 +20,6 @@ catkin_package(\n \t\troscpp \n \t\tstd_msgs \n \t\tsensor_msgs\n-\t\tself_test\n         camera_info_manager\n )\n "
+        },
+        {
+          "sha": "b7eaebad943b5163a2e0da266dd39b2db6208ae3",
+          "filename": "nodes/usb_cam_node.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/8e414f8b7e88beade7ddd6cc89e013020ab43f92/nodes%2Fusb_cam_node.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/8e414f8b7e88beade7ddd6cc89e013020ab43f92/nodes%2Fusb_cam_node.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/nodes%2Fusb_cam_node.cpp?ref=8e414f8b7e88beade7ddd6cc89e013020ab43f92",
+          "patch": "@@ -39,7 +39,7 @@\n #include <ros/ros.h>\n #include <sensor_msgs/fill_image.h>\n #include <usb_cam/usb_cam.h>\n-#include <self_test/self_test.h>\n+//#include <self_test/self_test.h>\n #include <image_transport/image_transport.h>\n \n #include <camera_info_manager/camera_info_manager.h>"
+        },
+        {
+          "sha": "3c41ddfac17ba23e629eb1b08c132479777153e5",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 3,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/8e414f8b7e88beade7ddd6cc89e013020ab43f92/package.xml",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/8e414f8b7e88beade7ddd6cc89e013020ab43f92/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/package.xml?ref=8e414f8b7e88beade7ddd6cc89e013020ab43f92",
+          "patch": "@@ -1,6 +1,6 @@\n <package>\n   <name>usb_cam</name>\n-  <version>0.1.3</version>\n+  <version>0.1.4</version>\n   <description>A generic driver for USB camera that are supported by V4L</description>\n \n   <license>BSD</license>\n@@ -18,15 +18,13 @@\n   <build_depend>roscpp</build_depend> \n   <build_depend>std_msgs</build_depend> \n   <build_depend>sensor_msgs</build_depend> \n-  <build_depend>self_test</build_depend> \n   <build_depend>ffmpeg</build_depend>\n   <build_depend>camera_info_manager</build_depend>\n \n   <run_depend>image_transport</run_depend> \n   <run_depend>roscpp</run_depend> \n   <run_depend>std_msgs</run_depend> \n   <run_depend>sensor_msgs</run_depend> \n-  <run_depend>self_test</run_depend> \n   <run_depend>ffmpeg</run_depend>\n   <run_depend>camera_info_manager</run_depend>\n "
+        }
+      ]
+    },
+    {
+      "author": "Daniel Seifert",
+      "date": "2016-09-19T08:49:05Z",
+      "sha": "00becba3b2286a928d2c2af9311fa9d8e3c23685",
+      "message": "replace use of deprecated functions in newer ffmpeg/libav versions\n\nffmpeg/libav 55.x (used in ROS Kinetic) deprecated the avcodec_alloc_frame.",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "1e031e8f31cdd630d899faffec056c20f4b87919",
+          "filename": "src/usb_cam.cpp",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/00becba3b2286a928d2c2af9311fa9d8e3c23685/src%2Fusb_cam.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/00becba3b2286a928d2c2af9311fa9d8e3c23685/src%2Fusb_cam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam.cpp?ref=00becba3b2286a928d2c2af9311fa9d8e3c23685",
+          "patch": "@@ -375,8 +375,13 @@ int UsbCam::init_mjpeg_decoder(int image_width, int image_height)\n   }\n \n   avcodec_context_ = avcodec_alloc_context3(avcodec_);\n+#if LIBAVCODEC_VERSION_MAJOR < 55\n   avframe_camera_ = avcodec_alloc_frame();\n   avframe_rgb_ = avcodec_alloc_frame();\n+#else\n+  avframe_camera_ = av_frame_alloc();\n+  avframe_rgb_ = av_frame_alloc();\n+#endif\n \n   avpicture_alloc((AVPicture *)avframe_rgb_, PIX_FMT_RGB24, image_width, image_height);\n "
+        }
+      ]
+    },
+    {
+      "author": "honeytrap15",
+      "date": "2016-02-03T11:16:28Z",
+      "sha": "fc6258035decab451dfcf73baee02d6f7b57294a",
+      "message": "Add grey scale pixel format.",
+      "files_changed": 2,
+      "additions": 10,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "05347fbcd0a51aed15285d603b683c7defc145dd",
+          "filename": "include/usb_cam/usb_cam.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/fc6258035decab451dfcf73baee02d6f7b57294a/include%2Fusb_cam%2Fusb_cam.h",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/fc6258035decab451dfcf73baee02d6f7b57294a/include%2Fusb_cam%2Fusb_cam.h",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/include%2Fusb_cam%2Fusb_cam.h?ref=fc6258035decab451dfcf73baee02d6f7b57294a",
+          "patch": "@@ -68,7 +68,7 @@ class UsbCam {\n \n   typedef enum\n   {\n-    PIXEL_FORMAT_YUYV, PIXEL_FORMAT_UYVY, PIXEL_FORMAT_MJPEG, PIXEL_FORMAT_YUVMONO10, PIXEL_FORMAT_RGB24, PIXEL_FORMAT_UNKNOWN\n+    PIXEL_FORMAT_YUYV, PIXEL_FORMAT_UYVY, PIXEL_FORMAT_MJPEG, PIXEL_FORMAT_YUVMONO10, PIXEL_FORMAT_RGB24, PIXEL_FORMAT_GREY, PIXEL_FORMAT_UNKNOWN\n   } pixel_format;\n \n   UsbCam();"
+        },
+        {
+          "sha": "bc498486f9235c16156f4621d121ad8e48415d4d",
+          "filename": "src/usb_cam.cpp",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 0,
+          "changes": 9,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/fc6258035decab451dfcf73baee02d6f7b57294a/src%2Fusb_cam.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/fc6258035decab451dfcf73baee02d6f7b57294a/src%2Fusb_cam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam.cpp?ref=fc6258035decab451dfcf73baee02d6f7b57294a",
+          "patch": "@@ -473,6 +473,8 @@ void UsbCam::process_image(const void * src, int len, camera_image_t *dest)\n     mjpeg2rgb((char*)src, len, dest->image, dest->width * dest->height);\n   else if (pixelformat_ == V4L2_PIX_FMT_RGB24)\n     rgb242rgb((char*)src, dest->image, dest->width * dest->height);\n+  else if (pixelformat_ == V4L2_PIX_FMT_GREY)\n+    memcpy(dest->image, (char*)src, dest->width * dest->height);\n }\n \n int UsbCam::read_frame()\n@@ -1022,6 +1024,11 @@ void UsbCam::start(const std::string& dev, io_method io_method,\n   {\n     pixelformat_ = V4L2_PIX_FMT_RGB24;\n   }\n+  else if (pixel_format == PIXEL_FORMAT_GREY)\n+  {\n+    pixelformat_ = V4L2_PIX_FMT_GREY;\n+    monochrome_ = true;\n+  }\n   else\n   {\n     ROS_ERROR(\"Unknown pixel format.\");\n@@ -1226,6 +1233,8 @@ UsbCam::pixel_format UsbCam::pixel_format_from_string(const std::string& str)\n       return PIXEL_FORMAT_YUVMONO10;\n     else if (str == \"rgb24\")\n       return PIXEL_FORMAT_RGB24;\n+    else if (str == \"grey\")\n+      return PIXEL_FORMAT_GREY;\n     else\n       return PIXEL_FORMAT_UNKNOWN;\n }"
+        }
+      ]
+    },
+    {
+      "author": "ludusrusso",
+      "date": "2016-01-19T09:55:02Z",
+      "sha": "6ae47bab49383dd34d4ab7ef01c6056fb93ec0ff",
+      "message": "add capture service",
+      "files_changed": 4,
+      "additions": 47,
+      "deletions": 5,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "be662c4da136f2230f386e745022790cb1812790",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/6ae47bab49383dd34d4ab7ef01c6056fb93ec0ff/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/6ae47bab49383dd34d4ab7ef01c6056fb93ec0ff/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/CMakeLists.txt?ref=6ae47bab49383dd34d4ab7ef01c6056fb93ec0ff",
+          "patch": "@@ -4,7 +4,7 @@ project(usb_cam)\n ## Find catkin macros and libraries\n ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)\n ## is used, also find other catkin packages\n-find_package(catkin REQUIRED COMPONENTS image_transport roscpp std_msgs sensor_msgs camera_info_manager)\n+find_package(catkin REQUIRED COMPONENTS image_transport roscpp std_msgs std_srvs sensor_msgs camera_info_manager)\n \n ## pkg-config libraries\n find_package(PkgConfig REQUIRED)"
+        },
+        {
+          "sha": "8ff177b0290de1371c5de98603aca27b2efabc3a",
+          "filename": "include/usb_cam/usb_cam.h",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 2,
+          "changes": 7,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/6ae47bab49383dd34d4ab7ef01c6056fb93ec0ff/include%2Fusb_cam%2Fusb_cam.h",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/6ae47bab49383dd34d4ab7ef01c6056fb93ec0ff/include%2Fusb_cam%2Fusb_cam.h",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/include%2Fusb_cam%2Fusb_cam.h?ref=6ae47bab49383dd34d4ab7ef01c6056fb93ec0ff",
+          "patch": "@@ -93,6 +93,10 @@ class UsbCam {\n   static io_method io_method_from_string(const std::string& str);\n   static pixel_format pixel_format_from_string(const std::string& str);\n \n+  void stop_capturing(void);\n+  void start_capturing(void);\n+  bool is_capturing();\n+\n  private:\n   typedef struct\n   {\n@@ -115,8 +119,6 @@ class UsbCam {\n   void mjpeg2rgb(char *MJPEG, int len, char *RGB, int NumPixels);\n   void process_image(const void * src, int len, camera_image_t *dest);\n   int read_frame();\n-  void stop_capturing(void);\n-  void start_capturing(void);\n   void uninit_device(void);\n   void init_read(unsigned int buffer_size);\n   void init_mmap(void);\n@@ -125,6 +127,7 @@ class UsbCam {\n   void close_device(void);\n   void open_device(void);\n   void grab_image();\n+  bool is_capturing_;\n \n \n   std::string camera_dev_;"
+        },
+        {
+          "sha": "2b4686e0fae80b333936fca10fc20dbe796af5be",
+          "filename": "nodes/usb_cam_node.cpp",
+          "status": "modified",
+          "additions": 35,
+          "deletions": 2,
+          "changes": 37,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/6ae47bab49383dd34d4ab7ef01c6056fb93ec0ff/nodes%2Fusb_cam_node.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/6ae47bab49383dd34d4ab7ef01c6056fb93ec0ff/nodes%2Fusb_cam_node.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/nodes%2Fusb_cam_node.cpp?ref=6ae47bab49383dd34d4ab7ef01c6056fb93ec0ff",
+          "patch": "@@ -39,6 +39,7 @@\n #include <image_transport/image_transport.h>\n #include <camera_info_manager/camera_info_manager.h>\n #include <sstream>\n+#include <std_srvs/Empty.h>\n \n namespace usb_cam {\n \n@@ -54,13 +55,32 @@ class UsbCamNode\n \n   // parameters\n   std::string video_device_name_, io_method_name_, pixel_format_name_, camera_name_, camera_info_url_;\n+  //std::string start_service_name_, start_service_name_;\n+  bool streaming_status_;\n   int image_width_, image_height_, framerate_, exposure_, brightness_, contrast_, saturation_, sharpness_, focus_,\n       white_balance_, gain_;\n   bool autofocus_, autoexposure_, auto_white_balance_;\n   boost::shared_ptr<camera_info_manager::CameraInfoManager> cinfo_;\n \n   UsbCam cam_;\n \n+  ros::ServiceServer service_start_, service_stop_;\n+\n+\n+\n+  bool service_start_cap(std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res )\n+  {\n+    cam_.start_capturing();\n+    return true;\n+  }\n+\n+\n+  bool service_stop_cap( std_srvs::Empty::Request  &req, std_srvs::Empty::Response &res )\n+  {\n+    cam_.stop_capturing();\n+    return true;\n+  }\n+\n   UsbCamNode() :\n       node_(\"~\")\n   {\n@@ -97,6 +117,11 @@ class UsbCamNode\n     node_.param(\"camera_name\", camera_name_, std::string(\"head_camera\"));\n     node_.param(\"camera_info_url\", camera_info_url_, std::string(\"\"));\n     cinfo_.reset(new camera_info_manager::CameraInfoManager(node_, camera_name_, camera_info_url_));\n+\n+    // create Services\n+    service_start_ = node_.advertiseService(\"start_capture\", &UsbCamNode::service_start_cap, this);\n+    service_stop_ = node_.advertiseService(\"stop_capture\", &UsbCamNode::service_stop_cap, this);\n+\n     // check for default camera info\n     if (!cinfo_->isCalibrated())\n     {\n@@ -222,13 +247,21 @@ class UsbCamNode\n     ros::Rate loop_rate(this->framerate_);\n     while (node_.ok())\n     {\n-      if (!take_and_send_image())\n-        ROS_WARN(\"USB camera did not respond in time.\");\n+      if (cam_.is_capturing()) {\n+        if (!take_and_send_image()) ROS_WARN(\"USB camera did not respond in time.\");\n+      }\n       ros::spinOnce();\n       loop_rate.sleep();\n+\n     }\n     return true;\n   }\n+\n+\n+\n+\n+\n+\n };\n \n }"
+        },
+        {
+          "sha": "9349f990bb63d41de5ebd92e8eea3ecfab9500e0",
+          "filename": "src/usb_cam.cpp",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/6ae47bab49383dd34d4ab7ef01c6056fb93ec0ff/src%2Fusb_cam.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/6ae47bab49383dd34d4ab7ef01c6056fb93ec0ff/src%2Fusb_cam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam.cpp?ref=6ae47bab49383dd34d4ab7ef01c6056fb93ec0ff",
+          "patch": "@@ -578,8 +578,13 @@ int UsbCam::read_frame()\n   return 1;\n }\n \n+bool UsbCam::is_capturing() {\n+  return is_capturing_;\n+}\n+\n void UsbCam::stop_capturing(void)\n {\n+  is_capturing_ = false;\n   enum v4l2_buf_type type;\n \n   switch (io_)\n@@ -656,6 +661,7 @@ void UsbCam::start_capturing(void)\n \n       break;\n   }\n+  is_capturing_ = true;\n }\n \n void UsbCam::uninit_device(void)"
+        }
+      ]
+    },
+    {
+      "author": "ezavesky",
+      "date": "2015-11-10T13:23:59Z",
+      "sha": "0af62e315175a980629b86ed00d6a5851c159318",
+      "message": "- fix bug for byte count in a pixel (3 bytes not 24 bytes)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e0775e5c3351f5e5b9d22492617cf9a68acd40e2",
+          "filename": "src/usb_cam.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/0af62e315175a980629b86ed00d6a5851c159318/src%2Fusb_cam.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/0af62e315175a980629b86ed00d6a5851c159318/src%2Fusb_cam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam.cpp?ref=0af62e315175a980629b86ed00d6a5851c159318",
+          "patch": "@@ -1025,7 +1025,7 @@ void UsbCam::start(const std::string& dev, io_method io_method,\n \n   image_->width = image_width;\n   image_->height = image_height;\n-  image_->bytes_per_pixel = 24;\n+  image_->bytes_per_pixel = 3;      //corrected 11/10/15 (BYTES not BITS per pixel)\n \n   image_->image_size = image_->width * image_->height * image_->bytes_per_pixel;\n   image_->is_new = 0;"
+        }
+      ]
+    },
+    {
+      "author": "Russell Toris",
+      "date": "2013-05-01T17:31:09Z",
+      "sha": "279f7f33c728329aa5e34425c14c8a4f3ffc68eb",
+      "message": "inital merge",
+      "files_changed": 9,
+      "additions": 0,
+      "deletions": 192,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "1e3d4554af88ae5acb60c4c157815c7015dc7f29",
+          "filename": "CLONE_SETUP.sh",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 20,
+          "changes": 20,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/f45bbc6f0db6f0b8f3f879cad48fca84c41318c9/CLONE_SETUP.sh",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/f45bbc6f0db6f0b8f3f879cad48fca84c41318c9/CLONE_SETUP.sh",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/CLONE_SETUP.sh?ref=f45bbc6f0db6f0b8f3f879cad48fca84c41318c9",
+          "patch": "@@ -1,20 +0,0 @@\n-#Build Ros\n-#git clone git://github.com/agcooke/roshome.git\n-roscd roshome/\n-cat .rosinstall | sed 's|git@github.com:agcooke/|git://github.com/agcooke/|g' > .rosinstall.tmp\n-mv .rosinstall.tmp .rosinstall\n-rosws update\n-cd src/ar_track_alvar\n-git pull origin groovy-devel\n-roscd\n-catkin_make\n-#Enter VirtualEnv\n-mkvirtualenv sofie --system-site-packages\n-workon sofie\n-#Required to compile PyTables and pythoncard is needed for the GUI.\n-sudo aptitude install libhdf5-serial-dev pythoncard\n-#Install Python Packages. (This should be taken care of with pip).\n-#They will fail but run them again until all dependencies are taken care of.\n-pip install -e git+git://github.com/uvemas/ViTables#egg=vitables\n-pip install -e git+git://github.com/agcooke/Sofie-HDF-Format.git#egg=sofiehdfformat --upgrade\n-pip install -e git+git://github.com/agcooke/ExperimentControl.git#egg=experimentcontrol --upgrade"
+        },
+        {
+          "sha": "f8572988dbffed342750d191765971d0fedb3992",
+          "filename": "CMakeLists.txt",
+          "status": "renamed",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/279f7f33c728329aa5e34425c14c8a4f3ffc68eb/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/279f7f33c728329aa5e34425c14c8a4f3ffc68eb/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/CMakeLists.txt?ref=279f7f33c728329aa5e34425c14c8a4f3ffc68eb",
+          "previous_filename": "src/usb_cam/CMakeLists.txt"
+        },
+        {
+          "sha": "484cd50302120714b01b4b677294c5cfa3f3ea7a",
+          "filename": "README.md",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 162,
+          "changes": 162,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/f45bbc6f0db6f0b8f3f879cad48fca84c41318c9/README.md",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/f45bbc6f0db6f0b8f3f879cad48fca84c41318c9/README.md",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/README.md?ref=f45bbc6f0db6f0b8f3f879cad48fca84c41318c9",
+          "patch": "@@ -1,162 +0,0 @@\n-Ros Home - Sofie Bicycle Setup.\n-=======\n-\n-This document describes how to install the bicycle stability test bench on an Ubuntu machine.\n-\n-The system is built using (ROS)[http://www.ros.org/wiki/], SOFIE HDF FORMAT. \n-There is also a package created for working with experiments.\n-### Download and install (Ubuntu)[http://releases.ubuntu.com/precise/]\n-\n-1. Create usb install disk from the download iso: The best Ubuntu version to use for now is\n-Ubuntu 12.04.\n-\n-     $sudo usb-disk-creator\n-\n-2. Boot the USB stick in the new computer and install from the menu on the new computer.\n-3. Setup EDUROAM: (UT Eduroam setup)[http://www.utwente.nl/icts/en/handleidingen/netwerk/]\n-4. Open a terminal\n-\n-Make sure the new user gets permanent SUDO rights.\n-\n-\t$ sudo su\n-\t$ visudo\n-\t\n-Add the user that you chose to the suders list then hit\tCTRL+D. Install essential services\n-\n-### Install required packages, update server and reboot.\n-\t\n-\t$ sudo apt-get install aptitude git openssh-server python-pip pythoncard\n-\t$ sudo aptitude update\n-\t$ sudo aptitude safe-upgrade\n-\t$ sudo reboot\n-\t\n-### INSTALL VIRTUALENVWRAPPER.\n-Then use virtualenv to manage the installation. Install: \n-(http://www.doughellmann.com/projects/virtualenvwrapper/)\n-\t\n-\t$ sudo pip install virtualenvwrapper\n-\t\n-### Install ros.\n-\t\n-Then install ROS, follow the instructions on the ROS website to add the repository for ubuntu.\n-ROS (install)[http://www.ros.org/wiki/groovy/Installation/Ubuntu]\n-\n-Install it from repository (groovy is stable).\n-\t\n-\t\n-    $ sudo aptitude install ros-groovy-desktop ros-groovy-image-view ros-groovy-rosserial python-rosinstall    \n-\n-\n-Edit your ~/.bashrc (this is common to all ROS installs, make sure that there are no spaces\n-before the commands in the .bashrc file.):\n-\n-     source /opt/ros/groovy/setup.bash\n-     export ROS_WORKSPACE=/home/${USER}/roshome/\n-     export ROS_PACKAGE_PATH=$ROS_WORKSPACE:$ROS_PACKAGE_PATH\n-     export ROS_HOSTNAME=127.0.0.1\n-     export ROS_MASTER_URI=http://127.0.0.1:11311\n-     export WORKON_HOME=~/Envs\n-     source /usr/local/bin/virtualenvwrapper.sh\n-     \n-Clean and install the correct packages:\n-\n-\t$ source ~/.bashrc\n-    $ sudo rosdep init\n-    $ rosdep update\n-    \n-### Download and install SOFIE ROS.\n-\n-\t$ cd ~/\n-\t$ git clone git://github.com/agcooke/roshome.git\n-\t$ roscd\n-\t\n-Get the correct groovy branch for ar_track_alvar. This could change later.\n-\n-Install the packages until tables installed correctly. Move out of the roshome directory then run:\n-\n-\t$ sh CLONE\\_SETUP.sh\n-\n-The above script will fail. Run the last three lines again, and again\n-installing dependencies until it works. The last three lines will fail,\n-what you need to do is rerun ¨sudo pip install tables\", fixing the missing\n-missing pip/python dependencies until tables is installed. Then install\n-the sofiehdfformat package (near end of the CLONE_SETUP.sh file.)\n-\t\n-\t$ roscd\n-\t$ catkin_make\n-\t$ source devel/setup.sh \n-\t\n-\n-### Install the Promove GUI information.\n-Now install IMU software to work with the Intertia Technology devices:\n-\n-There are two ways to do this:\n-for the quick:\n-\n- \t$ sudo dpkg -i promovegui_1.26+svn1003-1_all.deb \n-\n-of a longer but more robust way:\n-\n-Edit the apt file to add a debian package:\n-\n-    $sudo vi /etc/apt/sources.list\n-\n-Then add the following lines\n-\n-    def file:///home/${USER}/ExtraDebPackages/ /\n-\n-Then make the directory \n-\n-    $ mkdir /home/${USER}/ExtraDebPackages/\n-\n-Copy the latest promovegui debian file to this directory.\n-Then clone bashsnippets:\n-\n-    $ mdir ~/workspace\n-    $ cd ~/workspace\n-    $ git clone git://github.com/agcooke/bashsnippets.git\n-    $ cp bashsnippets/deb/CreatePackages /home/${USER}/ExtraDebPackages/\n-    $ sudo sh CreatePackages\n-    $ sudo aptitude update\n-    $ sudo aptitude install promovegui\n-\n-### Setup USB permissions.\n-\n-The user needs write permission on the serial ports:\n-\n-    $sudo usermod ${USER} -G dialout\n-\n-You might have to log out and back in again to get the correct\n-permissions on the /dev/ttyUSB0 or /dev/ttyUSB1,2,3,4,... that PromoveGUI uses.\n-\n-### Run the system\n-Now everything is installed and ready to use.\n-\n-Move into our virtualenv:\n-\n-    $ workon sofie\n-    \n-Make sure ros environment is correcct:\n-\n-    $ source ~/roshome/devel/setup.sh\n-   \n-Then run the GUI.\n-    \n-    $ experiment-control-gui.py -h\n-    \n-To debug the video, when an experiment is running in the terminal:\n-\n-\t$ rosrun rviz rviz \n-\t\n-Open the config file for rviz which sites in the ~/roshome/src/sofie_ros/ folder.\n-To debug the Arduino run\n-\n-\t$ rostopic echo /angle\n-\t\n-To ge the ProMoveGUI working we need to set the nodes connected to the wireless network,\n-each time we restart the program.\n-\n-\t$ProMoveGUI -m 2\n-\t\n-Then start to Capture data. Go to Options->Configuration->Wireless and set maximum number\n-of notes to 13 for the Gateway and the Nodes."
+        },
+        {
+          "sha": "34ad68c976ee1428c5fbe40666167af678d182a4",
+          "filename": "UPDATE_PROJECT.sh",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 10,
+          "changes": 10,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/f45bbc6f0db6f0b8f3f879cad48fca84c41318c9/UPDATE_PROJECT.sh",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/f45bbc6f0db6f0b8f3f879cad48fca84c41318c9/UPDATE_PROJECT.sh",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/UPDATE_PROJECT.sh?ref=f45bbc6f0db6f0b8f3f879cad48fca84c41318c9",
+          "patch": "@@ -1,10 +0,0 @@\n-#!/bin/bash\n-git pull origin master\n-cat .rosinstall | sed 's|git@github.com:agcooke/|git://github.com/agcooke/|g' > .rosinstall.tmp\n-mv .rosinstall.tmp .rosinstall\n-rosws update\n-catkin_make\n-source devel/setup.sh \n-workon sofie\n-pip install -e git+git://github.com/agcooke/Sofie-HDF-Format.git#egg=sofiehdfformat --upgrade\n-pip install -e git+git://github.com/agcooke/ExperimentControl.git#egg=experimentcontrol --upgrade\n\\ No newline at end of file"
+        },
+        {
+          "sha": "ef8617d8b183e44412216567fdd78ad642e6ba87",
+          "filename": "include/usb_cam/usb_cam.h",
+          "status": "renamed",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/279f7f33c728329aa5e34425c14c8a4f3ffc68eb/include%2Fusb_cam%2Fusb_cam.h",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/279f7f33c728329aa5e34425c14c8a4f3ffc68eb/include%2Fusb_cam%2Fusb_cam.h",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/include%2Fusb_cam%2Fusb_cam.h?ref=279f7f33c728329aa5e34425c14c8a4f3ffc68eb",
+          "previous_filename": "src/usb_cam/include/usb_cam/usb_cam.h"
+        },
+        {
+          "sha": "00fbe7ad95a7a547561cc1869ac373456a8132b1",
+          "filename": "nodes/usb_cam_node.cpp",
+          "status": "renamed",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/279f7f33c728329aa5e34425c14c8a4f3ffc68eb/nodes%2Fusb_cam_node.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/279f7f33c728329aa5e34425c14c8a4f3ffc68eb/nodes%2Fusb_cam_node.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/nodes%2Fusb_cam_node.cpp?ref=279f7f33c728329aa5e34425c14c8a4f3ffc68eb",
+          "previous_filename": "src/usb_cam/nodes/usb_cam_node.cpp"
+        },
+        {
+          "sha": "d2480cd3eb2d1d950979a7ee53bc579922b97c80",
+          "filename": "package.xml",
+          "status": "renamed",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/279f7f33c728329aa5e34425c14c8a4f3ffc68eb/package.xml",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/279f7f33c728329aa5e34425c14c8a4f3ffc68eb/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/package.xml?ref=279f7f33c728329aa5e34425c14c8a4f3ffc68eb",
+          "previous_filename": "src/usb_cam/package.xml"
+        },
+        {
+          "sha": "3fee832a2d54ab6162c1ba9a5adf402246a651c1",
+          "filename": "src/LICENSE",
+          "status": "renamed",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/279f7f33c728329aa5e34425c14c8a4f3ffc68eb/src%2FLICENSE",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/279f7f33c728329aa5e34425c14c8a4f3ffc68eb/src%2FLICENSE",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2FLICENSE?ref=279f7f33c728329aa5e34425c14c8a4f3ffc68eb",
+          "previous_filename": "src/usb_cam/LICENSE"
+        },
+        {
+          "sha": "76419009f0b14962cdc69f281a388c49896fe75c",
+          "filename": "src/usb_cam.cpp",
+          "status": "renamed",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/279f7f33c728329aa5e34425c14c8a4f3ffc68eb/src%2Fusb_cam.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/279f7f33c728329aa5e34425c14c8a4f3ffc68eb/src%2Fusb_cam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam.cpp?ref=279f7f33c728329aa5e34425c14c8a4f3ffc68eb",
+          "previous_filename": "src/usb_cam/src/usb_cam.cpp"
+        }
+      ]
+    },
+    {
+      "author": "tzutalin",
+      "date": "2015-07-02T08:33:46Z",
+      "sha": "d501938edc7e0244537d23839148e2e0c4a32aec",
+      "message": "Add a launch file for easy test",
+      "files_changed": 1,
+      "additions": 14,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "b061f91a79961b45b5ed89eef7a986cf559c6c6c",
+          "filename": "launch/usb_cam-test.launch",
+          "status": "added",
+          "additions": 14,
+          "deletions": 0,
+          "changes": 14,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/d501938edc7e0244537d23839148e2e0c4a32aec/launch%2Fusb_cam-test.launch",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/d501938edc7e0244537d23839148e2e0c4a32aec/launch%2Fusb_cam-test.launch",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/launch%2Fusb_cam-test.launch?ref=d501938edc7e0244537d23839148e2e0c4a32aec",
+          "patch": "@@ -0,0 +1,14 @@\n+<launch>\n+  <node name=\"usb_cam\" pkg=\"usb_cam\" type=\"usb_cam_node\" output=\"screen\" >\n+    <param name=\"video_device\" value=\"/dev/video0\" />\n+    <param name=\"image_width\" value=\"640\" />\n+    <param name=\"image_height\" value=\"480\" />\n+    <param name=\"pixel_format\" value=\"yuyv\" />\n+    <param name=\"camera_frame_id\" value=\"usb_cam\" />\n+    <param name=\"io_method\" value=\"mmap\"/>\n+  </node>\n+  <node name=\"image_view\" pkg=\"image_view\" type=\"image_view\" respawn=\"false\" output=\"screen\">\n+    <remap from=\"image\" to=\"/usb_cam/image_raw\"/>\n+    <param name=\"autosize\" value=\"true\" />\n+  </node>\n+</launch>"
+        }
+      ]
+    },
+    {
+      "author": "jsarrett",
+      "date": "2015-05-12T06:57:02Z",
+      "sha": "3e20f915645640768423768fe766c44eaaf1414d",
+      "message": "add gain parameter",
+      "files_changed": 1,
+      "additions": 7,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "3814d288898f3e37d3116b47bdcc16b80764805b",
+          "filename": "nodes/usb_cam_node.cpp",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 1,
+          "changes": 8,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/3e20f915645640768423768fe766c44eaaf1414d/nodes%2Fusb_cam_node.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/3e20f915645640768423768fe766c44eaaf1414d/nodes%2Fusb_cam_node.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/nodes%2Fusb_cam_node.cpp?ref=3e20f915645640768423768fe766c44eaaf1414d",
+          "patch": "@@ -55,7 +55,7 @@ class UsbCamNode\n   // parameters\n   std::string video_device_name_, io_method_name_, pixel_format_name_, camera_name_, camera_info_url_;\n   int image_width_, image_height_, framerate_, exposure_, brightness_, contrast_, saturation_, sharpness_, focus_,\n-      white_balance_;\n+      white_balance_, gain_;\n   bool autofocus_, autoexposure_, auto_white_balance_;\n   boost::shared_ptr<camera_info_manager::CameraInfoManager> cinfo_;\n \n@@ -87,6 +87,7 @@ class UsbCamNode\n     // enable/disable autoexposure\n     node_.param(\"autoexposure\", autoexposure_, true);\n     node_.param(\"exposure\", exposure_, 100);\n+    node_.param(\"gain\", gain_, -1); //0-100?, -1 \"leave alone\"\n     // enable/disable auto white balance temperature\n     node_.param(\"auto_white_balance\", auto_white_balance_, true);\n     node_.param(\"white_balance\", white_balance_, 4000);\n@@ -154,6 +155,11 @@ class UsbCamNode\n       cam_.set_v4l_parameter(\"sharpness\", sharpness_);\n     }\n \n+    if (gain_ >= 0)\n+    {\n+      cam_.set_v4l_parameter(\"gain\", gain_);\n+    }\n+\n     // check auto white balance\n     if (auto_white_balance_)\n     {"
+        }
+      ]
+    },
+    {
+      "author": "eliasm",
+      "date": "2015-03-17T18:50:36Z",
+      "sha": "b101dd18b2e0bf1feb49dbd83ee8f1b244c38dd0",
+      "message": "fixed check whether calibration file exists",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "cb2ad6f5c0b0b4c279ad84113bcf5026d94c1cee",
+          "filename": "nodes/usb_cam_node.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/b101dd18b2e0bf1feb49dbd83ee8f1b244c38dd0/nodes%2Fusb_cam_node.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/b101dd18b2e0bf1feb49dbd83ee8f1b244c38dd0/nodes%2Fusb_cam_node.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/nodes%2Fusb_cam_node.cpp?ref=b101dd18b2e0bf1feb49dbd83ee8f1b244c38dd0",
+          "patch": "@@ -97,7 +97,7 @@ class UsbCamNode\n     node_.param(\"camera_info_url\", camera_info_url_, std::string(\"\"));\n     cinfo_.reset(new camera_info_manager::CameraInfoManager(node_, camera_name_, camera_info_url_));\n     // check for default camera info\n-    if (camera_info_url_.size() == 0)\n+    if (!cinfo_->isCalibrated())\n     {\n       cinfo_->setCameraName(video_device_name_);\n       sensor_msgs::CameraInfo camera_info;"
+        }
+      ]
+    },
+    {
+      "author": "kmhallen",
+      "date": "2015-02-20T15:06:40Z",
+      "sha": "1012479a6fd4150b2eb2bad89b041c01cbe7bb92",
+      "message": "Publish YUVMONO10 images as mono8 instead of rgb8",
+      "files_changed": 1,
+      "additions": 15,
+      "deletions": 10,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "64c8d14768b2e5f33175c0adfa4cc4e4376eadc2",
+          "filename": "src/usb_cam.cpp",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 10,
+          "changes": 25,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/1012479a6fd4150b2eb2bad89b041c01cbe7bb92/src%2Fusb_cam.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/1012479a6fd4150b2eb2bad89b041c01cbe7bb92/src%2Fusb_cam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam.cpp?ref=1012479a6fd4150b2eb2bad89b041c01cbe7bb92",
+          "patch": "@@ -314,16 +314,13 @@ void uyvy2rgb(char *YUV, char *RGB, int NumPixels)\n   }\n }\n \n-static void mono102rgb(char *RAW, char *RGB, int NumPixels)\n+static void mono102mono8(char *RAW, char *MONO, int NumPixels)\n {\n   int i, j;\n-  for (i = 0, j = 0; i < (NumPixels << 1); i += 2, j += 3)\n+  for (i = 0, j = 0; i < (NumPixels << 1); i += 2, j += 1)\n   {\n     //first byte is low byte, second byte is high byte; smash together and convert to 8-bit\n-    unsigned char grayval = ((RAW[i + 0] >> 2) & 0x3F) | ((RAW[i + 1] << 6) & 0xC0);\n-    RGB[j + 0] = grayval;\n-    RGB[j + 1] = grayval;\n-    RGB[j + 2] = grayval;\n+    MONO[j] = (unsigned char)(((RAW[i + 0] >> 2) & 0x3F) | ((RAW[i + 1] << 6) & 0xC0));\n   }\n }\n \n@@ -463,7 +460,7 @@ void UsbCam::process_image(const void * src, int len, camera_image_t *dest)\n   {\n     if (monochrome_)\n     { //actually format V4L2_PIX_FMT_Y16, but xioctl gets unhappy if you don't use the advertised type (yuyv)\n-      mono102rgb((char*)src, dest->image, dest->width * dest->height);\n+      mono102mono8((char*)src, dest->image, dest->width * dest->height);\n     }\n     else\n     {\n@@ -1063,11 +1060,19 @@ void UsbCam::grab_image(sensor_msgs::Image* msg)\n {\n   // grab the image\n   grab_image();\n-  // fill the info\n-  fillImage(*msg, \"rgb8\", image_->height, image_->width, 3 * image_->width,\n-\t    image_->image);\n   // stamp the image\n   msg->header.stamp = ros::Time::now();\n+  // fill the info\n+  if (monochrome_)\n+  {\n+    fillImage(*msg, \"mono8\", image_->height, image_->width, image_->width,\n+        image_->image);\n+  }\n+  else\n+  {\n+    fillImage(*msg, \"rgb8\", image_->height, image_->width, 3 * image_->width,\n+        image_->image);\n+  }\n }\n \n void UsbCam::grab_image()"
+        }
+      ]
+    },
+    {
+      "author": "Mitchell Wills",
+      "date": "2015-01-24T08:33:21Z",
+      "sha": "6c6662ce6f64221c34a3033f08dd0d1bf17a3df6",
+      "message": "Fix installation of header files",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "e4748286fc72a375b9089c89a752b274f6b47e6a",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/6c6662ce6f64221c34a3033f08dd0d1bf17a3df6/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/6c6662ce6f64221c34a3033f08dd0d1bf17a3df6/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/CMakeLists.txt?ref=6c6662ce6f64221c34a3033f08dd0d1bf17a3df6",
+          "patch": "@@ -60,7 +60,7 @@ install(TARGETS ${PROJECT_NAME}_node ${PROJECT_NAME}\n   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n )\n \n-install(DIRECTORY include/\n+install(DIRECTORY include/${PROJECT_NAME}/\n    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}\n    FILES_MATCHING PATTERN \"*.h\" PATTERN \"*.hpp\"\n )"
+        }
+      ]
+    },
+    {
+      "author": "blutack",
+      "date": "2014-12-01T17:21:13Z",
+      "sha": "736e87ccd75f0fbb6711e06421b1c2e4fc5bbe32",
+      "message": "Warn rather than error if framerate can't be set\n\nThe driver doesn't currently work with em28xx based devices as they don't allow the framerate to be set directly and the node exits with an error. Changing to a warning allows these devices to be used.",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "0f4950d28810cd6786598a5dad4fb2d142d92f04",
+          "filename": "src/usb_cam.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/736e87ccd75f0fbb6711e06421b1c2e4fc5bbe32/src%2Fusb_cam.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/736e87ccd75f0fbb6711e06421b1c2e4fc5bbe32/src%2Fusb_cam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam.cpp?ref=736e87ccd75f0fbb6711e06421b1c2e4fc5bbe32",
+          "patch": "@@ -953,7 +953,7 @@ static void init_device(int image_width, int image_height, int framerate)\n   stream_params.parm.capture.timeperframe.numerator = 1;\n   stream_params.parm.capture.timeperframe.denominator = framerate;\n   if (xioctl(fd, VIDIOC_S_PARM, &stream_params) < 0)\n-    errno_exit(\"Couldn't set camera framerate\\n\");\n+    ROS_WARN(\"Couldn't set camera framerate\\n\");\n   else\n     ROS_DEBUG(\"Set framerate to be %i\", framerate);\n "
+        }
+      ]
+    },
+    {
+      "author": "rjw57",
+      "date": "2014-11-18T16:21:06Z",
+      "sha": "8a1f6980cafa566066b5af72b9671f04240cf33a",
+      "message": "do not modify parameters unless explicitly set\n\nThe contrast, saturation, brightness, sharpness and focus parameters\nwere recently added to usb_cam. This caused a regression\n(sigproc/robotic_surgery#17) whereby the default settings for a webcam\nare overridden in all cases by the hard-coded defaults in usb_cam.\n\nIn the absence of a know good set of \"default\" values, leave the\nparameters unset unless the user has explicitly set them in the launch\nfile.",
+      "files_changed": 1,
+      "additions": 36,
+      "deletions": 19,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "0efe6ab26e49e81843e5ee42225b307a8ef8aef3",
+          "filename": "nodes/usb_cam_node.cpp",
+          "status": "modified",
+          "additions": 36,
+          "deletions": 19,
+          "changes": 55,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/8a1f6980cafa566066b5af72b9671f04240cf33a/nodes%2Fusb_cam_node.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/8a1f6980cafa566066b5af72b9671f04240cf33a/nodes%2Fusb_cam_node.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/nodes%2Fusb_cam_node.cpp?ref=8a1f6980cafa566066b5af72b9671f04240cf33a",
+          "patch": "@@ -68,10 +68,10 @@ class UsbCamNode\n \n     // grab the parameters\n     node_.param(\"video_device\", video_device_name_, std::string(\"/dev/video0\"));\n-    node_.param(\"brightness\", brightness_, 128); //0-255\n-    node_.param(\"contrast\", contrast_, 32); //0-255\n-    node_.param(\"saturation\", saturation_, 32); //0-255\n-    node_.param(\"sharpness\", sharpness_, 22); //0-255\n+    node_.param(\"brightness\", brightness_, -1); //0-255, -1 \"leave alone\"\n+    node_.param(\"contrast\", contrast_, -1); //0-255, -1 \"leave alone\"\n+    node_.param(\"saturation\", saturation_, -1); //0-255, -1 \"leave alone\"\n+    node_.param(\"sharpness\", sharpness_, -1); //0-255, -1 \"leave alone\"\n     // possible values: mmap, read, userptr\n     node_.param(\"io_method\", io_method_name_, std::string(\"mmap\"));\n     node_.param(\"image_width\", image_width_, 640);\n@@ -81,7 +81,7 @@ class UsbCamNode\n     node_.param(\"pixel_format\", pixel_format_name_, std::string(\"mjpeg\"));\n     // enable/disable autofocus\n     node_.param(\"autofocus\", autofocus_, false);\n-    node_.param(\"focus\", focus_, 51);\n+    node_.param(\"focus\", focus_, -1); //0-255, -1 \"leave alone\"\n     // enable/disable autoexposure\n     node_.param(\"autoexposure\", autoexposure_, true);\n     node_.param(\"exposure\", exposure_, 100);\n@@ -138,17 +138,32 @@ class UsbCamNode\n \n     // set camera parameters\n     std::stringstream paramstream;\n-    paramstream << \"brightness=\" << brightness_;\n-    this->set_v4l_parameters(video_device_name_, paramstream.str());\n-    paramstream.str(\"\");\n-    paramstream << \"contrast=\" << contrast_;\n-    this->set_v4l_parameters(video_device_name_, paramstream.str());\n-    paramstream.str(\"\");\n-    paramstream << \"saturation=\" << saturation_;\n-    this->set_v4l_parameters(video_device_name_, paramstream.str());\n-    paramstream.str(\"\");\n-    paramstream << \"sharpness=\" << sharpness_;\n-    this->set_v4l_parameters(video_device_name_, paramstream.str());\n+    if (brightness_ >= 0)\n+    {\n+      paramstream << \"brightness=\" << brightness_;\n+      this->set_v4l_parameters(video_device_name_, paramstream.str());\n+      paramstream.str(\"\");\n+    }\n+\n+    if (contrast_ >= 0)\n+    {\n+      paramstream << \"contrast=\" << contrast_;\n+      this->set_v4l_parameters(video_device_name_, paramstream.str());\n+      paramstream.str(\"\");\n+    }\n+\n+    if (saturation_ >= 0)\n+    {\n+      paramstream << \"saturation=\" << saturation_;\n+      this->set_v4l_parameters(video_device_name_, paramstream.str());\n+      paramstream.str(\"\");\n+    }\n+\n+    if (sharpness_ >= 0)\n+    {\n+      paramstream << \"sharpness=\" << sharpness_;\n+      this->set_v4l_parameters(video_device_name_, paramstream.str());\n+    }\n \n     // check auto white balance\n     if (auto_white_balance_)\n@@ -183,9 +198,11 @@ class UsbCamNode\n     else\n     {\n       this->set_v4l_parameters(video_device_name_, \"focus_auto=0\");\n-      std::stringstream ss;\n-      ss << \"focus_absolute=\" << focus_;\n-      this->set_v4l_parameters(video_device_name_, ss.str());\n+      if (focus_ >= 0) {\n+        std::stringstream ss;\n+        ss << \"focus_absolute=\" << focus_;\n+        this->set_v4l_parameters(video_device_name_, ss.str());\n+      }\n     }\n   }\n "
+        }
+      ]
+    },
+    {
+      "author": "dekent",
+      "date": "2014-10-28T19:25:18Z",
+      "sha": "8a9acfd5758724c2d8f32f7990e4611d16467102",
+      "message": "Added parameter setting for absolute focus, brightness, contrast, saturation, and sharpness",
+      "files_changed": 1,
+      "additions": 26,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "72d8435b7cec1267f9a18f5973c4a596d5fc95e4",
+          "filename": "nodes/usb_cam_node.cpp",
+          "status": "modified",
+          "additions": 26,
+          "deletions": 1,
+          "changes": 27,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/8a9acfd5758724c2d8f32f7990e4611d16467102/nodes%2Fusb_cam_node.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/8a9acfd5758724c2d8f32f7990e4611d16467102/nodes%2Fusb_cam_node.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/nodes%2Fusb_cam_node.cpp?ref=8a9acfd5758724c2d8f32f7990e4611d16467102",
+          "patch": "@@ -54,7 +54,7 @@ class UsbCamNode\n \n   // parameters\n   std::string video_device_name_, io_method_name_, pixel_format_name_, camera_name_, camera_info_url_;\n-  int image_width_, image_height_, framerate_, exposure_;\n+  int image_width_, image_height_, framerate_, exposure_, brightness_, contrast_, saturation_, sharpness_, focus_;\n   bool autofocus_, autoexposure_;\n   boost::shared_ptr<camera_info_manager::CameraInfoManager> cinfo_;\n \n@@ -67,6 +67,10 @@ class UsbCamNode\n \n     // grab the parameters\n     node_.param(\"video_device\", video_device_name_, std::string(\"/dev/video0\"));\n+    node_.param(\"brightness\", brightness_, 128); //0-255\n+    node_.param(\"contrast\", contrast_, 32); //0-255\n+    node_.param(\"saturation\", saturation_, 32); //0-255\n+    node_.param(\"sharpness\", sharpness_, 22); //0-255\n     // possible values: mmap, read, userptr\n     node_.param(\"io_method\", io_method_name_, std::string(\"mmap\"));\n     node_.param(\"image_width\", image_width_, 640);\n@@ -76,6 +80,7 @@ class UsbCamNode\n     node_.param(\"pixel_format\", pixel_format_name_, std::string(\"mjpeg\"));\n     // enable/disable autofocus\n     node_.param(\"autofocus\", autofocus_, false);\n+    node_.param(\"focus\", focus_, 51);\n     // enable/disable autoexposure\n     node_.param(\"autoexposure\", autoexposure_, true);\n     node_.param(\"exposure\", exposure_, 100);\n@@ -127,12 +132,32 @@ class UsbCamNode\n     camera_image_ = usb_cam_camera_start(video_device_name_.c_str(), io_method, pixel_format, image_width_,\n                                          image_height_, framerate_);\n \n+    // set camera parameters\n+    std::stringstream paramstream;\n+    paramstream << \"brightness=\" << brightness_;\n+    this->set_v4l_parameters(video_device_name_, paramstream.str());\n+    paramstream.str(\"\");\n+    paramstream << \"contrast=\" << contrast_;\n+    this->set_v4l_parameters(video_device_name_, paramstream.str());\n+    paramstream.str(\"\");\n+    paramstream << \"saturation=\" << saturation_;\n+    this->set_v4l_parameters(video_device_name_, paramstream.str());\n+    paramstream.str(\"\");\n+    paramstream << \"sharpness=\" << sharpness_;\n+    this->set_v4l_parameters(video_device_name_, paramstream.str());\n+\n     // check auto focus\n     if (autofocus_)\n     {\n       usb_cam_camera_set_auto_focus(1);\n       this->set_v4l_parameters(video_device_name_, \"focus_auto=1\");\n     }\n+    else\n+    {\n+      std::stringstream ss;\n+      ss << \"focus_absolute=\" << focus_;\n+      this->set_v4l_parameters(video_device_name_, ss.str());\n+    }\n \n     // check auto exposure\n     if (!autoexposure_)"
+        }
+      ]
+    },
+    {
+      "author": "pronobis",
+      "date": "2014-07-24T00:02:45Z",
+      "sha": "dfab225402fca775c0c1ae56bf6638f65978c422",
+      "message": "Fixed a bug with av_free missing by adding a proper include on Ubuntu 14.04.",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "d0020a7d495b8e9c5cb56790ddc7a7566e6f329f",
+          "filename": "src/usb_cam.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/dfab225402fca775c0c1ae56bf6638f65978c422/src%2Fusb_cam.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/dfab225402fca775c0c1ae56bf6638f65978c422/src%2Fusb_cam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam.cpp?ref=dfab225402fca775c0c1ae56bf6638f65978c422",
+          "patch": "@@ -54,6 +54,7 @@ extern \"C\" {\n #include <linux/videodev2.h>\n #include <libavcodec/avcodec.h>\n #include <libswscale/swscale.h>\n+#include <libavutil/mem.h>\n }\n \n #include <ros/ros.h>"
+        }
+      ]
+    },
+    {
+      "author": "liang",
+      "date": "2014-08-25T21:41:42Z",
+      "sha": "6bdda5ac04c290a72b9808b8cd05b5b467835855",
+      "message": "Modified to enforce framerate control at the application level in addition to at the driver level.  This is necessary since the drivers for my webcam did not obey the requested framerate.",
+      "files_changed": 2,
+      "additions": 34,
+      "deletions": 17,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "4e6ec0b134ba130202b08fa5dfe712394cb8f2ab",
+          "filename": "nodes/usb_cam_node.cpp",
+          "status": "modified",
+          "additions": 27,
+          "deletions": 17,
+          "changes": 44,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/6bdda5ac04c290a72b9808b8cd05b5b467835855/nodes%2Fusb_cam_node.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/6bdda5ac04c290a72b9808b8cd05b5b467835855/nodes%2Fusb_cam_node.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/nodes%2Fusb_cam_node.cpp?ref=6bdda5ac04c290a72b9808b8cd05b5b467835855",
+          "patch": "@@ -58,6 +58,8 @@ class UsbCamNode\n   bool autofocus_, autoexposure_;\n   boost::shared_ptr<camera_info_manager::CameraInfoManager> cinfo_;\n \n+  ros::Time prevUpdateTime_;\n+\n   UsbCamNode() :\n       node_(\"~\")\n   {\n@@ -86,8 +88,8 @@ class UsbCamNode\n     node_.param(\"camera_info_url\", camera_info_url_, std::string(\"\"));\n     cinfo_.reset(new camera_info_manager::CameraInfoManager(node_, camera_name_, camera_info_url_));\n \n-    ROS_INFO(\"Starting '%s' (%s) at %dx%d via %s (%s)\", camera_name_.c_str(), video_device_name_.c_str(), image_width_,\n-             image_height_, io_method_name_.c_str(), pixel_format_name_.c_str());\n+    ROS_INFO(\"Starting '%s' (%s) at %dx%d via %s (%s), framerate %i\", camera_name_.c_str(), video_device_name_.c_str(), image_width_,\n+             image_height_, io_method_name_.c_str(), pixel_format_name_.c_str(), framerate_);\n \n     // set the IO method\n     usb_cam_io_method io_method;\n@@ -144,6 +146,8 @@ class UsbCamNode\n       ss << \"exposure_absolute=\" << exposure_;\n       this->set_v4l_parameters(video_device_name_, ss.str());\n     }\n+\n+    prevUpdateTime_ = ros::Time::now();\n   }\n \n   virtual ~UsbCamNode()\n@@ -153,21 +157,27 @@ class UsbCamNode\n \n   bool take_and_send_image()\n   {\n-    // grab the image\n-    usb_cam_camera_grab_image(camera_image_);\n-    // fill the info\n-    fillImage(img_, \"rgb8\", camera_image_->height, camera_image_->width, 3 * camera_image_->width,\n-              camera_image_->image);\n-    // stamp the image\n-    img_.header.stamp = ros::Time::now();\n-\n-    // grab the camera info\n-    sensor_msgs::CameraInfoPtr ci(new sensor_msgs::CameraInfo(cinfo_->getCameraInfo()));\n-    ci->header.frame_id = img_.header.frame_id;\n-    ci->header.stamp = img_.header.stamp;\n-\n-    // publish the image\n-    image_pub_.publish(img_, *ci);\n+    ros::Time currUpdateTime = ros::Time::now();\n+    if ((currUpdateTime - prevUpdateTime_).toSec() >= 1.0 / framerate_)\n+    {\n+      prevUpdateTime_ = currUpdateTime;\n+\n+      // grab the image\n+      usb_cam_camera_grab_image(camera_image_);\n+      // fill the info\n+      fillImage(img_, \"rgb8\", camera_image_->height, camera_image_->width, 3 * camera_image_->width,\n+                camera_image_->image);\n+      // stamp the image\n+      img_.header.stamp = ros::Time::now();\n+\n+      // grab the camera info\n+      sensor_msgs::CameraInfoPtr ci(new sensor_msgs::CameraInfo(cinfo_->getCameraInfo()));\n+      ci->header.frame_id = img_.header.frame_id;\n+      ci->header.stamp = img_.header.stamp;\n+\n+      // publish the image\n+      image_pub_.publish(img_, *ci);\n+    }\n     return true;\n   }\n "
+        },
+        {
+          "sha": "eebdaaed52958544f25ebfe95faa880f4a30e387",
+          "filename": "src/usb_cam.cpp",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/6bdda5ac04c290a72b9808b8cd05b5b467835855/src%2Fusb_cam.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/6bdda5ac04c290a72b9808b8cd05b5b467835855/src%2Fusb_cam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam.cpp?ref=6bdda5ac04c290a72b9808b8cd05b5b467835855",
+          "patch": "@@ -949,12 +949,19 @@ static void init_device(int image_width, int image_height, int framerate)\n   {\n     errno_exit(\"Couldn't query v4l fps!\\n\");\n   }\n+\n+  ROS_INFO(\"Capability flag: 0x%x\", stream_params.parm.capture.capability);\n+\n   stream_params.parm.capture.timeperframe.numerator = 1;\n   stream_params.parm.capture.timeperframe.denominator = framerate;\n   if (xioctl(fd, VIDIOC_S_PARM, &stream_params) < 0)\n   {\n     errno_exit(\"Couldn't set camera framerate\\n\");\n   }\n+  else\n+  {\n+    ROS_INFO(\"Set framerate to be %i\", framerate);\n+  }\n \n   switch (io)\n   {"
+        }
+      ]
+    },
+    {
+      "author": "mistoll",
+      "date": "2014-08-21T10:01:37Z",
+      "sha": "ba46da475c293832c5cc19f55c55c36002001d5d",
+      "message": "Added RGB24 as pixel format",
+      "files_changed": 3,
+      "additions": 14,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b68fc8922e557929291df54395d7ceef8567aadf",
+          "filename": "include/usb_cam/usb_cam.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/ba46da475c293832c5cc19f55c55c36002001d5d/include%2Fusb_cam%2Fusb_cam.h",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/ba46da475c293832c5cc19f55c55c36002001d5d/include%2Fusb_cam%2Fusb_cam.h",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/include%2Fusb_cam%2Fusb_cam.h?ref=ba46da475c293832c5cc19f55c55c36002001d5d",
+          "patch": "@@ -56,7 +56,7 @@ typedef enum\n \n typedef enum\n {\n-  PIXEL_FORMAT_YUYV, PIXEL_FORMAT_UYVY, PIXEL_FORMAT_MJPEG, PIXEL_FORMAT_YUVMONO10\n+  PIXEL_FORMAT_YUYV, PIXEL_FORMAT_UYVY, PIXEL_FORMAT_MJPEG, PIXEL_FORMAT_YUVMONO10, PIXEL_FORMAT_RGB24\n } usb_cam_pixel_format;\n \n // start camera"
+        },
+        {
+          "sha": "256ac7639addb0ce0218879fd7c6174c74c5e696",
+          "filename": "nodes/usb_cam_node.cpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/ba46da475c293832c5cc19f55c55c36002001d5d/nodes%2Fusb_cam_node.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/ba46da475c293832c5cc19f55c55c36002001d5d/nodes%2Fusb_cam_node.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/nodes%2Fusb_cam_node.cpp?ref=ba46da475c293832c5cc19f55c55c36002001d5d",
+          "patch": "@@ -75,7 +75,7 @@ class UsbCamNode\n     node_.param(\"image_width\", image_width_, 640);\n     node_.param(\"image_height\", image_height_, 480);\n     node_.param(\"framerate\", framerate_, 30);\n-    // possible values: yuyv, uyvy, mjpeg, yuvmono10\n+    // possible values: yuyv, uyvy, mjpeg, yuvmono10, rgb24\n     node_.param(\"pixel_format\", pixel_format_name_, std::string(\"mjpeg\"));\n     // enable/disable autofocus\n     node_.param(\"autofocus\", autofocus_, false);\n@@ -121,6 +121,8 @@ class UsbCamNode\n       pixel_format = PIXEL_FORMAT_MJPEG;\n     else if (pixel_format_name_ == \"yuvmono10\")\n       pixel_format = PIXEL_FORMAT_YUVMONO10;\n+    else if (pixel_format_name_ == \"rgb24\")\n+      pixel_format = PIXEL_FORMAT_RGB24;\n     else\n     {\n       ROS_FATAL(\"Unknown pixel format '%s'\", pixel_format_name_.c_str());"
+        },
+        {
+          "sha": "a474435aabfd302eca67bf8d9b5db6e4c4ec6c68",
+          "filename": "src/usb_cam.cpp",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 0,
+          "changes": 10,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/ba46da475c293832c5cc19f55c55c36002001d5d/src%2Fusb_cam.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/ba46da475c293832c5cc19f55c55c36002001d5d/src%2Fusb_cam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam.cpp?ref=ba46da475c293832c5cc19f55c55c36002001d5d",
+          "patch": "@@ -380,6 +380,10 @@ static void yuyv2rgb(char *YUV, char *RGB, int NumPixels)\n   }\n }\n \n+void rgb242rgb(char *YUV, char *RGB, int NumPixels)\n+{\n+  memcpy(RGB, YUV, NumPixels * 3);\n+}\n static int init_mjpeg_decoder(int image_width, int image_height)\n {\n   avcodec_register_all();\n@@ -485,6 +489,8 @@ static void process_image(const void * src, int len, usb_cam_camera_image_t *des\n     uyvy2rgb((char*)src, dest->image, dest->width * dest->height);\n   else if (pixelformat == V4L2_PIX_FMT_MJPEG)\n     mjpeg2rgb((char*)src, len, dest->image, dest->width * dest->height);\n+  else if (pixelformat == V4L2_PIX_FMT_RGB24)\n+    rgb242rgb((char*)src, dest->image, dest->width * dest->height);\n }\n \n static int read_frame(usb_cam_camera_image_t *image)\n@@ -1020,6 +1026,10 @@ usb_cam_camera_image_t *usb_cam_camera_start(const char* dev, usb_cam_io_method\n     pixelformat = V4L2_PIX_FMT_YUYV;\n     monochrome = true;\n   }\n+  else if (pixel_format == PIXEL_FORMAT_RGB24)\n+  {\n+\t  pixelformat = V4L2_PIX_FMT_RGB24;\n+  }\n   else\n   {\n     ROS_ERROR(\"Unknown pixelformat.\\n\");"
+        }
+      ]
+    },
+    {
+      "author": "sosentos",
+      "date": "2014-08-14T15:40:35Z",
+      "sha": "ffdf0c7535c574fc6dcdfd3b544f4bc75358eb55",
+      "message": "Merge pull request #14 from KaijenHsiao/master\n\nadded support for 10-bit mono cameras advertising as YUV",
+      "files_changed": 3,
+      "additions": 33,
+      "deletions": 4,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "8aec84e56217d9e7b16899281e33bc2c892b4f0d",
+          "filename": "include/usb_cam/usb_cam.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/ffdf0c7535c574fc6dcdfd3b544f4bc75358eb55/include%2Fusb_cam%2Fusb_cam.h",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/ffdf0c7535c574fc6dcdfd3b544f4bc75358eb55/include%2Fusb_cam%2Fusb_cam.h",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/include%2Fusb_cam%2Fusb_cam.h?ref=ffdf0c7535c574fc6dcdfd3b544f4bc75358eb55",
+          "patch": "@@ -56,7 +56,7 @@ typedef enum\n \n typedef enum\n {\n-  PIXEL_FORMAT_YUYV, PIXEL_FORMAT_UYVY, PIXEL_FORMAT_MJPEG,\n+  PIXEL_FORMAT_YUYV, PIXEL_FORMAT_UYVY, PIXEL_FORMAT_MJPEG, PIXEL_FORMAT_YUVMONO10\n } usb_cam_pixel_format;\n \n // start camera"
+        },
+        {
+          "sha": "5340c2a933dee77ebda7c81af097321021340fa2",
+          "filename": "nodes/usb_cam_node.cpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/ffdf0c7535c574fc6dcdfd3b544f4bc75358eb55/nodes%2Fusb_cam_node.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/ffdf0c7535c574fc6dcdfd3b544f4bc75358eb55/nodes%2Fusb_cam_node.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/nodes%2Fusb_cam_node.cpp?ref=ffdf0c7535c574fc6dcdfd3b544f4bc75358eb55",
+          "patch": "@@ -79,7 +79,7 @@ class UsbCamNode\n     node_.param(\"image_width\", image_width_, 640);\n     node_.param(\"image_height\", image_height_, 480);\n     node_.param(\"framerate\", framerate_, 30);\n-    node_.param(\"pixel_format\", pixel_format_name_, std::string(\"mjpeg\")); // possible values: yuyv, uyvy, mjpeg\n+    node_.param(\"pixel_format\", pixel_format_name_, std::string(\"mjpeg\")); // possible values: yuyv, uyvy, mjpeg, yuvmono10\n     node_.param(\"autofocus\", autofocus_, false); // enable/disable autofocus\n \n     node_.param(\"camera_frame_id\", img_.header.frame_id, std::string(\"head_camera\"));\n@@ -119,6 +119,8 @@ class UsbCamNode\n     {\n       pixel_format = PIXEL_FORMAT_MJPEG;\n     }\n+    else if (pixel_format_name_ == \"yuvmono10\")\n+      pixel_format = PIXEL_FORMAT_YUVMONO10;\n     else\n     {\n       ROS_FATAL(\"Unknown pixel format.\");"
+        },
+        {
+          "sha": "19e9289fec3381bc3b4353909225ef4c476258f2",
+          "filename": "src/usb_cam.cpp",
+          "status": "modified",
+          "additions": 29,
+          "deletions": 2,
+          "changes": 31,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/ffdf0c7535c574fc6dcdfd3b544f4bc75358eb55/src%2Fusb_cam.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/ffdf0c7535c574fc6dcdfd3b544f4bc75358eb55/src%2Fusb_cam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam.cpp?ref=ffdf0c7535c574fc6dcdfd3b544f4bc75358eb55",
+          "patch": "@@ -72,6 +72,7 @@ struct buffer\n \n static char *camera_dev;\n static unsigned int pixelformat;\n+static bool monochrome;\n static usb_cam_io_method io = IO_METHOD_MMAP;\n static int fd = -1;\n struct buffer * buffers = NULL;\n@@ -343,6 +344,19 @@ void uyvy2rgb(char *YUV, char *RGB, int NumPixels)\n   }\n }\n \n+static void mono102rgb(char *RAW, char *RGB, int NumPixels)\n+{\n+  int i, j;\n+  for (i = 0, j = 0; i < (NumPixels << 1); i += 2, j += 3) \n+  {\n+    //first byte is low byte, second byte is high byte; smash together and convert to 8-bit\n+    unsigned char grayval = ((RAW[i + 0] >> 2) & 0x3F) | (RAW[i + 1] << 6) & 0xC0;\n+    RGB[j + 0] = grayval;\n+    RGB[j + 1] = grayval;\n+    RGB[j + 2] = grayval; \n+  }\n+}\n+\n static void yuyv2rgb(char *YUV, char *RGB, int NumPixels)\n {\n   int i, j;\n@@ -459,8 +473,14 @@ static void mjpeg2rgb(char *MJPEG, int len, char *RGB, int NumPixels)\n \n static void process_image(const void * src, int len, usb_cam_camera_image_t *dest)\n {\n-  if (pixelformat == V4L2_PIX_FMT_YUYV)\n-    yuyv2rgb((char*)src, dest->image, dest->width * dest->height);\n+  if (pixelformat == V4L2_PIX_FMT_YUYV){\n+    if (monochrome) { //actually format V4L2_PIX_FMT_Y16, but xioctl gets unhappy if you don't use the advertised type (yuyv)\n+      mono102rgb((char*)src, dest->image, dest->width * dest->height);\n+    }\n+    else {\n+      yuyv2rgb((char*)src, dest->image, dest->width * dest->height);\n+    }\n+  }\n   else if (pixelformat == V4L2_PIX_FMT_UYVY)\n     uyvy2rgb((char*)src, dest->image, dest->width * dest->height);\n   else if (pixelformat == V4L2_PIX_FMT_MJPEG)\n@@ -984,6 +1004,7 @@ usb_cam_camera_image_t *usb_cam_camera_start(const char* dev, usb_cam_io_method\n \n   usb_cam_camera_image_t *image;\n   io = io_method;\n+  monochrome = false;\n   if (pixel_format == PIXEL_FORMAT_YUYV)\n     pixelformat = V4L2_PIX_FMT_YUYV;\n   else if (pixel_format == PIXEL_FORMAT_UYVY)\n@@ -993,6 +1014,12 @@ usb_cam_camera_image_t *usb_cam_camera_start(const char* dev, usb_cam_io_method\n     pixelformat = V4L2_PIX_FMT_MJPEG;\n     init_mjpeg_decoder(image_width, image_height);\n   }\n+  else if (pixel_format == PIXEL_FORMAT_YUVMONO10) \n+  {\n+    //actually format V4L2_PIX_FMT_Y16 (10-bit mono expresed as 16-bit pixels), but we need to use the advertised type (yuyv)\n+    pixelformat = V4L2_PIX_FMT_YUYV;\n+    monochrome = true;\n+  }\n   else\n   {\n     ROS_ERROR(\"Unknown pixelformat.\\n\");"
+        }
+      ]
+    },
+    {
+      "author": "KaijenHsiao",
+      "date": "2014-08-11T22:56:35Z",
+      "sha": "250c84860d8e5263d5ffe54921f55e4d946dc522",
+      "message": "added support for 10-bit mono cameras advertising as YUV (such as Leopard Imaging's LI-USB30-V034)",
+      "files_changed": 3,
+      "additions": 33,
+      "deletions": 4,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "8aec84e56217d9e7b16899281e33bc2c892b4f0d",
+          "filename": "include/usb_cam/usb_cam.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/250c84860d8e5263d5ffe54921f55e4d946dc522/include%2Fusb_cam%2Fusb_cam.h",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/250c84860d8e5263d5ffe54921f55e4d946dc522/include%2Fusb_cam%2Fusb_cam.h",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/include%2Fusb_cam%2Fusb_cam.h?ref=250c84860d8e5263d5ffe54921f55e4d946dc522",
+          "patch": "@@ -56,7 +56,7 @@ typedef enum\n \n typedef enum\n {\n-  PIXEL_FORMAT_YUYV, PIXEL_FORMAT_UYVY, PIXEL_FORMAT_MJPEG,\n+  PIXEL_FORMAT_YUYV, PIXEL_FORMAT_UYVY, PIXEL_FORMAT_MJPEG, PIXEL_FORMAT_YUVMONO10\n } usb_cam_pixel_format;\n \n // start camera"
+        },
+        {
+          "sha": "5340c2a933dee77ebda7c81af097321021340fa2",
+          "filename": "nodes/usb_cam_node.cpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/250c84860d8e5263d5ffe54921f55e4d946dc522/nodes%2Fusb_cam_node.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/250c84860d8e5263d5ffe54921f55e4d946dc522/nodes%2Fusb_cam_node.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/nodes%2Fusb_cam_node.cpp?ref=250c84860d8e5263d5ffe54921f55e4d946dc522",
+          "patch": "@@ -79,7 +79,7 @@ class UsbCamNode\n     node_.param(\"image_width\", image_width_, 640);\n     node_.param(\"image_height\", image_height_, 480);\n     node_.param(\"framerate\", framerate_, 30);\n-    node_.param(\"pixel_format\", pixel_format_name_, std::string(\"mjpeg\")); // possible values: yuyv, uyvy, mjpeg\n+    node_.param(\"pixel_format\", pixel_format_name_, std::string(\"mjpeg\")); // possible values: yuyv, uyvy, mjpeg, yuvmono10\n     node_.param(\"autofocus\", autofocus_, false); // enable/disable autofocus\n \n     node_.param(\"camera_frame_id\", img_.header.frame_id, std::string(\"head_camera\"));\n@@ -119,6 +119,8 @@ class UsbCamNode\n     {\n       pixel_format = PIXEL_FORMAT_MJPEG;\n     }\n+    else if (pixel_format_name_ == \"yuvmono10\")\n+      pixel_format = PIXEL_FORMAT_YUVMONO10;\n     else\n     {\n       ROS_FATAL(\"Unknown pixel format.\");"
+        },
+        {
+          "sha": "19e9289fec3381bc3b4353909225ef4c476258f2",
+          "filename": "src/usb_cam.cpp",
+          "status": "modified",
+          "additions": 29,
+          "deletions": 2,
+          "changes": 31,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/250c84860d8e5263d5ffe54921f55e4d946dc522/src%2Fusb_cam.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/250c84860d8e5263d5ffe54921f55e4d946dc522/src%2Fusb_cam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/src%2Fusb_cam.cpp?ref=250c84860d8e5263d5ffe54921f55e4d946dc522",
+          "patch": "@@ -72,6 +72,7 @@ struct buffer\n \n static char *camera_dev;\n static unsigned int pixelformat;\n+static bool monochrome;\n static usb_cam_io_method io = IO_METHOD_MMAP;\n static int fd = -1;\n struct buffer * buffers = NULL;\n@@ -343,6 +344,19 @@ void uyvy2rgb(char *YUV, char *RGB, int NumPixels)\n   }\n }\n \n+static void mono102rgb(char *RAW, char *RGB, int NumPixels)\n+{\n+  int i, j;\n+  for (i = 0, j = 0; i < (NumPixels << 1); i += 2, j += 3) \n+  {\n+    //first byte is low byte, second byte is high byte; smash together and convert to 8-bit\n+    unsigned char grayval = ((RAW[i + 0] >> 2) & 0x3F) | (RAW[i + 1] << 6) & 0xC0;\n+    RGB[j + 0] = grayval;\n+    RGB[j + 1] = grayval;\n+    RGB[j + 2] = grayval; \n+  }\n+}\n+\n static void yuyv2rgb(char *YUV, char *RGB, int NumPixels)\n {\n   int i, j;\n@@ -459,8 +473,14 @@ static void mjpeg2rgb(char *MJPEG, int len, char *RGB, int NumPixels)\n \n static void process_image(const void * src, int len, usb_cam_camera_image_t *dest)\n {\n-  if (pixelformat == V4L2_PIX_FMT_YUYV)\n-    yuyv2rgb((char*)src, dest->image, dest->width * dest->height);\n+  if (pixelformat == V4L2_PIX_FMT_YUYV){\n+    if (monochrome) { //actually format V4L2_PIX_FMT_Y16, but xioctl gets unhappy if you don't use the advertised type (yuyv)\n+      mono102rgb((char*)src, dest->image, dest->width * dest->height);\n+    }\n+    else {\n+      yuyv2rgb((char*)src, dest->image, dest->width * dest->height);\n+    }\n+  }\n   else if (pixelformat == V4L2_PIX_FMT_UYVY)\n     uyvy2rgb((char*)src, dest->image, dest->width * dest->height);\n   else if (pixelformat == V4L2_PIX_FMT_MJPEG)\n@@ -984,6 +1004,7 @@ usb_cam_camera_image_t *usb_cam_camera_start(const char* dev, usb_cam_io_method\n \n   usb_cam_camera_image_t *image;\n   io = io_method;\n+  monochrome = false;\n   if (pixel_format == PIXEL_FORMAT_YUYV)\n     pixelformat = V4L2_PIX_FMT_YUYV;\n   else if (pixel_format == PIXEL_FORMAT_UYVY)\n@@ -993,6 +1014,12 @@ usb_cam_camera_image_t *usb_cam_camera_start(const char* dev, usb_cam_io_method\n     pixelformat = V4L2_PIX_FMT_MJPEG;\n     init_mjpeg_decoder(image_width, image_height);\n   }\n+  else if (pixel_format == PIXEL_FORMAT_YUVMONO10) \n+  {\n+    //actually format V4L2_PIX_FMT_Y16 (10-bit mono expresed as 16-bit pixels), but we need to use the advertised type (yuyv)\n+    pixelformat = V4L2_PIX_FMT_YUYV;\n+    monochrome = true;\n+  }\n   else\n   {\n     ROS_ERROR(\"Unknown pixelformat.\\n\");"
+        }
+      ]
+    },
+    {
+      "author": "vrabaud",
+      "date": "2014-08-03T17:06:48Z",
+      "sha": "fcbd1f69eed7972d25428754e639b84180e1f59c",
+      "message": "add a a ros::spinOnce to get set_camera_info working\nThis is explained in the docs of CameraInfoManager\nhttps://github.com/ros-perception/image_common/blob/hydro-devel/camera_info_manager/include/camera_info_manager/camera_info_manager.h#L71\nAlso, this fixes https://github.com/ros-perception/image_pipeline/issues/78",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "3897db5b31a54a8e2e4fa1d5679db4ca13793c02",
+          "filename": "nodes/usb_cam_node.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/fcbd1f69eed7972d25428754e639b84180e1f59c/nodes%2Fusb_cam_node.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/fcbd1f69eed7972d25428754e639b84180e1f59c/nodes%2Fusb_cam_node.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/nodes%2Fusb_cam_node.cpp?ref=fcbd1f69eed7972d25428754e639b84180e1f59c",
+          "patch": "@@ -179,6 +179,7 @@ class UsbCamNode\n         ROS_ERROR(\"couldn't take image.\");\n         usleep(1000000);\n       }\n+      ros::spinOnce();\n //      self_test_.checkTest();\n     }\n     return true;"
+        }
+      ]
+    },
+    {
+      "author": "cottsay",
+      "date": "2014-03-24T07:31:43Z",
+      "sha": "adefb3ff83a18c9774d71f978151e9bce38ec3b5",
+      "message": "Use pkg-config to find avcodec and swscale",
+      "files_changed": 1,
+      "additions": 9,
+      "deletions": 3,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "5a1a949227e291ecfef68e313cd2554a1bd535fe",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 3,
+          "changes": 12,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/adefb3ff83a18c9774d71f978151e9bce38ec3b5/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/adefb3ff83a18c9774d71f978151e9bce38ec3b5/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/CMakeLists.txt?ref=adefb3ff83a18c9774d71f978151e9bce38ec3b5",
+          "patch": "@@ -14,6 +14,10 @@ set(ROS_BUILD_TYPE Release)\n \n set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)\n \n+find_package(PkgConfig REQUIRED)\n+pkg_check_modules(avcodec libavcodec REQUIRED)\n+pkg_check_modules(swscale libswscale REQUIRED)\n+\n catkin_package(\n \tINCLUDE_DIRS include\n \tCATKIN_DEPENDS\n@@ -26,15 +30,17 @@ catkin_package(\n )\n \n include_directories(include\n-                    ${catkin_INCLUDE_DIRS}\n+\t${catkin_INCLUDE_DIRS}\n+\t${avcodec_INCLUDE_DIRS}\n+\t${swscale_INCLUDE_DIRS}\n )\n add_library(usb_cam\n \tsrc/usb_cam.cpp\n )\n-target_link_libraries(usb_cam avcodec swscale ${catkin_LIBRARIES})\n+target_link_libraries(usb_cam ${avcodec_LIBRARIES} ${swscale_LIBRARIES} ${catkin_LIBRARIES})\n \n add_executable(usb_cam_node nodes/usb_cam_node.cpp)\n-target_link_libraries(usb_cam_node usb_cam avcodec swscale ${catkin_LIBRARIES})\n+target_link_libraries(usb_cam_node usb_cam ${avcodec_LIBRARIES} ${swscale_LIBRARIES} ${catkin_LIBRARIES})\n \n #############\n ## Install ##"
+        }
+      ]
+    },
+    {
+      "author": "FriedCircuits",
+      "date": "2013-11-10T00:43:47Z",
+      "sha": "2603194908c055e0652da840a6e5740ceb4ee21c",
+      "message": "Update usb_cam_node.cpp",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b7eaebad943b5163a2e0da266dd39b2db6208ae3",
+          "filename": "nodes/usb_cam_node.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/2603194908c055e0652da840a6e5740ceb4ee21c/nodes%2Fusb_cam_node.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/2603194908c055e0652da840a6e5740ceb4ee21c/nodes%2Fusb_cam_node.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/nodes%2Fusb_cam_node.cpp?ref=2603194908c055e0652da840a6e5740ceb4ee21c",
+          "patch": "@@ -39,7 +39,7 @@\n #include <ros/ros.h>\n #include <sensor_msgs/fill_image.h>\n #include <usb_cam/usb_cam.h>\n-#include <self_test/self_test.h>\n+//#include <self_test/self_test.h>\n #include <image_transport/image_transport.h>\n \n #include <camera_info_manager/camera_info_manager.h>"
+        }
+      ]
+    },
+    {
+      "author": "Jon Binney",
+      "date": "2013-07-10T22:18:53Z",
+      "sha": "a0cba42477022a95d4685f68a527ef5bca8eaa10",
+      "message": "use camera_info_manager",
+      "files_changed": 3,
+      "additions": 34,
+      "deletions": 61,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "186d1d512cf012ce59dc3c5c8aa9a5ac1704d030",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 2,
+          "changes": 6,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/a0cba42477022a95d4685f68a527ef5bca8eaa10/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/a0cba42477022a95d4685f68a527ef5bca8eaa10/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/CMakeLists.txt?ref=a0cba42477022a95d4685f68a527ef5bca8eaa10",
+          "patch": "@@ -6,7 +6,8 @@ find_package(catkin\n \t\troscpp \n \t\tstd_msgs \n \t\tsensor_msgs \n-\t\tself_test)\n+\t\tself_test\n+        camera_info_manager)\n \n \n set(ROS_BUILD_TYPE Release)\n@@ -19,8 +20,9 @@ catkin_package(\n \t\timage_transport \n \t\troscpp \n \t\tstd_msgs \n-\t\tsensor_msgs \n+\t\tsensor_msgs\n \t\tself_test\n+        camera_info_manager\n )\n \n include_directories(include"
+        },
+        {
+          "sha": "2d584ee9118289d6cec163df4778e6226ba589b5",
+          "filename": "nodes/usb_cam_node.cpp",
+          "status": "modified",
+          "additions": 25,
+          "deletions": 57,
+          "changes": 82,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/a0cba42477022a95d4685f68a527ef5bca8eaa10/nodes%2Fusb_cam_node.cpp",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/a0cba42477022a95d4685f68a527ef5bca8eaa10/nodes%2Fusb_cam_node.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/nodes%2Fusb_cam_node.cpp?ref=a0cba42477022a95d4685f68a527ef5bca8eaa10",
+          "patch": "@@ -42,6 +42,8 @@\n #include <self_test/self_test.h>\n #include <image_transport/image_transport.h>\n \n+#include <camera_info_manager/camera_info_manager.h>\n+\n class UsbCamNode\n {\n public:\n@@ -54,7 +56,8 @@ class UsbCamNode\n   std::string pixel_format_name_;\n   bool autofocus_;\n \n-  sensor_msgs::CameraInfo info_;\n+  std::string camera_name_;\n+  std::string camera_info_url_;\n \n   ros::Time next_time_;\n   int count_;\n@@ -63,8 +66,10 @@ class UsbCamNode\n \n   image_transport::CameraPublisher image_pub_;\n \n+  boost::shared_ptr<camera_info_manager::CameraInfoManager> cinfo_;\n+\n   UsbCamNode() :\n-      node_(\"~\")\n+    node_(\"~\")\n   {\n     image_transport::ImageTransport it(node_);\n     image_pub_ = it.advertiseCamera(\"image_raw\", 1);\n@@ -76,60 +81,20 @@ class UsbCamNode\n     node_.param(\"pixel_format\", pixel_format_name_, std::string(\"mjpeg\")); // possible values: yuyv, uyvy, mjpeg\n     node_.param(\"autofocus\", autofocus_, false); // enable/disable autofocus\n \n-    {\n-      XmlRpc::XmlRpcValue double_list;\n-      info_.height = image_height_;\n-      info_.width = image_width_;\n-\n-      node_.param(\"camera_frame_id\", img_.header.frame_id, std::string(\"head_camera\"));\n-      info_.header.frame_id = img_.header.frame_id;\n-\n-      node_.getParam(\"K\", double_list);\n-      if ((double_list.getType() == XmlRpc::XmlRpcValue::TypeArray) &&\n-          (double_list.size() == 9)) {\n-        for (int i=0; i<9; i++) {\n-          ROS_ASSERT(double_list[0].getType() == XmlRpc::XmlRpcValue::TypeDouble);\n-          info_.K[i] = double_list[i];\n-        }\n-      }\n-\n-      node_.getParam(\"D\", double_list);\n-\n-      if ((double_list.getType() == XmlRpc::XmlRpcValue::TypeArray)) {\n-        info_.D.resize(double_list.size());\n-        for (int i=0; i<double_list.size(); i++) {\n-          ROS_ASSERT(double_list[0].getType() == XmlRpc::XmlRpcValue::TypeDouble);\n-          info_.D[i] = double_list[i];\n-        }\n-      }\n-\n-      node_.getParam(\"R\", double_list);\n \n-      if ((double_list.getType() == XmlRpc::XmlRpcValue::TypeArray) &&\n-          (double_list.size() == 9)) {\n-        for (int i=0; i<9; i++) {\n-          ROS_ASSERT(double_list[0].getType() == XmlRpc::XmlRpcValue::TypeDouble);\n-          info_.R[i] = double_list[i];\n-        }\n-      }\n-\n-      node_.getParam(\"P\", double_list);\n-\n-      if ((double_list.getType() == XmlRpc::XmlRpcValue::TypeArray) &&\n-          (double_list.size() == 12)) {\n-        for (int i=0; i<12; i++) {\n-          ROS_ASSERT(double_list[0].getType() == XmlRpc::XmlRpcValue::TypeDouble);\n-          info_.P[i] = double_list[i];\n-        }\n-      }\n-    }\n+    node_.param(\"camera_frame_id\", img_.header.frame_id, std::string(\"head_camera\"));\n+    node_.param(\"camera_name\", camera_name_, std::string(\"head_camera\"));\n+    node_.param(\"camera_info_url\", camera_info_url_, std::string(\"\"));\n+    cinfo_.reset(new camera_info_manager::CameraInfoManager(node_, camera_name_, camera_info_url_));\n \n-    printf(\"usb_cam video_device set to [%s]\\n\", video_device_name_.c_str());\n-    printf(\"usb_cam io_method set to [%s]\\n\", io_method_name_.c_str());\n-    printf(\"usb_cam image_width set to [%d]\\n\", image_width_);\n-    printf(\"usb_cam image_height set to [%d]\\n\", image_height_);\n-    printf(\"usb_cam pixel_format set to [%s]\\n\", pixel_format_name_.c_str());\n-    printf(\"usb_cam auto_focus set to [%d]\\n\", autofocus_);\n+    ROS_INFO(\"Camera name: %s\", camera_name_.c_str());\n+    ROS_INFO(\"Camera info url: %s\", camera_info_url_.c_str());\n+    ROS_INFO(\"usb_cam video_device set to [%s]\\n\", video_device_name_.c_str());\n+    ROS_INFO(\"usb_cam io_method set to [%s]\\n\", io_method_name_.c_str());\n+    ROS_INFO(\"usb_cam image_width set to [%d]\\n\", image_width_);\n+    ROS_INFO(\"usb_cam image_height set to [%d]\\n\", image_height_);\n+    ROS_INFO(\"usb_cam pixel_format set to [%s]\\n\", pixel_format_name_.c_str());\n+    ROS_INFO(\"usb_cam auto_focus set to [%d]\\n\", autofocus_);\n \n     usb_cam_io_method io_method;\n     if(io_method_name_ == \"mmap\")\n@@ -182,10 +147,13 @@ class UsbCamNode\n   {\n     usb_cam_camera_grab_image(camera_image_);\n     fillImage(img_, \"rgb8\", camera_image_->height, camera_image_->width, 3 * camera_image_->width, camera_image_->image);\n-\n     img_.header.stamp = ros::Time::now();\n-    info_.header.stamp = img_.header.stamp;\n-    image_pub_.publish(img_, info_);\n+\n+    sensor_msgs::CameraInfoPtr ci(new sensor_msgs::CameraInfo(cinfo_->getCameraInfo()));\n+    ci->header.frame_id = img_.header.frame_id;\n+    ci->header.stamp = img_.header.stamp;\n+\n+    image_pub_.publish(img_, *ci);\n     return true;\n   }\n "
+        },
+        {
+          "sha": "ea9194dc7e60555ca8b57e7e87ab2f2b58cfb31f",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 2,
+          "changes": 7,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/a0cba42477022a95d4685f68a527ef5bca8eaa10/package.xml",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/a0cba42477022a95d4685f68a527ef5bca8eaa10/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/package.xml?ref=a0cba42477022a95d4685f68a527ef5bca8eaa10",
+          "patch": "@@ -19,13 +19,16 @@\n   <build_depend>std_msgs</build_depend> \n   <build_depend>sensor_msgs</build_depend> \n   <build_depend>self_test</build_depend> \n-  <build_depend>ffmpeg</build_depend> \n+  <build_depend>ffmpeg</build_depend>\n+  <build_depend>camera_info_manager</build_depend>\n+\n   <run_depend>image_transport</run_depend> \n   <run_depend>roscpp</run_depend> \n   <run_depend>std_msgs</run_depend> \n   <run_depend>sensor_msgs</run_depend> \n   <run_depend>self_test</run_depend> \n-  <run_depend>ffmpeg</run_depend> \n+  <run_depend>ffmpeg</run_depend>\n+  <run_depend>camera_info_manager</run_depend>\n \n   <export>\n     <cpp lflags=\"-L${prefix}/lib\" cflags=\"-I${prefix}/include -I${prefix}/msg/cpp\"/>"
+        }
+      ]
+    },
+    {
+      "author": "agcooke",
+      "date": "2012-07-05T07:04:51Z",
+      "sha": "acafdc430d7c83bac89a866370aaf28f60f219c1",
+      "message": "Initial commit",
+      "files_changed": 2,
+      "additions": 16,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "8df9393e28f62d44521b02edbb8b518964fa0fe4",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 12,
+          "deletions": 0,
+          "changes": 12,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/acafdc430d7c83bac89a866370aaf28f60f219c1/.gitignore",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/acafdc430d7c83bac89a866370aaf28f60f219c1/.gitignore",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/.gitignore?ref=acafdc430d7c83bac89a866370aaf28f60f219c1",
+          "patch": "@@ -0,0 +1,12 @@\n+# Compiled Object files\n+*.slo\n+*.lo\n+*.o\n+\n+# Compiled Dynamic libraries\n+*.so\n+\n+# Compiled Static libraries\n+*.lai\n+*.la\n+*.a"
+        },
+        {
+          "sha": "6b16e3d31e09d7141ecf110136cae5a528b13f6e",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/acafdc430d7c83bac89a866370aaf28f60f219c1/README.md",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/acafdc430d7c83bac89a866370aaf28f60f219c1/README.md",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/README.md?ref=acafdc430d7c83bac89a866370aaf28f60f219c1",
+          "patch": "@@ -0,0 +1,4 @@\n+ros_sofiehdfformat\n+==================\n+\n+Ros driver to connect Ros messages to the sofiehdfformat.\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "¨Adrian",
+      "date": "2012-07-05T07:17:43Z",
+      "sha": "6df0cfe3fab88e5f03930f8dcc7832b64d787a79",
+      "message": "Creating a listerner that can write to sofiehdfformat files.",
+      "files_changed": 1,
+      "additions": 14,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "3f1f6895387742d78fa0f0bc923de7db088322bb",
+          "filename": "nodes/sofiehdfformatwriter.py",
+          "status": "added",
+          "additions": 14,
+          "deletions": 0,
+          "changes": 14,
+          "blob_url": "https://github.com/ros-drivers/usb_cam/blob/6df0cfe3fab88e5f03930f8dcc7832b64d787a79/nodes%2Fsofiehdfformatwriter.py",
+          "raw_url": "https://github.com/ros-drivers/usb_cam/raw/6df0cfe3fab88e5f03930f8dcc7832b64d787a79/nodes%2Fsofiehdfformatwriter.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/usb_cam/contents/nodes%2Fsofiehdfformatwriter.py?ref=6df0cfe3fab88e5f03930f8dcc7832b64d787a79",
+          "patch": "@@ -0,0 +1,14 @@\n+#!/usr/bin/env python\n+import roslib; roslib.load_manifest('ros_sofiehdfformat')\n+import rospy\n+from std_msgs.msg import String\n+def callback(data):\n+    rospy.loginfo(rospy.get_name()+\"I heard %s\",data.data)\n+\n+def listener():\n+    rospy.init_node('sofiehdfformatwriter', anonymous=True)\n+    rospy.Subscriber(\"sofiehdfformat\", String, callback)\n+    rospy.spin()\n+\n+if __name__ == '__main__':\n+    listener()"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,443 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T04:22:36Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "rt-net",
+    "repo": "raspimouse2"
+  },
+  "data": [
+    {
+      "author": "KuraZuzu",
+      "date": "2024-10-23T01:57:35Z",
+      "sha": "02ff085f6bfa6d58c83d56e31f8fda6bf9c60f5d",
+      "message": "ROS 2 Jazzyへの対応 (#53)\n\n* Replaced \"Twist\" with \"TwistStamped\" (Changed in all instances, revert if any unexpected issues occur, \"revert\").\r\n\r\n* \"README.md\"をROS 2 Jazzyの対応に合わせて修正\r\n\r\n* 表示できていなかった実機の画像リンクを修正\r\n\r\n* 変更点の反映と、不足手順を追記\r\n\r\n* Updated documentation for compatibility with ROS 2 Jazzy\r\n[Note] Updated major version due to breaking changes in \"/cmd_vel\" backwards compatibility.\r\n\r\n* Revert \"Updated documentation for compatibility with ROS 2 Jazzy\"\r\n\r\nThis reverts commit 69bcbd5db1b76153e5aacfc7b9379a2022971195.\r\n\r\n* add author to package.xml\r\n\r\n* Updated the environment variables in \"industrial_ci.yml\" to Jazzy\r\n\r\n* Removed unnecessary steps for launching the launch file in the \"README.md\"\r\n\r\n* Corrected import order to comply with flake8\r\n\r\n* Applied \"isort\"\r\n\r\n* Sort import-modules for flake8\r\n\r\n* Replace the CI script with syntax supported by act\r\n\r\n* Update README.md (.bash extension completion)\r\n\r\nCo-authored-by: YusukeKato <YusukeKato@users.noreply.github.com>\r\n\r\n* Update checkout version of GitHub Action\r\n\r\nCo-authored-by: YusukeKato <YusukeKato@users.noreply.github.com>\r\n\r\n---------\r\n\r\nCo-authored-by: YusukeKato <YusukeKato@users.noreply.github.com>",
+      "files_changed": 6,
+      "additions": 35,
+      "deletions": 37,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "c94f204dcd21aedea98acaf93bb8bf6852f249cd",
+          "filename": ".github/workflows/industrial_ci.yml",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 4,
+          "changes": 10,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/02ff085f6bfa6d58c83d56e31f8fda6bf9c60f5d/.github%2Fworkflows%2Findustrial_ci.yml",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/02ff085f6bfa6d58c83d56e31f8fda6bf9c60f5d/.github%2Fworkflows%2Findustrial_ci.yml",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/.github%2Fworkflows%2Findustrial_ci.yml?ref=02ff085f6bfa6d58c83d56e31f8fda6bf9c60f5d",
+          "patch": "@@ -16,10 +16,12 @@ jobs:\n   industrial_ci:\n     strategy:\n       matrix:\n-        env:\n-          - { ROS_DISTRO: humble, ROS_REPO: ros }\n+        ROS_DISTRO: [jazzy]\n+        ROS_REPO: [ros]\n     runs-on: ubuntu-latest\n     steps:\n-      - uses: actions/checkout@v3\n+      - uses: actions/checkout@v4\n       - uses: \"ros-industrial/industrial_ci@master\"\n-        env: ${{ matrix.env }}\n+        env:\n+          ROS_DISTRO: ${{ matrix.ROS_DISTRO }}\n+          ROS_REPO: ${{ matrix.ROS_REPO }}"
+        },
+        {
+          "sha": "1c96f2fe97f199ffef93af7a9261779636c8e893",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 18,
+          "deletions": 25,
+          "changes": 43,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/02ff085f6bfa6d58c83d56e31f8fda6bf9c60f5d/README.md",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/02ff085f6bfa6d58c83d56e31f8fda6bf9c60f5d/README.md",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/README.md?ref=02ff085f6bfa6d58c83d56e31f8fda6bf9c60f5d",
+          "patch": "@@ -1,35 +1,26 @@\n # Raspimouse Node\n \n-ROS 2 node for the Raspberry Pi Mouse.\n-\n-![raspimouse](https://rt-net.jp/wp-content/uploads/2020/04/Raspberry-Pi-Mouse.png)\n-\n-## Build Status\n-\n-### master branch\n-\n-[![industrial_ci](https://github.com/rt-net/raspimouse2/workflows/industrial_ci/badge.svg?branch=master)](https://github.com/rt-net/raspimouse2/actions?query=workflow%3Aindustrial_ci+branch%3Amaster)\n+[![industrial_ci](https://github.com/rt-net/raspimouse2/actions/workflows/industrial_ci.yml/badge.svg?branch=master)](https://github.com/rt-net/raspimouse2/actions/workflows/industrial_ci.yml)\n \n-### Source Build Status on ROS2 Buildfarm\n+ROS 2 node for the Raspberry Pi Mouse.\n \n-| ROS 2 + Ubuntu | raspimouse | raspimouse_msgs |\n-|:---:|:---:|:---:|\n-| Foxy + Focal ([`foxy-devel`](https://github.com/rt-net/raspimouse2/tree/foxy-devel)) | [![Build Status](https://build.ros2.org/view/Fsrc_uF/job/Fsrc_uF__raspimouse__ubuntu_focal__source/badge/icon)](https://build.ros2.org/view/Fsrc_uF/job/Fsrc_uF__raspimouse__ubuntu_focal__source/) | [![Build Status](https://build.ros2.org/view/Fsrc_uF/job/Fsrc_uF__raspimouse_msgs__ubuntu_focal__source/badge/icon)](https://build.ros2.org/view/Fsrc_uF/job/Fsrc_uF__raspimouse_msgs__ubuntu_focal__source/) |\n-| Humble + Jammy ([`humble-devel`](https://github.com/rt-net/raspimouse2/tree/humble-devel)) | **TODO** | **TODO** |\n+![raspimouse](https://rt-net.github.io/images/raspberry-pi-mouse/Raspberry-Pi-Mouse.png)\n \n ## Requirements\n \n - Raspberry Pi Mouse\n-  - https://rt-net.jp/products/raspberrypimousev3/\n-  - [RT Robot Shop](https://www.rt-shop.jp/index.php?main_page=product_info&cPath=1299_1395&products_id=3774)\n+  - [Summary](https://rt-net.jp/products/raspberrypimousev3/)\n+  - [RT Robot Shop](https://www.rt-shop.jp/index.php?main_page=product_info&products_id=4141)\n - Linux OS\n-  - Ubuntu server 20.04\n-  - https://ubuntu.com/download/raspberry-pi\n+  - Ubuntu server\n+    - 22.04\n+    - 24.04\n+  - [Raspberry Pi OS](https://ubuntu.com/download/raspberry-pi)\n - Device Driver\n   - [rt-net/RaspberryPiMouse](https://github.com/rt-net/RaspberryPiMouse)\n - ROS\n-  - [Foxy Fitzroy](https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/)\n   - [Humble Hawksbill](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html)\n+  - [Jazzy Jalisco](https://docs.ros.org/en/jazzy/Installation/Ubuntu-Install-Debs.html)\n \n ## Installation\n \n@@ -44,7 +35,7 @@ $ sudo apt install ros-$ROS_DISTRO-raspimouse\n ```sh\n $ cd ~/ros2_ws/src\n # Clone package\n-$ git clone -b $ROS_DISTRO-devel https://github.com/rt-net/raspimouse2\n+$ git clone -b $ROS_DISTRO https://github.com/rt-net/raspimouse2\n \n # Install dependencies\n $ rosdep install -r -y -i --from-paths .\n@@ -57,6 +48,8 @@ $ source ~/ros2_ws/install/setup.bash\n \n ## QuickStart\n \n+Build and install the [device driver](https://github.com/rt-net/RaspberryPiMouse) in advance.\n+\n ```sh\n # Terminal 1\n $ source ~/ros2_ws/install/setup.bash\n@@ -69,7 +62,7 @@ $ ros2 topic pub -1 /buzzer std_msgs/msg/Int16 '{data: 1000}'\n $ ros2 topic pub -1 /buzzer std_msgs/msg/Int16 '{data: 0}'\n # or rotate motors\n $ ros2 service call /motor_power std_srvs/SetBool '{data: true}'\n-$ ros2 topic pub -1 /cmd_vel geometry_msgs/Twist '{linear: {x: 0.1, y: 0, z: 0}, angular: {x: 0, y: 0, z: 0.05}}'\n+$ ros2 topic pub -1 /cmd_vel geometry_msgs/msg/TwistStamped '{twist: {linear: {x: 0.05, y: 0, z: 0}, angular: {x: 0, y: 0, z: 0.05}}}'\n # Shutdown\n $ ros2 lifecycle set raspimouse shutdown\n ```\n@@ -105,7 +98,7 @@ a velocity command.\n \n ```shell\n $ ros2 service call /motor_power std_srvs/SetBool '{data: true}'\n-$ ros2 topic pub -1 /cmd_vel geometry_msgs/Twist '{linear: {x: 0.1, y: 0, z: 0}, angular: {x: 0, y: 0, z: 0.05}}'\n+$ ros2 topic pub -1 /cmd_vel geometry_msgs/msg/TwistStamped '{twist: {linear: {x: 0.1, y: 0, z: 0}, angular: {x: 0, y: 0, z: 0.05}}}'\n ```\n \n Odometry information can be checked by echoing the `odom` topic.\n@@ -129,7 +122,7 @@ Similarly other sensor information can also be viewed by echoing the relevant to\n \n - `cmd_vel`\n \n-  Type: `geometry_msgs/Twist`\n+  Type: `geometry_msgs/msg/TwistStamped`\n \n   Controls the motors. Specify the forward and turning speeds of the robot.\n \n@@ -220,7 +213,7 @@ Similarly other sensor information can also be viewed by echoing the relevant to\n \n   Sets the diameter of the robot's wheel.\n   The unit is in meters.\n-  \n+\n - `wheel_tread`\n \n   Type: `double`\n@@ -298,7 +291,7 @@ Similarly other sensor information can also be viewed by echoing the relevant to\n \n   Adds prefix to the frames of the topic `odom`.\n   If set as *`mouse`*, the frame_id and the child_frame_id will be *`mouse/odom`* and *`mouse/baes_footprint`*.\n-  \n+\n ## License\n \n This repository is licensed under the Apache 2.0, see [LICENSE](./LICENSE) for details."
+        },
+        {
+          "sha": "32196ffa538494dbe7d906680f11c6136d83dd60",
+          "filename": "raspimouse/include/raspimouse/raspimouse_component.hpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 2,
+          "changes": 5,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/02ff085f6bfa6d58c83d56e31f8fda6bf9c60f5d/raspimouse%2Finclude%2Fraspimouse%2Fraspimouse_component.hpp",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/02ff085f6bfa6d58c83d56e31f8fda6bf9c60f5d/raspimouse%2Finclude%2Fraspimouse%2Fraspimouse_component.hpp",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/raspimouse%2Finclude%2Fraspimouse%2Fraspimouse_component.hpp?ref=02ff085f6bfa6d58c83d56e31f8fda6bf9c60f5d",
+          "patch": "@@ -65,6 +65,7 @@ extern \"C\" {\n #include <std_msgs/msg/int16.hpp>\n #include <std_srvs/srv/set_bool.hpp>\n #include <nav_msgs/msg/odometry.hpp>\n+#include <geometry_msgs/msg/twist_stamped.hpp>\n \n #include <raspimouse_msgs/msg/leds.hpp>\n #include <raspimouse_msgs/msg/switches.hpp>\n@@ -97,7 +98,7 @@ class Raspimouse : public rclcpp_lifecycle::LifecycleNode\n   int last_pulse_count_left_;\n   int last_pulse_count_right_;\n \n-  rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr velocity_sub_;\n+  rclcpp::Subscription<geometry_msgs::msg::TwistStamped>::SharedPtr velocity_sub_;\n   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr power_service_;\n   rclcpp::TimerBase::SharedPtr watchdog_timer_;\n \n@@ -136,7 +137,7 @@ class Raspimouse : public rclcpp_lifecycle::LifecycleNode\n   void publish_switches();\n   void publish_light_sensors();\n \n-  void velocity_command(const geometry_msgs::msg::Twist::SharedPtr msg);\n+  void velocity_command(const geometry_msgs::msg::TwistStamped::SharedPtr msg);\n   void leds_command(const raspimouse_msgs::msg::Leds::SharedPtr msg);\n   void buzzer_command(const std_msgs::msg::Int16::SharedPtr msg);\n "
+        },
+        {
+          "sha": "b4c39e26091cb411ff5d46682cde7f6048aabb7b",
+          "filename": "raspimouse/launch/raspimouse.launch.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/02ff085f6bfa6d58c83d56e31f8fda6bf9c60f5d/raspimouse%2Flaunch%2Fraspimouse.launch.py",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/02ff085f6bfa6d58c83d56e31f8fda6bf9c60f5d/raspimouse%2Flaunch%2Fraspimouse.launch.py",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/raspimouse%2Flaunch%2Fraspimouse.launch.py?ref=02ff085f6bfa6d58c83d56e31f8fda6bf9c60f5d",
+          "patch": "@@ -21,8 +21,8 @@\n from launch.events import matches_action\n from launch.events import Shutdown\n from launch_ros.actions import LifecycleNode\n-from launch_ros.events import lifecycle\n from launch_ros.event_handlers import OnStateTransition\n+from launch_ros.events import lifecycle\n from lifecycle_msgs.msg import Transition\n \n \n@@ -33,7 +33,7 @@ def generate_launch_description():\n         package='raspimouse', executable='raspimouse', output='screen',\n         parameters=[os.path.join(get_package_share_directory(\n             'raspimouse'), 'config', 'params.yaml')]\n-            )\n+    )\n \n     emit_configuring_event = EmitEvent(\n         event=lifecycle.ChangeState("
+        },
+        {
+          "sha": "5ee6c14c686818f942c7c34815030289ba23d0e1",
+          "filename": "raspimouse/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/02ff085f6bfa6d58c83d56e31f8fda6bf9c60f5d/raspimouse%2Fpackage.xml",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/02ff085f6bfa6d58c83d56e31f8fda6bf9c60f5d/raspimouse%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/raspimouse%2Fpackage.xml?ref=02ff085f6bfa6d58c83d56e31f8fda6bf9c60f5d",
+          "patch": "@@ -11,6 +11,7 @@\n   <author email=\"daisuke.sato@rt-net.jp\">Daisuke Sato</author>\n   <author email=\"kozasa@rt-net.jp\">Shuhei Kozasa</author>\n   <author email=\"git@killbots.net\">Geoffrey Biggs</author>\n+  <author email=\"kurasawa@rt-net.jp\">Kazushi Kurasawa</author>\n \n   <buildtool_depend>ament_cmake</buildtool_depend>\n "
+        },
+        {
+          "sha": "e707a11cc5c52002bc64897590e523d728a2be21",
+          "filename": "raspimouse/src/raspimouse_component.cpp",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 4,
+          "changes": 9,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/02ff085f6bfa6d58c83d56e31f8fda6bf9c60f5d/raspimouse%2Fsrc%2Fraspimouse_component.cpp",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/02ff085f6bfa6d58c83d56e31f8fda6bf9c60f5d/raspimouse%2Fsrc%2Fraspimouse_component.cpp",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/raspimouse%2Fsrc%2Fraspimouse_component.cpp?ref=02ff085f6bfa6d58c83d56e31f8fda6bf9c60f5d",
+          "patch": "@@ -25,6 +25,7 @@\n #include \"rclcpp/rclcpp.hpp\"\n #include \"rosidl_runtime_cpp/message_initialization.hpp\"\n #include \"lifecycle_msgs/msg/transition.hpp\"\n+#include \"geometry_msgs/msg/twist_stamped.hpp\"\n \n #define _USE_MATH_DEFINES\n \n@@ -128,7 +129,7 @@ CallbackReturn Raspimouse::on_configure(const rclcpp_lifecycle::State &)\n   odom_timer_->cancel();\n \n   // Subscriber for velocity commands\n-  velocity_sub_ = create_subscription<geometry_msgs::msg::Twist>(\n+  velocity_sub_ = create_subscription<geometry_msgs::msg::TwistStamped>(\n     \"cmd_vel\", 10, std::bind(&Raspimouse::velocity_command, this, _1));\n \n   // Motor power control service\n@@ -431,10 +432,10 @@ void Raspimouse::publish_light_sensors()\n   light_sensors_pub_->publish(sensor_values);\n }\n \n-void Raspimouse::velocity_command(const geometry_msgs::msg::Twist::SharedPtr msg)\n+void Raspimouse::velocity_command(const geometry_msgs::msg::TwistStamped::SharedPtr msg)\n {\n-  linear_velocity_ = msg->linear.x;\n-  angular_velocity_ = msg->angular.z;\n+  linear_velocity_ = msg->twist.linear.x;\n+  angular_velocity_ = msg->twist.angular.z;\n \n   const auto WHEEL_DIAMETER = get_parameter(WHEEL_DIAMETER_PARAM).get_value<double>();\n   const auto WHEEL_TREAD = get_parameter(WHEEL_TREAD_PARAM).get_value<double>();"
+        }
+      ]
+    },
+    {
+      "author": "YusukeKato",
+      "date": "2023-08-24T06:24:34Z",
+      "sha": "05393ad82b3313007fe00b76c0b57337496b8faa",
+      "message": "リリースのためにCHANGELOGとpackage.xmlを更新 (#51)\n\n* リリースに向けてCHANGELOGを更新\r\n\r\n* 1.1.2",
+      "files_changed": 4,
+      "additions": 11,
+      "deletions": 3,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "88cde362bf7d92222ec76da9963b65e563892bb1",
+          "filename": "raspimouse/CHANGELOG.rst",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 1,
+          "changes": 7,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/05393ad82b3313007fe00b76c0b57337496b8faa/raspimouse%2FCHANGELOG.rst",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/05393ad82b3313007fe00b76c0b57337496b8faa/raspimouse%2FCHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/raspimouse%2FCHANGELOG.rst?ref=05393ad82b3313007fe00b76c0b57337496b8faa",
+          "patch": "@@ -2,6 +2,11 @@\n Changelog for package raspimouse\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+1.1.2 (2023-08-24)\n+------------------\n+* Calculate speed from robot parameters (`#50 <https://github.com/rt-net/raspimouse2/issues/50>`_)\n+* Contributors: Tatsuhiro Ikebe\n+\n 1.1.1 (2023-01-26)\n ------------------\n * Humble対応 (`#48 <https://github.com/rt-net/raspimouse2/issues/48>`_)\n@@ -53,4 +58,4 @@ Changelog for package raspimouse\n 0.1.0 (2018-09-07)\n ------------------\n * Initial commit\n-* Contributors: Geoffrey Biggs\n\\ No newline at end of file\n+* Contributors: Geoffrey Biggs"
+        },
+        {
+          "sha": "6e1fa19ceb74439fe6ad1ce21328f77b19090ae8",
+          "filename": "raspimouse/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/05393ad82b3313007fe00b76c0b57337496b8faa/raspimouse%2Fpackage.xml",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/05393ad82b3313007fe00b76c0b57337496b8faa/raspimouse%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/raspimouse%2Fpackage.xml?ref=05393ad82b3313007fe00b76c0b57337496b8faa",
+          "patch": "@@ -2,7 +2,7 @@\n <?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"3\">\n   <name>raspimouse</name>\n-  <version>1.1.1</version>\n+  <version>1.1.2</version>\n   <description>RaspiMouse ROS 2 node</description>\n   <maintainer email=\"shop@rt-net.jp\">RT Corporation</maintainer>\n   <license>Apache License 2.0</license>"
+        },
+        {
+          "sha": "bfeddec329ebf6d1164a336a8639acc0f7d60e61",
+          "filename": "raspimouse_msgs/CHANGELOG.rst",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/05393ad82b3313007fe00b76c0b57337496b8faa/raspimouse_msgs%2FCHANGELOG.rst",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/05393ad82b3313007fe00b76c0b57337496b8faa/raspimouse_msgs%2FCHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/raspimouse_msgs%2FCHANGELOG.rst?ref=05393ad82b3313007fe00b76c0b57337496b8faa",
+          "patch": "@@ -2,6 +2,9 @@\n Changelog for package raspimouse_msgs\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+1.1.2 (2023-08-24)\n+------------------\n+\n 1.1.1 (2023-01-26)\n ------------------\n "
+        },
+        {
+          "sha": "81084e4897cc219a19aad6df03486225e35e2bcd",
+          "filename": "raspimouse_msgs/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/05393ad82b3313007fe00b76c0b57337496b8faa/raspimouse_msgs%2Fpackage.xml",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/05393ad82b3313007fe00b76c0b57337496b8faa/raspimouse_msgs%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/raspimouse_msgs%2Fpackage.xml?ref=05393ad82b3313007fe00b76c0b57337496b8faa",
+          "patch": "@@ -2,7 +2,7 @@\n <?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"3\">\n   <name>raspimouse_msgs</name>\n-  <version>1.1.1</version>\n+  <version>1.1.2</version>\n   <description>RaspiMouse messages</description>\n   <maintainer email=\"shop@rt-net.jp\">RT Corporation</maintainer>\n   <license>Apache License 2.0</license>"
+        }
+      ]
+    },
+    {
+      "author": "uhobeike",
+      "date": "2023-03-01T05:26:54Z",
+      "sha": "2bac95b37d32ea28e8db5c83e2b70b8c46f14d79",
+      "message": "Calculate speed from robot parameters (#50)\n\n* Feature calculate speed from robot parameters\r\n\r\n* Reformat code",
+      "files_changed": 1,
+      "additions": 9,
+      "deletions": 4,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "8f597b01b0f7b4ef5d563a6c852a003f5a30a7cf",
+          "filename": "raspimouse/src/raspimouse_component.cpp",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 4,
+          "changes": 13,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/2bac95b37d32ea28e8db5c83e2b70b8c46f14d79/raspimouse%2Fsrc%2Fraspimouse_component.cpp",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/2bac95b37d32ea28e8db5c83e2b70b8c46f14d79/raspimouse%2Fsrc%2Fraspimouse_component.cpp",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/raspimouse%2Fsrc%2Fraspimouse_component.cpp?ref=2bac95b37d32ea28e8db5c83e2b70b8c46f14d79",
+          "patch": "@@ -436,11 +436,16 @@ void Raspimouse::velocity_command(const geometry_msgs::msg::Twist::SharedPtr msg\n   linear_velocity_ = msg->linear.x;\n   angular_velocity_ = msg->angular.z;\n \n-  auto forward_hz = 80000 * linear_velocity_ / (9 * M_PI);\n-  auto rotation_hz = 400 * angular_velocity_ / M_PI;\n+  const auto WHEEL_DIAMETER = get_parameter(WHEEL_DIAMETER_PARAM).get_value<double>();\n+  const auto WHEEL_TREAD = get_parameter(WHEEL_TREAD_PARAM).get_value<double>();\n+\n+  const double vel_left = (linear_velocity_ - angular_velocity_ * WHEEL_TREAD / 2.0) /\n+    (WHEEL_DIAMETER / 2);\n+  const double vel_right = (linear_velocity_ + angular_velocity_ * WHEEL_TREAD / 2.0) /\n+    (WHEEL_DIAMETER / 2);\n \n-  *left_motor_control_ << static_cast<int>(round(forward_hz - rotation_hz)) << std::endl;\n-  *right_motor_control_ << static_cast<int>(round(forward_hz + rotation_hz)) << std::endl;\n+  *left_motor_control_ << static_cast<int>(round(vel_left / (2.0 * M_PI) * 400.0)) << std::endl;\n+  *right_motor_control_ << static_cast<int>(round(vel_right / (2.0 * M_PI) * 400.0)) << std::endl;\n   // Reset the watchdog timeout\n   watchdog_timer_->reset();\n }"
+        }
+      ]
+    },
+    {
+      "author": "Shuhei Kozasa",
+      "date": "2021-11-19T06:34:17Z",
+      "sha": "6ee71bb149f1355b47a56d87ce7d84c573ac30fe",
+      "message": "パラメータの追加 （#34） (#36)\n\n* Adds wheel params\r\n\r\n* Adds PULSES param\r\n\r\n* Delete comment\r\n\r\n* Changes variable names.\r\n\r\nROS param case to lower case.\r\nConstant value names to upper case.\r\n\r\nCo-authored-by: Shota Aoki <s.aoki@rt-net.jp>\r\n\r\n* Changes constant value name to upper case\r\n\r\nCo-authored-by: Shota Aoki <s.aoki@rt-net.jp>\r\n\r\n* Changes constant value name to upper case\r\n\r\nCo-authored-by: Shota Aoki <s.aoki@rt-net.jp>\r\n\r\n* Changes PULSES_PER_REVOLUTION value to constant value\r\n\r\nCo-authored-by: Shota Aoki <s.aoki@rt-net.jp>\r\n\r\n* Update default values\r\n\r\nCo-authored-by: Shota Aoki <s.aoki@rt-net.jp>\r\n\r\n* Update default value\r\n\r\n* Changes param name\r\n\r\n* Adds param info\r\n\r\n* Changes constant values to upeer case\r\n\r\n* Changes value to constant value\r\n\r\nCo-authored-by: Shota Aoki <s.aoki@rt-net.jp>\r\n\r\nCo-authored-by: Shota Aoki <s.aoki@rt-net.jp>",
+      "files_changed": 2,
+      "additions": 41,
+      "deletions": 7,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "4167ff94bc799b3ad9bd666782f60bf9ecab9b85",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 27,
+          "deletions": 0,
+          "changes": 27,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/6ee71bb149f1355b47a56d87ce7d84c573ac30fe/README.md",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/6ee71bb149f1355b47a56d87ce7d84c573ac30fe/README.md",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/README.md?ref=6ee71bb149f1355b47a56d87ce7d84c573ac30fe",
+          "patch": "@@ -215,6 +215,33 @@ Similarly other sensor information can also be viewed by echoing the relevant to\n   Use hardware pulse counters as the odometry source. When set to true, hardware pulse counters\n   will be used only if present.\n \n+- `wheel_diameter`\n+\n+  Type: `double`\n+\n+  Default: `0.048`\n+\n+  Sets the diameter of the robot's wheel.\n+  The unit is in meters.\n+  \n+- `wheel_tread`\n+\n+  Type: `double`\n+\n+  Default: `0.0925`\n+\n+  Sets the distance between the wheels.\n+  The unit is in meters.\n+\n+- `pulses_per_revolution`\n+\n+  Type: `double`\n+\n+  Default: `400.0`\n+\n+  Sets the number of pulses needed for 1 rotation of the used motor.\n+\n+\n ## License\n \n This repository is licensed under the Apache 2.0, see [LICENSE](./LICENSE) for details."
+        },
+        {
+          "sha": "1d2a553999003626cf429a374a3c6a1428304b3a",
+          "filename": "raspimouse/src/raspimouse_component.cpp",
+          "status": "modified",
+          "additions": 14,
+          "deletions": 7,
+          "changes": 21,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/6ee71bb149f1355b47a56d87ce7d84c573ac30fe/raspimouse%2Fsrc%2Fraspimouse_component.cpp",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/6ee71bb149f1355b47a56d87ce7d84c573ac30fe/raspimouse%2Fsrc%2Fraspimouse_component.cpp",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/raspimouse%2Fsrc%2Fraspimouse_component.cpp?ref=6ee71bb149f1355b47a56d87ce7d84c573ac30fe",
+          "patch": "@@ -33,9 +33,9 @@ constexpr auto use_light_sensors_param = \"use_light_sensors\";\n constexpr auto odometry_scale_left_wheel_param = \"odometry_scale_left_wheel\";\n constexpr auto odometry_scale_right_wheel_param = \"odometry_scale_right_wheel\";\n \n-constexpr auto wheel_diameter = 0.048;\n-constexpr auto wheel_base = 0.09;\n-constexpr auto PULSES_PER_REVOLUTION = 400.0;\n+constexpr auto WHEEL_DIAMETER_PARAM = \"wheel_diameter\";\n+constexpr auto WHEEL_TREAD_PARAM = \"wheel_tread\";\n+constexpr auto PULSES_PER_REVOLUTION_PARAM= \"pulses_per_revolution\";\n \n constexpr auto DEVFILE_COUNTER_L = \"/dev/rtcounter_l1\";\n constexpr auto DEVFILE_COUNTER_R = \"/dev/rtcounter_r1\";\n@@ -185,6 +185,9 @@ CallbackReturn Raspimouse::on_configure(const rclcpp_lifecycle::State &)\n   declare_parameter(use_light_sensors_param, true);\n   declare_parameter(odometry_scale_left_wheel_param, 1.0);\n   declare_parameter(odometry_scale_right_wheel_param, 1.0);\n+  declare_parameter(WHEEL_DIAMETER_PARAM, 0.048);\n+  declare_parameter(WHEEL_TREAD_PARAM, 0.0925);\n+  declare_parameter(PULSES_PER_REVOLUTION_PARAM, 400.0);\n \n   // Test if the pulse counters are available\n   if (get_parameter(use_pulse_counters_param).get_value<bool>()) {\n@@ -484,9 +487,13 @@ void Raspimouse::stop_motors()\n \n void Raspimouse::calculate_odometry_from_pulse_counts(double & x, double & y, double & theta)\n {\n-  auto one_revolution_distance_left = M_PI * wheel_diameter *\n+  const auto WHEEL_DIAMETER = get_parameter(WHEEL_DIAMETER_PARAM).get_value<double>();\n+  const auto WHEEL_TREAD = get_parameter(WHEEL_TREAD_PARAM).get_value<double>();\n+  const auto PULSES_PER_REVOLUTION = get_parameter(PULSES_PER_REVOLUTION_PARAM).get_value<double>();\n+\n+  auto one_revolution_distance_left = M_PI * WHEEL_DIAMETER *\n     get_parameter(odometry_scale_left_wheel_param).get_value<double>();\n-  auto one_revolution_distance_right = M_PI * wheel_diameter *\n+  auto one_revolution_distance_right = M_PI * WHEEL_DIAMETER *\n     get_parameter(odometry_scale_right_wheel_param).get_value<double>();\n \n   RCLCPP_DEBUG(get_logger(), \"Reading counters\");\n@@ -507,7 +514,7 @@ void Raspimouse::calculate_odometry_from_pulse_counts(double & x, double & y, do\n   last_odom_time_ = now();\n \n   // Detect overflow/underflow\n-  constexpr auto OVERFLOW_THRESHOLD = 2.0 * PULSES_PER_REVOLUTION;\n+  const auto OVERFLOW_THRESHOLD = 2.0 * PULSES_PER_REVOLUTION;\n   if (fabs(pulse_count_difference_left) > OVERFLOW_THRESHOLD ||\n     fabs(pulse_count_difference_right) > OVERFLOW_THRESHOLD)\n   {\n@@ -530,7 +537,7 @@ void Raspimouse::calculate_odometry_from_pulse_counts(double & x, double & y, do\n     get_logger(), \"Left dist: %f\\tRight dist: %f\\tAverage: %f\",\n     left_distance, right_distance, average_distance);\n \n-  theta += atan2(right_distance - left_distance, wheel_base);\n+  theta += atan2(right_distance - left_distance, WHEEL_TREAD);\n   x += average_distance * cos(theta);\n   y += average_distance * sin(theta);\n "
+        }
+      ]
+    },
+    {
+      "author": "Shota Aoki",
+      "date": "2020-01-09T09:10:31Z",
+      "sha": "c4f1ef840bd6308e83868258bddb9efac56cac3f",
+      "message": "Merge pull request #7 from rt-net/add_contributors\n\nAdd contributors",
+      "files_changed": 1,
+      "additions": 8,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "e9b99d6b4009343492530716871f901568c398d6",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/c4f1ef840bd6308e83868258bddb9efac56cac3f/README.md",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/c4f1ef840bd6308e83868258bddb9efac56cac3f/README.md",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/README.md?ref=c4f1ef840bd6308e83868258bddb9efac56cac3f",
+          "patch": "@@ -147,3 +147,11 @@ Similarly other sensor information can also be viewed by echoing the relevant to\n   possible for reading from the pulse counters to cause the node to freeze. If this happens\n   regularly, disable the hardware pulse counters using the `use_pulse_counters` parameter and\n   rely on estimated odometry instead.\n+\n+## Contributors\n+\n+* Geoffrey Biggs ([@gbiggs](https://github.com/gbiggs)), **original author**\n+* Shota Hirama ([@shotahirama](https://github.com/shotahirama))\n+* Yutaka Kondo ([@youtalk](https://github.com/youtalk))\n+\n+Contributions are always welcome!"
+        }
+      ]
+    },
+    {
+      "author": "ShotaAk",
+      "date": "2022-06-30T02:08:50Z",
+      "sha": "a77b28375110415356c27df25f9576ef556bef8e",
+      "message": "ノードの実行を簡単にするためlaunchファイルとconfigファイルを追加",
+      "files_changed": 5,
+      "additions": 105,
+      "deletions": 9,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "efdcd555e5a1b3f9a6c10de2b60c9c8530f08ff6",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 9,
+          "changes": 14,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/a77b28375110415356c27df25f9576ef556bef8e/README.md",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/a77b28375110415356c27df25f9576ef556bef8e/README.md",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/README.md?ref=a77b28375110415356c27df25f9576ef556bef8e",
+          "patch": "@@ -59,22 +59,18 @@ $ source ~/ros2_ws/install/setup.bash\n ```sh\n # Terminal 1\n $ source ~/ros2_ws/install/setup.bash\n-$ ros2 run raspimouse raspimouse\n-\n+$ ros2 launch raspimouse raspimouse.launch.py\n \n # Terminal 2\n $ source ~/ros2_ws/install/setup.bash\n-$ ros2 lifecycle set raspimouse configure\n-\n # Set buzzer frequency\n $ ros2 topic pub -1 /buzzer std_msgs/msg/Int16 '{data: 1000}'\n $ ros2 topic pub -1 /buzzer std_msgs/msg/Int16 '{data: 0}'\n-\n # or rotate motors\n-$ ros2 lifecycle set raspimouse activate\n $ ros2 service call /motor_power std_srvs/SetBool '{data: true}'\n-$ ros2 topic pub -1 /cmd_vel geometry_msgs/Twist '{linear: {x: 0.05, y: 0, z: 0}, angular: {x: 0, y: 0, z: 0.05}}'\n-$ ros2 lifecycle set raspimouse deactivate\n+$ ros2 topic pub -1 /cmd_vel geometry_msgs/Twist '{linear: {x: 0.1, y: 0, z: 0}, angular: {x: 0, y: 0, z: 0.05}}'\n+# Shutdown\n+$ ros2 lifecycle set raspimouse shutdown\n ```\n \n ## Node Description\n@@ -108,7 +104,7 @@ a velocity command.\n \n ```shell\n $ ros2 service call /motor_power std_srvs/SetBool '{data: true}'\n-$ ros2 topic pub -1 /cmd_vel geometry_msgs/Twist '{linear: {x: 0.05, y: 0, z: 0}, angular: {x: 0, y: 0, z: 0.05}}'\n+$ ros2 topic pub -1 /cmd_vel geometry_msgs/Twist '{linear: {x: 0.1, y: 0, z: 0}, angular: {x: 0, y: 0, z: 0.05}}'\n ```\n \n Odometry information can be checked by echoing the `odom` topic."
+        },
+        {
+          "sha": "8b18c6cb8da9b8dd3c9039bf718e5843d34e5a81",
+          "filename": "raspimouse/CMakeLists.txt",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/a77b28375110415356c27df25f9576ef556bef8e/raspimouse%2FCMakeLists.txt",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/a77b28375110415356c27df25f9576ef556bef8e/raspimouse%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/raspimouse%2FCMakeLists.txt?ref=a77b28375110415356c27df25f9576ef556bef8e",
+          "patch": "@@ -75,6 +75,12 @@ install(\n   DESTINATION include\n )\n \n+install(DIRECTORY\n+  launch\n+  config\n+  DESTINATION share/${PROJECT_NAME}/\n+)\n+\n install(\n   TARGETS raspimouse_component\n   EXPORT export_raspimouse_component"
+        },
+        {
+          "sha": "ee8dc978f1cf50be6f3357d40c11f60867d1bfae",
+          "filename": "raspimouse/config/params.yaml",
+          "status": "added",
+          "additions": 11,
+          "deletions": 0,
+          "changes": 11,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/a77b28375110415356c27df25f9576ef556bef8e/raspimouse%2Fconfig%2Fparams.yaml",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/a77b28375110415356c27df25f9576ef556bef8e/raspimouse%2Fconfig%2Fparams.yaml",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/raspimouse%2Fconfig%2Fparams.yaml?ref=a77b28375110415356c27df25f9576ef556bef8e",
+          "patch": "@@ -0,0 +1,11 @@\n+raspimouse:\n+  ros__parameters:\n+    odometry_scale_left_wheel : 1.0\n+    odometry_scale_right_wheel: 1.0\n+    use_light_sensors         : true\n+    use_pulse_counters        : false\n+    wheel_diameter            : 0.048\n+    wheel_tread               : 0.0925\n+    pulses_per_revolution     : 400.0\n+    light_sensors_hz          : 100.0\n+    initial_motor_power       : false"
+        },
+        {
+          "sha": "3ba83b4dca86c479d5f485f2e166b21d3ef780c5",
+          "filename": "raspimouse/launch/raspimouse.launch.py",
+          "status": "added",
+          "additions": 81,
+          "deletions": 0,
+          "changes": 81,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/a77b28375110415356c27df25f9576ef556bef8e/raspimouse%2Flaunch%2Fraspimouse.launch.py",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/a77b28375110415356c27df25f9576ef556bef8e/raspimouse%2Flaunch%2Fraspimouse.launch.py",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/raspimouse%2Flaunch%2Fraspimouse.launch.py?ref=a77b28375110415356c27df25f9576ef556bef8e",
+          "patch": "@@ -0,0 +1,81 @@\n+# Copyright 2022 RT Corporation\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+import os\n+\n+from ament_index_python.packages import get_package_share_directory\n+from launch import LaunchDescription\n+from launch.actions import EmitEvent\n+from launch.actions import RegisterEventHandler\n+from launch.events import matches_action\n+from launch.events import Shutdown\n+from launch_ros.actions import LifecycleNode\n+from launch_ros.events import lifecycle\n+from launch_ros.event_handlers import OnStateTransition\n+from lifecycle_msgs.msg import Transition\n+\n+\n+def generate_launch_description():\n+    mouse_node = LifecycleNode(\n+        name='raspimouse',\n+        package='raspimouse', executable='raspimouse', output='screen',\n+        parameters=[os.path.join(get_package_share_directory(\n+            'raspimouse'), 'config', 'params.yaml')]\n+            )\n+\n+    emit_configuring_event = EmitEvent(\n+        event=lifecycle.ChangeState(\n+            lifecycle_node_matcher=matches_action(mouse_node),\n+            transition_id=Transition.TRANSITION_CONFIGURE,\n+        )\n+    )\n+\n+    emit_activating_event = EmitEvent(\n+        event=lifecycle.ChangeState(\n+            lifecycle_node_matcher=matches_action(mouse_node),\n+            transition_id=Transition.TRANSITION_ACTIVATE,\n+        )\n+    )\n+\n+    emit_shutdown_event = EmitEvent(\n+        event=Shutdown()\n+    )\n+\n+    register_activating_transition = RegisterEventHandler(\n+        OnStateTransition(\n+            target_lifecycle_node=mouse_node,\n+            goal_state='inactive',\n+            entities=[\n+                emit_activating_event\n+            ],\n+        )\n+    )\n+\n+    register_shutting_down_transition = RegisterEventHandler(\n+        OnStateTransition(\n+            target_lifecycle_node=mouse_node,\n+            goal_state='finalized',\n+            entities=[\n+                emit_shutdown_event\n+            ],\n+        )\n+    )\n+\n+    ld = LaunchDescription()\n+    ld.add_action(mouse_node)\n+    ld.add_action(register_activating_transition)\n+    ld.add_action(register_shutting_down_transition)\n+    ld.add_action(emit_configuring_event)\n+\n+    return ld"
+        },
+        {
+          "sha": "d18a75021c5947f1988c7334e4b2c9d25607f794",
+          "filename": "raspimouse/package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/a77b28375110415356c27df25f9576ef556bef8e/raspimouse%2Fpackage.xml",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/a77b28375110415356c27df25f9576ef556bef8e/raspimouse%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/raspimouse%2Fpackage.xml?ref=a77b28375110415356c27df25f9576ef556bef8e",
+          "patch": "@@ -33,6 +33,8 @@\n   <exec_depend>tf2_ros</exec_depend>\n   <exec_depend>raspimouse_msgs</exec_depend>\n \n+  <depend>lifecycle_msgs</depend>\n+\n   <test_depend>ament_lint_auto</test_depend>\n   <test_depend>ament_lint_common</test_depend>\n "
+        }
+      ]
+    },
+    {
+      "author": "Tiryoh",
+      "date": "2019-12-24T05:19:21Z",
+      "sha": "34ceda9fb48019ab3009a0d9cf9bdb42f15a5872",
+      "message": "Add contributors",
+      "files_changed": 1,
+      "additions": 8,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "7d82c5401b38f6bb56c42020322e15136308740e",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/34ceda9fb48019ab3009a0d9cf9bdb42f15a5872/README.md",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/34ceda9fb48019ab3009a0d9cf9bdb42f15a5872/README.md",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/README.md?ref=34ceda9fb48019ab3009a0d9cf9bdb42f15a5872",
+          "patch": "@@ -147,3 +147,11 @@ Similarly other sensor information can also be viewed by echoing the relevant to\n   possible for reading from the pulse counters to cause the node to freeze. If this happens\n   regularly, disable the hardware pulse counters using the `use_pulse_counters` parameter and\n   rely on estimated odometry instead.\n+\n+## Contributors\n+\n+* Geoffrey Biggs ([@gbiggs](https://github.com/gbiggs)), **original author**\n+* Shota Hirama ([@shotahirama](https://github.com/shotahirama))\n+* Yudaka Kondo ([@youtalk](https://github.com/youtalk))\n+\n+Contributions are always welcome!"
+        }
+      ]
+    },
+    {
+      "author": "youtalk",
+      "date": "2019-08-30T09:34:47Z",
+      "sha": "5b20fb40117c911aeb87c704ff2010e2e6eaa940",
+      "message": "Re-enable tf (#3)\n\n* comment in tf\r\n\r\n* initialize all instance variables\r\n\r\n* update readme",
+      "files_changed": 2,
+      "additions": 5,
+      "deletions": 9,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "fa987ef31f9fa57bbaa8c88b6a95de56671de60d",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 4,
+          "changes": 5,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/5b20fb40117c911aeb87c704ff2010e2e6eaa940/README.md",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/5b20fb40117c911aeb87c704ff2010e2e6eaa940/README.md",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/README.md?ref=5b20fb40117c911aeb87c704ff2010e2e6eaa940",
+          "patch": "@@ -90,7 +90,7 @@ Similarly other sensor information can also be viewed by echoing the relevant to\n   Type: `raspimouse_msgs/Switches`\n \n   Provides the status of each of the three push switches on the side of the robot.\n-  \n+\n \n ## Services\n \n@@ -147,6 +147,3 @@ Similarly other sensor information can also be viewed by echoing the relevant to\n   possible for reading from the pulse counters to cause the node to freeze. If this happens\n   regularly, disable the hardware pulse counters using the `use_pulse_counters` parameter and\n   rely on estimated odometry instead.\n-\n-- The necessary TF transform for use with the navivation stack is not currently publishable due to\n-  missing compatibility between managed-lifecycle nodes and the `tf2` library."
+        },
+        {
+          "sha": "60c18474f8e6f8c94f2749546191e72c5d66e349",
+          "filename": "raspimouse/src/raspimouse_component.cpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 5,
+          "changes": 9,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/5b20fb40117c911aeb87c704ff2010e2e6eaa940/raspimouse%2Fsrc%2Fraspimouse_component.cpp",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/5b20fb40117c911aeb87c704ff2010e2e6eaa940/raspimouse%2Fsrc%2Fraspimouse_component.cpp",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/raspimouse%2Fsrc%2Fraspimouse_component.cpp?ref=5b20fb40117c911aeb87c704ff2010e2e6eaa940",
+          "patch": "@@ -46,6 +46,7 @@ Raspimouse::Raspimouse(const rclcpp::NodeOptions &options)\n   last_odom_time_(0),\n   linear_velocity_(0),\n   angular_velocity_(0),\n+  odom_theta_(0),\n   use_pulse_counters_(false),\n   last_pulse_count_left_(0),\n   last_pulse_count_right_(0)\n@@ -74,9 +75,8 @@ CallbackReturn Raspimouse::on_configure(const rclcpp_lifecycle::State &)\n   odom_.pose.pose.orientation.w = 0;\n   odom_theta_ = 0;\n   // Publisher for odometry transform\n-  // TODO: When the tf2 API is updated to match rclcpp, re-enable this broadcaster\n-  //odom_transform_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(\n-    //std::static_pointer_cast<rclcpp::Node>(this->shared_from_this()));\n+  odom_transform_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(\n+      this->shared_from_this());\n   odom_transform_.header.frame_id = \"odom\";\n   odom_transform_.child_frame_id = \"base_link\";\n   odom_transform_.transform.translation.x = 0;\n@@ -288,15 +288,14 @@ void Raspimouse::publish_odometry()\n   odom_.twist.twist.angular.z = angular_velocity_;\n   odom_pub_->publish(odom_);\n \n-  /* TODO: When the tf2 API is updated to match rclcpp, re-enable this broadcaster\n   odom_transform_.header.stamp = last_odom_time_;\n   odom_transform_.transform.translation.x = odom_.pose.pose.position.x;\n   odom_transform_.transform.translation.y = odom_.pose.pose.position.y;\n   odom_transform_.transform.rotation.x = odom_q.x();\n   odom_transform_.transform.rotation.y = odom_q.y();\n   odom_transform_.transform.rotation.z = odom_q.z();\n   odom_transform_.transform.rotation.w = odom_q.w();\n-  odom_transform_broadcaster_->sendTransform(odom_transform_);*/\n+  odom_transform_broadcaster_->sendTransform(odom_transform_);\n }\n \n void Raspimouse::publish_switches()"
+        }
+      ]
+    },
+    {
+      "author": "shotahirama",
+      "date": "2019-05-16T22:13:56Z",
+      "sha": "90528988fb846187abc0268a4fbdb8d4d169ea9a",
+      "message": "Add Crystal support (#1)\n\n* Add Crystal support\r\n\r\n* Use type alias for CallbackReturn",
+      "files_changed": 2,
+      "additions": 21,
+      "deletions": 20,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "aef8f1e95da1b248f1e5cca22e30117ae19d35fb",
+          "filename": "raspimouse/include/raspimouse/raspimouse_component.hpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 4,
+          "changes": 8,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/90528988fb846187abc0268a4fbdb8d4d169ea9a/raspimouse%2Finclude%2Fraspimouse%2Fraspimouse_component.hpp",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/90528988fb846187abc0268a4fbdb8d4d169ea9a/raspimouse%2Finclude%2Fraspimouse%2Fraspimouse_component.hpp",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/raspimouse%2Finclude%2Fraspimouse%2Fraspimouse_component.hpp?ref=90528988fb846187abc0268a4fbdb8d4d169ea9a",
+          "patch": "@@ -111,10 +111,10 @@ class Raspimouse : public rclcpp_lifecycle::LifecycleNode\n   std::shared_ptr<std::ofstream> led3_output_;\n   std::shared_ptr<std::ofstream> buzzer_output_;\n \n-  rcl_lifecycle_transition_key_t on_configure(const rclcpp_lifecycle::State &);\n-  rcl_lifecycle_transition_key_t on_activate(const rclcpp_lifecycle::State &);\n-  rcl_lifecycle_transition_key_t on_deactivate(const rclcpp_lifecycle::State &);\n-  rcl_lifecycle_transition_key_t on_cleanup(const rclcpp_lifecycle::State &);\n+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_configure(const rclcpp_lifecycle::State &);\n+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_activate(const rclcpp_lifecycle::State &);\n+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_deactivate(const rclcpp_lifecycle::State &);\n+  rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_cleanup(const rclcpp_lifecycle::State &);\n \n   void publish_odometry();\n   void publish_switches();"
+        },
+        {
+          "sha": "86cdb1c7bb5eefafab231deeb8b6922e27d8f5fe",
+          "filename": "raspimouse/src/raspimouse_component.cpp",
+          "status": "modified",
+          "additions": 17,
+          "deletions": 16,
+          "changes": 33,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/90528988fb846187abc0268a4fbdb8d4d169ea9a/raspimouse%2Fsrc%2Fraspimouse_component.cpp",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/90528988fb846187abc0268a4fbdb8d4d169ea9a/raspimouse%2Fsrc%2Fraspimouse_component.cpp",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/raspimouse%2Fsrc%2Fraspimouse_component.cpp?ref=90528988fb846187abc0268a4fbdb8d4d169ea9a",
+          "patch": "@@ -26,6 +26,7 @@\n #include <lifecycle_msgs/msg/transition.hpp>\n \n using namespace std::chrono_literals;\n+using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;\n \n constexpr auto use_pulse_counters_param = \"use_pulse_counters\";\n constexpr auto use_light_sensors_param = \"use_light_sensors\";\n@@ -52,7 +53,7 @@ Raspimouse::Raspimouse()\n   // No construction necessary (node is uninitialised)\n }\n \n-rcl_lifecycle_transition_key_t Raspimouse::on_configure(const rclcpp_lifecycle::State &)\n+CallbackReturn Raspimouse::on_configure(const rclcpp_lifecycle::State &)\n {\n   RCLCPP_INFO(this->get_logger(), \"Configuring Raspimouse node\");\n \n@@ -120,42 +121,42 @@ rcl_lifecycle_transition_key_t Raspimouse::on_configure(const rclcpp_lifecycle::\n   power_control_ = std::make_shared<std::ofstream>(\"/dev/rtmotoren0\");\n   if (!power_control_->is_open()) {\n     RCLCPP_ERROR(get_logger(), \"Failed to open motor power device /dev/rtmotoren0\");\n-    return lifecycle_msgs::msg::Transition::TRANSITION_CALLBACK_FAILURE;\n+    return CallbackReturn::FAILURE;\n   }\n   left_motor_control_ = std::make_shared<std::ofstream>(\"/dev/rtmotor_raw_l0\");\n   if (!left_motor_control_->is_open()) {\n     RCLCPP_ERROR(get_logger(), \"Failed to open left motor device /dev/rtmotor_raw_l0\");\n-    return lifecycle_msgs::msg::Transition::TRANSITION_CALLBACK_FAILURE;\n+    return CallbackReturn::FAILURE;\n   }\n   right_motor_control_ = std::make_shared<std::ofstream>(\"/dev/rtmotor_raw_r0\");\n   if (!right_motor_control_->is_open()) {\n     RCLCPP_ERROR(get_logger(), \"Failed to open right motor device /dev/rtmotor_raw_r0\");\n-    return lifecycle_msgs::msg::Transition::TRANSITION_CALLBACK_FAILURE;\n+    return CallbackReturn::FAILURE;\n   }\n   led0_output_ = std::make_shared<std::ofstream>(\"/dev/rtled0\");\n   if (!led0_output_->is_open()) {\n     RCLCPP_ERROR(get_logger(), \"Failed to open LED 0 device /dev/rtled0\");\n-    return lifecycle_msgs::msg::Transition::TRANSITION_CALLBACK_FAILURE;\n+    return CallbackReturn::FAILURE;\n   }\n   led1_output_ = std::make_shared<std::ofstream>(\"/dev/rtled1\");\n   if (!led1_output_->is_open()) {\n     RCLCPP_ERROR(get_logger(), \"Failed to open LED 1 device /dev/rtled1\");\n-    return lifecycle_msgs::msg::Transition::TRANSITION_CALLBACK_FAILURE;\n+    return CallbackReturn::FAILURE;\n   }\n   led2_output_ = std::make_shared<std::ofstream>(\"/dev/rtled2\");\n   if (!led2_output_->is_open()) {\n     RCLCPP_ERROR(get_logger(), \"Failed to open LED 2 device /dev/rtled2\");\n-    return lifecycle_msgs::msg::Transition::TRANSITION_CALLBACK_FAILURE;\n+    return CallbackReturn::FAILURE;\n   }\n   led3_output_ = std::make_shared<std::ofstream>(\"/dev/rtled3\");\n   if (!led3_output_->is_open()) {\n     RCLCPP_ERROR(get_logger(), \"Failed to open LED 3 device /dev/rtled3\");\n-    return lifecycle_msgs::msg::Transition::TRANSITION_CALLBACK_FAILURE;\n+    return CallbackReturn::FAILURE;\n   }\n   buzzer_output_ = std::make_shared<std::ofstream>(\"/dev/rtbuzzer0\");\n   if (!buzzer_output_->is_open()) {\n     RCLCPP_ERROR(get_logger(), \"Failed to open buzzer device /dev/rtbuzzer0\");\n-    return lifecycle_msgs::msg::Transition::TRANSITION_CALLBACK_FAILURE;\n+    return CallbackReturn::FAILURE;\n   }\n \n   // Disable motors at startup\n@@ -198,10 +199,10 @@ rcl_lifecycle_transition_key_t Raspimouse::on_configure(const rclcpp_lifecycle::\n   }\n \n   RCLCPP_INFO(this->get_logger(), \"Configuring done\");\n-  return lifecycle_msgs::msg::Transition::TRANSITION_CALLBACK_SUCCESS;\n+  return CallbackReturn::SUCCESS;\n }\n \n-rcl_lifecycle_transition_key_t Raspimouse::on_activate(const rclcpp_lifecycle::State &)\n+CallbackReturn Raspimouse::on_activate(const rclcpp_lifecycle::State &)\n {\n   RCLCPP_INFO(this->get_logger(), \"Activating Raspimouse node\");\n \n@@ -218,10 +219,10 @@ rcl_lifecycle_transition_key_t Raspimouse::on_activate(const rclcpp_lifecycle::S\n   }\n \n   RCLCPP_INFO(this->get_logger(), \"Raspimouse node activated\");\n-  return lifecycle_msgs::msg::Transition::TRANSITION_CALLBACK_SUCCESS;\n+  return CallbackReturn::SUCCESS;\n }\n \n-rcl_lifecycle_transition_key_t Raspimouse::on_deactivate(const rclcpp_lifecycle::State &)\n+CallbackReturn Raspimouse::on_deactivate(const rclcpp_lifecycle::State &)\n {\n   RCLCPP_INFO(this->get_logger(), \"Deactivating node\");\n \n@@ -239,10 +240,10 @@ rcl_lifecycle_transition_key_t Raspimouse::on_deactivate(const rclcpp_lifecycle:\n   // For the sake of peace and quiet, stop the buzzer\n   *buzzer_output_ << 0 << std::endl;\n \n-  return lifecycle_msgs::msg::Transition::TRANSITION_CALLBACK_SUCCESS;\n+  return CallbackReturn::SUCCESS;\n }\n \n-rcl_lifecycle_transition_key_t Raspimouse::on_cleanup(const rclcpp_lifecycle::State &)\n+CallbackReturn Raspimouse::on_cleanup(const rclcpp_lifecycle::State &)\n {\n   RCLCPP_INFO(this->get_logger(), \"Cleaning up node\");\n \n@@ -269,7 +270,7 @@ rcl_lifecycle_transition_key_t Raspimouse::on_cleanup(const rclcpp_lifecycle::St\n   led3_output_.reset();\n   buzzer_output_.reset();\n \n-  return lifecycle_msgs::msg::Transition::TRANSITION_CALLBACK_SUCCESS;\n+  return CallbackReturn::SUCCESS;\n }\n \n void Raspimouse::publish_odometry()"
+        }
+      ]
+    },
+    {
+      "author": "gbiggs",
+      "date": "2018-09-07T09:15:26Z",
+      "sha": "c610cd74b9d6bb4bc58be619b31fb66f8a830ad2",
+      "message": "Initial commit",
+      "files_changed": 2,
+      "additions": 252,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "35d74bb771f5ef74aa1259a9e472c379e4d58d86",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 51,
+          "deletions": 0,
+          "changes": 51,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/c610cd74b9d6bb4bc58be619b31fb66f8a830ad2/.gitignore",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/c610cd74b9d6bb4bc58be619b31fb66f8a830ad2/.gitignore",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/.gitignore?ref=c610cd74b9d6bb4bc58be619b31fb66f8a830ad2",
+          "patch": "@@ -0,0 +1,51 @@\n+devel/\n+logs/\n+build/\n+bin/\n+lib/\n+msg_gen/\n+srv_gen/\n+msg/*Action.msg\n+msg/*ActionFeedback.msg\n+msg/*ActionGoal.msg\n+msg/*ActionResult.msg\n+msg/*Feedback.msg\n+msg/*Goal.msg\n+msg/*Result.msg\n+msg/_*.py\n+build_isolated/\n+devel_isolated/\n+\n+# Generated by dynamic reconfigure\n+*.cfgc\n+/cfg/cpp/\n+/cfg/*.py\n+\n+# Ignore generated docs\n+*.dox\n+*.wikidoc\n+\n+# eclipse stuff\n+.project\n+.cproject\n+\n+# qcreator stuff\n+CMakeLists.txt.user\n+\n+srv/_*.py\n+*.pcd\n+*.pyc\n+qtcreator-*\n+*.user\n+\n+/planning/cfg\n+/planning/docs\n+/planning/src\n+\n+*~\n+\n+# Emacs\n+.#*\n+\n+# Catkin custom files\n+CATKIN_IGNORE"
+        },
+        {
+          "sha": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 201,
+          "deletions": 0,
+          "changes": 201,
+          "blob_url": "https://github.com/rt-net/raspimouse2/blob/c610cd74b9d6bb4bc58be619b31fb66f8a830ad2/LICENSE",
+          "raw_url": "https://github.com/rt-net/raspimouse2/raw/c610cd74b9d6bb4bc58be619b31fb66f8a830ad2/LICENSE",
+          "contents_url": "https://api.github.com/repos/rt-net/raspimouse2/contents/LICENSE?ref=c610cd74b9d6bb4bc58be619b31fb66f8a830ad2",
+          "patch": "@@ -0,0 +1,201 @@\n+                                 Apache License\n+                           Version 2.0, January 2004\n+                        http://www.apache.org/licenses/\n+\n+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION\n+\n+   1. Definitions.\n+\n+      \"License\" shall mean the terms and conditions for use, reproduction,\n+      and distribution as defined by Sections 1 through 9 of this document.\n+\n+      \"Licensor\" shall mean the copyright owner or entity authorized by\n+      the copyright owner that is granting the License.\n+\n+      \"Legal Entity\" shall mean the union of the acting entity and all\n+      other entities that control, are controlled by, or are under common\n+      control with that entity. For the purposes of this definition,\n+      \"control\" means (i) the power, direct or indirect, to cause the\n+      direction or management of such entity, whether by contract or\n+      otherwise, or (ii) ownership of fifty percent (50%) or more of the\n+      outstanding shares, or (iii) beneficial ownership of such entity.\n+\n+      \"You\" (or \"Your\") shall mean an individual or Legal Entity\n+      exercising permissions granted by this License.\n+\n+      \"Source\" form shall mean the preferred form for making modifications,\n+      including but not limited to software source code, documentation\n+      source, and configuration files.\n+\n+      \"Object\" form shall mean any form resulting from mechanical\n+      transformation or translation of a Source form, including but\n+      not limited to compiled object code, generated documentation,\n+      and conversions to other media types.\n+\n+      \"Work\" shall mean the work of authorship, whether in Source or\n+      Object form, made available under the License, as indicated by a\n+      copyright notice that is included in or attached to the work\n+      (an example is provided in the Appendix below).\n+\n+      \"Derivative Works\" shall mean any work, whether in Source or Object\n+      form, that is based on (or derived from) the Work and for which the\n+      editorial revisions, annotations, elaborations, or other modifications\n+      represent, as a whole, an original work of authorship. For the purposes\n+      of this License, Derivative Works shall not include works that remain\n+      separable from, or merely link (or bind by name) to the interfaces of,\n+      the Work and Derivative Works thereof.\n+\n+      \"Contribution\" shall mean any work of authorship, including\n+      the original version of the Work and any modifications or additions\n+      to that Work or Derivative Works thereof, that is intentionally\n+      submitted to Licensor for inclusion in the Work by the copyright owner\n+      or by an individual or Legal Entity authorized to submit on behalf of\n+      the copyright owner. For the purposes of this definition, \"submitted\"\n+      means any form of electronic, verbal, or written communication sent\n+      to the Licensor or its representatives, including but not limited to\n+      communication on electronic mailing lists, source code control systems,\n+      and issue tracking systems that are managed by, or on behalf of, the\n+      Licensor for the purpose of discussing and improving the Work, but\n+      excluding communication that is conspicuously marked or otherwise\n+      designated in writing by the copyright owner as \"Not a Contribution.\"\n+\n+      \"Contributor\" shall mean Licensor and any individual or Legal Entity\n+      on behalf of whom a Contribution has been received by Licensor and\n+      subsequently incorporated within the Work.\n+\n+   2. Grant of Copyright License. Subject to the terms and conditions of\n+      this License, each Contributor hereby grants to You a perpetual,\n+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n+      copyright license to reproduce, prepare Derivative Works of,\n+      publicly display, publicly perform, sublicense, and distribute the\n+      Work and such Derivative Works in Source or Object form.\n+\n+   3. Grant of Patent License. Subject to the terms and conditions of\n+      this License, each Contributor hereby grants to You a perpetual,\n+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n+      (except as stated in this section) patent license to make, have made,\n+      use, offer to sell, sell, import, and otherwise transfer the Work,\n+      where such license applies only to those patent claims licensable\n+      by such Contributor that are necessarily infringed by their\n+      Contribution(s) alone or by combination of their Contribution(s)\n+      with the Work to which such Contribution(s) was submitted. If You\n+      institute patent litigation against any entity (including a\n+      cross-claim or counterclaim in a lawsuit) alleging that the Work\n+      or a Contribution incorporated within the Work constitutes direct\n+      or contributory patent infringement, then any patent licenses\n+      granted to You under this License for that Work shall terminate\n+      as of the date such litigation is filed.\n+\n+   4. Redistribution. You may reproduce and distribute copies of the\n+      Work or Derivative Works thereof in any medium, with or without\n+      modifications, and in Source or Object form, provided that You\n+      meet the following conditions:\n+\n+      (a) You must give any other recipients of the Work or\n+          Derivative Works a copy of this License; and\n+\n+      (b) You must cause any modified files to carry prominent notices\n+          stating that You changed the files; and\n+\n+      (c) You must retain, in the Source form of any Derivative Works\n+          that You distribute, all copyright, patent, trademark, and\n+          attribution notices from the Source form of the Work,\n+          excluding those notices that do not pertain to any part of\n+          the Derivative Works; and\n+\n+      (d) If the Work includes a \"NOTICE\" text file as part of its\n+          distribution, then any Derivative Works that You distribute must\n+          include a readable copy of the attribution notices contained\n+          within such NOTICE file, excluding those notices that do not\n+          pertain to any part of the Derivative Works, in at least one\n+          of the following places: within a NOTICE text file distributed\n+          as part of the Derivative Works; within the Source form or\n+          documentation, if provided along with the Derivative Works; or,\n+          within a display generated by the Derivative Works, if and\n+          wherever such third-party notices normally appear. The contents\n+          of the NOTICE file are for informational purposes only and\n+          do not modify the License. You may add Your own attribution\n+          notices within Derivative Works that You distribute, alongside\n+          or as an addendum to the NOTICE text from the Work, provided\n+          that such additional attribution notices cannot be construed\n+          as modifying the License.\n+\n+      You may add Your own copyright statement to Your modifications and\n+      may provide additional or different license terms and conditions\n+      for use, reproduction, or distribution of Your modifications, or\n+      for any such Derivative Works as a whole, provided Your use,\n+      reproduction, and distribution of the Work otherwise complies with\n+      the conditions stated in this License.\n+\n+   5. Submission of Contributions. Unless You explicitly state otherwise,\n+      any Contribution intentionally submitted for inclusion in the Work\n+      by You to the Licensor shall be under the terms and conditions of\n+      this License, without any additional terms or conditions.\n+      Notwithstanding the above, nothing herein shall supersede or modify\n+      the terms of any separate license agreement you may have executed\n+      with Licensor regarding such Contributions.\n+\n+   6. Trademarks. This License does not grant permission to use the trade\n+      names, trademarks, service marks, or product names of the Licensor,\n+      except as required for reasonable and customary use in describing the\n+      origin of the Work and reproducing the content of the NOTICE file.\n+\n+   7. Disclaimer of Warranty. Unless required by applicable law or\n+      agreed to in writing, Licensor provides the Work (and each\n+      Contributor provides its Contributions) on an \"AS IS\" BASIS,\n+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or\n+      implied, including, without limitation, any warranties or conditions\n+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A\n+      PARTICULAR PURPOSE. You are solely responsible for determining the\n+      appropriateness of using or redistributing the Work and assume any\n+      risks associated with Your exercise of permissions under this License.\n+\n+   8. Limitation of Liability. In no event and under no legal theory,\n+      whether in tort (including negligence), contract, or otherwise,\n+      unless required by applicable law (such as deliberate and grossly\n+      negligent acts) or agreed to in writing, shall any Contributor be\n+      liable to You for damages, including any direct, indirect, special,\n+      incidental, or consequential damages of any character arising as a\n+      result of this License or out of the use or inability to use the\n+      Work (including but not limited to damages for loss of goodwill,\n+      work stoppage, computer failure or malfunction, or any and all\n+      other commercial damages or losses), even if such Contributor\n+      has been advised of the possibility of such damages.\n+\n+   9. Accepting Warranty or Additional Liability. While redistributing\n+      the Work or Derivative Works thereof, You may choose to offer,\n+      and charge a fee for, acceptance of support, warranty, indemnity,\n+      or other liability obligations and/or rights consistent with this\n+      License. However, in accepting such obligations, You may act only\n+      on Your own behalf and on Your sole responsibility, not on behalf\n+      of any other Contributor, and only if You agree to indemnify,\n+      defend, and hold each Contributor harmless for any liability\n+      incurred by, or claims asserted against, such Contributor by reason\n+      of your accepting any such warranty or additional liability.\n+\n+   END OF TERMS AND CONDITIONS\n+\n+   APPENDIX: How to apply the Apache License to your work.\n+\n+      To apply the Apache License to your work, attach the following\n+      boilerplate notice, with the fields enclosed by brackets \"[]\"\n+      replaced with your own identifying information. (Don't include\n+      the brackets!)  The text should be enclosed in the appropriate\n+      comment syntax for the file format. We also recommend that a\n+      file or class name and description of purpose be included on the\n+      same \"printed page\" as the copyright notice for easier\n+      identification within third-party archives.\n+\n+   Copyright [yyyy] [name of copyright owner]\n+\n+   Licensed under the Apache License, Version 2.0 (the \"License\");\n+   you may not use this file except in compliance with the License.\n+   You may obtain a copy of the License at\n+\n+       http://www.apache.org/licenses/LICENSE-2.0\n+\n+   Unless required by applicable law or agreed to in writing, software\n+   distributed under the License is distributed on an \"AS IS\" BASIS,\n+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+   See the License for the specific language governing permissions and\n+   limitations under the License."
+        }
+      ]
+    }
+  ]
+}

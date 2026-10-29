@@ -1,0 +1,659 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T06:05:47Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "AndrejOrsula",
+    "repo": "pymoveit2"
+  },
+  "data": [
+    {
+      "author": "AndrejOrsula",
+      "date": "2021-12-13T23:13:07Z",
+      "sha": "dd2412d6703e14d1d1f1d407ba4b1e3fbfa76933",
+      "message": "Initial commit\n\nSigned-off-by: Andrej Orsula <orsula.andrej@gmail.com>",
+      "files_changed": 2,
+      "additions": 50,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "0b432da90b263533e911f60e153d51a66f30b873",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/dd2412d6703e14d1d1f1d407ba4b1e3fbfa76933/.gitignore",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/dd2412d6703e14d1d1f1d407ba4b1e3fbfa76933/.gitignore",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/.gitignore?ref=dd2412d6703e14d1d1f1d407ba4b1e3fbfa76933",
+          "patch": "@@ -0,0 +1,7 @@\n+# Colcon\n+**/build\n+**/install\n+**/log\n+\n+# Python\n+**/__pycache__"
+        },
+        {
+          "sha": "a9020750649f6c8004d817d7d7c1dcb7b6f1dd63",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 43,
+          "deletions": 0,
+          "changes": 43,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/dd2412d6703e14d1d1f1d407ba4b1e3fbfa76933/README.md",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/dd2412d6703e14d1d1f1d407ba4b1e3fbfa76933/README.md",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/README.md?ref=dd2412d6703e14d1d1f1d407ba4b1e3fbfa76933",
+          "patch": "@@ -0,0 +1,43 @@\n+# pymoveit2\n+\n+Basic Python interface for MoveIt 2 built on top of ROS 2 actions and services.\n+\n+## Instructions\n+\n+### Requirements\n+\n+- **OS:** Ubuntu 20.04 (Focal)\n+  - Other distributions might work (not tested).\n+\n+### Dependencies\n+\n+These are the primary dependencies required to use this project.\n+\n+- ROS 2 [Rolling](https://docs.ros.org/en/rolling/Installation.html)\n+  - [Foxy](https://docs.ros.org/en/galactic/Installation.html) and [Galactic](https://docs.ros.org/en/galactic/Installation.html) might work too (not tested).\n+- [MoveIt 2](https://moveit.ros.org/install-moveit2/binary)\n+  - Install/build a version based on the selected ROS 2 release\n+- [Python 3](https://www.python.org/downloads) (tested with `3.8`)\n+\n+### Building\n+\n+Clone this repository, install dependencies with [rosdep](https://github.com/ros-infrastructure/rosdep), and build with [colcon](https://colcon.readthedocs.io).\n+\n+```bash\n+# Clone this repository into your favourite ROS 2 workspace\n+git clone https://github.com/AndrejOrsula/pymoveit2.git\n+# Install dependencies\n+rosdep install -r --from-paths . --ignore-src --rosdistro ${ROS_DISTRO}\n+# Build\n+colcon build --merge-install --symlink-install --cmake-args \"-DCMAKE_BUILD_TYPE=Release\"\n+```\n+\n+### Sourcing\n+\n+Before utilising this package, remember to source the ROS 2 workspace overlay.\n+\n+```bash\n+source ${PYMOVEIT2_WS_DIR}/install/local_setup.bash\n+```\n+\n+This enables importing of `pymoveit2` module from external workspaces."
+        }
+      ]
+    },
+    {
+      "author": "mfinean",
+      "date": "2025-08-16T16:37:17Z",
+      "sha": "a89b816a94bd1daed0995a1364686a0270589373",
+      "message": "Add a method for setting the workspace parameters (#106)\n\n* Add a method for setting the workspace parameters\n\n* Ensure kinematic path request has the same workspace parameters\n\n* Formatting from pre-commit",
+      "files_changed": 1,
+      "additions": 38,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e5ccf7636fbfc7df796ee3649b0904681b8f19b2",
+          "filename": "pymoveit2/moveit2.py",
+          "status": "modified",
+          "additions": 38,
+          "deletions": 0,
+          "changes": 38,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/a89b816a94bd1daed0995a1364686a0270589373/pymoveit2%2Fmoveit2.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/a89b816a94bd1daed0995a1364686a0270589373/pymoveit2%2Fmoveit2.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/pymoveit2%2Fmoveit2.py?ref=a89b816a94bd1daed0995a1364686a0270589373",
+          "patch": "@@ -2367,6 +2367,44 @@ def planner_id(self) -> int:\n     def planner_id(self, value: str):\n         self.__move_action_goal.request.planner_id = value\n \n+    def set_workspace_parameters(\n+        self,\n+        min_corner: Tuple[float, float, float],\n+        max_corner: Tuple[float, float, float],\n+        frame_id: Optional[str] = None,\n+    ):\n+        \"\"\"\n+        Set the workspace parameters (min/max corners and optionally frame_id) for planning.\n+        - min_corner: (x, y, z) tuple for the minimum workspace corner\n+        - max_corner: (x, y, z) tuple for the maximum workspace corner\n+        - frame_id: reference frame for the workspace (defaults to base link if not provided)\n+        \"\"\"\n+        # Set workspace parameters for the main move action goal\n+        ws = self.__move_action_goal.request.workspace_parameters\n+        ws.min_corner.x, ws.min_corner.y, ws.min_corner.z = min_corner\n+        ws.max_corner.x, ws.max_corner.y, ws.max_corner.z = max_corner\n+        if frame_id is not None:\n+            ws.header.frame_id = frame_id\n+\n+        # Also ensure the kinematic path request has the same workspace parameters\n+        # This is a safety measure in case the kinematic path request gets recreated\n+        if hasattr(self, \"_plan_kinematic_path_service\"):\n+            kinematic_ws = (\n+                self.__kinematic_path_request.motion_plan_request.workspace_parameters\n+            )\n+            (\n+                kinematic_ws.min_corner.x,\n+                kinematic_ws.min_corner.y,\n+                kinematic_ws.min_corner.z,\n+            ) = min_corner\n+            (\n+                kinematic_ws.max_corner.x,\n+                kinematic_ws.max_corner.y,\n+                kinematic_ws.max_corner.z,\n+            ) = max_corner\n+            if frame_id is not None:\n+                kinematic_ws.header.frame_id = frame_id\n+\n \n def init_joint_state(\n     joint_names: List[str],"
+        }
+      ]
+    },
+    {
+      "author": "christian-rauch",
+      "date": "2025-05-11T13:54:22Z",
+      "sha": "f418cd9639a6322de0133b8243105ac1aa0d4621",
+      "message": "Revert #94, add trimesh to ROS dependencies, and remove sync param from `reset_controller()` methods (#96)\n\n* Revert \"Always specify executor when spinning the node (#94)\"\n\nThis reverts commit 4797ed5b0b89e602f184459b99f08257f78f319d.\n\n* add rosdep key for trimesh pip package\n\n* remove unused timing variables and parameters",
+      "files_changed": 3,
+      "additions": 13,
+      "deletions": 35,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "6e09a5a7db27e15bbc0649cb93c5d3e2821b8dae",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/f418cd9639a6322de0133b8243105ac1aa0d4621/package.xml",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/f418cd9639a6322de0133b8243105ac1aa0d4621/package.xml",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/package.xml?ref=f418cd9639a6322de0133b8243105ac1aa0d4621",
+          "patch": "@@ -19,6 +19,7 @@\n   <exec_depend>shape_msgs</exec_depend>\n   <exec_depend>std_srvs</exec_depend>\n   <exec_depend>trajectory_msgs</exec_depend>\n+  <exec_depend>python3-trimesh-pip</exec_depend>\n \n   <export>\n     <build_type>ament_cmake</build_type>"
+        },
+        {
+          "sha": "a95cf870a2d2221d051ad480dc63b39b62241469",
+          "filename": "pymoveit2/moveit2.py",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 27,
+          "changes": 35,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/f418cd9639a6322de0133b8243105ac1aa0d4621/pymoveit2%2Fmoveit2.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/f418cd9639a6322de0133b8243105ac1aa0d4621/pymoveit2%2Fmoveit2.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/pymoveit2%2Fmoveit2.py?ref=f418cd9639a6322de0133b8243105ac1aa0d4621",
+          "patch": "@@ -152,12 +152,8 @@ def __init__(\n         self.motion_suceeded = False\n         self.__execution_goal_handle = None\n         self.__last_error_code = None\n-        self.__wait_until_executed_rate = self._node.create_rate(1000.0)\n         self.__execution_mutex = threading.Lock()\n \n-        # Event that enables waiting until async future is done\n-        self.__future_done_event = threading.Event()\n-\n         # Create subscriber for current joint states\n         self._node.create_subscription(\n             msg_type=JointState,\n@@ -527,10 +523,8 @@ def plan(\n         if future is None:\n             return None\n \n-        # 100ms sleep\n-        rate = self._node.create_rate(10)\n         while not future.done():\n-            rclpy.spin_once(self._node, executor=self._node.executor, timeout_sec=1.0)\n+            rclpy.spin_once(self._node, timeout_sec=1.0)\n \n         return self.get_trajectory(\n             future,\n@@ -642,10 +636,7 @@ def plan_async(\n                 start_joint_state = self.__joint_state\n                 break\n             else:\n-                rclpy.spin_once(\n-                    self._node, executor=self._node.executor, timeout_sec=1.0\n-                )\n-\n+                rclpy.spin_once(self._node, timeout_sec=1.0)\n         self._node._logger.info(message=\"Joint states are available now\")\n \n         # Plan trajectory asynchronously by service call\n@@ -753,12 +744,13 @@ def wait_until_executed(self) -> bool:\n             return False\n \n         while self.__is_motion_requested or self.__is_executing:\n-            rclpy.spin_once(self._node, executor=self._node.executor, timeout_sec=1.0)\n+            rclpy.spin_once(self._node, timeout_sec=1.0)\n \n         return self.motion_suceeded\n \n     def reset_controller(\n-        self, joint_state: Union[JointState, List[float]], sync: bool = True\n+        self,\n+        joint_state: Union[JointState, List[float]],\n     ):\n         \"\"\"\n         Reset controller to a given `joint_state` by sending a dummy joint trajectory.\n@@ -775,10 +767,7 @@ def reset_controller(\n             joint_trajectory=joint_trajectory\n         )\n \n-        self._send_goal_async_execute_trajectory(\n-            goal=execute_trajectory_goal,\n-            wait_until_response=sync,\n-        )\n+        self._send_goal_async_execute_trajectory(goal=execute_trajectory_goal)\n \n     def set_pose_goal(\n         self,\n@@ -1196,10 +1185,8 @@ def compute_fk(\n         if future is None:\n             return None\n \n-        # 100ms sleep\n-        rate = self._node.create_rate(10)\n         while not future.done():\n-            rclpy.spin_once(self._node, executor=self._node.executor, timeout_sec=1.0)\n+            rclpy.spin_once(self._node, timeout_sec=1.0)\n \n         return self.get_compute_fk_result(future, fk_link_names=fk_link_names)\n \n@@ -1290,10 +1277,8 @@ def compute_ik(\n         if future is None:\n             return None\n \n-        # 10ms sleep\n-        rate = self._node.create_rate(10)\n         while not future.done():\n-            rclpy.spin_once(self._node, executor=self._node.executor, timeout_sec=1.0)\n+            rclpy.spin_once(self._node, timeout_sec=1.0)\n \n         return self.get_compute_ik_result(future)\n \n@@ -2126,7 +2111,6 @@ def __result_callback_move_action(self, res):\n     def _send_goal_async_execute_trajectory(\n         self,\n         goal: ExecuteTrajectory,\n-        wait_until_response: bool = False,\n     ):\n         self.__execution_mutex.acquire()\n \n@@ -2170,9 +2154,6 @@ def __response_callback_execute_trajectory(self, response):\n         )\n         self.__execution_mutex.release()\n \n-    def __response_callback_with_event_set_execute_trajectory(self, response):\n-        self.__future_done_event.set()\n-\n     def __result_callback_execute_trajectory(self, res):\n         self.__execution_mutex.acquire()\n         if res.result().status != GoalStatus.STATUS_SUCCEEDED:"
+        },
+        {
+          "sha": "a25810d9fb779d69b34a2208e8d0fcd7e44a5e57",
+          "filename": "pymoveit2/moveit2_gripper.py",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 8,
+          "changes": 12,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/f418cd9639a6322de0133b8243105ac1aa0d4621/pymoveit2%2Fmoveit2_gripper.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/f418cd9639a6322de0133b8243105ac1aa0d4621/pymoveit2%2Fmoveit2_gripper.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/pymoveit2%2Fmoveit2_gripper.py?ref=f418cd9639a6322de0133b8243105ac1aa0d4621",
+          "patch": "@@ -178,25 +178,21 @@ def move_to_position(self, position: float):\n         joint_positions = [position for _ in self.joint_names]\n         self.move_to_configuration(joint_positions=joint_positions)\n \n-    def reset_open(self, sync: bool = True):\n+    def reset_open(self):\n         \"\"\"\n         Reset into open configuration by sending a dummy joint trajectory.\n         This is useful for simulated robots that allow instantaneous reset of joints.\n         \"\"\"\n \n-        self.reset_controller(\n-            joint_state=self.__open_gripper_joint_positions, sync=sync\n-        )\n+        self.reset_controller(joint_state=self.__open_gripper_joint_positions)\n \n-    def reset_closed(self, sync: bool = True):\n+    def reset_closed(self):\n         \"\"\"\n         Reset into closed configuration by sending a dummy joint trajectory.\n         This is useful for simulated robots that allow instantaneous reset of joints.\n         \"\"\"\n \n-        self.reset_controller(\n-            joint_state=self.__closed_gripper_joint_positions, sync=sync\n-        )\n+        self.reset_controller(joint_state=self.__closed_gripper_joint_positions)\n \n     def __open_without_planning(self):\n         self._send_goal_async_follow_joint_trajectory("
+        }
+      ]
+    },
+    {
+      "author": "macmacal",
+      "date": "2025-11-06T09:58:26Z",
+      "sha": "5c6b24bb2fb70a4ad07e71600be62412ec312c61",
+      "message": "Fixed topic path for servo commands\n\nAdded namespace paramater for the servo commands",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "58ee8ee1a540f89e2c788c3d9f163d9ba200f4b2",
+          "filename": "pymoveit2/moveit2_servo.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/5c6b24bb2fb70a4ad07e71600be62412ec312c61/pymoveit2%2Fmoveit2_servo.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/5c6b24bb2fb70a4ad07e71600be62412ec312c61/pymoveit2%2Fmoveit2_servo.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/pymoveit2%2Fmoveit2_servo.py?ref=5c6b24bb2fb70a4ad07e71600be62412ec312c61",
+          "patch": "@@ -49,7 +49,7 @@ def __init__(\n         # Create publisher\n         self.__twist_pub = self._node.create_publisher(\n             msg_type=TwistStamped,\n-            topic=\"delta_twist_cmds\",\n+            topic=self.namespace + \"/servo_node/delta_twist_cmds\",\n             qos_profile=QoSProfile(\n                 durability=QoSDurabilityPolicy.VOLATILE,\n                 reliability=QoSReliabilityPolicy.RELIABLE,"
+        }
+      ]
+    },
+    {
+      "author": "dependabot[bot]",
+      "date": "2024-03-11T20:27:23Z",
+      "sha": "0a3f01937b14206aec88fbe5b1d8f6ea6d6bd89f",
+      "message": "build(deps): bump pre-commit-ci/lite-action from 1.0.1 to 1.0.2 (#52)\n\nBumps [pre-commit-ci/lite-action](https://github.com/pre-commit-ci/lite-action) from 1.0.1 to 1.0.2.\n- [Release notes](https://github.com/pre-commit-ci/lite-action/releases)\n- [Commits](https://github.com/pre-commit-ci/lite-action/compare/v1.0.1...v1.0.2)\n\n---\nupdated-dependencies:\n- dependency-name: pre-commit-ci/lite-action\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "99019933f1c247db6eca8a4395f6d49f7821fce5",
+          "filename": ".github/workflows/pre-commit.yml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/0a3f01937b14206aec88fbe5b1d8f6ea6d6bd89f/.github%2Fworkflows%2Fpre-commit.yml",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/0a3f01937b14206aec88fbe5b1d8f6ea6d6bd89f/.github%2Fworkflows%2Fpre-commit.yml",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/.github%2Fworkflows%2Fpre-commit.yml?ref=0a3f01937b14206aec88fbe5b1d8f6ea6d6bd89f",
+          "patch": "@@ -28,5 +28,5 @@ jobs:\n       - name: Run pre-commit\n         uses: pre-commit/action@v3.0.0\n       - name: Apply fixes from pre-commit\n-        uses: pre-commit-ci/lite-action@v1.0.1\n+        uses: pre-commit-ci/lite-action@v1.0.2\n         if: always()"
+        }
+      ]
+    },
+    {
+      "author": "Flamethr0wer",
+      "date": "2025-07-01T18:14:04Z",
+      "sha": "8b791491b497822b45b4e4b41af18e6d8abf6c53",
+      "message": "Add a new namespace parameter to MoveIt2Servo\n\nI'm making a setup for two robotic arms, and the moveit_servo package requires a planning group to be specified, meaning that one must use one moveit_servo node per arm. But, as all of them would publish to the same topics, namespacing is necessary. However, pymoveit2 has the service names hardcoded, so simply adding a namespace parameter and adding it to the service names enables multi-arm support 👍",
+      "files_changed": 1,
+      "additions": 6,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "14ca76d4666dd2a66c9800bf12ef1760f1600cde",
+          "filename": "pymoveit2/moveit2_servo.py",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 2,
+          "changes": 8,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/8b791491b497822b45b4e4b41af18e6d8abf6c53/pymoveit2%2Fmoveit2_servo.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/8b791491b497822b45b4e4b41af18e6d8abf6c53/pymoveit2%2Fmoveit2_servo.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/pymoveit2%2Fmoveit2_servo.py?ref=8b791491b497822b45b4e4b41af18e6d8abf6c53",
+          "patch": "@@ -24,6 +24,7 @@ def __init__(\n         self,\n         node: Node,\n         frame_id: str,\n+        namespace: str = \"\",\n         linear_speed: float = 1.0,\n         angular_speed: float = 1.0,\n         enable_at_init: bool = True,\n@@ -32,6 +33,7 @@ def __init__(\n         \"\"\"\n         Construct an instance of `MoveIt2Servo` interface.\n           - `node` - ROS 2 node that this interface is attached to\n+          - `namespace` - Namespace for the node\n           - `frame_id` - Reference frame in which to publish command messages\n           - `linear_speed` - Factor that can be used to scale all input linear twist commands\n           - `angular_speed` - Factor that can be used to scale all input angular twist commands\n@@ -42,6 +44,8 @@ def __init__(\n \n         self._node = node\n \n+        self.namespace = namespace\n+\n         # Create publisher\n         self.__twist_pub = self._node.create_publisher(\n             msg_type=TwistStamped,\n@@ -57,12 +61,12 @@ def __init__(\n         # Create service clients\n         self.__start_service = self._node.create_client(\n             srv_type=Trigger,\n-            srv_name=\"/servo_node/start_servo\",\n+            srv_name=self.namespace + \"/servo_node/start_servo\",\n             callback_group=callback_group,\n         )\n         self.__stop_service = self._node.create_client(\n             srv_type=Trigger,\n-            srv_name=\"/servo_node/stop_servo\",\n+            srv_name=self.namespace + \"/servo_node/stop_servo\",\n             callback_group=callback_group,\n         )\n         self.__trigger_req = Trigger.Request()"
+        }
+      ]
+    },
+    {
+      "author": "Zarnack",
+      "date": "2024-04-04T09:41:14Z",
+      "sha": "316a4330373c3c91792af188ab662f4db43ba972",
+      "message": "Added setting of cartesian speed and acceleration  (#53)\n\n* added re-use of max_velocity_scaling_factor and max_acceleration_scaling_factor from move_action goal to cartesian_path_request\r\n\r\n* Removed getter and setter of 'max_cartesian_speed' to avoid confusion\r\nas the corresponding value of the MotionPlanRequest.msg\r\n(respectively the self.__move_action_goal.request object) is currently\r\nnot used in moveit2.\r\n--> The 'max_cartesian_speed' variable requires the\r\n'default_planner_request_adapters/SetMaxCartesianEndEffectorSpeed'\r\nwhich currently only exists in moveit1.",
+      "files_changed": 1,
+      "additions": 9,
+      "deletions": 8,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "45db2e54b1f5e4407dc1f35afed7dcfd3f64899d",
+          "filename": "pymoveit2/moveit2.py",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 8,
+          "changes": 17,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/316a4330373c3c91792af188ab662f4db43ba972/pymoveit2%2Fmoveit2.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/316a4330373c3c91792af188ab662f4db43ba972/pymoveit2%2Fmoveit2.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/pymoveit2%2Fmoveit2.py?ref=316a4330373c3c91792af188ab662f4db43ba972",
+          "patch": "@@ -1855,6 +1855,15 @@ def _plan_cartesian_path(\n         self.__cartesian_path_request.start_state = (\n             self.__move_action_goal.request.start_state\n         )\n+\n+        self.__cartesian_path_request.max_velocity_scaling_factor = (\n+            self.__move_action_goal.request.max_velocity_scaling_factor\n+        )\n+\n+        self.__cartesian_path_request.max_acceleration_scaling_factor = (\n+            self.__move_action_goal.request.max_acceleration_scaling_factor\n+        )\n+\n         self.__cartesian_path_request.group_name = (\n             self.__move_action_goal.request.group_name\n         )\n@@ -2152,14 +2161,6 @@ def max_acceleration(self) -> float:\n     def max_acceleration(self, value: float):\n         self.__move_action_goal.request.max_acceleration_scaling_factor = value\n \n-    @property\n-    def max_cartesian_speed(self) -> float:\n-        return self.__move_action_goal.request.max_cartesian_speed\n-\n-    @max_cartesian_speed.setter\n-    def max_cartesian_speed(self, value: float):\n-        self.__move_action_goal.request.max_cartesian_speed = value\n-\n     @property\n     def num_planning_attempts(self) -> int:\n         return self.__move_action_goal.request.num_planning_attempts"
+        }
+      ]
+    },
+    {
+      "author": "alonborn",
+      "date": "2025-05-03T18:28:58Z",
+      "sha": "4797ed5b0b89e602f184459b99f08257f78f319d",
+      "message": "Always specify executor when spinning the node (#94)\n\n* Enhance logging for trajectory execution and action server communication\n\n* Fix formatting by removing unnecessary newline in MoveIt2 class\n\n* Add check for joint_trajectory before logging execution details\n\n* Fix spin_once usage by explicitly passing node's executor\n\nSigned-off-by: Alon <alonborn@gmail.com>\n\n* Refactor logging in MoveIt2 class to reduce verbosity during trajectory execution\n\n* Remove unnecessary logging after trajectory execution in MoveIt2 class\n\n* pre-commit: Apply suggestions\n\nSigned-off-by: Andrej Orsula <orsula.andrej@gmail.com>\n\n---------\n\nSigned-off-by: Alon <alonborn@gmail.com>\nSigned-off-by: Andrej Orsula <orsula.andrej@gmail.com>\nCo-authored-by: Andrej Orsula <orsula.andrej@gmail.com>",
+      "files_changed": 1,
+      "additions": 8,
+      "deletions": 5,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "227e3f9b968f7d174cd7956bb711a2312330bd2a",
+          "filename": "pymoveit2/moveit2.py",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 5,
+          "changes": 13,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/4797ed5b0b89e602f184459b99f08257f78f319d/pymoveit2%2Fmoveit2.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/4797ed5b0b89e602f184459b99f08257f78f319d/pymoveit2%2Fmoveit2.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/pymoveit2%2Fmoveit2.py?ref=4797ed5b0b89e602f184459b99f08257f78f319d",
+          "patch": "@@ -530,7 +530,7 @@ def plan(\n         # 100ms sleep\n         rate = self._node.create_rate(10)\n         while not future.done():\n-            rclpy.spin_once(self._node, timeout_sec=1.0)\n+            rclpy.spin_once(self._node, executor=self._node.executor, timeout_sec=1.0)\n \n         return self.get_trajectory(\n             future,\n@@ -642,7 +642,10 @@ def plan_async(\n                 start_joint_state = self.__joint_state\n                 break\n             else:\n-                rclpy.spin_once(self._node, timeout_sec=1.0)\n+                rclpy.spin_once(\n+                    self._node, executor=self._node.executor, timeout_sec=1.0\n+                )\n+\n         self._node._logger.info(message=\"Joint states are available now\")\n \n         # Plan trajectory asynchronously by service call\n@@ -750,7 +753,7 @@ def wait_until_executed(self) -> bool:\n             return False\n \n         while self.__is_motion_requested or self.__is_executing:\n-            rclpy.spin_once(self._node, timeout_sec=1.0)\n+            rclpy.spin_once(self._node, executor=self._node.executor, timeout_sec=1.0)\n \n         return self.motion_suceeded\n \n@@ -1196,7 +1199,7 @@ def compute_fk(\n         # 100ms sleep\n         rate = self._node.create_rate(10)\n         while not future.done():\n-            rclpy.spin_once(self._node, timeout_sec=1.0)\n+            rclpy.spin_once(self._node, executor=self._node.executor, timeout_sec=1.0)\n \n         return self.get_compute_fk_result(future, fk_link_names=fk_link_names)\n \n@@ -1290,7 +1293,7 @@ def compute_ik(\n         # 10ms sleep\n         rate = self._node.create_rate(10)\n         while not future.done():\n-            rclpy.spin_once(self._node, timeout_sec=1.0)\n+            rclpy.spin_once(self._node, executor=self._node.executor, timeout_sec=1.0)\n \n         return self.get_compute_ik_result(future)\n "
+        }
+      ]
+    },
+    {
+      "author": "andrewbowman23",
+      "date": "2025-03-04T19:47:30Z",
+      "sha": "4b1260aeada4268fd92770e889be4a9bf59fbcf8",
+      "message": "Fix rclpy import and spin issues (#88)\n\n* Fix rclpy import and spin issues from (#87)\n\nCan't use rclpy.spin unless rclpy is imported.\nAlso, wait_until_executed use of spin was incorrect.\n\n* Apply pre-commit suggestions\n\nSigned-off-by: Andrej Orsula <orsula.andrej@gmail.com>\n\n---------\n\nSigned-off-by: Andrej Orsula <orsula.andrej@gmail.com>\nCo-authored-by: Andrej Orsula <orsula.andrej@gmail.com>",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "7aa9d4115f91c0bf25c9ee4c7c72425d7194a2bf",
+          "filename": "pymoveit2/moveit2.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/4b1260aeada4268fd92770e889be4a9bf59fbcf8/pymoveit2%2Fmoveit2.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/4b1260aeada4268fd92770e889be4a9bf59fbcf8/pymoveit2%2Fmoveit2.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/pymoveit2%2Fmoveit2.py?ref=4b1260aeada4268fd92770e889be4a9bf59fbcf8",
+          "patch": "@@ -4,6 +4,7 @@\n from typing import Any, List, Optional, Tuple, Union\n \n import numpy as np\n+import rclpy\n from action_msgs.msg import GoalStatus\n from geometry_msgs.msg import Point, Pose, PoseStamped, Quaternion\n from moveit_msgs.action import ExecuteTrajectory, MoveGroup\n@@ -749,7 +750,7 @@ def wait_until_executed(self) -> bool:\n             return False\n \n         while self.__is_motion_requested or self.__is_executing:\n-            self.__wait_until_executed_rclpy.spin_once(self._node, timeout_sec=1.0)\n+            rclpy.spin_once(self._node, timeout_sec=1.0)\n \n         return self.motion_suceeded\n "
+        }
+      ]
+    },
+    {
+      "author": "belalhmedan90",
+      "date": "2025-03-04T01:48:16Z",
+      "sha": "1f030f6072dac16914c91d1368926f182ea5f1fc",
+      "message": "Fix potential deadlock and wait until service is available (#87)\n\n* Update moveit2.py\n\n* Apply pre-commit suggestions\n\nSigned-off-by: Andrej Orsula <orsula.andrej@gmail.com>\n\n---------\n\nSigned-off-by: Andrej Orsula <orsula.andrej@gmail.com>\nCo-authored-by: Andrej Orsula <orsula.andrej@gmail.com>",
+      "files_changed": 1,
+      "additions": 20,
+      "deletions": 25,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e9e56d85680a29098638256d478b9048e41a80d3",
+          "filename": "pymoveit2/moveit2.py",
+          "status": "modified",
+          "additions": 20,
+          "deletions": 25,
+          "changes": 45,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/1f030f6072dac16914c91d1368926f182ea5f1fc/pymoveit2%2Fmoveit2.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/1f030f6072dac16914c91d1368926f182ea5f1fc/pymoveit2%2Fmoveit2.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/pymoveit2%2Fmoveit2.py?ref=1f030f6072dac16914c91d1368926f182ea5f1fc",
+          "patch": "@@ -529,7 +529,7 @@ def plan(\n         # 100ms sleep\n         rate = self._node.create_rate(10)\n         while not future.done():\n-            rate.sleep()\n+            rclpy.spin_once(self._node, timeout_sec=1.0)\n \n         return self.get_trajectory(\n             future,\n@@ -634,22 +634,15 @@ def plan_async(\n                 tolerance=tolerance_joint_position,\n                 weight=weight_joint_position,\n             )\n-\n         # Define starting state for the plan (default to the current state)\n-        if start_joint_state is not None:\n-            if isinstance(start_joint_state, JointState):\n-                self.__move_action_goal.request.start_state.joint_state = (\n-                    start_joint_state\n-                )\n+        while start_joint_state is None:\n+            self._node._logger.warn(message=\"Joint states are not available yet!\")\n+            if self.__joint_state is not None:\n+                start_joint_state = self.__joint_state\n+                break\n             else:\n-                self.__move_action_goal.request.start_state.joint_state = (\n-                    init_joint_state(\n-                        joint_names=self.__joint_names,\n-                        joint_positions=start_joint_state,\n-                    )\n-                )\n-        elif self.joint_state is not None:\n-            self.__move_action_goal.request.start_state.joint_state = self.joint_state\n+                rclpy.spin_once(self._node, timeout_sec=1.0)\n+        self._node._logger.info(message=\"Joint states are available now\")\n \n         # Plan trajectory asynchronously by service call\n         if cartesian:\n@@ -756,7 +749,7 @@ def wait_until_executed(self) -> bool:\n             return False\n \n         while self.__is_motion_requested or self.__is_executing:\n-            self.__wait_until_executed_rate.sleep()\n+            self.__wait_until_executed_rclpy.spin_once(self._node, timeout_sec=1.0)\n \n         return self.motion_suceeded\n \n@@ -1202,7 +1195,7 @@ def compute_fk(\n         # 100ms sleep\n         rate = self._node.create_rate(10)\n         while not future.done():\n-            rate.sleep()\n+            rclpy.spin_once(self._node, timeout_sec=1.0)\n \n         return self.get_compute_fk_result(future, fk_link_names=fk_link_names)\n \n@@ -1266,7 +1259,7 @@ def compute_fk_async(\n \n         stamp = self._node.get_clock().now().to_msg()\n         self.__compute_fk_req.header.stamp = stamp\n-\n+        self.__compute_fk_client.wait_for_service(timeout_sec=3.0)\n         if not self.__compute_fk_client.service_is_ready():\n             self._node.get_logger().warn(\n                 f\"Service '{self.__compute_fk_client.srv_name}' is not yet available. Better luck next time!\"\n@@ -1296,7 +1289,7 @@ def compute_ik(\n         # 10ms sleep\n         rate = self._node.create_rate(10)\n         while not future.done():\n-            rate.sleep()\n+            rclpy.spin_once(self._node, timeout_sec=1.0)\n \n         return self.get_compute_ik_result(future)\n \n@@ -1391,7 +1384,7 @@ def compute_ik_async(\n \n         stamp = self._node.get_clock().now().to_msg()\n         self.__compute_ik_req.ik_request.pose_stamped.header.stamp = stamp\n-\n+        self.__compute_ik_client.wait_for_service(timeout_sec=3.0)\n         if not self.__compute_ik_client.wait_for_service(\n             timeout_sec=wait_for_server_timeout_sec\n         ):\n@@ -1828,7 +1821,7 @@ def update_planning_scene(self) -> bool:\n         Gets the current planning scene. Returns whether the service call was\n         successful.\n         \"\"\"\n-\n+        self._get_planning_scene_service.wait_for_service(timeout_sec=3.0)\n         if not self._get_planning_scene_service.service_is_ready():\n             self._node.get_logger().warn(\n                 f\"Service '{self._get_planning_scene_service.srv_name}' is not yet available. Better luck next time!\"\n@@ -1879,6 +1872,7 @@ def allow_collisions(self, id: str, allow: bool) -> Optional[Future]:\n             allowed_collision_matrix.entry_values[j] = allowed_collision_entry\n \n         # Apply the new planning scene\n+        self._apply_planning_scene_service.wait_for_service(timeout_sec=3.0)\n         if not self._apply_planning_scene_service.service_is_ready():\n             self._node.get_logger().warn(\n                 f\"Service '{self._apply_planning_scene_service.srv_name}' is not yet available. Better luck next time!\"\n@@ -1923,6 +1917,7 @@ def clear_all_collision_objects(self) -> Optional[Future]:\n         self.__planning_scene.robot_state.attached_collision_objects = []\n \n         # Apply the new planning scene\n+        self._apply_planning_scene_service.wait_for_service(timeout_sec=3.0)\n         if not self._apply_planning_scene_service.service_is_ready():\n             self._node.get_logger().warn(\n                 f\"Service '{self._apply_planning_scene_service.srv_name}' is not yet available. Better luck next time!\"\n@@ -1983,7 +1978,7 @@ def _plan_kinematic_path(self) -> Optional[Future]:\n                 position_constraint.header.stamp = stamp\n             for orientation_constraint in constraints.orientation_constraints:\n                 orientation_constraint.header.stamp = stamp\n-\n+        self._plan_kinematic_path_service.wait_for_service(timeout_sec=3.0)\n         if not self._plan_kinematic_path_service.service_is_ready():\n             self._node.get_logger().warn(\n                 f\"Service '{self._plan_kinematic_path_service.srv_name}' is not yet available. Better luck next time!\"\n@@ -2054,7 +2049,7 @@ def _plan_cartesian_path(\n         )\n \n         self.__cartesian_path_request.waypoints = [target_pose]\n-\n+        self._plan_cartesian_path_service.wait_for_service(timeout_sec=3.0)\n         if not self._plan_cartesian_path_service.service_is_ready():\n             self._node.get_logger().warn(\n                 f\"Service '{self._plan_cartesian_path_service.srv_name}' is not yet available. Better luck next time!\"\n@@ -2112,7 +2107,7 @@ def __result_callback_move_action(self, res):\n         self.__execution_mutex.acquire()\n         if res.result().status != GoalStatus.STATUS_SUCCEEDED:\n             self._node.get_logger().warn(\n-                f\"Action '{self.__move_action_client._action_name}' was unsuccessful: {enum_to_str(GoalStatus,res.result().status)}.\"\n+                f\"Action '{self.__move_action_client._action_name}' was unsuccessful: {enum_to_str(GoalStatus, res.result().status)}.\"\n             )\n             self.motion_suceeded = False\n         else:\n@@ -2178,7 +2173,7 @@ def __result_callback_execute_trajectory(self, res):\n         self.__execution_mutex.acquire()\n         if res.result().status != GoalStatus.STATUS_SUCCEEDED:\n             self._node.get_logger().warn(\n-                f\"Action '{self._execute_trajectory_action_client._action_name}' was unsuccessful: {enum_to_str(GoalStatus,res.result().status)}.\"\n+                f\"Action '{self._execute_trajectory_action_client._action_name}' was unsuccessful: {enum_to_str(GoalStatus, res.result().status)}.\"\n             )\n             self.motion_suceeded = False\n         else:"
+        }
+      ]
+    },
+    {
+      "author": "blooop",
+      "date": "2025-02-19T12:21:22Z",
+      "sha": "b8dde8584c82615c864be295b77d532251d37364",
+      "message": "Feature/string error codes (#83)\n\n* feat: add method for getting the string value of error codes\n\n* feat: update logging to print string error codes\n\n* feat: update logging to print string error codes for gripper\n\n* rename get_enum_string -> enum_to_str and add type hints\n\n* formatting: make pre-commit happy\n\n* pre-commit: fix import order",
+      "files_changed": 3,
+      "additions": 33,
+      "deletions": 6,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e4f15ca0204654f5b75d545f4baa6091cd743d69",
+          "filename": "pymoveit2/gripper_command.py",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "changes": 4,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/b8dde8584c82615c864be295b77d532251d37364/pymoveit2%2Fgripper_command.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/b8dde8584c82615c864be295b77d532251d37364/pymoveit2%2Fgripper_command.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/pymoveit2%2Fgripper_command.py?ref=b8dde8584c82615c864be295b77d532251d37364",
+          "patch": "@@ -14,6 +14,8 @@\n )\n from sensor_msgs.msg import JointState\n \n+from pymoveit2.utils import enum_to_str\n+\n \n class GripperCommand:\n     \"\"\"\n@@ -289,7 +291,7 @@ def __response_callback_gripper_command(self, response):\n     def __result_callback_gripper_command(self, res):\n         if res.result().status != GoalStatus.STATUS_SUCCEEDED:\n             self._node.get_logger().error(\n-                f\"Action '{self.__gripper_command_action_client._action_name}' was unsuccessful: {res.result().status}\"\n+                f\"Action '{self.__gripper_command_action_client._action_name}' was unsuccessful: {enum_to_str(GoalStatus, res.result().status)}\"\n             )\n \n         self.__is_executing = False"
+        },
+        {
+          "sha": "81637aba0cf41e9e6f5d1ac8ca9e73881c9d6a52",
+          "filename": "pymoveit2/moveit2.py",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 5,
+          "changes": 12,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/b8dde8584c82615c864be295b77d532251d37364/pymoveit2%2Fmoveit2.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/b8dde8584c82615c864be295b77d532251d37364/pymoveit2%2Fmoveit2.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/pymoveit2%2Fmoveit2.py?ref=b8dde8584c82615c864be295b77d532251d37364",
+          "patch": "@@ -41,6 +41,8 @@\n from std_msgs.msg import Header, String\n from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint\n \n+from pymoveit2.utils import enum_to_str\n+\n \n class MoveIt2State(Enum):\n     \"\"\"\n@@ -703,7 +705,7 @@ def get_trajectory(\n                     return None\n             else:\n                 self._node.get_logger().warn(\n-                    f\"Planning failed! Error code: {res.error_code.val}.\"\n+                    f\"Planning failed! Error code: {enum_to_str(MoveItErrorCodes, res.error_code.val)}\"\n                 )\n                 return None\n \n@@ -713,7 +715,7 @@ def get_trajectory(\n             return res.trajectory.joint_trajectory\n         else:\n             self._node.get_logger().warn(\n-                f\"Planning failed! Error code: {res.error_code.val}.\"\n+                f\"Planning failed! Error code: {enum_to_str(MoveItErrorCodes, res.error_code.val)}\"\n             )\n             return None\n \n@@ -1318,7 +1320,7 @@ def get_compute_ik_result(\n             return res.solution.joint_state\n         else:\n             self._node.get_logger().warn(\n-                f\"IK computation failed! Error code: {res.error_code.val}.\"\n+                f\"IK computation failed! Error code: {enum_to_str(MoveItErrorCodes, res.error_code.val)}\"\n             )\n             return None\n \n@@ -2110,7 +2112,7 @@ def __result_callback_move_action(self, res):\n         self.__execution_mutex.acquire()\n         if res.result().status != GoalStatus.STATUS_SUCCEEDED:\n             self._node.get_logger().warn(\n-                f\"Action '{self.__move_action_client._action_name}' was unsuccessful: {res.result().status}.\"\n+                f\"Action '{self.__move_action_client._action_name}' was unsuccessful: {enum_to_str(GoalStatus,res.result().status)}.\"\n             )\n             self.motion_suceeded = False\n         else:\n@@ -2176,7 +2178,7 @@ def __result_callback_execute_trajectory(self, res):\n         self.__execution_mutex.acquire()\n         if res.result().status != GoalStatus.STATUS_SUCCEEDED:\n             self._node.get_logger().warn(\n-                f\"Action '{self._execute_trajectory_action_client._action_name}' was unsuccessful: {res.result().status}.\"\n+                f\"Action '{self._execute_trajectory_action_client._action_name}' was unsuccessful: {enum_to_str(GoalStatus,res.result().status)}.\"\n             )\n             self.motion_suceeded = False\n         else:"
+        },
+        {
+          "sha": "67f99588b4f4ec75db92cb0e46532d5b37b13ba4",
+          "filename": "pymoveit2/utils.py",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/b8dde8584c82615c864be295b77d532251d37364/pymoveit2%2Futils.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/b8dde8584c82615c864be295b77d532251d37364/pymoveit2%2Futils.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/pymoveit2%2Futils.py?ref=b8dde8584c82615c864be295b77d532251d37364",
+          "patch": "@@ -0,0 +1,23 @@\n+from typing import Type\n+\n+\n+def enum_to_str(enum_class: Type, value: int) -> str:\n+    \"\"\"Converts a ROS2 enum value to its string name.\n+\n+    Args:\n+        enum_class: The ROS2 message class containing the enum constants.\n+        value: The integer value of the enum.\n+\n+    Returns:\n+        str: The name of the enum constant, or the value with \"UNKNOWN NAME\" if not found.\n+    \"\"\"\n+    mapping = {}\n+    # Iterate over all attributes in the enum class\n+    for attr_name in dir(enum_class):\n+        # Consider only uppercase attributes (common convention for enums)\n+        if attr_name.isupper():\n+            attr_value = getattr(enum_class, attr_name)\n+            # Check if the attribute is an integer (enum values are typically int)\n+            if isinstance(attr_value, int):\n+                mapping[attr_value] = attr_name\n+    return mapping.get(value, f\"{value} :UNKNOWN NAME\")"
+        }
+      ]
+    },
+    {
+      "author": "amalnanavati",
+      "date": "2023-07-13T09:01:23Z",
+      "sha": "6973d6c43833abad947ea372c674e2deff8fd60c",
+      "message": "Add `target_link` param to `plan` (#30)\n\nAlthough `target_link` is a parameter to `move_to_pose`, it isn't used if `self.__execute_via_moveit` is False. This commit addresses that.",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "98e77941360076b9a7da7cd2f8cd12858464d194",
+          "filename": "pymoveit2/moveit2.py",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/6973d6c43833abad947ea372c674e2deff8fd60c/pymoveit2%2Fmoveit2.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/6973d6c43833abad947ea372c674e2deff8fd60c/pymoveit2%2Fmoveit2.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/pymoveit2%2Fmoveit2.py?ref=6973d6c43833abad947ea372c674e2deff8fd60c",
+          "patch": "@@ -276,6 +276,7 @@ def move_to_pose(\n                     position=position,\n                     quat_xyzw=quat_xyzw,\n                     frame_id=frame_id,\n+                    target_link=target_link,\n                     tolerance_position=tolerance_position,\n                     tolerance_orientation=tolerance_orientation,\n                     weight_position=weight_position,\n@@ -343,6 +344,7 @@ def plan(\n         joint_positions: Optional[List[float]] = None,\n         joint_names: Optional[List[str]] = None,\n         frame_id: Optional[str] = None,\n+        target_link: Optional[str] = None,\n         tolerance_position: float = 0.001,\n         tolerance_orientation: float = 0.001,\n         tolerance_joint_position: float = 0.001,\n@@ -364,6 +366,7 @@ def plan(\n             self.set_position_goal(\n                 position=position,\n                 frame_id=frame_id,\n+                target_link=target_link,\n                 tolerance=tolerance_position,\n                 weight=weight_position,\n             )\n@@ -372,6 +375,7 @@ def plan(\n             self.set_orientation_goal(\n                 quat_xyzw=quat_xyzw,\n                 frame_id=frame_id,\n+                target_link=target_link,\n                 tolerance=tolerance_orientation,\n                 weight=weight_orientation,\n             )"
+        }
+      ]
+    },
+    {
+      "author": "m0rph03nix",
+      "date": "2024-11-25T10:57:09Z",
+      "sha": "b9b82b8d397da942971c584f3f1eab58445a9163",
+      "message": "Add UR robot + generalize example to every robot (#76)\n\n* add UR robot\r\n\r\n* generalise exemples for every robots",
+      "files_changed": 12,
+      "additions": 87,
+      "deletions": 53,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "ab4304f579d88d1e1a4ac0e9819db4d4e5b03869",
+          "filename": "examples/ex_allow_collisions.py",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 5,
+          "changes": 10,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/b9b82b8d397da942971c584f3f1eab58445a9163/examples%2Fex_allow_collisions.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/b9b82b8d397da942971c584f3f1eab58445a9163/examples%2Fex_allow_collisions.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/examples%2Fex_allow_collisions.py?ref=b9b82b8d397da942971c584f3f1eab58445a9163",
+          "patch": "@@ -13,7 +13,7 @@\n from rclpy.node import Node\n \n from pymoveit2 import MoveIt2\n-from pymoveit2.robots import panda\n+from pymoveit2.robots import panda as robot\n \n \n def main():\n@@ -38,10 +38,10 @@ def main():\n     # Create MoveIt 2 interface\n     moveit2 = MoveIt2(\n         node=node,\n-        joint_names=panda.joint_names(),\n-        base_link_name=panda.base_link_name(),\n-        end_effector_name=panda.end_effector_name(),\n-        group_name=panda.MOVE_GROUP_ARM,\n+        joint_names=robot.joint_names(),\n+        base_link_name=robot.base_link_name(),\n+        end_effector_name=robot.end_effector_name(),\n+        group_name=robot.MOVE_GROUP_ARM,\n         callback_group=callback_group,\n     )\n "
+        },
+        {
+          "sha": "4ba250c17dda82a63e48334e32cc99f44b7e28a5",
+          "filename": "examples/ex_clear_planning_scene.py",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 5,
+          "changes": 11,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/b9b82b8d397da942971c584f3f1eab58445a9163/examples%2Fex_clear_planning_scene.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/b9b82b8d397da942971c584f3f1eab58445a9163/examples%2Fex_clear_planning_scene.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/examples%2Fex_clear_planning_scene.py?ref=b9b82b8d397da942971c584f3f1eab58445a9163",
+          "patch": "@@ -15,7 +15,7 @@\n from rclpy.node import Node\n \n from pymoveit2 import MoveIt2\n-from pymoveit2.robots import panda\n+from pymoveit2.robots import panda as robot\n \n \n def main():\n@@ -42,13 +42,14 @@ def main():\n     # Create callback group that allows execution of callbacks in parallel without restrictions\n     callback_group = ReentrantCallbackGroup()\n \n+\n     # Create MoveIt 2 interface\n     moveit2 = MoveIt2(\n         node=node,\n-        joint_names=panda.joint_names(),\n-        base_link_name=panda.base_link_name(),\n-        end_effector_name=panda.end_effector_name(),\n-        group_name=panda.MOVE_GROUP_ARM,\n+        joint_names=robot.joint_names(),\n+        base_link_name=robot.base_link_name(),\n+        end_effector_name=robot.end_effector_name(),\n+        group_name=robot.MOVE_GROUP_ARM,\n         callback_group=callback_group,\n     )\n "
+        },
+        {
+          "sha": "2d9dbbd36496c7bcdcbd050101f944274bbbfd1d",
+          "filename": "examples/ex_collision_mesh.py",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 5,
+          "changes": 10,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/b9b82b8d397da942971c584f3f1eab58445a9163/examples%2Fex_collision_mesh.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/b9b82b8d397da942971c584f3f1eab58445a9163/examples%2Fex_collision_mesh.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/examples%2Fex_collision_mesh.py?ref=b9b82b8d397da942971c584f3f1eab58445a9163",
+          "patch": "@@ -17,7 +17,7 @@\n from rclpy.node import Node\n \n from pymoveit2 import MoveIt2\n-from pymoveit2.robots import panda\n+from pymoveit2.robots import panda as robot \n \n DEFAULT_EXAMPLE_MESH = path.join(\n     path.dirname(path.realpath(__file__)), \"assets\", \"suzanne.stl\"\n@@ -50,10 +50,10 @@ def main():\n     # Create MoveIt 2 interface\n     moveit2 = MoveIt2(\n         node=node,\n-        joint_names=panda.joint_names(),\n-        base_link_name=panda.base_link_name(),\n-        end_effector_name=panda.end_effector_name(),\n-        group_name=panda.MOVE_GROUP_ARM,\n+        joint_names=robot.joint_names(),\n+        base_link_name=robot.base_link_name(),\n+        end_effector_name=robot.end_effector_name(),\n+        group_name=robot.MOVE_GROUP_ARM,\n         callback_group=callback_group,\n     )\n "
+        },
+        {
+          "sha": "19607938e47745a3a1de9b3fbded0dc87e47b709",
+          "filename": "examples/ex_collision_primitive.py",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 5,
+          "changes": 10,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/b9b82b8d397da942971c584f3f1eab58445a9163/examples%2Fex_collision_primitive.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/b9b82b8d397da942971c584f3f1eab58445a9163/examples%2Fex_collision_primitive.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/examples%2Fex_collision_primitive.py?ref=b9b82b8d397da942971c584f3f1eab58445a9163",
+          "patch": "@@ -14,7 +14,7 @@\n from rclpy.node import Node\n \n from pymoveit2 import MoveIt2\n-from pymoveit2.robots import panda\n+from pymoveit2.robots import panda as robot\n \n \n def main():\n@@ -42,10 +42,10 @@ def main():\n     # Create MoveIt 2 interface\n     moveit2 = MoveIt2(\n         node=node,\n-        joint_names=panda.joint_names(),\n-        base_link_name=panda.base_link_name(),\n-        end_effector_name=panda.end_effector_name(),\n-        group_name=panda.MOVE_GROUP_ARM,\n+        joint_names=robot.joint_names(),\n+        base_link_name=robot.base_link_name(),\n+        end_effector_name=robot.end_effector_name(),\n+        group_name=robot.MOVE_GROUP_ARM,\n         callback_group=callback_group,\n     )\n "
+        },
+        {
+          "sha": "387b2584b755ea2d8be2e5029deda6bc27496c07",
+          "filename": "examples/ex_fk.py",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 5,
+          "changes": 10,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/b9b82b8d397da942971c584f3f1eab58445a9163/examples%2Fex_fk.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/b9b82b8d397da942971c584f3f1eab58445a9163/examples%2Fex_fk.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/examples%2Fex_fk.py?ref=b9b82b8d397da942971c584f3f1eab58445a9163",
+          "patch": "@@ -12,7 +12,7 @@\n from rclpy.node import Node\n \n from pymoveit2 import MoveIt2, MoveIt2State\n-from pymoveit2.robots import panda\n+from pymoveit2.robots import panda as robot\n \n \n def main():\n@@ -42,10 +42,10 @@ def main():\n     # Create MoveIt 2 interface\n     moveit2 = MoveIt2(\n         node=node,\n-        joint_names=panda.joint_names(),\n-        base_link_name=panda.base_link_name(),\n-        end_effector_name=panda.end_effector_name(),\n-        group_name=panda.MOVE_GROUP_ARM,\n+        joint_names=robot.joint_names(),\n+        base_link_name=robot.base_link_name(),\n+        end_effector_name=robot.end_effector_name(),\n+        group_name=robot.MOVE_GROUP_ARM,\n         callback_group=callback_group,\n     )\n "
+        },
+        {
+          "sha": "4f5c17726e36361e4c8d4693a47d3986527d8e1c",
+          "filename": "examples/ex_gripper.py",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 5,
+          "changes": 10,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/b9b82b8d397da942971c584f3f1eab58445a9163/examples%2Fex_gripper.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/b9b82b8d397da942971c584f3f1eab58445a9163/examples%2Fex_gripper.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/examples%2Fex_gripper.py?ref=b9b82b8d397da942971c584f3f1eab58445a9163",
+          "patch": "@@ -13,7 +13,7 @@\n from rclpy.node import Node\n \n from pymoveit2 import GripperInterface\n-from pymoveit2.robots import panda\n+from pymoveit2.robots import panda as robot\n \n \n def main():\n@@ -34,10 +34,10 @@ def main():\n     # Create gripper interface\n     gripper_interface = GripperInterface(\n         node=node,\n-        gripper_joint_names=panda.gripper_joint_names(),\n-        open_gripper_joint_positions=panda.OPEN_GRIPPER_JOINT_POSITIONS,\n-        closed_gripper_joint_positions=panda.CLOSED_GRIPPER_JOINT_POSITIONS,\n-        gripper_group_name=panda.MOVE_GROUP_GRIPPER,\n+        gripper_joint_names=robot.gripper_joint_names(),\n+        open_gripper_joint_positions=robot.OPEN_GRIPPER_JOINT_POSITIONS,\n+        closed_gripper_joint_positions=robot.CLOSED_GRIPPER_JOINT_POSITIONS,\n+        gripper_group_name=robot.MOVE_GROUP_GRIPPER,\n         callback_group=callback_group,\n         gripper_command_action_name=\"gripper_action_controller/gripper_cmd\",\n     )"
+        },
+        {
+          "sha": "d8a6f3fefdf547af9a364c824fc9e23a926604f5",
+          "filename": "examples/ex_ik.py",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 5,
+          "changes": 10,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/b9b82b8d397da942971c584f3f1eab58445a9163/examples%2Fex_ik.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/b9b82b8d397da942971c584f3f1eab58445a9163/examples%2Fex_ik.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/examples%2Fex_ik.py?ref=b9b82b8d397da942971c584f3f1eab58445a9163",
+          "patch": "@@ -12,7 +12,7 @@\n from rclpy.node import Node\n \n from pymoveit2 import MoveIt2, MoveIt2State\n-from pymoveit2.robots import panda\n+from pymoveit2.robots import panda as robot\n \n \n def main():\n@@ -32,10 +32,10 @@ def main():\n     # Create MoveIt 2 interface\n     moveit2 = MoveIt2(\n         node=node,\n-        joint_names=panda.joint_names(),\n-        base_link_name=panda.base_link_name(),\n-        end_effector_name=panda.end_effector_name(),\n-        group_name=panda.MOVE_GROUP_ARM,\n+        joint_names=robot.joint_names(),\n+        base_link_name=robot.base_link_name(),\n+        end_effector_name=robot.end_effector_name(),\n+        group_name=robot.MOVE_GROUP_ARM,\n         callback_group=callback_group,\n     )\n "
+        },
+        {
+          "sha": "eccc35646182f78af61e0b3a8bd91e6d44b18980",
+          "filename": "examples/ex_joint_goal.py",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 6,
+          "changes": 11,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/b9b82b8d397da942971c584f3f1eab58445a9163/examples%2Fex_joint_goal.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/b9b82b8d397da942971c584f3f1eab58445a9163/examples%2Fex_joint_goal.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/examples%2Fex_joint_goal.py?ref=b9b82b8d397da942971c584f3f1eab58445a9163",
+          "patch": "@@ -13,8 +13,7 @@\n from rclpy.node import Node\n \n from pymoveit2 import MoveIt2, MoveIt2State\n-from pymoveit2.robots import panda\n-\n+from pymoveit2.robots import panda as robot\n \n def main():\n     rclpy.init()\n@@ -47,10 +46,10 @@ def main():\n     # Create MoveIt 2 interface\n     moveit2 = MoveIt2(\n         node=node,\n-        joint_names=panda.joint_names(),\n-        base_link_name=panda.base_link_name(),\n-        end_effector_name=panda.end_effector_name(),\n-        group_name=panda.MOVE_GROUP_ARM,\n+        joint_names=robot.joint_names(),\n+        base_link_name=robot.base_link_name(),\n+        end_effector_name=robot.end_effector_name(),\n+        group_name=robot.MOVE_GROUP_ARM,\n         callback_group=callback_group,\n     )\n     moveit2.planner_id = ("
+        },
+        {
+          "sha": "19a83be13ce89cee2ce06c268e36333f6774d12e",
+          "filename": "examples/ex_orientation_path_constraint.py",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 5,
+          "changes": 10,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/b9b82b8d397da942971c584f3f1eab58445a9163/examples%2Fex_orientation_path_constraint.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/b9b82b8d397da942971c584f3f1eab58445a9163/examples%2Fex_orientation_path_constraint.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/examples%2Fex_orientation_path_constraint.py?ref=b9b82b8d397da942971c584f3f1eab58445a9163",
+          "patch": "@@ -12,7 +12,7 @@\n from rclpy.node import Node\n \n from pymoveit2 import MoveIt2, MoveIt2State\n-from pymoveit2.robots import panda\n+from pymoveit2.robots import panda as robot\n \n \n def main():\n@@ -64,10 +64,10 @@ def main():\n     # Create MoveIt 2 interface\n     moveit2 = MoveIt2(\n         node=node,\n-        joint_names=panda.joint_names(),\n-        base_link_name=panda.base_link_name(),\n-        end_effector_name=panda.end_effector_name(),\n-        group_name=panda.MOVE_GROUP_ARM,\n+        joint_names=robot.joint_names(),\n+        base_link_name=robot.base_link_name(),\n+        end_effector_name=robot.end_effector_name(),\n+        group_name=robot.MOVE_GROUP_ARM,\n         callback_group=callback_group,\n     )\n "
+        },
+        {
+          "sha": "8b95ccc49d3ba60ab7144b4bcdfbdd9eac6f36b9",
+          "filename": "examples/ex_pose_goal.py",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 5,
+          "changes": 10,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/b9b82b8d397da942971c584f3f1eab58445a9163/examples%2Fex_pose_goal.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/b9b82b8d397da942971c584f3f1eab58445a9163/examples%2Fex_pose_goal.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/examples%2Fex_pose_goal.py?ref=b9b82b8d397da942971c584f3f1eab58445a9163",
+          "patch": "@@ -13,7 +13,7 @@\n from rclpy.node import Node\n \n from pymoveit2 import MoveIt2, MoveIt2State\n-from pymoveit2.robots import panda\n+from pymoveit2.robots import panda as robot\n \n \n def main():\n@@ -43,10 +43,10 @@ def main():\n     # Create MoveIt 2 interface\n     moveit2 = MoveIt2(\n         node=node,\n-        joint_names=panda.joint_names(),\n-        base_link_name=panda.base_link_name(),\n-        end_effector_name=panda.end_effector_name(),\n-        group_name=panda.MOVE_GROUP_ARM,\n+        joint_names=robot.joint_names(),\n+        base_link_name=robot.base_link_name(),\n+        end_effector_name=robot.end_effector_name(),\n+        group_name=robot.MOVE_GROUP_ARM,\n         callback_group=callback_group,\n     )\n     moveit2.planner_id = ("
+        },
+        {
+          "sha": "c085f8242a73f8b7e41c8a9f5948921b3c3071ed",
+          "filename": "examples/ex_servo.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/b9b82b8d397da942971c584f3f1eab58445a9163/examples%2Fex_servo.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/b9b82b8d397da942971c584f3f1eab58445a9163/examples%2Fex_servo.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/examples%2Fex_servo.py?ref=b9b82b8d397da942971c584f3f1eab58445a9163",
+          "patch": "@@ -12,7 +12,7 @@\n from rclpy.node import Node\n \n from pymoveit2 import MoveIt2Servo\n-from pymoveit2.robots import panda\n+from pymoveit2.robots import panda as robot\n \n \n def main():\n@@ -27,7 +27,7 @@ def main():\n     # Create MoveIt 2 Servo interface\n     moveit2_servo = MoveIt2Servo(\n         node=node,\n-        frame_id=panda.base_link_name(),\n+        frame_id=robot.base_link_name(),\n         callback_group=callback_group,\n     )\n "
+        },
+        {
+          "sha": "f133eca2b930c0cd09d0c9bf21d7acf313ae7f83",
+          "filename": "pymoveit2/robots/ur.py",
+          "status": "added",
+          "additions": 34,
+          "deletions": 0,
+          "changes": 34,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/b9b82b8d397da942971c584f3f1eab58445a9163/pymoveit2%2Frobots%2Fur.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/b9b82b8d397da942971c584f3f1eab58445a9163/pymoveit2%2Frobots%2Fur.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/pymoveit2%2Frobots%2Fur.py?ref=b9b82b8d397da942971c584f3f1eab58445a9163",
+          "patch": "@@ -0,0 +1,34 @@\n+from typing import List\n+\n+MOVE_GROUP_ARM: str = \"ur_manipulator\"\n+MOVE_GROUP_GRIPPER: str = \"gripper\"\n+\n+prefix: str = \"\"\n+\n+OPEN_GRIPPER_JOINT_POSITIONS: List[float] = [0.04, 0.04]\n+CLOSED_GRIPPER_JOINT_POSITIONS: List[float] = [0.0, 0.0]\n+\n+\n+def joint_names(prefix: str = prefix) -> List[str]:\n+    return [\n+        prefix + \"shoulder_pan_joint\",\n+        prefix + \"shoulder_lift_joint\",\n+        prefix + \"elbow_joint\",\n+        prefix + \"wrist_1_joint\",\n+        prefix + \"wrist_2_joint\",\n+        prefix + \"wrist_3_joint\",\n+    ]\n+\n+\n+def base_link_name(prefix: str = prefix) -> str:\n+    return prefix + \"base_link\"\n+\n+\n+def end_effector_name(prefix: str = prefix) -> str:\n+    return prefix + \"tool0\"\n+\n+\n+def gripper_joint_names(prefix: str = prefix) -> List[str]:\n+    return [\n+\n+    ]"
+        }
+      ]
+    },
+    {
+      "author": "ycheng517",
+      "date": "2024-06-03T08:03:05Z",
+      "sha": "afd30fa01724ba890599ae6143586d6694ff2319",
+      "message": "Add function to move gripper to a specific position (#70)",
+      "files_changed": 3,
+      "additions": 42,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "52a968ee4acfacfd0646fd45cc17bd3f6dd3353b",
+          "filename": "pymoveit2/gripper_command.py",
+          "status": "modified",
+          "additions": 16,
+          "deletions": 0,
+          "changes": 16,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/afd30fa01724ba890599ae6143586d6694ff2319/pymoveit2%2Fgripper_command.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/afd30fa01724ba890599ae6143586d6694ff2319/pymoveit2%2Fgripper_command.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/pymoveit2%2Fgripper_command.py?ref=afd30fa01724ba890599ae6143586d6694ff2319",
+          "patch": "@@ -107,6 +107,7 @@ def __init__(\n         self.__close_gripper_command_goal = self.__init_gripper_command_goal(\n             position=closed_gripper_joint_positions, max_effort=max_effort\n         )\n+        self.__max_effort = max_effort\n \n         # Initialise internals for determining whether the gripper is open or closed\n         self.__joint_state_mutex = threading.Lock()\n@@ -180,6 +181,21 @@ def close(self, skip_if_noop: bool = False):\n \n         self.__send_goal_async_gripper_command(self.__close_gripper_command_goal)\n \n+    def move_to_position(self, position: float):\n+        \"\"\"\n+        Move the gripper to a specific position.\n+        - `position` - Desired position of the gripper.\n+        \"\"\"\n+\n+        if self.__ignore_new_calls_while_executing and self.__is_executing:\n+            return\n+        self.__is_motion_requested = True\n+\n+        gripper_cmd_goal = GripperCommandAction.Goal()\n+        gripper_cmd_goal.command.position = position\n+        gripper_cmd_goal.command.max_effort = self.__max_effort\n+        self.__send_goal_async_gripper_command(gripper_cmd_goal)\n+\n     def reset_open(self, **kwargs):\n         \"\"\"\n         Reset into open configuration by sending a dummy joint trajectory."
+        },
+        {
+          "sha": "2fa4380dcdaa0fe01a08370e1f265f78f37c1b01",
+          "filename": "pymoveit2/gripper_interface.py",
+          "status": "modified",
+          "additions": 17,
+          "deletions": 0,
+          "changes": 17,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/afd30fa01724ba890599ae6143586d6694ff2319/pymoveit2%2Fgripper_interface.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/afd30fa01724ba890599ae6143586d6694ff2319/pymoveit2%2Fgripper_interface.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/pymoveit2%2Fgripper_interface.py?ref=afd30fa01724ba890599ae6143586d6694ff2319",
+          "patch": "@@ -138,6 +138,23 @@ def close(self, skip_if_noop: bool = False):\n \n         self._interface.close(self=self, skip_if_noop=skip_if_noop)\n \n+    def move_to_position(self, position: float):\n+        \"\"\"\n+        Move the gripper to a specific position.\n+        - `position` - Desired position of the gripper.\n+        \"\"\"\n+\n+        if self._interface is None:\n+            self.__determine_interface()\n+        if self._interface is None:\n+            self._node.get_logger().error(\n+                \"Unable to move the gripper to a position because the appropriate \"\n+                \"interface cannot be determined.\"\n+            )\n+            return\n+\n+        self._interface.move_to_position(self=self, position=position)\n+\n     def reset_open(self, sync: bool = True):\n         \"\"\"\n         Reset into open configuration by sending a dummy joint trajectory."
+        },
+        {
+          "sha": "74d1529b7b717459428184b54224bf061f509ae4",
+          "filename": "pymoveit2/moveit2_gripper.py",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 0,
+          "changes": 9,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/afd30fa01724ba890599ae6143586d6694ff2319/pymoveit2%2Fmoveit2_gripper.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/afd30fa01724ba890599ae6143586d6694ff2319/pymoveit2%2Fmoveit2_gripper.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/pymoveit2%2Fmoveit2_gripper.py?ref=afd30fa01724ba890599ae6143586d6694ff2319",
+          "patch": "@@ -169,6 +169,15 @@ def close(self, skip_if_noop: bool = False):\n                 joint_positions=self.__closed_gripper_joint_positions\n             )\n \n+    def move_to_position(self, position: float):\n+        \"\"\"\n+        Move the gripper to a specific position.\n+        - `position` - Desired position of the gripper\n+        \"\"\"\n+\n+        joint_positions = [position for _ in self.joint_names]\n+        self.move_to_configuration(joint_positions=joint_positions)\n+\n     def reset_open(self, sync: bool = True):\n         \"\"\"\n         Reset into open configuration by sending a dummy joint trajectory."
+        }
+      ]
+    },
+    {
+      "author": "mhubii",
+      "date": "2023-11-10T15:28:20Z",
+      "sha": "2bc9a4302059f8b5d00923b8842a3bb5ad5cfb2a",
+      "message": "Add support for KUKA LBRs (#38)",
+      "files_changed": 1,
+      "additions": 18,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "f3f15b03b4430204dde090f76dc16e339d7ccd08",
+          "filename": "pymoveit2/robots/lbr.py",
+          "status": "added",
+          "additions": 18,
+          "deletions": 0,
+          "changes": 18,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/2bc9a4302059f8b5d00923b8842a3bb5ad5cfb2a/pymoveit2%2Frobots%2Flbr.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/2bc9a4302059f8b5d00923b8842a3bb5ad5cfb2a/pymoveit2%2Frobots%2Flbr.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/pymoveit2%2Frobots%2Flbr.py?ref=2bc9a4302059f8b5d00923b8842a3bb5ad5cfb2a",
+          "patch": "@@ -0,0 +1,18 @@\n+from typing import List\n+\n+# Documentation:\n+# https://github.com/lbr-stack/lbr_fri_ros2_stack/\n+\n+MOVE_GROUP_ARM: str = \"arm\"\n+\n+\n+def joint_names() -> List[str]:\n+    return [f\"A{i}\" for i in range(8)]\n+\n+\n+def base_link_name() -> str:\n+    return \"link_0\"\n+\n+\n+def end_effector_name() -> str:\n+    return \"link_ee\""
+        }
+      ]
+    },
+    {
+      "author": "MDecarabas",
+      "date": "2023-11-08T21:36:37Z",
+      "sha": "5b35728306665e7f21fe2ab1ee5bb42565c68e12",
+      "message": "Added crane_x7 robot model (#37)\n\n* Added crane_x7 robot model\r\n\r\n* Update pymoveit2/robots/crane_x7.py\r\n\r\nCo-authored-by: Andrej Orsula <orsula.andrej@gmail.com>\r\n\r\n---------\r\n\r\nCo-authored-by: Andrej Orsula <orsula.andrej@gmail.com>",
+      "files_changed": 1,
+      "additions": 36,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "8614714ef04815300a6bc4ec0e431a52684eee54",
+          "filename": "pymoveit2/robots/crane_x7.py",
+          "status": "added",
+          "additions": 36,
+          "deletions": 0,
+          "changes": 36,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/5b35728306665e7f21fe2ab1ee5bb42565c68e12/pymoveit2%2Frobots%2Fcrane_x7.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/5b35728306665e7f21fe2ab1ee5bb42565c68e12/pymoveit2%2Frobots%2Fcrane_x7.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/pymoveit2%2Frobots%2Fcrane_x7.py?ref=5b35728306665e7f21fe2ab1ee5bb42565c68e12",
+          "patch": "@@ -0,0 +1,36 @@\n+from typing import List\n+\n+MOVE_GROUP_ARM: str = \"arm\"\n+MOVE_GROUP_GRIPPER: str = \"gripper\"\n+\n+OPEN_GRIPPER_JOINT_POSITIONS: List[float] = [0.7, 0.7]\n+CLOSED_GRIPPER_JOINT_POSITIONS: List[float] = [0.0, 0.0]\n+\n+robot_prefix = \"crane_x7_\"\n+\n+\n+def joint_names(prefix: str = robot_prefix) -> List[str]:\n+    return [\n+        prefix + \"shoulder_fixed_part_pan_joint\",\n+        prefix + \"shoulder_revolute_part_tilt_joint\",\n+        prefix + \"upper_arm_revolute_part_twist_joint\",\n+        prefix + \"upper_arm_revolute_part_rotate_joint\",\n+        prefix + \"lower_arm_fixed_part_joint\",\n+        prefix + \"lower_arm_revolute_part_joint\",\n+        prefix + \"wrist_joint\",\n+    ]\n+\n+\n+def base_link_name(prefix: str = robot_prefix) -> str:\n+    return \"base_link\"\n+\n+\n+def end_effector_name(prefix: str = robot_prefix) -> str:\n+    return prefix + \"gripper_base_link\"\n+\n+\n+def gripper_joint_names(prefix: str = robot_prefix) -> List[str]:\n+    return [\n+        prefix + \"gripper_finger_a_joint\",\n+        prefix + \"gripper_finger_b_joint\",\n+    ]"
+        }
+      ]
+    },
+    {
+      "author": "egordon",
+      "date": "2023-08-23T08:44:52Z",
+      "sha": "afb0dbd2daee08758c32c8f53d8e1ad2ee1f4ac0",
+      "message": "Add Kinova JACO + MICO definitions to robot (#32)\n\n* Added Kinova JACO + MICO robot definition\r\n\r\n* Match moveit groups to https://github.com/Kinovarobotics/kinova-ros/tree/noetic-devel/kinova_moveit\r\n\r\n* Include gripper type and assistive/service designation in kinova prefix\r\n\r\n* Added pre-commit hooks",
+      "files_changed": 1,
+      "additions": 51,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b0878dce936da4bbca6170c84e756fc2aff7c996",
+          "filename": "pymoveit2/robots/kinova.py",
+          "status": "added",
+          "additions": 51,
+          "deletions": 0,
+          "changes": 51,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/afb0dbd2daee08758c32c8f53d8e1ad2ee1f4ac0/pymoveit2%2Frobots%2Fkinova.py",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/afb0dbd2daee08758c32c8f53d8e1ad2ee1f4ac0/pymoveit2%2Frobots%2Fkinova.py",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/pymoveit2%2Frobots%2Fkinova.py?ref=afb0dbd2daee08758c32c8f53d8e1ad2ee1f4ac0",
+          "patch": "@@ -0,0 +1,51 @@\n+from typing import List\n+\n+# Documentation:\n+# https://github.com/Kinovarobotics/kinova-ros/\n+\n+MOVE_GROUP_ARM: str = \"arm\"\n+MOVE_GROUP_GRIPPER: str = \"gripper\"\n+\n+JACO_PREFIX: str = \"j2\"\n+MICO_PREFIX: str = \"m1\"\n+\n+\n+def get_prefix(\n+    version_prefix: str = JACO_PREFIX,\n+    arm_dof: int = 6,\n+    hand_dof: int = 2,\n+    spherical=False,\n+    assistive=False,\n+) -> str:\n+    return (\n+        version_prefix\n+        + (\"s\" if spherical else \"n\")\n+        + str(arm_dof)\n+        + (\"a\" if assistive else \"s\")\n+        + str(hand_dof)\n+        + \"00_\"\n+    )\n+\n+\n+def joint_names(prefix: str = get_prefix()) -> List[str]:\n+    res = []\n+    arm_dof = int(prefix[3])\n+    for i in range(arm_dof):\n+        res.append(prefix + \"joint_\" + str(i + 1))\n+    return res\n+\n+\n+def base_link_name(prefix: str = get_prefix()) -> str:\n+    return prefix + \"link_base\"\n+\n+\n+def end_effector_name(prefix: str = get_prefix()) -> str:\n+    return prefix + \"end_effector\"\n+\n+\n+def gripper_joint_names(prefix: str = get_prefix()) -> List[str]:\n+    res = []\n+    hand_dof = int(prefix[5])\n+    for i in range(hand_dof):\n+        res.append(prefix + \"joint_finger_\" + str(i + 1))\n+    return res"
+        }
+      ]
+    },
+    {
+      "author": "pre-commit-ci[bot]",
+      "date": "2022-05-10T08:07:11Z",
+      "sha": "6836e9a5213fd2634754b627859ad0dffdbcb40c",
+      "message": "[pre-commit.ci] pre-commit autoupdate (#12)\n\nupdates:\r\n- [github.com/pre-commit/pre-commit-hooks: v4.0.1 → v4.2.0](https://github.com/pre-commit/pre-commit-hooks/compare/v4.0.1...v4.2.0)\r\n- [github.com/psf/black: 21.10b0 → 22.3.0](https://github.com/psf/black/compare/21.10b0...22.3.0)\r\n- [github.com/executablebooks/mdformat: 0.7.10 → 0.7.14](https://github.com/executablebooks/mdformat/compare/0.7.10...0.7.14)\r\n\r\nCo-authored-by: pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com>",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 3,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "5a67ff7bb89e8239da1babd9154cef8ff979ddfc",
+          "filename": ".pre-commit-config.yaml",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/AndrejOrsula/pymoveit2/blob/6836e9a5213fd2634754b627859ad0dffdbcb40c/.pre-commit-config.yaml",
+          "raw_url": "https://github.com/AndrejOrsula/pymoveit2/raw/6836e9a5213fd2634754b627859ad0dffdbcb40c/.pre-commit-config.yaml",
+          "contents_url": "https://api.github.com/repos/AndrejOrsula/pymoveit2/contents/.pre-commit-config.yaml?ref=6836e9a5213fd2634754b627859ad0dffdbcb40c",
+          "patch": "@@ -3,7 +3,7 @@\n \n repos:\n   - repo: https://github.com/pre-commit/pre-commit-hooks\n-    rev: v4.0.1\n+    rev: v4.2.0\n     hooks:\n       - id: check-added-large-files\n       - id: check-case-conflict\n@@ -26,7 +26,7 @@ repos:\n         args: [\"--profile\", \"black\"]\n \n   - repo: https://github.com/psf/black\n-    rev: 21.10b0\n+    rev: 22.3.0\n     hooks:\n       - id: black\n \n@@ -36,6 +36,6 @@ repos:\n       - id: beautysh\n \n   - repo: https://github.com/executablebooks/mdformat\n-    rev: 0.7.10\n+    rev: 0.7.14\n     hooks:\n       - id: mdformat"
+        }
+      ]
+    }
+  ]
+}

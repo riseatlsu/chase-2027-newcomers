@@ -1,0 +1,263 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T06:53:14Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "pal-robotics",
+    "repo": "urdf_test"
+  },
+  "data": [
+    {
+      "author": "mathias-luedtke",
+      "date": "2024-10-10T12:16:17Z",
+      "sha": "4c2be4bd438f87966661814970fd398153662b66",
+      "message": "Implement xacro test functions",
+      "files_changed": 5,
+      "additions": 290,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "26c7213576156e4a617ac384bff4daf2dbf29c4b",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/pal-robotics/urdf_test/blob/4c2be4bd438f87966661814970fd398153662b66/CMakeLists.txt",
+          "raw_url": "https://github.com/pal-robotics/urdf_test/raw/4c2be4bd438f87966661814970fd398153662b66/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/pal-robotics/urdf_test/contents/CMakeLists.txt?ref=4c2be4bd438f87966661814970fd398153662b66",
+          "patch": "@@ -7,6 +7,8 @@ ament_auto_find_build_dependencies()\n if(BUILD_TESTING)\n   find_package(ament_lint_auto REQUIRED)\n   ament_lint_auto_find_test_dependencies()\n+\n+  ament_add_pytest_test(test_xacro_test tests/test_xacro_test.py)\n endif()\n \n "
+        },
+        {
+          "sha": "0e80749abe64e359e671ad30d8a10bf3bed5c019",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 25,
+          "deletions": 2,
+          "changes": 27,
+          "blob_url": "https://github.com/pal-robotics/urdf_test/blob/4c2be4bd438f87966661814970fd398153662b66/README.md",
+          "raw_url": "https://github.com/pal-robotics/urdf_test/raw/4c2be4bd438f87966661814970fd398153662b66/README.md",
+          "contents_url": "https://api.github.com/repos/pal-robotics/urdf_test/contents/README.md?ref=4c2be4bd438f87966661814970fd398153662b66",
+          "patch": "@@ -24,7 +24,30 @@ __all__ = ('TestDescriptionPublished', 'TestSuccessfulExit')\n def generate_test_description():\n     return generate_urdf_test_description(\n         include_launch_py_description(\n-            'pmb2_description', ['launch', 'robot_state_publisher.launch.py']),         \n-    )                                        \n+            'pmb2_description', ['launch', 'robot_state_publisher.launch.py']),\n+    )\n ```\n \n+# xacro_test\n+\n+As a faster alternative, the xacro can get checked directly.\n+`define_xacro_test` takes a xacro file path and a number of `DeclareLaunchArgument` arguments,\n+which are used to form the test matrix (cartesian product).\n+\n+\n+```python\n+from pathlib import Path\n+\n+from ament_index_python.packages import get_package_share_directory\n+from pmb2_description.launch_arguments import PMB2Args\n+\n+from urdf_test.xacro_test import define_xacro_test\n+\n+xacro_file_path = Path(\n+    get_package_share_directory('pmb2_description'),\n+    'robots',\n+    'pmb2.urdf.xacro',\n+)\n+\n+test_xacro = define_xacro_test(xacro_file_path, PMB2Args.laser_model, PMB2Args.add_on_module)\n+```"
+        },
+        {
+          "sha": "39ace2cb405678530a4c58b66298e2fe99c10dbd",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/pal-robotics/urdf_test/blob/4c2be4bd438f87966661814970fd398153662b66/package.xml",
+          "raw_url": "https://github.com/pal-robotics/urdf_test/raw/4c2be4bd438f87966661814970fd398153662b66/package.xml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/urdf_test/contents/package.xml?ref=4c2be4bd438f87966661814970fd398153662b66",
+          "patch": "@@ -15,8 +15,14 @@\n \n   <depend>rclpy</depend>\n \n+  <exec_depend>liburdfdom-tools</exec_depend>\n+\n+  <test_depend>ament_cmake_pytest</test_depend>\n   <test_depend>ament_lint_auto</test_depend>\n   <test_depend>ament_lint_common</test_depend>\n+  <test_depend>launch</test_depend>\n+  <test_depend>xacro</test_depend>\n+\n   <export>\n     <build_type>ament_cmake</build_type>\n   </export>"
+        },
+        {
+          "sha": "7f72cff4dc6c60da29d3fb5e3aa6fdd7743eefd4",
+          "filename": "tests/test_xacro_test.py",
+          "status": "added",
+          "additions": 160,
+          "deletions": 0,
+          "changes": 160,
+          "blob_url": "https://github.com/pal-robotics/urdf_test/blob/4c2be4bd438f87966661814970fd398153662b66/tests%2Ftest_xacro_test.py",
+          "raw_url": "https://github.com/pal-robotics/urdf_test/raw/4c2be4bd438f87966661814970fd398153662b66/tests%2Ftest_xacro_test.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/urdf_test/contents/tests%2Ftest_xacro_test.py?ref=4c2be4bd438f87966661814970fd398153662b66",
+          "patch": "@@ -0,0 +1,160 @@\n+# Copyright (c) 2024 PAL Robotics S.L. All rights reserved.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+import subprocess\n+import tempfile\n+\n+import pytest\n+import xacro\n+\n+from launch.actions import DeclareLaunchArgument\n+from urdf_test.xacro_test import (check_urdf,\n+                                  check_xacro_file,\n+                                  define_xacro_test,\n+                                  gen_choices_product)\n+\n+\n+@pytest.mark.parametrize(\n+    'choices,expected',\n+    [\n+        pytest.param(\n+            (\n+                {'a': [9, 8]},\n+            ),\n+            [{'a': 9}, {'a': 8}],\n+            id='single_dict',\n+        ),\n+        pytest.param(\n+            (\n+                {'a': [9, 8]},\n+                {'b': [1, 2]},\n+            ),\n+            [{'a': 9, 'b': 1}, {'a': 9, 'b': 2}, {'a': 8, 'b': 1}, {'a': 8, 'b': 2}],\n+            id='two_dicts',\n+        ),\n+        pytest.param(\n+            (\n+                {'a': [9, 8], 'c': '23'},\n+            ),\n+            [{'a': 9, 'c': '23'}, {'a': 8, 'c': '23'}],\n+            id='mixed_dict',\n+        ),\n+        pytest.param(\n+            (\n+                DeclareLaunchArgument('a', choices=[9, 8]),\n+            ),\n+            [{'a': 8}, {'a': 9}],\n+            id='single_dla',\n+        ),\n+        pytest.param(\n+            (\n+                (DeclareLaunchArgument('a', choices=[9, 8]),\n+                 DeclareLaunchArgument('b', choices=[1, 2])),\n+            ),\n+            [{'a': 8, 'b': 1}, {'a': 8, 'b': 2}, {'a': 9, 'b': 1}, {'a': 9, 'b': 2}],\n+            id='double_dla',\n+        ),\n+        pytest.param(\n+            (\n+                DeclareLaunchArgument('a', choices=[9, 8]),\n+                DeclareLaunchArgument('b', choices=[1, 2]),\n+            ),\n+            [{'a': 8, 'b': 1}, {'a': 8, 'b': 2}, {'a': 9, 'b': 1}, {'a': 9, 'b': 2}],\n+            id='two_dla',\n+        ),\n+        pytest.param(\n+            (\n+                {'c': '23'},\n+                DeclareLaunchArgument('b', choices=[1, 2]),\n+            ),\n+            [{'b': 1, 'c': '23'}, {'b': 2, 'c': '23'}],\n+            id='dla_and_dict',\n+        ),\n+    ],\n+)\n+def test_gen_choices(choices, expected):\n+    assert list(gen_choices_product(*choices)) == expected\n+\n+\n+def test_define_xacro_test():\n+    func = define_xacro_test('test.xacro', {'a': [9, 8]}, {'b': [1, 2]})\n+    assert callable(func)\n+    assert func.__name__ == 'test_urdf'\n+    mark, = func.pytestmark\n+    assert mark.name == 'parametrize'\n+    assert mark.args[0] == 'params'\n+    params = {p.id: p.values for p in mark.args[1]}\n+    assert params == {\n+        'a=8, b=1': ({'a': 8, 'b': 1},),\n+        'a=8, b=2': ({'a': 8, 'b': 2},),\n+        'a=9, b=1': ({'a': 9, 'b': 1},),\n+        'a=9, b=2': ({'a': 9, 'b': 2},)\n+    }\n+\n+\n+def test_check_urdf():\n+    good_xml = \"\"\"\n+    <?xml version=\"1.0\"?>\n+    <robot name=\"robot\">\n+      <link name=\"my_link\"/>\n+    </robot>\n+    \"\"\"\n+    check_urdf(good_xml)\n+\n+    bad_xml = \"\"\"\n+    <?xml version=\"1.0\"?>\n+    <robot name=\"robot\">\n+      <link name=\"my_link\"/>\n+    </robot2>\n+    \"\"\"\n+    with pytest.raises(subprocess.CalledProcessError):\n+        check_urdf(bad_xml)\n+\n+\n+def test_check_xacro_file():\n+    with tempfile.NamedTemporaryFile(mode='w', suffix='.xacro') as f:\n+        f.write(\"\"\"\n+        <robot xmlns:xacro=\"http://www.ros.org/wiki/xacro\" name=\"robot\">\n+          <xacro:arg name=\"link\" default=\"\"/>\n+          <xacro:property name=\"link\" value=\"$(arg link)\"/>\n+          <link name=\"base\"/>\n+          <link name=\"link\"/>\n+          <joint name=\"joint\" type=\"floating\">\n+            <parent link=\"base\"/>\n+            <child link=\"${link}\"/>\n+          </joint>\n+        </robot>\n+        \"\"\")\n+        f.flush()\n+        check_xacro_file(f.name, {'link': 'link'})\n+\n+        with pytest.raises(subprocess.CalledProcessError):\n+            check_xacro_file(f.name, {'link2': 'link'})\n+\n+\n+def test_check_invalid_xacro_file():\n+    with tempfile.NamedTemporaryFile(mode='w', suffix='.xacro') as f:\n+        f.write(\"\"\"\n+        <robot xmlns:xacro=\"http://www.ros.org/wiki/xacro\" name=\"robot\">\n+          <link name=\"base\"/>\n+          <link name=\"link\"/>\n+          <joint name=\"joint\" type=\"floating\">\n+            <parent link=\"base\"/>\n+            <child link=\"${link}\"/>\n+          </joint>\n+        </robot>\n+        \"\"\")\n+        f.flush()\n+        with pytest.raises(xacro.XacroException):\n+            check_xacro_file(f.name, {'link': 'link'})"
+        },
+        {
+          "sha": "4e1b214f2763c1d437075167c7c8de9f3f4ec5cb",
+          "filename": "urdf_test/xacro_test.py",
+          "status": "added",
+          "additions": 97,
+          "deletions": 0,
+          "changes": 97,
+          "blob_url": "https://github.com/pal-robotics/urdf_test/blob/4c2be4bd438f87966661814970fd398153662b66/urdf_test%2Fxacro_test.py",
+          "raw_url": "https://github.com/pal-robotics/urdf_test/raw/4c2be4bd438f87966661814970fd398153662b66/urdf_test%2Fxacro_test.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/urdf_test/contents/urdf_test%2Fxacro_test.py?ref=4c2be4bd438f87966661814970fd398153662b66",
+          "patch": "@@ -0,0 +1,97 @@\n+# Copyright (c) 2024 PAL Robotics S.L. All rights reserved.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+import itertools\n+import subprocess\n+\n+import pytest\n+import xacro\n+\n+from collections.abc import Iterable, Sequence\n+\n+\n+def check_urdf(urdf, check=True, stdout=subprocess.DEVNULL, **kwargs):\n+    \"\"\"Run check_urdf on the given URDF string. Output is redirected to /dev/null by default.\"\"\"\n+    return subprocess.run(['check_urdf', \"/dev/stdin\"],\n+                          check=check,\n+                          text=True, input=urdf,\n+                          stdout=stdout,\n+                          **kwargs)\n+\n+\n+def check_xacro_file(xacro_file_path, mappings, check=True, **kwargs):\n+    \"\"\"Process the given xacro file with the given mappings and run check_urdf on the result.\"\"\"\n+    urdf = xacro.process_file(xacro_file_path, mappings=mappings).toxml()\n+    return check_urdf(urdf, check=check, **kwargs)\n+\n+\n+def _choices_from_dict(arg):\n+    # one list per key\n+    for k, v in arg.items():\n+        if isinstance(v, str) or not isinstance(v, Iterable):\n+            yield [(k, v)]\n+        else:\n+            yield [(k, c) for c in v]\n+\n+\n+def _gen_choices_list(*choices):\n+    \"\"\"Normalize the choices into lists of tuples.\"\"\"\n+    for args in choices:\n+        # if it's not a list/tuple, make it a list\n+        if not isinstance(args, Sequence):\n+            args = [args]\n+\n+        for arg in args:\n+            if isinstance(arg, dict):\n+                yield from _choices_from_dict(arg)\n+            else:\n+                # assume launch.actions.DeclareLaunchArgument\n+                yield [(arg.name, c) for c in sorted(arg.choices)]\n+\n+\n+def gen_choices_product(*choices):\n+    \"\"\"\n+    Generate the cartesian product of the choices as a list of dictionaries.\n+\n+    Each choice is a DeclareLaunchArgument (or similar) object, a dictionary or a list of those.\n+    Each DeclareLaunchArgument yield on list of tuples, one per choice.\n+    Each dictionary yields one list of tuples per key, one per element in the value.\n+\n+    Examples\n+    --------\n+    gen_choices_product(DeclareLaunchArgument(name=\"a\", choices=[9, 8]),\n+                        DeclareLaunchArgument(name=\"b\", choices=[7, 6])) yields\n+        {'a': 9, 'b': 7}, {'a': 9, 'b': 6}, {'a': 8, 'b': 7}, {'a': 8, 'b': 6}\n+\n+    gen_choices_product({\"c\": [1, 2], \"d\": [3, 4]}) yields\n+        {'c': 1, 'd': 3}, {'c': 1, 'd': 4}, {'c': 2, 'd': 3}, {'c': 2, 'd': 4}\n+    which is the same as gen_choices_product({\"c\": [1, 2]}, {\"d\": [3, 4]})\n+\n+    \"\"\"\n+    for c in itertools.product(*_gen_choices_list(*choices)):\n+        yield dict(c)\n+\n+\n+def parametrize_choices(*choices):\n+    \"\"\"Generate pytest parameters for the cartesian product of the choices with pretty ids.\"\"\"\n+    for choice in gen_choices_product(*choices):\n+        yield pytest.param(choice, id=', '.join(f\"{k}={v}\" for k, v in choice.items()))\n+\n+\n+def define_xacro_test(xacro_file_path, *choices):\n+    \"\"\"Generate a pytest test that checks the given xacro file for the given choices.\"\"\"\n+    @pytest.mark.parametrize(\"params\", parametrize_choices(*choices))\n+    def test_urdf(params):\n+        check_xacro_file(xacro_file_path, params)\n+    return test_urdf"
+        }
+      ]
+    },
+    {
+      "author": "Noel215",
+      "date": "2022-09-14T11:17:19Z",
+      "sha": "6b29b6c995c8e98d8341bb186358a8a1f43d7a89",
+      "message": "linters",
+      "files_changed": 2,
+      "additions": 4,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "c83a48a5c3e4b8156d8b4484cb81589bfe3af4f5",
+          "filename": "setup.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/pal-robotics/urdf_test/blob/6b29b6c995c8e98d8341bb186358a8a1f43d7a89/setup.py",
+          "raw_url": "https://github.com/pal-robotics/urdf_test/raw/6b29b6c995c8e98d8341bb186358a8a1f43d7a89/setup.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/urdf_test/contents/setup.py?ref=6b29b6c995c8e98d8341bb186358a8a1f43d7a89",
+          "patch": "@@ -1,4 +1,5 @@\n from distutils.core import setup\n+\n from catkin_pkg.python_setup import generate_distutils_setup\n \n d = generate_distutils_setup("
+        },
+        {
+          "sha": "4ac81898846c2eb5f06a89dc020953f8380b7b81",
+          "filename": "urdf_test/description_test.py",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/pal-robotics/urdf_test/blob/6b29b6c995c8e98d8341bb186358a8a1f43d7a89/urdf_test%2Fdescription_test.py",
+          "raw_url": "https://github.com/pal-robotics/urdf_test/raw/6b29b6c995c8e98d8341bb186358a8a1f43d7a89/urdf_test%2Fdescription_test.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/urdf_test/contents/urdf_test%2Fdescription_test.py?ref=6b29b6c995c8e98d8341bb186358a8a1f43d7a89",
+          "patch": "@@ -12,12 +12,12 @@\n # See the License for the specific language governing permissions and\n # limitations under the License.\n \n-from launch import LaunchDescription\n-import launch_testing\n-import unittest\n import os\n+import unittest\n \n+from launch import LaunchDescription\n from launch_ros.actions import Node\n+import launch_testing\n \n \n def generate_urdf_test_description(launch_file_action):"
+        }
+      ]
+    },
+    {
+      "author": "doterkuile",
+      "date": "2024-03-14T17:28:23Z",
+      "sha": "a9098facb0d8a2b2c9a625ef2592cb0f35da2151",
+      "message": "Fix deprecated QOS warning",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "1962fe1f4b974e82f889448f75ecce6c3dc0d95b",
+          "filename": "scripts/test_urdf.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/pal-robotics/urdf_test/blob/a9098facb0d8a2b2c9a625ef2592cb0f35da2151/scripts%2Ftest_urdf.py",
+          "raw_url": "https://github.com/pal-robotics/urdf_test/raw/a9098facb0d8a2b2c9a625ef2592cb0f35da2151/scripts%2Ftest_urdf.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/urdf_test/contents/scripts%2Ftest_urdf.py?ref=a9098facb0d8a2b2c9a625ef2592cb0f35da2151",
+          "patch": "@@ -15,7 +15,7 @@\n \n import rclpy\n from rclpy.node import Node\n-from rclpy.qos import QoSDurabilityPolicy\n+from rclpy.qos import DurabilityPolicy\n from rclpy.qos import QoSProfile\n \n \n@@ -30,7 +30,7 @@ def __init__(self):\n \n         qos_profile = QoSProfile(\n             depth=1,\n-            durability=QoSDurabilityPolicy.RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL)\n+            durability=DurabilityPolicy.TRANSIENT_LOCAL)\n         self.subscription = self.create_subscription(\n             String,\n             'robot_description',"
+        }
+      ]
+    },
+    {
+      "author": "jordan-palacios",
+      "date": "2022-09-14T13:53:31Z",
+      "sha": "a322add7ce110bc4f9399b2fdfc5a1252d8ee897",
+      "message": "Merge branch 'tests' into 'humble-devel'\n\nfix linter errors\n\nSee merge request qa/urdf_test!4",
+      "files_changed": 2,
+      "additions": 4,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "c83a48a5c3e4b8156d8b4484cb81589bfe3af4f5",
+          "filename": "setup.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/pal-robotics/urdf_test/blob/a322add7ce110bc4f9399b2fdfc5a1252d8ee897/setup.py",
+          "raw_url": "https://github.com/pal-robotics/urdf_test/raw/a322add7ce110bc4f9399b2fdfc5a1252d8ee897/setup.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/urdf_test/contents/setup.py?ref=a322add7ce110bc4f9399b2fdfc5a1252d8ee897",
+          "patch": "@@ -1,4 +1,5 @@\n from distutils.core import setup\n+\n from catkin_pkg.python_setup import generate_distutils_setup\n \n d = generate_distutils_setup("
+        },
+        {
+          "sha": "4ac81898846c2eb5f06a89dc020953f8380b7b81",
+          "filename": "urdf_test/description_test.py",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/pal-robotics/urdf_test/blob/a322add7ce110bc4f9399b2fdfc5a1252d8ee897/urdf_test%2Fdescription_test.py",
+          "raw_url": "https://github.com/pal-robotics/urdf_test/raw/a322add7ce110bc4f9399b2fdfc5a1252d8ee897/urdf_test%2Fdescription_test.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/urdf_test/contents/urdf_test%2Fdescription_test.py?ref=a322add7ce110bc4f9399b2fdfc5a1252d8ee897",
+          "patch": "@@ -12,12 +12,12 @@\n # See the License for the specific language governing permissions and\n # limitations under the License.\n \n-from launch import LaunchDescription\n-import launch_testing\n-import unittest\n import os\n+import unittest\n \n+from launch import LaunchDescription\n from launch_ros.actions import Node\n+import launch_testing\n \n \n def generate_urdf_test_description(launch_file_action):"
+        }
+      ]
+    },
+    {
+      "author": "Victor Lopez",
+      "date": "2018-12-12T10:13:28Z",
+      "sha": "ab8428bef0a92fd9f883a37695a9ece6d32f0427",
+      "message": "Add test suffix",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "7b71f1ef22bdc97fe250973f0cf0dbce062dbfda",
+          "filename": "launch/test_urdf.launch",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/pal-robotics/urdf_test/blob/ab8428bef0a92fd9f883a37695a9ece6d32f0427/launch%2Ftest_urdf.launch",
+          "raw_url": "https://github.com/pal-robotics/urdf_test/raw/ab8428bef0a92fd9f883a37695a9ece6d32f0427/launch%2Ftest_urdf.launch",
+          "contents_url": "https://api.github.com/repos/pal-robotics/urdf_test/contents/launch%2Ftest_urdf.launch?ref=ab8428bef0a92fd9f883a37695a9ece6d32f0427",
+          "patch": "@@ -1,7 +1,8 @@\n <launch>\n     <arg name=\"get_description\" default=\"false\"/>\n+    <arg name=\"test_suffix\" default=\"\"/>\n \n     <param unless=\"$(arg get_description)\" name=\"robot_description\" value=\"None\"/>\n \n-    <test test-name=\"test_urdf\" pkg=\"urdf_test\" type=\"test_urdf.py\"/>\n+    <test test-name=\"test_urdf$(arg test_suffix)\" pkg=\"urdf_test\" type=\"test_urdf.py\"/>\n </launch>"
+        }
+      ]
+    },
+    {
+      "author": "davidfernandez",
+      "date": "2017-07-17T15:33:10Z",
+      "sha": "2088e559dddaf29cef470f0310342a4a1dfda933",
+      "message": "Initial import",
+      "files_changed": 4,
+      "additions": 76,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "a2d1e88b7ef630b338f5935970fd0b90c8101057",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 32,
+          "deletions": 0,
+          "changes": 32,
+          "blob_url": "https://github.com/pal-robotics/urdf_test/blob/2088e559dddaf29cef470f0310342a4a1dfda933/CMakeLists.txt",
+          "raw_url": "https://github.com/pal-robotics/urdf_test/raw/2088e559dddaf29cef470f0310342a4a1dfda933/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/pal-robotics/urdf_test/contents/CMakeLists.txt?ref=2088e559dddaf29cef470f0310342a4a1dfda933",
+          "patch": "@@ -0,0 +1,32 @@\n+cmake_minimum_required(VERSION 2.8.3)\n+project(urdf_test)\n+\n+find_package(catkin REQUIRED COMPONENTS roscpp)\n+\n+###################################\n+## catkin specific configuration ##\n+###################################\n+catkin_package(\n+#  INCLUDE_DIRS include\n+#  LIBRARIES urdf_test\n+#  CATKIN_DEPENDS other_catkin_pkg\n+#  DEPENDS system_lib\n+)\n+\n+###########\n+## Build ##\n+###########\n+\n+#############\n+## Install ##\n+#############\n+\n+#############\n+## Testing ##\n+#############\n+\n+if(CATKIN_ENABLE_TESTING)\n+  find_package(rostest REQUIRED)\n+  add_rostest_gtest(test_urdf test/test_urdf.test test/test_urdf.cpp)\n+  target_link_libraries(test_urdf ${catkin_LIBRARIES})\n+endif()"
+        },
+        {
+          "sha": "7c40a82f280706c9e8eac6aa819c69e490fd27c5",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 15,
+          "deletions": 0,
+          "changes": 15,
+          "blob_url": "https://github.com/pal-robotics/urdf_test/blob/2088e559dddaf29cef470f0310342a4a1dfda933/package.xml",
+          "raw_url": "https://github.com/pal-robotics/urdf_test/raw/2088e559dddaf29cef470f0310342a4a1dfda933/package.xml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/urdf_test/contents/package.xml?ref=2088e559dddaf29cef470f0310342a4a1dfda933",
+          "patch": "@@ -0,0 +1,15 @@\n+<?xml version=\"1.0\"?>\n+<package format=\"2\">\n+  <name>urdf_test</name>\n+  <version>0.0.0</version>\n+  <description>The urdf_test package</description>\n+\n+  <maintainer email=\"david.fernandez@pal-robotics.com\">davidfernandez</maintainer>\n+\n+  <license>Proprietary</license>\n+\n+  <buildtool_depend>catkin</buildtool_depend>\n+\n+  <export>\n+  </export>\n+</package>"
+        },
+        {
+          "sha": "3c2f8bc6213e42fd7cb579f78a4de389008e2f1d",
+          "filename": "test/test_urdf.cpp",
+          "status": "added",
+          "additions": 22,
+          "deletions": 0,
+          "changes": 22,
+          "blob_url": "https://github.com/pal-robotics/urdf_test/blob/2088e559dddaf29cef470f0310342a4a1dfda933/test%2Ftest_urdf.cpp",
+          "raw_url": "https://github.com/pal-robotics/urdf_test/raw/2088e559dddaf29cef470f0310342a4a1dfda933/test%2Ftest_urdf.cpp",
+          "contents_url": "https://api.github.com/repos/pal-robotics/urdf_test/contents/test%2Ftest_urdf.cpp?ref=2088e559dddaf29cef470f0310342a4a1dfda933",
+          "patch": "@@ -0,0 +1,22 @@\n+\n+#include <ros/ros.h>\n+#include <gtest/gtest.h>\n+\n+namespace pal\n+{\n+TEST(TestURDFTest, testURDFParam)\n+{\n+  ros::NodeHandle nh;\n+  std::string test_string;\n+  ASSERT_TRUE(nh.getParam(\"robot_description\", test_string));\n+  ASSERT_NE(\"\", test_string);\n+}\n+}\n+\n+int main(int argc, char **argv)\n+{\n+  ros::init(argc, argv, \"\");\n+  // ros::start();\n+  testing::InitGoogleTest(&argc, argv);\n+  return RUN_ALL_TESTS();\n+}"
+        },
+        {
+          "sha": "776071885e4b90c415f9312b8a8632d822f6967a",
+          "filename": "test/test_urdf.test",
+          "status": "added",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/pal-robotics/urdf_test/blob/2088e559dddaf29cef470f0310342a4a1dfda933/test%2Ftest_urdf.test",
+          "raw_url": "https://github.com/pal-robotics/urdf_test/raw/2088e559dddaf29cef470f0310342a4a1dfda933/test%2Ftest_urdf.test",
+          "contents_url": "https://api.github.com/repos/pal-robotics/urdf_test/contents/test%2Ftest_urdf.test?ref=2088e559dddaf29cef470f0310342a4a1dfda933",
+          "patch": "@@ -0,0 +1,7 @@\n+<launch>\n+    <arg name=\"get_description\" default=\"false\"/>\n+\n+    <param unless=\"$(arg get_description)\" name=\"robot_description\" value=\"None\"/>\n+\n+    <test test-name=\"test_urdf\" pkg=\"urdf_test\" type=\"test_urdf\"/>\n+</launch>"
+        }
+      ]
+    }
+  ]
+}

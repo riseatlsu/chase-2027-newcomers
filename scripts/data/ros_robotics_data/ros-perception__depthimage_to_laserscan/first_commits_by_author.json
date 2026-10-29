@@ -1,0 +1,587 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T04:55:40Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ros-perception",
+    "repo": "depthimage_to_laserscan"
+  },
+  "data": [
+    {
+      "author": "clalancette",
+      "date": "2017-06-05T19:35:30Z",
+      "sha": "a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c",
+      "message": "Port depthimage_to_laserscan to ROS2.\n\nSigned-off-by: Chris Lalancette <clalancette@openrobotics.org>",
+      "files_changed": 11,
+      "additions": 244,
+      "deletions": 289,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "ee16d17e822779f49671c5b01448e522c58b2450",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 48,
+          "deletions": 40,
+          "changes": 88,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/CMakeLists.txt?ref=a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c",
+          "patch": "@@ -1,53 +1,61 @@\n-# http://ros.org/doc/groovy/api/catkin/html/user_guide/supposed.html\n-cmake_minimum_required(VERSION 2.8)\n+cmake_minimum_required(VERSION 3.5)\n project(depthimage_to_laserscan)\n+if(NOT WIN32)\n+  set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -Wpedantic\")\n+endif()\n+\n+find_package(ament_cmake_ros REQUIRED)\n \n-# Load catkin and all dependencies required for this package\n-find_package(catkin REQUIRED dynamic_reconfigure image_geometry image_transport nodelet roscpp sensor_msgs)\n-#find_package(OpenCV REQUIRED)\n+find_package(image_geometry REQUIRED)\n+find_package(OpenCV REQUIRED)\n+find_package(rclcpp REQUIRED)\n+find_package(sensor_msgs REQUIRED)\n \n-# Dynamic reconfigure support\n-generate_dynamic_reconfigure_options(cfg/Depth.cfg)\n+include_directories(include)\n \n-catkin_package(\n-  INCLUDE_DIRS include\n-  LIBRARIES DepthImageToLaserScan DepthImageToLaserScanROS DepthImageToLaserScanNodelet\n-  CATKIN_DEPENDS dynamic_reconfigure image_geometry image_transport nodelet roscpp sensor_msgs\n+add_library(DepthImageToLaserScan\n+  src/DepthImageToLaserScan.cpp\n+)\n+ament_target_dependencies(DepthImageToLaserScan\n+  \"image_geometry\"\n+  \"OpenCV\"\n+  \"sensor_msgs\"\n )\n \n-include_directories(include ${catkin_INCLUDE_DIRS})\n+add_library(DepthImageToLaserScanROS\n+  src/DepthImageToLaserScanROS.cpp\n+)\n+ament_target_dependencies(DepthImageToLaserScanROS\n+  \"rclcpp\"\n+)\n+target_link_libraries(DepthImageToLaserScanROS DepthImageToLaserScan)\n \n-add_library(DepthImageToLaserScan src/DepthImageToLaserScan.cpp)\n-target_link_libraries(DepthImageToLaserScan ${catkin_LIBRARIES})\n+add_executable(depthimage_to_laserscan_node\n+  src/depthimage_to_laserscan.cpp\n+)\n+target_link_libraries(depthimage_to_laserscan_node\n+  DepthImageToLaserScan\n+  DepthImageToLaserScanROS\n+)\n \n-add_library(DepthImageToLaserScanROS src/DepthImageToLaserScanROS.cpp)\n-add_dependencies(DepthImageToLaserScanROS ${PROJECT_NAME}_gencfg)\n-target_link_libraries(DepthImageToLaserScanROS DepthImageToLaserScan ${catkin_LIBRARIES})\n+install(DIRECTORY include/\n+  DESTINATION include\n+)\n \n-add_library(DepthImageToLaserScanNodelet src/DepthImageToLaserScanNodelet.cpp)\n-target_link_libraries(DepthImageToLaserScanNodelet DepthImageToLaserScanROS ${catkin_LIBRARIES})\n+install(TARGETS DepthImageToLaserScan DepthImageToLaserScanROS depthimage_to_laserscan_node\n+  EXPORT export_depthimage_to_laserscan_node\n+  ARCHIVE DESTINATION lib\n+  LIBRARY DESTINATION lib\n+  RUNTIME DESTINATION bin\n+)\n \n-add_executable(depthimage_to_laserscan src/depthimage_to_laserscan.cpp)\n-target_link_libraries(depthimage_to_laserscan DepthImageToLaserScanROS ${catkin_LIBRARIES})\n+if(BUILD_TESTING)\n+  find_package(ament_cmake_gtest REQUIRED)\n \n-if(CATKIN_ENABLE_TESTING)\n-  # Test the library\n-  catkin_add_gtest(libtest test/DepthImageToLaserScanTest.cpp)\n-  target_link_libraries(libtest DepthImageToLaserScan ${catkin_LIBRARIES})\n+  ament_add_gtest(${PROJECT_NAME}-test test/DepthImageToLaserScanTest.cpp)\n+  target_link_libraries(${PROJECT_NAME}-test DepthImageToLaserScan)\n endif()\n \n-# add the test executable, keep it from being built by \"make all\"\n-add_executable(test_dtl EXCLUDE_FROM_ALL test/depthimage_to_laserscan_rostest.cpp)\n-\n-# Install targets\n-install(TARGETS DepthImageToLaserScan DepthImageToLaserScanROS DepthImageToLaserScanNodelet depthimage_to_laserscan\n-\tRUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n-\tLIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n-\tARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})\n-\n-install(DIRECTORY include/${PROJECT_NAME}/\n-        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}\n-)\n-install(FILES nodelets.xml\n-        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}\n-)\n+ament_export_include_directories(include)\n+ament_export_libraries(DepthImageToLaserScan DepthImageToLaserScanROS)\n+ament_package()"
+        },
+        {
+          "sha": "d5f600c05d80017343bb0480ff71ffd8ae007b7a",
+          "filename": "include/depthimage_to_laserscan/DepthImageToLaserScan.h",
+          "status": "modified",
+          "additions": 20,
+          "deletions": 20,
+          "changes": 40,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c/include%2Fdepthimage_to_laserscan%2FDepthImageToLaserScan.h",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c/include%2Fdepthimage_to_laserscan%2FDepthImageToLaserScan.h",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/include%2Fdepthimage_to_laserscan%2FDepthImageToLaserScan.h?ref=a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c",
+          "patch": "@@ -34,15 +34,18 @@\n #ifndef DEPTH_IMAGE_TO_LASERSCAN\n #define DEPTH_IMAGE_TO_LASERSCAN\n \n-#include <sensor_msgs/Image.h>\n-#include <sensor_msgs/LaserScan.h>\n-#include <sensor_msgs/image_encodings.h>\n+#include <sensor_msgs/msg/image.hpp>\n+#include <sensor_msgs/msg/laser_scan.hpp>\n #include <image_geometry/pinhole_camera_model.h>\n #include <depthimage_to_laserscan/depth_traits.h>\n #include <sstream>\n #include <limits.h>\n #include <math.h>\n \n+#include <string>\n+#include <opencv2/core/core.hpp>\n+#include <sensor_msgs/msg/camera_info.hpp>\n+\n namespace depthimage_to_laserscan\n { \n   class DepthImageToLaserScan\n@@ -55,31 +58,31 @@ namespace depthimage_to_laserscan\n      * Converts the information in a depth image (sensor_msgs::Image) to a sensor_msgs::LaserScan.\n      * \n      * This function converts the information in the depth encoded image (UInt16 or Float32 encoding) into\n-     * a sensor_msgs::LaserScan as accurately as possible.  To do this, it requires the synchornized Image/CameraInfo\n+     * a sensor_msgs::msg::LaserScan as accurately as possible.  To do this, it requires the synchronized Image/CameraInfo\n      * pair associated with the image.\n      * \n      * @param depth_msg UInt16 or Float32 encoded depth image.\n      * @param info_msg CameraInfo associated with depth_msg\n-     * @return sensor_msgs::LaserScanPtr for the center row(s) of the depth image.\n+     * @return sensor_msgs::msg::LaserScan::SharedPtr for the center row(s) of the depth image.\n      * \n      */\n-    sensor_msgs::LaserScanPtr convert_msg(const sensor_msgs::ImageConstPtr& depth_msg,\n-\t\t\t\t\t   const sensor_msgs::CameraInfoConstPtr& info_msg);\n-    \n+    sensor_msgs::msg::LaserScan::SharedPtr convert_msg(const sensor_msgs::msg::Image::ConstSharedPtr& depth_msg,\n+                                                       const sensor_msgs::msg::CameraInfo::ConstSharedPtr& info_msg);\n+\n     /**\n      * Sets the scan time parameter.\n      * \n-     * This function stores the desired value for scan_time.  In sensor_msgs::LaserScan, scan_time is defined as \n-     * \"time between scans [seconds]\".  This value is not easily calculated from consquetive messages, and is thus\n+     * This function stores the desired value for scan_time.  In sensor_msgs::msg::LaserScan, scan_time is defined as\n+     * \"time between scans [seconds]\".  This value is not easily calculated from consecutive messages, and is thus\n      * left to the user to set correctly.\n      * \n-     * @param scan_time The value to use for outgoing sensor_msgs::LaserScan.\n+     * @param scan_time The value to use for outgoing sensor_msgs::msg::LaserScan.\n      * \n      */\n     void set_scan_time(const float scan_time);\n     \n     /**\n-     * Sets the minimum and maximum range for the sensor_msgs::LaserScan.\n+     * Sets the minimum and maximum range for the sensor_msgs::msg::LaserScan.\n      * \n      * range_min is used to determine how close of a value to allow through when multiple radii correspond to the same\n      * angular increment.  range_max is used to set the output message.\n@@ -108,7 +111,7 @@ namespace depthimage_to_laserscan\n      * Output frame_id for the LaserScan.  Will probably NOT be the same frame_id as the depth image.\n      * Example: For OpenNI cameras, this should be set to 'camera_depth_frame' while the camera uses 'camera_depth_optical_frame'.\n      * \n-     * @param output_frame_id Frame_id to use for the output sensor_msgs::LaserScan.\n+     * @param output_frame_id Frame_id to use for the output sensor_msgs::msg::LaserScan.\n      * \n      */\n     void set_output_frame(const std::string output_frame_id);\n@@ -167,23 +170,20 @@ namespace depthimage_to_laserscan\n     * \n     */\n     template<typename T>\n-    void convert(const sensor_msgs::ImageConstPtr& depth_msg, const image_geometry::PinholeCameraModel& cam_model, \n-\t\t const sensor_msgs::LaserScanPtr& scan_msg, const int& scan_height) const{\n+    void convert(const sensor_msgs::msg::Image::ConstSharedPtr& depth_msg, const image_geometry::PinholeCameraModel& cam_model,\n+                 const sensor_msgs::msg::LaserScan::SharedPtr& scan_msg, const int& scan_height) const{\n       // Use correct principal point from calibration\n       float center_x = cam_model.cx();\n-      float center_y = cam_model.cy();\n \n       // Combine unit conversion (if necessary) with scaling by focal length for computing (X,Y)\n       double unit_scaling = depthimage_to_laserscan::DepthTraits<T>::toMeters( T(1) );\n       float constant_x = unit_scaling / cam_model.fx();\n-      float constant_y = unit_scaling / cam_model.fy();\n       \n       const T* depth_row = reinterpret_cast<const T*>(&depth_msg->data[0]);\n       int row_step = depth_msg->step / sizeof(T);\n \n-      int offset = (int)(cam_model.cy()-scan_height/2);\n+      int offset = static_cast<int>(cam_model.cy() - scan_height / 2);\n       depth_row += offset*row_step; // Offset to center of image\n-\n       for(int v = offset; v < offset+scan_height_; v++, depth_row += row_step){\n \t\tfor (int u = 0; u < (int)depth_msg->width; u++) // Loop over each pixel in row\n \t\t{\t\n@@ -222,4 +222,4 @@ namespace depthimage_to_laserscan\n   \n } // depthimage_to_laserscan\n \n-#endif\n+#endif\n\\ No newline at end of file"
+        },
+        {
+          "sha": "dbbde09ba74f100e771014e9e4829b4472f92172",
+          "filename": "include/depthimage_to_laserscan/DepthImageToLaserScanROS.h",
+          "status": "modified",
+          "additions": 20,
+          "deletions": 48,
+          "changes": 68,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c/include%2Fdepthimage_to_laserscan%2FDepthImageToLaserScanROS.h",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c/include%2Fdepthimage_to_laserscan%2FDepthImageToLaserScanROS.h",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/include%2Fdepthimage_to_laserscan%2FDepthImageToLaserScanROS.h?ref=a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c",
+          "patch": "@@ -34,13 +34,10 @@\n #ifndef DEPTH_IMAGE_TO_LASERSCAN_ROS\n #define DEPTH_IMAGE_TO_LASERSCAN_ROS\n \n-#include <ros/ros.h>\n-#include <image_transport/image_transport.h>\n-#include <sensor_msgs/Image.h>\n-#include <sensor_msgs/LaserScan.h>\n-#include <boost/thread/mutex.hpp>\n-#include <dynamic_reconfigure/server.h>\n-#include <depthimage_to_laserscan/DepthConfig.h>\n+#include <rclcpp/rclcpp.hpp>\n+#include <sensor_msgs/msg/camera_info.hpp>\n+#include <sensor_msgs/msg/image.hpp>\n+#include <sensor_msgs/msg/laser_scan.hpp>\n \n #include <depthimage_to_laserscan/DepthImageToLaserScan.h>\n \n@@ -49,62 +46,37 @@ namespace depthimage_to_laserscan\n   class DepthImageToLaserScanROS\n   {\n   public:\n-    DepthImageToLaserScanROS(ros::NodeHandle& n, ros::NodeHandle& pnh);\n+    explicit DepthImageToLaserScanROS(rclcpp::node::Node::SharedPtr & node);\n     \n     ~DepthImageToLaserScanROS();\n \n   private:\n     /**\n      * Callback for image_transport\n      * \n-     * Synchronized callback for depth image and camera info.  Publishes laserscan at the end of this callback.\n+     * Callback for depth image.  Publishes laserscan at the end of this callback.\n      * \n-     * @param depth_msg Image provided by image_transport.\n-     * @param info_msg CameraInfo provided by image_transport.\n+     * @param image Image provided by image_transport.\n      * \n      */\n-    void depthCb(const sensor_msgs::ImageConstPtr& depth_msg,\n-\t\t  const sensor_msgs::CameraInfoConstPtr& info_msg);\n+    void depthCb(const sensor_msgs::msg::Image::SharedPtr image);\n \n-    /**\n-     * Callback that is called when there is a new subscriber.\n-     * \n-     * Will not subscribe to the image and camera_info until we have a subscriber for our LaserScan (lazy subscribing).\n-     * \n-     */\n-    void connectCb(const ros::SingleSubscriberPublisher& pub);\n+    void infoCb(sensor_msgs::msg::CameraInfo::SharedPtr info);\n+\n+    rclcpp::node::Node::SharedPtr node_;\n+    sensor_msgs::msg::CameraInfo::SharedPtr cam_info_;\n+\n+    rclcpp::subscription::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr cam_info_sub_;\n+    rclcpp::subscription::Subscription<sensor_msgs::msg::Image>::SharedPtr depth_image_sub_;\n+\n+    rclcpp::publisher::Publisher<sensor_msgs::msg::LaserScan>::SharedPtr scan_pub_;\n+\n+    rclcpp::parameter_service::ParameterService::SharedPtr parameter_service_;\n \n-    /**\n-     * Callback called when a subscriber unsubscribes.\n-     * \n-     * If all current subscribers of our LaserScan stop listening, stop subscribing (lazy subscribing).\n-     * \n-     */\n-    void disconnectCb(const ros::SingleSubscriberPublisher& pub);\n-    \n-    /**\n-     * Dynamic reconfigure callback.\n-     * \n-     * Callback that is used to set each of the parameters insde the DepthImageToLaserScan object.\n-     * \n-     * @param config Dynamic Reconfigure object.\n-     * @param level Dynamic Reconfigure level.\n-     * \n-     */\n-    void reconfigureCb(depthimage_to_laserscan::DepthConfig& config, uint32_t level);\n-    \n-    ros::NodeHandle pnh_; ///< Private nodehandle used to generate the transport hints in the connectCb.\n-    image_transport::ImageTransport it_; ///< Subscribes to synchronized Image CameraInfo pairs.\n-    image_transport::CameraSubscriber sub_; ///< Subscriber for image_transport\n-    ros::Publisher pub_; ///< Publisher for output LaserScan messages\n-    dynamic_reconfigure::Server<depthimage_to_laserscan::DepthConfig> srv_; ///< Dynamic reconfigure server\n-    \n     depthimage_to_laserscan::DepthImageToLaserScan dtl_; ///< Instance of the DepthImageToLaserScan conversion class.\n-    \n-    boost::mutex connect_mutex_; ///< Prevents the connectCb and disconnectCb from being called until everything is initialized.\n   };\n   \n   \n } // depthimage_to_laserscan\n \n-#endif\n+#endif\n\\ No newline at end of file"
+        },
+        {
+          "sha": "d433b348e5bad907ba45e3bb989a96abc9093b44",
+          "filename": "include/depthimage_to_laserscan/depth_traits.h",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c/include%2Fdepthimage_to_laserscan%2Fdepth_traits.h",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c/include%2Fdepthimage_to_laserscan%2Fdepth_traits.h",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/include%2Fdepthimage_to_laserscan%2Fdepth_traits.h?ref=a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c",
+          "patch": "@@ -36,6 +36,7 @@\n \n #include <algorithm>\n #include <limits>\n+#include <vector>\n \n namespace depthimage_to_laserscan {\n \n@@ -48,7 +49,7 @@ struct DepthTraits<uint16_t>\n   static inline bool valid(uint16_t depth) { return depth != 0; }\n   static inline float toMeters(uint16_t depth) { return depth * 0.001f; } // originally mm\n   static inline uint16_t fromMeters(float depth) { return (depth * 1000.0f) + 0.5f; }\n-  static inline void initializeBuffer(std::vector<uint8_t>& buffer) {} // Do nothing - already zero-filled\n+  static inline void initializeBuffer(std::vector<uint8_t>&) {} // Already zero-filled\n };\n \n template<>\n@@ -65,7 +66,6 @@ struct DepthTraits<float>\n     std::fill(start, end, std::numeric_limits<float>::quiet_NaN());\n   }\n };\n-\n-} // namespace depth_image_proc\n+} // namespace depthimage_to_laserscan\n \n #endif\n\\ No newline at end of file"
+        },
+        {
+          "sha": "aaf9092bea75471dcd77403495e956f9b33a9c5a",
+          "filename": "nodelets.xml",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 11,
+          "changes": 11,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/07b075eb05d38b08fd81a475139104ea3d5c49bd/nodelets.xml",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/07b075eb05d38b08fd81a475139104ea3d5c49bd/nodelets.xml",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/nodelets.xml?ref=07b075eb05d38b08fd81a475139104ea3d5c49bd",
+          "patch": "@@ -1,11 +0,0 @@\n-<library path=\"lib/libDepthImageToLaserScanNodelet\">\n-\n-  <class name=\"depthimage_to_laserscan/DepthImageToLaserScanNodelet\"\n-\t type=\"depthimage_to_laserscan::DepthImageToLaserScanNodelet\"\n-\t base_class_type=\"nodelet::Nodelet\">\n-    <description>\n-      Nodelet to convert raw depth images to sensor_msgs/LaserScans.\n-    </description>\n-  </class>\n-\n-</library>"
+        },
+        {
+          "sha": "49344a1d9cac2a8a26448a8fc9fff3a26125f8b5",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 19,
+          "changes": 30,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c/package.xml",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/package.xml?ref=a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c",
+          "patch": "@@ -1,34 +1,26 @@\n-<package>\n+<?xml version=\"1.0\"?>\n+<package format=\"2\">\n   <name>depthimage_to_laserscan</name>\n   <version>1.0.8</version>\n   <description>depthimage_to_laserscan</description>\n-  <maintainer email=\"chadrockey@gmail.com\">Chad Rockey</maintainer>\n-\n+  <author>Chad Rockey</author>\n+  <maintainer email=\"clalancette@osrfoundation.org\">Chris Lalancette</maintainer>\n   <license>BSD</license>\n \n   <url type=\"website\">http://ros.org/wiki/depthimage_to_laserscan</url>\n   <url type=\"bugtracker\">https://github.com/ros-perception/depthimage_to_laserscan/issues</url>\n   <url type=\"repository\">https://github.com/ros-perception/depthimage_to_laserscan</url>\n \n-  <author>Chad Rockey</author>\n+  <buildtool_depend>ament_cmake_ros</buildtool_depend>\n \n-  <buildtool_depend version_gte=\"0.5.68\">catkin</buildtool_depend>\n+  <depend>image_geometry</depend>\n+  <depend>libopencv-dev</depend>\n+  <depend>rclcpp</depend>\n+  <depend>sensor_msgs</depend>\n \n-  <build_depend>roscpp</build_depend>\n-  <build_depend>gtest</build_depend>\n-  <build_depend>sensor_msgs</build_depend>\n-  <build_depend>nodelet</build_depend>\n-  <build_depend>image_transport</build_depend>\n-  <build_depend>image_geometry</build_depend>\n-  <build_depend>dynamic_reconfigure</build_depend>\n-  <run_depend>roscpp</run_depend>\n-  <run_depend>sensor_msgs</run_depend>\n-  <run_depend>nodelet</run_depend>\n-  <run_depend>image_transport</run_depend>\n-  <run_depend>image_geometry</run_depend>\n-  <run_depend>dynamic_reconfigure</run_depend>\n+  <test_depend>ament_cmake_gtest</test_depend>\n \n   <export>\n-    <nodelet plugin=\"${prefix}/nodelets.xml\"/>\n+    <build_type>ament_cmake</build_type>\n   </export>\n </package>"
+        },
+        {
+          "sha": "dfeb3324ca17fc932c2f81a0e37c0431cfd128f4",
+          "filename": "src/DepthImageToLaserScan.cpp",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 5,
+          "changes": 20,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c/src%2FDepthImageToLaserScan.cpp",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c/src%2FDepthImageToLaserScan.cpp",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/src%2FDepthImageToLaserScan.cpp?ref=a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c",
+          "patch": "@@ -33,6 +33,16 @@\n \n #include <depthimage_to_laserscan/DepthImageToLaserScan.h>\n \n+#include <opencv2/core/core.hpp>\n+#include <sensor_msgs/image_encodings.hpp>\n+#include <sensor_msgs/msg/camera_info.hpp>\n+#include <sensor_msgs/msg/image.hpp>\n+#include <sensor_msgs/msg/laser_scan.hpp>\n+\n+#include <limits>\n+#include <memory>\n+#include <string>\n+\n using namespace depthimage_to_laserscan;\n   \n DepthImageToLaserScan::DepthImageToLaserScan(){\n@@ -52,14 +62,14 @@ double DepthImageToLaserScan::angle_between_rays(const cv::Point3d& ray1, const\n   return acos(dot_product / (magnitude1 * magnitude2));\n }\n \n-bool DepthImageToLaserScan::use_point(const float new_value, const float old_value, const float range_min, const float range_max) const{  \n+bool DepthImageToLaserScan::use_point(const float new_value, const float old_value, const float range_min, const float range_max) const{\n   // Check for NaNs and Infs, a real number within our limits is more desirable than these.\n   bool new_finite = std::isfinite(new_value);\n   bool old_finite = std::isfinite(old_value);\n   \n   // Infs are preferable over NaNs (more information)\n   if(!new_finite && !old_finite){ // Both are not NaN or Inf.\n-    if(!isnan(new_value)){ // new is not NaN, so use it's +-Inf value.\n+    if(!std::isnan(new_value)){ // new is not NaN, so use it's +-Inf value.\n       return true;\n     }\n     return false; // Do not replace old_value\n@@ -80,8 +90,8 @@ bool DepthImageToLaserScan::use_point(const float new_value, const float old_val\n   return shorter_check;\n }\n \n-sensor_msgs::LaserScanPtr DepthImageToLaserScan::convert_msg(const sensor_msgs::ImageConstPtr& depth_msg,\n-\t      const sensor_msgs::CameraInfoConstPtr& info_msg){\n+sensor_msgs::msg::LaserScan::SharedPtr DepthImageToLaserScan::convert_msg(const sensor_msgs::msg::Image::ConstSharedPtr& depth_msg,\n+             const sensor_msgs::msg::CameraInfo::ConstSharedPtr& info_msg){\n   // Set camera model\n   cam_model_.fromCameraInfo(info_msg);\n   \n@@ -102,7 +112,7 @@ sensor_msgs::LaserScanPtr DepthImageToLaserScan::convert_msg(const sensor_msgs::\n   double angle_min = -angle_between_rays(center_ray, right_ray); // Negative because the laserscan message expects an opposite rotation of that from the depth image\n   \n   // Fill in laserscan message\n-  sensor_msgs::LaserScanPtr scan_msg(new sensor_msgs::LaserScan());\n+  sensor_msgs::msg::LaserScan::SharedPtr scan_msg = std::make_shared<sensor_msgs::msg::LaserScan>();\n   scan_msg->header = depth_msg->header;\n   if(output_frame_id_.length() > 0){\n     scan_msg->header.frame_id = output_frame_id_;"
+        },
+        {
+          "sha": "4bd8972471090f3dca31f118bc92773120898a90",
+          "filename": "src/DepthImageToLaserScanNodelet.cpp",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 61,
+          "changes": 61,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/07b075eb05d38b08fd81a475139104ea3d5c49bd/src%2FDepthImageToLaserScanNodelet.cpp",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/07b075eb05d38b08fd81a475139104ea3d5c49bd/src%2FDepthImageToLaserScanNodelet.cpp",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/src%2FDepthImageToLaserScanNodelet.cpp?ref=07b075eb05d38b08fd81a475139104ea3d5c49bd",
+          "patch": "@@ -1,61 +0,0 @@\n-/*\n- * Copyright (c) 2012, Willow Garage, Inc.\n- * All rights reserved.\n- *\n- * Redistribution and use in source and binary forms, with or without\n- * modification, are permitted provided that the following conditions are met:\n- *\n- *     * Redistributions of source code must retain the above copyright\n- *       notice, this list of conditions and the following disclaimer.\n- *     * Redistributions in binary form must reproduce the above copyright\n- *       notice, this list of conditions and the following disclaimer in the\n- *       documentation and/or other materials provided with the distribution.\n- *     * Neither the name of the Willow Garage, Inc. nor the names of its\n- *       contributors may be used to endorse or promote products derived from\n- *       this software without specific prior written permission.\n- *\n- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE\n- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n- * POSSIBILITY OF SUCH DAMAGE.\n- */\n-\n-/* \n- * Author: Chad Rockey\n- */\n-\n-#include <depthimage_to_laserscan/DepthImageToLaserScanROS.h>\n-#include <nodelet/nodelet.h>\n-\n-\n-namespace depthimage_to_laserscan\n-{\n-\n-class DepthImageToLaserScanNodelet : public nodelet::Nodelet\n-{\n-public:\n-  DepthImageToLaserScanNodelet()  {};\n-\n-  ~DepthImageToLaserScanNodelet() {}\n-\n-private:\n-  virtual void onInit()\n-  {\n-    dtl.reset(new DepthImageToLaserScanROS(getNodeHandle(), getPrivateNodeHandle()));\n-  };\n-  \n-  boost::shared_ptr<DepthImageToLaserScanROS> dtl;\n-};\n-\n-}\n-\n-#include <pluginlib/class_list_macros.h>\n-PLUGINLIB_EXPORT_CLASS(depthimage_to_laserscan::DepthImageToLaserScanNodelet, nodelet::Nodelet)\n-"
+        },
+        {
+          "sha": "62fa8cdbef5752605d6328cd0d31a5d33ef64a7d",
+          "filename": "src/DepthImageToLaserScanROS.cpp",
+          "status": "modified",
+          "additions": 59,
+          "deletions": 42,
+          "changes": 101,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c/src%2FDepthImageToLaserScanROS.cpp",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c/src%2FDepthImageToLaserScanROS.cpp",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/src%2FDepthImageToLaserScanROS.cpp?ref=a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c",
+          "patch": "@@ -31,61 +31,78 @@\n  * Author: Chad Rockey\n  */\n \n+#include <rclcpp/rclcpp.hpp>\n+#include <sensor_msgs/msg/camera_info.hpp>\n+#include <sensor_msgs/msg/image.hpp>\n+#include <sensor_msgs/msg/laser_scan.hpp>\n+\n+#include <functional>\n+\n #include <depthimage_to_laserscan/DepthImageToLaserScanROS.h>\n \n+#define ROS_ERROR printf\n+\n using namespace depthimage_to_laserscan;\n-  \n-DepthImageToLaserScanROS::DepthImageToLaserScanROS(ros::NodeHandle& n, ros::NodeHandle& pnh):pnh_(pnh), it_(n), srv_(pnh) {\n-  boost::mutex::scoped_lock lock(connect_mutex_);\n-  \n-  // Dynamic Reconfigure\n-  dynamic_reconfigure::Server<depthimage_to_laserscan::DepthConfig>::CallbackType f;\n-  f = boost::bind(&DepthImageToLaserScanROS::reconfigureCb, this, _1, _2);\n-  srv_.setCallback(f);\n-  \n-  // Lazy subscription to depth image topic\n-  pub_ = n.advertise<sensor_msgs::LaserScan>(\"scan\", 10, boost::bind(&DepthImageToLaserScanROS::connectCb, this, _1), boost::bind(&DepthImageToLaserScanROS::disconnectCb, this, _1));\n+\n+DepthImageToLaserScanROS::DepthImageToLaserScanROS(rclcpp::node::Node::SharedPtr & node):node_(node) {\n+\n+  cam_info_sub_ = node_->create_subscription<sensor_msgs::msg::CameraInfo>(\"depth_camera_info\",\n+      std::bind(\n+        &DepthImageToLaserScanROS::infoCb, this,\n+        std::placeholders::_1),\n+      rmw_qos_profile_sensor_data);\n+\n+  depth_image_sub_ =\n+    node_->create_subscription<sensor_msgs::msg::Image>(\"depth\",\n+      std::bind(&DepthImageToLaserScanROS::depthCb, this, std::placeholders::_1),\n+      rmw_qos_profile_sensor_data);\n+\n+  scan_pub_ = node_->create_publisher<sensor_msgs::msg::LaserScan>(\"scan\", rmw_qos_profile_sensor_data);\n+\n+  parameter_service_ = std::make_shared<rclcpp::parameter_service::ParameterService>(node_);\n+\n+  float scan_time = 0.033;\n+  node_->get_parameter(\"scan_time\", scan_time);\n+  dtl_.set_scan_time(scan_time);\n+\n+  float range_min = 0.45;\n+  float range_max = 10.0;\n+  node_->get_parameter(\"range_min\", range_min);\n+  node_->get_parameter(\"range_max\", range_max);\n+  dtl_.set_range_limits(range_min, range_max);\n+\n+  int scan_height = 1;\n+  node_->get_parameter(\"scan_height\", scan_height);\n+  dtl_.set_scan_height(scan_height);\n+\n+  std::string output_frame = \"camera_depth_frame\";\n+  node_->get_parameter(\"output_frame\", output_frame);\n+  dtl_.set_output_frame(output_frame);\n }\n \n-DepthImageToLaserScanROS::~DepthImageToLaserScanROS(){\n-  sub_.shutdown();\n+DepthImageToLaserScanROS::~DepthImageToLaserScanROS()\n+{\n }\n \n+void DepthImageToLaserScanROS::infoCb(sensor_msgs::msg::CameraInfo::SharedPtr info)\n+{\n+  cam_info_ = info;\n+}\n \n+void DepthImageToLaserScanROS::depthCb(const sensor_msgs::msg::Image::SharedPtr image)\n+{\n+  if (nullptr == cam_info_) {\n+    ROS_ERROR(\"No camera info, skipping point cloud squash\\n\");\n+    return;\n+  }\n \n-void DepthImageToLaserScanROS::depthCb(const sensor_msgs::ImageConstPtr& depth_msg,\n-\t      const sensor_msgs::CameraInfoConstPtr& info_msg){\n   try\n   {\n-    sensor_msgs::LaserScanPtr scan_msg = dtl_.convert_msg(depth_msg, info_msg);\n-    pub_.publish(scan_msg);\n+    sensor_msgs::msg::LaserScan::SharedPtr scan_msg = dtl_.convert_msg(image, cam_info_);\n+    scan_pub_->publish(scan_msg);\n   }\n   catch (std::runtime_error& e)\n   {\n-    ROS_ERROR_THROTTLE(1.0, \"Could not convert depth image to laserscan: %s\", e.what());\n-  }\n-}\n-\n-void DepthImageToLaserScanROS::connectCb(const ros::SingleSubscriberPublisher& pub) {\n-  boost::mutex::scoped_lock lock(connect_mutex_);\n-  if (!sub_ && pub_.getNumSubscribers() > 0) {\n-    ROS_DEBUG(\"Connecting to depth topic.\");\n-    image_transport::TransportHints hints(\"raw\", ros::TransportHints(), pnh_);\n-    sub_ = it_.subscribeCamera(\"image\", 10, &DepthImageToLaserScanROS::depthCb, this, hints);\n+    ROS_ERROR(\"Could not convert depth image to laserscan: %s\\n\", e.what());\n   }\n }\n-\n-void DepthImageToLaserScanROS::disconnectCb(const ros::SingleSubscriberPublisher& pub) {\n-  boost::mutex::scoped_lock lock(connect_mutex_);\n-  if (pub_.getNumSubscribers() == 0) {\n-    ROS_DEBUG(\"Unsubscribing from depth topic.\");\n-    sub_.shutdown();\n-  }\n-}\n-\n-void DepthImageToLaserScanROS::reconfigureCb(depthimage_to_laserscan::DepthConfig& config, uint32_t level){\n-    dtl_.set_scan_time(config.scan_time);\n-    dtl_.set_range_limits(config.range_min, config.range_max);\n-    dtl_.set_scan_height(config.scan_height);\n-    dtl_.set_output_frame(config.output_frame_id);\n-}"
+        },
+        {
+          "sha": "7551c234bf53c99449371efd954a2b1cd255927a",
+          "filename": "src/depthimage_to_laserscan.cpp",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 7,
+          "changes": 16,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c/src%2Fdepthimage_to_laserscan.cpp",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c/src%2Fdepthimage_to_laserscan.cpp",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/src%2Fdepthimage_to_laserscan.cpp?ref=a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c",
+          "patch": "@@ -34,13 +34,15 @@\n #include <depthimage_to_laserscan/DepthImageToLaserScanROS.h>\n \n int main(int argc, char **argv){\n-  ros::init(argc, argv, \"depthimage_to_laserscan\");\n-  ros::NodeHandle n;\n-  ros::NodeHandle pnh(\"~\");\n-  \n-  depthimage_to_laserscan::DepthImageToLaserScanROS dtl(n, pnh);\n-  \n-  ros::spin();\n+  rclcpp::init(argc, argv);\n+\n+  rclcpp::node::Node::SharedPtr node = rclcpp::node::Node::make_shared(\"depthimage_to_laserscan\");\n+\n+  depthimage_to_laserscan::DepthImageToLaserScanROS dtl(node);\n+\n+  rclcpp::spin(node);\n+\n+  rclcpp::shutdown();\n \n   return 0;\n }\n\\ No newline at end of file"
+        },
+        {
+          "sha": "789436afce14361f5dda0ffd7a678d543f5be2a8",
+          "filename": "test/DepthImageToLaserScanTest.cpp",
+          "status": "modified",
+          "additions": 59,
+          "deletions": 33,
+          "changes": 92,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c/test%2FDepthImageToLaserScanTest.cpp",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c/test%2FDepthImageToLaserScanTest.cpp",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/test%2FDepthImageToLaserScanTest.cpp?ref=a952a6d46589b7a9ef8c03dfda10abc8c4a3a92c",
+          "patch": "@@ -43,12 +43,14 @@\n #include <stdlib.h>\n #include <time.h>\n \n+#include <sensor_msgs/image_encodings.hpp>\n+\n // Library object\n depthimage_to_laserscan::DepthImageToLaserScan dtl_;\n \n // Inputs\n-sensor_msgs::ImagePtr depth_msg_;\n-sensor_msgs::CameraInfoPtr info_msg_;\n+sensor_msgs::msg::Image::SharedPtr depth_msg_;\n+sensor_msgs::msg::CameraInfo::SharedPtr info_msg_;\n \n // Check if the setters work properly and initialize member variables\n TEST(ConvertTest, setupLibrary)\n@@ -64,9 +66,9 @@ TEST(ConvertTest, setupLibrary)\n   const std::string output_frame = \"camera_depth_frame\";\n   dtl_.set_output_frame(output_frame);\n   \n-  depth_msg_.reset(new sensor_msgs::Image);\n-  depth_msg_->header.seq = 42;\n-  depth_msg_->header.stamp.fromNSec(1234567890);\n+  depth_msg_.reset(new sensor_msgs::msg::Image);\n+  depth_msg_->header.stamp.sec = 0;\n+  depth_msg_->header.stamp.nanosec = 0;\n   depth_msg_->header.frame_id = \"frame\";\n   depth_msg_->height = 480;\n   depth_msg_->width = 640;\n@@ -76,27 +78,51 @@ TEST(ConvertTest, setupLibrary)\n   uint16_t value = 0x0F;\n   depth_msg_->data.assign(depth_msg_->height*depth_msg_->step, value); // Sets all values to 3.855m\n   \n-  info_msg_.reset(new sensor_msgs::CameraInfo);\n+  info_msg_.reset(new sensor_msgs::msg::CameraInfo);\n   info_msg_->header = depth_msg_->header;\n   info_msg_->height = depth_msg_->height;\n   info_msg_->width = depth_msg_->width;\n   info_msg_->distortion_model = \"plumb_bob\";\n-  info_msg_->D.resize(5); // All 0, no distortion\n-  info_msg_->K[0] = 570.3422241210938;\n-  info_msg_->K[2] = 314.5;\n-  info_msg_->K[4] = 570.3422241210938;\n-  info_msg_->K[5] = 235.5;\n-  info_msg_->K[8] = 1.0;\n-  info_msg_->R[0] = 1.0;\n-  info_msg_->R[4] = 1.0;\n-  info_msg_->R[8] = 1.0;\n-  info_msg_->P[0] = 570.3422241210938;\n-  info_msg_->P[2] = 314.5;\n-  info_msg_->P[5] = 570.3422241210938;\n-  info_msg_->P[6] = 235.5;\n-  info_msg_->P[10] = 1.0;\n-  \n-  sensor_msgs::LaserScanPtr scan_msg = dtl_.convert_msg(depth_msg_, info_msg_);\n+  info_msg_->binning_x = 0;\n+  info_msg_->binning_y = 0;\n+  info_msg_->roi.x_offset = 0;\n+  info_msg_->roi.y_offset = 0;\n+  info_msg_->roi.height = 0;\n+  info_msg_->roi.width = 0;\n+  info_msg_->roi.do_rectify = 0;\n+  info_msg_->d.resize(5); // All 0, no distortion\n+  info_msg_->k[0] = 570.3422241210938;\n+  info_msg_->k[1] = 0.0;\n+  info_msg_->k[2] = 314.5;\n+  info_msg_->k[3] = 0.0;\n+  info_msg_->k[4] = 570.3422241210938;\n+  info_msg_->k[5] = 235.5;\n+  info_msg_->k[6] = 0.0;\n+  info_msg_->k[7] = 0.0;\n+  info_msg_->k[8] = 1.0;\n+  info_msg_->r[0] = 1.0;\n+  info_msg_->r[1] = 0.0;\n+  info_msg_->r[2] = 0.0;\n+  info_msg_->r[3] = 0.0;\n+  info_msg_->r[4] = 1.0;\n+  info_msg_->r[5] = 0.0;\n+  info_msg_->r[6] = 0.0;\n+  info_msg_->r[7] = 0.0;\n+  info_msg_->r[8] = 1.0;\n+  info_msg_->p[0] = 570.3422241210938;\n+  info_msg_->p[1] = 0.0;\n+  info_msg_->p[2] = 314.5;\n+  info_msg_->p[3] = 0.0;\n+  info_msg_->p[4] = 0.0;\n+  info_msg_->p[5] = 570.3422241210938;\n+  info_msg_->p[6] = 235.5;\n+  info_msg_->p[7] = 0.0;\n+  info_msg_->p[8] = 0.0;\n+  info_msg_->p[9] = 0.0;\n+  info_msg_->p[10] = 1.0;\n+  info_msg_->p[11] = 0.0;\n+\n+  sensor_msgs::msg::LaserScan::SharedPtr scan_msg = dtl_.convert_msg(depth_msg_, info_msg_);\n   \n   // Test set variables\n   EXPECT_EQ(scan_msg->scan_time, scan_time);\n@@ -132,7 +158,7 @@ TEST(ConvertTest, testScanHeight)\n \n     dtl_.set_scan_height(scan_height);\n \n-    int offset = (int)(info_msg_->K[5]-scan_height/2);\n+    int offset = (int)(info_msg_->k[5]-scan_height/2);\n     data += offset*row_step; // Offset to center of image\n \n     for(int v = 0; v < scan_height; v++, data += row_step){\n@@ -147,7 +173,7 @@ TEST(ConvertTest, testScanHeight)\n     }\n \n     // Convert\n-    sensor_msgs::LaserScanPtr scan_msg = dtl_.convert_msg(depth_msg_, info_msg_);\n+    sensor_msgs::msg::LaserScan::SharedPtr scan_msg = dtl_.convert_msg(depth_msg_, info_msg_);\n \n     // Test for minimum\n     float high_float_thresh = (float)high_value * 1.0f/1000.0f * 0.9f; // 0.9f represents 10 percent margin on range\n@@ -177,7 +203,7 @@ TEST(ConvertTest, testRandom)\n   }\n   \n   // Convert\n-  sensor_msgs::LaserScanPtr scan_msg = dtl_.convert_msg(depth_msg_, info_msg_);\n+  sensor_msgs::msg::LaserScan::SharedPtr scan_msg = dtl_.convert_msg(depth_msg_, info_msg_);\n   \n   // Make sure all values are greater than or equal to range_min and less than or equal to range_max\n   for(size_t i = 0; i < scan_msg->ranges.size(); i++){\n@@ -192,7 +218,7 @@ TEST(ConvertTest, testRandom)\n TEST(ConvertTest, testNaN)\n {\n   // Use a floating point image\n-  sensor_msgs::ImagePtr float_msg(new sensor_msgs::Image(*depth_msg_));\n+  sensor_msgs::msg::Image::SharedPtr float_msg(new sensor_msgs::msg::Image(*depth_msg_));\n   float_msg->encoding = sensor_msgs::image_encodings::TYPE_32FC1;\n   float_msg->step = float_msg->width*4; // 4 bytes per pixel\n   float_msg->data.resize(float_msg->step * float_msg->height);\n@@ -203,7 +229,7 @@ TEST(ConvertTest, testNaN)\n   }\n   \n   // Convert\n-  sensor_msgs::LaserScanPtr scan_msg = dtl_.convert_msg(float_msg, info_msg_);\n+  sensor_msgs::msg::LaserScan::SharedPtr scan_msg = dtl_.convert_msg(float_msg, info_msg_);\n   \n   // Make sure all values are NaN\n   for(size_t i = 0; i < scan_msg->ranges.size(); i++){\n@@ -217,7 +243,7 @@ TEST(ConvertTest, testNaN)\n TEST(ConvertTest, testPositiveInf)\n {\n   // Use a floating point image\n-  sensor_msgs::ImagePtr float_msg(new sensor_msgs::Image(*depth_msg_));\n+  sensor_msgs::msg::Image::SharedPtr float_msg(new sensor_msgs::msg::Image(*depth_msg_));\n   float_msg->encoding = sensor_msgs::image_encodings::TYPE_32FC1;\n   float_msg->step = float_msg->width*4; // 4 bytes per pixel\n   float_msg->data.resize(float_msg->step * float_msg->height);\n@@ -228,14 +254,14 @@ TEST(ConvertTest, testPositiveInf)\n   }\n   \n   // Convert\n-  sensor_msgs::LaserScanPtr scan_msg = dtl_.convert_msg(float_msg, info_msg_);\n+  sensor_msgs::msg::LaserScan::SharedPtr scan_msg = dtl_.convert_msg(float_msg, info_msg_);\n   \n   // Make sure most (> 80%) values are Inf\n   size_t nan_count = 0;\n   for(size_t i = 0; i < scan_msg->ranges.size(); i++){\n     if(std::isfinite(scan_msg->ranges[i])){ // NaNs are acceptable.\n       ADD_FAILURE() << \"Non-finite value produced from postive infniity test.\";\n-    } else if(isnan(scan_msg->ranges[i])){\n+    } else if(std::isnan(scan_msg->ranges[i])){\n       nan_count++;\n     } else if(scan_msg->ranges[i] < 0){\n       ADD_FAILURE() << \"Negative value produced from postive infinity test.\";\n@@ -249,7 +275,7 @@ TEST(ConvertTest, testPositiveInf)\n TEST(ConvertTest, testNegativeInf)\n {\n   // Use a floating point image\n-  sensor_msgs::ImagePtr float_msg(new sensor_msgs::Image(*depth_msg_));\n+  sensor_msgs::msg::Image::SharedPtr float_msg(new sensor_msgs::msg::Image(*depth_msg_));\n   float_msg->encoding = sensor_msgs::image_encodings::TYPE_32FC1;\n   float_msg->step = float_msg->width*4; // 4 bytes per pixel\n   float_msg->data.resize(float_msg->step * float_msg->height);\n@@ -260,14 +286,14 @@ TEST(ConvertTest, testNegativeInf)\n   }\n   \n   // Convert\n-  sensor_msgs::LaserScanPtr scan_msg = dtl_.convert_msg(float_msg, info_msg_);\n+  sensor_msgs::msg::LaserScan::SharedPtr scan_msg = dtl_.convert_msg(float_msg, info_msg_);\n   \n   // Make sure most (> 80%) values are Inf\n   size_t nan_count = 0;\n   for(size_t i = 0; i < scan_msg->ranges.size(); i++){\n     if(std::isfinite(scan_msg->ranges[i])){ // NaNs are acceptable.\n       ADD_FAILURE() << \"Non-finite value produced from postive infniity test.\";\n-    } else if(isnan(scan_msg->ranges[i])){\n+    } else if(std::isnan(scan_msg->ranges[i])){\n       nan_count++;\n     } else if(scan_msg->ranges[i] > 0){\n       ADD_FAILURE() << \"Postive value produced from negative infinity test.\";"
+        }
+      ]
+    },
+    {
+      "author": "JosefGst",
+      "date": "2023-07-19T12:14:55Z",
+      "sha": "cd097640cfe7acaa29a38a61890a4e2221f007f9",
+      "message": "fix node name (#71)\n\n* match name from launch to namespace used in param\r\n\r\n* update output frame\r\n\r\nCo-authored-by: Chris Lalancette <clalancette@gmail.com>",
+      "files_changed": 2,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "8aa0aaf9ab932fb4498c7844955dd5151b022b8d",
+          "filename": "cfg/param.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/cd097640cfe7acaa29a38a61890a4e2221f007f9/cfg%2Fparam.yaml",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/cd097640cfe7acaa29a38a61890a4e2221f007f9/cfg%2Fparam.yaml",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/cfg%2Fparam.yaml?ref=cd097640cfe7acaa29a38a61890a4e2221f007f9",
+          "patch": "@@ -4,4 +4,4 @@ depthimage_to_laserscan:\n     range_min: 0.45\n     range_max: 10.0\n     scan_height: 1\n-    output_frame: camera_depth_optical_frame\n+    output_frame: \"camera_depth_frame\""
+        },
+        {
+          "sha": "8132f1ed7d4393fc44c6883efaea2a56810eb044",
+          "filename": "launch/depthimage_to_laserscan-launch.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/cd097640cfe7acaa29a38a61890a4e2221f007f9/launch%2Fdepthimage_to_laserscan-launch.py",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/cd097640cfe7acaa29a38a61890a4e2221f007f9/launch%2Fdepthimage_to_laserscan-launch.py",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/launch%2Fdepthimage_to_laserscan-launch.py?ref=cd097640cfe7acaa29a38a61890a4e2221f007f9",
+          "patch": "@@ -28,7 +28,7 @@ def generate_launch_description():\n         Node(\n             package='depthimage_to_laserscan',\n             executable='depthimage_to_laserscan_node',\n-            name='depthimage_to_laserscan_node',\n+            name='depthimage_to_laserscan',\n             remappings=[('depth', '/camera/depth/image_rect_raw'),\n                         ('depth_camera_info', '/camera/depth/camera_info')],\n             parameters=[param_config])"
+        }
+      ]
+    },
+    {
+      "author": "sloretz",
+      "date": "2018-05-25T21:55:15Z",
+      "sha": "3b209f81669e5923b3dba0ca2dd5aec9b672ecf5",
+      "message": "ParameterService auto started (#7)",
+      "files_changed": 2,
+      "additions": 1,
+      "deletions": 5,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "990f5a1477e01b1d5d97c91a2eae89e40233c24a",
+          "filename": "include/depthimage_to_laserscan/DepthImageToLaserScanROS.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 3,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/3b209f81669e5923b3dba0ca2dd5aec9b672ecf5/include%2Fdepthimage_to_laserscan%2FDepthImageToLaserScanROS.h",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/3b209f81669e5923b3dba0ca2dd5aec9b672ecf5/include%2Fdepthimage_to_laserscan%2FDepthImageToLaserScanROS.h",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/include%2Fdepthimage_to_laserscan%2FDepthImageToLaserScanROS.h?ref=3b209f81669e5923b3dba0ca2dd5aec9b672ecf5",
+          "patch": "@@ -71,12 +71,10 @@ namespace depthimage_to_laserscan\n \n     rclcpp::Publisher<sensor_msgs::msg::LaserScan>::SharedPtr scan_pub_;\n \n-    rclcpp::ParameterService::SharedPtr parameter_service_;\n-\n     depthimage_to_laserscan::DepthImageToLaserScan dtl_; ///< Instance of the DepthImageToLaserScan conversion class.\n   };\n   \n   \n } // depthimage_to_laserscan\n \n-#endif\n\\ No newline at end of file\n+#endif"
+        },
+        {
+          "sha": "40e3dc251887dbf17e0916ba7e9f058f3ab1dbcb",
+          "filename": "src/DepthImageToLaserScanROS.cpp",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 2,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/3b209f81669e5923b3dba0ca2dd5aec9b672ecf5/src%2FDepthImageToLaserScanROS.cpp",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/3b209f81669e5923b3dba0ca2dd5aec9b672ecf5/src%2FDepthImageToLaserScanROS.cpp",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/src%2FDepthImageToLaserScanROS.cpp?ref=3b209f81669e5923b3dba0ca2dd5aec9b672ecf5",
+          "patch": "@@ -61,8 +61,6 @@ DepthImageToLaserScanROS::DepthImageToLaserScanROS(rclcpp::Node::SharedPtr & nod\n \n   scan_pub_ = node_->create_publisher<sensor_msgs::msg::LaserScan>(\"scan\");\n \n-  parameter_service_ = std::make_shared<rclcpp::ParameterService>(node_);\n-\n   float scan_time = 0.033;\n   node_->get_parameter(\"scan_time\", scan_time);\n   dtl_.set_scan_time(scan_time);"
+        }
+      ]
+    },
+    {
+      "author": "seanyen",
+      "date": "2019-10-22T18:57:16Z",
+      "sha": "2bc172bb708a3bc8258d5c1d4298e118859b2e77",
+      "message": "Export interfaces for Win32 Shared Lib (#44)",
+      "files_changed": 3,
+      "additions": 15,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "8087082a5e0f5ca5fe7f5249fb31a72199806f79",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 0,
+          "changes": 11,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/2bc172bb708a3bc8258d5c1d4298e118859b2e77/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/2bc172bb708a3bc8258d5c1d4298e118859b2e77/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/CMakeLists.txt?ref=2bc172bb708a3bc8258d5c1d4298e118859b2e77",
+          "patch": "@@ -1,5 +1,7 @@\n cmake_minimum_required(VERSION 3.5)\n project(depthimage_to_laserscan)\n+include(GenerateExportHeader)\n+\n if(NOT WIN32)\n   set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -Wpedantic\")\n endif()\n@@ -21,6 +23,8 @@ ament_target_dependencies(DepthImageToLaserScan\n   \"OpenCV\"\n   \"sensor_msgs\"\n )\n+generate_export_header(DepthImageToLaserScan EXPORT_FILE_NAME ${PROJECT_NAME}/DepthImageToLaserScan_export.h)\n+target_include_directories(DepthImageToLaserScan PUBLIC \"$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>\")\n \n add_library(DepthImageToLaserScanROS\n   src/DepthImageToLaserScanROS.cpp\n@@ -29,6 +33,8 @@ ament_target_dependencies(DepthImageToLaserScanROS\n   \"rclcpp\"\n )\n target_link_libraries(DepthImageToLaserScanROS DepthImageToLaserScan)\n+generate_export_header(DepthImageToLaserScanROS EXPORT_FILE_NAME ${PROJECT_NAME}/DepthImageToLaserScanROS_export.h)\n+target_include_directories(DepthImageToLaserScanROS PUBLIC \"$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>\")\n \n add_executable(depthimage_to_laserscan_node\n   src/depthimage_to_laserscan.cpp\n@@ -59,6 +65,11 @@ install(TARGETS depthimage_to_laserscan_node\n   DESTINATION lib/${PROJECT_NAME}\n )\n \n+install(FILES\n+  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/DepthImageToLaserScan_export.h\n+  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/DepthImageToLaserScanROS_export.h\n+  DESTINATION include/${PROJECT_NAME})\n+\n if(BUILD_TESTING)\n   find_package(ament_cmake_gtest REQUIRED)\n "
+        },
+        {
+          "sha": "960653640dd18a471227a58f619f4c14a94c4a26",
+          "filename": "include/depthimage_to_laserscan/DepthImageToLaserScan.h",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/2bc172bb708a3bc8258d5c1d4298e118859b2e77/include%2Fdepthimage_to_laserscan%2FDepthImageToLaserScan.h",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/2bc172bb708a3bc8258d5c1d4298e118859b2e77/include%2Fdepthimage_to_laserscan%2FDepthImageToLaserScan.h",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/include%2Fdepthimage_to_laserscan%2FDepthImageToLaserScan.h?ref=2bc172bb708a3bc8258d5c1d4298e118859b2e77",
+          "patch": "@@ -38,6 +38,7 @@\n #include <sensor_msgs/msg/laser_scan.hpp>\n #include <image_geometry/pinhole_camera_model.h>\n #include <depthimage_to_laserscan/depth_traits.h>\n+#include <depthimage_to_laserscan/DepthImageToLaserScan_export.h>\n #include <sstream>\n #include <limits.h>\n #include <math.h>\n@@ -48,7 +49,7 @@\n \n namespace depthimage_to_laserscan\n { \n-  class DepthImageToLaserScan\n+  class DEPTHIMAGETOLASERSCAN_EXPORT DepthImageToLaserScan\n   {\n   public:\n     DepthImageToLaserScan();"
+        },
+        {
+          "sha": "f9d8695782278e38aa10316a2bfcbf83756d561a",
+          "filename": "include/depthimage_to_laserscan/DepthImageToLaserScanROS.h",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/2bc172bb708a3bc8258d5c1d4298e118859b2e77/include%2Fdepthimage_to_laserscan%2FDepthImageToLaserScanROS.h",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/2bc172bb708a3bc8258d5c1d4298e118859b2e77/include%2Fdepthimage_to_laserscan%2FDepthImageToLaserScanROS.h",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/include%2Fdepthimage_to_laserscan%2FDepthImageToLaserScanROS.h?ref=2bc172bb708a3bc8258d5c1d4298e118859b2e77",
+          "patch": "@@ -40,10 +40,11 @@\n #include <sensor_msgs/msg/laser_scan.hpp>\n \n #include <depthimage_to_laserscan/DepthImageToLaserScan.h>\n+#include <depthimage_to_laserscan/DepthImageToLaserScanROS_export.h>\n \n namespace depthimage_to_laserscan\n { \n-  class DepthImageToLaserScanROS\n+  class DEPTHIMAGETOLASERSCANROS_EXPORT DepthImageToLaserScanROS\n   {\n   public:\n     explicit DepthImageToLaserScanROS(rclcpp::Node::SharedPtr & node);"
+        }
+      ]
+    },
+    {
+      "author": "ahuizxc",
+      "date": "2019-09-06T12:09:45Z",
+      "sha": "7f5d9a00bf5e5bfc1cc755f089265386ad426f5e",
+      "message": "update code to be consist with new ros2 core (#42)\n\n* use declare_parameter instead of get_parameter due to change of ros2 core\r\n\r\n* update code according to review comment\r\n\r\n* add launch file and adapt the code as comment, already verfied using intel realsense\r\n\r\n* updated the code as recommended",
+      "files_changed": 6,
+      "additions": 63,
+      "deletions": 24,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "2f1f25c494d67c506e2ee3b630155c88355c1c93",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/7f5d9a00bf5e5bfc1cc755f089265386ad426f5e/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/7f5d9a00bf5e5bfc1cc755f089265386ad426f5e/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/CMakeLists.txt?ref=7f5d9a00bf5e5bfc1cc755f089265386ad426f5e",
+          "patch": "@@ -42,6 +42,13 @@ install(DIRECTORY include/\n   DESTINATION include\n )\n \n+install(DIRECTORY\n+  launch\n+  cfg\n+  DESTINATION share/${PROJECT_NAME}/\n+)\n+\n+\n install(TARGETS DepthImageToLaserScan DepthImageToLaserScanROS\n   ARCHIVE DESTINATION lib\n   LIBRARY DESTINATION lib"
+        },
+        {
+          "sha": "698fdc05139e3b66485e5bcade7036eb70f567dc",
+          "filename": "cfg/param.yaml",
+          "status": "added",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/7f5d9a00bf5e5bfc1cc755f089265386ad426f5e/cfg%2Fparam.yaml",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/7f5d9a00bf5e5bfc1cc755f089265386ad426f5e/cfg%2Fparam.yaml",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/cfg%2Fparam.yaml?ref=7f5d9a00bf5e5bfc1cc755f089265386ad426f5e",
+          "patch": "@@ -0,0 +1,7 @@\n+depthimage_to_laserscan:\n+  ros__parameters:\n+    scan_time: 0.033\n+    range_min: 0.45\n+    range_max: 10.0\n+    scan_height: 1\n+    output_frame: camera_depth_optical_frame"
+        },
+        {
+          "sha": "340677c78c8be76dbc690fe8ba72db8c1a9cdf6c",
+          "filename": "include/depthimage_to_laserscan/DepthImageToLaserScan.h",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/7f5d9a00bf5e5bfc1cc755f089265386ad426f5e/include%2Fdepthimage_to_laserscan%2FDepthImageToLaserScan.h",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/7f5d9a00bf5e5bfc1cc755f089265386ad426f5e/include%2Fdepthimage_to_laserscan%2FDepthImageToLaserScan.h",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/include%2Fdepthimage_to_laserscan%2FDepthImageToLaserScan.h?ref=7f5d9a00bf5e5bfc1cc755f089265386ad426f5e",
+          "patch": "@@ -66,7 +66,7 @@ namespace depthimage_to_laserscan\n      * @return sensor_msgs::msg::LaserScan::SharedPtr for the center row(s) of the depth image.\n      * \n      */\n-    sensor_msgs::msg::LaserScan::SharedPtr convert_msg(const sensor_msgs::msg::Image::ConstSharedPtr& depth_msg,\n+    sensor_msgs::msg::LaserScan::UniquePtr convert_msg(const sensor_msgs::msg::Image::ConstSharedPtr& depth_msg,\n                                                        const sensor_msgs::msg::CameraInfo::ConstSharedPtr& info_msg);\n \n     /**\n@@ -171,7 +171,7 @@ namespace depthimage_to_laserscan\n     */\n     template<typename T>\n     void convert(const sensor_msgs::msg::Image::ConstSharedPtr& depth_msg, const image_geometry::PinholeCameraModel& cam_model,\n-                 const sensor_msgs::msg::LaserScan::SharedPtr& scan_msg, const int& scan_height) const{\n+                 const sensor_msgs::msg::LaserScan::UniquePtr& scan_msg, const int& scan_height) const{\n       // Use correct principal point from calibration\n       float center_x = cam_model.cx();\n "
+        },
+        {
+          "sha": "9c92eed2be00bc7522e43c97719e18535fea14b9",
+          "filename": "launch/depthimage_to_laserscan.launch.py",
+          "status": "added",
+          "additions": 32,
+          "deletions": 0,
+          "changes": 32,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/7f5d9a00bf5e5bfc1cc755f089265386ad426f5e/launch%2Fdepthimage_to_laserscan.launch.py",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/7f5d9a00bf5e5bfc1cc755f089265386ad426f5e/launch%2Fdepthimage_to_laserscan.launch.py",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/launch%2Fdepthimage_to_laserscan.launch.py?ref=7f5d9a00bf5e5bfc1cc755f089265386ad426f5e",
+          "patch": "@@ -0,0 +1,32 @@\n+# Copyright 2019 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+# /* Author: Gary Liu */\n+\n+import os\n+from ament_index_python.packages import get_package_share_directory\n+from launch import LaunchDescription\n+from launch_ros.actions import Node\n+\n+def generate_launch_description():\n+    param_config_dir = os.path.join(get_package_share_directory('depthimage_to_laserscan'), 'cfg', 'param.yaml')\n+    return LaunchDescription([\n+        Node(\n+            package='depthimage_to_laserscan',\n+            node_executable='depthimage_to_laserscan_node',\n+            node_name='depthimage_to_laserscan_node',\n+            remappings=[('depth','/camera/depth/image_rect_raw'),\n+                        ('depth_camera_info', '/camera/depth/camera_info')],\n+            parameters=[param_config_dir])\n+    ])"
+        },
+        {
+          "sha": "38259e982d5ab320b26ff6e42d1b4f5772da860c",
+          "filename": "src/DepthImageToLaserScan.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/7f5d9a00bf5e5bfc1cc755f089265386ad426f5e/src%2FDepthImageToLaserScan.cpp",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/7f5d9a00bf5e5bfc1cc755f089265386ad426f5e/src%2FDepthImageToLaserScan.cpp",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/src%2FDepthImageToLaserScan.cpp?ref=7f5d9a00bf5e5bfc1cc755f089265386ad426f5e",
+          "patch": "@@ -90,7 +90,7 @@ bool DepthImageToLaserScan::use_point(const float new_value, const float old_val\n   return shorter_check;\n }\n \n-sensor_msgs::msg::LaserScan::SharedPtr DepthImageToLaserScan::convert_msg(const sensor_msgs::msg::Image::ConstSharedPtr& depth_msg,\n+sensor_msgs::msg::LaserScan::UniquePtr DepthImageToLaserScan::convert_msg(const sensor_msgs::msg::Image::ConstSharedPtr& depth_msg,\n              const sensor_msgs::msg::CameraInfo::ConstSharedPtr& info_msg){\n   // Set camera model\n   cam_model_.fromCameraInfo(info_msg);\n@@ -112,7 +112,7 @@ sensor_msgs::msg::LaserScan::SharedPtr DepthImageToLaserScan::convert_msg(const\n   double angle_min = -angle_between_rays(center_ray, right_ray); // Negative because the laserscan message expects an opposite rotation of that from the depth image\n   \n   // Fill in laserscan message\n-  sensor_msgs::msg::LaserScan::SharedPtr scan_msg = std::make_shared<sensor_msgs::msg::LaserScan>();\n+  sensor_msgs::msg::LaserScan::UniquePtr scan_msg = std::make_unique<sensor_msgs::msg::LaserScan>();\n   scan_msg->header = depth_msg->header;\n   if(output_frame_id_.length() > 0){\n     scan_msg->header.frame_id = output_frame_id_;"
+        },
+        {
+          "sha": "03e760328db55425deca753652655976cb96dcce",
+          "filename": "src/DepthImageToLaserScanROS.cpp",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 20,
+          "changes": 33,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/7f5d9a00bf5e5bfc1cc755f089265386ad426f5e/src%2FDepthImageToLaserScanROS.cpp",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/7f5d9a00bf5e5bfc1cc755f089265386ad426f5e/src%2FDepthImageToLaserScanROS.cpp",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/src%2FDepthImageToLaserScanROS.cpp?ref=7f5d9a00bf5e5bfc1cc755f089265386ad426f5e",
+          "patch": "@@ -47,36 +47,29 @@\n using namespace depthimage_to_laserscan;\n \n DepthImageToLaserScanROS::DepthImageToLaserScanROS(rclcpp::Node::SharedPtr & node):node_(node) {\n-\n-  cam_info_sub_ = node_->create_subscription<sensor_msgs::msg::CameraInfo>(\"depth_camera_info\",\n+  auto qos = rclcpp:: SystemDefaultsQoS();\n+  cam_info_sub_ = node_->create_subscription<sensor_msgs::msg::CameraInfo>(\"depth_camera_info\", qos,\n       std::bind(\n         &DepthImageToLaserScanROS::infoCb, this,\n-        std::placeholders::_1),\n-      rmw_qos_profile_sensor_data);\n+        std::placeholders::_1));\n \n   depth_image_sub_ =\n-    node_->create_subscription<sensor_msgs::msg::Image>(\"depth\",\n-      std::bind(&DepthImageToLaserScanROS::depthCb, this, std::placeholders::_1),\n-      rmw_qos_profile_sensor_data);\n+    node_->create_subscription<sensor_msgs::msg::Image>(\"depth\", qos,\n+      std::bind(&DepthImageToLaserScanROS::depthCb, this, std::placeholders::_1));\n \n-  scan_pub_ = node_->create_publisher<sensor_msgs::msg::LaserScan>(\"scan\");\n+  scan_pub_ = node_->create_publisher<sensor_msgs::msg::LaserScan>(\"scan\", qos);\n \n-  float scan_time = 0.033;\n-  node_->get_parameter(\"scan_time\", scan_time);\n+  float scan_time = node_->declare_parameter(\"scan_time\", 0.033);\n   dtl_.set_scan_time(scan_time);\n \n-  float range_min = 0.45;\n-  float range_max = 10.0;\n-  node_->get_parameter(\"range_min\", range_min);\n-  node_->get_parameter(\"range_max\", range_max);\n+  float range_min = node_->declare_parameter(\"range_min\", 0.45);\n+  float range_max  = node_->declare_parameter(\"range_max\", 10.0);\n   dtl_.set_range_limits(range_min, range_max);\n \n-  int scan_height = 1;\n-  node_->get_parameter(\"scan_height\", scan_height);\n+  int scan_height = node_->declare_parameter(\"scan_height\", 1);\n   dtl_.set_scan_height(scan_height);\n \n-  std::string output_frame = \"camera_depth_frame\";\n-  node_->get_parameter(\"output_frame\", output_frame);\n+  std::string output_frame = node_->declare_parameter(\"output_frame\", \"camera_depth_frame\");\n   dtl_.set_output_frame(output_frame);\n }\n \n@@ -98,8 +91,8 @@ void DepthImageToLaserScanROS::depthCb(const sensor_msgs::msg::Image::SharedPtr\n \n   try\n   {\n-    sensor_msgs::msg::LaserScan::SharedPtr scan_msg = dtl_.convert_msg(image, cam_info_);\n-    scan_pub_->publish(scan_msg);\n+    sensor_msgs::msg::LaserScan::UniquePtr scan_msg = dtl_.convert_msg(image, cam_info_);\n+    scan_pub_->publish(std::move(scan_msg));\n   }\n   catch (std::runtime_error& e)\n   {"
+        }
+      ]
+    },
+    {
+      "author": "chadrockey",
+      "date": "2012-12-05T18:16:18Z",
+      "sha": "3d6a6961f4cd874067ec321c6e7d6237f2a77d12",
+      "message": "Initial commit",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "6bbf372e72091a0ad56082db11e56c2f90e83e45",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/3d6a6961f4cd874067ec321c6e7d6237f2a77d12/README.md",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/3d6a6961f4cd874067ec321c6e7d6237f2a77d12/README.md",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/README.md?ref=3d6a6961f4cd874067ec321c6e7d6237f2a77d12",
+          "patch": "@@ -0,0 +1,4 @@\n+depthimage_to_laserscan\n+=======================\n+\n+Converts a depth image to a laser scan for use with navigation and localization.\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "mikaelarguedas",
+      "date": "2017-06-28T19:41:46Z",
+      "sha": "b6312d54293f4850e5e8b6a9b9b28bbd8099747f",
+      "message": "install node to libexec (#4)",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 2,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "38dd59b8732f020a9495c6fb911fffb6e2ea43b0",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 2,
+          "changes": 7,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/b6312d54293f4850e5e8b6a9b9b28bbd8099747f/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/b6312d54293f4850e5e8b6a9b9b28bbd8099747f/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/CMakeLists.txt?ref=b6312d54293f4850e5e8b6a9b9b28bbd8099747f",
+          "patch": "@@ -42,13 +42,16 @@ install(DIRECTORY include/\n   DESTINATION include\n )\n \n-install(TARGETS DepthImageToLaserScan DepthImageToLaserScanROS depthimage_to_laserscan_node\n-  EXPORT export_depthimage_to_laserscan_node\n+install(TARGETS DepthImageToLaserScan DepthImageToLaserScanROS\n   ARCHIVE DESTINATION lib\n   LIBRARY DESTINATION lib\n   RUNTIME DESTINATION bin\n )\n \n+install(TARGETS depthimage_to_laserscan_node\n+  DESTINATION lib/${PROJECT_NAME}\n+)\n+\n if(BUILD_TESTING)\n   find_package(ament_cmake_gtest REQUIRED)\n "
+        }
+      ]
+    },
+    {
+      "author": "dhood",
+      "date": "2017-06-23T01:22:01Z",
+      "sha": "d6a4f64e13e954f9faa0409e5a2445b528d5a722",
+      "message": "Use reliable publisher to give the subscriber the choice of reliability",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "525cfad7677f47725d9e9fa3bcd661221abe2055",
+          "filename": "src/DepthImageToLaserScanROS.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/d6a4f64e13e954f9faa0409e5a2445b528d5a722/src%2FDepthImageToLaserScanROS.cpp",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/d6a4f64e13e954f9faa0409e5a2445b528d5a722/src%2FDepthImageToLaserScanROS.cpp",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/src%2FDepthImageToLaserScanROS.cpp?ref=d6a4f64e13e954f9faa0409e5a2445b528d5a722",
+          "patch": "@@ -57,7 +57,7 @@ DepthImageToLaserScanROS::DepthImageToLaserScanROS(rclcpp::node::Node::SharedPtr\n       std::bind(&DepthImageToLaserScanROS::depthCb, this, std::placeholders::_1),\n       rmw_qos_profile_sensor_data);\n \n-  scan_pub_ = node_->create_publisher<sensor_msgs::msg::LaserScan>(\"scan\", rmw_qos_profile_sensor_data);\n+  scan_pub_ = node_->create_publisher<sensor_msgs::msg::LaserScan>(\"scan\");\n \n   parameter_service_ = std::make_shared<rclcpp::parameter_service::ParameterService>(node_);\n "
+        }
+      ]
+    },
+    {
+      "author": "vliedel",
+      "date": "2014-04-22T10:03:53Z",
+      "sha": "c652af87aa1036888e3f9d673254321c1f408040",
+      "message": "fixed angle_increment",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "6ad04874533a4e69b83f26f234131d5cd7bc30fe",
+          "filename": "src/DepthImageToLaserScan.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/c652af87aa1036888e3f9d673254321c1f408040/src%2FDepthImageToLaserScan.cpp",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/c652af87aa1036888e3f9d673254321c1f408040/src%2FDepthImageToLaserScan.cpp",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/src%2FDepthImageToLaserScan.cpp?ref=c652af87aa1036888e3f9d673254321c1f408040",
+          "patch": "@@ -109,7 +109,7 @@ sensor_msgs::LaserScanPtr DepthImageToLaserScan::convert_msg(const sensor_msgs::\n   }\n   scan_msg->angle_min = angle_min;\n   scan_msg->angle_max = angle_max;\n-  scan_msg->angle_increment = (scan_msg->angle_max - scan_msg->angle_min) / depth_msg->width;\n+  scan_msg->angle_increment = (scan_msg->angle_max - scan_msg->angle_min) / (depth_msg->width - 1);\n   scan_msg->time_increment = 0.0;\n   scan_msg->scan_time = scan_time_;\n   scan_msg->range_min = range_min_;\n@@ -159,4 +159,4 @@ void DepthImageToLaserScan::set_scan_height(const int scan_height){\n \n void DepthImageToLaserScan::set_output_frame(const std::string output_frame_id){\n   output_frame_id_ = output_frame_id;\n-}\n\\ No newline at end of file\n+}"
+        }
+      ]
+    },
+    {
+      "author": "bulwahn",
+      "date": "2014-01-22T10:18:25Z",
+      "sha": "f953151cce932ffa8e0d14fc12b512d8e7d448fe",
+      "message": "check for CATKIN_ENABLE_TESTING",
+      "files_changed": 2,
+      "additions": 6,
+      "deletions": 4,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "a76b0548f119061b428f5a23aaa32d1dcef80cac",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 3,
+          "changes": 8,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/f953151cce932ffa8e0d14fc12b512d8e7d448fe/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/f953151cce932ffa8e0d14fc12b512d8e7d448fe/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/CMakeLists.txt?ref=f953151cce932ffa8e0d14fc12b512d8e7d448fe",
+          "patch": "@@ -30,9 +30,11 @@ target_link_libraries(DepthImageToLaserScanNodelet DepthImageToLaserScanROS ${ca\n add_executable(depthimage_to_laserscan src/depthimage_to_laserscan.cpp)\n target_link_libraries(depthimage_to_laserscan DepthImageToLaserScanROS ${catkin_LIBRARIES})\n \n-# Test the library\n-catkin_add_gtest(libtest test/DepthImageToLaserScanTest.cpp)\n-target_link_libraries(libtest DepthImageToLaserScan ${catkin_LIBRARIES})\n+if(CATKIN_ENABLE_TESTING)\n+  # Test the library\n+  catkin_add_gtest(libtest test/DepthImageToLaserScanTest.cpp)\n+  target_link_libraries(libtest DepthImageToLaserScan ${catkin_LIBRARIES})\n+endif()\n \n # add the test executable, keep it from being built by \"make all\"\n add_executable(test_dtl EXCLUDE_FROM_ALL test/depthimage_to_laserscan_rostest.cpp)"
+        },
+        {
+          "sha": "d5ecc06b19d9f8033f2de37484335810ea014db9",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/f953151cce932ffa8e0d14fc12b512d8e7d448fe/package.xml",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/f953151cce932ffa8e0d14fc12b512d8e7d448fe/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/package.xml?ref=f953151cce932ffa8e0d14fc12b512d8e7d448fe",
+          "patch": "@@ -12,7 +12,7 @@\n \n   <author>Chad Rockey</author>\n \n-  <buildtool_depend>catkin</buildtool_depend>\n+  <buildtool_depend version_gte=\"0.5.68\">catkin</buildtool_depend>\n \n   <build_depend>roscpp</build_depend>\n   <build_depend>gtest</build_depend>"
+        }
+      ]
+    },
+    {
+      "author": "ericperko",
+      "date": "2013-01-26T20:04:59Z",
+      "sha": "16b6e167b4d689b1bff36029a7de35f9792a8c29",
+      "message": "Cleaned up CMakeLists a bit",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 6,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "7e73a895f479378683357cba1916fcf718f65525",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 6,
+          "changes": 10,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/16b6e167b4d689b1bff36029a7de35f9792a8c29/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/16b6e167b4d689b1bff36029a7de35f9792a8c29/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/CMakeLists.txt?ref=16b6e167b4d689b1bff36029a7de35f9792a8c29",
+          "patch": "@@ -21,14 +21,13 @@ add_library(DepthImageToLaserScan src/DepthImageToLaserScan.cpp)\n target_link_libraries(DepthImageToLaserScan ${catkin_LIBRARIES})\n \n add_library(DepthImageToLaserScanROS src/DepthImageToLaserScanROS.cpp)\n+add_dependencies(DepthImageToLaserScanROS ${PROJECT_NAME}_gencfg)\n target_link_libraries(DepthImageToLaserScanROS DepthImageToLaserScan ${catkin_LIBRARIES})\n \n add_library(DepthImageToLaserScanNodelet src/DepthImageToLaserScanNodelet.cpp)\n-add_dependencies(DepthImageToLaserScanNodelet ${PROJECT_NAME}_gencfg)\n target_link_libraries(DepthImageToLaserScanNodelet DepthImageToLaserScanROS ${catkin_LIBRARIES})\n \n add_executable(depthimage_to_laserscan src/depthimage_to_laserscan.cpp)\n-add_dependencies(depthimage_to_laserscan ${PROJECT_NAME}_gencfg)\n target_link_libraries(depthimage_to_laserscan DepthImageToLaserScanROS ${catkin_LIBRARIES})\n \n # Test the library\n@@ -39,14 +38,13 @@ target_link_libraries(libtest DepthImageToLaserScan ${catkin_LIBRARIES})\n add_executable(test_dtl EXCLUDE_FROM_ALL test/depthimage_to_laserscan_rostest.cpp)\n \n # Install targets\n-install(TARGETS DepthImageToLaserScan DepthImageToLaserScanROS DepthImageToLaserScanNodelet DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})\n+install(TARGETS DepthImageToLaserScan DepthImageToLaserScanROS DepthImageToLaserScanNodelet depthimage_to_laserscan\n+\tRUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n+\tLIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION} )\n \n install(DIRECTORY include/${PROJECT_NAME}/\n         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}\n )\n install(FILES nodelets.xml\n         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}\n )\n-install(TARGETS depthimage_to_laserscan\n-        DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n-)\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "Austin Hendrix",
+      "date": "2013-01-23T02:02:27Z",
+      "sha": "1440033e1ca25bfbc90ee607ccaccad97ae5f897",
+      "message": "Remove old makefile.",
+      "files_changed": 1,
+      "additions": 0,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "b75b928f20ef9ea4f509a17db62e4e31b422c27f",
+          "filename": "Makefile",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 1,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/8def02e9ca8bc369d2323044c879d269f3212184/Makefile",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/8def02e9ca8bc369d2323044c879d269f3212184/Makefile",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/Makefile?ref=8def02e9ca8bc369d2323044c879d269f3212184",
+          "patch": "@@ -1 +0,0 @@\n-include $(shell rospack find mk)/cmake.mk\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "dirk-thomas",
+      "date": "2012-12-19T09:49:20Z",
+      "sha": "f51fd2ef78d1261fea6de8edfeec729816c86f54",
+      "message": "fix dyn reconf",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 3,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "0c84a5c1f46fc50e02c112aaec2912b857bebe24",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/f51fd2ef78d1261fea6de8edfeec729816c86f54/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/f51fd2ef78d1261fea6de8edfeec729816c86f54/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/CMakeLists.txt?ref=f51fd2ef78d1261fea6de8edfeec729816c86f54",
+          "patch": "@@ -6,16 +6,16 @@ project(depthimage_to_laserscan)\n find_package(catkin REQUIRED dynamic_reconfigure image_geometry image_transport nodelet roscpp sensor_msgs)\n #find_package(OpenCV REQUIRED)\n \n+# Dynamic reconfigure support\n+generate_dynamic_reconfigure_options(cfg/Depth.cfg)\n+\n catkin_package(DEPENDS sensor_msgs roscpp nodelet image_transport image_geometry dynamic_reconfigure\n                INCLUDE_DIRS include\n                LIBRARIES ${PROJECT_NAME}\n )\n \n include_directories(include ${catkin_INCLUDE_DIRS})\n \n-# Dynamic reconfigure support\n-generate_dynamic_reconfigure_options(cfg/Depth.cfg)\n-\n add_library(DepthImageToLaserScan src/DepthImageToLaserScan.cpp)\n target_link_libraries(DepthImageToLaserScan ${catkin_LIBRARIES})\n "
+        }
+      ]
+    },
+    {
+      "author": "Aaron Blasdel",
+      "date": "2012-12-14T22:06:41Z",
+      "sha": "21789cecb744882e195a387f183b4a057822ef79",
+      "message": "updated catkin buildtool_depend",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "8b8d67ae97f0855aff626ba5e16308bac5b2bf43",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-perception/depthimage_to_laserscan/blob/21789cecb744882e195a387f183b4a057822ef79/package.xml",
+          "raw_url": "https://github.com/ros-perception/depthimage_to_laserscan/raw/21789cecb744882e195a387f183b4a057822ef79/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-perception/depthimage_to_laserscan/contents/package.xml?ref=21789cecb744882e195a387f183b4a057822ef79",
+          "patch": "@@ -12,6 +12,8 @@\n \n   <author>Chad Rockey</author>\n \n+  <buildtool_depend>catkin</buildtool_depend>\n+\n   <build_depend>roscpp</build_depend>\n   <build_depend>gtest</build_depend>\n   <build_depend>sensor_msgs</build_depend>"
+        }
+      ]
+    }
+  ]
+}

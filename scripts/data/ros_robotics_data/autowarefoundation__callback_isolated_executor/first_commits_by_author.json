@@ -1,0 +1,359 @@
+{
+  "_meta": {
+    "fetched_at": "2026-09-21T17:45:12Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "autowarefoundation",
+    "repo": "callback_isolated_executor"
+  },
+  "data": [
+    {
+      "author": "atsushi421",
+      "date": "2024-01-03T09:48:44Z",
+      "sha": "0bfc18d8fcafbd9ee7d35796bd104ee18e0f9835",
+      "message": "feat: support SCHED_DEADLINE (#1)\n\n* feat: SCHED_DEADLINE policy\r\n\r\n* feat: set_affinity_by_cgroup\r\n\r\n* fix\r\n\r\n* style",
+      "files_changed": 4,
+      "additions": 127,
+      "deletions": 14,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "87d55e88bb09a92a5cdedb22cc180e19b21478d5",
+          "filename": "ros2_thread_configurator/include/sched_deadline.hpp",
+          "status": "added",
+          "additions": 28,
+          "deletions": 0,
+          "changes": 28,
+          "blob_url": "https://github.com/autowarefoundation/callback_isolated_executor/blob/0bfc18d8fcafbd9ee7d35796bd104ee18e0f9835/ros2_thread_configurator%2Finclude%2Fsched_deadline.hpp",
+          "raw_url": "https://github.com/autowarefoundation/callback_isolated_executor/raw/0bfc18d8fcafbd9ee7d35796bd104ee18e0f9835/ros2_thread_configurator%2Finclude%2Fsched_deadline.hpp",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/callback_isolated_executor/contents/ros2_thread_configurator%2Finclude%2Fsched_deadline.hpp?ref=0bfc18d8fcafbd9ee7d35796bd104ee18e0f9835",
+          "patch": "@@ -0,0 +1,28 @@\n+#pragma once\n+#include <linux/sched.h>\n+#include <sched.h>\n+#include <sys/syscall.h>\n+#include <sys/types.h>\n+\n+struct sched_attr {\n+  uint32_t size;\n+\n+  uint32_t sched_policy;\n+  uint64_t sched_flags;\n+\n+  /* SCHED_NORMAL, SCHED_BATCH */\n+  int32_t sched_nice;\n+\n+  /* SCHED_FIFO, SCHED_RR */\n+  uint32_t sched_priority;\n+\n+  /* SCHED_DEADLINE (nsec) */\n+  uint64_t sched_runtime;\n+  uint64_t sched_deadline;\n+  uint64_t sched_period;\n+};\n+\n+int sched_setattr(pid_t pid, const struct sched_attr *attr,\n+                  unsigned int flags) {\n+  return syscall(__NR_sched_setattr, pid, attr, flags);\n+}"
+        },
+        {
+          "sha": "ec7756c37d75d4ad164296061ae87c0c9edab457",
+          "filename": "ros2_thread_configurator/include/thread_configurator_node.hpp",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 1,
+          "changes": 11,
+          "blob_url": "https://github.com/autowarefoundation/callback_isolated_executor/blob/0bfc18d8fcafbd9ee7d35796bd104ee18e0f9835/ros2_thread_configurator%2Finclude%2Fthread_configurator_node.hpp",
+          "raw_url": "https://github.com/autowarefoundation/callback_isolated_executor/raw/0bfc18d8fcafbd9ee7d35796bd104ee18e0f9835/ros2_thread_configurator%2Finclude%2Fthread_configurator_node.hpp",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/callback_isolated_executor/contents/ros2_thread_configurator%2Finclude%2Fthread_configurator_node.hpp?ref=0bfc18d8fcafbd9ee7d35796bd104ee18e0f9835",
+          "patch": "@@ -15,22 +15,31 @@ class ThreadConfiguratorNode : public rclcpp::Node {\n     std::vector<int> affinity;\n     std::string policy;\n     int priority;\n+\n+    // For SCHED_DEADLINE\n+    unsigned int runtime;\n+    unsigned int period;\n+    unsigned int deadline;\n+\n     bool applied = false;\n   };\n \n public:\n   ThreadConfiguratorNode(const YAML::Node &yaml);\n+  ~ThreadConfiguratorNode();\n   bool all_applied();\n   void print_all_unapplied();\n \n private:\n-  bool issue_syscalls(const CallbackGroupConfig &config) const;\n+  bool set_affinity_by_cgroup(int64_t thread_id, const std::vector<int>& cpus);\n+  bool issue_syscalls(const CallbackGroupConfig &config);\n   void topic_callback(const thread_config_msgs::msg::CallbackGroupInfo::SharedPtr msg);\n \n   rclcpp::Subscription<thread_config_msgs::msg::CallbackGroupInfo>::SharedPtr subscription_;\n \n   std::vector<CallbackGroupConfig> callback_group_configs_;\n   std::unordered_map<std::string, CallbackGroupConfig*> id_to_callback_group_config_;\n   int unapplied_num_;\n+  int cgroup_num_;\n };\n "
+        },
+        {
+          "sha": "103cb4d78c2f3f91d5b2f2f436b0b5af906f7935",
+          "filename": "ros2_thread_configurator/src/main.cpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 1,
+          "changes": 5,
+          "blob_url": "https://github.com/autowarefoundation/callback_isolated_executor/blob/0bfc18d8fcafbd9ee7d35796bd104ee18e0f9835/ros2_thread_configurator%2Fsrc%2Fmain.cpp",
+          "raw_url": "https://github.com/autowarefoundation/callback_isolated_executor/raw/0bfc18d8fcafbd9ee7d35796bd104ee18e0f9835/ros2_thread_configurator%2Fsrc%2Fmain.cpp",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/callback_isolated_executor/contents/ros2_thread_configurator%2Fsrc%2Fmain.cpp?ref=0bfc18d8fcafbd9ee7d35796bd104ee18e0f9835",
+          "patch": "@@ -28,7 +28,10 @@ static void spin_thread_configurator_node(const std::string &config_filename) {\n   }\n \n   if (node->all_applied()) {\n-    RCLCPP_INFO(node->get_logger(), \"Success: All of the configurations are applied. shutting down...\");\n+    RCLCPP_INFO(node->get_logger(),\n+                \"Success: All of the configurations are applied. \"\n+                \"Press enter to exit and remove cgroups:\");\n+    std::cin.get();\n   } else {\n     node->print_all_unapplied();\n   }"
+        },
+        {
+          "sha": "6fac6397df69845da9beab5e9004195c8a68a45c",
+          "filename": "ros2_thread_configurator/src/thread_configurator_node.cpp",
+          "status": "modified",
+          "additions": 85,
+          "deletions": 12,
+          "changes": 97,
+          "blob_url": "https://github.com/autowarefoundation/callback_isolated_executor/blob/0bfc18d8fcafbd9ee7d35796bd104ee18e0f9835/ros2_thread_configurator%2Fsrc%2Fthread_configurator_node.cpp",
+          "raw_url": "https://github.com/autowarefoundation/callback_isolated_executor/raw/0bfc18d8fcafbd9ee7d35796bd104ee18e0f9835/ros2_thread_configurator%2Fsrc%2Fthread_configurator_node.cpp",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/callback_isolated_executor/contents/ros2_thread_configurator%2Fsrc%2Fthread_configurator_node.cpp?ref=0bfc18d8fcafbd9ee7d35796bd104ee18e0f9835",
+          "patch": "@@ -1,8 +1,9 @@\n #include <string>\n #include <unordered_map>\n+#include <fstream>\n+#include <filesystem>\n \n #include <error.h>\n-#include <sched.h>\n #include <sys/time.h>\n #include <sys/resource.h>\n #include <unistd.h>\n@@ -12,8 +13,9 @@\n \n #include \"thread_config_msgs/msg/callback_group_info.hpp\"\n #include \"thread_configurator_node.hpp\"\n+#include \"sched_deadline.hpp\"\n \n-ThreadConfiguratorNode::ThreadConfiguratorNode(const YAML::Node &yaml) : Node(\"thread_configurator_node\"), unapplied_num_(0) {\n+ThreadConfiguratorNode::ThreadConfiguratorNode(const YAML::Node &yaml) : Node(\"thread_configurator_node\"), unapplied_num_(0), cgroup_num_(0) {\n   {\n     YAML::Node callback_groups = yaml[\"callback_groups\"];\n     unapplied_num_ = callback_groups.size();\n@@ -28,6 +30,12 @@ ThreadConfiguratorNode::ThreadConfiguratorNode(const YAML::Node &yaml) : Node(\"t\n       config.policy = callback_group[\"policy\"].as<std::string>();\n       config.priority = callback_group[\"priority\"].as<int>();\n \n+      if (config.policy == \"SCHED_DEADLINE\") {\n+        config.runtime = callback_group[\"runtime\"].as<unsigned int>();\n+        config.period = callback_group[\"period\"].as<unsigned int>();\n+        config.deadline = callback_group[\"deadline\"].as<unsigned int>();\n+      }\n+\n       id_to_callback_group_config_[config.callback_group_id] = &config;\n     }\n   }\n@@ -36,6 +44,14 @@ ThreadConfiguratorNode::ThreadConfiguratorNode(const YAML::Node &yaml) : Node(\"t\n     \"/ros2_thread_configurator/callback_group_info\", 0 /* infinite queue size*/, std::bind(&ThreadConfiguratorNode::topic_callback, this, std::placeholders::_1));\n }\n \n+ThreadConfiguratorNode::~ThreadConfiguratorNode() {\n+  if (cgroup_num_ > 0) {\n+    for (int i = 0; i < cgroup_num_; i++) {\n+      rmdir((\"/sys/fs/cgroup/cpuset/\" + std::to_string(i)).c_str());\n+    }\n+  }\n+}\n+\n bool ThreadConfiguratorNode::all_applied() {\n   return unapplied_num_ == 0;\n }\n@@ -50,18 +66,37 @@ void ThreadConfiguratorNode::print_all_unapplied() {\n   }\n }\n \n-bool ThreadConfiguratorNode::issue_syscalls(const CallbackGroupConfig &config) const {\n-  if (config.affinity.size() > 0) {\n-    cpu_set_t set;\n-    CPU_ZERO(&set);\n-    for (int cpu : config.affinity) CPU_SET(cpu, &set);\n-    if (sched_setaffinity(config.thread_id, sizeof(set), &set) == -1) {\n-      RCLCPP_ERROR(this->get_logger(), \"Failed to configure affinity (id=%s, tid=%ld): %s\",\n-          config.callback_group_id.c_str(), config.thread_id, strerror(errno));\n-      return false;\n-    }\n+bool ThreadConfiguratorNode::set_affinity_by_cgroup(int64_t thread_id, const std::vector<int>& cpus) {\n+  std::string cgroup_path = \"/sys/fs/cgroup/cpuset/\" + std::to_string(cgroup_num_++);\n+  if (!std::filesystem::create_directory(cgroup_path)) {\n+    return false;\n+  }\n+\n+  std::string cpus_path = cgroup_path + \"/cpuset.cpus\";\n+  if (std::ofstream cpus_file{cpus_path}) {\n+    for (int cpu : cpus) cpus_file << cpu << \",\";\n+  } else {\n+    return false;\n+  }\n+\n+  std::string mems_path = cgroup_path + \"/cpuset.mems\";\n+  if (std::ofstream mems_file{mems_path}) {\n+    mems_file << 0;\n+  } else {\n+    return false;\n+  }\n+\n+  std::string tasks_path = cgroup_path + \"/tasks\";\n+  if (std::ofstream tasks_file{tasks_path}) {\n+    tasks_file << thread_id;\n+  } else {\n+    return false;\n   }\n \n+  return true;\n+}\n+\n+bool ThreadConfiguratorNode::issue_syscalls(const CallbackGroupConfig &config) {\n   if (config.policy == \"SCHED_OTHER\" || config.policy == \"SCHED_BATCH\" || config.policy == \"SCHED_IDLE\") {\n     struct sched_param param;\n     param.sched_priority = 0;\n@@ -99,6 +134,44 @@ bool ThreadConfiguratorNode::issue_syscalls(const CallbackGroupConfig &config) c\n           config.callback_group_id.c_str(), config.thread_id, strerror(errno));\n       return false;\n     }\n+\n+  } else if (config.policy == \"SCHED_DEADLINE\") {\n+    struct sched_attr attr;\n+    attr.size = sizeof(attr);\n+    attr.sched_flags = 0;\n+    attr.sched_nice = 0;\n+    attr.sched_priority = 0;\n+\n+    attr.sched_policy = SCHED_DEADLINE;\n+    attr.sched_runtime = config.runtime;\n+    attr.sched_period = config.period;\n+    attr.sched_deadline = config.deadline;\n+\n+    if (sched_setattr(config.thread_id, &attr, 0) == -1) {\n+      RCLCPP_ERROR(this->get_logger(), \"Failed to configure policy (id=%s, tid=%ld): %s\",\n+          config.callback_group_id.c_str(), config.thread_id, strerror(errno));\n+      return false;\n+    }\n+  }\n+\n+  if (config.affinity.size() > 0) {\n+    if (config.policy == \"SCHED_DEADLINE\") {\n+      if (!set_affinity_by_cgroup(config.thread_id, config.affinity)) {\n+        RCLCPP_ERROR(this->get_logger(), \"Failed to configure affinity (id=%s, tid=%ld): %s\",\n+            config.callback_group_id.c_str(), config.thread_id, \"Please disable cgroup v2 if used: `systemd.unified_cgroup_hierarchy=0`\");\n+        return false;\n+        }\n+\n+    } else {\n+      cpu_set_t set;\n+      CPU_ZERO(&set);\n+      for (int cpu : config.affinity) CPU_SET(cpu, &set);\n+      if (sched_setaffinity(config.thread_id, sizeof(set), &set) == -1) {\n+        RCLCPP_ERROR(this->get_logger(), \"Failed to configure affinity (id=%s, tid=%ld): %s\",\n+            config.callback_group_id.c_str(), config.thread_id, strerror(errno));\n+        return false;\n+      }\n+    }\n   }\n \n   return true;"
+        }
+      ]
+    },
+    {
+      "author": "ran2810",
+      "date": "2026-06-23T20:15:25Z",
+      "sha": "f2bb37fdb19b0bbdfe85d50bc46ef0c8914dc2c6",
+      "message": "test: add unit tests for create_callback_group_id\n\nSigned-off-by: ran2810 <prkr@mail.de>",
+      "files_changed": 3,
+      "additions": 125,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "bb30bff8cd014a0a1743d7fc424f1cfc81ff7975",
+          "filename": "cie_thread_configurator/CMakeLists.txt",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/autowarefoundation/callback_isolated_executor/blob/f2bb37fdb19b0bbdfe85d50bc46ef0c8914dc2c6/cie_thread_configurator%2FCMakeLists.txt",
+          "raw_url": "https://github.com/autowarefoundation/callback_isolated_executor/raw/f2bb37fdb19b0bbdfe85d50bc46ef0c8914dc2c6/cie_thread_configurator%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/callback_isolated_executor/contents/cie_thread_configurator%2FCMakeLists.txt?ref=f2bb37fdb19b0bbdfe85d50bc46ef0c8914dc2c6",
+          "patch": "@@ -20,6 +20,13 @@ if(BUILD_TESTING)\n   # uncomment the line when this package is not in a git repo\n   #set(ament_cmake_cpplint_FOUND TRUE)\n   ament_lint_auto_find_test_dependencies()\n+\n+  find_package(ament_cmake_ros REQUIRED)\n+  find_package(std_msgs REQUIRED)\n+\n+  ament_add_ros_isolated_gtest(test_util test/test_util.cpp)\n+  target_link_libraries(test_util thread_configurator)\n+  ament_target_dependencies(test_util rclcpp std_msgs cie_config_msgs)\n endif()\n \n add_library(thread_configurator SHARED src/util.cpp)"
+        },
+        {
+          "sha": "8a7f6365a30a1f553d49d00090b74ed4d454e0b2",
+          "filename": "cie_thread_configurator/package.xml",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/autowarefoundation/callback_isolated_executor/blob/f2bb37fdb19b0bbdfe85d50bc46ef0c8914dc2c6/cie_thread_configurator%2Fpackage.xml",
+          "raw_url": "https://github.com/autowarefoundation/callback_isolated_executor/raw/f2bb37fdb19b0bbdfe85d50bc46ef0c8914dc2c6/cie_thread_configurator%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/callback_isolated_executor/contents/cie_thread_configurator%2Fpackage.xml?ref=f2bb37fdb19b0bbdfe85d50bc46ef0c8914dc2c6",
+          "patch": "@@ -19,6 +19,9 @@\n   <test_depend>ament_lint_auto</test_depend>\n   <test_depend>ament_lint_common</test_depend>\n \n+  <test_depend>ament_cmake_ros</test_depend>\n+  <test_depend>std_msgs</test_depend>\n+\n   <depend>rclcpp</depend>\n   <depend>yaml-cpp</depend>\n "
+        },
+        {
+          "sha": "7011ac114344e431d6a52e9feba5fb41b1db929e",
+          "filename": "cie_thread_configurator/test/test_util.cpp",
+          "status": "added",
+          "additions": 115,
+          "deletions": 0,
+          "changes": 115,
+          "blob_url": "https://github.com/autowarefoundation/callback_isolated_executor/blob/f2bb37fdb19b0bbdfe85d50bc46ef0c8914dc2c6/cie_thread_configurator%2Ftest%2Ftest_util.cpp",
+          "raw_url": "https://github.com/autowarefoundation/callback_isolated_executor/raw/f2bb37fdb19b0bbdfe85d50bc46ef0c8914dc2c6/cie_thread_configurator%2Ftest%2Ftest_util.cpp",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/callback_isolated_executor/contents/cie_thread_configurator%2Ftest%2Ftest_util.cpp?ref=f2bb37fdb19b0bbdfe85d50bc46ef0c8914dc2c6",
+          "patch": "@@ -0,0 +1,115 @@\n+// Copyright 2026 The Autoware Contributors\n+//\n+// Licensed under the Apache License, Version 2.0 (the \"License\");\n+// you may not use this file except in compliance with the License.\n+// You may obtain a copy of the License at\n+//\n+//     http://www.apache.org/licenses/LICENSE-2.0\n+//\n+// Unless required by applicable law or agreed to in writing, software\n+// distributed under the License is distributed on an \"AS IS\" BASIS,\n+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+// See the License for the specific language governing permissions and\n+// limitations under the License.\n+\n+#include <chrono>\n+#include <memory>\n+#include <string>\n+\n+#include \"rclcpp/rclcpp.hpp\"\n+#include \"std_msgs/msg/string.hpp\"\n+#include \"gtest/gtest.h\"\n+\n+#include \"cie_thread_configurator/cie_thread_configurator.hpp\"\n+\n+using cie_thread_configurator::create_callback_group_id;\n+\n+// Each test runs in its own rclcpp context so node names and the ROS graph\n+// do not leak between cases.\n+class CreateCallbackGroupIdTest : public ::testing::Test {\n+protected:\n+  void SetUp() override { rclcpp::init(0, nullptr); }\n+  void TearDown() override { rclcpp::shutdown(); }\n+\n+  // Helper: attach a subscription on an absolute topic to the given group.\n+  rclcpp::SubscriptionBase::SharedPtr\n+  add_subscription(const rclcpp::Node::SharedPtr &node,\n+                   const rclcpp::CallbackGroup::SharedPtr &group,\n+                   const std::string &topic) {\n+    rclcpp::SubscriptionOptions options;\n+    options.callback_group = group;\n+    return node->create_subscription<std_msgs::msg::String>(\n+        topic, rclcpp::QoS(10),\n+        [](const std_msgs::msg::String::ConstSharedPtr) {}, options);\n+  }\n+};\n+\n+// A node at the root namespace must produce a single leading slash\n+// (e.g. \"/node\", not \"//node\"), then the entity descriptor.\n+TEST_F(CreateCallbackGroupIdTest, RootNamespaceWithSubscription) {\n+  auto node = std::make_shared<rclcpp::Node>(\"test_node\");\n+  auto group =\n+      node->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);\n+  auto sub = add_subscription(node, group, \"/chatter\");\n+  ASSERT_NE(sub, nullptr);\n+\n+  EXPECT_EQ(create_callback_group_id(group, node),\n+            \"/test_node@Subscription(/chatter)\");\n+}\n+\n+// A non-root namespace exercises the \"ns + '/'\" branch.\n+TEST_F(CreateCallbackGroupIdTest, NonRootNamespace) {\n+  auto node = std::make_shared<rclcpp::Node>(\"test_node\", \"my_ns\");\n+  auto group =\n+      node->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);\n+  auto sub = add_subscription(node, group, \"/chatter\");\n+  ASSERT_NE(sub, nullptr);\n+\n+  EXPECT_EQ(create_callback_group_id(group, node),\n+            \"/my_ns/test_node@Subscription(/chatter)\");\n+}\n+\n+// The trailing '@' separator appended after the last entity must be removed.\n+TEST_F(CreateCallbackGroupIdTest, TrailingSeparatorStripped) {\n+  auto node = std::make_shared<rclcpp::Node>(\"test_node\");\n+  auto group =\n+      node->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);\n+  auto sub = add_subscription(node, group, \"/chatter\");\n+  ASSERT_NE(sub, nullptr);\n+\n+  const std::string id = create_callback_group_id(group, node);\n+  ASSERT_FALSE(id.empty());\n+  EXPECT_NE(id.back(), '@');\n+}\n+\n+// Timers have no name, so they are identified by their period in nanoseconds.\n+// 100 ms == 100000000 ns.\n+TEST_F(CreateCallbackGroupIdTest, TimerEntityUsesPeriodNanoseconds) {\n+  auto node = std::make_shared<rclcpp::Node>(\"test_node\");\n+  auto group =\n+      node->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);\n+  auto timer =\n+      node->create_wall_timer(std::chrono::milliseconds(100), []() {}, group);\n+  ASSERT_NE(timer, nullptr);\n+\n+  EXPECT_EQ(create_callback_group_id(group, node),\n+            \"/test_node@Timer(100000000)\");\n+}\n+\n+// The Node overload must delegate to the NodeBaseInterface overload and yield\n+// an identical result.\n+TEST_F(CreateCallbackGroupIdTest,\n+       NodeBaseInterfaceOverloadMatchesNodeOverload) {\n+  auto node = std::make_shared<rclcpp::Node>(\"test_node\");\n+  auto group =\n+      node->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);\n+  auto sub = add_subscription(node, group, \"/chatter\");\n+  ASSERT_NE(sub, nullptr);\n+\n+  const std::string id_base =\n+      create_callback_group_id(group, node->get_node_base_interface());\n+  const std::string id_node = create_callback_group_id(group, node);\n+\n+  EXPECT_EQ(id_base, id_node);\n+  EXPECT_EQ(id_base, \"/test_node@Subscription(/chatter)\");\n+}"
+        }
+      ]
+    },
+    {
+      "author": "sykwer",
+      "date": "2023-09-14T15:51:34Z",
+      "sha": "b102097d3462e1d7f1420c8a4609c85a0e11034d",
+      "message": "add a message type of central role",
+      "files_changed": 3,
+      "additions": 49,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "de78c6b06f6a1175772856998897da35cd042e17",
+          "filename": "thread_config_msgs/CMakeLists.txt",
+          "status": "added",
+          "additions": 25,
+          "deletions": 0,
+          "changes": 25,
+          "blob_url": "https://github.com/autowarefoundation/callback_isolated_executor/blob/b102097d3462e1d7f1420c8a4609c85a0e11034d/thread_config_msgs%2FCMakeLists.txt",
+          "raw_url": "https://github.com/autowarefoundation/callback_isolated_executor/raw/b102097d3462e1d7f1420c8a4609c85a0e11034d/thread_config_msgs%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/callback_isolated_executor/contents/thread_config_msgs%2FCMakeLists.txt?ref=b102097d3462e1d7f1420c8a4609c85a0e11034d",
+          "patch": "@@ -0,0 +1,25 @@\n+cmake_minimum_required(VERSION 3.8)\n+project(thread_config_msgs)\n+\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  add_compile_options(-Wall -Wextra -Wpedantic)\n+endif()\n+\n+# find dependencies\n+find_package(ament_cmake REQUIRED)\n+find_package(rosidl_default_generators REQUIRED)\n+\n+if(BUILD_TESTING)\n+  find_package(ament_lint_auto REQUIRED)\n+  # the following line skips the linter which checks for copyrights\n+  # uncomment the line when a copyright and license is not present in all source files\n+  #set(ament_cmake_copyright_FOUND TRUE)\n+  # the following line skips cpplint (only works in a git repo)\n+  # uncomment the line when this package is not in a git repo\n+  #set(ament_cmake_cpplint_FOUND TRUE)\n+  ament_lint_auto_find_test_dependencies()\n+endif()\n+\n+rosidl_generate_interfaces(${PROJECT_NAME} \"msg/CallbackGroupInfo.msg\")\n+\n+ament_package()"
+        },
+        {
+          "sha": "c3c824aad5ff2e60a42ce5815bb6c9becd932d54",
+          "filename": "thread_config_msgs/msg/CallbackGroupInfo.msg",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/autowarefoundation/callback_isolated_executor/blob/b102097d3462e1d7f1420c8a4609c85a0e11034d/thread_config_msgs%2Fmsg%2FCallbackGroupInfo.msg",
+          "raw_url": "https://github.com/autowarefoundation/callback_isolated_executor/raw/b102097d3462e1d7f1420c8a4609c85a0e11034d/thread_config_msgs%2Fmsg%2FCallbackGroupInfo.msg",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/callback_isolated_executor/contents/thread_config_msgs%2Fmsg%2FCallbackGroupInfo.msg?ref=b102097d3462e1d7f1420c8a4609c85a0e11034d",
+          "patch": "@@ -0,0 +1,2 @@\n+string callback_group_id\n+int64 thread_id"
+        },
+        {
+          "sha": "3205aeb7e938d4cdbc2c5659c88a63e3330dc619",
+          "filename": "thread_config_msgs/package.xml",
+          "status": "added",
+          "additions": 22,
+          "deletions": 0,
+          "changes": 22,
+          "blob_url": "https://github.com/autowarefoundation/callback_isolated_executor/blob/b102097d3462e1d7f1420c8a4609c85a0e11034d/thread_config_msgs%2Fpackage.xml",
+          "raw_url": "https://github.com/autowarefoundation/callback_isolated_executor/raw/b102097d3462e1d7f1420c8a4609c85a0e11034d/thread_config_msgs%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/callback_isolated_executor/contents/thread_config_msgs%2Fpackage.xml?ref=b102097d3462e1d7f1420c8a4609c85a0e11034d",
+          "patch": "@@ -0,0 +1,22 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n+  <name>thread_config_msgs</name>\n+  <version>0.0.0</version>\n+  <description>TODO: Package description</description>\n+  <maintainer email=\"sykwer@gmail.com\">sykwer</maintainer>\n+  <license>TODO: License declaration</license>\n+\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+\n+  <test_depend>ament_lint_auto</test_depend>\n+  <test_depend>ament_lint_common</test_depend>\n+\n+  <build_depend>rosidl_default_generators</build_depend>\n+  <exec_depend>rosidl_default_runtime</exec_depend>\n+  <member_of_group>rosidl_interface_packages</member_of_group>\n+\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n+</package>"
+        }
+      ]
+    },
+    {
+      "author": "Koichi98",
+      "date": "2025-09-19T05:31:06Z",
+      "sha": "6bc3c2357f61da954e59c1d084adf9c19a5ed661",
+      "message": "Update README.md",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "ac31641aea4b313ae18638e80cf85aeeccff25da",
+          "filename": "cie_thread_configurator/README.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/autowarefoundation/callback_isolated_executor/blob/6bc3c2357f61da954e59c1d084adf9c19a5ed661/cie_thread_configurator%2FREADME.md",
+          "raw_url": "https://github.com/autowarefoundation/callback_isolated_executor/raw/6bc3c2357f61da954e59c1d084adf9c19a5ed661/cie_thread_configurator%2FREADME.md",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/callback_isolated_executor/contents/cie_thread_configurator%2FREADME.md?ref=6bc3c2357f61da954e59c1d084adf9c19a5ed661",
+          "patch": "@@ -77,7 +77,7 @@ On Linux, these values are `99` and `1`.\n ```\n \n ### EDF Scheduler\n-For threads operating on the FIFO scheduler, you can specify the parameters named `runtime`, `deadline`, and `period`.\n+For threads operating on the EDF scheduler, you can specify the parameters named `runtime`, `deadline`, and `period`.\n \n ```yaml\n   - id: xxxxx"
+        }
+      ]
+    },
+    {
+      "author": "Ching-Hao Liu",
+      "date": "2025-01-07T05:54:55Z",
+      "sha": "4e77598798baf481340ceda76581fc662810dd2d",
+      "message": "Add log for value of unapplied_num_",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "63a7771390d27977069fec5709692916685ec3e2",
+          "filename": "ros2_thread_configurator/src/thread_configurator_node.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/autowarefoundation/callback_isolated_executor/blob/4e77598798baf481340ceda76581fc662810dd2d/ros2_thread_configurator%2Fsrc%2Fthread_configurator_node.cpp",
+          "raw_url": "https://github.com/autowarefoundation/callback_isolated_executor/raw/4e77598798baf481340ceda76581fc662810dd2d/ros2_thread_configurator%2Fsrc%2Fthread_configurator_node.cpp",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/callback_isolated_executor/contents/ros2_thread_configurator%2Fsrc%2Fthread_configurator_node.cpp?ref=4e77598798baf481340ceda76581fc662810dd2d",
+          "patch": "@@ -54,6 +54,7 @@ ThreadConfiguratorNode::~ThreadConfiguratorNode() {\n }\n \n bool ThreadConfiguratorNode::all_applied() {\n+  RCLCPP_INFO(this->get_logger(), \"unapplied_num_ = %d\", unapplied_num_);\n   return unapplied_num_ == 0;\n }\n "
+        }
+      ]
+    },
+    {
+      "author": "chihungtzeng",
+      "date": "2024-08-18T01:21:44Z",
+      "sha": "816382ed4cb30fcff9f39805359cb126ae774718",
+      "message": "Add missing namespace brace (#6)\n\n* Add missing namespace brace\r\n\r\nAdd missing namespace brace and return statement to make the build process succesful.\r\n\r\n* Explicitly shut down the node\r\n\r\n---------\r\n\r\nCo-authored-by: chtseng <chtseng@itri.org.tw>",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "cfa0a8c56cc0f3cdf57c8b48f9326ae43d0a5334",
+          "filename": "component_container_callback_isolated/src/component_container_rt.cpp",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 2,
+          "changes": 7,
+          "blob_url": "https://github.com/autowarefoundation/callback_isolated_executor/blob/816382ed4cb30fcff9f39805359cb126ae774718/component_container_callback_isolated%2Fsrc%2Fcomponent_container_rt.cpp",
+          "raw_url": "https://github.com/autowarefoundation/callback_isolated_executor/raw/816382ed4cb30fcff9f39805359cb126ae774718/component_container_callback_isolated%2Fsrc%2Fcomponent_container_rt.cpp",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/callback_isolated_executor/contents/component_container_callback_isolated%2Fsrc%2Fcomponent_container_rt.cpp?ref=816382ed4cb30fcff9f39805359cb126ae774718",
+          "patch": "@@ -18,7 +18,7 @@ class ComponentManagerRt : public rclcpp_components::ComponentManager {\n   template<typename... Args>\n   ComponentManagerRt(Args&&... args) : rclcpp_components::ComponentManager(std::forward<Args>(args)...) {\n     client_publisher_ = ros2_thread_configurator::create_client_publisher();\n-    \n+\n     auto tid = syscall(SYS_gettid);\n     for (int i = 0; i < 3; i++) {\n       std::this_thread::sleep_for(std::chrono::milliseconds(100));\n@@ -33,6 +33,7 @@ class ComponentManagerRt : public rclcpp_components::ComponentManager {\n   void passRt();\n   rclcpp::Publisher<thread_config_msgs::msg::CallbackGroupInfo>::SharedPtr client_publisher_;\n };\n+};  // namespace rclcpp_components\n \n int main(int argc, char * argv[])\n {\n@@ -42,4 +43,6 @@ int main(int argc, char * argv[])\n   auto node = std::make_shared<rclcpp_components::ComponentManagerRt>();\n   exec->add_node(node);\n   exec->spin();\n-}\n\\ No newline at end of file\n+  rclcpp::shutdown();\n+  return 0;\n+}"
+        }
+      ]
+    },
+    {
+      "author": "reddy428",
+      "date": "2024-05-17T02:48:24Z",
+      "sha": "512fd65bff0b61204e577240cbe56223364e85ce",
+      "message": "add cmake function",
+      "files_changed": 9,
+      "additions": 324,
+      "deletions": 18,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "02b3c32f9d41329ff65fa38d12facc1975022d7b",
+          "filename": "component_container_callback_isolated/CMakeLists.txt",
+          "status": "modified",
+          "additions": 18,
+          "deletions": 2,
+          "changes": 20,
+          "blob_url": "https://github.com/autowarefoundation/callback_isolated_executor/blob/512fd65bff0b61204e577240cbe56223364e85ce/component_container_callback_isolated%2FCMakeLists.txt",
+          "raw_url": "https://github.com/autowarefoundation/callback_isolated_executor/raw/512fd65bff0b61204e577240cbe56223364e85ce/component_container_callback_isolated%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/callback_isolated_executor/contents/component_container_callback_isolated%2FCMakeLists.txt?ref=512fd65bff0b61204e577240cbe56223364e85ce",
+          "patch": "@@ -37,6 +37,11 @@ target_include_directories(static_callback_isolated_executor PUBLIC\n   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>\n   $<INSTALL_INTERFACE:include>\n )\n+set(node_main_template_install_dir \"share/${PROJECT_NAME}\")\n+install(FILES\n+  src/node_main.cpp.in\n+  DESTINATION ${node_main_template_install_dir}\n+)\n install(TARGETS static_callback_isolated_executor\n   EXPORT export_${PROJECT_NAME}\n   LIBRARY DESTINATION lib\n@@ -49,8 +54,19 @@ install(\n   DESTINATION include\n )\n \n-ament_export_dependencies(ros2_thread_configurator thread_config_msgs)\n+install(\n+  DIRECTORY cmake\n+  DESTINATION share/${PROJECT_NAME}\n+)\n \n ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)\n ament_export_include_directories(include)\n-ament_package()\n+\n+ament_export_dependencies(ament_index_cpp)\n+ament_export_dependencies(class_loader)\n+ament_export_dependencies(composition_interfaces)\n+ament_export_dependencies(rclcpp)\n+ament_export_dependencies(rclcpp_components)\n+ament_export_dependencies(ros2_thread_configurator thread_config_msgs)\n+\n+ament_package(CONFIG_EXTRAS callback_rclcpp_components-extras.cmake.in)\n\\ No newline at end of file"
+        },
+        {
+          "sha": "2cd0a900b2135b001c5bbc5df45e0017ac5a4b45",
+          "filename": "component_container_callback_isolated/callback_rclcpp_components-extras.cmake.in",
+          "status": "added",
+          "additions": 32,
+          "deletions": 0,
+          "changes": 32,
+          "blob_url": "https://github.com/autowarefoundation/callback_isolated_executor/blob/512fd65bff0b61204e577240cbe56223364e85ce/component_container_callback_isolated%2Fcallback_rclcpp_components-extras.cmake.in",
+          "raw_url": "https://github.com/autowarefoundation/callback_isolated_executor/raw/512fd65bff0b61204e577240cbe56223364e85ce/component_container_callback_isolated%2Fcallback_rclcpp_components-extras.cmake.in",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/callback_isolated_executor/contents/component_container_callback_isolated%2Fcallback_rclcpp_components-extras.cmake.in?ref=512fd65bff0b61204e577240cbe56223364e85ce",
+          "patch": "@@ -0,0 +1,32 @@\n+# Copyright 2019 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+# copied from rclcpp_components/rclcpp_components-extras.cmake\n+\n+# register ament_package() hook for node plugins once.\n+macro(_callback_rclcpp_components_register_package_hook)\n+  if(NOT DEFINED _RCLCPP_COMPONENTS_PACKAGE_HOOK_REGISTERED)\n+    set(_RCLCPP_COMPONENTS_PACKAGE_HOOK_REGISTERED TRUE)\n+\n+    find_package(ament_cmake_core QUIET REQUIRED)\n+    ament_register_extension(\"ament_package\" \"rclcpp_components\"\n+      \"rclcpp_components_package_hook.cmake\")\n+  endif()\n+endmacro()\n+\n+get_filename_component(@PROJECT_NAME@_SHARE_DIR \"${@PROJECT_NAME@_DIR}\" DIRECTORY)\n+set(@PROJECT_NAME@_NODE_TEMPLATE \"${@PROJECT_NAME@_SHARE_DIR}/node_main.cpp.in\")\n+\n+include(\"${rclcpp_component_container_callback_isolated_DIR}/callback_rclcpp_components_register_nodes.cmake\")\n+include(\"${rclcpp_component_container_callback_isolated_DIR}/callback_rclcpp_components_register_node.cmake\")"
+        },
+        {
+          "sha": "7f97179dece00359f4444b8ff0d0ac565805ee12",
+          "filename": "component_container_callback_isolated/cmake/callback_rclcpp_components_register_node.cmake",
+          "status": "added",
+          "additions": 81,
+          "deletions": 0,
+          "changes": 81,
+          "blob_url": "https://github.com/autowarefoundation/callback_isolated_executor/blob/512fd65bff0b61204e577240cbe56223364e85ce/component_container_callback_isolated%2Fcmake%2Fcallback_rclcpp_components_register_node.cmake",
+          "raw_url": "https://github.com/autowarefoundation/callback_isolated_executor/raw/512fd65bff0b61204e577240cbe56223364e85ce/component_container_callback_isolated%2Fcmake%2Fcallback_rclcpp_components_register_node.cmake",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/callback_isolated_executor/contents/component_container_callback_isolated%2Fcmake%2Fcallback_rclcpp_components_register_node.cmake?ref=512fd65bff0b61204e577240cbe56223364e85ce",
+          "patch": "@@ -0,0 +1,81 @@\n+# Copyright 2019 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+# Register an rclcpp component with the ament\n+# resource index and create an executable.\n+#\n+# usage: rclcpp_components_register_node(\n+#        <target> PLUGIN <component> EXECUTABLE <node>)\n+#\n+# :param target: the shared library target\n+# :type target: string\n+# :param PLUGIN: the plugin name\n+# :type PLUGIN: string\n+# :param EXECUTABLE: the node's executable name\n+# :type EXECUTABLE: string\n+# :param RESOURCE_INDEX: the ament resource index to register the components\n+# :type RESOURCE_INDEX: string\n+#\n+macro(callback_rclcpp_components_register_node target)\n+  cmake_parse_arguments(ARGS \"\" \"PLUGIN;EXECUTABLE;EXECUTOR;RESOURCE_INDEX\" \"\" ${ARGN})\n+  if(ARGS_UNPARSED_ARGUMENTS)\n+    message(FATAL_ERROR \"rclcpp_components_register_node() called with unused \"\n+      \"arguments: ${ARGS_UNPARSED_ARGUMENTS}\")\n+  endif()\n+  if(\"${ARGS_PLUGIN}\" STREQUAL \"\")\n+    message(FATAL_ERROR \"rclcpp_components_register_node macro requires a PLUGIN argument for target ${target}\")\n+  endif()\n+  if(\"${ARGS_EXECUTABLE}\" STREQUAL \"\")\n+    message(FATAL_ERROR \"rclcpp_components_register_node macro requires a EXECUTABLE argument for target ${target}\")\n+  endif()\n+  # default to rclcpp_components if not specified otherwise\n+  set(resource_index \"rclcpp_components\")\n+  if(NOT \"${ARGS_RESOURCE_INDEX}\" STREQUAL \"\")\n+    set(resource_index ${ARGS_RESOURCE_INDEX})\n+    message(STATUS \"Setting component resource index to non-default value ${resource_index}\")\n+  endif()\n+\n+  # default to executor if not specified otherwise\n+  set(executor \"StaticCallbackIsolatedExecutor\")\n+  if(NOT \"${ARGS_EXECUTOR}\" STREQUAL \"\")\n+    set(executor ${ARGS_EXECUTOR})\n+    message(STATUS \"Setting executor non-default value ${executor}\")\n+  endif()\n+\n+  set(component ${ARGS_PLUGIN})\n+  set(node ${ARGS_EXECUTABLE})\n+  _callback_rclcpp_components_register_package_hook()\n+  set(_path \"lib\")\n+  set(library_name \"$<TARGET_FILE_NAME:${target}>\")\n+  if(WIN32)\n+    set(_path \"bin\")\n+  endif()\n+  set(_RCLCPP_COMPONENTS_${resource_index}__NODES\n+    \"${_RCLCPP_COMPONENTS_${resource_index}__NODES}${component};${_path}/$<TARGET_FILE_NAME:${target}>\\n\")\n+  list(APPEND _RCLCPP_COMPONENTS_PACKAGE_RESOURCE_INDICES ${resource_index})\n+\n+  configure_file(${rclcpp_component_container_callback_isolated_NODE_TEMPLATE}\n+    ${PROJECT_BINARY_DIR}/rclcpp_component_container_callback_isolated/node_main_configured_${node}.cpp.in)\n+  file(GENERATE OUTPUT ${PROJECT_BINARY_DIR}/rclcpp_component_container_callback_isolated/node_main_${node}.cpp\n+    INPUT ${PROJECT_BINARY_DIR}/rclcpp_component_container_callback_isolated/node_main_configured_${node}.cpp.in)\n+  add_executable(${node} ${PROJECT_BINARY_DIR}/rclcpp_component_container_callback_isolated/node_main_${node}.cpp)\n+  ament_target_dependencies(${node}\n+    \"rclcpp\"\n+    \"class_loader\"\n+    \"rclcpp_components\"\n+    \"rclcpp_component_container_callback_isolated\")\n+  install(TARGETS\n+    ${node}\n+    DESTINATION lib/${PROJECT_NAME})\n+endmacro()"
+        },
+        {
+          "sha": "64021b1de4ac1e298e7086e2db0c4075f2de59ec",
+          "filename": "component_container_callback_isolated/cmake/callback_rclcpp_components_register_nodes.cmake",
+          "status": "added",
+          "additions": 72,
+          "deletions": 0,
+          "changes": 72,
+          "blob_url": "https://github.com/autowarefoundation/callback_isolated_executor/blob/512fd65bff0b61204e577240cbe56223364e85ce/component_container_callback_isolated%2Fcmake%2Fcallback_rclcpp_components_register_nodes.cmake",
+          "raw_url": "https://github.com/autowarefoundation/callback_isolated_executor/raw/512fd65bff0b61204e577240cbe56223364e85ce/component_container_callback_isolated%2Fcmake%2Fcallback_rclcpp_components_register_nodes.cmake",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/callback_isolated_executor/contents/component_container_callback_isolated%2Fcmake%2Fcallback_rclcpp_components_register_nodes.cmake?ref=512fd65bff0b61204e577240cbe56223364e85ce",
+          "patch": "@@ -0,0 +1,72 @@\n+# Copyright 2019 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+#\n+# Register an rclcpp component with the ament resource index.\n+#\n+# The passed library can contain multiple nodes each registered via macro.\n+#\n+# :param target: the shared library target\n+# :type target: string\n+# :param ARGN: the unique plugin names being exported using class_loader\n+# :type ARGN: list of strings\n+# :param RESOURCE_INDEX: the ament resource index to register the components\n+# :type RESOURCE_INDEX: string\n+#\n+macro(callback_rclcpp_components_register_nodes target)\n+  if(NOT TARGET ${target})\n+    message(\n+      FATAL_ERROR\n+      \"rclcpp_components_register_nodes() first argument \"\n+      \"'${target}' is not a target\")\n+  endif()\n+  cmake_parse_arguments(ARGS \"\" \"RESOURCE_INDEX\" \"\" ${ARGN})\n+  # default to rclcpp_components if not specified otherwise\n+  set(resource_index \"rclcpp_components\")\n+  if(NOT \"${ARGS_RESOURCE_INDEX}\" STREQUAL \"\")\n+    set(resource_index ${ARGS_RESOURCE_INDEX})\n+    message(STATUS \"Setting component resource index to non-default value ${resource_index}\")\n+  endif()\n+  get_target_property(_target_type ${target} TYPE)\n+  if(NOT _target_type STREQUAL \"SHARED_LIBRARY\")\n+    message(\n+      FATAL_ERROR\n+      \"rclcpp_components_register_nodes() first argument \"\n+      \"'${target}' is not a shared library target\")\n+  endif()\n+\n+  if(${ARGC} GREATER 0)\n+    _rclcpp_components_register_package_hook()\n+    set(_unique_names)\n+    foreach(_arg ${ARGS_UNPARSED_ARGUMENTS})\n+      if(_arg IN_LIST _unique_names)\n+        message(\n+          FATAL_ERROR\n+          \"rclcpp_components_register_nodes() the plugin names \"\n+          \"must be unique (multiple '${_arg}')\")\n+      endif()\n+      list(APPEND _unique_names \"${_arg}\")\n+\n+      if(WIN32)\n+        set(_path \"bin\")\n+      else()\n+        set(_path \"lib\")\n+      endif()\n+      set(_RCLCPP_COMPONENTS_${resource_index}__NODES\n+        \"${_RCLCPP_COMPONENTS_${resource_index}__NODES}${_arg};${_path}/$<TARGET_FILE_NAME:${target}>\\n\")\n+      list(APPEND _RCLCPP_COMPONENTS_PACKAGE_RESOURCE_INDICES ${resource_index})\n+    endforeach()\n+  endif()\n+endmacro()\n+"
+        },
+        {
+          "sha": "268bc5bedb18f20f654c64703c0abdba2b899bad",
+          "filename": "component_container_callback_isolated/cmake/rclcpp_components_package_hook.cmake",
+          "status": "added",
+          "additions": 21,
+          "deletions": 0,
+          "changes": 21,
+          "blob_url": "https://github.com/autowarefoundation/callback_isolated_executor/blob/512fd65bff0b61204e577240cbe56223364e85ce/component_container_callback_isolated%2Fcmake%2Frclcpp_components_package_hook.cmake",
+          "raw_url": "https://github.com/autowarefoundation/callback_isolated_executor/raw/512fd65bff0b61204e577240cbe56223364e85ce/component_container_callback_isolated%2Fcmake%2Frclcpp_components_package_hook.cmake",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/callback_isolated_executor/contents/component_container_callback_isolated%2Fcmake%2Frclcpp_components_package_hook.cmake?ref=512fd65bff0b61204e577240cbe56223364e85ce",
+          "patch": "@@ -0,0 +1,21 @@\n+# Copyright 2019 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+# register node plugins\n+list(REMOVE_DUPLICATES _RCLCPP_COMPONENTS_PACKAGE_RESOURCE_INDICES)\n+foreach(resource_index ${_RCLCPP_COMPONENTS_PACKAGE_RESOURCE_INDICES})\n+  ament_index_register_resource(\n+    ${resource_index} CONTENT \"${_RCLCPP_COMPONENTS_${resource_index}__NODES}\")\n+endforeach()\n+"
+        },
+        {
+          "sha": "0c958bfb30e5f200310a90a4a88a792fae933b9f",
+          "filename": "component_container_callback_isolated/include/static_callback_isolated_executor.hpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 3,
+          "changes": 7,
+          "blob_url": "https://github.com/autowarefoundation/callback_isolated_executor/blob/512fd65bff0b61204e577240cbe56223364e85ce/component_container_callback_isolated%2Finclude%2Fstatic_callback_isolated_executor.hpp",
+          "raw_url": "https://github.com/autowarefoundation/callback_isolated_executor/raw/512fd65bff0b61204e577240cbe56223364e85ce/component_container_callback_isolated%2Finclude%2Fstatic_callback_isolated_executor.hpp",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/callback_isolated_executor/contents/component_container_callback_isolated%2Finclude%2Fstatic_callback_isolated_executor.hpp?ref=512fd65bff0b61204e577240cbe56223364e85ce",
+          "patch": "@@ -4,8 +4,9 @@\n class StaticCallbackIsolatedExecutor {\n public:\n   void add_node(const rclcpp::Node::SharedPtr &node);\n+  void add_node(const rclcpp::node_interfaces::NodeBaseInterface::SharedPtr &node);\n   void spin();\n private:\n-  rclcpp::Node::SharedPtr node_;\n-};\n-\n+  //rclcpp::Node::SharedPtr node_;\n+  rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_;\n+};\n\\ No newline at end of file"
+        },
+        {
+          "sha": "476dccd5c7da0007c723fede6bf4b08a70a51326",
+          "filename": "component_container_callback_isolated/src/node_main.cpp.in",
+          "status": "added",
+          "additions": 76,
+          "deletions": 0,
+          "changes": 76,
+          "blob_url": "https://github.com/autowarefoundation/callback_isolated_executor/blob/512fd65bff0b61204e577240cbe56223364e85ce/component_container_callback_isolated%2Fsrc%2Fnode_main.cpp.in",
+          "raw_url": "https://github.com/autowarefoundation/callback_isolated_executor/raw/512fd65bff0b61204e577240cbe56223364e85ce/component_container_callback_isolated%2Fsrc%2Fnode_main.cpp.in",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/callback_isolated_executor/contents/component_container_callback_isolated%2Fsrc%2Fnode_main.cpp.in?ref=512fd65bff0b61204e577240cbe56223364e85ce",
+          "patch": "@@ -0,0 +1,76 @@\n+// Copyright 2019 Open Source Robotics Foundation, Inc.\n+//\n+// Licensed under the Apache License, Version 2.0 (the \"License\");\n+// you may not use this file except in compliance with the License.\n+// You may obtain a copy of the License at\n+//\n+//     http://www.apache.org/licenses/LICENSE-2.0\n+//\n+// Unless required by applicable law or agreed to in writing, software\n+// distributed under the License is distributed on an \"AS IS\" BASIS,\n+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+// See the License for the specific language governing permissions and\n+// limitations under the License.\n+\n+#include <memory>\n+#include <string>\n+#include <vector>\n+\n+#include <class_loader/class_loader.hpp>\n+#include <rclcpp/rclcpp.hpp>\n+#include <rclcpp_components/node_factory.hpp>\n+#include <rclcpp_components/node_factory_template.hpp>\n+#include \"static_callback_isolated_executor.hpp\"\n+\n+#define NODE_MAIN_LOGGER_NAME \"@node@\"\n+\n+int main(int argc, char * argv[])\n+{\n+  auto args = rclcpp::init_and_remove_ros_arguments(argc, argv);\n+  rclcpp::Logger logger = rclcpp::get_logger(NODE_MAIN_LOGGER_NAME);\n+  @executor@ exec;\n+  rclcpp::NodeOptions options;\n+  options.arguments(args);\n+  std::vector<class_loader::ClassLoader * > loaders;\n+  std::vector<rclcpp_components::NodeInstanceWrapper> node_wrappers;\n+\n+  std::string library_name = \"@library_name@\";\n+  std::string class_name = \"rclcpp_components::NodeFactoryTemplate<@component@>\";\n+\n+  RCLCPP_DEBUG(logger, \"Load library %s\", library_name.c_str());\n+  auto loader = new class_loader::ClassLoader(library_name);\n+  auto classes = loader->getAvailableClasses<rclcpp_components::NodeFactory>();\n+  for (const auto & clazz : classes) {\n+    std::string name = clazz.c_str();\n+    if (name.compare(class_name) == 0) {\n+      RCLCPP_DEBUG(logger, \"Instantiate class %s\", clazz.c_str());\n+      std::shared_ptr<rclcpp_components::NodeFactory> node_factory = nullptr;\n+      try {\n+        node_factory = loader->createInstance<rclcpp_components::NodeFactory>(clazz);\n+      } catch (const std::exception & ex) {\n+        RCLCPP_ERROR(logger, \"Failed to load library %s\", ex.what());\n+        return 1;\n+      } catch (...) {\n+        RCLCPP_ERROR(logger, \"Failed to load library\");\n+        return 1;\n+      }\n+      auto wrapper = node_factory->create_node_instance(options);\n+      auto node = wrapper.get_node_base_interface();\n+      node_wrappers.push_back(wrapper);\n+      exec.add_node(node);\n+    }\n+  }\n+  loaders.push_back(loader);\n+\n+\n+  exec.spin();\n+\n+  //for (auto wrapper : node_wrappers) {\n+  //  exec.remove_node(wrapper.get_node_base_interface());\n+  //}\n+  node_wrappers.clear();\n+\n+  rclcpp::shutdown();\n+\n+  return 0;\n+}"
+        },
+        {
+          "sha": "62aefd6c64e80da5885d27fa71f4f1e66fca2771",
+          "filename": "component_container_callback_isolated/src/static_callback_isolated_executor.cpp",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 4,
+          "changes": 11,
+          "blob_url": "https://github.com/autowarefoundation/callback_isolated_executor/blob/512fd65bff0b61204e577240cbe56223364e85ce/component_container_callback_isolated%2Fsrc%2Fstatic_callback_isolated_executor.cpp",
+          "raw_url": "https://github.com/autowarefoundation/callback_isolated_executor/raw/512fd65bff0b61204e577240cbe56223364e85ce/component_container_callback_isolated%2Fsrc%2Fstatic_callback_isolated_executor.cpp",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/callback_isolated_executor/contents/component_container_callback_isolated%2Fsrc%2Fstatic_callback_isolated_executor.cpp?ref=512fd65bff0b61204e577240cbe56223364e85ce",
+          "patch": "@@ -10,6 +10,9 @@\n #include \"static_callback_isolated_executor.hpp\"\n \n void StaticCallbackIsolatedExecutor::add_node(const rclcpp::Node::SharedPtr &node) {\n+  node_ = node->get_node_base_interface();\n+}\n+void StaticCallbackIsolatedExecutor::add_node(const rclcpp::node_interfaces::NodeBaseInterface::SharedPtr &node) {\n   node_ = node;\n }\n \n@@ -21,12 +24,13 @@ void StaticCallbackIsolatedExecutor::spin() {\n   node_->for_each_callback_group([this, &executors, &callback_group_ids](rclcpp::CallbackGroup::SharedPtr group) {\n       if (group->get_associated_with_executor_atomic().load()) {\n         std::string id = ros2_thread_configurator::create_callback_group_id(group, node_);\n-        RCLCPP_WARN(node_->get_logger(), \"A callback group (%s) has been already added to an executor. skip.\", id.c_str());\n+        //RCLCPP_WARN(node_->get_logger(), \"A callback group (%s) has been already added to an executor. skip.\", id.c_str());\n         return;\n       }\n \n       auto executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();\n-      executor->add_callback_group(group, node_->get_node_base_interface());\n+      //executor->add_callback_group(group, node_->get_node_base_interface());\n+      executor->add_callback_group(group, node_);\n       executors.push_back(executor);\n       callback_group_ids.push_back(ros2_thread_configurator::create_callback_group_id(group, node_));\n   });\n@@ -47,5 +51,4 @@ void StaticCallbackIsolatedExecutor::spin() {\n   for (auto &t : threads) {\n     t.join();\n   }\n-}\n-\n+}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "a9f2188ec82dd674edf3562d00888686e52187e6",
+          "filename": "sample_app_callback_isolated/CMakeLists.txt",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 9,
+          "changes": 22,
+          "blob_url": "https://github.com/autowarefoundation/callback_isolated_executor/blob/512fd65bff0b61204e577240cbe56223364e85ce/sample_app_callback_isolated%2FCMakeLists.txt",
+          "raw_url": "https://github.com/autowarefoundation/callback_isolated_executor/raw/512fd65bff0b61204e577240cbe56223364e85ce/sample_app_callback_isolated%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/callback_isolated_executor/contents/sample_app_callback_isolated%2FCMakeLists.txt?ref=512fd65bff0b61204e577240cbe56223364e85ce",
+          "patch": "@@ -27,18 +27,22 @@ include_directories(include)\n \n add_library(sample_node SHARED src/sample_node.cpp)\n ament_target_dependencies(sample_node rclcpp rclcpp_components std_msgs)\n-rclcpp_components_register_nodes(sample_node \"SampleNode\")\n+#rclcpp_components_register_nodes(sample_node \"SampleNode\")\n+callback_rclcpp_components_register_node(sample_node\n+  PLUGIN \"SampleNode\"\n+  EXECUTABLE topic_state_monitor_node\n+)\n \n-add_executable(sample_node_main src/sample_node_main.cpp)\n-target_link_libraries(sample_node_main sample_node)\n-ament_target_dependencies(sample_node_main rclcpp rclcpp_component_container_callback_isolated)\n+#add_executable(sample_node_main src/sample_node_main.cpp)\n+#target_link_libraries(sample_node_main sample_node)\n+#ament_target_dependencies(sample_node_main rclcpp rclcpp_component_container_callback_isolated)\n \n # Install the library and executable\n-install(TARGETS\n-  sample_node\n-  sample_node_main\n-  DESTINATION lib/${PROJECT_NAME}\n-)\n+#install(TARGETS\n+#  sample_node\n+#  sample_node_main\n+#  DESTINATION lib/${PROJECT_NAME}\n+#)\n \n # Install headers\n install(DIRECTORY include/"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,480 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T05:51:18Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "octomap",
+    "repo": "octomap_msgs"
+  },
+  "data": [
+    {
+      "author": "wxmerkt",
+      "date": "2020-01-31T17:16:23Z",
+      "sha": "82ca3b1114b128eb65ab482802a4e7e18b9ff4db",
+      "message": "Merge pull request #13 from PickNikRobotics/ros2\n\nPorting to ROS2 (New PR)",
+      "files_changed": 5,
+      "additions": 58,
+      "deletions": 35,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "cd3112a519548ab3b35e29da49acc2c4450b6f1b",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 30,
+          "deletions": 13,
+          "changes": 43,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/82ca3b1114b128eb65ab482802a4e7e18b9ff4db/CMakeLists.txt",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/82ca3b1114b128eb65ab482802a4e7e18b9ff4db/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/CMakeLists.txt?ref=82ca3b1114b128eb65ab482802a4e7e18b9ff4db",
+          "patch": "@@ -1,27 +1,44 @@\n-cmake_minimum_required(VERSION 2.8)\n+cmake_minimum_required(VERSION 3.5)\n project(octomap_msgs)\n \n-find_package(catkin REQUIRED COMPONENTS message_generation geometry_msgs std_msgs)\n+# Default to C++14\n+if(NOT CMAKE_CXX_STANDARD)\n+  set(CMAKE_CXX_STANDARD 14)\n+endif()\n+\n+# Disable Wredundant-decls warnings since rosidl generates redundant function declarations \n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wno-redundant-decls\")\n+endif()\n \n include_directories(include)\n \n-add_message_files(\n-  DIRECTORY msg\n-  FILES Octomap.msg OctomapWithPose.msg\n-  )\n+find_package(ament_cmake REQUIRED)\n+find_package(rosidl_default_generators REQUIRED)\n+find_package(std_msgs REQUIRED)\n+find_package(geometry_msgs REQUIRED)\n \n-add_service_files(\n-  DIRECTORY srv\n-  FILES GetOctomap.srv BoundingBoxQuery.srv\n+set(msg_files\n+\t\"msg/Octomap.msg\"\n+\t\"msg/OctomapWithPose.msg\"\n+)\n+set(srv_files\n+\t\"srv/BoundingBoxQuery.srv\"\n+\t\"srv/GetOctomap.srv\"\n )\n \n-generate_messages(DEPENDENCIES std_msgs geometry_msgs)\n-\n-catkin_package(DEPENDS message_runtime geometry_msgs std_msgs\n-               INCLUDE_DIRS include\n+rosidl_generate_interfaces(${PROJECT_NAME}\n+  ${msg_files}\n+  ${srv_files}\n+\tDEPENDENCIES\n+\t\tstd_msgs\n+\t\tgeometry_msgs\n )\n \n install(DIRECTORY include/\n         DESTINATION include\n         FILES_MATCHING PATTERN \"*.h\"\n         PATTERN \".svn\" EXCLUDE)\n+\n+ament_export_dependencies(rosidl_default_runtime)\n+ament_package()"
+        },
+        {
+          "sha": "fc3ec770a15e8235e8be5d500b927272d16c266f",
+          "filename": "include/octomap_msgs/conversions.h",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 7,
+          "changes": 14,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/82ca3b1114b128eb65ab482802a4e7e18b9ff4db/include%2Foctomap_msgs%2Fconversions.h",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/82ca3b1114b128eb65ab482802a4e7e18b9ff4db/include%2Foctomap_msgs%2Fconversions.h",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/include%2Foctomap_msgs%2Fconversions.h?ref=82ca3b1114b128eb65ab482802a4e7e18b9ff4db",
+          "patch": "@@ -39,7 +39,7 @@\n #define OCTOMAP_MSGS_CONVERT_MSGS_H\n \n #include <octomap/octomap.h>\n-#include <octomap_msgs/Octomap.h>\n+#include <octomap_msgs/msg/octomap.hpp>\n #include <octomap/ColorOcTree.h>\n \n // new conversion functions  \n@@ -52,7 +52,7 @@ namespace octomap_msgs{\n    * full map information (i.e., binary is false) and returns an AbstractOcTree*\n    * to it. You will need to free the memory when you're done.\n    */  \n-  static inline octomap::AbstractOcTree* fullMsgToMap(const Octomap& msg){\n+  static inline octomap::AbstractOcTree* fullMsgToMap(const octomap_msgs::msg::Octomap& msg){\n     octomap::AbstractOcTree* tree = octomap::AbstractOcTree::createTree(msg.id, msg.resolution);    \n     if (tree){\n       std::stringstream datastream;\n@@ -67,7 +67,7 @@ namespace octomap_msgs{\n \n \n   template<class TreeType>\n-  void readTree(TreeType* octree, const Octomap& msg){\n+  void readTree(TreeType* octree, const octomap_msgs::msg::Octomap& msg){\n     std::stringstream datastream;\n     if (msg.data.size() > 0){\n       datastream.write((const char*) &msg.data[0], msg.data.size());\n@@ -82,7 +82,7 @@ namespace octomap_msgs{\n    * This creates a new OcTree object and returns a pointer to it.\n    * You will need to free the memory when you're done.\n    */\n-  static inline octomap::AbstractOcTree* binaryMsgToMap(const Octomap& msg){\n+  static inline octomap::AbstractOcTree* binaryMsgToMap(const octomap_msgs::msg::Octomap& msg){\n     if (!msg.binary)\n       return NULL;\n \n@@ -107,7 +107,7 @@ namespace octomap_msgs{\n    * \\brief Convert an octomap representation to a new octree (full probabilities\n    * or binary). You will need to free the memory. Return NULL on error.\n    **/\n-  static inline octomap::AbstractOcTree* msgToMap(const Octomap& msg){\n+  static inline octomap::AbstractOcTree* msgToMap(const octomap_msgs::msg::Octomap& msg){\n     if (msg.binary)\n       return binaryMsgToMap(msg);\n     else\n@@ -163,7 +163,7 @@ namespace octomap_msgs{\n    * @return success of serialization\n    */\n   template <class OctomapT>\n-  static inline bool binaryMapToMsg(const OctomapT& octomap, Octomap& msg){\n+  static inline bool binaryMapToMsg(const OctomapT& octomap, octomap_msgs::msg::Octomap& msg){\n     msg.resolution = octomap.getResolution();\n     msg.id = octomap.getTreeType();\n     msg.binary = true;\n@@ -185,7 +185,7 @@ namespace octomap_msgs{\n    * @return success of serialization\n    */\n   template <class OctomapT>\n-  static inline bool fullMapToMsg(const OctomapT& octomap, Octomap& msg){\n+  static inline bool fullMapToMsg(const OctomapT& octomap, octomap_msgs::msg::Octomap& msg){\n     msg.resolution = octomap.getResolution();\n     msg.id = octomap.getTreeType();\n     msg.binary = false;"
+        },
+        {
+          "sha": "1cc59d7bfef59fd8d14334782d2f11e76b9fcc41",
+          "filename": "msg/Octomap.msg",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/82ca3b1114b128eb65ab482802a4e7e18b9ff4db/msg%2FOctomap.msg",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/82ca3b1114b128eb65ab482802a4e7e18b9ff4db/msg%2FOctomap.msg",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/msg%2FOctomap.msg?ref=82ca3b1114b128eb65ab482802a4e7e18b9ff4db",
+          "patch": "@@ -1,5 +1,5 @@\n # A 3D map in binary format, as Octree\n-Header header\n+std_msgs/Header header\n \n # Flag to denote a binary (only free/occupied) or full occupancy octree (.bt/.ot file)\n bool binary"
+        },
+        {
+          "sha": "2963922b10d8aec5919b0de5e94a7e1b45b696ad",
+          "filename": "msg/OctomapWithPose.msg",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/82ca3b1114b128eb65ab482802a4e7e18b9ff4db/msg%2FOctomapWithPose.msg",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/82ca3b1114b128eb65ab482802a4e7e18b9ff4db/msg%2FOctomapWithPose.msg",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/msg%2FOctomapWithPose.msg?ref=82ca3b1114b128eb65ab482802a4e7e18b9ff4db",
+          "patch": "@@ -1,7 +1,7 @@\n # A 3D map in binary format, as Octree\n-Header header\n+std_msgs/Header header\n \n-# The pose of the octree with respect to the header frame \n+# The pose of the octree with respect to the header frame\n geometry_msgs/Pose origin\n \n # The actual octree msg"
+        },
+        {
+          "sha": "69a8a37d3ab08ecf1ac31c2cbd2d37b3f6dfbbf7",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 18,
+          "deletions": 12,
+          "changes": 30,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/82ca3b1114b128eb65ab482802a4e7e18b9ff4db/package.xml",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/82ca3b1114b128eb65ab482802a4e7e18b9ff4db/package.xml",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/package.xml?ref=82ca3b1114b128eb65ab482802a4e7e18b9ff4db",
+          "patch": "@@ -1,26 +1,32 @@\n-<package>\n+<package format=\"3\">\n   <name>octomap_msgs</name>\n   <version>0.3.3</version>\n   <description>\n-   This package provides messages and serializations / conversion for the <a href=\"http://octomap.github.com\">OctoMap library</a>.    \n+   This package provides messages and serializations / conversion for the <a href=\"http://octomap.github.com\">OctoMap library</a>.\n   </description>\n \n   <author email=\"armin@hornung.io\">Armin Hornung</author>\n   <maintainer email=\"armin@hornung.io\">Armin Hornung</maintainer>\n \n-  <license>BSD</license>  \n+  <license>BSD</license>\n \n   <url type=\"website\">http://ros.org/wiki/octomap_msgs</url>\n   <url type=\"bugtracker\">https://github.com/OctoMap/octomap_msgs/issues</url>\n \n-  <buildtool_depend>catkin</buildtool_depend>\n- \n-  <build_depend>message_generation</build_depend>\n-  <build_depend>geometry_msgs</build_depend>\n-  <build_depend>std_msgs</build_depend>\n-  \n-  <run_depend>geometry_msgs</run_depend>\n-  <run_depend>std_msgs</run_depend>\n-  <run_depend>message_runtime</run_depend>\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n \n+  <buildtool_depend>rosidl_default_generators</buildtool_depend>\n+\n+  <build_depend>rosidl_default_generators</build_depend>\n+\n+  <depend>std_msgs</depend>\n+  <depend>geometry_msgs</depend>\n+\n+  <exec_depend>rosidl_default_runtime</exec_depend>\n+\n+  <member_of_group>rosidl_interface_packages</member_of_group>\n+\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n </package>"
+        }
+      ]
+    },
+    {
+      "author": "tylerjw",
+      "date": "2022-05-19T00:38:33Z",
+      "sha": "16af48e8b99c8eb246b72e7c370c079b8036d063",
+      "message": "Fix cmake install of headers\n\nSigned-off-by: Tyler Weaver <tyler@picknik.ai>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "f535eb001a348c80eda61fdeb5c955dc3c7ad7d2",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/16af48e8b99c8eb246b72e7c370c079b8036d063/CMakeLists.txt",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/16af48e8b99c8eb246b72e7c370c079b8036d063/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/CMakeLists.txt?ref=16af48e8b99c8eb246b72e7c370c079b8036d063",
+          "patch": "@@ -36,7 +36,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}\n )\n \n install(DIRECTORY include/\n-        DESTINATION include\n+        DESTINATION include/${PROJECT_NAME}\n         FILES_MATCHING PATTERN \"*.h\"\n         PATTERN \".svn\" EXCLUDE)\n "
+        }
+      ]
+    },
+    {
+      "author": "ibaiape",
+      "date": "2019-02-11T11:42:19Z",
+      "sha": "f835d66bf34d79721027220d0e9569e797ae7618",
+      "message": "Update CMakeLists.txt and package.xml",
+      "files_changed": 2,
+      "additions": 48,
+      "deletions": 25,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "cd3112a519548ab3b35e29da49acc2c4450b6f1b",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 30,
+          "deletions": 13,
+          "changes": 43,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/f835d66bf34d79721027220d0e9569e797ae7618/CMakeLists.txt",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/f835d66bf34d79721027220d0e9569e797ae7618/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/CMakeLists.txt?ref=f835d66bf34d79721027220d0e9569e797ae7618",
+          "patch": "@@ -1,27 +1,44 @@\n-cmake_minimum_required(VERSION 2.8)\n+cmake_minimum_required(VERSION 3.5)\n project(octomap_msgs)\n \n-find_package(catkin REQUIRED COMPONENTS message_generation geometry_msgs std_msgs)\n+# Default to C++14\n+if(NOT CMAKE_CXX_STANDARD)\n+  set(CMAKE_CXX_STANDARD 14)\n+endif()\n+\n+# Disable Wredundant-decls warnings since rosidl generates redundant function declarations \n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wno-redundant-decls\")\n+endif()\n \n include_directories(include)\n \n-add_message_files(\n-  DIRECTORY msg\n-  FILES Octomap.msg OctomapWithPose.msg\n-  )\n+find_package(ament_cmake REQUIRED)\n+find_package(rosidl_default_generators REQUIRED)\n+find_package(std_msgs REQUIRED)\n+find_package(geometry_msgs REQUIRED)\n \n-add_service_files(\n-  DIRECTORY srv\n-  FILES GetOctomap.srv BoundingBoxQuery.srv\n+set(msg_files\n+\t\"msg/Octomap.msg\"\n+\t\"msg/OctomapWithPose.msg\"\n+)\n+set(srv_files\n+\t\"srv/BoundingBoxQuery.srv\"\n+\t\"srv/GetOctomap.srv\"\n )\n \n-generate_messages(DEPENDENCIES std_msgs geometry_msgs)\n-\n-catkin_package(DEPENDS message_runtime geometry_msgs std_msgs\n-               INCLUDE_DIRS include\n+rosidl_generate_interfaces(${PROJECT_NAME}\n+  ${msg_files}\n+  ${srv_files}\n+\tDEPENDENCIES\n+\t\tstd_msgs\n+\t\tgeometry_msgs\n )\n \n install(DIRECTORY include/\n         DESTINATION include\n         FILES_MATCHING PATTERN \"*.h\"\n         PATTERN \".svn\" EXCLUDE)\n+\n+ament_export_dependencies(rosidl_default_runtime)\n+ament_package()"
+        },
+        {
+          "sha": "69a8a37d3ab08ecf1ac31c2cbd2d37b3f6dfbbf7",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 18,
+          "deletions": 12,
+          "changes": 30,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/f835d66bf34d79721027220d0e9569e797ae7618/package.xml",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/f835d66bf34d79721027220d0e9569e797ae7618/package.xml",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/package.xml?ref=f835d66bf34d79721027220d0e9569e797ae7618",
+          "patch": "@@ -1,26 +1,32 @@\n-<package>\n+<package format=\"3\">\n   <name>octomap_msgs</name>\n   <version>0.3.3</version>\n   <description>\n-   This package provides messages and serializations / conversion for the <a href=\"http://octomap.github.com\">OctoMap library</a>.    \n+   This package provides messages and serializations / conversion for the <a href=\"http://octomap.github.com\">OctoMap library</a>.\n   </description>\n \n   <author email=\"armin@hornung.io\">Armin Hornung</author>\n   <maintainer email=\"armin@hornung.io\">Armin Hornung</maintainer>\n \n-  <license>BSD</license>  \n+  <license>BSD</license>\n \n   <url type=\"website\">http://ros.org/wiki/octomap_msgs</url>\n   <url type=\"bugtracker\">https://github.com/OctoMap/octomap_msgs/issues</url>\n \n-  <buildtool_depend>catkin</buildtool_depend>\n- \n-  <build_depend>message_generation</build_depend>\n-  <build_depend>geometry_msgs</build_depend>\n-  <build_depend>std_msgs</build_depend>\n-  \n-  <run_depend>geometry_msgs</run_depend>\n-  <run_depend>std_msgs</run_depend>\n-  <run_depend>message_runtime</run_depend>\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n \n+  <buildtool_depend>rosidl_default_generators</buildtool_depend>\n+\n+  <build_depend>rosidl_default_generators</build_depend>\n+\n+  <depend>std_msgs</depend>\n+  <depend>geometry_msgs</depend>\n+\n+  <exec_depend>rosidl_default_runtime</exec_depend>\n+\n+  <member_of_group>rosidl_interface_packages</member_of_group>\n+\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n </package>"
+        }
+      ]
+    },
+    {
+      "author": "ahornung",
+      "date": "2015-08-09T19:29:11Z",
+      "sha": "2b390b684782dbed0ad244dbf75923522c40a2f2",
+      "message": "Removed check for \"OcTree\" id in binary deserialization, see Issue #4 and #5",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b0ceb4180647da95dc74ad71169a85546d0704a9",
+          "filename": "include/octomap_msgs/conversions.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/2b390b684782dbed0ad244dbf75923522c40a2f2/include%2Foctomap_msgs%2Fconversions.h",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/2b390b684782dbed0ad244dbf75923522c40a2f2/include%2Foctomap_msgs%2Fconversions.h",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/include%2Foctomap_msgs%2Fconversions.h?ref=2b390b684782dbed0ad244dbf75923522c40a2f2",
+          "patch": "@@ -71,7 +71,7 @@ namespace octomap_msgs{\n    * You will need to free the memory when you're done.\n    */\n   static inline octomap::OcTree* binaryMsgToMap(const Octomap& msg){\n-    if (msg.id != \"OcTree\" || !msg.binary)\n+    if (!msg.binary)\n       return NULL;\n     \n     octomap::OcTree* octree = new octomap::OcTree(msg.resolution);    "
+        }
+      ]
+    },
+    {
+      "author": "felixendres",
+      "date": "2016-06-09T16:34:44Z",
+      "sha": "63f9b3516dc01ae970ea3eec29739c8fc2983a1d",
+      "message": "Fix for binary ColorOcTrees messages",
+      "files_changed": 1,
+      "additions": 24,
+      "deletions": 9,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "311bf414abe07edb8e55a79fe3b1947b531df75c",
+          "filename": "include/octomap_msgs/conversions.h",
+          "status": "modified",
+          "additions": 24,
+          "deletions": 9,
+          "changes": 33,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/63f9b3516dc01ae970ea3eec29739c8fc2983a1d/include%2Foctomap_msgs%2Fconversions.h",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/63f9b3516dc01ae970ea3eec29739c8fc2983a1d/include%2Foctomap_msgs%2Fconversions.h",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/include%2Foctomap_msgs%2Fconversions.h?ref=63f9b3516dc01ae970ea3eec29739c8fc2983a1d",
+          "patch": "@@ -40,6 +40,7 @@\n \n #include <octomap/octomap.h>\n #include <octomap_msgs/Octomap.h>\n+#include <octomap/ColorOcTree.h>\n \n // new conversion functions  \n namespace octomap_msgs{\n@@ -63,25 +64,39 @@ namespace octomap_msgs{\n     \n     return tree;      \n   }\n+\n+\n+  template<class TreeType>\n+  void readTree(TreeType* octree, const Octomap& msg){\n+    std::stringstream datastream;\n+    if (msg.data.size() > 0){\n+      datastream.write((const char*) &msg.data[0], msg.data.size());\n+      octree->readBinaryData(datastream);\n+    }\n+  }\n+    \n   \n   /**\n    * @brief Creates a new octree by deserializing from msg,\n    * e.g. from a message or service (binary: only free and occupied .bt file format).\n    * This creates a new OcTree object and returns a pointer to it.\n    * You will need to free the memory when you're done.\n    */\n-  static inline octomap::OcTree* binaryMsgToMap(const Octomap& msg){\n+  static inline octomap::AbstractOcTree* binaryMsgToMap(const Octomap& msg){\n     if (!msg.binary)\n       return NULL;\n-    \n-    octomap::OcTree* octree = new octomap::OcTree(msg.resolution);    \n-    std::stringstream datastream;\n-    if (msg.data.size() > 0){\n-      datastream.write((const char*) &msg.data[0], msg.data.size());\n-      octree->readBinaryData(datastream);\n+\n+    octomap::AbstractOcTree* tree;\n+    if (msg.id == \"ColorOcTree\"){\n+      octomap::ColorOcTree* octree = new octomap::ColorOcTree(msg.resolution);    \n+      readTree(octree, msg);\n+      tree = octree;\n+    } else {\n+      octomap::OcTree* octree = new octomap::OcTree(msg.resolution);    \n+      readTree(octree, msg);\n+      tree = octree;\n     }\n-    \n-    return octree;      \n+    return tree;      \n   }\n \n   // Note: binaryMsgDataToMap() deleted, potentially causes confusion "
+        }
+      ]
+    },
+    {
+      "author": "Armin Hornung",
+      "date": "2012-04-19T08:19:46Z",
+      "sha": "61011aa2c46a12e5f1b0c2755015e885ad9090df",
+      "message": "Moved octomap_mapping stack one level deeper in folder hierarchy, created new octomap_msgs pkg / stack",
+      "files_changed": 8,
+      "additions": 80,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "799b339a3dc87b4579d52426c69fcf273f7a5791",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 33,
+          "deletions": 0,
+          "changes": 33,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/61011aa2c46a12e5f1b0c2755015e885ad9090df/CMakeLists.txt",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/61011aa2c46a12e5f1b0c2755015e885ad9090df/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/CMakeLists.txt?ref=61011aa2c46a12e5f1b0c2755015e885ad9090df",
+          "patch": "@@ -0,0 +1,33 @@\n+cmake_minimum_required(VERSION 2.4.6)\n+include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)\n+\n+# Set the build type.  Options are:\n+#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage\n+#  Debug          : w/ debug symbols, w/o optimization\n+#  Release        : w/o debug symbols, w/ optimization\n+#  RelWithDebInfo : w/ debug symbols, w/ optimization\n+#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries\n+#set(ROS_BUILD_TYPE RelWithDebInfo)\n+\n+rosbuild_init()\n+\n+find_package(octomap REQUIRED)\n+include_directories(${OCTOMAP_INCLUDE_DIRS})\n+link_directories(${OCTOMAP_LIBRARY_DIRS})\n+link_libraries(${PROJECT_NAME} ${OCTOMAP_LIBRARIES})\n+\n+#set the default path for built executables to the \"bin\" directory\n+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)\n+#set the default path for built libraries to the \"lib\" directory\n+set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)\n+\n+rosbuild_genmsg()\n+rosbuild_gensrv()\n+\n+\n+\n+\n+#rosbuild_add_library(${PROJECT_NAME} src/conversions.cpp)\n+#rosbuild_add_executable(test_octomap_ros src/test_octomap_ros.cpp)\n+\n+"
+        },
+        {
+          "sha": "b75b928f20ef9ea4f509a17db62e4e31b422c27f",
+          "filename": "Makefile",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/61011aa2c46a12e5f1b0c2755015e885ad9090df/Makefile",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/61011aa2c46a12e5f1b0c2755015e885ad9090df/Makefile",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/Makefile?ref=61011aa2c46a12e5f1b0c2755015e885ad9090df",
+          "patch": "@@ -0,0 +1 @@\n+include $(shell rospack find mk)/cmake.mk\n\\ No newline at end of file"
+        },
+        {
+          "sha": "b3e44d994efa20177c3b6052a7aef69ca5659897",
+          "filename": "manifest.xml",
+          "status": "added",
+          "additions": 22,
+          "deletions": 0,
+          "changes": 22,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/61011aa2c46a12e5f1b0c2755015e885ad9090df/manifest.xml",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/61011aa2c46a12e5f1b0c2755015e885ad9090df/manifest.xml",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/manifest.xml?ref=61011aa2c46a12e5f1b0c2755015e885ad9090df",
+          "patch": "@@ -0,0 +1,22 @@\n+<package>\n+  <description brief=\"octomap_msgs - conversions and messages for OctoMap\">\n+\n+  octomap_msgs - conversions and messages for OctoMap\n+\n+  </description>\n+  <author>Armin Hornung</author>\n+  <license>BSD</license>\n+  <review status=\"unreviewed\" notes=\"\"/>\n+  <url>http://ros.org/wiki/octomap_msgs</url>\n+  \n+  <export>\n+    <cpp cflags=\"-I${prefix}/include\"  lflags=\"-L${prefix}/lib -Wl,-rpath,${prefix}/lib -loctomap_msgs\"/>\n+  </export>\n+  \n+  <depend package=\"std_msgs\"/>\n+  \n+  <rosdep name=\"octomap\" />\n+\n+</package>\n+\n+"
+        },
+        {
+          "sha": "e7c1f1f54140ed00dc6cd6a69ff5bc804cacc239",
+          "filename": "msg/MoveMap.msg",
+          "status": "added",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/61011aa2c46a12e5f1b0c2755015e885ad9090df/msg%2FMoveMap.msg",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/61011aa2c46a12e5f1b0c2755015e885ad9090df/msg%2FMoveMap.msg",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/msg%2FMoveMap.msg?ref=61011aa2c46a12e5f1b0c2755015e885ad9090df",
+          "patch": "@@ -0,0 +1,5 @@\n+# update a map node in an o/h hierarchy\n+Header header\n+int32  id\n+geometry_msgs/Pose transform\n+bool absolute\n\\ No newline at end of file"
+        },
+        {
+          "sha": "b5fa501df1023acadf779879bbd1cd604ac9c797",
+          "filename": "msg/OctomapBinary.msg",
+          "status": "added",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/61011aa2c46a12e5f1b0c2755015e885ad9090df/msg%2FOctomapBinary.msg",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/61011aa2c46a12e5f1b0c2755015e885ad9090df/msg%2FOctomapBinary.msg",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/msg%2FOctomapBinary.msg?ref=61011aa2c46a12e5f1b0c2755015e885ad9090df",
+          "patch": "@@ -0,0 +1,3 @@\n+# A 3D map in binary format, as Octree\n+Header header\n+int8[] data\n\\ No newline at end of file"
+        },
+        {
+          "sha": "712667dcff2d6792f9bf201bbb5f0c8165553244",
+          "filename": "msg/OctomapBinaryWithPose.msg",
+          "status": "added",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/61011aa2c46a12e5f1b0c2755015e885ad9090df/msg%2FOctomapBinaryWithPose.msg",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/61011aa2c46a12e5f1b0c2755015e885ad9090df/msg%2FOctomapBinaryWithPose.msg",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/msg%2FOctomapBinaryWithPose.msg?ref=61011aa2c46a12e5f1b0c2755015e885ad9090df",
+          "patch": "@@ -0,0 +1,5 @@\n+# A 3D map in binary format, as Octree\n+Header header\n+int32  id\n+geometry_msgs/Pose origin\n+int8[] data\n\\ No newline at end of file"
+        },
+        {
+          "sha": "729982d94f916db1422d4e848ef01fa20632cb4c",
+          "filename": "srv/ClearBBXRegion.srv",
+          "status": "added",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/61011aa2c46a12e5f1b0c2755015e885ad9090df/srv%2FClearBBXRegion.srv",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/61011aa2c46a12e5f1b0c2755015e885ad9090df/srv%2FClearBBXRegion.srv",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/srv%2FClearBBXRegion.srv?ref=61011aa2c46a12e5f1b0c2755015e885ad9090df",
+          "patch": "@@ -0,0 +1,8 @@\n+# Clear a region specified by a global axis-aligned bounding box in stored OctoMap\n+\n+# minimum corner point of axis-aligned bounding box in global frame\n+geometry_msgs/Point min\n+# maximum corner point of axis-aligned bounding box in global frame\n+geometry_msgs/Point max\n+---\n+"
+        },
+        {
+          "sha": "77976f1e09aabbf1bd00519bd84d076e49d02efc",
+          "filename": "srv/GetOctomap.srv",
+          "status": "added",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/61011aa2c46a12e5f1b0c2755015e885ad9090df/srv%2FGetOctomap.srv",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/61011aa2c46a12e5f1b0c2755015e885ad9090df/srv%2FGetOctomap.srv",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/srv%2FGetOctomap.srv?ref=61011aa2c46a12e5f1b0c2755015e885ad9090df",
+          "patch": "@@ -0,0 +1,3 @@\n+# Get the map as a octomap/OctomapBinary\n+---\n+octomap_ros/OctomapBinary map"
+        }
+      ]
+    },
+    {
+      "author": "jkammerl",
+      "date": "2012-12-08T01:19:41Z",
+      "sha": "4d45b2e6f9f985d6665d3ebb48612f1874a6933f",
+      "message": "more catkin fixing",
+      "files_changed": 2,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "64c23770add2abe1d896d513f7783b473bd6441f",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/4d45b2e6f9f985d6665d3ebb48612f1874a6933f/CMakeLists.txt",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/4d45b2e6f9f985d6665d3ebb48612f1874a6933f/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/CMakeLists.txt?ref=4d45b2e6f9f985d6665d3ebb48612f1874a6933f",
+          "patch": "@@ -1,7 +1,7 @@\n cmake_minimum_required(VERSION 2.8)\n project(octomap_msgs)\n \n-find_package(catkin REQUIRED REQUIRED COMPONENTS genmsg geometry_msgs std_msgs)\n+find_package(catkin REQUIRED COMPONENTS genmsg geometry_msgs std_msgs)\n \n include_directories(include)\n "
+        },
+        {
+          "sha": "4dc17883e74e05337b2690be27191a68d0b17842",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/4d45b2e6f9f985d6665d3ebb48612f1874a6933f/package.xml",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/4d45b2e6f9f985d6665d3ebb48612f1874a6933f/package.xml",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/package.xml?ref=4d45b2e6f9f985d6665d3ebb48612f1874a6933f",
+          "patch": "@@ -1,6 +1,6 @@\n <package>\n   <name>octomap_msgs</name>\n-  <version>0.2.4</version>\n+  <version>0.2.5</version>\n   <description>\n    This package provides messages for the <a href=\"http://octomap.sourceforge.net/\">OctoMap library</a>.    \n   </description>"
+        }
+      ]
+    },
+    {
+      "author": "Ioan Sucan",
+      "date": "2012-06-12T20:27:47Z",
+      "sha": "d2a6ce72c3dc7847bd10a0b7bb1dfac5b084512e",
+      "message": "changes for new build syste",
+      "files_changed": 5,
+      "additions": 65,
+      "deletions": 35,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "075266b7a620abc7dfb1886ea249acc35a4f3a9a",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 25,
+          "deletions": 25,
+          "changes": 50,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/d2a6ce72c3dc7847bd10a0b7bb1dfac5b084512e/CMakeLists.txt",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/d2a6ce72c3dc7847bd10a0b7bb1dfac5b084512e/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/CMakeLists.txt?ref=d2a6ce72c3dc7847bd10a0b7bb1dfac5b084512e",
+          "patch": "@@ -1,33 +1,33 @@\n-cmake_minimum_required(VERSION 2.4.6)\n-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)\n+cmake_minimum_required(VERSION 2.8)\n+project(octomap_msgs)\n \n-# Set the build type.  Options are:\n-#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage\n-#  Debug          : w/ debug symbols, w/o optimization\n-#  Release        : w/o debug symbols, w/ optimization\n-#  RelWithDebInfo : w/ debug symbols, w/ optimization\n-#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries\n-#set(ROS_BUILD_TYPE RelWithDebInfo)\n+find_package(catkin REQUIRED)\n+find_package(ROS REQUIRED COMPONENTS genmsg)\n \n-rosbuild_init()\n+catkin_stack()\n+catkin_project(octomap_msgs\n+  INCLUDE_DIRS include)\n \n-find_package(octomap REQUIRED)\n-include_directories(${OCTOMAP_INCLUDE_DIRS})\n-link_directories(${OCTOMAP_LIBRARY_DIRS})\n-link_libraries(${PROJECT_NAME} ${OCTOMAP_LIBRARIES})\n+include_directories(include)\n \n-#set the default path for built executables to the \"bin\" directory\n-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)\n-#set the default path for built libraries to the \"lib\" directory\n-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)\n+add_message_files(\n+  DIRECTORY msg\n+  FILES OctomapBinary.msg OctomapBinaryWithPose.msg\n+  )\n \n-rosbuild_genmsg()\n-rosbuild_gensrv()\n+add_service_files(\n+  DIRECTORY srv\n+  FILES GetOctomap.srv BoundingBoxQuery.srv\n+)\n \n+find_package(std_msgs)\n+find_package(geometry_msgs)\n+generate_messages(DEPENDENCIES std_msgs geometry_msgs)\n \n+install(DIRECTORY include/\n+        DESTINATION include\n+        FILES_MATCHING PATTERN \"*.h\"\n+        PATTERN \".svn\" EXCLUDE)\n \n-\n-#rosbuild_add_library(${PROJECT_NAME} src/conversions.cpp)\n-#rosbuild_add_executable(test_octomap_ros src/test_octomap_ros.cpp)\n-\n-\n+install(FILES manifest-to-install.xml\n+        DESTINATION share/octomap_msgs RENAME manifest.xml)"
+        },
+        {
+          "sha": "f11a0724534b359c415b4a62cafff5abaec4617a",
+          "filename": "Makefile",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "changes": 4,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/d2a6ce72c3dc7847bd10a0b7bb1dfac5b084512e/Makefile",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/d2a6ce72c3dc7847bd10a0b7bb1dfac5b084512e/Makefile",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/Makefile?ref=d2a6ce72c3dc7847bd10a0b7bb1dfac5b084512e",
+          "patch": "@@ -1 +1,3 @@\n-include $(shell rospack find mk)/cmake.mk\n\\ No newline at end of file\n+all:\n+\tmkdir -p build\n+\tcd build && cmake .. && make"
+        },
+        {
+          "sha": "ca17e8eb18a7ecf838163949bb535013f9269019",
+          "filename": "manifest-to-install.xml",
+          "status": "added",
+          "additions": 19,
+          "deletions": 0,
+          "changes": 19,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/d2a6ce72c3dc7847bd10a0b7bb1dfac5b084512e/manifest-to-install.xml",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/d2a6ce72c3dc7847bd10a0b7bb1dfac5b084512e/manifest-to-install.xml",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/manifest-to-install.xml?ref=d2a6ce72c3dc7847bd10a0b7bb1dfac5b084512e",
+          "patch": "@@ -0,0 +1,19 @@\n+<package>\n+  <description brief=\"octomap_msgs - conversions and messages for OctoMap\">\n+\n+  octomap_msgs - conversions and messages for OctoMap\n+\n+  </description>\n+  <author>Armin Hornung</author>\n+  <license>BSD</license>\n+  <review status=\"unreviewed\" notes=\"\"/>\n+  <url>http://ros.org/wiki/octomap_msgs</url>\n+  \n+  <depend package=\"std_msgs\"/>\n+  <depend package=\"geometry_msgs\"/>\n+  \n+  <export>\n+    <cpp cflags=\"`PKG_CONFIG_PATH=${prefix}/../../lib/pkgconfig pkg-config --cflags octomap_msgs`\"/>\n+  </export>\n+\n+</package>"
+        },
+        {
+          "sha": "a68d48401944ccfda838ba45645afc8237ae53df",
+          "filename": "manifest.xml",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 5,
+          "changes": 8,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/d2a6ce72c3dc7847bd10a0b7bb1dfac5b084512e/manifest.xml",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/d2a6ce72c3dc7847bd10a0b7bb1dfac5b084512e/manifest.xml",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/manifest.xml?ref=d2a6ce72c3dc7847bd10a0b7bb1dfac5b084512e",
+          "patch": "@@ -9,14 +9,12 @@\n   <review status=\"unreviewed\" notes=\"\"/>\n   <url>http://ros.org/wiki/octomap_msgs</url>\n   \n-  <export>\n-    <cpp cflags=\"-I${prefix}/include -DOCTOMAP_NODEBUGOUT\"/>\n-  </export>\n-  \n   <depend package=\"std_msgs\"/>\n   <depend package=\"geometry_msgs\"/>\n   \n-  <rosdep name=\"octomap\" />\n+  <export>\n+    <cpp cflags=\"-I${prefix}/include -I${prefix}/build/gen/cpp\"/>\n+  </export>\n \n </package>\n "
+        },
+        {
+          "sha": "5945201e6dd548e3b0fa0c831e2b6d69c91f5deb",
+          "filename": "stack.xml",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 4,
+          "changes": 19,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/d2a6ce72c3dc7847bd10a0b7bb1dfac5b084512e/stack.xml",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/d2a6ce72c3dc7847bd10a0b7bb1dfac5b084512e/stack.xml",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/stack.xml?ref=d2a6ce72c3dc7847bd10a0b7bb1dfac5b084512e",
+          "patch": "@@ -1,13 +1,24 @@\n <stack>\n-  <version>0.1.1</version>\n+  <name>octomap_msgs</name>\n+  <version>0.1.2</version>\n   <description brief=\"octomap_msgs - conversions and messages for OctoMap\">\n    This low-dependency stacks provides messages and basic conversions for \n     the <a href=\"http://octomap.sourceforge.net/\">OctoMap library</a>.    \n   </description>\n-  <author>Maintained by Armin Hornung</author>\n+  <author>Armin Hornung</author>\n+  <maintainer>Armin Hornung</maintainer>\n+\n   <license>BSD</license>  \n-  <review status=\"unreviewed\" notes=\"\"/>\n+  <copyright>Armin Hornung</copyright>\n   <url>http://ros.org/wiki/octomap_msgs</url>\n-  <depend stack=\"common_msgs\" /> \n+  \n+  <review status=\"unreviewed\" notes=\"\"/>\n+\n+  <build_depends>catkin</build_depends>\n+  <build_depends>genmsg</build_depends>\n+  <build_depends>langs</build_depends>\n+  <build_depends>common_msgs</build_depends>\n+  \n+  <depends>common_msgs</depends> \n \n </stack>"
+        }
+      ]
+    },
+    {
+      "author": "vrabaud",
+      "date": "2012-10-11T15:39:34Z",
+      "sha": "0eb5d62f6951fba4d0bc7beaf4954a529863e070",
+      "message": "comply to the new catkin API",
+      "files_changed": 5,
+      "additions": 13,
+      "deletions": 61,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "feef2f665d2f52b4498e601aa105f4817a561f48",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 10,
+          "changes": 14,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/0eb5d62f6951fba4d0bc7beaf4954a529863e070/CMakeLists.txt",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/0eb5d62f6951fba4d0bc7beaf4954a529863e070/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/CMakeLists.txt?ref=0eb5d62f6951fba4d0bc7beaf4954a529863e070",
+          "patch": "@@ -1,12 +1,11 @@\n cmake_minimum_required(VERSION 2.8)\n project(octomap_msgs)\n \n-find_package(catkin REQUIRED)\n-find_package(ROS REQUIRED COMPONENTS genmsg)\n+find_package(catkin REQUIRED REQUIRED COMPONENTS genmsg geometry_msgs std_msgs)\n \n-catkin_stack()\n-catkin_project(octomap_msgs\n-  INCLUDE_DIRS include)\n+catkin_package(DEPENDS geometry_msgs std_msgs\n+               INCLUDE_DIRS include\n+)\n \n include_directories(include)\n \n@@ -20,14 +19,9 @@ add_service_files(\n   FILES GetOctomap.srv BoundingBoxQuery.srv\n )\n \n-find_package(std_msgs)\n-find_package(geometry_msgs)\n generate_messages(DEPENDENCIES std_msgs geometry_msgs)\n \n install(DIRECTORY include/\n         DESTINATION include\n         FILES_MATCHING PATTERN \"*.h\"\n         PATTERN \".svn\" EXCLUDE)\n-\n-install(FILES manifest-to-install.xml\n-        DESTINATION share/octomap_msgs RENAME manifest.xml)"
+        },
+        {
+          "sha": "f11a0724534b359c415b4a62cafff5abaec4617a",
+          "filename": "Makefile",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 3,
+          "changes": 3,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/8637e528e14cddb9fd03af687a7412523401c081/Makefile",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/8637e528e14cddb9fd03af687a7412523401c081/Makefile",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/Makefile?ref=8637e528e14cddb9fd03af687a7412523401c081",
+          "patch": "@@ -1,3 +0,0 @@\n-all:\n-\tmkdir -p build\n-\tcd build && cmake .. && make"
+        },
+        {
+          "sha": "ca17e8eb18a7ecf838163949bb535013f9269019",
+          "filename": "manifest-to-install.xml",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 19,
+          "changes": 19,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/8637e528e14cddb9fd03af687a7412523401c081/manifest-to-install.xml",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/8637e528e14cddb9fd03af687a7412523401c081/manifest-to-install.xml",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/manifest-to-install.xml?ref=8637e528e14cddb9fd03af687a7412523401c081",
+          "patch": "@@ -1,19 +0,0 @@\n-<package>\n-  <description brief=\"octomap_msgs - conversions and messages for OctoMap\">\n-\n-  octomap_msgs - conversions and messages for OctoMap\n-\n-  </description>\n-  <author>Armin Hornung</author>\n-  <license>BSD</license>\n-  <review status=\"unreviewed\" notes=\"\"/>\n-  <url>http://ros.org/wiki/octomap_msgs</url>\n-  \n-  <depend package=\"std_msgs\"/>\n-  <depend package=\"geometry_msgs\"/>\n-  \n-  <export>\n-    <cpp cflags=\"`PKG_CONFIG_PATH=${prefix}/../../lib/pkgconfig pkg-config --cflags octomap_msgs`\"/>\n-  </export>\n-\n-</package>"
+        },
+        {
+          "sha": "7e2aed1c64c90cd2d23f9d1fc8738bbf2111a8c8",
+          "filename": "manifest.xml",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 21,
+          "changes": 21,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/8637e528e14cddb9fd03af687a7412523401c081/manifest.xml",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/8637e528e14cddb9fd03af687a7412523401c081/manifest.xml",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/manifest.xml?ref=8637e528e14cddb9fd03af687a7412523401c081",
+          "patch": "@@ -1,21 +0,0 @@\n-<package>\n-  <description brief=\"octomap_msgs - conversions and messages for OctoMap\">\n-\n- octomap_msgs - conversions and messages for <a href=\"http://octomap.sourceforge.net/\">OctoMap</a>\n-\n-  </description>\n-  <author>Armin Hornung</author>\n-  <license>BSD</license>\n-  <review status=\"unreviewed\" notes=\"\"/>\n-  <url>http://ros.org/wiki/octomap_msgs</url>\n-  \n-  <depend package=\"std_msgs\"/>\n-  <depend package=\"geometry_msgs\"/>\n-  \n-  <export>\n-    <cpp cflags=\"-I${prefix}/include -I${prefix}/build/gen/cpp\"/>\n-  </export>\n-\n-</package>\n-\n-"
+        },
+        {
+          "sha": "c18761c7e781fbdac4cbbd55c22629613d49de2d",
+          "filename": "package.xml",
+          "status": "renamed",
+          "additions": 9,
+          "deletions": 8,
+          "changes": 17,
+          "blob_url": "https://github.com/OctoMap/octomap_msgs/blob/0eb5d62f6951fba4d0bc7beaf4954a529863e070/package.xml",
+          "raw_url": "https://github.com/OctoMap/octomap_msgs/raw/0eb5d62f6951fba4d0bc7beaf4954a529863e070/package.xml",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_msgs/contents/package.xml?ref=0eb5d62f6951fba4d0bc7beaf4954a529863e070",
+          "patch": "@@ -1,4 +1,4 @@\n-<stack>\n+<package>\n   <name>octomap_msgs</name>\n   <version>0.2.2</version>\n   <description brief=\"octomap_msgs - conversions and messages for OctoMap\">\n@@ -14,11 +14,12 @@\n   \n   <review status=\"unreviewed\" notes=\"\"/>\n \n-  <build_depends>catkin</build_depends>\n-  <build_depends>genmsg</build_depends>\n-  <build_depends>langs</build_depends>\n-  <build_depends>common_msgs</build_depends>\n+  <build_depend>catkin</build_depend>\n+  <build_depend>genmsg</build_depend>\n+  <build_depend>geometry_msgs</build_depend>\n+  <build_depend>langs</build_depend>\n+  <build_depend>std_msgs</build_depend>\n   \n-  <depends>common_msgs</depends> \n-\n-</stack>\n+  <run_depend>geometry_msgs</run_depend>\n+  <run_depend>std_msgs</run_depend>\n+</package>",
+          "previous_filename": "stack.xml"
+        }
+      ]
+    }
+  ]
+}

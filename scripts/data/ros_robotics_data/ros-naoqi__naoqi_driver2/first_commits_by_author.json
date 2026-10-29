@@ -1,0 +1,1199 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T05:46:22Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ros-naoqi",
+    "repo": "naoqi_driver2"
+  },
+  "data": [
+    {
+      "author": "severin-lemaignan",
+      "date": "2019-05-10T08:34:00Z",
+      "sha": "2fa8d917dd6af64719f856bd1b1bac5e555a7781",
+      "message": "Merge pull request #111 from Pandhariix/feature/stereo\n\nFeature/stereo",
+      "files_changed": 9,
+      "additions": 321,
+      "deletions": 36,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e1619c93deb0a423170135e880e96ac847c6a95d",
+          "filename": "include/naoqi_driver/naoqi_driver.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/2fa8d917dd6af64719f856bd1b1bac5e555a7781/include%2Fnaoqi_driver%2Fnaoqi_driver.hpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/2fa8d917dd6af64719f856bd1b1bac5e555a7781/include%2Fnaoqi_driver%2Fnaoqi_driver.hpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/include%2Fnaoqi_driver%2Fnaoqi_driver.hpp?ref=2fa8d917dd6af64719f856bd1b1bac5e555a7781",
+          "patch": "@@ -240,6 +240,7 @@ class Driver\n   bool record_enabled_;\n   bool log_enabled_;\n   bool keep_looping;\n+  bool has_stereo;\n \n   const size_t freq_;\n   boost::thread publisherThread_;"
+        },
+        {
+          "sha": "632d61e7b7bea6881208bb2317983fbb8f46e242",
+          "filename": "share/boot_config.json",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 2,
+          "changes": 11,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/2fa8d917dd6af64719f856bd1b1bac5e555a7781/share%2Fboot_config.json",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/2fa8d917dd6af64719f856bd1b1bac5e555a7781/share%2Fboot_config.json",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/share%2Fboot_config.json?ref=2fa8d917dd6af64719f856bd1b1bac5e555a7781",
+          "patch": "@@ -19,7 +19,15 @@\n     \"depth_camera\":\n     {\n       \"enabled\"       : true,\n-      \"resolution\"    : 1,\n+      \"xtion_resolution\": 1,\n+      \"stereo_resolution\": 9,\n+      \"fps\"           : 10,\n+      \"recorder_fps\"  : 5\n+    },\n+    \"stereo_camera\":\n+    {\n+      \"enabled\"       : true,\n+      \"resolution\"    : 15,\n       \"fps\"           : 10,\n       \"recorder_fps\"  : 5\n     },\n@@ -93,4 +101,3 @@\n     }\n   }\n }\n-"
+        },
+        {
+          "sha": "b8f4ea5d413e63cd6e9c33893c5cbf9b84aa46af",
+          "filename": "src/converters/camera.cpp",
+          "status": "modified",
+          "additions": 94,
+          "deletions": 24,
+          "changes": 118,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/2fa8d917dd6af64719f856bd1b1bac5e555a7781/src%2Fconverters%2Fcamera.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/2fa8d917dd6af64719f856bd1b1bac5e555a7781/src%2Fconverters%2Fcamera.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fconverters%2Fcamera.cpp?ref=2fa8d917dd6af64719f856bd1b1bac5e555a7781",
+          "patch": "@@ -113,6 +113,64 @@ const sensor_msgs::CameraInfo& getCameraInfo( int camera_source, int resolution\n       static const sensor_msgs::CameraInfo cam_info_msg = createCameraInfoDEPTHQQVGA();\n       return cam_info_msg;\n     }\n+    else if (resolution == AL::k720p){\n+        static const sensor_msgs::CameraInfo cam_info_msg = createCameraInfoDEPTH720P();\n+        return cam_info_msg;\n+    }\n+    else if (resolution == AL::kQ720p){\n+        static const sensor_msgs::CameraInfo cam_info_msg = createCameraInfoDEPTHQ720P();\n+        return cam_info_msg;\n+    }\n+    else if (resolution == AL::kQQ720p){\n+        static const sensor_msgs::CameraInfo cam_info_msg = createCameraInfoDEPTHQQ720P();\n+        return cam_info_msg;\n+    }\n+    else if (resolution == AL::kQQQ720p){\n+        static const sensor_msgs::CameraInfo cam_info_msg = createCameraInfoDEPTHQQQ720P();\n+        return cam_info_msg;\n+    }\n+    else if (resolution == AL::kQQQQ720p){\n+        static const sensor_msgs::CameraInfo cam_info_msg = createCameraInfoDEPTHQQQQ720P();\n+        return cam_info_msg;\n+    }\n+  }\n+  else if (camera_source == AL::kInfraredOrStereoCamera) {\n+    if ( resolution == AL::kVGA )\n+    {\n+      static const sensor_msgs::CameraInfo cam_info_msg = createCameraInfoDEPTHVGA();\n+      ROS_WARN(\"VGA resolution is not supported for the depth camera, use QVGA or lower\");\n+      return cam_info_msg;\n+    }\n+    else if( resolution == AL::kQVGA )\n+    {\n+      static const sensor_msgs::CameraInfo cam_info_msg = createCameraInfoDEPTHQVGA();\n+      return cam_info_msg;\n+    }\n+    else if( resolution == AL::kQQVGA )\n+    {\n+      static const sensor_msgs::CameraInfo cam_info_msg = createCameraInfoDEPTHQQVGA();\n+      return cam_info_msg;\n+    }\n+    else if (resolution == AL::k720px2){\n+      static const sensor_msgs::CameraInfo cam_info_msg = createCameraInfoStereo720PX2();\n+      return cam_info_msg;\n+    }\n+    else if (resolution == AL::kQ720px2){\n+      static const sensor_msgs::CameraInfo cam_info_msg = createCameraInfoStereoQ720PX2();\n+      return cam_info_msg;\n+    }\n+    else if (resolution == AL::kQQ720px2){\n+      static const sensor_msgs::CameraInfo cam_info_msg = createCameraInfoStereoQQ720PX2();\n+      return cam_info_msg;\n+    }\n+    else if (resolution == AL::kQQQ720px2){\n+      static const sensor_msgs::CameraInfo cam_info_msg = createCameraInfoStereoQQQ720PX2();\n+      return cam_info_msg;\n+    }\n+    else if (resolution == AL::kQQQQ720px2){\n+      static const sensor_msgs::CameraInfo cam_info_msg = createCameraInfoStereoQQQQ720PX2();\n+      return cam_info_msg;\n+    }\n   }\n   else{\n     std::cout << \"no camera information found for camera_source \" << camera_source << \" and res: \" << resolution << std::endl;\n@@ -122,8 +180,13 @@ const sensor_msgs::CameraInfo& getCameraInfo( int camera_source, int resolution\n \n } // camera_info_definitions\n \n-CameraConverter::CameraConverter( const std::string& name, const float& frequency, const qi::SessionPtr& session, const int& camera_source, const int& resolution )\n-  : BaseConverter( name, frequency, session ),\n+CameraConverter::CameraConverter(\n+  const std::string& name,\n+  const float& frequency,\n+  const qi::SessionPtr& session,\n+  const int& camera_source,\n+  const int& resolution,\n+  const bool& has_stereo) : BaseConverter( name, frequency, session ),\n     p_video_( session->service(\"ALVideoDevice\") ),\n     camera_source_(camera_source),\n     resolution_(resolution),\n@@ -133,28 +196,35 @@ CameraConverter::CameraConverter( const std::string& name, const float& frequenc\n     cv_mat_type_( (camera_source_!=AL::kDepthCamera)?CV_8UC3:CV_16U ),\n     camera_info_( camera_info_definitions::getCameraInfo(camera_source, resolution) )\n {\n-  if ( camera_source == AL::kTopCamera )\n-  {\n-    msg_frameid_ = \"CameraTop_optical_frame\";\n-  }\n-  else if (camera_source == AL::kBottomCamera )\n-  {\n-    msg_frameid_ = \"CameraBottom_optical_frame\";\n-  }\n-  else if (camera_source_ == AL::kDepthCamera )\n-  {\n-    msg_frameid_ = \"CameraDepth_optical_frame\";\n-  }\n-  // Overwrite the parameters for the infrared\n-  else if (camera_source_ == AL::kInfraredCamera )\n-  {\n-    // Reset to kDepth since it's the same device handle\n-    camera_source_ = AL::kDepthCamera;\n-    msg_frameid_ = \"CameraDepth_optical_frame\";\n-    colorspace_ = AL::kInfraredColorSpace;\n-    msg_colorspace_ = \"16UC1\";\n-    cv_mat_type_ = CV_16U;\n-    camera_info_ = camera_info_definitions::getCameraInfo(camera_source_, resolution_);\n+  switch (camera_source) {\n+    case AL::kTopCamera:\n+      msg_frameid_ = \"CameraTop_optical_frame\";\n+      break;\n+\n+    case AL::kBottomCamera:\n+      msg_frameid_ = \"CameraBottom_optical_frame\";\n+      break;\n+\n+    case AL::kDepthCamera:\n+      msg_frameid_ = \"CameraDepth_optical_frame\";\n+\n+      if (has_stereo)\n+        colorspace_ = AL::kDepthColorSpace;\n+\n+      break;\n+\n+    case AL::kInfraredOrStereoCamera:\n+      msg_frameid_ = \"CameraDepth_optical_frame\";\n+\n+      if (!has_stereo) {\n+        camera_source_ = AL::kDepthCamera;\n+        colorspace_ = AL::kInfraredColorSpace;\n+        msg_colorspace_ = \"16UC1\";\n+        cv_mat_type_ = CV_16U;\n+      }\n+\n+      camera_info_ = camera_info_definitions::getCameraInfo(camera_source_, resolution_);\n+      break;\n   }\n }\n "
+        },
+        {
+          "sha": "e5e5b2304d0aef3f1c5406f64bf8e1d9eb89eb32",
+          "filename": "src/converters/camera.hpp",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 1,
+          "changes": 8,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/2fa8d917dd6af64719f856bd1b1bac5e555a7781/src%2Fconverters%2Fcamera.hpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/2fa8d917dd6af64719f856bd1b1bac5e555a7781/src%2Fconverters%2Fcamera.hpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fconverters%2Fcamera.hpp?ref=2fa8d917dd6af64719f856bd1b1bac5e555a7781",
+          "patch": "@@ -40,7 +40,13 @@ class CameraConverter : public BaseConverter<CameraConverter>\n   typedef boost::function<void(sensor_msgs::ImagePtr, sensor_msgs::CameraInfo)> Callback_t;\n \n public:\n-  CameraConverter( const std::string& name, const float& frequency, const qi::SessionPtr& session, const int& camera_source, const int& resolution );\n+  CameraConverter(\n+    const std::string& name,\n+    const float& frequency,\n+    const qi::SessionPtr& session,\n+    const int& camera_source,\n+    const int& resolution,\n+    const bool& has_stereo=false);\n \n   ~CameraConverter();\n "
+        },
+        {
+          "sha": "953dc9d3af6d1e4703ddb521e5e94383e7cc60c7",
+          "filename": "src/converters/camera_info_definitions.hpp",
+          "status": "modified",
+          "additions": 107,
+          "deletions": 0,
+          "changes": 107,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/2fa8d917dd6af64719f856bd1b1bac5e555a7781/src%2Fconverters%2Fcamera_info_definitions.hpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/2fa8d917dd6af64719f856bd1b1bac5e555a7781/src%2Fconverters%2Fcamera_info_definitions.hpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fconverters%2Fcamera_info_definitions.hpp?ref=2fa8d917dd6af64719f856bd1b1bac5e555a7781",
+          "patch": "@@ -223,6 +223,113 @@ inline sensor_msgs::CameraInfo createCameraInfoDEPTHQQVGA()\n \n   return cam_info_msg;\n }\n+\n+/**\n+* STEREO CAMERA\n+*/\n+inline sensor_msgs::CameraInfo createCameraInfoStereo(\n+        const int &width,\n+        const int &height,\n+        const float &reductionFactor) {\n+\n+  sensor_msgs::CameraInfo cam_info_msg;\n+\n+  cam_info_msg.header.frame_id = \"CameraDepth_optical_frame\";\n+\n+  const size_t nK = 9;\n+  const size_t nD = 5;\n+  const size_t nR = 9;\n+  const size_t nP = 12;\n+\n+  float kTab[nK] = {703.102356f/reductionFactor, 0, 647.821594f/reductionFactor,\n+                    0, 702.432312f/reductionFactor, 380.971680f/reductionFactor,\n+                    0, 0, 1 };\n+\n+  float dTab[nD] = {-0.168594331,\n+                    .00881872326,\n+                    -0.000182721298,\n+                    -0.0000145479062,\n+                    0.0137237618};\n+\n+  float rTab[nR] = {0.999984741, 0.000130843779, 0.00552622462,\n+                    -0.000111592424, 0.999993920, -0.00348380185,\n+                    -0.00552664697, 0.00348313176, 0.999978662};\n+\n+  float pTab[nP] = {569.869568f/reductionFactor, 0, 644.672058f/reductionFactor, 0,\n+                    0, 569.869568f/reductionFactor, 393.368958f/reductionFactor, 0,\n+                    0, 0, 1, 0 };\n+\n+\n+  cam_info_msg.width = width;\n+  cam_info_msg.height = height;\n+\n+  for (int i = 0; i < nK; ++i)\n+    cam_info_msg.K.at(i) = kTab[i];\n+\n+  cam_info_msg.distortion_model = \"plumb_bob\";\n+  cam_info_msg.D.assign(dTab, dTab + nD);\n+\n+  for (int i = 0; i < nR; ++i)\n+    cam_info_msg.R.at(i) = rTab[i];\n+\n+  for (int i = 0; i < nP; ++i)\n+    cam_info_msg.P.at(i) = pTab[i];\n+\n+  return cam_info_msg;\n+}\n+\n+inline sensor_msgs::CameraInfo createCameraInfoDEPTH720P()\n+{\n+  return createCameraInfoStereo(1280, 720, 1.0);\n+}\n+\n+\n+inline sensor_msgs::CameraInfo createCameraInfoDEPTHQ720P()\n+{\n+  return createCameraInfoStereo(640, 360, 2.0);\n+}\n+\n+inline sensor_msgs::CameraInfo createCameraInfoDEPTHQQ720P()\n+{\n+  return createCameraInfoStereo(320, 180, 4.0);\n+}\n+\n+inline sensor_msgs::CameraInfo createCameraInfoDEPTHQQQ720P()\n+{\n+  return createCameraInfoStereo(160, 90, 8.0);\n+}\n+\n+inline sensor_msgs::CameraInfo createCameraInfoDEPTHQQQQ720P()\n+{\n+  return createCameraInfoStereo(80, 45, 16.0);\n+}\n+\n+// Complete methods for stereo image parameteres\n+inline sensor_msgs::CameraInfo createCameraInfoStereo720PX2()\n+{\n+  return createCameraInfoStereo(2560, 720, 1.0);\n+}\n+\n+inline sensor_msgs::CameraInfo createCameraInfoStereoQ720PX2()\n+{\n+    return createCameraInfoStereo(1280, 360, 2.0);\n+}\n+\n+inline sensor_msgs::CameraInfo createCameraInfoStereoQQ720PX2()\n+{\n+    return createCameraInfoStereo(640, 180, 4.0);\n+}\n+\n+inline sensor_msgs::CameraInfo createCameraInfoStereoQQQ720PX2()\n+{\n+    return createCameraInfoStereo(320, 90, 8.0);\n+}\n+\n+inline sensor_msgs::CameraInfo createCameraInfoStereoQQQQ720PX2()\n+{\n+    return createCameraInfoStereo(160, 45, 16.0);\n+}\n+\n } // camera_info_definitions\n } //publisher\n } //naoqi"
+        },
+        {
+          "sha": "329423df65005047e1db9e4fe4c7566cd50cc042",
+          "filename": "src/helpers/driver_helpers.cpp",
+          "status": "modified",
+          "additions": 36,
+          "deletions": 0,
+          "changes": 36,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/2fa8d917dd6af64719f856bd1b1bac5e555a7781/src%2Fhelpers%2Fdriver_helpers.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/2fa8d917dd6af64719f856bd1b1bac5e555a7781/src%2Fhelpers%2Fdriver_helpers.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fhelpers%2Fdriver_helpers.cpp?ref=2fa8d917dd6af64719f856bd1b1bac5e555a7781",
+          "patch": "@@ -42,19 +42,29 @@ static naoqi_bridge_msgs::RobotInfo& getRobotInfoLocal( const qi::SessionPtr& se\n   std::cout << \"Receiving information about robot model\" << std::endl;\n   qi::AnyObject p_memory = session->service(\"ALMemory\");\n   std::string robot = p_memory.call<std::string>(\"getData\", \"RobotConfig/Body/Type\" );\n+  std::string version = p_memory.call<std::string>(\"getData\", \"RobotConfig/Body/BaseVersion\" );\n   std::transform(robot.begin(), robot.end(), robot.begin(), ::tolower);\n \n   if (std::string(robot) == \"nao\")\n   {\n     info.type = naoqi_bridge_msgs::RobotInfo::NAO;\n+    std::cout << BOLDYELLOW << \"Robot detected: \"\n+              << BOLDCYAN << \"NAO \" << version\n+              << RESETCOLOR << std::endl;\n   }\n   if (std::string(robot) == \"pepper\" || std::string(robot) == \"juliette\" )\n   {\n     info.type = naoqi_bridge_msgs::RobotInfo::PEPPER;\n+    std::cout << BOLDYELLOW << \"Robot detected: \"\n+              << BOLDCYAN << \"Pepper \" << version\n+              << RESETCOLOR << std::endl;\n   }\n   if (std::string(robot) == \"romeo\" )\n   {\n     info.type = naoqi_bridge_msgs::RobotInfo::ROMEO;\n+    std::cout << BOLDYELLOW << \"Robot detected: \"\n+              << BOLDCYAN << \"Romeo \" << version\n+              << RESETCOLOR << std::endl;\n   }\n \n   // Get the data from RobotConfig\n@@ -223,6 +233,32 @@ std::string& getLanguage( const qi::SessionPtr& session )\n   return language;\n }\n \n+/**\n+ * Function that detects if the robot is using stereo cameras to compute depth\n+ */\n+bool isDepthStereo(const qi::SessionPtr &session) {\n+ std::vector<std::string> sensor_names;\n+\n+ try {\n+   qi::AnyObject p_motion = session->service(\"ALMotion\");\n+   sensor_names = p_motion.call<std::vector<std::string>>(\"getSensorNames\");\n+\n+   if (std::find(sensor_names.begin(),\n+                 sensor_names.end(),\n+                 \"CameraStereo\") != sensor_names.end()) {\n+     return true;\n+   }\n+\n+   else {\n+     return false;\n+   }\n+\n+ } catch (const std::exception &e) {\n+   std::cerr << e.what() << std::endl;\n+   return false;\n+ }\n+}\n+\n } // driver\n } // helpers\n } // naoqi"
+        },
+        {
+          "sha": "342c141df9148e510a406263aa02f1fe15f6a511",
+          "filename": "src/helpers/driver_helpers.hpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/2fa8d917dd6af64719f856bd1b1bac5e555a7781/src%2Fhelpers%2Fdriver_helpers.hpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/2fa8d917dd6af64719f856bd1b1bac5e555a7781/src%2Fhelpers%2Fdriver_helpers.hpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fhelpers%2Fdriver_helpers.hpp?ref=2fa8d917dd6af64719f856bd1b1bac5e555a7781",
+          "patch": "@@ -42,6 +42,8 @@ bool& setLanguage( const qi::SessionPtr& session, naoqi_bridge_msgs::SetStringRe\n \n std::string& getLanguage( const qi::SessionPtr& session );\n \n+bool isDepthStereo(const qi::SessionPtr &session);\n+\n } // driver\n } // helpers\n } // naoqi"
+        },
+        {
+          "sha": "6f41d8057e3c44045154327557cfc3c14613ac20",
+          "filename": "src/naoqi_driver.cpp",
+          "status": "modified",
+          "additions": 55,
+          "deletions": 8,
+          "changes": 63,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/2fa8d917dd6af64719f856bd1b1bac5e555a7781/src%2Fnaoqi_driver.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/2fa8d917dd6af64719f856bd1b1bac5e555a7781/src%2Fnaoqi_driver.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fnaoqi_driver.cpp?ref=2fa8d917dd6af64719f856bd1b1bac5e555a7781",
+          "patch": "@@ -124,7 +124,8 @@ Driver::Driver( qi::SessionPtr session, const std::string& prefix )\n   log_enabled_(false),\n   keep_looping(true),\n   recorder_(boost::make_shared<recorder::GlobalRecorder>(prefix)),\n-  buffer_duration_(helpers::recorder::bufferDefaultDuration)\n+  buffer_duration_(helpers::recorder::bufferDefaultDuration),\n+  has_stereo(helpers::driver::isDepthStereo(session))\n {\n   if(prefix == \"\"){\n     std::cout << \"Error driver prefix must not be empty\" << std::endl;\n@@ -568,10 +569,17 @@ void Driver::registerDefaultConverter()\n   size_t camera_bottom_fps            = boot_config_.get( \"converters.bottom_camera.fps\", 10);\n   size_t camera_bottom_recorder_fps   = boot_config_.get( \"converters.bottom_camera.recorder_fps\", 5);\n \n-  bool camera_depth_enabled           = boot_config_.get( \"converters.depth_camera.enabled\", true);\n-  size_t camera_depth_resolution      = boot_config_.get( \"converters.depth_camera.resolution\", 1); // QVGA\n-  size_t camera_depth_fps             = boot_config_.get( \"converters.depth_camera.fps\", 10);\n-  size_t camera_depth_recorder_fps    = boot_config_.get( \"converters.depth_camera.recorder_fps\", 5);\n+  size_t camera_depth_resolution;\n+  bool camera_depth_enabled             = boot_config_.get( \"converters.depth_camera.enabled\", true);\n+  size_t camera_depth_xtion_resolution  = boot_config_.get( \"converters.depth_camera.xtion_resolution\", 1); // QVGA\n+  size_t camera_depth_stereo_resolution = boot_config_.get( \"converters.depth_camera.stereo_resolution\", 9); // Q720p\n+  size_t camera_depth_fps               = boot_config_.get( \"converters.depth_camera.fps\", 10);\n+  size_t camera_depth_recorder_fps      = boot_config_.get( \"converters.depth_camera.recorder_fps\", 5);\n+\n+  bool camera_stereo_enabled          = boot_config_.get( \"converters.stereo_camera.enabled\", true);\n+  size_t camera_stereo_resolution     = boot_config_.get( \"converters.stereo_camera.resolution\", 15); // QQ720px2\n+  size_t camera_stereo_fps            = boot_config_.get( \"converters.stereo_camera.fps\", 10);\n+  size_t camera_stereo_recorder_fps    = boot_config_.get( \"converters.stereo_camera.recorder_fps\", 5);\n \n   bool camera_ir_enabled              = boot_config_.get( \"converters.ir_camera.enabled\", true);\n   size_t camera_ir_resolution         = boot_config_.get( \"converters.ir_camera.resolution\", 1); // QVGA\n@@ -593,6 +601,18 @@ void Driver::registerDefaultConverter()\n   bool bumper_enabled                 = boot_config_.get( \"converters.bumper.enabled\", true);\n   bool hand_enabled                   = boot_config_.get( \"converters.touch_hand.enabled\", true);\n   bool head_enabled                   = boot_config_.get( \"converters.touch_head.enabled\", true);\n+\n+  // Load the correct variables depending on the type of the depth camera\n+  // (XTION or stereo). IR disabled if the robot uses a stereo camera to\n+  // compute the depth\n+  if (this->has_stereo) {\n+      camera_ir_enabled = false;\n+      camera_depth_resolution = camera_depth_stereo_resolution;\n+  }\n+  else {\n+      camera_depth_resolution = camera_depth_xtion_resolution;\n+  }\n+\n   /*\n    * The info converter will be called once after it was added to the priority queue. Once it is its turn to be called, its\n    * callAll method will be triggered (because InfoPublisher is considered to always have subscribers, isSubscribed always\n@@ -694,19 +714,46 @@ void Driver::registerDefaultConverter()\n     {\n       boost::shared_ptr<publisher::CameraPublisher> dcp = boost::make_shared<publisher::CameraPublisher>( \"camera/depth/image_raw\", AL::kDepthCamera );\n       boost::shared_ptr<recorder::CameraRecorder> dcr = boost::make_shared<recorder::CameraRecorder>( \"camera/depth\", camera_depth_recorder_fps );\n-      boost::shared_ptr<converter::CameraConverter> dcc = boost::make_shared<converter::CameraConverter>( \"depth_camera\", camera_depth_fps, sessionPtr_, AL::kDepthCamera, camera_depth_resolution );\n+      boost::shared_ptr<converter::CameraConverter> dcc = boost::make_shared<converter::CameraConverter>(\n+        \"depth_camera\",\n+        camera_depth_fps,\n+        sessionPtr_,\n+        AL::kDepthCamera,\n+        camera_depth_resolution,\n+        this->has_stereo);\n+\n       dcc->registerCallback( message_actions::PUBLISH, boost::bind(&publisher::CameraPublisher::publish, dcp, _1, _2) );\n       dcc->registerCallback( message_actions::RECORD, boost::bind(&recorder::CameraRecorder::write, dcr, _1, _2) );\n       dcc->registerCallback( message_actions::LOG, boost::bind(&recorder::CameraRecorder::bufferize, dcr, _1, _2) );\n       registerConverter( dcc, dcp, dcr );\n     }\n \n+    /** Stereo Camera */\n+    if (this->has_stereo && camera_stereo_enabled)\n+    {\n+      boost::shared_ptr<publisher::CameraPublisher> scp = boost::make_shared<publisher::CameraPublisher>( \"camera/stereo/image_raw\", AL::kInfraredOrStereoCamera );\n+      boost::shared_ptr<recorder::CameraRecorder> scr = boost::make_shared<recorder::CameraRecorder>( \"camera/stereo\", camera_stereo_recorder_fps );\n+\n+      boost::shared_ptr<converter::CameraConverter> scc = boost::make_shared<converter::CameraConverter>(\n+        \"stereo_camera\",\n+        camera_stereo_fps,\n+        sessionPtr_,\n+        AL::kInfraredOrStereoCamera,\n+        camera_stereo_resolution,\n+        this->has_stereo);\n+\n+      scc->registerCallback( message_actions::PUBLISH, boost::bind(&publisher::CameraPublisher::publish, scp, _1, _2) );\n+      scc->registerCallback( message_actions::RECORD, boost::bind(&recorder::CameraRecorder::write, scr, _1, _2) );\n+      scc->registerCallback( message_actions::LOG, boost::bind(&recorder::CameraRecorder::bufferize, scr, _1, _2) );\n+      registerConverter( scc, scp, scr );\n+    }\n+\n     /** Infrared Camera */\n     if ( camera_ir_enabled )\n     {\n-      boost::shared_ptr<publisher::CameraPublisher> icp = boost::make_shared<publisher::CameraPublisher>( \"camera/ir/image_raw\", AL::kInfraredCamera );\n+      boost::shared_ptr<publisher::CameraPublisher> icp = boost::make_shared<publisher::CameraPublisher>( \"camera/ir/image_raw\", AL::kInfraredOrStereoCamera );\n       boost::shared_ptr<recorder::CameraRecorder> icr = boost::make_shared<recorder::CameraRecorder>( \"camera/ir\", camera_ir_recorder_fps );\n-      boost::shared_ptr<converter::CameraConverter> icc = boost::make_shared<converter::CameraConverter>( \"infrared_camera\", camera_ir_fps, sessionPtr_, AL::kInfraredCamera, camera_ir_resolution);\n+      boost::shared_ptr<converter::CameraConverter> icc = boost::make_shared<converter::CameraConverter>( \"infrared_camera\", camera_ir_fps, sessionPtr_, AL::kInfraredOrStereoCamera, camera_ir_resolution);\n       icc->registerCallback( message_actions::PUBLISH, boost::bind(&publisher::CameraPublisher::publish, icp, _1, _2) );\n       icc->registerCallback( message_actions::RECORD, boost::bind(&recorder::CameraRecorder::write, icr, _1, _2) );\n       icc->registerCallback( message_actions::LOG, boost::bind(&recorder::CameraRecorder::bufferize, icr, _1, _2) );"
+        },
+        {
+          "sha": "ef817146e07348aa0ddf98d4c330e8b66660d22f",
+          "filename": "src/tools/alvisiondefinitions.h",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 1,
+          "changes": 11,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/2fa8d917dd6af64719f856bd1b1bac5e555a7781/src%2Ftools%2Falvisiondefinitions.h",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/2fa8d917dd6af64719f856bd1b1bac5e555a7781/src%2Ftools%2Falvisiondefinitions.h",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Ftools%2Falvisiondefinitions.h?ref=2fa8d917dd6af64719f856bd1b1bac5e555a7781",
+          "patch": "@@ -36,7 +36,7 @@ namespace AL\n   const int kTopCamera = 0;\n   const int kBottomCamera = 1;\n   const int kDepthCamera = 2;\n-  const int kInfraredCamera = 3;\n+  const int kInfraredOrStereoCamera = 3;\n \n   const float kApertureH_OV7670  = 47.8f;\n   const float kApertureV_OV7670  = 36.8f;\n@@ -51,6 +51,15 @@ namespace AL\n   const int k16VGA = 4;  //2560*1920\n   const int k1920p = k16VGA;  //2560*1920\n   const int k720p = 5;  //1280*720\n+  const int kQ720p = 9; //640*360\n+  const int kQQ720p = 10; //320*180\n+  const int kQQQ720p = 11; //160*90\n+  const int kQQQQ720p = 12; //80*45\n+  const int k720px2 = 13;  //2560*720\n+  const int kQ720px2 = 14; //1280*360\n+  const int kQQ720px2 = 15; //640*180\n+  const int kQQQ720px2 = 16; //320*90\n+  const int kQQQQ720px2 = 17; //160*45\n   const int k1080p = 6;  //1920*1080\n   const int kQQQVGA = 7;  // 80*60\n   const int kQQQQVGA = 8;  // 40*30"
+        }
+      ]
+    },
+    {
+      "author": "victorpaleologue",
+      "date": "2023-09-01T12:44:34Z",
+      "sha": "99b39b83f2a1c2c45c982bc85252fdff640fc1a6",
+      "message": "Remove dependence to `orocos-kdl`",
+      "files_changed": 2,
+      "additions": 2,
+      "deletions": 5,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "89d445d28683dcb3795683595aac2fd86f820144",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 4,
+          "changes": 6,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/99b39b83f2a1c2c45c982bc85252fdff640fc1a6/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/99b39b83f2a1c2c45c982bc85252fdff640fc1a6/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/CMakeLists.txt?ref=99b39b83f2a1c2c45c982bc85252fdff640fc1a6",
+          "patch": "@@ -18,7 +18,6 @@ find_package(tf2_geometry_msgs REQUIRED)\n find_package(tf2_msgs REQUIRED)\n find_package(tf2_ros REQUIRED)\n find_package(OpenCV REQUIRED)\n-find_package(orocos_kdl REQUIRED)\n find_package(Boost QUIET COMPONENTS chrono filesystem program_options regex system thread random)\n \n # define source files that can be used by qibuild or catkin\n@@ -96,10 +95,10 @@ add_definitions(-DLIBQI_VERSION=${naoqi_libqi_VERSION_MAJOR}${naoqi_libqi_VERSIO\n # Add pre-processor compile flag indicating ament\n add_definitions( -DAMENT_BUILD )\n \n-include_directories(include \n+include_directories(include\n   ${naoqi_libqi_INCLUDE_DIRS}\n   ${OpenCV_INCLUDE_DIRS}\n-  ${orocos_kdl_INCLUDE_DIRS})\n+)\n \n # create the different libraries\n # add_library(\n@@ -143,7 +142,6 @@ ament_target_dependencies(naoqi_driver\n   tf2_msgs\n   tf2_ros\n   OpenCV\n-  orocos_kdl\n   Boost)\n \n install(TARGETS naoqi_driver DESTINATION lib/)"
+        },
+        {
+          "sha": "1b3fb274d9718819de120dcdec66ff761f8d67bb",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 1,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/99b39b83f2a1c2c45c982bc85252fdff640fc1a6/package.xml",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/99b39b83f2a1c2c45c982bc85252fdff640fc1a6/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/package.xml?ref=99b39b83f2a1c2c45c982bc85252fdff640fc1a6",
+          "patch": "@@ -20,7 +20,6 @@\n   <depend version_gte=\"2.0.0\">naoqi_bridge_msgs</depend>\n   <depend>naoqi_libqi</depend>\n   <depend>naoqi_libqicore</depend>\n-  <depend>orocos_kdl</depend>\n   <depend>robot_state_publisher</depend>\n   <depend>tf2_ros</depend>\n   <depend>boost</depend>"
+        }
+      ]
+    },
+    {
+      "author": "mbusy",
+      "date": "2019-05-09T14:17:33Z",
+      "sha": "44fe9ec490bec20ca2d87096feaf6915ec645a11",
+      "message": "Add the RGB Stereo and Depth Stereo parameters to the vision definitions",
+      "files_changed": 1,
+      "additions": 10,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "ef817146e07348aa0ddf98d4c330e8b66660d22f",
+          "filename": "src/tools/alvisiondefinitions.h",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 1,
+          "changes": 11,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/44fe9ec490bec20ca2d87096feaf6915ec645a11/src%2Ftools%2Falvisiondefinitions.h",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/44fe9ec490bec20ca2d87096feaf6915ec645a11/src%2Ftools%2Falvisiondefinitions.h",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Ftools%2Falvisiondefinitions.h?ref=44fe9ec490bec20ca2d87096feaf6915ec645a11",
+          "patch": "@@ -36,7 +36,7 @@ namespace AL\n   const int kTopCamera = 0;\n   const int kBottomCamera = 1;\n   const int kDepthCamera = 2;\n-  const int kInfraredCamera = 3;\n+  const int kInfraredOrStereoCamera = 3;\n \n   const float kApertureH_OV7670  = 47.8f;\n   const float kApertureV_OV7670  = 36.8f;\n@@ -51,6 +51,15 @@ namespace AL\n   const int k16VGA = 4;  //2560*1920\n   const int k1920p = k16VGA;  //2560*1920\n   const int k720p = 5;  //1280*720\n+  const int kQ720p = 9; //640*360\n+  const int kQQ720p = 10; //320*180\n+  const int kQQQ720p = 11; //160*90\n+  const int kQQQQ720p = 12; //80*45\n+  const int k720px2 = 13;  //2560*720\n+  const int kQ720px2 = 14; //1280*360\n+  const int kQQ720px2 = 15; //640*180\n+  const int kQQQ720px2 = 16; //320*90\n+  const int kQQQQ720px2 = 17; //160*45\n   const int k1080p = 6;  //1920*1080\n   const int kQQQVGA = 7;  // 80*60\n   const int kQQQQVGA = 8;  // 40*30"
+        }
+      ]
+    },
+    {
+      "author": "arturocuma",
+      "date": "2020-05-27T09:36:35Z",
+      "sha": "f73d697e94b7137bb011608b1295ccb959533fcc",
+      "message": "refactor moveto for rclcpp, geometry_msgs compliancy",
+      "files_changed": 2,
+      "additions": 15,
+      "deletions": 14,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "6bbba6464e35aa6e8fa8c9323ff7c6fa11acffaa",
+          "filename": "src/subscribers/moveto.cpp",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 7,
+          "changes": 15,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/f73d697e94b7137bb011608b1295ccb959533fcc/src%2Fsubscribers%2Fmoveto.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/f73d697e94b7137bb011608b1295ccb959533fcc/src%2Fsubscribers%2Fmoveto.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fsubscribers%2Fmoveto.cpp?ref=f73d697e94b7137bb011608b1295ccb959533fcc",
+          "patch": "@@ -1,6 +1,7 @@\n /*\n  * Copyright 2015 Aldebaran\n  *\n+ *\n  * Licensed under the Apache License, Version 2.0 (the \"License\");\n  * you may not use this file except in compliance with the License.\n  * You may obtain a copy of the License at\n@@ -40,22 +41,22 @@ MovetoSubscriber::MovetoSubscriber( const std::string& name, const std::string&\n   tf2_buffer_( tf2_buffer )\n {}\n \n-void MovetoSubscriber::reset( ros::NodeHandle& nh )\n+void MovetoSubscriber::reset( rclcpp::Node& node )\n {\n-  sub_moveto_ = nh.subscribe( topic_, 10, &MovetoSubscriber::callback, this );\n+  sub_moveto_ = node.create_subscription( topic_, 10, &MovetoSubscriber::callback, this );\n   is_initialized_ = true;\n }\n \n-void MovetoSubscriber::callback( const geometry_msgs::PoseStampedConstPtr& pose_msg )\n+void MovetoSubscriber::callback( const geometry_msgs::msg::PoseStamped::SharedPtr pose_msg )\n {\n   if (pose_msg->header.frame_id == \"odom\") {\n-    geometry_msgs::PoseStamped pose_msg_bf;\n+    geometry_msgs::msg::PoseStamped pose_msg_bf;\n \n     bool canTransform = tf2_buffer_->canTransform(\n       \"base_footprint\",\n       \"odom\",\n-      ros::Time(0),\n-      ros::Duration(2));\n+      rclcpp::Time(0),\n+      rclcpp::Duration(2));\n \n     if (!canTransform) {\n       std::cout << \"Cannot transform from \"\n@@ -70,7 +71,7 @@ void MovetoSubscriber::callback( const geometry_msgs::PoseStampedConstPtr& pose_\n         *pose_msg,\n         pose_msg_bf,\n         \"base_footprint\",\n-        ros::Time(0),\n+        rclcpp::Time(0),\n         \"odom\");\n \n       double yaw = helpers::transform::getYaw(pose_msg_bf.pose);"
+        },
+        {
+          "sha": "b74b7445f9f44cf22bd01ac3346c43c0cf154293",
+          "filename": "src/subscribers/moveto.hpp",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 7,
+          "changes": 14,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/f73d697e94b7137bb011608b1295ccb959533fcc/src%2Fsubscribers%2Fmoveto.hpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/f73d697e94b7137bb011608b1295ccb959533fcc/src%2Fsubscribers%2Fmoveto.hpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fsubscribers%2Fmoveto.hpp?ref=f73d697e94b7137bb011608b1295ccb959533fcc",
+          "patch": "@@ -1,5 +1,6 @@\n /*\n- * Copyright 2015 Aldebaran\n+ * Copyright 2020 Softbank Robotics Europe\n+ *\n  *\n  * Licensed under the Apache License, Version 2.0 (the \"License\");\n  * you may not use this file except in compliance with the License.\n@@ -23,12 +24,11 @@\n  * LOCAL includes\n  */\n #include \"subscriber_base.hpp\"\n-\n /*\n  * ROS includes\n  */\n-#include <ros/ros.h>\n-#include <geometry_msgs/PoseStamped.h>\n+#include \"rclcpp/rclcpp.hpp\"\n+#include <geometry_msgs/msg/pose_stamped.hpp>\n #include <tf2_ros/buffer.h>\n \n namespace naoqi\n@@ -42,12 +42,12 @@ class MovetoSubscriber: public BaseSubscriber<MovetoSubscriber>\n   MovetoSubscriber( const std::string& name, const std::string& topic, const qi::SessionPtr& session, const boost::shared_ptr<tf2_ros::Buffer>& tf2_buffer );\n   ~MovetoSubscriber(){}\n \n-  void reset( ros::NodeHandle& nh );\n-  void callback( const geometry_msgs::PoseStampedConstPtr& pose_msg );\n+  void reset( rclcpp::Node& node );\n+  void callback( const geometry_msgs::msg::PoseStamped::SharedPtr pose_msg );\n \n private:\n   qi::AnyObject p_motion_;\n-  ros::Subscriber sub_moveto_;\n+  rclcpp::Subscription sub_moveto_;\n   boost::shared_ptr<tf2_ros::Buffer> tf2_buffer_;\n }; // class Teleop\n "
+        }
+      ]
+    },
+    {
+      "author": "mcaniot",
+      "date": "2020-05-19T13:55:43Z",
+      "sha": "f78d8ba3d13b80bba958bcd6d7dd57756f0cd118",
+      "message": "Refactor the bool memory publisher\n\nadd msg namespace\nreplace ros::NodeHandle by rclcpp::Node\nreplace . by pointer ->\nreplace advertise by create_publisher",
+      "files_changed": 2,
+      "additions": 8,
+      "deletions": 8,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "96044ae38f44e38f54722d13bd0be6e54d88edc5",
+          "filename": "src/publishers/memory/bool.cpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 4,
+          "changes": 8,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/f78d8ba3d13b80bba958bcd6d7dd57756f0cd118/src%2Fpublishers%2Fmemory%2Fbool.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/f78d8ba3d13b80bba958bcd6d7dd57756f0cd118/src%2Fpublishers%2Fmemory%2Fbool.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fpublishers%2Fmemory%2Fbool.cpp?ref=f78d8ba3d13b80bba958bcd6d7dd57756f0cd118",
+          "patch": "@@ -29,14 +29,14 @@ MemoryBoolPublisher::MemoryBoolPublisher( const std::string& topic ):\n   BasePublisher( topic )\n {}\n \n-void MemoryBoolPublisher::publish(const naoqi_bridge_msgs::BoolStamped& msg )\n+void MemoryBoolPublisher::publish(const naoqi_bridge_msgs::msg::BoolStamped& msg )\n {\n-  pub_.publish( msg );\n+  pub_->publish( msg );\n }\n \n-void MemoryBoolPublisher::reset( ros::NodeHandle& nh )\n+void MemoryBoolPublisher::reset( rclcpp::Node& node )\n {\n-  pub_ = nh.advertise< naoqi_bridge_msgs::BoolStamped >( topic_, 10 );\n+  pub_ = node->create_publisher< naoqi_bridge_msgs::msg::BoolStamped >( topic_, 10 );\n   is_initialized_ = true;\n }\n "
+        },
+        {
+          "sha": "1c58ad9ede3d4e7930b3095ef9091942eaef671b",
+          "filename": "src/publishers/memory/bool.hpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 4,
+          "changes": 8,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/f78d8ba3d13b80bba958bcd6d7dd57756f0cd118/src%2Fpublishers%2Fmemory%2Fbool.hpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/f78d8ba3d13b80bba958bcd6d7dd57756f0cd118/src%2Fpublishers%2Fmemory%2Fbool.hpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fpublishers%2Fmemory%2Fbool.hpp?ref=f78d8ba3d13b80bba958bcd6d7dd57756f0cd118",
+          "patch": "@@ -26,22 +26,22 @@\n /*\n * ROS includes\n */\n-#include <naoqi_bridge_msgs/BoolStamped.h>\n+#include <naoqi_bridge_msgs/msg/BoolStamped.hpp>\n \n namespace naoqi\n {\n namespace publisher\n {\n \n-class MemoryBoolPublisher : public BasePublisher<naoqi_bridge_msgs::BoolStamped>\n+class MemoryBoolPublisher : public BasePublisher<naoqi_bridge_msgs::msg::BoolStamped>\n {\n \n public:\n   MemoryBoolPublisher( const std::string& topic );\n \n-  void publish( const naoqi_bridge_msgs::BoolStamped& msg );\n+  void publish( const naoqi_bridge_msgs::msg::BoolStamped& msg );\n \n-  void reset( ros::NodeHandle& nh );\n+  void reset( rclcpp::Node& node );\n \n }; // class\n "
+        }
+      ]
+    },
+    {
+      "author": "elagrue",
+      "date": "2020-05-27T08:58:00Z",
+      "sha": "333bd3c6b74d7d6b810b28d1eb6c307138d43aec",
+      "message": "Event refactoring minor bugfix",
+      "files_changed": 3,
+      "additions": 5,
+      "deletions": 4,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "2741135ff587e21b0969c3a1b811a58940fcf12c",
+          "filename": "src/event/audio.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/333bd3c6b74d7d6b810b28d1eb6c307138d43aec/src%2Fevent%2Faudio.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/333bd3c6b74d7d6b810b28d1eb6c307138d43aec/src%2Fevent%2Faudio.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fevent%2Faudio.cpp?ref=333bd3c6b74d7d6b810b28d1eb6c307138d43aec",
+          "patch": "@@ -163,9 +163,9 @@ void AudioEventRegister::unregisterCallback()\n void AudioEventRegister::processRemote(int nbOfChannels, int samplesByChannel, qi::AnyValue altimestamp, qi::AnyValue buffer)\n {\n   naoqi_bridge_msgs::msg::AudioBuffer msg = naoqi_bridge_msgs::msg::AudioBuffer();\n-  msg.header.stamp = rclcpp::Time::now();\n+  msg.header.stamp = helpers::Time::now();\n   msg.frequency = 48000;\n-  msg.channelMap = channelMap;\n+  msg.channel_map = channelMap;\n \n   std::pair<char*, size_t> buffer_pointer = buffer.asRaw();\n "
+        },
+        {
+          "sha": "56db175551ab6a643ffd3b442c6e08069c7393a3",
+          "filename": "src/event/audio.hpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/333bd3c6b74d7d6b810b28d1eb6c307138d43aec/src%2Fevent%2Faudio.hpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/333bd3c6b74d7d6b810b28d1eb6c307138d43aec/src%2Fevent%2Faudio.hpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fevent%2Faudio.hpp?ref=333bd3c6b74d7d6b810b28d1eb6c307138d43aec",
+          "patch": "@@ -29,6 +29,7 @@\n \n #include <rclcpp/rclcpp.hpp>\n #include <naoqi_bridge_msgs/msg/audio_buffer.h>\n+#include <naoqi_driver/helpers.hpp>\n \n #include <naoqi_driver/tools.hpp>\n #include <naoqi_driver/recorder/globalrecorder.hpp>\n@@ -68,7 +69,7 @@ class AudioEventRegister: public boost::enable_shared_from_this<AudioEventRegist\n   void startProcess();\n   void stopProcess();\n \n-  void writeDump(const ros::Time& time);\n+  void writeDump(const rclcpp::Time& time);\n   void setBufferDuration(float duration);\n \n   void isRecording(bool state);"
+        },
+        {
+          "sha": "e0a3dcc9d6127e9f0b32c05988e436416c0155d4",
+          "filename": "src/event/basic.hxx",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/333bd3c6b74d7d6b810b28d1eb6c307138d43aec/src%2Fevent%2Fbasic.hxx",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/333bd3c6b74d7d6b810b28d1eb6c307138d43aec/src%2Fevent%2Fbasic.hxx",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fevent%2Fbasic.hxx?ref=333bd3c6b74d7d6b810b28d1eb6c307138d43aec",
+          "patch": "@@ -63,7 +63,7 @@ EventRegister<Converter, Publisher, Recorder>::~EventRegister()\n template <typename Converter, typename Publisher, typename Recorder>\n void EventRegister<Converter, Publisher, Recorder>::resetPublisher(  rclcpp::Node& node )\n {\n-  publisher_->reset(nh);\n+  publisher_->reset(node);\n }\n \n template <typename Converter, typename Publisher, typename Recorder>"
+        }
+      ]
+    },
+    {
+      "author": "Edo",
+      "date": "2020-05-25T15:20:38Z",
+      "sha": "91c16fd5a00f8de0c55d53bfe9364f658937f641",
+      "message": "Refactor the audio event",
+      "files_changed": 2,
+      "additions": 16,
+      "deletions": 16,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "91786f3c2cf81823f3710bc4efcf9dc2b43b162f",
+          "filename": "src/event/audio.cpp",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 11,
+          "changes": 22,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/91c16fd5a00f8de0c55d53bfe9364f658937f641/src%2Fevent%2Faudio.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/91c16fd5a00f8de0c55d53bfe9364f658937f641/src%2Fevent%2Faudio.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fevent%2Faudio.cpp?ref=91c16fd5a00f8de0c55d53bfe9364f658937f641",
+          "patch": "@@ -20,7 +20,7 @@\n \n #include <boost/make_shared.hpp>\n \n-#include <ros/ros.h>\n+#include <rclcpp/rclcpp.hpp>\n \n #include <qi/anyobject.hpp>\n \n@@ -59,13 +59,13 @@ AudioEventRegister::AudioEventRegister( const std::string& name, const float& fr\n     channelMap.push_back(1);\n     channelMap.push_back(4);\n   }\n-  publisher_ = boost::make_shared<publisher::BasicPublisher<naoqi_bridge_msgs::AudioBuffer> >( name );\n-  recorder_ = boost::make_shared<recorder::BasicEventRecorder<naoqi_bridge_msgs::AudioBuffer> >( name );\n+  publisher_ = boost::make_shared<publisher::BasicPublisher<naoqi_bridge_msgs::msg::AudioBuffer> >( name );\n+  recorder_ = boost::make_shared<recorder::BasicEventRecorder<naoqi_bridge_msgs::msg::AudioBuffer> >( name );\n   converter_ = boost::make_shared<converter::AudioEventConverter>( name, frequency, session );\n \n-  converter_->registerCallback( message_actions::PUBLISH, boost::bind(&publisher::BasicPublisher<naoqi_bridge_msgs::AudioBuffer>::publish, publisher_, _1) );\n-  converter_->registerCallback( message_actions::RECORD, boost::bind(&recorder::BasicEventRecorder<naoqi_bridge_msgs::AudioBuffer>::write, recorder_, _1) );\n-  converter_->registerCallback( message_actions::LOG, boost::bind(&recorder::BasicEventRecorder<naoqi_bridge_msgs::AudioBuffer>::bufferize, recorder_, _1) );\n+  converter_->registerCallback( message_actions::PUBLISH, boost::bind(&publisher::BasicPublisher<naoqi_bridge_msgs::msg::AudioBuffer>::publish, publisher_, _1) );\n+  converter_->registerCallback( message_actions::RECORD, boost::bind(&recorder::BasicEventRecorder<naoqi_bridge_msgs::msg::AudioBuffer>::write, recorder_, _1) );\n+  converter_->registerCallback( message_actions::LOG, boost::bind(&recorder::BasicEventRecorder<naoqi_bridge_msgs::msg::AudioBuffer>::bufferize, recorder_, _1) );\n \n }\n \n@@ -74,9 +74,9 @@ AudioEventRegister::~AudioEventRegister()\n   stopProcess();\n }\n \n-void AudioEventRegister::resetPublisher(ros::NodeHandle& nh)\n+void AudioEventRegister::resetPublisher(rclcpp::Node& node)\n {\n-  publisher_->reset(nh);\n+  publisher_->reset(node);\n }\n \n void AudioEventRegister::resetRecorder( boost::shared_ptr<naoqi::recorder::GlobalRecorder> gr )\n@@ -121,7 +121,7 @@ void AudioEventRegister::stopProcess()\n   }\n }\n \n-void AudioEventRegister::writeDump(const ros::Time& time)\n+void AudioEventRegister::writeDump(const rclcpp::Time& time)\n {\n   if (isStarted_)\n   {\n@@ -162,8 +162,8 @@ void AudioEventRegister::unregisterCallback()\n \n void AudioEventRegister::processRemote(int nbOfChannels, int samplesByChannel, qi::AnyValue altimestamp, qi::AnyValue buffer)\n {\n-  naoqi_bridge_msgs::AudioBuffer msg = naoqi_bridge_msgs::AudioBuffer();\n-  msg.header.stamp = ros::Time::now();\n+  naoqi_bridge_msgs::msg::AudioBuffer msg = naoqi_bridge_msgs::msg::AudioBuffer();\n+  msg.header.stamp = rclcpp::Time::now();\n   msg.frequency = 48000;\n   msg.channelMap = channelMap;\n "
+        },
+        {
+          "sha": "b8afc102b8d919f090160318fc3591e8c05653c2",
+          "filename": "src/event/audio.hpp",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 5,
+          "changes": 10,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/91c16fd5a00f8de0c55d53bfe9364f658937f641/src%2Fevent%2Faudio.hpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/91c16fd5a00f8de0c55d53bfe9364f658937f641/src%2Fevent%2Faudio.hpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fevent%2Faudio.hpp?ref=91c16fd5a00f8de0c55d53bfe9364f658937f641",
+          "patch": "@@ -27,8 +27,8 @@\n \n #include <qi/session.hpp>\n \n-#include <ros/ros.h>\n-#include <naoqi_bridge_msgs/AudioBuffer.h>\n+#include <rclcpp/rclcpp.hpp>\n+#include <naoqi_bridge_msgs/msg/audio_buffer.h>\n \n #include <naoqi_driver/tools.hpp>\n #include <naoqi_driver/recorder/globalrecorder.hpp>\n@@ -62,7 +62,7 @@ class AudioEventRegister: public boost::enable_shared_from_this<AudioEventRegist\n   AudioEventRegister( const std::string& name, const float& frequency, const qi::SessionPtr& session );\n   ~AudioEventRegister();\n \n-  void resetPublisher( ros::NodeHandle& nh );\n+  void resetPublisher( rclcpp::Node& node );\n   void resetRecorder( boost::shared_ptr<naoqi::recorder::GlobalRecorder> gr );\n \n   void startProcess();\n@@ -84,8 +84,8 @@ class AudioEventRegister: public boost::enable_shared_from_this<AudioEventRegist\n \n private:\n   boost::shared_ptr<converter::AudioEventConverter> converter_;\n-  boost::shared_ptr<publisher::BasicPublisher<naoqi_bridge_msgs::AudioBuffer> > publisher_;\n-  boost::shared_ptr<recorder::BasicEventRecorder<naoqi_bridge_msgs::AudioBuffer> > recorder_;\n+  boost::shared_ptr<publisher::BasicPublisher<naoqi_bridge_msgs::msg::AudioBuffer> > publisher_;\n+  boost::shared_ptr<recorder::BasicEventRecorder<naoqi_bridge_msgs::msg::AudioBuffer> > recorder_;\n \n   qi::SessionPtr session_;\n   qi::AnyObject p_audio_;"
+        }
+      ]
+    },
+    {
+      "author": "Maxime Busy",
+      "date": "2017-11-16T16:11:35Z",
+      "sha": "7db69238951b8b9a26d363c260fd10fab4d56f04",
+      "message": "Update gitignore",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "ea4a51c701f01fc88cbd84523b37decf2cc40abb",
+          "filename": ".gitignore",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/7db69238951b8b9a26d363c260fd10fab4d56f04/.gitignore",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/7db69238951b8b9a26d363c260fd10fab4d56f04/.gitignore",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/.gitignore?ref=7db69238951b8b9a26d363c260fd10fab4d56f04",
+          "patch": "@@ -3,3 +3,5 @@ build*\n doc/*\n !doc/source/*\n !doc/Doxyfile\n+*.pro\n+*.pro.user"
+        }
+      ]
+    },
+    {
+      "author": "mikaelarguedas",
+      "date": "2016-09-12T16:21:59Z",
+      "sha": "129f304b099d2a341a3c747ae10206c737d22bd5",
+      "message": "Merge pull request #72 from furushchev/increase-joint-state-freq\n\n[share/boot_config.json] increase frequency for publishing joint_states",
+      "files_changed": 2,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "2f43ac1254d5862ac5a3d3d032003403c4f0e6ba",
+          "filename": "share/boot_config.json",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/129f304b099d2a341a3c747ae10206c737d22bd5/share%2Fboot_config.json",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/129f304b099d2a341a3c747ae10206c737d22bd5/share%2Fboot_config.json",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/share%2Fboot_config.json?ref=129f304b099d2a341a3c747ae10206c737d22bd5",
+          "patch": "@@ -58,7 +58,7 @@\n     \"joint_states\":\n     {\n       \"enabled\"       : true,\n-      \"frequency\"     : 15\n+      \"frequency\"     : 50\n     },\n     \"laser\":\n     {"
+        },
+        {
+          "sha": "e6cf48f63dcbeda3d96d6a53f4b5df87e9a3f56e",
+          "filename": "src/naoqi_driver.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/129f304b099d2a341a3c747ae10206c737d22bd5/src%2Fnaoqi_driver.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/129f304b099d2a341a3c747ae10206c737d22bd5/src%2Fnaoqi_driver.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fnaoqi_driver.cpp?ref=129f304b099d2a341a3c747ae10206c737d22bd5",
+          "patch": "@@ -569,7 +569,7 @@ void Driver::registerDefaultConverter()\n   size_t camera_ir_recorder_fps       = boot_config_.get( \"converters.ir_camera.recorder_fps\", 5);\n \n   bool joint_states_enabled           = boot_config_.get( \"converters.joint_states.enabled\", true);\n-  size_t joint_states_frequency       = boot_config_.get( \"converters.joint_states.frequency\", 15);\n+  size_t joint_states_frequency       = boot_config_.get( \"converters.joint_states.frequency\", 50);\n \n   bool laser_enabled                  = boot_config_.get( \"converters.laser.enabled\", true);\n   size_t laser_frequency              = boot_config_.get( \"converters.laser.frequency\", 10);"
+        }
+      ]
+    },
+    {
+      "author": "nlyubova",
+      "date": "2015-09-02T10:08:32Z",
+      "sha": "9df992bad8178f04f34bd67b98f8bec6cfff326c",
+      "message": "missing romeo.urdf",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "ddaefda3fbba5073f6dfe48329ed6dbd51692aaa",
+          "filename": "src/tools/robot_description.cpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/9df992bad8178f04f34bd67b98f8bec6cfff326c/src%2Ftools%2Frobot_description.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/9df992bad8178f04f34bd67b98f8bec6cfff326c/src%2Ftools%2Frobot_description.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Ftools%2Frobot_description.cpp?ref=9df992bad8178f04f34bd67b98f8bec6cfff326c",
+          "patch": "@@ -39,6 +39,10 @@ std::string getRobotDescription( const robot::Robot& robot){\n     {\n       urdf_path = helpers::filesystem::getURDF(\"nao.urdf\");\n     }\n+    else if ( robot == robot::ROMEO )\n+    {\n+      urdf_path = helpers::filesystem::getURDF(\"romeo.urdf\");\n+    }\n     else\n     {\n       std::cerr << \" could not load urdf file from disk \" << std::endl;"
+        }
+      ]
+    },
+    {
+      "author": "kochigami",
+      "date": "2016-02-08T03:44:41Z",
+      "sha": "355c2f2198d35f47aaba118ff11d2c7659c102e1",
+      "message": "add hand touch sensor input to touch programs",
+      "files_changed": 6,
+      "additions": 56,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "33c0cce4a32a61ed6be2b5aa9de2c983d52514c3",
+          "filename": "share/boot_config.json",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/355c2f2198d35f47aaba118ff11d2c7659c102e1/share%2Fboot_config.json",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/355c2f2198d35f47aaba118ff11d2c7659c102e1/share%2Fboot_config.json",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/share%2Fboot_config.json?ref=355c2f2198d35f47aaba118ff11d2c7659c102e1",
+          "patch": "@@ -82,6 +82,10 @@\n     {\n       \"enabled\"       : true\n     },\n+    \"hand\":\n+    {\n+      \"enabled\"       : true\n+    },\n     \"odom\":\n     {\n       \"enabled\"       : true,"
+        },
+        {
+          "sha": "ce99a9bb28a0282b4d8e087bf9fb04f8fc57eeb7",
+          "filename": "src/converters/touch.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/355c2f2198d35f47aaba118ff11d2c7659c102e1/src%2Fconverters%2Ftouch.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/355c2f2198d35f47aaba118ff11d2c7659c102e1/src%2Fconverters%2Ftouch.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fconverters%2Ftouch.cpp?ref=355c2f2198d35f47aaba118ff11d2c7659c102e1",
+          "patch": "@@ -64,6 +64,7 @@ void TouchEventConverter<T>::callAll(const std::vector<message_actions::MessageA\n // http://stackoverflow.com/questions/8752837/undefined-reference-to-template-class-constructor\n template class TouchEventConverter<naoqi_bridge_msgs::Bumper>;\n template class TouchEventConverter<naoqi_bridge_msgs::TactileTouch>;\n+template class TouchEventConverter<naoqi_bridge_msgs::HandTouch>;\n }\n \n }"
+        },
+        {
+          "sha": "c15ea2eaca58be6a75298ab29a00dce4d99b0f7b",
+          "filename": "src/converters/touch.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/355c2f2198d35f47aaba118ff11d2c7659c102e1/src%2Fconverters%2Ftouch.hpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/355c2f2198d35f47aaba118ff11d2c7659c102e1/src%2Fconverters%2Ftouch.hpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fconverters%2Ftouch.hpp?ref=355c2f2198d35f47aaba118ff11d2c7659c102e1",
+          "patch": "@@ -28,6 +28,7 @@\n * ROS includes\n */\n #include <naoqi_bridge_msgs/Bumper.h>\n+#include <naoqi_bridge_msgs/HandTouch.h>\n #include <naoqi_bridge_msgs/TactileTouch.h>\n \n /*"
+        },
+        {
+          "sha": "0c9562047dbe373e316726a9ab07f5eb5db86320",
+          "filename": "src/event/touch.cpp",
+          "status": "modified",
+          "additions": 14,
+          "deletions": 0,
+          "changes": 14,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/355c2f2198d35f47aaba118ff11d2c7659c102e1/src%2Fevent%2Ftouch.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/355c2f2198d35f47aaba118ff11d2c7659c102e1/src%2Fevent%2Ftouch.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fevent%2Ftouch.cpp?ref=355c2f2198d35f47aaba118ff11d2c7659c102e1",
+          "patch": "@@ -229,8 +229,22 @@ void TouchEventRegister<T>::touchCallbackMessage(std::string &key, bool &state,\n   }\n }\n \n+template<class T>\n+void TouchEventRegister<T>::touchCallbackMessage(std::string &key, bool &state, naoqi_bridge_msgs::HandTouch &msg)\n+{\n+  int i = 0;\n+  for(std::vector<std::string>::const_iterator it = keys_.begin(); it != keys_.end(); ++it, ++i)\n+  {\n+    if ( key == it->c_str() ) {\n+      msg.hand = i;\n+      msg.state = state?(naoqi_bridge_msgs::HandTouch::statePressed):(naoqi_bridge_msgs::HandTouch::stateReleased);\n+    }\n+  }\n+}\n+\n // http://stackoverflow.com/questions/8752837/undefined-reference-to-template-class-constructor\n template class TouchEventRegister<naoqi_bridge_msgs::Bumper>;\n template class TouchEventRegister<naoqi_bridge_msgs::TactileTouch>;\n+template class TouchEventRegister<naoqi_bridge_msgs::HandTouch>;\n \n }//namespace"
+        },
+        {
+          "sha": "bb73f383ec599d1602458b386cb4d204b8eb0134",
+          "filename": "src/event/touch.hpp",
+          "status": "modified",
+          "additions": 16,
+          "deletions": 0,
+          "changes": 16,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/355c2f2198d35f47aaba118ff11d2c7659c102e1/src%2Fevent%2Ftouch.hpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/355c2f2198d35f47aaba118ff11d2c7659c102e1/src%2Fevent%2Ftouch.hpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fevent%2Ftouch.hpp?ref=355c2f2198d35f47aaba118ff11d2c7659c102e1",
+          "patch": "@@ -30,6 +30,7 @@\n #include <ros/ros.h>\n #include <naoqi_bridge_msgs/Bumper.h>\n #include <naoqi_bridge_msgs/TactileTouch.h>\n+#include <naoqi_bridge_msgs/HandTouch.h>\n \n #include <naoqi_driver/tools.hpp>\n #include <naoqi_driver/recorder/globalrecorder.hpp>\n@@ -80,6 +81,7 @@ class TouchEventRegister: public boost::enable_shared_from_this<TouchEventRegist\n   void touchCallback(std::string &key, qi::AnyValue &value, qi::AnyValue &message);\n   void touchCallbackMessage(std::string &key, bool &state, naoqi_bridge_msgs::Bumper &msg);\n   void touchCallbackMessage(std::string &key, bool &state, naoqi_bridge_msgs::TactileTouch &msg);\n+  void touchCallbackMessage(std::string &key, bool &state, naoqi_bridge_msgs::HandTouch &msg);\n   \n \n private:\n@@ -121,6 +123,12 @@ class TactileTouchEventRegister: public TouchEventRegister<naoqi_bridge_msgs::Ta\n   TactileTouchEventRegister( const std::string& name, const std::vector<std::string> keys, const float& frequency, const qi::SessionPtr& session ) : TouchEventRegister<naoqi_bridge_msgs::TactileTouch>(name, keys, frequency, session) {}\n };\n \n+class HandTouchEventRegister: public TouchEventRegister<naoqi_bridge_msgs::HandTouch>\n+{\n+public:\n+  HandTouchEventRegister( const std::string& name, const std::vector<std::string> keys, const float& frequency, const qi::SessionPtr& session ) : TouchEventRegister<naoqi_bridge_msgs::HandTouch>(name, keys, frequency, session) {}\n+};\n+\n //QI_REGISTER_OBJECT(BumperEventRegister, touchCallback)\n //QI_REGISTER_OBJECT(TactileTouchEventRegister, touchCallback)\n \n@@ -140,6 +148,14 @@ static bool _qiregisterTouchEventRegisterTactileTouch() {\n   }\n static bool BOOST_PP_CAT(__qi_registration, __LINE__) = _qiregisterTouchEventRegisterTactileTouch();\n \n+static bool _qiregisterTouchEventRegisterHandTouch() {\n+  ::qi::ObjectTypeBuilder<TouchEventRegister<naoqi_bridge_msgs::HandTouch> > b;\n+  QI_VAARGS_APPLY(__QI_REGISTER_ELEMENT, TouchEventRegister<naoqi_bridge_msgs::HandTouch>, touchCallback)\n+    b.registerType();\n+  return true;\n+  }\n+static bool BOOST_PP_CAT(__qi_registration, __LINE__) = _qiregisterTouchEventRegisterHandTouch();\n+\n } //naoqi\n \n #endif"
+        },
+        {
+          "sha": "6fa61ad2d19635947e111fbc46609bb9627de11c",
+          "filename": "src/naoqi_driver.cpp",
+          "status": "modified",
+          "additions": 20,
+          "deletions": 0,
+          "changes": 20,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/355c2f2198d35f47aaba118ff11d2c7659c102e1/src%2Fnaoqi_driver.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/355c2f2198d35f47aaba118ff11d2c7659c102e1/src%2Fnaoqi_driver.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fnaoqi_driver.cpp?ref=355c2f2198d35f47aaba118ff11d2c7659c102e1",
+          "patch": "@@ -584,6 +584,7 @@ void Driver::registerDefaultConverter()\n \n   bool bumper_enabled                 = boot_config_.get( \"converters.bumper.enabled\", true);\n   bool tactile_enabled                = boot_config_.get( \"converters.tactile.enabled\", true);\n+  bool hand_enabled                   = boot_config_.get( \"converters.hand.enabled\", true);\n   /*\n    * The info converter will be called once after it was added to the priority queue. Once it is its turn to be called, its\n    * callAll method will be triggered (because InfoPublisher is considered to always have subscribers, isSubscribed always\n@@ -807,6 +808,25 @@ void Driver::registerDefaultConverter()\n     }\n   }\n \n+  if ( hand_enabled )\n+    {\n+      std::vector<std::string> hand_touch_events;\n+      hand_touch_events.push_back(\"HandRightBackTouched\");\n+      hand_touch_events.push_back(\"HandRightLeftTouched\");\n+      hand_touch_events.push_back(\"HandRightRightTouched\");\n+      hand_touch_events.push_back(\"HandLeftBackTouched\");\n+      hand_touch_events.push_back(\"HandLeftLeftTouched\");\n+      hand_touch_events.push_back(\"HandLeftRightTouched\");\n+      boost::shared_ptr<HandTouchEventRegister> event_register =\n+\tboost::make_shared<HandTouchEventRegister>( \"hand_touch\", hand_touch_events, 0, sessionPtr_ );\n+      insertEventConverter(\"hand_touch\", event_register);\n+      if (keep_looping) {\n+\tevent_map_.find(\"hand_touch\")->second.startProcess();\n+      }\n+      if (publish_enabled_) {\n+\tevent_map_.find(\"hand_touch\")->second.isPublishing(true);\n+      }\n+    }\n   \n   /** Odom */\n   if ( odom_enabled )"
+        }
+      ]
+    },
+    {
+      "author": "Natalia Lyubova",
+      "date": "2018-02-16T06:32:43Z",
+      "sha": "5a5c9271a195dbb7eca3f57cfa37ffc1c670ab73",
+      "message": "adding CHANGELOG",
+      "files_changed": 1,
+      "additions": 31,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "1f2d2aa1b306a0a024ac4bad51e75f95acba8a61",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 31,
+          "deletions": 0,
+          "changes": 31,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/5a5c9271a195dbb7eca3f57cfa37ffc1c670ab73/CHANGELOG.rst",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/5a5c9271a195dbb7eca3f57cfa37ffc1c670ab73/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/CHANGELOG.rst?ref=5a5c9271a195dbb7eca3f57cfa37ffc1c670ab73",
+          "patch": "@@ -2,6 +2,37 @@\n Changelog for package naoqi_rosbridge\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+Forthcoming\n+-----------\n+* disable logs as default (reference `#68 <https://github.com/ros-naoqi/naoqi_driver/issues/68>`_) (`#88 <https://github.com/ros-naoqi/naoqi_driver/issues/88>`_)\n+* Missing tf2 include and tf2 exception type (`#103 <https://github.com/ros-naoqi/naoqi_driver/issues/103>`_)\n+  * Add missing include tf2_ros/buffer.h\n+  * Catch tf2::TransformException\n+* add services for get and set language (`#87 <https://github.com/ros-naoqi/naoqi_driver/issues/87>`_)\n+* C-style comments are not syntactically correct in JSON (`#98 <https://github.com/ros-naoqi/naoqi_driver/issues/98>`_)\n+  * C-style comments are not syntactically correct in JSON\n+* Remove Jade from Travis description (`#95 <https://github.com/ros-naoqi/naoqi_driver/issues/95>`_)\n+  * Remove Jade from Travis description and CI matrix\n+  * Correct badges according to the Travis matrix modification, and add Debian stretch badge\n+* Adding a maintainer\n+* Ci (`#94 <https://github.com/ros-naoqi/naoqi_driver/issues/94>`_)\n+  * Add .travis.yml\n+* Adding a warning for VGA resolution for depth camera (`#93 <https://github.com/ros-naoqi/naoqi_driver/issues/93>`_)\n+  Adding a warning for VGA resolution for depth camera\n+* Merge pull request `#92 <https://github.com/ros-naoqi/naoqi_driver/issues/92>`_ from Pandhariix/add_joint_limits\n+  Add joint limits to the diagnostics\n+* Start adding joints limits to the diagnostic\n+  Add double layered float vector converter method\n+  Add the joints limit map, and add the joints limits to the diagnostic message\n+* Update gitignore\n+* Fix typo in naoqi_driver.hpp\n+* Merge pull request `#85 <https://github.com/ros-naoqi/naoqi_driver/issues/85>`_ from PacoDu/fix_node_name_empty\n+  Fix node name empty related to pepper_robot issue `#35 <https://github.com/ros-naoqi/naoqi_driver/issues/35>`_\n+* Update naoqi_driver.cpp\n+  Error while merging, setPrefix removed.\n+* Fix node name issue `#35 <https://github.com/ros-naoqi/naoqi_driver/issues/35>`_\n+* Contributors: Dupont Paco, Esteve Fernandez, Kanae Kochigami, Maxime Busy, Natalia Lyubova, Paco Dupont, Shane Loretz, Surya Ambrose\n+\n 0.5.9 (2016-11-08)\n ------------------\n * -Vincent Rabaud as a maintainer, +Natalia Lyubova"
+        }
+      ]
+    },
+    {
+      "author": "sloretz",
+      "date": "2018-02-14T07:41:00Z",
+      "sha": "a83ec334973363ac18d01497cfe5e75d0fed898f",
+      "message": "Missing tf2 include and tf2 exception type (#103)\n\n* Add missing include tf2_ros/buffer.h\r\n* Catch tf2::TransformException",
+      "files_changed": 2,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "c39239217d203e8009fb208d561fcc3d26e09174",
+          "filename": "src/converters/joint_state.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/a83ec334973363ac18d01497cfe5e75d0fed898f/src%2Fconverters%2Fjoint_state.hpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/a83ec334973363ac18d01497cfe5e75d0fed898f/src%2Fconverters%2Fjoint_state.hpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fconverters%2Fjoint_state.hpp?ref=a83ec334973363ac18d01497cfe5e75d0fed898f",
+          "patch": "@@ -30,6 +30,7 @@\n */\n #include <urdf/model.h>\n #include <sensor_msgs/JointState.h>\n+#include <tf2_ros/buffer.h>\n #include <robot_state_publisher/robot_state_publisher.h>\n \n namespace naoqi"
+        },
+        {
+          "sha": "d6cf4169947a63251f609f0e338d880c53583ff0",
+          "filename": "src/converters/nao_footprint.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/a83ec334973363ac18d01497cfe5e75d0fed898f/src%2Fconverters%2Fnao_footprint.hpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/a83ec334973363ac18d01497cfe5e75d0fed898f/src%2Fconverters%2Fnao_footprint.hpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fconverters%2Fnao_footprint.hpp?ref=a83ec334973363ac18d01497cfe5e75d0fed898f",
+          "patch": "@@ -52,7 +52,7 @@ inline void addBaseFootprint( boost::shared_ptr<tf2_ros::Buffer> tf2_buffer, std\n     tf_odom_to_left_foot  = tf2_buffer->lookupTransform(\"odom\", \"l_sole\",    time );\n     tf_odom_to_right_foot = tf2_buffer->lookupTransform(\"odom\", \"r_sole\",    time );\n     tf_odom_to_base       = tf2_buffer->lookupTransform(\"odom\", \"base_link\", time );\n-  } catch (const tf::TransformException& ex){\n+  } catch (const tf2::TransformException& ex){\n     ROS_ERROR(\"NAO Footprint error %s\",ex.what());\n     return ;\n   }"
+        }
+      ]
+    },
+    {
+      "author": "esteve",
+      "date": "2018-01-11T23:45:26Z",
+      "sha": "f33dca74c20253b22d528d2a0d6c9d3a4a43ddec",
+      "message": "C-style comments are not syntactically correct in JSON (#98)\n\n* C-style comments are not syntactically correct in JSON\r\n\r\nThe JSON grammar does not accept C (/* */) or C++ (//) comments.\r\n\r\nSee:\r\n- http://www.json.org/\r\n- http://www.ietf.org/rfc/rfc7159.txt\r\n- https://stackoverflow.com/a/4183018\r\n\r\n* Use a dummy field to store the comment",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "fbfbdb46662a767efcf6b50ea8bc4c2d776075e7",
+          "filename": "share/boot_config.json",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/f33dca74c20253b22d528d2a0d6c9d3a4a43ddec/share%2Fboot_config.json",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/f33dca74c20253b22d528d2a0d6c9d3a4a43ddec/share%2Fboot_config.json",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/share%2Fboot_config.json?ref=f33dca74c20253b22d528d2a0d6c9d3a4a43ddec",
+          "patch": "@@ -1,5 +1,5 @@\n-/* QQVGA = 0, QVGA = 1, VGA =2 */\n {\n+  \"_comment\": \"QQVGA = 0, QVGA = 1, VGA = 2\",\n   \"converters\":\n   {\n     \"front_camera\":"
+        }
+      ]
+    },
+    {
+      "author": "suryaambrose",
+      "date": "2015-03-05T15:52:25Z",
+      "sha": "b76eba0434c1cee05caa61a5c6e34c42f2865bb6",
+      "message": "Add ros dependency to qiproject\n\nThis will automatically deploy ros package on the robot when using\nqibuild deploy",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "d917a80b115d5b21a9707c87a016e6e133695557",
+          "filename": "qiproject.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/b76eba0434c1cee05caa61a5c6e34c42f2865bb6/qiproject.xml",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/b76eba0434c1cee05caa61a5c6e34c42f2865bb6/qiproject.xml",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/qiproject.xml?ref=b76eba0434c1cee05caa61a5c6e34c42f2865bb6",
+          "patch": "@@ -1,6 +1,6 @@\n <!-- in qiproject.xml -->\n <project version=\"3\">\n   <qibuild name=\"alrosbridge\" >\n-    <depends buildtime=\"true\" runtime=\"true\" names=\"libnaoqi libqicore\" />\n+    <depends buildtime=\"true\" runtime=\"true\" names=\"libnaoqi libqicore ros\" />\n   </qibuild>\n </project>"
+        }
+      ]
+    },
+    {
+      "author": "PacoDu",
+      "date": "2017-04-07T14:32:06Z",
+      "sha": "2076732192a505a80a707301e5709cf710500e09",
+      "message": "Fix node name issue #35",
+      "files_changed": 4,
+      "additions": 16,
+      "deletions": 7,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "d7bf4038d359fc7fe5d98aec4db04c738042e573",
+          "filename": "launch/naoqi_driver.launch",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/2076732192a505a80a707301e5709cf710500e09/launch%2Fnaoqi_driver.launch",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/2076732192a505a80a707301e5709cf710500e09/launch%2Fnaoqi_driver.launch",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/launch%2Fnaoqi_driver.launch?ref=2076732192a505a80a707301e5709cf710500e09",
+          "patch": "@@ -4,7 +4,8 @@\n   <arg name=\"nao_port\"          default=\"$(optenv NAO_PORT 9559)\" />\n   <arg name=\"roscore_ip\"        default=\"127.0.0.1\" />\n   <arg name=\"network_interface\" default=\"eth0\" />\n+  <arg name=\"namespace\"         default=\"naoqi_driver\" />\n \n-  <node pkg=\"naoqi_driver\" type=\"naoqi_driver_node\" name=\"naoqi_driver\" required=\"true\" args=\"--qi-url=tcp://$(arg nao_ip):$(arg nao_port) --roscore_ip=$(arg roscore_ip) --network_interface=$(arg network_interface)\" output=\"screen\" />\n+  <node pkg=\"naoqi_driver\" type=\"naoqi_driver_node\" name=\"$(arg namespace)\" required=\"true\" args=\"--qi-url=tcp://$(arg nao_ip):$(arg nao_port) --roscore_ip=$(arg roscore_ip) --network_interface=$(arg network_interface) --namespace=$(arg namespace)\" output=\"screen\" />\n \n </launch>"
+        },
+        {
+          "sha": "a41fefa54f69166b7cdb4926db59717cff8870e4",
+          "filename": "src/external_registration.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/2076732192a505a80a707301e5709cf710500e09/src%2Fexternal_registration.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/2076732192a505a80a707301e5709cf710500e09/src%2Fexternal_registration.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fexternal_registration.cpp?ref=2076732192a505a80a707301e5709cf710500e09",
+          "patch": "@@ -39,7 +39,7 @@ int main(int argc, char** argv)\n     (\"help,h\", \"print help message\")\n     (\"roscore_ip,r\", po::value<std::string>(), \"set the ip of the roscore to use\")\n     (\"network_interface,i\", po::value<std::string>()->default_value(\"eth0\"),  \"set the network interface over which to connect\")\n-    (\"namespace,n\", po::value<std::string>()->default_value(\"\"), \"set an explicit namespace in case ROS namespace variables cannot be used\");\n+    (\"namespace,n\", po::value<std::string>()->default_value(\"naoqi_driver_node\"), \"set an explicit namespace in case ROS namespace variables cannot be used\");\n \n   po::variables_map vm;\n   try"
+        },
+        {
+          "sha": "a98a3360d2d5fe6a55626b41f6d9ddd9b7d7de53",
+          "filename": "src/naoqi_driver.cpp",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 4,
+          "changes": 16,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/2076732192a505a80a707301e5709cf710500e09/src%2Fnaoqi_driver.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/2076732192a505a80a707301e5709cf710500e09/src%2Fnaoqi_driver.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fnaoqi_driver.cpp?ref=2076732192a505a80a707301e5709cf710500e09",
+          "patch": "@@ -125,6 +125,14 @@ Driver::Driver( qi::SessionPtr session, const std::string& prefix )\n   buffer_duration_(helpers::recorder::bufferDefaultDuration)\n {\n   naoqi::ros_env::setPrefix(prefix);\n+  if(prefix == \"\"){\n+    std::cout << \"Error driver prefix must not be empty\" << std::endl;\n+    throw new ros::Exception(\"Error driver prefix must not be empty\");\n+  }\n+  else {\n+    naoqi::ros_env::setPrefix(prefix);\n+  }\n+\n }\n \n Driver::~Driver()\n@@ -577,10 +585,10 @@ void Driver::registerDefaultConverter()\n \n   bool sonar_enabled                  = boot_config_.get( \"converters.sonar.enabled\", true);\n   size_t sonar_frequency              = boot_config_.get( \"converters.sonar.frequency\", 10);\n-  \n+\n   bool odom_enabled                  = boot_config_.get( \"converters.odom.enabled\", true);\n   size_t odom_frequency              = boot_config_.get( \"converters.odom.frequency\", 10);\n-  \n+\n   bool bumper_enabled                 = boot_config_.get( \"converters.bumper.enabled\", true);\n   bool hand_enabled                   = boot_config_.get( \"converters.touch_hand.enabled\", true);\n   bool head_enabled                   = boot_config_.get( \"converters.touch_head.enabled\", true);\n@@ -826,7 +834,7 @@ void Driver::registerDefaultConverter()\n       event_map_.find(\"head_touch\")->second.isPublishing(true);\n     }\n   }\n-  \n+\n   /** Odom */\n   if ( odom_enabled )\n   {\n@@ -838,7 +846,7 @@ void Driver::registerDefaultConverter()\n     lc->registerCallback( message_actions::LOG, boost::bind(&recorder::BasicRecorder<nav_msgs::Odometry>::bufferize, lr, _1) );\n     registerConverter( lc, lp, lr );\n   }\n-  \n+\n }\n \n "
+        },
+        {
+          "sha": "4d746723f6485880d2178706c4a77bc9f550e878",
+          "filename": "src/ros_env.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/2076732192a505a80a707301e5709cf710500e09/src%2Fros_env.hpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/2076732192a505a80a707301e5709cf710500e09/src%2Fros_env.hpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fros_env.hpp?ref=2076732192a505a80a707301e5709cf710500e09",
+          "patch": "@@ -90,7 +90,7 @@ static void setMasterURI( const std::string& uri, const std::string& network_int\n   remap[\"__ip\"] = ::naoqi::ros_env::getROSIP(network_interface);\n   // init ros without a sigint-handler in order to shutdown correctly by naoqi\n   const char* ns_env = std::getenv(\"ROS_NAMESPACE\");\n-  ros::init( remap, (ns_env==NULL)?(std::string(\"naoqi_driver_node\")):(::naoqi::ros_env::getPrefix()) , ros::init_options::NoSigintHandler );\n+  ros::init( remap, (::naoqi::ros_env::getPrefix()), ros::init_options::NoSigintHandler );\n   // to prevent shutdown based on no existing nodehandle\n   ros::start();\n "
+        }
+      ]
+    },
+    {
+      "author": "vrabaud",
+      "date": "2015-01-13T16:22:17Z",
+      "sha": "d5332d8547e9c04ec82f8e63d957e30bbd1e505e",
+      "message": "add a README file",
+      "files_changed": 1,
+      "additions": 17,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "964e9e3f178ea2ef261a15dc25d52a25e1cc79a9",
+          "filename": "README.rst",
+          "status": "added",
+          "additions": 17,
+          "deletions": 0,
+          "changes": 17,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/d5332d8547e9c04ec82f8e63d957e30bbd1e505e/README.rst",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/d5332d8547e9c04ec82f8e63d957e30bbd1e505e/README.rst",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/README.rst?ref=d5332d8547e9c04ec82f8e63d957e30bbd1e505e",
+          "patch": "@@ -0,0 +1,17 @@\n+Description\n+===========\n+\n+This is a NAOqi module that bridges with ROS. It publishes\n+several sensor data as well as the robot position.\n+\n+On the other hand it enables ROS to call parts of the\n+NAOqi API.\n+\n+TODO\n+====\n+\n+- get the toolchain in https://gitlab.aldebaran.lan/kknese/\n+- write down instructions on how to install that toolchain\n+and compile that module in the README.rst file\n+- write down instructions on how to deploy that module in that README.rst file\n+- write down instructions on how to use it in an official qidoc .rst file"
+        }
+      ]
+    },
+    {
+      "author": "Karsten1987",
+      "date": "2015-04-24T07:58:19Z",
+      "sha": "dbfd4293df734acc35613e7df34958e3310cde0c",
+      "message": "Initial commit",
+      "files_changed": 1,
+      "additions": 202,
+      "deletions": 0,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "8f71f43fee3f78649d238238cbde51e6d7055c82",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 202,
+          "deletions": 0,
+          "changes": 202,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/dbfd4293df734acc35613e7df34958e3310cde0c/LICENSE",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/dbfd4293df734acc35613e7df34958e3310cde0c/LICENSE",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/LICENSE?ref=dbfd4293df734acc35613e7df34958e3310cde0c",
+          "patch": "@@ -0,0 +1,202 @@\n+                                 Apache License\n+                           Version 2.0, January 2004\n+                        http://www.apache.org/licenses/\n+\n+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION\n+\n+   1. Definitions.\n+\n+      \"License\" shall mean the terms and conditions for use, reproduction,\n+      and distribution as defined by Sections 1 through 9 of this document.\n+\n+      \"Licensor\" shall mean the copyright owner or entity authorized by\n+      the copyright owner that is granting the License.\n+\n+      \"Legal Entity\" shall mean the union of the acting entity and all\n+      other entities that control, are controlled by, or are under common\n+      control with that entity. For the purposes of this definition,\n+      \"control\" means (i) the power, direct or indirect, to cause the\n+      direction or management of such entity, whether by contract or\n+      otherwise, or (ii) ownership of fifty percent (50%) or more of the\n+      outstanding shares, or (iii) beneficial ownership of such entity.\n+\n+      \"You\" (or \"Your\") shall mean an individual or Legal Entity\n+      exercising permissions granted by this License.\n+\n+      \"Source\" form shall mean the preferred form for making modifications,\n+      including but not limited to software source code, documentation\n+      source, and configuration files.\n+\n+      \"Object\" form shall mean any form resulting from mechanical\n+      transformation or translation of a Source form, including but\n+      not limited to compiled object code, generated documentation,\n+      and conversions to other media types.\n+\n+      \"Work\" shall mean the work of authorship, whether in Source or\n+      Object form, made available under the License, as indicated by a\n+      copyright notice that is included in or attached to the work\n+      (an example is provided in the Appendix below).\n+\n+      \"Derivative Works\" shall mean any work, whether in Source or Object\n+      form, that is based on (or derived from) the Work and for which the\n+      editorial revisions, annotations, elaborations, or other modifications\n+      represent, as a whole, an original work of authorship. For the purposes\n+      of this License, Derivative Works shall not include works that remain\n+      separable from, or merely link (or bind by name) to the interfaces of,\n+      the Work and Derivative Works thereof.\n+\n+      \"Contribution\" shall mean any work of authorship, including\n+      the original version of the Work and any modifications or additions\n+      to that Work or Derivative Works thereof, that is intentionally\n+      submitted to Licensor for inclusion in the Work by the copyright owner\n+      or by an individual or Legal Entity authorized to submit on behalf of\n+      the copyright owner. For the purposes of this definition, \"submitted\"\n+      means any form of electronic, verbal, or written communication sent\n+      to the Licensor or its representatives, including but not limited to\n+      communication on electronic mailing lists, source code control systems,\n+      and issue tracking systems that are managed by, or on behalf of, the\n+      Licensor for the purpose of discussing and improving the Work, but\n+      excluding communication that is conspicuously marked or otherwise\n+      designated in writing by the copyright owner as \"Not a Contribution.\"\n+\n+      \"Contributor\" shall mean Licensor and any individual or Legal Entity\n+      on behalf of whom a Contribution has been received by Licensor and\n+      subsequently incorporated within the Work.\n+\n+   2. Grant of Copyright License. Subject to the terms and conditions of\n+      this License, each Contributor hereby grants to You a perpetual,\n+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n+      copyright license to reproduce, prepare Derivative Works of,\n+      publicly display, publicly perform, sublicense, and distribute the\n+      Work and such Derivative Works in Source or Object form.\n+\n+   3. Grant of Patent License. Subject to the terms and conditions of\n+      this License, each Contributor hereby grants to You a perpetual,\n+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n+      (except as stated in this section) patent license to make, have made,\n+      use, offer to sell, sell, import, and otherwise transfer the Work,\n+      where such license applies only to those patent claims licensable\n+      by such Contributor that are necessarily infringed by their\n+      Contribution(s) alone or by combination of their Contribution(s)\n+      with the Work to which such Contribution(s) was submitted. If You\n+      institute patent litigation against any entity (including a\n+      cross-claim or counterclaim in a lawsuit) alleging that the Work\n+      or a Contribution incorporated within the Work constitutes direct\n+      or contributory patent infringement, then any patent licenses\n+      granted to You under this License for that Work shall terminate\n+      as of the date such litigation is filed.\n+\n+   4. Redistribution. You may reproduce and distribute copies of the\n+      Work or Derivative Works thereof in any medium, with or without\n+      modifications, and in Source or Object form, provided that You\n+      meet the following conditions:\n+\n+      (a) You must give any other recipients of the Work or\n+          Derivative Works a copy of this License; and\n+\n+      (b) You must cause any modified files to carry prominent notices\n+          stating that You changed the files; and\n+\n+      (c) You must retain, in the Source form of any Derivative Works\n+          that You distribute, all copyright, patent, trademark, and\n+          attribution notices from the Source form of the Work,\n+          excluding those notices that do not pertain to any part of\n+          the Derivative Works; and\n+\n+      (d) If the Work includes a \"NOTICE\" text file as part of its\n+          distribution, then any Derivative Works that You distribute must\n+          include a readable copy of the attribution notices contained\n+          within such NOTICE file, excluding those notices that do not\n+          pertain to any part of the Derivative Works, in at least one\n+          of the following places: within a NOTICE text file distributed\n+          as part of the Derivative Works; within the Source form or\n+          documentation, if provided along with the Derivative Works; or,\n+          within a display generated by the Derivative Works, if and\n+          wherever such third-party notices normally appear. The contents\n+          of the NOTICE file are for informational purposes only and\n+          do not modify the License. You may add Your own attribution\n+          notices within Derivative Works that You distribute, alongside\n+          or as an addendum to the NOTICE text from the Work, provided\n+          that such additional attribution notices cannot be construed\n+          as modifying the License.\n+\n+      You may add Your own copyright statement to Your modifications and\n+      may provide additional or different license terms and conditions\n+      for use, reproduction, or distribution of Your modifications, or\n+      for any such Derivative Works as a whole, provided Your use,\n+      reproduction, and distribution of the Work otherwise complies with\n+      the conditions stated in this License.\n+\n+   5. Submission of Contributions. Unless You explicitly state otherwise,\n+      any Contribution intentionally submitted for inclusion in the Work\n+      by You to the Licensor shall be under the terms and conditions of\n+      this License, without any additional terms or conditions.\n+      Notwithstanding the above, nothing herein shall supersede or modify\n+      the terms of any separate license agreement you may have executed\n+      with Licensor regarding such Contributions.\n+\n+   6. Trademarks. This License does not grant permission to use the trade\n+      names, trademarks, service marks, or product names of the Licensor,\n+      except as required for reasonable and customary use in describing the\n+      origin of the Work and reproducing the content of the NOTICE file.\n+\n+   7. Disclaimer of Warranty. Unless required by applicable law or\n+      agreed to in writing, Licensor provides the Work (and each\n+      Contributor provides its Contributions) on an \"AS IS\" BASIS,\n+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or\n+      implied, including, without limitation, any warranties or conditions\n+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A\n+      PARTICULAR PURPOSE. You are solely responsible for determining the\n+      appropriateness of using or redistributing the Work and assume any\n+      risks associated with Your exercise of permissions under this License.\n+\n+   8. Limitation of Liability. In no event and under no legal theory,\n+      whether in tort (including negligence), contract, or otherwise,\n+      unless required by applicable law (such as deliberate and grossly\n+      negligent acts) or agreed to in writing, shall any Contributor be\n+      liable to You for damages, including any direct, indirect, special,\n+      incidental, or consequential damages of any character arising as a\n+      result of this License or out of the use or inability to use the\n+      Work (including but not limited to damages for loss of goodwill,\n+      work stoppage, computer failure or malfunction, or any and all\n+      other commercial damages or losses), even if such Contributor\n+      has been advised of the possibility of such damages.\n+\n+   9. Accepting Warranty or Additional Liability. While redistributing\n+      the Work or Derivative Works thereof, You may choose to offer,\n+      and charge a fee for, acceptance of support, warranty, indemnity,\n+      or other liability obligations and/or rights consistent with this\n+      License. However, in accepting such obligations, You may act only\n+      on Your own behalf and on Your sole responsibility, not on behalf\n+      of any other Contributor, and only if You agree to indemnify,\n+      defend, and hold each Contributor harmless for any liability\n+      incurred by, or claims asserted against, such Contributor by reason\n+      of your accepting any such warranty or additional liability.\n+\n+   END OF TERMS AND CONDITIONS\n+\n+   APPENDIX: How to apply the Apache License to your work.\n+\n+      To apply the Apache License to your work, attach the following\n+      boilerplate notice, with the fields enclosed by brackets \"{}\"\n+      replaced with your own identifying information. (Don't include\n+      the brackets!)  The text should be enclosed in the appropriate\n+      comment syntax for the file format. We also recommend that a\n+      file or class name and description of purpose be included on the\n+      same \"printed page\" as the copyright notice for easier\n+      identification within third-party archives.\n+\n+   Copyright {yyyy} {name of copyright owner}\n+\n+   Licensed under the Apache License, Version 2.0 (the \"License\");\n+   you may not use this file except in compliance with the License.\n+   You may obtain a copy of the License at\n+\n+       http://www.apache.org/licenses/LICENSE-2.0\n+\n+   Unless required by applicable law or agreed to in writing, software\n+   distributed under the License is distributed on an \"AS IS\" BASIS,\n+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+   See the License for the specific language governing permissions and\n+   limitations under the License.\n+"
+        }
+      ]
+    },
+    {
+      "author": "lgeorge",
+      "date": "2016-01-10T21:03:27Z",
+      "sha": "b1d3b243f5d065dc578a44a4ffa124edd3b14efd",
+      "message": "fix(odom): update code based on comment in pull request",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 9,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "7e4cf1eed2f42235c63794860367c505edb44eea",
+          "filename": "src/converters/odom.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 9,
+          "changes": 11,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/b1d3b243f5d065dc578a44a4ffa124edd3b14efd/src%2Fconverters%2Fodom.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/b1d3b243f5d065dc578a44a4ffa124edd3b14efd/src%2Fconverters%2Fodom.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fconverters%2Fodom.cpp?ref=b1d3b243f5d065dc578a44a4ffa124edd3b14efd",
+          "patch": "@@ -52,16 +52,12 @@ void OdomConverter::callAll( const std::vector<message_actions::MessageAction>&\n   \n   int FRAME_WORLD = 1;\n   bool use_sensor = true;\n+  // documentation of getPosition available here: http://doc.aldebaran.com/2-1/naoqi/motion/control-cartesian.html\n   std::vector<float> al_odometry_data = p_motion_.call<std::vector<float> >( \"getPosition\", \"Torso\", FRAME_WORLD, use_sensor );\n   \n   const ros::Time& odom_stamp = ros::Time::now();\n   std::vector<float> al_speed_data = p_motion_.call<std::vector<float> >( \"getRobotVelocity\" );\n   \n-  \n-  //std::cout << \"ODOM val\" << al_odometry_data << std::endl;\n-  //std::cout << \"ODOM speed\" << al_speed_data << std::endl;\n-  \n-  \n   const float& odomX  =  al_odometry_data[0];\n   const float& odomY  =  al_odometry_data[1];\n   const float& odomZ  =  al_odometry_data[2];\n@@ -72,8 +68,7 @@ void OdomConverter::callAll( const std::vector<message_actions::MessageAction>&\n   const float& dX = al_speed_data[0];\n   const float& dY = al_speed_data[1];\n   const float& dWZ = al_speed_data[2];\n-  \n-  \n+\n   //since all odometry is 6DOF we'll need a quaternion created from yaw\n   tf2::Quaternion tf_quat;\n   tf_quat.setRPY( odomWX, odomWY, odomWZ );\n@@ -96,8 +91,6 @@ void OdomConverter::callAll( const std::vector<message_actions::MessageAction>&\n   msg_odom.twist.twist.angular.x = 0;\n   msg_odom.twist.twist.angular.y = 0;\n   msg_odom.twist.twist.angular.z = dWZ;\n-  \n-  \n \n   for_each( message_actions::MessageAction action, actions )\n   {"
+        }
+      ]
+    },
+    {
+      "author": "Laurent GEORGE",
+      "date": "2015-02-24T13:08:34Z",
+      "sha": "a55f523f7b028791ac9bf477eccc825d2a485542",
+      "message": "Moving section compiling into Getting started.\n\nIt is easier to read the documentation this way: In getting start it's\nstraightforward no need to go to end of page to understand how to install the\nros bridge.",
+      "files_changed": 1,
+      "additions": 22,
+      "deletions": 21,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "be2b8829ac36163011028b41511720e2c731b0a7",
+          "filename": "doc/source/index.rst",
+          "status": "modified",
+          "additions": 22,
+          "deletions": 21,
+          "changes": 43,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/a55f523f7b028791ac9bf477eccc825d2a485542/doc%2Fsource%2Findex.rst",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/a55f523f7b028791ac9bf477eccc825d2a485542/doc%2Fsource%2Findex.rst",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/doc%2Fsource%2Findex.rst?ref=a55f523f7b028791ac9bf477eccc825d2a485542",
+          "patch": "@@ -49,6 +49,28 @@ To get things faster:\n Getting Started\n ---------------\n \n+Compiling\n++++++++++\n+\n+Those instructions are internal to Aldebaran for now.\n+\n+To compile the module, you first need to get ROS in your toolchain. Get the toolchain file from https://gitlab.aldebaran.lan/kknese/ros-toolchain/tree/master .\n+\n+Then execute the proper instruction to add it to your toolchain, e.g.:\n+\n+.. code-block:: sh\n+\n+  $ qitoolchain add-package -c atom toolchain_install_atom.zip\n+\n+Get the code from gitlab:\n+\n+.. code-block:: sh\n+\n+  $ git clone git@gitlab.aldebaran.lan:kknese/alrosconverter.git\n+  $ qisrc add ./alrosconverter\n+  $ qibuild configure -c atom alrosconverter\n+  $ qibuild make -c atom alrosconverter\n+\n Starting ROS on your machine\n ++++++++++++++++++++++++++++\n \n@@ -185,27 +207,6 @@ ROS\n +++\n For any ROS question, please refer to the official doc at http://wiki.ros.org .\n \n-Compiling\n-+++++++++\n-\n-Those instructions are internal to Aldebaran for now.\n-\n-To compile the module, you first need to get ROS in your toolchain. Get the toolchain file from https://gitlab.aldebaran.lan/kknese/ros-toolchain/tree/master .\n-\n-Then execute the proper instruction to add it to your toolchain, e.g.:\n-\n-.. code-block:: sh\n-\n-  $ qitoolchain add-package -c atom toolchain_install_atom.zip\n-\n-Get the code from gitlab:\n-\n-.. code-block:: sh\n-\n-  $ git clone git@gitlab.aldebaran.lan:kknese/alrosconverter.git\n-  $ qisrc add ./alrosconverter\n-  $ qibuild configure -c atom alrosconverter\n-  $ qibuild make -c atom alrosconverter\n \n Android Teleop\n ++++++++++++++"
+        }
+      ]
+    },
+    {
+      "author": "furushchev",
+      "date": "2016-09-08T15:00:24Z",
+      "sha": "7d2ea0b574a037fc8c80f25cc4b7945638db9e9e",
+      "message": "[share/boot_config.json] increase frequency for publishing joint_states",
+      "files_changed": 2,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "2f43ac1254d5862ac5a3d3d032003403c4f0e6ba",
+          "filename": "share/boot_config.json",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/7d2ea0b574a037fc8c80f25cc4b7945638db9e9e/share%2Fboot_config.json",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/7d2ea0b574a037fc8c80f25cc4b7945638db9e9e/share%2Fboot_config.json",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/share%2Fboot_config.json?ref=7d2ea0b574a037fc8c80f25cc4b7945638db9e9e",
+          "patch": "@@ -58,7 +58,7 @@\n     \"joint_states\":\n     {\n       \"enabled\"       : true,\n-      \"frequency\"     : 15\n+      \"frequency\"     : 50\n     },\n     \"laser\":\n     {"
+        },
+        {
+          "sha": "e6cf48f63dcbeda3d96d6a53f4b5df87e9a3f56e",
+          "filename": "src/naoqi_driver.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/7d2ea0b574a037fc8c80f25cc4b7945638db9e9e/src%2Fnaoqi_driver.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/7d2ea0b574a037fc8c80f25cc4b7945638db9e9e/src%2Fnaoqi_driver.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fnaoqi_driver.cpp?ref=7d2ea0b574a037fc8c80f25cc4b7945638db9e9e",
+          "patch": "@@ -569,7 +569,7 @@ void Driver::registerDefaultConverter()\n   size_t camera_ir_recorder_fps       = boot_config_.get( \"converters.ir_camera.recorder_fps\", 5);\n \n   bool joint_states_enabled           = boot_config_.get( \"converters.joint_states.enabled\", true);\n-  size_t joint_states_frequency       = boot_config_.get( \"converters.joint_states.frequency\", 15);\n+  size_t joint_states_frequency       = boot_config_.get( \"converters.joint_states.frequency\", 50);\n \n   bool laser_enabled                  = boot_config_.get( \"converters.laser.enabled\", true);\n   size_t laser_frequency              = boot_config_.get( \"converters.laser.frequency\", 10);"
+        }
+      ]
+    },
+    {
+      "author": "k-okada",
+      "date": "2015-07-08T04:47:02Z",
+      "sha": "12c4c3dd8624b23b9e19b2c483edb1cde4c31aab",
+      "message": "ros_env.hpp write error message when network interface is not found",
+      "files_changed": 1,
+      "additions": 10,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "7e1bd5276b4d8f1cda5d50f29ba7b8e46bbb2e7a",
+          "filename": "src/ros_env.hpp",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 1,
+          "changes": 11,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/12c4c3dd8624b23b9e19b2c483edb1cde4c31aab/src%2Fros_env.hpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/12c4c3dd8624b23b9e19b2c483edb1cde4c31aab/src%2Fros_env.hpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fros_env.hpp?ref=12c4c3dd8624b23b9e19b2c483edb1cde4c31aab",
+          "patch": "@@ -47,8 +47,17 @@ static std::string getROSIP(std::string network_interface)\n {\n   if (network_interface.empty())\n     network_interface = \"eth0\";\n+\n   typedef std::map< std::string, std::vector<std::string> > Map_IP;\n-  static const std::string ip = static_cast<Map_IP>(qi::os::hostIPAddrs())[network_interface][0];\n+  Map_IP map_ip = static_cast<Map_IP>(qi::os::hostIPAddrs());\n+  if ( map_ip.find(network_interface) == map_ip.end() ) {\n+    std::cerr << \"Could not find network interface named \" << network_interface << \", pssible interfaces are ... \";\n+    for (Map_IP::iterator it=map_ip.begin(); it!=map_ip.end(); ++it) std::cerr << it->first <<  \" \";\n+    std::cerr << std::endl;\n+    exit(1);\n+  }\n+\n+  static const std::string ip = map_ip[network_interface][0];\n   return ip;\n }\n "
+        }
+      ]
+    },
+    {
+      "author": "Karsten Knese",
+      "date": "2015-01-13T15:34:01Z",
+      "sha": "04e143f3460f2ab31fcc67bf1174e8500e267a2c",
+      "message": "initial commit",
+      "files_changed": 5,
+      "additions": 101,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "76338529aa650298f73a8d15878cc40e08eb3d4c",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 12,
+          "deletions": 0,
+          "changes": 12,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/04e143f3460f2ab31fcc67bf1174e8500e267a2c/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/04e143f3460f2ab31fcc67bf1174e8500e267a2c/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/CMakeLists.txt?ref=04e143f3460f2ab31fcc67bf1174e8500e267a2c",
+          "patch": "@@ -0,0 +1,12 @@\n+cmake_minimum_required(VERSION 2.8)\n+project(myservice)\n+find_package(qibuild)\n+\n+if (I_AM_A_ROBOT)\n+#include_directories(\"include\")\n+qi_create_bin(alrosconverter\n+              src/main.cpp\n+              src/alrosconverter.cpp\n+            )\n+qi_use_lib(alrosconverter QI ROS)\n+endif()"
+        },
+        {
+          "sha": "8a6c76eb4c0d27164725313c5dfcc8c496abc01c",
+          "filename": "qiproject.xml",
+          "status": "added",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/04e143f3460f2ab31fcc67bf1174e8500e267a2c/qiproject.xml",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/04e143f3460f2ab31fcc67bf1174e8500e267a2c/qiproject.xml",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/qiproject.xml?ref=04e143f3460f2ab31fcc67bf1174e8500e267a2c",
+          "patch": "@@ -0,0 +1,6 @@\n+<!-- in qiproject.xml -->\n+<project version=\"3\">\n+  <qibuild name=\"alrosconverter\" >\n+    <depends buildtime=\"true\" runtime=\"true\" names=\"libnaoqi\" />\n+  </qibuild>\n+</project>"
+        },
+        {
+          "sha": "9d859ce97ccbf452702f8fa2bee0e006a95f21ad",
+          "filename": "src/alrosconverter.cpp",
+          "status": "added",
+          "additions": 38,
+          "deletions": 0,
+          "changes": 38,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/04e143f3460f2ab31fcc67bf1174e8500e267a2c/src%2Falrosconverter.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/04e143f3460f2ab31fcc67bf1174e8500e267a2c/src%2Falrosconverter.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Falrosconverter.cpp?ref=04e143f3460f2ab31fcc67bf1174e8500e267a2c",
+          "patch": "@@ -0,0 +1,38 @@\n+#include \"alrosconverter.hpp\"\n+#include <qi/anyobject.hpp>\n+\n+#include <stdlib.h>\n+\n+namespace ros_env\n+{\n+\n+static void setMasterURI( const std::string& uri )\n+{\n+  setenv(\"ROS_MASTER_URI\", uri.c_str(), 1);\n+}\n+\n+static std::string getMasterURI( )\n+{\n+  return getenv(\"ROS_MASTER_URI\");\n+}\n+\n+} //ros_env\n+\n+\n+ALRosConverter::ALRosConverter( const std::string& ip)\n+{\n+  // set ros environment\n+  ros_env::setMasterURI( ip );\n+}\n+\n+std::string ALRosConverter::getMasterURI() const\n+{\n+  return ros_env::getMasterURI();\n+}\n+\n+void ALRosConverter::setMasterURI( const std::string& uri ) const\n+{\n+  ros_env::setMasterURI( uri );\n+}\n+\n+QI_REGISTER_OBJECT( ALRosConverter, getMasterURI, setMasterURI );"
+        },
+        {
+          "sha": "cde3486ae2c1ac3d2b49ee184a062e4fd5e407ed",
+          "filename": "src/alrosconverter.hpp",
+          "status": "added",
+          "additions": 16,
+          "deletions": 0,
+          "changes": 16,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/04e143f3460f2ab31fcc67bf1174e8500e267a2c/src%2Falrosconverter.hpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/04e143f3460f2ab31fcc67bf1174e8500e267a2c/src%2Falrosconverter.hpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Falrosconverter.hpp?ref=04e143f3460f2ab31fcc67bf1174e8500e267a2c",
+          "patch": "@@ -0,0 +1,16 @@\n+#include <string>\n+\n+class ALRosConverter{\n+  public:\n+    ALRosConverter( const std::string& ip );\n+\n+    /**\n+    * callable with qicli call\n+    */\n+    std::string getMasterURI() const;\n+\n+    /**\n+    * callable with qicli call\n+    */\n+    void setMasterURI( const std::string& uri ) const;\n+};"
+        },
+        {
+          "sha": "be3956dd16c5e451d6b9a8b14a0ed97381edfd99",
+          "filename": "src/main.cpp",
+          "status": "added",
+          "additions": 29,
+          "deletions": 0,
+          "changes": 29,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/04e143f3460f2ab31fcc67bf1174e8500e267a2c/src%2Fmain.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/04e143f3460f2ab31fcc67bf1174e8500e267a2c/src%2Fmain.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fmain.cpp?ref=04e143f3460f2ab31fcc67bf1174e8500e267a2c",
+          "patch": "@@ -0,0 +1,29 @@\n+// in main.cpp\n+#include <qi/applicationsession.hpp>\n+#include <qi/anyobject.hpp>\n+#include <qi/session.hpp>\n+\n+#include <string>\n+#include <ros/ros.h>\n+\n+#include \"alrosconverter.hpp\"\n+\n+int main(int argc, char *argv[])\n+{\n+  qi::ApplicationSession app(argc, argv);\n+  app.start();\n+  qi::SessionPtr session = app.session();\n+\n+  // tmp master ip\n+  const std::string& ip = \"http://10.0.132.69:11311\";\n+  qi::Object<ALRosConverter> converter( new ALRosConverter(ip) );\n+\n+  ros::init( argc, argv, \"alrosconverter\" );\n+  std::cout << \"alrosconverter init\" << std::endl;\n+\n+  ros::NodeHandle nh;\n+  std::cout << \"node handle setup\" << std::endl;\n+\n+  session->registerService(\"ALRosConverter\", converter);\n+  app.run();\n+}"
+        }
+      ]
+    },
+    {
+      "author": "antegallya",
+      "date": "2015-08-23T08:51:31Z",
+      "sha": "6b6b9d988c5b7afc0d5e19bcadf9be9aee136177",
+      "message": "Fix a code-block in install.rst",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "c31f090c03bbf683e7c1dd6bc042c47a85dca99a",
+          "filename": "doc/source/install.rst",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/6b6b9d988c5b7afc0d5e19bcadf9be9aee136177/doc%2Fsource%2Finstall.rst",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/6b6b9d988c5b7afc0d5e19bcadf9be9aee136177/doc%2Fsource%2Finstall.rst",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/doc%2Fsource%2Finstall.rst?ref=6b6b9d988c5b7afc0d5e19bcadf9be9aee136177",
+          "patch": "@@ -63,6 +63,7 @@ How to install it\n     qibuild add-config <tc_name> -t <tc_name>\n \n   By default, qitoolchains don't come with ROS packages. So we need to add them manually.\n+\n   .. code-block:: console\n \n     # Add a package that will find your local ROS installation"
+        }
+      ]
+    },
+    {
+      "author": "lgeo3",
+      "date": "2015-08-05T09:49:49Z",
+      "sha": "878bef0927c96e41e2a52790299fb6f1f7e9b479",
+      "message": "fix git repo url\n\nit's a _ not a -",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "e10de82a3df853f4c6c7c11400ddc780738a9b4f",
+          "filename": "doc/source/install.rst",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/878bef0927c96e41e2a52790299fb6f1f7e9b479/doc%2Fsource%2Finstall.rst",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/878bef0927c96e41e2a52790299fb6f1f7e9b479/doc%2Fsource%2Finstall.rst",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/doc%2Fsource%2Finstall.rst?ref=878bef0927c96e41e2a52790299fb6f1f7e9b479",
+          "patch": "@@ -27,7 +27,7 @@ How to install it\n \n     mkdir -p ~/catkin_ws/src\n     cd ~/catkin_ws/src\n-    git clone https://github.com/ros-naoqi/naoqi-driver.git\n+    git clone https://github.com/ros-naoqi/naoqi_driver.git\n     # make sure you get all the dependencies installed\n     rosdep install -i -y --from-paths ./naoqi_driver\n     # build"
+        }
+      ]
+    },
+    {
+      "author": "guillaume-jcb",
+      "date": "2015-05-05T09:31:31Z",
+      "sha": "d9ccc50ba35d833be76c9ace78581921a52e5422",
+      "message": "fix cameraInfo for infrared camera",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "df64e17deec7e61ca70d5f0a8f1b569ba22190ff",
+          "filename": "src/converters/camera.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/d9ccc50ba35d833be76c9ace78581921a52e5422/src%2Fconverters%2Fcamera.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/d9ccc50ba35d833be76c9ace78581921a52e5422/src%2Fconverters%2Fcamera.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fconverters%2Fcamera.cpp?ref=d9ccc50ba35d833be76c9ace78581921a52e5422",
+          "patch": "@@ -152,6 +152,7 @@ CameraConverter::CameraConverter( const std::string& name, const float& frequenc\n     colorspace_ = AL::kInfraredColorSpace;\n     msg_colorspace_ = \"16UC1\";\n     cv_mat_type_ = CV_16U;\n+    camera_info_ = camera_info_definitions::getCameraInfo(camera_source_, resolution_);\n   }\n }\n "
+        }
+      ]
+    },
+    {
+      "author": "Marine CHAMOUX",
+      "date": "2015-03-03T15:19:33Z",
+      "sha": "3ab68e63a084ff0857aad3f673b0d3af44084965",
+      "message": "Correct tf2 time lookup in moveto && Add orientation to moveto command",
+      "files_changed": 1,
+      "additions": 15,
+      "deletions": 6,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "35debb5c16794c917eabd779cccb86028bd1eaac",
+          "filename": "src/subscribers/moveto.cpp",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 6,
+          "changes": 21,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/3ab68e63a084ff0857aad3f673b0d3af44084965/src%2Fsubscribers%2Fmoveto.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/3ab68e63a084ff0857aad3f673b0d3af44084965/src%2Fsubscribers%2Fmoveto.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fsubscribers%2Fmoveto.cpp?ref=3ab68e63a084ff0857aad3f673b0d3af44084965",
+          "patch": "@@ -23,6 +23,7 @@\n #include <tf2_geometry_msgs/tf2_geometry_msgs.h>\n #include <tf2_ros/buffer.h>\n #include <tf2_ros/transform_listener.h>\n+#include <tf/transform_datatypes.h>\n \n namespace alros\n {\n@@ -51,20 +52,28 @@ void MovetoSubscriber::callback( const geometry_msgs::PoseStampedConstPtr& pose_\n \n   if ( pose_msg->header.frame_id == \"base_footprint\" )\n   {\n-    std::cout << \"going to move x: \" <<  pose_msg->pose.position.x << \" y: \" << pose_msg->pose.position.y << \" z: \" << pose_msg->pose.position.z << std::endl;\n-    p_motion_.call<void>(\"moveTo\", pose_msg->pose.position.x, pose_msg->pose.position.y, 0.0f);\n+    double yaw = tf::getYaw(pose_msg->pose.orientation);\n+\n+    std::cout << \"going to move x: \" <<  pose_msg->pose.position.x << \" y: \" << pose_msg->pose.position.y << \" z: \" << pose_msg->pose.position.z << \" yaw: \" << yaw << std::endl;\n+    p_motion_.call<void>(\"moveTo\", pose_msg->pose.position.x, pose_msg->pose.position.y, yaw);\n   }\n   else{\n     geometry_msgs::PoseStamped pose_msg_bf;\n     //geometry_msgs::TransformStamped tf_trans;\n-    //tf_listenerPtr_->waitForTransform( \"/base_footprint\", \"/odom\", ros::Time(0), ros::Duration(5) );\n+    //tf_listenerPtr_->waitForTransform( \"/base_footprint\", pose_msg->header.frame_id, ros::Time(0), ros::Duration(5) );\n+    bool canTransform = buffer_->canTransform(\"base_footprint\", pose_msg->header.frame_id, ros::Time(0), ros::Duration(2) );\n+    if (!canTransform) {\n+      std::cout << \"Cannot transform from \" << pose_msg->header.frame_id << \" to base_footprint\" << std::endl;\n+      return;\n+    }\n     try\n     {\n       //tf_listenerPtr_->lookupTransform( \"/base_footprint\", pose_msg->header.frame_id, ros::Time(0), tf_trans);\n       //std::cout << \"got a transform \" << tf_trans.getOrigin().x() << std::endl;\n-      buffer_->transform( *pose_msg, pose_msg_bf, \"/base_footprint\" );\n-    std::cout << \"odom to move x: \" <<  pose_msg_bf.pose.position.x << \" y: \" << pose_msg_bf.pose.position.y << \" z: \" << pose_msg_bf.pose.position.z << std::endl;\n-      p_motion_.call<void>(\"moveTo\", pose_msg_bf.pose.position.x, pose_msg_bf.pose.position.y, 0.0f );\n+      buffer_->transform( *pose_msg, pose_msg_bf, \"base_footprint\", ros::Time(0), pose_msg->header.frame_id );\n+      double yaw = tf::getYaw(pose_msg_bf.pose.orientation);\n+      std::cout << \"odom to move x: \" <<  pose_msg_bf.pose.position.x << \" y: \" << pose_msg_bf.pose.position.y << \" z: \" << pose_msg_bf.pose.position.z << \" yaw: \" << yaw << std::endl;\n+      p_motion_.call<void>(\"moveTo\", pose_msg_bf.pose.position.x, pose_msg_bf.pose.position.y, yaw );\n     } catch( const tf2::LookupException& e)\n     {\n       std::cout << e.what() << std::endl;"
+        }
+      ]
+    },
+    {
+      "author": "zygopter",
+      "date": "2015-04-29T12:11:51Z",
+      "sha": "3773668d420c2a811adea1128eb5b3a83f3b0ae8",
+      "message": "Add missing dependency in install.rst",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "c019a1bb82e2901d11087358831fa0c948a61594",
+          "filename": "doc/source/install.rst",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/3773668d420c2a811adea1128eb5b3a83f3b0ae8/doc%2Fsource%2Finstall.rst",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/3773668d420c2a811adea1128eb5b3a83f3b0ae8/doc%2Fsource%2Finstall.rst",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/doc%2Fsource%2Finstall.rst?ref=3773668d420c2a811adea1128eb5b3a83f3b0ae8",
+          "patch": "@@ -33,6 +33,7 @@ Download the dependencies of the alrosbridge ::\n   $ cd ~/qibuild_ws\n   $ git clone https://github.com/aldebaran/gtest.git\n   $ git clone https://github.com/aldebaran/libqiprobes.git\n+  $ git clone https://github.com/aldebaran/libqicore.git\n   $ git clone https://github.com/aldebaran/libqi.git\n \n Download this project and compile it ::\n@@ -47,4 +48,4 @@ Once compilation is over, the resulting binary will be in *~/qibuild_ws/alrosbri\n \n If you encounter any compilation issue, (unable to find some dependencies), you might need to install them (through *apt-get install* for instance)\n \n-Once you successfully compiled the module, you can learn how to use it on the :ref:`Getting started page <start>` or you can go back to the :ref:`index <main menu>`.\n\\ No newline at end of file\n+Once you successfully compiled the module, you can learn how to use it on the :ref:`Getting started page <start>` or you can go back to the :ref:`index <main menu>`."
+        }
+      ]
+    },
+    {
+      "author": "Karsten KNESE",
+      "date": "2015-02-03T11:05:50Z",
+      "sha": "54b069d75961be866256a5ef509b21cede9e048f",
+      "message": "Merge branch 'master' into 'master'\n\nallow for different publisher frequencies",
+      "files_changed": 13,
+      "additions": 92,
+      "deletions": 45,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "d424a98f2cfd6b526e8f3106cc913f443033d824",
+          "filename": "src/alrosbridge.cpp",
+          "status": "modified",
+          "additions": 26,
+          "deletions": 23,
+          "changes": 49,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/54b069d75961be866256a5ef509b21cede9e048f/src%2Falrosbridge.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/54b069d75961be866256a5ef509b21cede9e048f/src%2Falrosbridge.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Falrosbridge.cpp?ref=54b069d75961be866256a5ef509b21cede9e048f",
+          "patch": "@@ -48,30 +48,29 @@ Bridge::~Bridge()\n \n void Bridge::rosLoop()\n {\n-  static ros::Rate r(freq_);\n   while( ros::ok() )\n   {\n     if ( isAlive() )\n     {\n-      publish();\n-      ros::spinOnce();\n-    }\n-    r.sleep();\n-  }\n-}\n-\n-void Bridge::publish( )\n-{\n-  foreach( publisher::Publisher& pub, all_publisher_ )\n-  {\n-    //std::cout << \"******************************\" << std::endl;\n-    //std::cout << \"Publisher name:\\t\" << pub.name() << std::endl;\n-    //std::cout << \"Publisher subscribed:\\t\" << pub.isSubscribed() << std::endl;\n-    //std::cout << \"Publisher init:\\t\" << pub.isInitialized() << std::endl;\n-    if ( pub.isSubscribed() && pub.isInitialized() )\n-    {\n-      pub.publish();\n+      // Wait for the next Publisher to be ready\n+      alros::publisher::Publisher* pub = pub_queue_.top().pub_;\n+      ros::Time schedule = pub_queue_.top().schedule_;\n+\n+      ros::Duration(schedule - ros::Time::now()).sleep();\n+\n+      if ( pub->isSubscribed() && pub->isInitialized() )\n+      {\n+        // std::cout << \"******************************\" << std::endl;\n+        // std::cout << \"Publisher name:\\t\" << pub->name() << std::endl;\n+        // std::cout << \"Publisher subscribed:\\t\" << pub->isSubscribed() << std::endl;\n+        // std::cout << \"Publisher init:\\t\" << pub->isInitialized() << std::endl;\n+        // pub->publish();\n+      }\n+      // Schedule for a future time\n+      pub_queue_.pop();\n+      pub_queue_.push(ScheduledPublish(schedule + ros::Duration(1.0f / pub->frequency()), pub));\n     }\n+    ros::spinOnce();\n   }\n }\n \n@@ -85,24 +84,28 @@ void Bridge::registerPublisher( publisher::Publisher pub )\n   if (it == all_publisher_.end() )\n   {\n     all_publisher_.push_back( pub );\n+    it = all_publisher_.end() - 1;\n     std::cout << \"registered publisher:\\t\" << pub.name() << std::endl;\n   }\n   // if found, re-init them\n   else\n   {\n     std::cout << \"re-initialized existing publisher:\\t\" << it->name() << std::endl;\n   }\n+\n+  // Schedule it for the next publish\n+  pub_queue_.push(ScheduledPublish(ros::Time::now() + ros::Duration(1.0f / pub.frequency()), &(*it)));\n }\n \n void Bridge::registerDefaultPublisher()\n {\n   qi::AnyObject p_motion = sessionPtr_->service(\"ALMotion\");\n   qi::AnyObject p_video = sessionPtr_->service(\"ALVideoDevice\");\n \n-//  registerPublisher( alros::publisher::StringPublisher( \"string_pub\", \"string_pub\") );\n-//  registerPublisher( alros::publisher::IntPublisher(\"int_pub\", \"int_pub\") );\n-//  registerPublisher( alros::publisher::JointStatePublisher(\"/joint_states\", \"/joint_states\", p_motion) );\n-  registerPublisher( alros::publisher::CameraPublisher(\"camera\", \"camera/front\", p_video) );\n+//  registerPublisher( alros::publisher::StringPublisher( \"string_pub\", \"string_pub\", 15) );\n+//  registerPublisher( alros::publisher::IntPublisher(\"int_pub\", \"int_pub\", 15) );\n+//  registerPublisher( alros::publisher::JointStatePublisher(\"/joint_states\", \"/joint_states\", 15, p_motion) );\n+  registerPublisher( alros::publisher::CameraPublisher(\"camera\", \"camera/front\", 15, p_video) );\n }\n \n void Bridge::initPublisher()"
+        },
+        {
+          "sha": "e327aafefff4b0b7182e31b4e12fc901e8bee812",
+          "filename": "src/alrosbridge.hpp",
+          "status": "modified",
+          "additions": 19,
+          "deletions": 2,
+          "changes": 21,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/54b069d75961be866256a5ef509b21cede9e048f/src%2Falrosbridge.hpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/54b069d75961be866256a5ef509b21cede9e048f/src%2Falrosbridge.hpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Falrosbridge.hpp?ref=54b069d75961be866256a5ef509b21cede9e048f",
+          "patch": "@@ -2,6 +2,7 @@\n #define ALROS_BRIDGE_HPP\n \n #include <vector>\n+#include <queue>\n \n /*\n * BOOST\n@@ -29,8 +30,6 @@ class Bridge\n   // make a copy here since this should actually be replaced by move semantics\n   void registerPublisher( publisher::Publisher pub );\n \n-  void publish( );\n-\n   bool isAlive() const;\n \n   /**\n@@ -58,6 +57,24 @@ class Bridge\n   boost::mutex mutex_reinit_;\n \n   std::vector< publisher::Publisher > all_publisher_;\n+\n+  /** Pub Publisher to execute at a specific time */\n+  struct ScheduledPublish {\n+    ScheduledPublish(const ros::Time& schedule, alros::publisher::Publisher* pub) :\n+       schedule_(schedule), pub_(pub)\n+    {\n+    }\n+    bool operator < (const ScheduledPublish& sp_in) const {\n+      return schedule_ > sp_in.schedule_;\n+    }\n+    /** Time at which the publisher will be called */\n+    ros::Time schedule_;\n+    /** Time at which the publisher will be called */\n+    alros::publisher::Publisher* pub_;\n+  };\n+\n+  /** Priority queue to process the publishers according to their frequency */\n+  std::priority_queue<ScheduledPublish> pub_queue_;\n };\n \n } // alros"
+        },
+        {
+          "sha": "0ae52c246890b88b79c5794e67c5a38caa5b201b",
+          "filename": "src/publishers/publisher.hpp",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 0,
+          "changes": 11,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/54b069d75961be866256a5ef509b21cede9e048f/src%2Fpublishers%2Fpublisher.hpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/54b069d75961be866256a5ef509b21cede9e048f/src%2Fpublishers%2Fpublisher.hpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fpublishers%2Fpublisher.hpp?ref=54b069d75961be866256a5ef509b21cede9e048f",
+          "patch": "@@ -47,6 +47,11 @@ class Publisher\n     return pubPtr_->name();\n   }\n \n+  float frequency() const\n+  {\n+    return pubPtr_->frequency();\n+  }\n+\n   std::string topic() const\n   {\n     return pubPtr_->topic();\n@@ -74,6 +79,7 @@ class Publisher\n     virtual void reset( ros::NodeHandle& nh ) = 0;\n     virtual std::string name() const = 0;\n     virtual std::string topic() const = 0;\n+    virtual float frequency() const = 0;\n   };\n \n \n@@ -97,6 +103,11 @@ class Publisher\n       return publisher_.topic();\n     }\n \n+    float frequency() const\n+    {\n+      return publisher_.frequency();\n+    }\n+\n     void publish()\n     {\n       publisher_.publish();"
+        },
+        {
+          "sha": "9393f01de0f9c0d8c7e783a0c5ba667e5eea8360",
+          "filename": "src/publishers/publisher_base.hpp",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 1,
+          "changes": 10,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/54b069d75961be866256a5ef509b21cede9e048f/src%2Fpublishers%2Fpublisher_base.hpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/54b069d75961be866256a5ef509b21cede9e048f/src%2Fpublishers%2Fpublisher_base.hpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fpublishers%2Fpublisher_base.hpp?ref=54b069d75961be866256a5ef509b21cede9e048f",
+          "patch": "@@ -14,9 +14,10 @@ class BasePublisher\n {\n \n public:\n-  BasePublisher( const std::string& name, const std::string& topic ):\n+  BasePublisher( const std::string& name, const std::string& topic, float frequency ):\n     name_( name ),\n     topic_( topic ),\n+    frequency_( frequency ),\n     is_initialized_( false )\n   {}\n \n@@ -32,6 +33,11 @@ class BasePublisher\n     return topic_;\n   }\n \n+  inline float frequency() const\n+  {\n+    return frequency_;\n+  }\n+\n   inline bool isInitialized() const\n   {\n     return is_initialized_;\n@@ -49,6 +55,8 @@ class BasePublisher\n   ros::Publisher pub_;\n   bool is_initialized_;\n \n+  /** Frequency at which the publisher should publish. This is informative */\n+  float frequency_;\n }; // class\n \n } //publisher"
+        },
+        {
+          "sha": "fcb49ab1a34741390da34c4baaba489c25540b84",
+          "filename": "src/publishers/publisher_base_image.hpp",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 1,
+          "changes": 10,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/54b069d75961be866256a5ef509b21cede9e048f/src%2Fpublishers%2Fpublisher_base_image.hpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/54b069d75961be866256a5ef509b21cede9e048f/src%2Fpublishers%2Fpublisher_base_image.hpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fpublishers%2Fpublisher_base_image.hpp?ref=54b069d75961be866256a5ef509b21cede9e048f",
+          "patch": "@@ -14,9 +14,10 @@ class ImageBasePublisher\n {\n \n public:\n-  ImageBasePublisher( const std::string& name, const std::string& topic ):\n+  ImageBasePublisher( const std::string& name, const std::string& topic, float frequency ):\n     name_( name ),\n     topic_( topic ),\n+    frequency_( frequency ),\n     is_initialized_( false )\n   {}\n \n@@ -32,6 +33,11 @@ class ImageBasePublisher\n     return topic_;\n   }\n \n+  inline float frequency() const\n+  {\n+    return frequency_;\n+  }\n+\n   inline bool isInitialized() const\n   {\n     return is_initialized_;\n@@ -50,6 +56,8 @@ class ImageBasePublisher\n   image_transport::Publisher pub_;\n   bool is_initialized_;\n \n+  /** Frequency at which the publisher will publish */\n+  float frequency_;\n }; // class\n \n } //publisher"
+        },
+        {
+          "sha": "ec7e03be1f87c42421e50f386d253326738a4081",
+          "filename": "src/publishers/publisher_camera.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/54b069d75961be866256a5ef509b21cede9e048f/src%2Fpublishers%2Fpublisher_camera.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/54b069d75961be866256a5ef509b21cede9e048f/src%2Fpublishers%2Fpublisher_camera.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fpublishers%2Fpublisher_camera.cpp?ref=54b069d75961be866256a5ef509b21cede9e048f",
+          "patch": "@@ -15,8 +15,8 @@ namespace alros\n namespace publisher\n {\n \n-CameraPublisher::CameraPublisher( const std::string& name, const std::string& topic, const qi::AnyObject& p_video )\n-  : ImageBasePublisher( name, topic ),\n+CameraPublisher::CameraPublisher( const std::string& name, const std::string& topic, float frequency, const qi::AnyObject& p_video )\n+  : ImageBasePublisher( name, topic, frequency ),\n     p_video_( p_video )\n {}\n "
+        },
+        {
+          "sha": "7a354f70a76893bd409333f45e49b97bb6527553",
+          "filename": "src/publishers/publisher_camera.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/54b069d75961be866256a5ef509b21cede9e048f/src%2Fpublishers%2Fpublisher_camera.hpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/54b069d75961be866256a5ef509b21cede9e048f/src%2Fpublishers%2Fpublisher_camera.hpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fpublishers%2Fpublisher_camera.hpp?ref=54b069d75961be866256a5ef509b21cede9e048f",
+          "patch": "@@ -16,7 +16,7 @@ namespace publisher\n class CameraPublisher : public ImageBasePublisher<CameraPublisher>\n {\n public:\n-  CameraPublisher( const std::string& name, const std::string& topic, const qi::AnyObject& p_video);\n+  CameraPublisher( const std::string& name, const std::string& topic, float frequency, const qi::AnyObject& p_video);\n \n   void publish();\n "
+        },
+        {
+          "sha": "3654cce89b4b89e1d01a8894a7e15dccf841958e",
+          "filename": "src/publishers/publisher_int.cpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 4,
+          "changes": 8,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/54b069d75961be866256a5ef509b21cede9e048f/src%2Fpublishers%2Fpublisher_int.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/54b069d75961be866256a5ef509b21cede9e048f/src%2Fpublishers%2Fpublisher_int.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fpublishers%2Fpublisher_int.cpp?ref=54b069d75961be866256a5ef509b21cede9e048f",
+          "patch": "@@ -9,12 +9,12 @@ namespace alros\n namespace publisher\n {\n \n-IntPublisher::IntPublisher( const std::string& name, const std::string& topic ):\n-  BasePublisher( name, topic )\n+IntPublisher::IntPublisher( const std::string& name, const std::string& topic, float frequency ):\n+  BasePublisher( name, topic, frequency )\n {}\n \n-IntPublisher::IntPublisher( const std::string& name, const std::string& topic, ros::NodeHandle& nh ):\n-  BasePublisher( name, topic )\n+IntPublisher::IntPublisher( const std::string& name, const std::string& topic, float frequency, ros::NodeHandle& nh ):\n+  BasePublisher( name, topic, frequency )\n {\n   reset( nh );\n }"
+        },
+        {
+          "sha": "ba3f1f6e944e328c0370599cd84c626bef2000fa",
+          "filename": "src/publishers/publisher_int.hpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/54b069d75961be866256a5ef509b21cede9e048f/src%2Fpublishers%2Fpublisher_int.hpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/54b069d75961be866256a5ef509b21cede9e048f/src%2Fpublishers%2Fpublisher_int.hpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fpublishers%2Fpublisher_int.hpp?ref=54b069d75961be866256a5ef509b21cede9e048f",
+          "patch": "@@ -14,8 +14,8 @@ class IntPublisher : public BasePublisher<IntPublisher>\n {\n \n public:\n-  IntPublisher( const std::string& name, const std::string& topic );\n-  IntPublisher( const std::string& name, const std::string& topic, ros::NodeHandle& nh );\n+  IntPublisher( const std::string& name, const std::string& topic, float frequency );\n+  IntPublisher( const std::string& name, const std::string& topic, float frequency, ros::NodeHandle& nh );\n \n   void publish();\n "
+        },
+        {
+          "sha": "122e69aa6caf31a3165a5589b2f64bd2368803cd",
+          "filename": "src/publishers/publisher_joint_state.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/54b069d75961be866256a5ef509b21cede9e048f/src%2Fpublishers%2Fpublisher_joint_state.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/54b069d75961be866256a5ef509b21cede9e048f/src%2Fpublishers%2Fpublisher_joint_state.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fpublishers%2Fpublisher_joint_state.cpp?ref=54b069d75961be866256a5ef509b21cede9e048f",
+          "patch": "@@ -12,8 +12,8 @@ namespace alros\n namespace publisher\n {\n \n-JointStatePublisher::JointStatePublisher( const std::string& name, const std::string& topic, qi::AnyObject& p_motion ):\n-  BasePublisher( name, topic ),\n+JointStatePublisher::JointStatePublisher( const std::string& name, const std::string& topic, float frequency, qi::AnyObject& p_motion ):\n+  BasePublisher( name, topic, frequency ),\n   p_motion_( p_motion )\n {}\n "
+        },
+        {
+          "sha": "773311b0911a671a9ac5d1e3c0614ed26b4c1f9c",
+          "filename": "src/publishers/publisher_joint_state.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/54b069d75961be866256a5ef509b21cede9e048f/src%2Fpublishers%2Fpublisher_joint_state.hpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/54b069d75961be866256a5ef509b21cede9e048f/src%2Fpublishers%2Fpublisher_joint_state.hpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fpublishers%2Fpublisher_joint_state.hpp?ref=54b069d75961be866256a5ef509b21cede9e048f",
+          "patch": "@@ -26,7 +26,7 @@ class JointStatePublisher : public BasePublisher<JointStatePublisher>\n {\n \n public:\n-  JointStatePublisher( const std::string& name, const std::string& topic, qi::AnyObject& p_motion );\n+  JointStatePublisher( const std::string& name, const std::string& topic, float frequency, qi::AnyObject& p_motion );\n \n   void publish();\n "
+        },
+        {
+          "sha": "7880bbd31a440b32667497a8213d9047effe9118",
+          "filename": "src/publishers/publisher_string.cpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 4,
+          "changes": 8,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/54b069d75961be866256a5ef509b21cede9e048f/src%2Fpublishers%2Fpublisher_string.cpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/54b069d75961be866256a5ef509b21cede9e048f/src%2Fpublishers%2Fpublisher_string.cpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fpublishers%2Fpublisher_string.cpp?ref=54b069d75961be866256a5ef509b21cede9e048f",
+          "patch": "@@ -9,13 +9,13 @@ namespace alros\n namespace publisher\n {\n \n-StringPublisher::StringPublisher( const std::string& name, const std::string& topic ):\n-    BasePublisher( name, topic )\n+StringPublisher::StringPublisher( const std::string& name, const std::string& topic, float frequency ):\n+    BasePublisher( name, topic, frequency )\n {\n }\n \n-StringPublisher::StringPublisher( const std::string& name, const std::string& topic, ros::NodeHandle& nh ):\n-  BasePublisher( name, topic )\n+StringPublisher::StringPublisher( const std::string& name, const std::string& topic, float frequency, ros::NodeHandle& nh ):\n+  BasePublisher( name, topic, frequency )\n {\n   reset( nh );\n }"
+        },
+        {
+          "sha": "5767ffa171d0d01cd4cc2d8883081ca0375f4126",
+          "filename": "src/publishers/publisher_string.hpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-naoqi/naoqi_driver2/blob/54b069d75961be866256a5ef509b21cede9e048f/src%2Fpublishers%2Fpublisher_string.hpp",
+          "raw_url": "https://github.com/ros-naoqi/naoqi_driver2/raw/54b069d75961be866256a5ef509b21cede9e048f/src%2Fpublishers%2Fpublisher_string.hpp",
+          "contents_url": "https://api.github.com/repos/ros-naoqi/naoqi_driver2/contents/src%2Fpublishers%2Fpublisher_string.hpp?ref=54b069d75961be866256a5ef509b21cede9e048f",
+          "patch": "@@ -14,8 +14,8 @@ class StringPublisher : public BasePublisher<StringPublisher>\n {\n \n public:\n-  StringPublisher( const std::string& name, const std::string& topic );\n-  StringPublisher( const std::string& name, const std::string& topic, ros::NodeHandle& nh );\n+  StringPublisher( const std::string& name, const std::string& topic, float frequency );\n+  StringPublisher( const std::string& name, const std::string& topic, float frequency, ros::NodeHandle& nh );\n \n   void publish();\n "
+        }
+      ]
+    }
+  ]
+}

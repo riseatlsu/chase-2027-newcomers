@@ -1,0 +1,129 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T06:02:55Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "li9i",
+    "repo": "pointcloud-to-ply"
+  },
+  "data": [
+    {
+      "author": "li9i",
+      "date": "2025-11-29T17:33:35Z",
+      "sha": "761dbcedf477425dcb228b551dba60d49c54593c",
+      "message": "Initial commit",
+      "files_changed": 9,
+      "additions": 342,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "643840eb46325adfc224abbd54ca2134d1cccc0d",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 28,
+          "deletions": 0,
+          "changes": 28,
+          "blob_url": "https://github.com/li9i/pointcloud-to-ply/blob/761dbcedf477425dcb228b551dba60d49c54593c/CMakeLists.txt",
+          "raw_url": "https://github.com/li9i/pointcloud-to-ply/raw/761dbcedf477425dcb228b551dba60d49c54593c/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/li9i/pointcloud-to-ply/contents/CMakeLists.txt?ref=761dbcedf477425dcb228b551dba60d49c54593c",
+          "patch": "@@ -0,0 +1,28 @@\n+cmake_minimum_required(VERSION 3.8)\n+project(pointcloud_to_ply)\n+\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  add_compile_options(-Wall -Wextra -Wpedantic)\n+endif()\n+\n+# Find Python & ROS dependencies\n+find_package(ament_cmake REQUIRED)\n+find_package(ament_cmake_python REQUIRED)\n+\n+find_package(rclpy REQUIRED)\n+find_package(sensor_msgs REQUIRED)\n+\n+ament_python_install_package(${PROJECT_NAME})\n+\n+install(DIRECTORY\n+  launch\n+  config\n+  DESTINATION share/${PROJECT_NAME}\n+)\n+\n+install(PROGRAMS\n+  pointcloud_to_ply/pointcloud_to_ply_node.py\n+  DESTINATION lib/${PROJECT_NAME}\n+)\n+\n+ament_package()"
+        },
+        {
+          "sha": "4eac9bc6a44cac3ba153aff2b345fc4070a7d214",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 13,
+          "deletions": 0,
+          "changes": 13,
+          "blob_url": "https://github.com/li9i/pointcloud-to-ply/blob/761dbcedf477425dcb228b551dba60d49c54593c/README.md",
+          "raw_url": "https://github.com/li9i/pointcloud-to-ply/raw/761dbcedf477425dcb228b551dba60d49c54593c/README.md",
+          "contents_url": "https://api.github.com/repos/li9i/pointcloud-to-ply/contents/README.md?ref=761dbcedf477425dcb228b551dba60d49c54593c",
+          "patch": "@@ -0,0 +1,13 @@\n+# `pointcloud_to_ply`\n+\n+Capture a point cloud from a sensor by subscribing to the topic where it publishes messages to, and store it in `.ply` or `.obj` form on disk.\n+\n+Set your specific point cloud sensor topic, save location, and other params in `launch/pointcloud_to_ply.launch.xml`. \n+\n+\n+\n+Then launch the node with\n+\n+```bash\n+ros2 launch pointcloud_to_ply pointcloud_to_ply.launch.xml\n+```"
+        },
+        {
+          "sha": "4708feff82f258c7fe661be7af21a4343e688b23",
+          "filename": "launch/pointcloud_to_ply.launch.xml",
+          "status": "added",
+          "additions": 33,
+          "deletions": 0,
+          "changes": 33,
+          "blob_url": "https://github.com/li9i/pointcloud-to-ply/blob/761dbcedf477425dcb228b551dba60d49c54593c/launch%2Fpointcloud_to_ply.launch.xml",
+          "raw_url": "https://github.com/li9i/pointcloud-to-ply/raw/761dbcedf477425dcb228b551dba60d49c54593c/launch%2Fpointcloud_to_ply.launch.xml",
+          "contents_url": "https://api.github.com/repos/li9i/pointcloud-to-ply/contents/launch%2Fpointcloud_to_ply.launch.xml?ref=761dbcedf477425dcb228b551dba60d49c54593c",
+          "patch": "@@ -0,0 +1,33 @@\n+<launch>\n+\n+  <node pkg=\"pointcloud_to_ply\"\n+    exec=\"pointcloud_to_ply_node\"\n+    name=\"pointcloud_to_ply_node\"\n+    output=\"screen\">\n+      <param name=\"pointcloud_topic\"            value=\"/rc_viscore/points2\"/> <!-- Topic to subscribe to -->\n+      <!-- Save options -->\n+      <param name=\"output_path\"                 value=\"\"/>                    <!-- output_path will be created if missing -->\n+      <param name=\"output_basename\"             value=\"output_mesh\"/>         <!-- final file will be \"mesh.obj\" or \"mesh.ply\" -->\n+      <param name=\"output_format\"               value=\"obj\"/>                 <!-- \"obj\" or \"ply\" -->\n+      <!-- Preprocessing -->\n+      <param name=\"voxel_downsample_size\"       value=\"0.0\"/>                 <!-- 0 disables downsampling -->\n+      <param name=\"remove_statistical_outliers\" value=\"true\"/>\n+      <param name=\"nso_nb_neighbors\"            value=\"20\"/>\n+      <param name=\"nso_std_ratio\"               value=\"2.0\"/>\n+      <!-- Normal estimation -->\n+      <param name=\"normal_radius\"               value=\"0.05\"/>\n+      <param name=\"normal_max_nn\"               value=\"30\"/>\n+      <!-- Reconstruction selection -->\n+      <param name=\"reconstruction_method\"       value=\"poisson\"/>             <!-- \"poisson\" or \"bpa\" -->\n+      <!-- Poisson params -->\n+      <param name=\"poisson_depth\"               value=\"9\"/>\n+      <param name=\"poisson_density_quantile\"    value=\"0.05\"/>                <!-- remove lowest X fraction by density (0..1) -->\n+      <!-- Ball-Pivoting params -->\n+      <param name=\"bpa_radii\"                   value=\"[0.02, 0.04, 0.08]\"/>  <!-- list of radii (meters) -->\n+      <param name=\"bpa_triangle_angle\"          value=\"30.0\"/>                <!-- degrees; 0..90 typical -->\n+      <!-- Node behavior -->\n+      <param name=\"shutdown_after_save\"         value=\"true\"/>\n+      <param name=\"log_level_debug\"             value=\"false\"/>\n+  </node>\n+\n+</launch>"
+        },
+        {
+          "sha": "9d199f8f19d10ee8526a2b3992919582f4eeec63",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 24,
+          "deletions": 0,
+          "changes": 24,
+          "blob_url": "https://github.com/li9i/pointcloud-to-ply/blob/761dbcedf477425dcb228b551dba60d49c54593c/package.xml",
+          "raw_url": "https://github.com/li9i/pointcloud-to-ply/raw/761dbcedf477425dcb228b551dba60d49c54593c/package.xml",
+          "contents_url": "https://api.github.com/repos/li9i/pointcloud-to-ply/contents/package.xml?ref=761dbcedf477425dcb228b551dba60d49c54593c",
+          "patch": "@@ -0,0 +1,24 @@\n+<?xml version=\"1.0\"?>\n+<package format=\"3\">\n+  <name>pointcloud_to_ply</name>\n+  <version>0.0.1</version>\n+  <description>Subscribe to a PointCloud2, reconstruct a mesh, and save to OBJ/PLY.</description>\n+  <maintainer email=\"alexandros.filotheou@gmail.com\">li9i</maintainer>\n+  <license>BSD</license>\n+\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+\n+  <depend>rclpy</depend>\n+  <depend>sensor_msgs</depend>\n+  <depend>python3-open3d</depend>\n+\n+  <test_depend>ament_lint_auto</test_depend>\n+  <test_depend>ament_lint_common</test_depend>\n+\n+  <export>\n+    <build_type>ament_python</build_type>\n+  </export>\n+\n+  <!-- You must have Open3D available in your environment -->\n+  <!-- e.g., sudo apt install python3-pip && pip3 install open3d -->\n+</package>"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "pointcloud_to_ply/__init__.py",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/li9i/pointcloud-to-ply/blob/761dbcedf477425dcb228b551dba60d49c54593c/pointcloud_to_ply%2F__init__.py",
+          "raw_url": "https://github.com/li9i/pointcloud-to-ply/raw/761dbcedf477425dcb228b551dba60d49c54593c/pointcloud_to_ply%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/li9i/pointcloud-to-ply/contents/pointcloud_to_ply%2F__init__.py?ref=761dbcedf477425dcb228b551dba60d49c54593c"
+        },
+        {
+          "sha": "3f84c24705576a1a2a2d8c1e75ce81dba511a85a",
+          "filename": "pointcloud_to_ply/pointcloud_to_ply_node.py",
+          "status": "added",
+          "additions": 214,
+          "deletions": 0,
+          "changes": 214,
+          "blob_url": "https://github.com/li9i/pointcloud-to-ply/blob/761dbcedf477425dcb228b551dba60d49c54593c/pointcloud_to_ply%2Fpointcloud_to_ply_node.py",
+          "raw_url": "https://github.com/li9i/pointcloud-to-ply/raw/761dbcedf477425dcb228b551dba60d49c54593c/pointcloud_to_ply%2Fpointcloud_to_ply_node.py",
+          "contents_url": "https://api.github.com/repos/li9i/pointcloud-to-ply/contents/pointcloud_to_ply%2Fpointcloud_to_ply_node.py?ref=761dbcedf477425dcb228b551dba60d49c54593c",
+          "patch": "@@ -0,0 +1,214 @@\n+#!/usr/bin/env python3\n+import os\n+from typing import List, Tuple\n+\n+import numpy as np\n+import rclpy\n+from rclpy.node import Node\n+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy\n+\n+from sensor_msgs.msg import PointCloud2\n+import sensor_msgs_py.point_cloud2 as pc2\n+\n+# Open3D must be installed in your environment (pip install open3d)\n+import open3d as o3d\n+\n+\n+def cloud_to_numpy(msg: PointCloud2) -> np.ndarray:\n+    \"\"\"Convert ROS2 PointCloud2 to (N,3) numpy array.\"\"\"\n+    pts = np.asarray([\n+        (x, y, z)\n+        for x, y, z in pc2.read_points(msg, field_names=(\"x\", \"y\", \"z\"), skip_nans=True)\n+    ], dtype=np.float64)\n+    return pts\n+\n+\n+def numpy_to_o3d_pointcloud(points: np.ndarray) -> o3d.geometry.PointCloud:\n+    pcd = o3d.geometry.PointCloud()\n+    pcd.points = o3d.utility.Vector3dVector(points)\n+    return pcd\n+\n+\n+def preprocess_pointcloud(\n+    pcd: o3d.geometry.PointCloud,\n+    voxel_downsample_size: float,\n+    remove_statistical_outliers: bool,\n+    nso_nb_neighbors: int,\n+    nso_std_ratio: float,\n+) -> o3d.geometry.PointCloud:\n+    if voxel_downsample_size and voxel_downsample_size > 0.0:\n+        pcd = pcd.voxel_down_sample(voxel_downsample_size)\n+\n+    if remove_statistical_outliers:\n+        pcd, _ = pcd.remove_statistical_outlier(\n+            nb_neighbors=nso_nb_neighbors, std_ratio=nso_std_ratio\n+        )\n+    return pcd\n+\n+\n+def estimate_normals(\n+    pcd: o3d.geometry.PointCloud, normal_radius: float, normal_max_nn: int\n+):\n+    pcd.estimate_normals(\n+        search_param=o3d.geometry.KDTreeSearchParamHybrid(\n+            radius=normal_radius, max_nn=normal_max_nn\n+        )\n+    )\n+    pcd.orient_normals_consistent_tangent_plane(10)\n+\n+\n+def poisson_reconstruction(\n+    pcd: o3d.geometry.PointCloud, depth: int, density_quantile: float\n+) -> o3d.geometry.TriangleMesh:\n+    mesh, densities = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(\n+        pcd, depth=depth\n+    )\n+    if density_quantile is not None and 0.0 < density_quantile < 1.0:\n+        densities = np.asarray(densities)\n+        mask = densities < np.quantile(densities, density_quantile)\n+        mesh.remove_vertices_by_mask(mask)\n+    mesh.remove_degenerate_triangles()\n+    mesh.remove_duplicated_triangles()\n+    mesh.remove_duplicated_vertices()\n+    mesh.remove_non_manifold_edges()\n+    return mesh\n+\n+\n+def bpa_reconstruction(\n+    pcd: o3d.geometry.PointCloud, radii: List[float], tri_angle_deg: float\n+) -> o3d.geometry.TriangleMesh:\n+    # Open3D BPA uses radii list; ensure ascending and >0\n+    radii = sorted([r for r in radii if r > 0.0])\n+    if not radii:\n+        raise ValueError(\"bpa_radii must contain positive values\")\n+    mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_ball_pivoting(\n+        pcd, o3d.utility.DoubleVector(radii)\n+    )\n+    # Optional: simplify very sharp triangles if angle threshold provided\n+    if tri_angle_deg is not None:\n+        mesh = mesh.filter_smooth_taubin(number_of_iterations=1)\n+    mesh.remove_degenerate_triangles()\n+    mesh.remove_duplicated_triangles()\n+    mesh.remove_duplicated_vertices()\n+    mesh.remove_non_manifold_edges()\n+    return mesh\n+\n+\n+def save_mesh(mesh: o3d.geometry.TriangleMesh, out_dir: str, basename: str, fmt: str) -> str:\n+    os.makedirs(out_dir, exist_ok=True)\n+    fmt = fmt.lower()\n+    if fmt not in (\"obj\", \"ply\"):\n+        raise ValueError('output_format must be \"obj\" or \"ply\"')\n+    path = os.path.join(out_dir, f\"{basename}.{fmt}\")\n+    o3d.io.write_triangle_mesh(path, mesh)\n+    return path\n+\n+\n+class PointCloudToMeshNode(Node):\n+    def __init__(self):\n+        super().__init__(\"pointcloud_to_ply_node\")\n+\n+        # Parameters (declare with defaults; override via YAML)\n+        self.declare_parameter(\"pointcloud_topic\", \"/rc_viscore/points2\")\n+        self.declare_parameter(\"output_path\", \"/tmp/mesh_output\")\n+        self.declare_parameter(\"output_basename\", \"mesh\")\n+        self.declare_parameter(\"output_format\", \"obj\")\n+\n+        self.declare_parameter(\"voxel_downsample_size\", 0.0)\n+        self.declare_parameter(\"remove_statistical_outliers\", True)\n+        self.declare_parameter(\"nso_nb_neighbors\", 20)\n+        self.declare_parameter(\"nso_std_ratio\", 2.0)\n+\n+        self.declare_parameter(\"normal_radius\", 0.05)\n+        self.declare_parameter(\"normal_max_nn\", 30)\n+\n+        self.declare_parameter(\"reconstruction_method\", \"poisson\")\n+        self.declare_parameter(\"poisson_depth\", 9)\n+        self.declare_parameter(\"poisson_density_quantile\", 0.05)\n+        self.declare_parameter(\"bpa_radii\", [0.02, 0.04, 0.08])\n+        self.declare_parameter(\"bpa_triangle_angle\", 30.0)\n+\n+        self.declare_parameter(\"shutdown_after_save\", True)\n+        self.declare_parameter(\"log_level_debug\", False)\n+\n+        topic = self.get_parameter(\"pointcloud_topic\").get_parameter_value().string_value\n+\n+        # Should match the topic's qos profile\n+        qos = QoSProfile(\n+            reliability=ReliabilityPolicy.BEST_EFFORT,\n+            durability=DurabilityPolicy.VOLATILE,\n+            history=HistoryPolicy.KEEP_LAST,\n+            depth=10,\n+        )\n+\n+        self.subscription = self.create_subscription(\n+            PointCloud2, topic, self._callback, qos\n+        )\n+        self._done = False\n+\n+        self.get_logger().info(f\"Subscribed to {topic}\")\n+\n+    def _callback(self, msg: PointCloud2):\n+        if self._done:\n+            return\n+        self._done = True\n+\n+        dbg = self.get_parameter(\"log_level_debug\").value\n+        try:\n+            self.get_logger().info(\"Received point cloud; converting to numpy...\")\n+            points = cloud_to_numpy(msg)\n+            self.get_logger().info(f\"Point count: {points.shape[0]}\")\n+\n+            pcd = numpy_to_o3d_pointcloud(points)\n+\n+            # Preprocess\n+            pcd = preprocess_pointcloud(\n+                pcd=pcd,\n+                voxel_downsample_size=self.get_parameter(\"voxel_downsample_size\").value,\n+                remove_statistical_outliers=self.get_parameter(\"remove_statistical_outliers\").value,\n+                nso_nb_neighbors=self.get_parameter(\"nso_nb_neighbors\").value,\n+                nso_std_ratio=self.get_parameter(\"nso_std_ratio\").value,\n+            )\n+\n+            # Normals\n+            estimate_normals(\n+                pcd,\n+                self.get_parameter(\"normal_radius\").value,\n+                self.get_parameter(\"normal_max_nn\").value,\n+            )\n+\n+            # Reconstruction method\n+            method = self.get_parameter(\"reconstruction_method\").value.lower()\n+            if method == \"poisson\":\n+                depth = int(self.get_parameter(\"poisson_depth\").value)\n+                dq = float(self.get_parameter(\"poisson_density_quantile\").value)\n+                mesh = poisson_reconstruction(pcd, depth, dq)\n+                self.get_logger().info(f\"Poisson reconstruction complete (depth={depth})\")\n+            elif method == \"bpa\":\n+                radii = list(self.get_parameter(\"bpa_radii\").value)\n+                tri_angle = float(self.get_parameter(\"bpa_triangle_angle\").value)\n+                mesh = bpa_reconstruction(pcd, radii, tri_angle)\n+                self.get_logger().info(f\"BPA reconstruction complete (radii={radii})\")\n+            else:\n+                raise ValueError('reconstruction_method must be \"poisson\" or \"bpa\"')\n+\n+            out_dir = self.get_parameter(\"output_path\").value\n+            basename = self.get_parameter(\"output_basename\").value\n+            fmt = self.get_parameter(\"output_format\").value\n+            out_path = save_mesh(mesh, out_dir, basename, fmt)\n+            self.get_logger().info(f\"Saved mesh to: {out_path}\")\n+\n+        except Exception as e:\n+            self.get_logger().error(f\"Failed to create/save mesh: {e}\")\n+        finally:\n+            if self.get_parameter(\"shutdown_after_save\").value:\n+                self.get_logger().info(\"Shutting down node.\")\n+                rclpy.shutdown()\n+\n+\n+def main(args=None):\n+    rclpy.init(args=args)\n+    node = PointCloudToMeshNode()\n+    rclpy.spin(node)\n+    node.destroy_node()\n+    rclpy.shutdown()"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "resource/pointcloud_to_ply",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/li9i/pointcloud-to-ply/blob/761dbcedf477425dcb228b551dba60d49c54593c/resource%2Fpointcloud_to_ply",
+          "raw_url": "https://github.com/li9i/pointcloud-to-ply/raw/761dbcedf477425dcb228b551dba60d49c54593c/resource%2Fpointcloud_to_ply",
+          "contents_url": "https://api.github.com/repos/li9i/pointcloud-to-ply/contents/resource%2Fpointcloud_to_ply?ref=761dbcedf477425dcb228b551dba60d49c54593c"
+        },
+        {
+          "sha": "ec249390d425ba0ab57cdd22b9c62614a63dc8ad",
+          "filename": "setup.cfg",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/li9i/pointcloud-to-ply/blob/761dbcedf477425dcb228b551dba60d49c54593c/setup.cfg",
+          "raw_url": "https://github.com/li9i/pointcloud-to-ply/raw/761dbcedf477425dcb228b551dba60d49c54593c/setup.cfg",
+          "contents_url": "https://api.github.com/repos/li9i/pointcloud-to-ply/contents/setup.cfg?ref=761dbcedf477425dcb228b551dba60d49c54593c",
+          "patch": "@@ -0,0 +1,4 @@\n+[develop]\n+script_dir=$base/lib/pointcloud_to_ply\n+[install]\n+install_scripts=$base/lib/pointcloud_to_ply"
+        },
+        {
+          "sha": "a7962f0c9dc0d18cd2f431316295dd4fa098582d",
+          "filename": "setup.py",
+          "status": "added",
+          "additions": 26,
+          "deletions": 0,
+          "changes": 26,
+          "blob_url": "https://github.com/li9i/pointcloud-to-ply/blob/761dbcedf477425dcb228b551dba60d49c54593c/setup.py",
+          "raw_url": "https://github.com/li9i/pointcloud-to-ply/raw/761dbcedf477425dcb228b551dba60d49c54593c/setup.py",
+          "contents_url": "https://api.github.com/repos/li9i/pointcloud-to-ply/contents/setup.py?ref=761dbcedf477425dcb228b551dba60d49c54593c",
+          "patch": "@@ -0,0 +1,26 @@\n+from setuptools import setup\n+\n+package_name = 'pointcloud_to_ply'\n+\n+setup(\n+    name=package_name,\n+    version='0.0.1',\n+    packages=[package_name],\n+    data_files=[\n+      ('share/' + package_name, ['package.xml']),\n+      ('share/' + package_name + '/launch', ['launch/pointcloud_to_ply.launch.xml']),\n+      ('share/ament_index/resource_index/packages', ['resource/' + package_name]),\n+      ],\n+    install_requires=['setuptools'],\n+    zip_safe=True,\n+    maintainer='li9i',\n+    maintainer_email='alexandros.filotheou@gmail.com',\n+    description='Subscribe to a PointCloud2, reconstruct a mesh, and save to OBJ/PLY',\n+    license='MIT',\n+    tests_require=['pytest'],\n+    entry_points={\n+      'console_scripts': [\n+        'pointcloud_to_ply_node = pointcloud_to_ply.pointcloud_to_ply_node:main',\n+        ],\n+      },\n+    )"
+        }
+      ]
+    }
+  ]
+}

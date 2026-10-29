@@ -1,0 +1,227 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T07:01:28Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "autowarefoundation",
+    "repo": "zmqpp_vendor"
+  },
+  "data": [
+    {
+      "author": "xmfcx",
+      "date": "2025-12-22T07:48:47Z",
+      "sha": "025d9408dfb49c148c5a91d14eccab40ce0982a0",
+      "message": "ci: update humble, kilted, jazzy, rolling and rm EoL distros (#10)\n\nSigned-off-by: Mete Fatih Cırıt <mfc@autoware.org>",
+      "files_changed": 4,
+      "additions": 9,
+      "deletions": 40,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "f71f5fb2c867b038657413931289fbc63904d6b6",
+          "filename": ".github/workflows/BloomRelease.yaml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/autowarefoundation/zmqpp_vendor/blob/025d9408dfb49c148c5a91d14eccab40ce0982a0/.github%2Fworkflows%2FBloomRelease.yaml",
+          "raw_url": "https://github.com/autowarefoundation/zmqpp_vendor/raw/025d9408dfb49c148c5a91d14eccab40ce0982a0/.github%2Fworkflows%2FBloomRelease.yaml",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/zmqpp_vendor/contents/.github%2Fworkflows%2FBloomRelease.yaml?ref=025d9408dfb49c148c5a91d14eccab40ce0982a0",
+          "patch": "@@ -12,10 +12,10 @@ jobs:\n       - name: bloom release\n         uses: at-wat/bloom-release-action@v0\n         with:\n-          ros_distro: foxy galactic humble rolling\n+          ros_distro: foxy galactic humble jazzy rolling\n           github_token_bloom: ${{ secrets.GITHUB_TOKEN_BLOOM }}\n           github_user: hakuturu583\n           git_user: Masaya Kataoka\n           git_email: masaya.kataoka@tier4.jp\n           release_repository_push_url: https://github.com/${{ github.repository }}-release.git\n-          open_pr: true\n\\ No newline at end of file\n+          open_pr: true"
+        },
+        {
+          "sha": "4b0f772df52b03e461c2a3a891cc759d69f0f388",
+          "filename": ".github/workflows/Build.yaml",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 9,
+          "changes": 15,
+          "blob_url": "https://github.com/autowarefoundation/zmqpp_vendor/blob/025d9408dfb49c148c5a91d14eccab40ce0982a0/.github%2Fworkflows%2FBuild.yaml",
+          "raw_url": "https://github.com/autowarefoundation/zmqpp_vendor/raw/025d9408dfb49c148c5a91d14eccab40ce0982a0/.github%2Fworkflows%2FBuild.yaml",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/zmqpp_vendor/contents/.github%2Fworkflows%2FBuild.yaml?ref=025d9408dfb49c148c5a91d14eccab40ce0982a0",
+          "patch": "@@ -18,13 +18,10 @@ jobs:\n       max-parallel: 8\n       matrix:\n         rosdistro: [\n-          [ubuntu-18.04, dashing],\n-          [ubuntu-18.04, eloquent],\n-          [ubuntu-20.04, foxy],\n-          [ubuntu-20.04, galactic],\n-          #[ubuntu-22.04, humble],\n-          [ubuntu-20.04, rolling]] #,\n-          #[ubuntu-22.04, rolling]]\n+          [ubuntu-22.04, humble],\n+          [ubuntu-24.04, jazzy],\n+          [ubuntu-24.04, kilted],\n+          [ubuntu-24.04, rolling]]\n     env:\n       ROS_DISTRO: ${{ matrix.rosdistro[1] }}\n     steps:\n@@ -33,7 +30,7 @@ jobs:\n         with:\n           fetch-depth: 0\n       - name: Setup ROS2 ${{ matrix.rosdistro[1] }} environment\n-        uses: ros-tooling/setup-ros@v0.2\n+        uses: ros-tooling/setup-ros@v0.7\n         with:\n           required-ros-distributions: ${{ matrix.rosdistro[1] }}\n       - name: Search packages in this repository\n@@ -44,7 +41,7 @@ jobs:\n         run: |\n           echo \"Target packages: ${{ steps.list_packages.outputs.package_list }}\"\n       - name: Run build test\n-        uses: ros-tooling/action-ros-ci@v0.2\n+        uses: ros-tooling/action-ros-ci@v0.4\n         with:\n           package-name: ${{ steps.list_packages.outputs.package_list }}\n           target-ros2-distro: ${{ matrix.rosdistro[1] }}"
+        },
+        {
+          "sha": "bf2403c4dc323dc6fb9ed2715be5182bb3d6d947",
+          "filename": ".github/workflows/Release.yaml",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 28,
+          "changes": 28,
+          "blob_url": "https://github.com/autowarefoundation/zmqpp_vendor/blob/225354f54fcca56fca6279a1d50c25ff373092e3/.github%2Fworkflows%2FRelease.yaml",
+          "raw_url": "https://github.com/autowarefoundation/zmqpp_vendor/raw/225354f54fcca56fca6279a1d50c25ff373092e3/.github%2Fworkflows%2FRelease.yaml",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/zmqpp_vendor/contents/.github%2Fworkflows%2FRelease.yaml?ref=225354f54fcca56fca6279a1d50c25ff373092e3",
+          "patch": "@@ -1,28 +0,0 @@\n-name: Release\n-on:\n-  issues:\n-    types: [opened]\n-\n-jobs:\n-  release:\n-    runs-on: ubuntu-latest\n-    if: startsWith(github.event.issue.title, 'Release ')\n-    steps:\n-      - name: checkout\n-        uses: actions/checkout@v2\n-      - name: create release\n-        id: create_release\n-        uses: at-wat/catkin-release-action@v1\n-        with:\n-          issue_title: ${{ github.event.issue.title }}\n-          git_user: hakuturu583\n-          git_email: masaya.kataoka@tier4.jp\n-          github_token: ${{ secrets.GITHUB_TOKEN }}\n-      - name: open pull-request\n-        uses: repo-sync/pull-request@v2\n-        with:\n-          source_branch: ${{ steps.create_release.outputs.created_branch }}\n-          destination_branch: main\n-          pr_title: Release ${{ steps.create_release.outputs.version}}\n-          pr_body: close \\#${{ github.event.issue.number }}\n-          github_token: ${{ secrets.GITHUB_TOKEN }}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "394c72cb95fec318ca5c57f29fd4bb48a06392b5",
+          "filename": "CONTRIBUTING.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/autowarefoundation/zmqpp_vendor/blob/025d9408dfb49c148c5a91d14eccab40ce0982a0/CONTRIBUTING.md",
+          "raw_url": "https://github.com/autowarefoundation/zmqpp_vendor/raw/025d9408dfb49c148c5a91d14eccab40ce0982a0/CONTRIBUTING.md",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/zmqpp_vendor/contents/CONTRIBUTING.md?ref=025d9408dfb49c148c5a91d14eccab40ce0982a0",
+          "patch": "@@ -11,4 +11,4 @@ be under the Apache 2 License, as dictated by that\n    Notwithstanding the above, nothing herein shall supersede or modify\n    the terms of any separate license agreement you may have executed\n    with Licensor regarding such Contributions.\n-~~~\n\\ No newline at end of file\n+~~~"
+        }
+      ]
+    },
+    {
+      "author": "mitsudome-r",
+      "date": "2025-12-22T08:35:30Z",
+      "sha": "cc77bf65cacd06da9b567d1e6155bd2513f69bcf",
+      "message": "chore: release 0.1.0 (#12)\n\n* chore: update changelog for 0.1.0\n\nSigned-off-by: mitsudome-r <ryohsuke.mitsudome@tier4.jp>\n\n* chore: release 0.1.0\n\nSigned-off-by: mitsudome-r <ryohsuke.mitsudome@tier4.jp>\n\n---------\n\nSigned-off-by: mitsudome-r <ryohsuke.mitsudome@tier4.jp>",
+      "files_changed": 2,
+      "additions": 13,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "d855928484fce2b17273d86f4e3cc56d971c8cdf",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 0,
+          "changes": 12,
+          "blob_url": "https://github.com/autowarefoundation/zmqpp_vendor/blob/cc77bf65cacd06da9b567d1e6155bd2513f69bcf/CHANGELOG.rst",
+          "raw_url": "https://github.com/autowarefoundation/zmqpp_vendor/raw/cc77bf65cacd06da9b567d1e6155bd2513f69bcf/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/zmqpp_vendor/contents/CHANGELOG.rst?ref=cc77bf65cacd06da9b567d1e6155bd2513f69bcf",
+          "patch": "@@ -2,6 +2,18 @@\n Changelog for package zmqpp_vendor\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+0.1.0 (2025-12-22)\n+------------------\n+* ci: update bloom release info (`#11 <https://github.com/autowarefoundation/zmqpp_vendor/issues/11>`_)\n+* feat: use ament_vendor for setting up zmqpp (`#9 <https://github.com/autowarefoundation/zmqpp_vendor/issues/9>`_)\n+  * Use ament_vendor and CMake export features\n+  * Use more specific version (formerly master)\n+* ci: update humble, kilted, jazzy, rolling and rm EoL distros (`#10 <https://github.com/autowarefoundation/zmqpp_vendor/issues/10>`_)\n+* Merge pull request `#8 <https://github.com/autowarefoundation/zmqpp_vendor/issues/8>`_ from tier4/feature/bloom_release_action\n+  add BloomRelease Action\n+* add BloomRelease Action\n+* Contributors: Masaya Kataoka, MasayaKataoka, Mete Fatih Cırıt, ぐるぐる\n+\n 0.0.2 (2022-05-24)\n ------------------\n * Merge pull request `#5 <https://github.com/tier4/zmqpp_vendor/issues/5>`_ from tier4/fix/default_branch_name"
+        },
+        {
+          "sha": "a0bb418b11e775119662bf7a2f7baf696cd3b3f4",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/autowarefoundation/zmqpp_vendor/blob/cc77bf65cacd06da9b567d1e6155bd2513f69bcf/package.xml",
+          "raw_url": "https://github.com/autowarefoundation/zmqpp_vendor/raw/cc77bf65cacd06da9b567d1e6155bd2513f69bcf/package.xml",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/zmqpp_vendor/contents/package.xml?ref=cc77bf65cacd06da9b567d1e6155bd2513f69bcf",
+          "patch": "@@ -2,7 +2,7 @@\n <?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"3\">\n   <name>zmqpp_vendor</name>\n-  <version>0.0.2</version>\n+  <version>0.1.0</version>\n   <description>Vendor package for zmqpp</description>\n   <maintainer email=\"masaya.kataoka@tier4.jp\">Masaya Kataoka</maintainer>\n   <license>Apache License 2.0</license>"
+        }
+      ]
+    },
+    {
+      "author": "f0reachARR",
+      "date": "2025-12-22T08:04:19Z",
+      "sha": "462f4ca9575430ace9790a41932411b7c04ef697",
+      "message": "feat: use ament_vendor for setting up zmqpp (#9)\n\n* Use ament_vendor and CMake export features\n\n* Use more specific version (formerly master)",
+      "files_changed": 4,
+      "additions": 37,
+      "deletions": 31,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "96ee0dcf21a0b4421a955fdca8e070915f989f8b",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 30,
+          "changes": 39,
+          "blob_url": "https://github.com/autowarefoundation/zmqpp_vendor/blob/462f4ca9575430ace9790a41932411b7c04ef697/CMakeLists.txt",
+          "raw_url": "https://github.com/autowarefoundation/zmqpp_vendor/raw/462f4ca9575430ace9790a41932411b7c04ef697/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/zmqpp_vendor/contents/CMakeLists.txt?ref=462f4ca9575430ace9790a41932411b7c04ef697",
+          "patch": "@@ -6,36 +6,15 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n endif()\n \n find_package(ament_cmake REQUIRED)\n+find_package(ament_cmake_vendor_package REQUIRED)\n \n-macro(build_zmqpp)\n-  set(cmake_commands)\n-  set(cmake_configure_args\n-    -Wno-dev\n-    -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_install)\n+ament_vendor(zmqpp_vendor\n+  SATISFIED ${zmqpp_FOUND}\n+  VCS_URL https://github.com/zeromq/zmqpp.git\n+  VCS_VERSION da73a138f290274cfd604b3f05a908956390a66e\n+  PATCHES patches/zmqpp_export.patch\n+)\n \n-  include(ExternalProject)\n-  externalproject_add(cpp-zmqpp-ext\n-    GIT_REPOSITORY https://github.com/zeromq/zmqpp.git\n-    GIT_TAG master\n-    TIMEOUT 6000\n-    ${cmake_commands}\n-    CMAKE_ARGS ${cmake_configure_args}\n-  )\n-  install(\n-    DIRECTORY\n-      ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_install/\n-    DESTINATION\n-      ${CMAKE_INSTALL_PREFIX}\n-  )\n-endmacro()\n+ament_export_dependencies(zmqpp)\n \n-build_zmqpp()\n-ament_export_include_directories(include)\n-ament_export_libraries(zmqpp)\n-\n-if(BUILD_TESTING)\n-  find_package(ament_lint_auto REQUIRED)\n-  ament_lint_auto_find_test_dependencies()\n-endif()\n-\n-ament_package()\n+ament_package(CONFIG_EXTRAS zmqpp_vendor-extras.cmake)"
+        },
+        {
+          "sha": "b88c046f49d9f14a243aa08df6e3b05134bda148",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/autowarefoundation/zmqpp_vendor/blob/462f4ca9575430ace9790a41932411b7c04ef697/package.xml",
+          "raw_url": "https://github.com/autowarefoundation/zmqpp_vendor/raw/462f4ca9575430ace9790a41932411b7c04ef697/package.xml",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/zmqpp_vendor/contents/package.xml?ref=462f4ca9575430ace9790a41932411b7c04ef697",
+          "patch": "@@ -6,9 +6,10 @@\n   <description>Vendor package for zmqpp</description>\n   <maintainer email=\"masaya.kataoka@tier4.jp\">Masaya Kataoka</maintainer>\n   <license>Apache License 2.0</license>\n-  <license>Mozilla Public License 2.0</license> <!-- sol2 is MPLv2 -->\n+  <license>Mozilla Public License 2.0</license> <!-- zmqpp is MPLv2 -->\n \n   <buildtool_depend>ament_cmake</buildtool_depend>\n+  <buildtool_depend>ament_cmake_vendor_package</buildtool_depend>\n   <buildtool_depend>git</buildtool_depend>\n \n   <depend>libzmq3-dev</depend>"
+        },
+        {
+          "sha": "c3a24cc16a642f06d21da994f6d935fbffdebbce",
+          "filename": "patches/zmqpp_export.patch",
+          "status": "added",
+          "additions": 25,
+          "deletions": 0,
+          "changes": 25,
+          "blob_url": "https://github.com/autowarefoundation/zmqpp_vendor/blob/462f4ca9575430ace9790a41932411b7c04ef697/patches%2Fzmqpp_export.patch",
+          "raw_url": "https://github.com/autowarefoundation/zmqpp_vendor/raw/462f4ca9575430ace9790a41932411b7c04ef697/patches%2Fzmqpp_export.patch",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/zmqpp_vendor/contents/patches%2Fzmqpp_export.patch?ref=462f4ca9575430ace9790a41932411b7c04ef697",
+          "patch": "@@ -0,0 +1,25 @@\n+diff --git a/CMakeLists.txt b/CMakeLists.txt\n+index 489916a..19ab1ac 100644\n+--- a/CMakeLists.txt\n++++ b/CMakeLists.txt\n+@@ -230,9 +230,11 @@ endif()\n+ # Install\n+ # -------\n+ install(TARGETS ${INSTALL_TARGET_LIST}\n++        EXPORT zmqpp-targets\n+         RUNTIME DESTINATION bin\n+         LIBRARY DESTINATION lib\n+-        ARCHIVE DESTINATION lib)\n++        ARCHIVE DESTINATION lib\n++        INCLUDES DESTINATION include)\n+ \n+ install(DIRECTORY src/zmqpp DESTINATION include/\n+         FILES_MATCHING PATTERN \"*.hpp\")\n+@@ -240,3 +242,7 @@ install(DIRECTORY src/zmqpp DESTINATION include/\n+ install(FILES\n+         \"${CMAKE_CURRENT_BINARY_DIR}/zmqpp_export.h\"\n+         DESTINATION \"include\")\n++\n++install(EXPORT zmqpp-targets\n++        FILE zmqpp-config.cmake\n++        DESTINATION lib/cmake/zmqpp)"
+        },
+        {
+          "sha": "2c02169038546220ac6d8cf97d1e809de827f332",
+          "filename": "zmqpp_vendor-extras.cmake",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/autowarefoundation/zmqpp_vendor/blob/462f4ca9575430ace9790a41932411b7c04ef697/zmqpp_vendor-extras.cmake",
+          "raw_url": "https://github.com/autowarefoundation/zmqpp_vendor/raw/462f4ca9575430ace9790a41932411b7c04ef697/zmqpp_vendor-extras.cmake",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/zmqpp_vendor/contents/zmqpp_vendor-extras.cmake?ref=462f4ca9575430ace9790a41932411b7c04ef697",
+          "patch": "@@ -0,0 +1 @@\n+list(APPEND zmqpp_vendor_TARGETS zmqpp)"
+        }
+      ]
+    },
+    {
+      "author": "hakuturu583",
+      "date": "2022-05-12T02:26:10Z",
+      "sha": "c791a058cb4803c526d5757db1c2fa13b38ae632",
+      "message": "Initial commit",
+      "files_changed": 2,
+      "additions": 203,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 201,
+          "deletions": 0,
+          "changes": 201,
+          "blob_url": "https://github.com/autowarefoundation/zmqpp_vendor/blob/c791a058cb4803c526d5757db1c2fa13b38ae632/LICENSE",
+          "raw_url": "https://github.com/autowarefoundation/zmqpp_vendor/raw/c791a058cb4803c526d5757db1c2fa13b38ae632/LICENSE",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/zmqpp_vendor/contents/LICENSE?ref=c791a058cb4803c526d5757db1c2fa13b38ae632",
+          "patch": "@@ -0,0 +1,201 @@\n+                                 Apache License\n+                           Version 2.0, January 2004\n+                        http://www.apache.org/licenses/\n+\n+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION\n+\n+   1. Definitions.\n+\n+      \"License\" shall mean the terms and conditions for use, reproduction,\n+      and distribution as defined by Sections 1 through 9 of this document.\n+\n+      \"Licensor\" shall mean the copyright owner or entity authorized by\n+      the copyright owner that is granting the License.\n+\n+      \"Legal Entity\" shall mean the union of the acting entity and all\n+      other entities that control, are controlled by, or are under common\n+      control with that entity. For the purposes of this definition,\n+      \"control\" means (i) the power, direct or indirect, to cause the\n+      direction or management of such entity, whether by contract or\n+      otherwise, or (ii) ownership of fifty percent (50%) or more of the\n+      outstanding shares, or (iii) beneficial ownership of such entity.\n+\n+      \"You\" (or \"Your\") shall mean an individual or Legal Entity\n+      exercising permissions granted by this License.\n+\n+      \"Source\" form shall mean the preferred form for making modifications,\n+      including but not limited to software source code, documentation\n+      source, and configuration files.\n+\n+      \"Object\" form shall mean any form resulting from mechanical\n+      transformation or translation of a Source form, including but\n+      not limited to compiled object code, generated documentation,\n+      and conversions to other media types.\n+\n+      \"Work\" shall mean the work of authorship, whether in Source or\n+      Object form, made available under the License, as indicated by a\n+      copyright notice that is included in or attached to the work\n+      (an example is provided in the Appendix below).\n+\n+      \"Derivative Works\" shall mean any work, whether in Source or Object\n+      form, that is based on (or derived from) the Work and for which the\n+      editorial revisions, annotations, elaborations, or other modifications\n+      represent, as a whole, an original work of authorship. For the purposes\n+      of this License, Derivative Works shall not include works that remain\n+      separable from, or merely link (or bind by name) to the interfaces of,\n+      the Work and Derivative Works thereof.\n+\n+      \"Contribution\" shall mean any work of authorship, including\n+      the original version of the Work and any modifications or additions\n+      to that Work or Derivative Works thereof, that is intentionally\n+      submitted to Licensor for inclusion in the Work by the copyright owner\n+      or by an individual or Legal Entity authorized to submit on behalf of\n+      the copyright owner. For the purposes of this definition, \"submitted\"\n+      means any form of electronic, verbal, or written communication sent\n+      to the Licensor or its representatives, including but not limited to\n+      communication on electronic mailing lists, source code control systems,\n+      and issue tracking systems that are managed by, or on behalf of, the\n+      Licensor for the purpose of discussing and improving the Work, but\n+      excluding communication that is conspicuously marked or otherwise\n+      designated in writing by the copyright owner as \"Not a Contribution.\"\n+\n+      \"Contributor\" shall mean Licensor and any individual or Legal Entity\n+      on behalf of whom a Contribution has been received by Licensor and\n+      subsequently incorporated within the Work.\n+\n+   2. Grant of Copyright License. Subject to the terms and conditions of\n+      this License, each Contributor hereby grants to You a perpetual,\n+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n+      copyright license to reproduce, prepare Derivative Works of,\n+      publicly display, publicly perform, sublicense, and distribute the\n+      Work and such Derivative Works in Source or Object form.\n+\n+   3. Grant of Patent License. Subject to the terms and conditions of\n+      this License, each Contributor hereby grants to You a perpetual,\n+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n+      (except as stated in this section) patent license to make, have made,\n+      use, offer to sell, sell, import, and otherwise transfer the Work,\n+      where such license applies only to those patent claims licensable\n+      by such Contributor that are necessarily infringed by their\n+      Contribution(s) alone or by combination of their Contribution(s)\n+      with the Work to which such Contribution(s) was submitted. If You\n+      institute patent litigation against any entity (including a\n+      cross-claim or counterclaim in a lawsuit) alleging that the Work\n+      or a Contribution incorporated within the Work constitutes direct\n+      or contributory patent infringement, then any patent licenses\n+      granted to You under this License for that Work shall terminate\n+      as of the date such litigation is filed.\n+\n+   4. Redistribution. You may reproduce and distribute copies of the\n+      Work or Derivative Works thereof in any medium, with or without\n+      modifications, and in Source or Object form, provided that You\n+      meet the following conditions:\n+\n+      (a) You must give any other recipients of the Work or\n+          Derivative Works a copy of this License; and\n+\n+      (b) You must cause any modified files to carry prominent notices\n+          stating that You changed the files; and\n+\n+      (c) You must retain, in the Source form of any Derivative Works\n+          that You distribute, all copyright, patent, trademark, and\n+          attribution notices from the Source form of the Work,\n+          excluding those notices that do not pertain to any part of\n+          the Derivative Works; and\n+\n+      (d) If the Work includes a \"NOTICE\" text file as part of its\n+          distribution, then any Derivative Works that You distribute must\n+          include a readable copy of the attribution notices contained\n+          within such NOTICE file, excluding those notices that do not\n+          pertain to any part of the Derivative Works, in at least one\n+          of the following places: within a NOTICE text file distributed\n+          as part of the Derivative Works; within the Source form or\n+          documentation, if provided along with the Derivative Works; or,\n+          within a display generated by the Derivative Works, if and\n+          wherever such third-party notices normally appear. The contents\n+          of the NOTICE file are for informational purposes only and\n+          do not modify the License. You may add Your own attribution\n+          notices within Derivative Works that You distribute, alongside\n+          or as an addendum to the NOTICE text from the Work, provided\n+          that such additional attribution notices cannot be construed\n+          as modifying the License.\n+\n+      You may add Your own copyright statement to Your modifications and\n+      may provide additional or different license terms and conditions\n+      for use, reproduction, or distribution of Your modifications, or\n+      for any such Derivative Works as a whole, provided Your use,\n+      reproduction, and distribution of the Work otherwise complies with\n+      the conditions stated in this License.\n+\n+   5. Submission of Contributions. Unless You explicitly state otherwise,\n+      any Contribution intentionally submitted for inclusion in the Work\n+      by You to the Licensor shall be under the terms and conditions of\n+      this License, without any additional terms or conditions.\n+      Notwithstanding the above, nothing herein shall supersede or modify\n+      the terms of any separate license agreement you may have executed\n+      with Licensor regarding such Contributions.\n+\n+   6. Trademarks. This License does not grant permission to use the trade\n+      names, trademarks, service marks, or product names of the Licensor,\n+      except as required for reasonable and customary use in describing the\n+      origin of the Work and reproducing the content of the NOTICE file.\n+\n+   7. Disclaimer of Warranty. Unless required by applicable law or\n+      agreed to in writing, Licensor provides the Work (and each\n+      Contributor provides its Contributions) on an \"AS IS\" BASIS,\n+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or\n+      implied, including, without limitation, any warranties or conditions\n+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A\n+      PARTICULAR PURPOSE. You are solely responsible for determining the\n+      appropriateness of using or redistributing the Work and assume any\n+      risks associated with Your exercise of permissions under this License.\n+\n+   8. Limitation of Liability. In no event and under no legal theory,\n+      whether in tort (including negligence), contract, or otherwise,\n+      unless required by applicable law (such as deliberate and grossly\n+      negligent acts) or agreed to in writing, shall any Contributor be\n+      liable to You for damages, including any direct, indirect, special,\n+      incidental, or consequential damages of any character arising as a\n+      result of this License or out of the use or inability to use the\n+      Work (including but not limited to damages for loss of goodwill,\n+      work stoppage, computer failure or malfunction, or any and all\n+      other commercial damages or losses), even if such Contributor\n+      has been advised of the possibility of such damages.\n+\n+   9. Accepting Warranty or Additional Liability. While redistributing\n+      the Work or Derivative Works thereof, You may choose to offer,\n+      and charge a fee for, acceptance of support, warranty, indemnity,\n+      or other liability obligations and/or rights consistent with this\n+      License. However, in accepting such obligations, You may act only\n+      on Your own behalf and on Your sole responsibility, not on behalf\n+      of any other Contributor, and only if You agree to indemnify,\n+      defend, and hold each Contributor harmless for any liability\n+      incurred by, or claims asserted against, such Contributor by reason\n+      of your accepting any such warranty or additional liability.\n+\n+   END OF TERMS AND CONDITIONS\n+\n+   APPENDIX: How to apply the Apache License to your work.\n+\n+      To apply the Apache License to your work, attach the following\n+      boilerplate notice, with the fields enclosed by brackets \"[]\"\n+      replaced with your own identifying information. (Don't include\n+      the brackets!)  The text should be enclosed in the appropriate\n+      comment syntax for the file format. We also recommend that a\n+      file or class name and description of purpose be included on the\n+      same \"printed page\" as the copyright notice for easier\n+      identification within third-party archives.\n+\n+   Copyright [yyyy] [name of copyright owner]\n+\n+   Licensed under the Apache License, Version 2.0 (the \"License\");\n+   you may not use this file except in compliance with the License.\n+   You may obtain a copy of the License at\n+\n+       http://www.apache.org/licenses/LICENSE-2.0\n+\n+   Unless required by applicable law or agreed to in writing, software\n+   distributed under the License is distributed on an \"AS IS\" BASIS,\n+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+   See the License for the specific language governing permissions and\n+   limitations under the License."
+        },
+        {
+          "sha": "b4715d497a1433e0ebbbcf3a878a196fbfebd996",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/autowarefoundation/zmqpp_vendor/blob/c791a058cb4803c526d5757db1c2fa13b38ae632/README.md",
+          "raw_url": "https://github.com/autowarefoundation/zmqpp_vendor/raw/c791a058cb4803c526d5757db1c2fa13b38ae632/README.md",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/zmqpp_vendor/contents/README.md?ref=c791a058cb4803c526d5757db1c2fa13b38ae632",
+          "patch": "@@ -0,0 +1,2 @@\n+# zmqpp_vendor\n+vendor package for https://github.com/zeromq/zmqpp"
+        }
+      ]
+    },
+    {
+      "author": "cottsay",
+      "date": "2022-05-19T21:48:57Z",
+      "sha": "d878c2abce7941ea988db6211a51cdffa39d659e",
+      "message": "Add missing buildtool_depend on git",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "3507c523f030cc27a6cf30fec2a8ed7ed9bd960c",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/autowarefoundation/zmqpp_vendor/blob/d878c2abce7941ea988db6211a51cdffa39d659e/package.xml",
+          "raw_url": "https://github.com/autowarefoundation/zmqpp_vendor/raw/d878c2abce7941ea988db6211a51cdffa39d659e/package.xml",
+          "contents_url": "https://api.github.com/repos/autowarefoundation/zmqpp_vendor/contents/package.xml?ref=d878c2abce7941ea988db6211a51cdffa39d659e",
+          "patch": "@@ -9,6 +9,7 @@\n   <license>Mozilla Public License 2.0</license> <!-- sol2 is MPLv2 -->\n \n   <buildtool_depend>ament_cmake</buildtool_depend>\n+  <buildtool_depend>git</buildtool_depend>\n \n   <depend>libzmq3-dev</depend>\n "
+        }
+      ]
+    }
+  ]
+}

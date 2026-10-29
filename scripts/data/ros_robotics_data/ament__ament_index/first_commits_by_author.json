@@ -1,0 +1,1440 @@
+{
+  "_meta": {
+    "fetched_at": "2026-09-24T14:51:04Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ament",
+    "repo": "ament_index",
+    "refreshed_at": "2026-09-24T14:51:04Z",
+    "refresh_note": "incrementally added 1 author(s) missing from a prior stale cache"
+  },
+  "data": [
+    {
+      "author": "clalancette",
+      "date": "2020-02-21T21:10:30Z",
+      "sha": "47236e623aa93e596457a1fa18741a302f7ff967",
+      "message": "Revert 46 (#48)\n\n* Revert \"Address clang-tidy warnings (#47)\"\r\n\r\nThis reverts commit 602d4b154a41010d90ebd43972255299eb3ad108.\r\n\r\nSigned-off-by: Chris Lalancette <clalancette@openrobotics.org>\r\n\r\n* Revert \"Refactor paths to use rcpputils filesystem helper (#46)\"\r\n\r\nThis reverts commit 5954265704f26a11e6e01b6c61e82e498f15f221.\r\n\r\nSigned-off-by: Chris Lalancette <clalancette@openrobotics.org>",
+      "files_changed": 9,
+      "additions": 20,
+      "deletions": 39,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "761f8e0ef4e19ae55b144f3f013affca4f6c9174",
+          "filename": "ament_index_cpp/CMakeLists.txt",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 2,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/47236e623aa93e596457a1fa18741a302f7ff967/ament_index_cpp%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ament/ament_index/raw/47236e623aa93e596457a1fa18741a302f7ff967/ament_index_cpp%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2FCMakeLists.txt?ref=47236e623aa93e596457a1fa18741a302f7ff967",
+          "patch": "@@ -18,7 +18,6 @@ unless the library was explicitly added as a static library.\"\n   ON)\n \n find_package(ament_cmake REQUIRED)\n-find_package(rcpputils REQUIRED)\n \n add_library(${PROJECT_NAME}\n   src/get_package_prefix.cpp\n@@ -33,7 +32,6 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE \"AMENT_INDEX_CPP_BUILDING_DLL\n target_include_directories(${PROJECT_NAME} PUBLIC\n   \"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>\"\n   \"$<INSTALL_INTERFACE:include>\")\n-ament_target_dependencies(${PROJECT_NAME} rcpputils)\n \n ament_export_include_directories(include)\n ament_export_interfaces(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)"
+        },
+        {
+          "sha": "804dc9a7574eb639203d38165af5c228d474fddd",
+          "filename": "ament_index_cpp/package.xml",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 2,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/47236e623aa93e596457a1fa18741a302f7ff967/ament_index_cpp%2Fpackage.xml",
+          "raw_url": "https://github.com/ament/ament_index/raw/47236e623aa93e596457a1fa18741a302f7ff967/ament_index_cpp%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fpackage.xml?ref=47236e623aa93e596457a1fa18741a302f7ff967",
+          "patch": "@@ -11,8 +11,6 @@\n \n   <buildtool_depend>ament_cmake</buildtool_depend>\n \n-  <depend>rcpputils</depend>\n-  \n   <test_depend>ament_cmake_gtest</test_depend>\n   <test_depend>ament_lint_auto</test_depend>\n   <test_depend>ament_lint_common</test_depend>"
+        },
+        {
+          "sha": "d6468c18e3fd6c7d199fd236b6ebe996eb35e6f5",
+          "filename": "ament_index_cpp/src/get_package_prefix.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ament/ament_index/blob/47236e623aa93e596457a1fa18741a302f7ff967/ament_index_cpp%2Fsrc%2Fget_package_prefix.cpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/47236e623aa93e596457a1fa18741a302f7ff967/ament_index_cpp%2Fsrc%2Fget_package_prefix.cpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fsrc%2Fget_package_prefix.cpp?ref=47236e623aa93e596457a1fa18741a302f7ff967",
+          "patch": "@@ -32,7 +32,7 @@ format_package_not_found_error_message(const std::string & package_name)\n   for (const auto & path : search_paths) {\n     message += path + \", \";\n   }\n-  if (!search_paths.empty()) {\n+  if (search_paths.size() > 0) {\n     message = message.substr(0, message.size() - 2);\n   }\n   return message + \"]\";\n@@ -43,7 +43,7 @@ PackageNotFoundError::PackageNotFoundError(const std::string & _package_name)\n   package_name(_package_name)\n {}\n \n-PackageNotFoundError::~PackageNotFoundError() = default;\n+PackageNotFoundError::~PackageNotFoundError() {}\n \n std::string\n get_package_prefix(const std::string & package_name)"
+        },
+        {
+          "sha": "02f01bb2a6b57e0b4b686a04ea4ee440f706c725",
+          "filename": "ament_index_cpp/src/get_package_share_directory.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 5,
+          "changes": 6,
+          "blob_url": "https://github.com/ament/ament_index/blob/47236e623aa93e596457a1fa18741a302f7ff967/ament_index_cpp%2Fsrc%2Fget_package_share_directory.cpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/47236e623aa93e596457a1fa18741a302f7ff967/ament_index_cpp%2Fsrc%2Fget_package_share_directory.cpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fsrc%2Fget_package_share_directory.cpp?ref=47236e623aa93e596457a1fa18741a302f7ff967",
+          "patch": "@@ -16,8 +16,6 @@\n \n #include <string>\n \n-#include \"rcpputils/filesystem_helper.hpp\"\n-\n #include \"ament_index_cpp/get_package_prefix.hpp\"\n \n namespace ament_index_cpp\n@@ -26,9 +24,7 @@ namespace ament_index_cpp\n std::string\n get_package_share_directory(const std::string & package_name)\n {\n-  auto share_directory =\n-    rcpputils::fs::path{get_package_prefix(package_name)} / \"share\" / package_name;\n-  return share_directory.string();\n+  return get_package_prefix(package_name) + \"/share/\" + package_name;\n }\n \n }  // namespace ament_index_cpp"
+        },
+        {
+          "sha": "3bd57a186cfccb625f9c9902b29b536db1dcb0aa",
+          "filename": "ament_index_cpp/src/get_resource.cpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 6,
+          "changes": 10,
+          "blob_url": "https://github.com/ament/ament_index/blob/47236e623aa93e596457a1fa18741a302f7ff967/ament_index_cpp%2Fsrc%2Fget_resource.cpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/47236e623aa93e596457a1fa18741a302f7ff967/ament_index_cpp%2Fsrc%2Fget_resource.cpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fsrc%2Fget_resource.cpp?ref=47236e623aa93e596457a1fa18741a302f7ff967",
+          "patch": "@@ -19,8 +19,6 @@\n #include <stdexcept>\n #include <string>\n \n-#include \"rcpputils/filesystem_helper.hpp\"\n-\n #include \"ament_index_cpp/get_search_paths.hpp\"\n \n namespace ament_index_cpp\n@@ -40,10 +38,10 @@ get_resource(\n     throw std::runtime_error(\"ament_index_cpp::get_resource() resource name must not be empty\");\n   }\n   auto paths = get_search_paths();\n-  for (const auto & path : paths) {\n-    auto resource_path = rcpputils::fs::path{path} / \"share\" / \"ament_index\" / \"resource_index\" /\n-    resource_type / resource_name;\n-    std::ifstream s(resource_path.string());\n+  for (auto path : paths) {\n+    auto resource_path = path + \"/share/ament_index/resource_index/\" +\n+      resource_type + \"/\" + resource_name;\n+    std::ifstream s(resource_path);\n     if (s.is_open()) {\n       std::stringstream buffer;\n       buffer << s.rdbuf();"
+        },
+        {
+          "sha": "75e2cd5cb8de4c04a0f096096d561d079402f739",
+          "filename": "ament_index_cpp/src/get_resources.cpp",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 10,
+          "changes": 17,
+          "blob_url": "https://github.com/ament/ament_index/blob/47236e623aa93e596457a1fa18741a302f7ff967/ament_index_cpp%2Fsrc%2Fget_resources.cpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/47236e623aa93e596457a1fa18741a302f7ff967/ament_index_cpp%2Fsrc%2Fget_resources.cpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fsrc%2Fget_resources.cpp?ref=47236e623aa93e596457a1fa18741a302f7ff967",
+          "patch": "@@ -16,16 +16,14 @@\n \n #ifndef _WIN32\n #include <dirent.h>\n-#include <cerrno>\n+#include <errno.h>\n #else\n #include <windows.h>\n #endif\n #include <map>\n #include <stdexcept>\n #include <string>\n \n-#include \"rcpputils/filesystem_helper.hpp\"\n-\n #include \"ament_index_cpp/get_search_paths.hpp\"\n \n namespace ament_index_cpp\n@@ -39,19 +37,18 @@ get_resources(const std::string & resource_type)\n   }\n   std::map<std::string, std::string> resources;\n   auto paths = get_search_paths();\n-  for (const auto & base_path : paths) {\n-    auto path =\n-      rcpputils::fs::path{base_path} / \"share\" / \"ament_index\" / \"resource_index\" / resource_type;\n+  for (auto base_path : paths) {\n+    auto path = base_path + \"/share/ament_index/resource_index/\" + resource_type;\n \n #ifndef _WIN32\n-    auto dir = opendir(path.string().c_str());\n+    auto dir = opendir(path.c_str());\n     if (!dir) {\n       continue;\n     }\n     dirent * entry;\n-    while ((entry = readdir(dir)) != nullptr) {\n+    while ((entry = readdir(dir)) != NULL) {\n       // ignore directories\n-      auto subdir = opendir((path / entry->d_name).string().c_str());\n+      auto subdir = opendir((path + \"/\" + entry->d_name).c_str());\n       if (subdir) {\n         closedir(subdir);\n         continue;\n@@ -72,7 +69,7 @@ get_resources(const std::string & resource_type)\n     closedir(dir);\n \n #else\n-    const auto pattern = (path / \"*\").string();\n+    std::string pattern = path + \"/*\";\n     WIN32_FIND_DATA find_data;\n     HANDLE find_handle = FindFirstFile(pattern.c_str(), &find_data);\n     if (find_handle == INVALID_HANDLE_VALUE) {"
+        },
+        {
+          "sha": "7a411aca3f9ccf3868b58cbbe9371308b5829fd1",
+          "filename": "ament_index_cpp/src/get_search_paths.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/47236e623aa93e596457a1fa18741a302f7ff967/ament_index_cpp%2Fsrc%2Fget_search_paths.cpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/47236e623aa93e596457a1fa18741a302f7ff967/ament_index_cpp%2Fsrc%2Fget_search_paths.cpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fsrc%2Fget_search_paths.cpp?ref=47236e623aa93e596457a1fa18741a302f7ff967",
+          "patch": "@@ -60,7 +60,7 @@ get_search_paths()\n       continue;\n     }\n     // skip non existing directories\n-    struct stat s {};\n+    struct stat s;\n     if (stat(tok.c_str(), &s)) {\n       continue;\n     }"
+        },
+        {
+          "sha": "edd7426d7db8eab935cfeeb20db23da087403f81",
+          "filename": "ament_index_cpp/src/has_resource.cpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 6,
+          "changes": 10,
+          "blob_url": "https://github.com/ament/ament_index/blob/47236e623aa93e596457a1fa18741a302f7ff967/ament_index_cpp%2Fsrc%2Fhas_resource.cpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/47236e623aa93e596457a1fa18741a302f7ff967/ament_index_cpp%2Fsrc%2Fhas_resource.cpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fsrc%2Fhas_resource.cpp?ref=47236e623aa93e596457a1fa18741a302f7ff967",
+          "patch": "@@ -18,8 +18,6 @@\n #include <stdexcept>\n #include <string>\n \n-#include \"rcpputils/filesystem_helper.hpp\"\n-\n #include \"ament_index_cpp/get_search_paths.hpp\"\n \n namespace ament_index_cpp\n@@ -38,10 +36,10 @@ has_resource(\n     throw std::runtime_error(\"ament_index_cpp::has_resource() resource name must not be empty\");\n   }\n   auto paths = get_search_paths();\n-  for (const auto & path : paths) {\n-    auto resource_path = rcpputils::fs::path{path} / \"share\" / \"ament_index\" / \"resource_index\" /\n-    resource_type / resource_name;\n-    std::ifstream s(resource_path.string());\n+  for (auto path : paths) {\n+    auto resource_path = path + \"/share/ament_index/resource_index/\" +\n+      resource_type + \"/\" + resource_name;\n+    std::ifstream s(resource_path);\n     if (s.is_open()) {\n       if (prefix_path) {\n         *prefix_path = path;"
+        },
+        {
+          "sha": "33baa1429f1997c67b8f3acffa79a374352f5af3",
+          "filename": "ament_index_cpp/test/utest.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 5,
+          "changes": 6,
+          "blob_url": "https://github.com/ament/ament_index/blob/47236e623aa93e596457a1fa18741a302f7ff967/ament_index_cpp%2Ftest%2Futest.cpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/47236e623aa93e596457a1fa18741a302f7ff967/ament_index_cpp%2Ftest%2Futest.cpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Ftest%2Futest.cpp?ref=47236e623aa93e596457a1fa18741a302f7ff967",
+          "patch": "@@ -21,8 +21,6 @@\n #include <stdexcept>\n #include <string>\n \n-#include \"rcpputils/filesystem_helper.hpp\"\n-\n #include \"ament_index_cpp/get_package_prefix.hpp\"\n #include \"ament_index_cpp/get_package_share_directory.hpp\"\n #include \"ament_index_cpp/get_packages_with_prefixes.hpp\"\n@@ -255,10 +253,8 @@ TEST(AmentIndexCpp, get_package_share_directory) {\n   subfolders.push_back(\"prefix2\");  // only contains bar and baz packages\n   set_ament_prefix_path(subfolders);\n   // bar is in both, but prefix 1 takes precedence\n-  const auto subfolder_path =\n-    rcpputils::fs::path{generate_subfolder_path(\"prefix1\")} / \"share\" / \"bar\";\n   EXPECT_EQ(\n-    subfolder_path.string(),\n+    generate_subfolder_path(\"prefix1\") + \"/share/bar\",\n     ament_index_cpp::get_package_share_directory(\"bar\"));\n }\n "
+        }
+      ]
+    },
+    {
+      "author": "ericmlujan",
+      "date": "2026-01-09T08:56:11Z",
+      "sha": "b54077af91e25b75dcbb44004d096f49e3a28710",
+      "message": "Add autogenerated version header (#105)\n\nSigned-off-by: Eric Lujan <eric@foxglove.dev>\nSigned-off-by: Chris Lalancette <clalancette@gmail.com>\nCo-authored-by: Chris Lalancette <clalancette@gmail.com>",
+      "files_changed": 2,
+      "additions": 3,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "4ffcb9ac34592125fbbaeedb19bf134a33fd9fa8",
+          "filename": "ament_index_cpp/CMakeLists.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/b54077af91e25b75dcbb44004d096f49e3a28710/ament_index_cpp%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ament/ament_index/raw/b54077af91e25b75dcbb44004d096f49e3a28710/ament_index_cpp%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2FCMakeLists.txt?ref=b54077af91e25b75dcbb44004d096f49e3a28710",
+          "patch": "@@ -19,6 +19,7 @@ unless the library was explicitly added as a static library.\"\n   ON)\n \n find_package(ament_cmake REQUIRED)\n+find_package(ament_cmake_gen_version_h REQUIRED)\n \n add_library(${PROJECT_NAME}\n   src/get_package_prefix.cpp\n@@ -55,6 +56,7 @@ if(BUILD_TESTING)\n endif()\n \n ament_package()\n+ament_generate_version_header(ament_index_cpp)\n \n install(DIRECTORY include/ DESTINATION include/${PROJECT_NAME})\n "
+        },
+        {
+          "sha": "7fbae8efee17daffcafc13ae6aaca2c9c76d2fbe",
+          "filename": "ament_index_cpp/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ament/ament_index/blob/b54077af91e25b75dcbb44004d096f49e3a28710/ament_index_cpp%2Fpackage.xml",
+          "raw_url": "https://github.com/ament/ament_index/raw/b54077af91e25b75dcbb44004d096f49e3a28710/ament_index_cpp%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fpackage.xml?ref=b54077af91e25b75dcbb44004d096f49e3a28710",
+          "patch": "@@ -16,6 +16,7 @@\n   <author>Dirk Thomas</author>\n \n   <buildtool_depend>ament_cmake</buildtool_depend>\n+  <buildtool_depend>ament_cmake_gen_version_h</buildtool_depend>\n \n   <test_depend>ament_cmake_gtest</test_depend>\n   <test_depend>ament_lint_auto</test_depend>"
+        }
+      ]
+    },
+    {
+      "author": "ahcorde",
+      "date": "2020-05-06T14:55:22Z",
+      "sha": "e5504adfe7ed8ab5a7149d4674bcdb5b1a12c4ff",
+      "message": "Added docblock to ament_index_cpp (#52)\n\n* Added docblock to ament_index_cpp\r\n\r\nSigned-off-by: ahcorde <ahcorde@gmail.com>\r\n\r\n* added in and out to param in docblock\r\n\r\nSigned-off-by: ahcorde <ahcorde@gmail.com>",
+      "files_changed": 6,
+      "additions": 30,
+      "deletions": 4,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "450b97b8f580e9095626ea318a9188e7a47f70f5",
+          "filename": "ament_index_cpp/include/ament_index_cpp/get_package_prefix.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/e5504adfe7ed8ab5a7149d4674bcdb5b1a12c4ff/ament_index_cpp%2Finclude%2Fament_index_cpp%2Fget_package_prefix.hpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/e5504adfe7ed8ab5a7149d4674bcdb5b1a12c4ff/ament_index_cpp%2Finclude%2Fament_index_cpp%2Fget_package_prefix.hpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Finclude%2Fament_index_cpp%2Fget_package_prefix.hpp?ref=e5504adfe7ed8ab5a7149d4674bcdb5b1a12c4ff",
+          "patch": "@@ -38,7 +38,7 @@ class PackageNotFoundError : public std::out_of_range\n \n /// Return the installation prefix of the given package if found.\n /**\n- * \\param package_name the name of the package to locate.\n+ * \\param[in] package_name the name of the package to locate.\n  * \\return installation prefix path in which the package was found.\n  * \\throws PackageNotFoundError when the given package is not found.\n  */"
+        },
+        {
+          "sha": "c78cfd8a6fdac453776844746f17121fe0706a81",
+          "filename": "ament_index_cpp/include/ament_index_cpp/get_package_share_directory.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/e5504adfe7ed8ab5a7149d4674bcdb5b1a12c4ff/ament_index_cpp%2Finclude%2Fament_index_cpp%2Fget_package_share_directory.hpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/e5504adfe7ed8ab5a7149d4674bcdb5b1a12c4ff/ament_index_cpp%2Finclude%2Fament_index_cpp%2Fget_package_share_directory.hpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Finclude%2Fament_index_cpp%2Fget_package_share_directory.hpp?ref=e5504adfe7ed8ab5a7149d4674bcdb5b1a12c4ff",
+          "patch": "@@ -24,7 +24,7 @@ namespace ament_index_cpp\n \n /// Return the share directory of the given package if found.\n /**\n- * \\param package_name the name of the package to locate.\n+ * \\param[in] package_name the name of the package to locate.\n  * \\return share path of the package.\n  * \\throws PackageNotFoundError when the given package is not found.\n  */"
+        },
+        {
+          "sha": "25bdeaa52f8791d6f043d7a80d41733746c9d30a",
+          "filename": "ament_index_cpp/include/ament_index_cpp/get_resource.hpp",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 1,
+          "changes": 10,
+          "blob_url": "https://github.com/ament/ament_index/blob/e5504adfe7ed8ab5a7149d4674bcdb5b1a12c4ff/ament_index_cpp%2Finclude%2Fament_index_cpp%2Fget_resource.hpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/e5504adfe7ed8ab5a7149d4674bcdb5b1a12c4ff/ament_index_cpp%2Finclude%2Fament_index_cpp%2Fget_resource.hpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Finclude%2Fament_index_cpp%2Fget_resource.hpp?ref=e5504adfe7ed8ab5a7149d4674bcdb5b1a12c4ff",
+          "patch": "@@ -21,7 +21,15 @@\n \n namespace ament_index_cpp\n {\n-\n+/// Get a the content and path of a resource\n+/**\n+ * \\param[in] resource_type type of the resource\n+ * \\param[in] resource_name name of the resource\n+ * \\param[out] content content of the resource\n+ * \\param[out] prefix_path the installation prefix of the given resource if found.\n+ * \\return `true` is the resource exists, `false` otherwise.\n+ * \\throws std::runtime_error if resource_type or resource_name are empty.\n+ */\n AMENT_INDEX_CPP_PUBLIC\n bool\n get_resource("
+        },
+        {
+          "sha": "7cb7629808569b3afd6a02a7666c80c63a2b59ff",
+          "filename": "ament_index_cpp/include/ament_index_cpp/get_resources.hpp",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/ament/ament_index/blob/e5504adfe7ed8ab5a7149d4674bcdb5b1a12c4ff/ament_index_cpp%2Finclude%2Fament_index_cpp%2Fget_resources.hpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/e5504adfe7ed8ab5a7149d4674bcdb5b1a12c4ff/ament_index_cpp%2Finclude%2Fament_index_cpp%2Fget_resources.hpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Finclude%2Fament_index_cpp%2Fget_resources.hpp?ref=e5504adfe7ed8ab5a7149d4674bcdb5b1a12c4ff",
+          "patch": "@@ -23,6 +23,12 @@\n namespace ament_index_cpp\n {\n \n+/// Get a map of resources names to their installation prefix.\n+/**\n+ * \\param resource_type type of the resource.\n+ * \\return a map of resources names to their installation prefix.\n+ * \\throws std::runtime_error if resource_type is empty.\n+ */\n AMENT_INDEX_CPP_PUBLIC\n std::map<std::string, std::string>\n get_resources(const std::string & resource_type);"
+        },
+        {
+          "sha": "017b41790ea38d5170c959c1f5bf1f07f84c111a",
+          "filename": "ament_index_cpp/include/ament_index_cpp/get_search_paths.hpp",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 1,
+          "changes": 6,
+          "blob_url": "https://github.com/ament/ament_index/blob/e5504adfe7ed8ab5a7149d4674bcdb5b1a12c4ff/ament_index_cpp%2Finclude%2Fament_index_cpp%2Fget_search_paths.hpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/e5504adfe7ed8ab5a7149d4674bcdb5b1a12c4ff/ament_index_cpp%2Finclude%2Fament_index_cpp%2Fget_search_paths.hpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Finclude%2Fament_index_cpp%2Fget_search_paths.hpp?ref=e5504adfe7ed8ab5a7149d4674bcdb5b1a12c4ff",
+          "patch": "@@ -22,7 +22,11 @@\n \n namespace ament_index_cpp\n {\n-\n+/// Get the searcheable paths in the environment variable AMENT_PREFIX_PATH.\n+/**\n+ * \\return a list with the searcheable paths\n+ * \\throws runtime_error if the environment variable AMENT_PREFIX_PATH is not set\n+ */\n AMENT_INDEX_CPP_PUBLIC\n std::list<std::string>\n get_search_paths();"
+        },
+        {
+          "sha": "e0178c037ba733e770a43cd114d44eca4e0f5145",
+          "filename": "ament_index_cpp/include/ament_index_cpp/has_resource.hpp",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/ament/ament_index/blob/e5504adfe7ed8ab5a7149d4674bcdb5b1a12c4ff/ament_index_cpp%2Finclude%2Fament_index_cpp%2Fhas_resource.hpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/e5504adfe7ed8ab5a7149d4674bcdb5b1a12c4ff/ament_index_cpp%2Finclude%2Fament_index_cpp%2Fhas_resource.hpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Finclude%2Fament_index_cpp%2Fhas_resource.hpp?ref=e5504adfe7ed8ab5a7149d4674bcdb5b1a12c4ff",
+          "patch": "@@ -22,6 +22,14 @@\n namespace ament_index_cpp\n {\n \n+/// Return the install path of resource if exists\n+/**\n+ * \\param[in] resource_type type of the resource\n+ * \\param[in] resource_name name of the resource\n+ * \\param[out] prefix_path the installation prefix of the given resource if found.\n+ * \\return `true` if resource exists,`false` otherwise\n+ * \\throws std::runtime_error if resource_type or resource_name are empty\n+ */\n AMENT_INDEX_CPP_PUBLIC\n bool\n has_resource("
+        }
+      ]
+    },
+    {
+      "author": "mosfet80",
+      "date": "2025-07-21T15:44:49Z",
+      "sha": "2b419244e1cc3a3ee40fdcc09f54e35d0a6a896f",
+      "message": "fix setuptools deprecations (#101)\n\nSigned-off-by: mosfet80 <10235105+mosfet80@users.noreply.github.com>",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "451a5185049c449681cf807f0c3025a8e91dd2c4",
+          "filename": "ament_index_python/setup.py",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 2,
+          "changes": 7,
+          "blob_url": "https://github.com/ament/ament_index/blob/2b419244e1cc3a3ee40fdcc09f54e35d0a6a896f/ament_index_python%2Fsetup.py",
+          "raw_url": "https://github.com/ament/ament_index/raw/2b419244e1cc3a3ee40fdcc09f54e35d0a6a896f/ament_index_python%2Fsetup.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fsetup.py?ref=2b419244e1cc3a3ee40fdcc09f54e35d0a6a896f",
+          "patch": "@@ -28,7 +28,6 @@\n     keywords=['ROS'],\n     classifiers=[\n         'Intended Audience :: Developers',\n-        'License :: OSI Approved :: Apache Software License',\n         'Programming Language :: Python',\n         'Topic :: Software Development',\n     ],\n@@ -37,7 +36,11 @@\n A Python API to find resources based on their type in the ament resource index\n and get the content of individual resources.\"\"\",\n     license='Apache License, Version 2.0',\n-    tests_require=['pytest'],\n+    extras_require={\n+        'test': [\n+            'pytest',\n+        ],\n+    },\n     entry_points={\n         'console_scripts': [\n             'ament_index = ament_index_python.cli:main',"
+        }
+      ]
+    },
+    {
+      "author": "cottsay",
+      "date": "2025-04-17T23:50:02Z",
+      "sha": "26fa7f40b096adfa4ea02ca59b3f518abe4bbadb",
+      "message": "1.10.2",
+      "files_changed": 5,
+      "additions": 11,
+      "deletions": 3,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "f486d956bc3eb5a011d949ed3c190f4374305f75",
+          "filename": "ament_index_cpp/CHANGELOG.rst",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ament/ament_index/blob/26fa7f40b096adfa4ea02ca59b3f518abe4bbadb/ament_index_cpp%2FCHANGELOG.rst",
+          "raw_url": "https://github.com/ament/ament_index/raw/26fa7f40b096adfa4ea02ca59b3f518abe4bbadb/ament_index_cpp%2FCHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2FCHANGELOG.rst?ref=26fa7f40b096adfa4ea02ca59b3f518abe4bbadb",
+          "patch": "@@ -2,6 +2,9 @@\n Changelog for package ament_index_cpp\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+1.10.2 (2025-04-17)\n+-------------------\n+\n 1.10.1 (2024-11-20)\n -------------------\n "
+        },
+        {
+          "sha": "5f1f5d654e001c265fb4c9f63f9f6911583e841f",
+          "filename": "ament_index_cpp/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/26fa7f40b096adfa4ea02ca59b3f518abe4bbadb/ament_index_cpp%2Fpackage.xml",
+          "raw_url": "https://github.com/ament/ament_index/raw/26fa7f40b096adfa4ea02ca59b3f518abe4bbadb/ament_index_cpp%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fpackage.xml?ref=26fa7f40b096adfa4ea02ca59b3f518abe4bbadb",
+          "patch": "@@ -2,7 +2,7 @@\n <?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"2\">\n   <name>ament_index_cpp</name>\n-  <version>1.10.1</version>\n+  <version>1.10.2</version>\n   <description>\n     C++ API to access the ament resource index.\n   </description>"
+        },
+        {
+          "sha": "d355c0fe7c701bfadb2b1f52d6fb53a31d1c8c42",
+          "filename": "ament_index_python/CHANGELOG.rst",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/ament/ament_index/blob/26fa7f40b096adfa4ea02ca59b3f518abe4bbadb/ament_index_python%2FCHANGELOG.rst",
+          "raw_url": "https://github.com/ament/ament_index/raw/26fa7f40b096adfa4ea02ca59b3f518abe4bbadb/ament_index_python%2FCHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2FCHANGELOG.rst?ref=26fa7f40b096adfa4ea02ca59b3f518abe4bbadb",
+          "patch": "@@ -2,6 +2,11 @@\n Changelog for package ament_index_python\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+1.10.2 (2025-04-17)\n+-------------------\n+* Add py.typed to package_data (`#100 <https://github.com/ament/ament_index/issues/100>`_)\n+* Contributors: Michael Carlstrom\n+\n 1.10.1 (2024-11-20)\n -------------------\n * Add test_xmllint to ament_index_python. (`#96 <https://github.com/ament/ament_index/issues/96>`_)"
+        },
+        {
+          "sha": "06bf0159366dc71ffa12c6a5d0fde66baeabc1a6",
+          "filename": "ament_index_python/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/26fa7f40b096adfa4ea02ca59b3f518abe4bbadb/ament_index_python%2Fpackage.xml",
+          "raw_url": "https://github.com/ament/ament_index/raw/26fa7f40b096adfa4ea02ca59b3f518abe4bbadb/ament_index_python%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fpackage.xml?ref=26fa7f40b096adfa4ea02ca59b3f518abe4bbadb",
+          "patch": "@@ -2,7 +2,7 @@\n <?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"2\">\n   <name>ament_index_python</name>\n-  <version>1.10.1</version>\n+  <version>1.10.2</version>\n   <description>\n     Python API to access the ament resource index.\n   </description>"
+        },
+        {
+          "sha": "7690689e0428348b60b09534bbcad66ff5f88fc5",
+          "filename": "ament_index_python/setup.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/26fa7f40b096adfa4ea02ca59b3f518abe4bbadb/ament_index_python%2Fsetup.py",
+          "raw_url": "https://github.com/ament/ament_index/raw/26fa7f40b096adfa4ea02ca59b3f518abe4bbadb/ament_index_python%2Fsetup.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fsetup.py?ref=26fa7f40b096adfa4ea02ca59b3f518abe4bbadb",
+          "patch": "@@ -5,7 +5,7 @@\n \n setup(\n     name=package_name,\n-    version='1.10.1',\n+    version='1.10.2',\n     packages=find_packages(exclude=['test']),\n     data_files=[\n         ('share/' + package_name, ['package.xml']),"
+        }
+      ]
+    },
+    {
+      "author": "InvincibleRMC",
+      "date": "2024-03-21T11:32:27Z",
+      "sha": "fbccc987dceeeb50784ff8f7d8c8ad2b1b3a9a0c",
+      "message": "Add type annotations to python files. (#93)\n\n* Add type annotations\r\n\r\nSigned-off-by: Michael Carlstrom <rmc@carlstrom.com>",
+      "files_changed": 5,
+      "additions": 33,
+      "deletions": 17,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "4fa8f67db183e0f4dc722f5cdad7bac9eefa223e",
+          "filename": "ament_index_python/ament_index_python/cli.py",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 6,
+          "changes": 19,
+          "blob_url": "https://github.com/ament/ament_index/blob/fbccc987dceeeb50784ff8f7d8c8ad2b1b3a9a0c/ament_index_python%2Fament_index_python%2Fcli.py",
+          "raw_url": "https://github.com/ament/ament_index/raw/fbccc987dceeeb50784ff8f7d8c8ad2b1b3a9a0c/ament_index_python%2Fament_index_python%2Fcli.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fament_index_python%2Fcli.py?ref=fbccc987dceeeb50784ff8f7d8c8ad2b1b3a9a0c",
+          "patch": "@@ -14,13 +14,14 @@\n \n import argparse\n import sys\n+from typing import Any, Dict, Generator, List, Optional, Tuple, Union\n \n from ament_index_python.resources import get_resource\n from ament_index_python.resources import get_resource_types\n from ament_index_python.resources import get_resources\n \n \n-def main(argv=sys.argv[1:]):\n+def main(argv: List[str] = sys.argv[1:]) -> Optional[str]:\n     parser = argparse.ArgumentParser(\n         description='Query the ament resource index.')\n     arg = parser.add_argument(\n@@ -44,13 +45,13 @@ def main(argv=sys.argv[1:]):\n     if args.resource_type is None:\n         for resource_type in sorted(get_resource_types()):\n             print(resource_type)\n-        return\n+        return None\n \n     if args.resource_name is None:\n         resources = get_resources(args.resource_type)\n         for resource_name in sorted(resources.keys()):\n-            print(resource_name + '\\t' + resources[resource_name])\n-        return\n+            print(f'{resource_name}\\t{resources[resource_name]}')\n+        return None\n \n     try:\n         content, path = get_resource(args.resource_type, args.resource_name)\n@@ -62,12 +63,18 @@ def main(argv=sys.argv[1:]):\n         print(content)\n         print('>>>')\n \n+    return None\n \n-def resource_type_completer(prefix, **kwargs):\n+\n+def resource_type_completer(prefix: Union[str, Tuple[str, ...]],\n+                            **kwarg: Dict[str, Any]) -> Generator[str, None, None]:\n     return (t for t in get_resource_types() if t.startswith(prefix))\n \n \n-def resource_name_completer(prefix, parsed_args, **kwargs):\n+def resource_name_completer(prefix: Union[str, Tuple[str, ...]],\n+                            parsed_args: argparse.Namespace,\n+                            **kwargs: Dict[str, Any]) -> Union[Generator[str, None, None],\n+                                                               List[str]]:\n     resource_type = getattr(parsed_args, 'resource_type', None)\n     if not resource_type:\n         return []"
+        },
+        {
+          "sha": "e6696879cafc9a1d2ba8f1e82bb748eb68679113",
+          "filename": "ament_index_python/ament_index_python/packages.py",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 4,
+          "changes": 10,
+          "blob_url": "https://github.com/ament/ament_index/blob/fbccc987dceeeb50784ff8f7d8c8ad2b1b3a9a0c/ament_index_python%2Fament_index_python%2Fpackages.py",
+          "raw_url": "https://github.com/ament/ament_index/raw/fbccc987dceeeb50784ff8f7d8c8ad2b1b3a9a0c/ament_index_python%2Fament_index_python%2Fpackages.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fament_index_python%2Fpackages.py?ref=fbccc987dceeeb50784ff8f7d8c8ad2b1b3a9a0c",
+          "patch": "@@ -15,8 +15,10 @@\n import os\n import pathlib\n import re\n+from typing import Dict\n import warnings\n \n+\n from .resources import get_resource\n from .resources import get_resources\n from .search_paths import get_search_paths\n@@ -26,7 +28,7 @@ class PackageNotFoundError(KeyError):\n     pass\n \n \n-def get_packages_with_prefixes():\n+def get_packages_with_prefixes() -> Dict[str, str]:\n     \"\"\"\n     Return a dict of package names to the prefixes in which they are found.\n \n@@ -36,7 +38,7 @@ def get_packages_with_prefixes():\n     return get_resources('packages')\n \n \n-def get_package_prefix(package_name):\n+def get_package_prefix(package_name: str) -> str:\n     \"\"\"\n     Return the installation prefix directory of the given package.\n \n@@ -62,7 +64,7 @@ def get_package_prefix(package_name):\n     return package_prefix\n \n \n-def get_package_share_directory(package_name, print_warning=True):\n+def get_package_share_directory(package_name: str, print_warning: bool = True) -> str:\n     \"\"\"\n     Return the share directory of the given package.\n \n@@ -83,7 +85,7 @@ def get_package_share_directory(package_name, print_warning=True):\n     return path\n \n \n-def get_package_share_path(package_name, print_warning=True):\n+def get_package_share_path(package_name: str, print_warning: bool = True) -> pathlib.Path:\n     \"\"\"\n     Return the share directory of the given package as a pathlib.Path.\n "
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "ament_index_python/ament_index_python/py.typed",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/ament/ament_index/blob/fbccc987dceeeb50784ff8f7d8c8ad2b1b3a9a0c/ament_index_python%2Fament_index_python%2Fpy.typed",
+          "raw_url": "https://github.com/ament/ament_index/raw/fbccc987dceeeb50784ff8f7d8c8ad2b1b3a9a0c/ament_index_python%2Fament_index_python%2Fpy.typed",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fament_index_python%2Fpy.typed?ref=fbccc987dceeeb50784ff8f7d8c8ad2b1b3a9a0c"
+        },
+        {
+          "sha": "90b1bd95d1ca6452f4ed3b75b916b2dcea24b628",
+          "filename": "ament_index_python/ament_index_python/resources.py",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 6,
+          "changes": 18,
+          "blob_url": "https://github.com/ament/ament_index/blob/fbccc987dceeeb50784ff8f7d8c8ad2b1b3a9a0c/ament_index_python%2Fament_index_python%2Fresources.py",
+          "raw_url": "https://github.com/ament/ament_index/raw/fbccc987dceeeb50784ff8f7d8c8ad2b1b3a9a0c/ament_index_python%2Fament_index_python%2Fresources.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fament_index_python%2Fresources.py?ref=fbccc987dceeeb50784ff8f7d8c8ad2b1b3a9a0c",
+          "patch": "@@ -13,9 +13,15 @@\n # limitations under the License.\n \n import os\n+import sys\n+from typing import Dict, Literal, Tuple, Union\n \n-from .constants import RESOURCE_INDEX_SUBFOLDER\n+if sys.version_info >= (3, 10):\n+    Set = set\n+else:\n+    from typing import Set\n \n+from .constants import RESOURCE_INDEX_SUBFOLDER\n from .search_paths import get_search_paths\n \n \n@@ -31,7 +37,7 @@ class InvalidResourceNameError(ValueError):\n     pass\n \n \n-def _name_is_invalid(resource_name):\n+def _name_is_invalid(resource_name: str) -> bool:\n     \"\"\"\n     Get the whether a resource name or a resource type name is invalid.\n \n@@ -49,7 +55,7 @@ def _name_is_invalid(resource_name):\n     return ('/' in resource_name) or ('\\\\' in resource_name)\n \n \n-def get_resource(resource_type, resource_name):\n+def get_resource(resource_type: str, resource_name: str) -> Tuple[str, str]:\n     \"\"\"\n     Get the content of a specific resource and its prefix path.\n \n@@ -87,7 +93,7 @@ def get_resource(resource_type, resource_name):\n         \"Could not find the resource '%s' of type '%s'\" % (resource_name, resource_type))\n \n \n-def get_resources(resource_type):\n+def get_resources(resource_type: str) -> Dict[str, str]:\n     \"\"\"\n     Get the resource names of all resources of the specified type.\n \n@@ -115,7 +121,7 @@ def get_resources(resource_type):\n     return resources\n \n \n-def get_resource_types():\n+def get_resource_types() -> Set[str]:\n     \"\"\"\n     Get the resource types.\n \n@@ -135,7 +141,7 @@ def get_resource_types():\n     return resource_types\n \n \n-def has_resource(resource_type, resource_name):\n+def has_resource(resource_type: str, resource_name: str) -> Union[str, Literal[False]]:\n     \"\"\"\n     Check if a specific resource exists.\n "
+        },
+        {
+          "sha": "80982a3b1b63b0741dca9c1af04391acca894c0e",
+          "filename": "ament_index_python/ament_index_python/search_paths.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/ament/ament_index/blob/fbccc987dceeeb50784ff8f7d8c8ad2b1b3a9a0c/ament_index_python%2Fament_index_python%2Fsearch_paths.py",
+          "raw_url": "https://github.com/ament/ament_index/raw/fbccc987dceeeb50784ff8f7d8c8ad2b1b3a9a0c/ament_index_python%2Fament_index_python%2Fsearch_paths.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fament_index_python%2Fsearch_paths.py?ref=fbccc987dceeeb50784ff8f7d8c8ad2b1b3a9a0c",
+          "patch": "@@ -13,11 +13,12 @@\n # limitations under the License.\n \n import os\n+from typing import List\n \n from .constants import AMENT_PREFIX_PATH_ENV_VAR\n \n \n-def get_search_paths():\n+def get_search_paths() -> List[str]:\n     \"\"\"\n     Get the paths from the environment variable '{AMENT_PREFIX_PATH_ENV_VAR}'.\n "
+        }
+      ]
+    },
+    {
+      "author": "marcoag",
+      "date": "2024-03-28T08:06:21Z",
+      "sha": "8eaa1d6057046147d005fa566160ffdec07e65ad",
+      "message": "Changelog.\n\nSigned-off-by: Marco A. Gutierrez <marcogg@marcogg.com>",
+      "files_changed": 2,
+      "additions": 10,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "75a2caf7fa0bcc5e9f41a3a1331318bf60db54c0",
+          "filename": "ament_index_cpp/CHANGELOG.rst",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/ament/ament_index/blob/8eaa1d6057046147d005fa566160ffdec07e65ad/ament_index_cpp%2FCHANGELOG.rst",
+          "raw_url": "https://github.com/ament/ament_index/raw/8eaa1d6057046147d005fa566160ffdec07e65ad/ament_index_cpp%2FCHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2FCHANGELOG.rst?ref=8eaa1d6057046147d005fa566160ffdec07e65ad",
+          "patch": "@@ -2,6 +2,11 @@\n Changelog for package ament_index_cpp\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+Forthcoming\n+-----------\n+* only append search paths on first PackageNotFound (`#91 <https://github.com/ament/ament_index/issues/91>`_)\n+* Contributors: Lucas Walter\n+\n 1.7.0 (2023-08-21)\n ------------------\n * Update to C++17 (`#90 <https://github.com/ament/ament_index/issues/90>`_)"
+        },
+        {
+          "sha": "fab6856d5adb8b6320705fdfb39a432fd6c16143",
+          "filename": "ament_index_python/CHANGELOG.rst",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/ament/ament_index/blob/8eaa1d6057046147d005fa566160ffdec07e65ad/ament_index_python%2FCHANGELOG.rst",
+          "raw_url": "https://github.com/ament/ament_index/raw/8eaa1d6057046147d005fa566160ffdec07e65ad/ament_index_python%2FCHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2FCHANGELOG.rst?ref=8eaa1d6057046147d005fa566160ffdec07e65ad",
+          "patch": "@@ -2,6 +2,11 @@\n Changelog for package ament_index_python\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+Forthcoming\n+-----------\n+* Add type annotations to python files. (`#93 <https://github.com/ament/ament_index/issues/93>`_)\n+* Contributors: Michael Carlstrom\n+\n 1.7.0 (2023-08-21)\n ------------------\n "
+        }
+      ]
+    },
+    {
+      "author": "christophebedard",
+      "date": "2024-03-28T22:27:56Z",
+      "sha": "c4d5ac604be6a6afaa67eec97d7e6b54698cd2a4",
+      "message": "Update quality declaration documents (#94)\n\nSigned-off-by: Christophe Bedard <christophe.bedard@apex.ai>",
+      "files_changed": 2,
+      "additions": 27,
+      "deletions": 14,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "8eb579951970389e6fd80bd03680999d59bb9df4",
+          "filename": "ament_index_cpp/QUALITY_DECLARATION.md",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 6,
+          "changes": 18,
+          "blob_url": "https://github.com/ament/ament_index/blob/c4d5ac604be6a6afaa67eec97d7e6b54698cd2a4/ament_index_cpp%2FQUALITY_DECLARATION.md",
+          "raw_url": "https://github.com/ament/ament_index/raw/c4d5ac604be6a6afaa67eec97d7e6b54698cd2a4/ament_index_cpp%2FQUALITY_DECLARATION.md",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2FQUALITY_DECLARATION.md?ref=c4d5ac604be6a6afaa67eec97d7e6b54698cd2a4",
+          "patch": "@@ -14,7 +14,8 @@ Below are the rationales, notes, and caveats for this claim, organized by each r\n \n ### Version Stability [1.ii]\n \n-`ament_index_cpp` is at a stable version, i.e. >= 1.0.0. The current version can be found in its [package.xml](./package.xml).\n+`ament_index_cpp` is at a stable version, i.e. >= 1.0.0.\n+The current version can be found in its [package.xml](./package.xml).\n \n ### Public API Declaration [1.iii]\n \n@@ -42,7 +43,8 @@ All changes will occur through a pull request, check the [ROS 2 Developer Guide]\n \n ### Contributor Origin [2.ii]\n \n-This package uses DCO as its confirmation of contributor origin policy. More information can be found in [CONTRIBUTING](../CONTRIBUTING.md)\n+This package uses DCO as its confirmation of contributor origin policy.\n+More information can be found in [CONTRIBUTING](../CONTRIBUTING.md)\n \n ### Peer Review Policy [2.iii]\n \n@@ -76,13 +78,15 @@ All `ament_index_cpp` API functions are documented using docstrings, and it is [\n \n The license for `ament_index_cpp` is Apache 2.0, and a summary is in each source file, the type is declared in the [`package.xml`](./package.xml) manifest file, and a full copy of the license is in the [`LICENSE`](../LICENSE) file.\n \n-There is an automated test which runs a linter that ensures each file has a license statement. [Here](https://ci.ros2.org/view/nightly/job/nightly_linux_release/lastBuild/testReport/ament_index_cpp/) can be found a list with the latest results of the various linters being run on the package.\n+There is an automated test which runs a linter that ensures each file has a license statement.\n+[Here](https://ci.ros2.org/view/nightly/job/nightly_linux_release/lastBuild/testReport/ament_index_cpp/) can be found a list with the latest results of the various linters being run on the package.\n \n ### Copyright Statements [3.iv]\n \n The copyright holders each provide a statement of copyright in each source code file in `ament_index_cpp`.\n \n-There is an automated test which runs a linter that ensures each file has at least one copyright statement. Latest linter result report can be seen [here](https://ci.ros2.org/view/nightly/job/nightly_linux_release/lastBuild/testReport/ament_index_cpp/copyright/).\n+There is an automated test which runs a linter that ensures each file has at least one copyright statement.\n+Latest linter result report can be seen [here](https://ci.ros2.org/view/nightly/job/nightly_linux_release/lastBuild/testReport/ament_index_cpp/copyright/).\n \n ## Testing [4]\n \n@@ -100,7 +104,8 @@ New features are required to have tests before being added.\n \n ### Public API Testing [4.ii]\n \n-All the functionality of the declared API in this package is covered in its unit tests. Currently it has a line coverage of [99%](https://ci.ros2.org/job/nightly_linux_coverage/lastSuccessfulBuild/cobertura/src_ament_ament_index_ament_index_cpp_src/).\n+All the functionality of the declared API in this package is covered in its unit tests.\n+Currently it has a line coverage of [99%](https://ci.ros2.org/job/nightly_linux_coverage/lastSuccessfulBuild/cobertura/src_ament_ament_index_ament_index_cpp_src/).\n \n ### Coverage [4.iii]\n \n@@ -130,7 +135,8 @@ Therefore `ament_index_cpp` does not conduct explicit performance tests.\n \n ### Linters and Static Analysis [4.v]\n \n-`ament_index_cpp` uses and passes all the ROS2 standard linters and static analysis tools for a C++ package as described in the [ROS 2 Developer Guide](https://docs.ros.org/en/rolling/Contributing/Developer-Guide.html#linters-and-static-analysis). Passing implies there are no linter/static errors when testing against CI of supported platforms.\n+`ament_index_cpp` uses and passes all the ROS 2 standard linters and static analysis tools for a C++ package as described in the [ROS 2 Developer Guide](https://docs.ros.org/en/rolling/Contributing/Developer-Guide.html#linters-and-static-analysis).\n+Passing implies there are no linter/static errors when testing against CI of supported platforms.\n \n Currently nightly results can be seen here:\n * [linux-aarch64_release](https://ci.ros2.org/view/nightly/job/nightly_linux-aarch64_release/lastBuild/testReport/ament_index_cpp/)"
+        },
+        {
+          "sha": "074087b84f85ff936c540e30ff0103da39e3377b",
+          "filename": "ament_index_python/QUALITY_DECLARATION.md",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 8,
+          "changes": 23,
+          "blob_url": "https://github.com/ament/ament_index/blob/c4d5ac604be6a6afaa67eec97d7e6b54698cd2a4/ament_index_python%2FQUALITY_DECLARATION.md",
+          "raw_url": "https://github.com/ament/ament_index/raw/c4d5ac604be6a6afaa67eec97d7e6b54698cd2a4/ament_index_python%2FQUALITY_DECLARATION.md",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2FQUALITY_DECLARATION.md?ref=c4d5ac604be6a6afaa67eec97d7e6b54698cd2a4",
+          "patch": "@@ -14,7 +14,8 @@ Below are the rationales, notes, and caveats for this claim, organized by each r\n \n ### Version Stability [1.ii]\n \n-`ament_index_python` is at a stable version, i.e. >= 1.0.0. The current version can be found in its [package.xml](./package.xml).\n+`ament_index_python` is at a stable version, i.e. >= 1.0.0.\n+The current version can be found in its [package.xml](./package.xml).\n \n ### Public API Declaration [1.iii]\n \n@@ -42,7 +43,8 @@ All changes will occur through a pull request, check the [ROS 2 Developer Guide]\n \n ### Contributor Origin [2.ii]\n \n-This package uses DCO as its confirmation of contributor origin policy. More information can be found in [CONTRIBUTING](../CONTRIBUTING.md).\n+This package uses DCO as its confirmation of contributor origin policy.\n+More information can be found in [CONTRIBUTING](../CONTRIBUTING.md).\n \n ### Peer Review Policy [2.iii]\n \n@@ -66,23 +68,26 @@ All pull requests must resolve related documentation changes before merging.\n \n ### Feature Documentation [3.i]\n \n-`ament_index_python` does not have a documented feature list. Although it currently states part of its conceptual overview [here](https://github.com/ament/ament_cmake/blob/master/ament_cmake_core/doc/resource_index.md).\n+`ament_index_python` does not have a documented feature list, although it currently states part of its conceptual overview [here](https://github.com/ament/ament_cmake/blob/rolling/ament_cmake_core/doc/resource_index.md).\n \n ### Public API Documentation [3.ii]\n \n-Most `ament_index_python` API functions are documented using docstrings. However, this is not hosted anywhere.\n+Most `ament_index_python` API functions are documented using docstrings.\n+However, this is not hosted anywhere.\n \n ### License [3.iii]\n \n The license for `ament_index_python` is Apache 2.0, and a summary is in each source file, the type is declared in the [`package.xml`](./package.xml) manifest file, and a full copy of the license is in the [`LICENSE`](../LICENSE) file.\n \n-There is an automated test which runs a linter that ensures each file has a license statement. [Here](https://ci.ros2.org/view/nightly/job/nightly_linux_release/lastBuild/testReport/ament_index_python.src.ament.ament_index.ament_index_python.test/) can be found a list with the latest results of the various linters being run on the package.\n+There is an automated test which runs a linter that ensures each file has a license statement.\n+[Here](https://ci.ros2.org/view/nightly/job/nightly_linux_release/lastBuild/testReport/ament_index_python.src.ament.ament_index.ament_index_python.test/) can be found a list with the latest results of the various linters being run on the package.\n \n ### Copyright Statements [3.iv]\n \n The copyright holders each provide a statement of copyright in each source code file in `ament_index_python`.\n \n-There is an automated test which runs a linter that ensures each file has at least one copyright statement. Latest linter result report can be seen [here](https://ci.ros2.org/view/nightly/job/nightly_linux_release/lastBuild/testReport/ament_index_python.src.ament.ament_index.ament_index_python.test/test_copyright/) .\n+There is an automated test which runs a linter that ensures each file has at least one copyright statement.\n+Latest linter result report can be seen [here](https://ci.ros2.org/view/nightly/job/nightly_linux_release/lastBuild/testReport/ament_index_python.src.ament.ament_index.ament_index_python.test/test_copyright/) .\n \n ## Testing [4]\n \n@@ -100,7 +105,8 @@ New features are required to have tests before being added.\n \n ### Public API Testing [4.ii]\n \n-All the functionality of the declared API in this package is covered in its unit tests. Currently it has a line coverage of [96%](https://ci.ros2.org/job/ci_linux_coverage/85/cobertura/ament_index_python/).\n+All the functionality of the declared API in this package is covered in its unit tests.\n+Currently it has a line coverage of [96%](https://ci.ros2.org/job/ci_linux_coverage/85/cobertura/ament_index_python/).\n \n ### Coverage [4.iii]\n \n@@ -128,7 +134,8 @@ Therefore `ament_index_python` does not conduct explicit performance tests.\n \n ### Linters and Static Analysis [4.v]\n \n-`ament_index_python` uses and passes all the ROS2 standard linters and static analysis tools for a Python package as described in the [ROS 2 Developer Guide](https://docs.ros.org/en/rolling/Contributing/Developer-Guide.html#linters-and-static-analysis). Passing implies there are no linter/static errors when testing against CI of supported platforms.\n+`ament_index_python` uses and passes all the ROS 2 standard linters and static analysis tools for a Python package as described in the [ROS 2 Developer Guide](https://docs.ros.org/en/rolling/Contributing/Developer-Guide.html#linters-and-static-analysis).\n+Passing implies there are no linter/static errors when testing against CI of supported platforms.\n \n Currently nightly test results can be seen here:\n * [linux-aarch64_release](https://ci.ros2.org/view/nightly/job/nightly_linux-aarch64_release/lastBuild/testReport/ament_index_python.src.ament.ament_index.ament_index_python.test/)"
+        }
+      ]
+    },
+    {
+      "author": "lucasw",
+      "date": "2024-03-25T23:51:11Z",
+      "sha": "327a38f454ae1a3a0190d35d4659e28aaf068775",
+      "message": "only append search paths on first PackageNotFound (#91)\n\nSigned-off-by: Lucas Walter <wsacul@gmail.com>",
+      "files_changed": 1,
+      "additions": 10,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "52c13a7455dc04eef1a4fa3f2738271901d672a1",
+          "filename": "ament_index_cpp/src/get_package_prefix.cpp",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 1,
+          "changes": 11,
+          "blob_url": "https://github.com/ament/ament_index/blob/327a38f454ae1a3a0190d35d4659e28aaf068775/ament_index_cpp%2Fsrc%2Fget_package_prefix.cpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/327a38f454ae1a3a0190d35d4659e28aaf068775/ament_index_cpp%2Fsrc%2Fget_package_prefix.cpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fsrc%2Fget_package_prefix.cpp?ref=327a38f454ae1a3a0190d35d4659e28aaf068775",
+          "patch": "@@ -23,11 +23,20 @@\n namespace ament_index_cpp\n {\n \n+static size_t package_not_found_count = 0;\n+\n static\n std::string\n format_package_not_found_error_message(const std::string & package_name)\n {\n-  std::string message = \"package '\" + package_name + \"' not found, searching: [\";\n+  std::string message = \"package '\" + package_name + \"' not found\";\n+\n+  // Don't need to print out the package paths more than once\n+  if (package_not_found_count++ > 0) {\n+    return message;\n+  }\n+\n+  message += \", searching: [\";\n   auto search_paths = get_search_paths();\n   for (const auto & path : search_paths) {\n     message += path + \", \";"
+        }
+      ]
+    },
+    {
+      "author": "Yadunund",
+      "date": "2023-04-27T00:28:25Z",
+      "sha": "880020d52377a7007add076996bc5e5246d90eab",
+      "message": "1.6.0",
+      "files_changed": 5,
+      "additions": 9,
+      "deletions": 3,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "ae9beb46dcc917689b15872fadb541383e1ab6b5",
+          "filename": "ament_index_cpp/CHANGELOG.rst",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ament/ament_index/blob/880020d52377a7007add076996bc5e5246d90eab/ament_index_cpp%2FCHANGELOG.rst",
+          "raw_url": "https://github.com/ament/ament_index/raw/880020d52377a7007add076996bc5e5246d90eab/ament_index_cpp%2FCHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2FCHANGELOG.rst?ref=880020d52377a7007add076996bc5e5246d90eab",
+          "patch": "@@ -2,6 +2,9 @@\n Changelog for package ament_index_cpp\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+1.6.0 (2023-04-27)\n+------------------\n+\n 1.5.2 (2023-02-14)\n ------------------\n * [rolling] Update maintainers - 2022-11-07 (`#89 <https://github.com/ament/ament_index/issues/89>`_)"
+        },
+        {
+          "sha": "a042aaf583cdb7eae1a7187383159110fb9d1ad3",
+          "filename": "ament_index_cpp/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/880020d52377a7007add076996bc5e5246d90eab/ament_index_cpp%2Fpackage.xml",
+          "raw_url": "https://github.com/ament/ament_index/raw/880020d52377a7007add076996bc5e5246d90eab/ament_index_cpp%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fpackage.xml?ref=880020d52377a7007add076996bc5e5246d90eab",
+          "patch": "@@ -2,7 +2,7 @@\n <?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"2\">\n   <name>ament_index_cpp</name>\n-  <version>1.5.2</version>\n+  <version>1.6.0</version>\n   <description>\n     C++ API to access the ament resource index.\n   </description>"
+        },
+        {
+          "sha": "1c3af3bce5ae700df793418fd2fb5079803cae14",
+          "filename": "ament_index_python/CHANGELOG.rst",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ament/ament_index/blob/880020d52377a7007add076996bc5e5246d90eab/ament_index_python%2FCHANGELOG.rst",
+          "raw_url": "https://github.com/ament/ament_index/raw/880020d52377a7007add076996bc5e5246d90eab/ament_index_python%2FCHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2FCHANGELOG.rst?ref=880020d52377a7007add076996bc5e5246d90eab",
+          "patch": "@@ -2,6 +2,9 @@\n Changelog for package ament_index_python\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+1.6.0 (2023-04-27)\n+------------------\n+\n 1.5.2 (2023-02-14)\n ------------------\n * [rolling] Update maintainers - 2022-11-07 (`#89 <https://github.com/ament/ament_index/issues/89>`_)"
+        },
+        {
+          "sha": "8c3752d1436da4316abdeda059a173158be4942e",
+          "filename": "ament_index_python/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/880020d52377a7007add076996bc5e5246d90eab/ament_index_python%2Fpackage.xml",
+          "raw_url": "https://github.com/ament/ament_index/raw/880020d52377a7007add076996bc5e5246d90eab/ament_index_python%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fpackage.xml?ref=880020d52377a7007add076996bc5e5246d90eab",
+          "patch": "@@ -2,7 +2,7 @@\n <?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"2\">\n   <name>ament_index_python</name>\n-  <version>1.5.2</version>\n+  <version>1.6.0</version>\n   <description>\n     Python API to access the ament resource index.\n   </description>"
+        },
+        {
+          "sha": "0f1790f8c89e147a9aaa666a13574b648546d8df",
+          "filename": "ament_index_python/setup.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/880020d52377a7007add076996bc5e5246d90eab/ament_index_python%2Fsetup.py",
+          "raw_url": "https://github.com/ament/ament_index/raw/880020d52377a7007add076996bc5e5246d90eab/ament_index_python%2Fsetup.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fsetup.py?ref=880020d52377a7007add076996bc5e5246d90eab",
+          "patch": "@@ -5,7 +5,7 @@\n \n setup(\n     name=package_name,\n-    version='1.5.2',\n+    version='1.6.0',\n     packages=find_packages(exclude=['test']),\n     data_files=[\n         ('share/' + package_name, ['package.xml']),"
+        }
+      ]
+    },
+    {
+      "author": "audrow",
+      "date": "2022-11-28T19:48:04Z",
+      "sha": "9b3e033059aaea713d9da4d686b217d83293ebcc",
+      "message": "[rolling] Update maintainers - 2022-11-07 (#89)\n\n* Add Dharini Dutia to CODEOWNERs file\r\n\r\n* Update maintainers to Dharini Dutia\r\n\r\nSigned-off-by: Audrow Nash <audrow@openrobotics.org>",
+      "files_changed": 4,
+      "additions": 14,
+      "deletions": 6,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "d490d00da2c7988ae7b06b9785d3cc3aee4d0df0",
+          "filename": "CODEOWNERS",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/9b3e033059aaea713d9da4d686b217d83293ebcc/CODEOWNERS",
+          "raw_url": "https://github.com/ament/ament_index/raw/9b3e033059aaea713d9da4d686b217d83293ebcc/CODEOWNERS",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/CODEOWNERS?ref=9b3e033059aaea713d9da4d686b217d83293ebcc",
+          "patch": "@@ -0,0 +1,2 @@\n+# This file was generated by https://github.com/audrow/update-ros2-repos\n+* @quarkytale"
+        },
+        {
+          "sha": "5406c81b961afaad1dcbadafaa77b1ee5d067606",
+          "filename": "ament_index_cpp/package.xml",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 2,
+          "changes": 7,
+          "blob_url": "https://github.com/ament/ament_index/blob/9b3e033059aaea713d9da4d686b217d83293ebcc/ament_index_cpp%2Fpackage.xml",
+          "raw_url": "https://github.com/ament/ament_index/raw/9b3e033059aaea713d9da4d686b217d83293ebcc/ament_index_cpp%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fpackage.xml?ref=9b3e033059aaea713d9da4d686b217d83293ebcc",
+          "patch": "@@ -6,11 +6,14 @@\n   <description>\n     C++ API to access the ament resource index.\n   </description>\n-  <maintainer email=\"audrow@openrobotics.org\">Audrow Nash</maintainer>\n+\n+  <maintainer email=\"dharini@openrobotics.org\">Dharini Dutia</maintainer>\n+\n   <license>Apache License 2.0</license>\n \n-  <author>Dirk Thomas</author>\n+  <author email=\"audrow@openrobotics.org\">Audrow Nash</author>\n   <author>Claire Wang</author>\n+  <author>Dirk Thomas</author>\n \n   <buildtool_depend>ament_cmake</buildtool_depend>\n "
+        },
+        {
+          "sha": "1484924164639f0a3c569f496b4bcf549a64471e",
+          "filename": "ament_index_python/package.xml",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 2,
+          "changes": 7,
+          "blob_url": "https://github.com/ament/ament_index/blob/9b3e033059aaea713d9da4d686b217d83293ebcc/ament_index_python%2Fpackage.xml",
+          "raw_url": "https://github.com/ament/ament_index/raw/9b3e033059aaea713d9da4d686b217d83293ebcc/ament_index_python%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fpackage.xml?ref=9b3e033059aaea713d9da4d686b217d83293ebcc",
+          "patch": "@@ -6,11 +6,14 @@\n   <description>\n     Python API to access the ament resource index.\n   </description>\n-  <maintainer email=\"audrow@openrobotics.org\">Audrow Nash</maintainer>\n+\n+  <maintainer email=\"dharini@openrobotics.org\">Dharini Dutia</maintainer>\n+\n   <license>Apache License 2.0</license>\n \n-  <author>Dirk Thomas</author>\n+  <author email=\"audrow@openrobotics.org\">Audrow Nash</author>\n   <author>Claire Wang</author>\n+  <author>Dirk Thomas</author>\n \n   <test_depend>ament_copyright</test_depend>\n   <test_depend>ament_flake8</test_depend>"
+        },
+        {
+          "sha": "cea80ce4855efcf8212f023118223623703c78da",
+          "filename": "ament_index_python/setup.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ament/ament_index/blob/9b3e033059aaea713d9da4d686b217d83293ebcc/ament_index_python%2Fsetup.py",
+          "raw_url": "https://github.com/ament/ament_index/raw/9b3e033059aaea713d9da4d686b217d83293ebcc/ament_index_python%2Fsetup.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fsetup.py?ref=9b3e033059aaea713d9da4d686b217d83293ebcc",
+          "patch": "@@ -20,8 +20,8 @@\n     zip_safe=True,\n     author='Dirk Thomas',\n     author_email='dthomas@osrfoundation.org',\n-    maintainer='Audrow Nash',\n-    maintainer_email='audrow@openrobotics.org',\n+    maintainer='Dharini Dutia',\n+    maintainer_email='dharini@openrobotics.org',\n     url='https://github.com/ament/ament_index',\n     download_url='https://github.com/ament/ament_index/releases',\n     keywords=['ROS'],"
+        }
+      ]
+    },
+    {
+      "author": "paudrow",
+      "date": "2021-02-02T21:53:09Z",
+      "sha": "6134519573fe3bfbf5de41d811c36c374e5facd9",
+      "message": "Add Audrow as a maintainer (#68)\n\nSigned-off-by: Audrow Nash <audrow.nash@gmail.com>",
+      "files_changed": 2,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "a42c3afa8c86ad8bdd6efcc59ae1dce8bf403951",
+          "filename": "ament_index_cpp/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ament/ament_index/blob/6134519573fe3bfbf5de41d811c36c374e5facd9/ament_index_cpp%2Fpackage.xml",
+          "raw_url": "https://github.com/ament/ament_index/raw/6134519573fe3bfbf5de41d811c36c374e5facd9/ament_index_cpp%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fpackage.xml?ref=6134519573fe3bfbf5de41d811c36c374e5facd9",
+          "patch": "@@ -7,6 +7,7 @@\n     C++ API to access the ament resource index.\n   </description>\n   <maintainer email=\"clairewang@openrobotics.org\">Claire Wang</maintainer>\n+  <maintainer email=\"audrow@openrobotics.org\">Audrow Nash</maintainer>\n   <license>Apache License 2.0</license>\n \n   <author email=\"dthomas@osrfoundation.org\">Dirk Thomas</author>"
+        },
+        {
+          "sha": "ff7cbac18e041f1d83b0fd73f26c6fffecf37511",
+          "filename": "ament_index_python/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ament/ament_index/blob/6134519573fe3bfbf5de41d811c36c374e5facd9/ament_index_python%2Fpackage.xml",
+          "raw_url": "https://github.com/ament/ament_index/raw/6134519573fe3bfbf5de41d811c36c374e5facd9/ament_index_python%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fpackage.xml?ref=6134519573fe3bfbf5de41d811c36c374e5facd9",
+          "patch": "@@ -7,6 +7,7 @@\n     Python API to access the ament resource index.\n   </description>\n   <maintainer email=\"clairewang@openrobotics.org\">Claire Wang</maintainer>\n+  <maintainer email=\"audrow@openrobotics.org\">Audrow Nash</maintainer>\n   <license>Apache License 2.0</license>\n \n   <author email=\"dthomas@osrfoundation.org\">Dirk Thomas</author>"
+        }
+      ]
+    },
+    {
+      "author": "sloretz",
+      "date": "2021-11-30T17:34:11Z",
+      "sha": "aa774fe3773169f0f18bbbf4ef2baaa7bf3a1540",
+      "message": "Remove ament_export_include_directories and ament_export_libraries (#81)\n\nSigned-off-by: Shane Loretz <sloretz@osrfoundation.org>",
+      "files_changed": 1,
+      "additions": 0,
+      "deletions": 2,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "6a7454e49904b7d7b9e060281ee14bff98058d31",
+          "filename": "ament_index_cpp/CMakeLists.txt",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 2,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/aa774fe3773169f0f18bbbf4ef2baaa7bf3a1540/ament_index_cpp%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ament/ament_index/raw/aa774fe3773169f0f18bbbf4ef2baaa7bf3a1540/ament_index_cpp%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2FCMakeLists.txt?ref=aa774fe3773169f0f18bbbf4ef2baaa7bf3a1540",
+          "patch": "@@ -33,8 +33,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC\n   \"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>\"\n   \"$<INSTALL_INTERFACE:include>\")\n \n-ament_export_include_directories(include)\n-ament_export_libraries(${PROJECT_NAME})\n ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)\n \n if(BUILD_TESTING)"
+        }
+      ]
+    },
+    {
+      "author": "DLu",
+      "date": "2021-05-27T16:37:17Z",
+      "sha": "028080c7a82e520d47f24aadc4743a195effc7ac",
+      "message": "Add get_package_share_path method (#73)\n\n* Add get_package_share_path method\r\n\r\nSigned-off-by: David V. Lu <davidvlu@gmail.com>\r\n\r\n* PR Feedback\r\n\r\nSigned-off-by: David V. Lu <davidvlu@gmail.com>",
+      "files_changed": 3,
+      "additions": 40,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "5f35f6e17894d2adfea745e05e8e7fd925954ef2",
+          "filename": "ament_index_python/ament_index_python/__init__.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/028080c7a82e520d47f24aadc4743a195effc7ac/ament_index_python%2Fament_index_python%2F__init__.py",
+          "raw_url": "https://github.com/ament/ament_index/raw/028080c7a82e520d47f24aadc4743a195effc7ac/ament_index_python%2Fament_index_python%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fament_index_python%2F__init__.py?ref=028080c7a82e520d47f24aadc4743a195effc7ac",
+          "patch": "@@ -15,6 +15,7 @@\n from .constants import RESOURCE_INDEX_SUBFOLDER\n from .packages import get_package_prefix\n from .packages import get_package_share_directory\n+from .packages import get_package_share_path\n from .packages import get_packages_with_prefixes\n from .packages import PackageNotFoundError\n from .resources import get_resource\n@@ -26,6 +27,7 @@\n __all__ = [\n     'get_package_prefix',\n     'get_package_share_directory',\n+    'get_package_share_path',\n     'get_packages_with_prefixes',\n     'get_resource',\n     'get_resources',"
+        },
+        {
+          "sha": "7127f7dd78c6c010c54f3cc1a23bbe7314167a4b",
+          "filename": "ament_index_python/ament_index_python/packages.py",
+          "status": "modified",
+          "additions": 18,
+          "deletions": 0,
+          "changes": 18,
+          "blob_url": "https://github.com/ament/ament_index/blob/028080c7a82e520d47f24aadc4743a195effc7ac/ament_index_python%2Fament_index_python%2Fpackages.py",
+          "raw_url": "https://github.com/ament/ament_index/raw/028080c7a82e520d47f24aadc4743a195effc7ac/ament_index_python%2Fament_index_python%2Fpackages.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fament_index_python%2Fpackages.py?ref=028080c7a82e520d47f24aadc4743a195effc7ac",
+          "patch": "@@ -13,6 +13,7 @@\n # limitations under the License.\n \n import os\n+import pathlib\n \n from .resources import get_resource\n from .resources import get_resources\n@@ -67,3 +68,20 @@ def get_package_share_directory(package_name):\n     :raises: :exc:`PackageNotFoundError` if the package is not found\n     \"\"\"\n     return os.path.join(get_package_prefix(package_name), 'share', package_name)\n+\n+\n+def get_package_share_path(package_name):\n+    \"\"\"\n+    Return the share directory of the given package as a pathlib.Path.\n+\n+    For example, if you install the package 'foo' into\n+    '/home/user/ros2_ws/install' and you called this function with 'foo' as the\n+    argument, then it will return a path representing '/home/user/ros2_ws/install/share/foo'\n+    and then you could use it to construct the path to a shared file with\n+    `get_package_share_path('foo') / 'urdf/robot.urdf'`\n+\n+    :param str package_name: name of the package to locate\n+    :returns: share directory of the package as a pathlib.Path\n+    :raises: :exc:`PackageNotFoundError` if the package is not found\n+    \"\"\"\n+    return pathlib.Path(get_package_share_directory(package_name))"
+        },
+        {
+          "sha": "b9a2231ad016165cd193edcddf8a70043fce7f7b",
+          "filename": "ament_index_python/test/test_ament_index_python.py",
+          "status": "modified",
+          "additions": 20,
+          "deletions": 0,
+          "changes": 20,
+          "blob_url": "https://github.com/ament/ament_index/blob/028080c7a82e520d47f24aadc4743a195effc7ac/ament_index_python%2Ftest%2Ftest_ament_index_python.py",
+          "raw_url": "https://github.com/ament/ament_index/raw/028080c7a82e520d47f24aadc4743a195effc7ac/ament_index_python%2Ftest%2Ftest_ament_index_python.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Ftest%2Ftest_ament_index_python.py?ref=028080c7a82e520d47f24aadc4743a195effc7ac",
+          "patch": "@@ -17,6 +17,7 @@\n \n from ament_index_python import get_package_prefix\n from ament_index_python import get_package_share_directory\n+from ament_index_python import get_package_share_path\n from ament_index_python import get_packages_with_prefixes\n from ament_index_python import get_resource\n from ament_index_python import get_resource_types\n@@ -166,6 +167,25 @@ def get_package_share_directory_test(package_name, expect_prefix):\n         get_package_share_directory('does_not_exist')\n \n \n+def test_get_package_share_path():\n+    set_ament_prefix_path(['prefix1', 'prefix2'])\n+\n+    def get_package_share_path_test(package_name, expect_prefix):\n+        my_path = get_package_share_path(package_name)\n+        assert len(my_path.parts) >= 3\n+        assert my_path.parts[-1] == package_name, f\"Expected package name '{package_name}'\"\n+        assert my_path.parts[-2] == 'share', \"Expected 'share'\"\n+        assert my_path.parts[-3] == expect_prefix, f\"Expected '{expect_prefix}'\"\n+\n+    get_package_share_path_test('foo', 'prefix1')\n+    # found in both prefix1 and prefix2, but prefix1 is ahead on the APP\n+    get_package_share_path_test('bar', 'prefix1')\n+    get_package_share_path_test('baz', 'prefix2')\n+\n+    with pytest.raises(PackageNotFoundError):\n+        get_package_share_path('does_not_exist')\n+\n+\n def test_get_resource_types():\n     set_ament_prefix_path([])\n     with pytest.raises(EnvironmentError):"
+        }
+      ]
+    },
+    {
+      "author": "rob-clarke",
+      "date": "2021-06-04T03:35:26Z",
+      "sha": "e04af7b42c1f49a9e1f00913459dc8cd11e8d85e",
+      "message": "Fail lookups on invalid resource names (#69)\n\n* Fail lookups on absolute paths\r\n\r\nSigned-off-by: Rob Clarke <robert.clarke@bristol.ac.uk>\r\n\r\n* Update for linter errors\r\n\r\nSigned-off-by: Rob Clarke <robert.clarke@bristol.ac.uk>\r\n\r\n* Hopefully final linter fix\r\n\r\nSigned-off-by: Rob Clarke <robert.clarke@bristol.ac.uk>\r\n\r\n* Add valid package name check\r\n\r\nSigned-off-by: Rob Clarke <robert.clarke@bristol.ac.uk>\r\n\r\n* Linting\r\n\r\nSigned-off-by: Rob Clarke <robert.clarke@bristol.ac.uk>\r\n\r\n* Add backslash to invalid chars for resource name\r\n\r\nSigned-off-by: Rob Clarke <robert.clarke@bristol.ac.uk>\r\n\r\n* Add validity check for type\r\n\r\nSigned-off-by: Rob Clarke <robert.clarke@bristol.ac.uk>\r\n\r\n* Fix quote style\r\n\r\nSigned-off-by: Rob Clarke <robert.clarke@bristol.ac.uk>\r\n\r\n* Fix import ordering\r\n\r\nSigned-off-by: Rob Clarke <robert.clarke@bristol.ac.uk>\r\n\r\n* Update package name regex to match REP-127\r\n\r\nNow allows uppercase letters, dashes and leading numerals.\r\nTest modified to reflect this\r\n\r\nSigned-off-by: Rob Clarke <robert.clarke@bristol.ac.uk>\r\n\r\n* Add docstrings\r\n\r\nSigned-off-by: Rob Clarke <robert.clarke@bristol.ac.uk>\r\n\r\n* Add private API marker\r\n\r\nSigned-off-by: Rob Clarke <robert.clarke@bristol.ac.uk>",
+      "files_changed": 4,
+      "additions": 124,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "75f340082f9ef36bda73efccf490be6666873271",
+          "filename": "ament_index_python/ament_index_python/__init__.py",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/ament/ament_index/blob/e04af7b42c1f49a9e1f00913459dc8cd11e8d85e/ament_index_python%2Fament_index_python%2F__init__.py",
+          "raw_url": "https://github.com/ament/ament_index/raw/e04af7b42c1f49a9e1f00913459dc8cd11e8d85e/ament_index_python%2Fament_index_python%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fament_index_python%2F__init__.py?ref=e04af7b42c1f49a9e1f00913459dc8cd11e8d85e",
+          "patch": "@@ -22,6 +22,8 @@\n from .resources import get_resource_types\n from .resources import get_resources\n from .resources import has_resource\n+from .resources import InvalidResourceNameError\n+from .resources import InvalidResourceTypeNameError\n from .search_paths import get_search_paths\n \n __all__ = [\n@@ -34,6 +36,8 @@\n     'get_search_paths',\n     'get_resource_types',\n     'has_resource',\n+    'InvalidResourceTypeNameError',\n+    'InvalidResourceNameError',\n     'PackageNotFoundError',\n     'RESOURCE_INDEX_SUBFOLDER',\n ]"
+        },
+        {
+          "sha": "0716c64e495508fa7c559f3df0a010a8532e6f6d",
+          "filename": "ament_index_python/ament_index_python/packages.py",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/ament/ament_index/blob/e04af7b42c1f49a9e1f00913459dc8cd11e8d85e/ament_index_python%2Fament_index_python%2Fpackages.py",
+          "raw_url": "https://github.com/ament/ament_index/raw/e04af7b42c1f49a9e1f00913459dc8cd11e8d85e/ament_index_python%2Fament_index_python%2Fpackages.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fament_index_python%2Fpackages.py?ref=e04af7b42c1f49a9e1f00913459dc8cd11e8d85e",
+          "patch": "@@ -14,6 +14,7 @@\n \n import os\n import pathlib\n+import re\n \n from .resources import get_resource\n from .resources import get_resources\n@@ -45,7 +46,13 @@ def get_package_prefix(package_name):\n     :param str package_name: name of the package to locate\n     :returns: installation prefix of the package\n     :raises: :exc:`PackageNotFoundError` if the package is not found\n+    :raises: :exc:`ValueError` if the package name is invalid\n     \"\"\"\n+    # This regex checks for a valid package name as defined by REP-127 including the recommended\n+    #  exemptions. See https://ros.org/reps/rep-0127.html#name\n+    if re.fullmatch('[a-zA-Z0-9][a-zA-Z0-9_-]+', package_name, re.ASCII) is None:\n+        raise ValueError(\n+            \"'{}' is not a valid package name\".format(package_name))\n     try:\n         content, package_prefix = get_resource('packages', package_name)\n     except LookupError:\n@@ -66,6 +73,7 @@ def get_package_share_directory(package_name):\n     :param str package_name: name of the package to locate\n     :returns: share directory of the package\n     :raises: :exc:`PackageNotFoundError` if the package is not found\n+    :raises: :exc:`ValueError` if the package name is invalid\n     \"\"\"\n     return os.path.join(get_package_prefix(package_name), 'share', package_name)\n "
+        },
+        {
+          "sha": "248291e63f0999218ea7a22ccdb71d844b653a88",
+          "filename": "ament_index_python/ament_index_python/resources.py",
+          "status": "modified",
+          "additions": 50,
+          "deletions": 0,
+          "changes": 50,
+          "blob_url": "https://github.com/ament/ament_index/blob/e04af7b42c1f49a9e1f00913459dc8cd11e8d85e/ament_index_python%2Fament_index_python%2Fresources.py",
+          "raw_url": "https://github.com/ament/ament_index/raw/e04af7b42c1f49a9e1f00913459dc8cd11e8d85e/ament_index_python%2Fament_index_python%2Fresources.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fament_index_python%2Fresources.py?ref=e04af7b42c1f49a9e1f00913459dc8cd11e8d85e",
+          "patch": "@@ -19,6 +19,36 @@\n from .search_paths import get_search_paths\n \n \n+class InvalidResourceTypeNameError(ValueError):\n+    \"\"\"Raised when a resource type name is invalid.\"\"\"\n+\n+    pass\n+\n+\n+class InvalidResourceNameError(ValueError):\n+    \"\"\"Raised when a resource name is invalid.\"\"\"\n+\n+    pass\n+\n+\n+def _name_is_invalid(resource_name):\n+    \"\"\"\n+    Get the whether a resource name or a resource type name is invalid.\n+\n+    This is not considered public API.\n+\n+    A name is considered invalid if it contains any path separators. The index represents resources\n+    as files and resource types as folders so allowing path separators causes issues.\n+\n+    For a more complete discussion, see: https://github.com/ament/ament_index/pull/69\n+\n+    :param resource_name: the name of the resource or resource type\n+    :type resource_name: str\n+    :returns: True or False\n+    \"\"\"\n+    return ('/' in resource_name) or ('\\\\' in resource_name)\n+\n+\n def get_resource(resource_type, resource_name):\n     \"\"\"\n     Get the content of a specific resource and its prefix path.\n@@ -31,9 +61,17 @@ def get_resource(resource_type, resource_name):\n     :raises: :exc:`EnvironmentError`\n     :raises: :exc:`OSError`\n     :raises: :exc:`LookupError`\n+    :raises: :exc:`InvalidResourceTypeNameError`\n+    :raises: :exc:`InvalidResourceNameError`\n     \"\"\"\n     assert resource_type, 'The resource type must not be empty'\n     assert resource_name, 'The resource name must not be empty'\n+    if _name_is_invalid(resource_type):\n+        raise InvalidResourceTypeNameError(\n+            \"Resource type '%s' is invalid\" % resource_type)\n+    if _name_is_invalid(resource_name):\n+        raise InvalidResourceNameError(\n+            \"Resource name '%s' is invalid\" % resource_name)\n     for path in get_search_paths():\n         resource_path = os.path.join(path, RESOURCE_INDEX_SUBFOLDER, resource_type, resource_name)\n         if os.path.isfile(resource_path):\n@@ -57,8 +95,12 @@ def get_resources(resource_type):\n     :type resource_type: str\n     :returns: dict of resource names to the prefix path they are in\n     :raises: :exc:`EnvironmentError`\n+    :raises: :exc:`InvalidResourceTypeNameError`\n     \"\"\"\n     assert resource_type, 'The resource type must not be empty'\n+    if _name_is_invalid(resource_type):\n+        raise InvalidResourceTypeNameError(\n+            \"Resource type '%s' is invalid\" % resource_type)\n     resources = {}\n     for path in get_search_paths():\n         resource_path = os.path.join(path, RESOURCE_INDEX_SUBFOLDER, resource_type)\n@@ -103,9 +145,17 @@ def has_resource(resource_type, resource_name):\n     :type resource_name: str\n     :returns: The prefix path if the resource exists, False otherwise\n     :raises: :exc:`EnvironmentError`\n+    :raises: :exc:`InvalidResourceTypeNameError`\n+    :raises: :exc:`InvalidResourceNameError`\n     \"\"\"\n     assert resource_type, 'The resource type must not be empty'\n     assert resource_name, 'The resource name must not be empty'\n+    if _name_is_invalid(resource_type):\n+        raise InvalidResourceTypeNameError(\n+            \"Resource type '%s' is invalid\" % resource_type)\n+    if _name_is_invalid(resource_name):\n+        raise InvalidResourceNameError(\n+            \"Resource name '%s' is invalid\" % resource_name)\n     for path in get_search_paths():\n         resource_path = os.path.join(path, RESOURCE_INDEX_SUBFOLDER, resource_type, resource_name)\n         if os.path.isfile(resource_path):"
+        },
+        {
+          "sha": "b6ba9bd5c730528f47bb9c49f21bddd1e64718ee",
+          "filename": "ament_index_python/test/test_ament_index_python.py",
+          "status": "modified",
+          "additions": 62,
+          "deletions": 0,
+          "changes": 62,
+          "blob_url": "https://github.com/ament/ament_index/blob/e04af7b42c1f49a9e1f00913459dc8cd11e8d85e/ament_index_python%2Ftest%2Ftest_ament_index_python.py",
+          "raw_url": "https://github.com/ament/ament_index/raw/e04af7b42c1f49a9e1f00913459dc8cd11e8d85e/ament_index_python%2Ftest%2Ftest_ament_index_python.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Ftest%2Ftest_ament_index_python.py?ref=e04af7b42c1f49a9e1f00913459dc8cd11e8d85e",
+          "patch": "@@ -24,6 +24,8 @@\n from ament_index_python import get_resources\n from ament_index_python import get_search_paths\n from ament_index_python import has_resource\n+from ament_index_python import InvalidResourceNameError\n+from ament_index_python import InvalidResourceTypeNameError\n from ament_index_python import PackageNotFoundError\n from ament_index_python.cli import main\n from ament_index_python.cli import resource_name_completer\n@@ -67,6 +69,25 @@ def test_unknown_resources():\n     assert len(resources) == 0, 'Expected no resources'\n \n \n+def test_invalid_resources():\n+    set_ament_prefix_path(['prefix1'])\n+\n+    invalid_resource_type_names = [\n+        '/invalid/name', 'invalid/name', '\\\\invalid\\\\name', 'invalid\\\\name']\n+\n+    for name in invalid_resource_type_names:\n+        with pytest.raises(InvalidResourceTypeNameError):\n+            resources = get_resources(name)\n+            assert len(resources) == 0, 'Expected no resources'\n+\n+        with pytest.raises(InvalidResourceTypeNameError):\n+            exists = has_resource(name, 'example_resource')\n+            assert not exists, 'Resource should not exist'\n+\n+        with pytest.raises(InvalidResourceTypeNameError):\n+            get_resource(name, 'example_resource')\n+\n+\n def test_resources():\n     set_ament_prefix_path(['prefix1'])\n     resources = get_resources('resource_type1')\n@@ -97,6 +118,33 @@ def test_unknown_resource():\n         get_resource('resource_type4', 'bar')\n \n \n+def test_invalid_resource_names():\n+    set_ament_prefix_path(['prefix1'])\n+\n+    invalid_resource_names = [\n+        '/invalid/name', 'invalid/name', '\\\\invalid\\\\name', 'invalid\\\\name']\n+\n+    for name in invalid_resource_names:\n+        with pytest.raises(InvalidResourceNameError):\n+            exists = has_resource('resource_type4', name)\n+            assert not exists, 'Resource should not exist'\n+\n+        with pytest.raises(InvalidResourceNameError):\n+            get_resource('resource_type4', name)\n+\n+\n+def test_absolute_path_resource():\n+    extant_absolute_path = os.path.abspath(__file__)\n+\n+    set_ament_prefix_path(['prefix1'])\n+    with pytest.raises(InvalidResourceNameError):\n+        exists = has_resource('resource_type4', str(extant_absolute_path))\n+        assert not exists, 'Resource should not exist'\n+\n+    with pytest.raises(InvalidResourceNameError):\n+        get_resource('resource_type4', str(extant_absolute_path))\n+\n+\n def test_resource():\n     set_ament_prefix_path(['prefix1'])\n     exists = has_resource('resource_type4', 'foo')\n@@ -145,6 +193,17 @@ def get_package_prefix_basename(package_name):\n         get_package_prefix('does_not_exist')\n     assert issubclass(PackageNotFoundError, KeyError)\n \n+    invalid_package_names = [\n+        '_package', 'package a', 'package/a', 'package.a']\n+    for name in invalid_package_names:\n+        with pytest.raises(ValueError):\n+            get_package_prefix(name)\n+\n+    with pytest.raises(ValueError):\n+        # An absolue path is not a valid package name\n+        extant_absolute_path = os.path.abspath(__file__)\n+        get_package_prefix(extant_absolute_path)\n+\n \n def test_get_package_share_directory():\n     set_ament_prefix_path(['prefix1', 'prefix2'])\n@@ -166,6 +225,9 @@ def get_package_share_directory_test(package_name, expect_prefix):\n     with pytest.raises(PackageNotFoundError):\n         get_package_share_directory('does_not_exist')\n \n+    with pytest.raises(ValueError):\n+        get_package_share_directory('/invalid/package/name')\n+\n \n def test_get_package_share_path():\n     set_ament_prefix_path(['prefix1', 'prefix2'])"
+        }
+      ]
+    },
+    {
+      "author": "claireyywang",
+      "date": "2020-10-07T19:44:14Z",
+      "sha": "d9bdf844c907118165d850535ed383c2dbf0afd9",
+      "message": "update maintainers (#67)\n\nSigned-off-by: claireyywang <22240514+claireyywang@users.noreply.github.com>",
+      "files_changed": 2,
+      "additions": 6,
+      "deletions": 2,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "2123e861bb37674f6861b2f527cf40af2a1eede4",
+          "filename": "ament_index_cpp/package.xml",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "changes": 4,
+          "blob_url": "https://github.com/ament/ament_index/blob/d9bdf844c907118165d850535ed383c2dbf0afd9/ament_index_cpp%2Fpackage.xml",
+          "raw_url": "https://github.com/ament/ament_index/raw/d9bdf844c907118165d850535ed383c2dbf0afd9/ament_index_cpp%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fpackage.xml?ref=d9bdf844c907118165d850535ed383c2dbf0afd9",
+          "patch": "@@ -6,9 +6,11 @@\n   <description>\n     C++ API to access the ament resource index.\n   </description>\n-  <maintainer email=\"dthomas@osrfoundation.org\">Dirk Thomas</maintainer>\n+  <maintainer email=\"clairewang@openrobotics.org\">Claire Wang</maintainer>\n   <license>Apache License 2.0</license>\n \n+  <author email=\"dthomas@osrfoundation.org\">Dirk Thomas</author>\n+\n   <buildtool_depend>ament_cmake</buildtool_depend>\n \n   <test_depend>ament_cmake_gtest</test_depend>"
+        },
+        {
+          "sha": "a7c155b7e2749d2c77b5c7b253be2de1ba98a011",
+          "filename": "ament_index_python/package.xml",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "changes": 4,
+          "blob_url": "https://github.com/ament/ament_index/blob/d9bdf844c907118165d850535ed383c2dbf0afd9/ament_index_python%2Fpackage.xml",
+          "raw_url": "https://github.com/ament/ament_index/raw/d9bdf844c907118165d850535ed383c2dbf0afd9/ament_index_python%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fpackage.xml?ref=d9bdf844c907118165d850535ed383c2dbf0afd9",
+          "patch": "@@ -6,9 +6,11 @@\n   <description>\n     Python API to access the ament resource index.\n   </description>\n-  <maintainer email=\"dthomas@osrfoundation.org\">Dirk Thomas</maintainer>\n+  <maintainer email=\"clairewang@openrobotics.org\">Claire Wang</maintainer>\n   <license>Apache License 2.0</license>\n \n+  <author email=\"dthomas@osrfoundation.org\">Dirk Thomas</author>\n+\n   <test_depend>ament_copyright</test_depend>\n   <test_depend>ament_flake8</test_depend>\n   <test_depend>ament_pep257</test_depend>"
+        }
+      ]
+    },
+    {
+      "author": "jacobperron",
+      "date": "2020-04-18T00:29:42Z",
+      "sha": "7c7624e25a8809c8753f091aa0b665e2b5a060d0",
+      "message": "0.8.0",
+      "files_changed": 3,
+      "additions": 3,
+      "deletions": 3,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "385632eaa8c607d6a39825a960cd97eb89298a0f",
+          "filename": "ament_index_cpp/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/7c7624e25a8809c8753f091aa0b665e2b5a060d0/ament_index_cpp%2Fpackage.xml",
+          "raw_url": "https://github.com/ament/ament_index/raw/7c7624e25a8809c8753f091aa0b665e2b5a060d0/ament_index_cpp%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fpackage.xml?ref=7c7624e25a8809c8753f091aa0b665e2b5a060d0",
+          "patch": "@@ -2,7 +2,7 @@\n <?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"2\">\n   <name>ament_index_cpp</name>\n-  <version>0.7.2</version>\n+  <version>0.8.0</version>\n   <description>\n     C++ API to access the ament resource index.\n   </description>"
+        },
+        {
+          "sha": "c25125864b3a6bcd38d9b7e77fcbe6143f535f96",
+          "filename": "ament_index_python/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/7c7624e25a8809c8753f091aa0b665e2b5a060d0/ament_index_python%2Fpackage.xml",
+          "raw_url": "https://github.com/ament/ament_index/raw/7c7624e25a8809c8753f091aa0b665e2b5a060d0/ament_index_python%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fpackage.xml?ref=7c7624e25a8809c8753f091aa0b665e2b5a060d0",
+          "patch": "@@ -2,7 +2,7 @@\n <?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"2\">\n   <name>ament_index_python</name>\n-  <version>0.7.2</version>\n+  <version>0.8.0</version>\n   <description>\n     Python API to access the ament resource index.\n   </description>"
+        },
+        {
+          "sha": "71ca51fd865dd8743c50768f2c21193ca77cc2e0",
+          "filename": "ament_index_python/setup.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/7c7624e25a8809c8753f091aa0b665e2b5a060d0/ament_index_python%2Fsetup.py",
+          "raw_url": "https://github.com/ament/ament_index/raw/7c7624e25a8809c8753f091aa0b665e2b5a060d0/ament_index_python%2Fsetup.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fsetup.py?ref=7c7624e25a8809c8753f091aa0b665e2b5a060d0",
+          "patch": "@@ -5,7 +5,7 @@\n \n setup(\n     name=package_name,\n-    version='0.7.2',\n+    version='0.8.0',\n     packages=find_packages(exclude=['test']),\n     data_files=[\n         ('share/' + package_name, ['package.xml']),"
+        }
+      ]
+    },
+    {
+      "author": "brawner",
+      "date": "2020-06-18T19:43:47Z",
+      "sha": "55a7f2d40cab0182c52cf9557c21a26c237c998e",
+      "message": "Update QD ament_index_cpp to QL 2 (#59)\n\n* Update Quality Declaration to reflect QL 2\r\n* Address PR feedback\r\n* Fix coverage link, add link to on-boarding docs\r\n\r\nSigned-off-by: Stephen Brawner <brawner@gmail.com>",
+      "files_changed": 2,
+      "additions": 13,
+      "deletions": 10,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "b78339def27137dd4da2a3e643edbe1f436c217d",
+          "filename": "ament_index_cpp/QUALITY_DECLARATION.md",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 9,
+          "changes": 21,
+          "blob_url": "https://github.com/ament/ament_index/blob/55a7f2d40cab0182c52cf9557c21a26c237c998e/ament_index_cpp%2FQUALITY_DECLARATION.md",
+          "raw_url": "https://github.com/ament/ament_index/raw/55a7f2d40cab0182c52cf9557c21a26c237c998e/ament_index_cpp%2FQUALITY_DECLARATION.md",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2FQUALITY_DECLARATION.md?ref=55a7f2d40cab0182c52cf9557c21a26c237c998e",
+          "patch": "@@ -2,7 +2,7 @@ This document is a declaration of software quality for the `ament_index_cpp` pac\n \n # `ament_index_cpp` Quality Declaration\n \n-The package `ament_index_cpp` claims to be in the **Quality Level 4** category.\n+The package `ament_index_cpp` claims to be in the **Quality Level 2** category.\n \n Below are the rationales, notes, and caveats for this claim, organized by each requirement listed in the [Package Quality Categories in REP-2004](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#package-quality-categories)\n \n@@ -66,11 +66,12 @@ All pull requests must resolve related documentation changes before merging.\n \n ### Feature Documentation [3.i]\n \n-`ament_index_cpp` does not have a documented feature list. Although it currently states part of its conceptual overview [here](https://github.com/ament/ament_cmake/blob/master/ament_cmake_core/doc/resource_index.md).\n+`ament_index_cpp` has a documented feature list, but it is not yet hosted.\n+It is currently described in the get_resource.hpp header and can be automatically generated with doxygen.\n \n ### Public API Documentation [3.ii]\n \n-Some `ament_index_cpp` API functions are documented using docstrings. However, this is not hosted anywhere.\n+Some `ament_index_cpp` API functions are documented using docstrings, but it is not yet hosted.\n \n ### License [3.iii]\n \n@@ -114,7 +115,9 @@ This includes:\n \n Changes are required to make a best effort to keep or increase coverage before being accepted, but decreases are allowed if properly justified and accepted by reviewers.\n \n-Current coverage statistics can be viewed [here](https://ci.ros2.org/job/ci_linux_coverage/85/cobertura/src_ament_ament_index_ament_index_cpp_src/).\n+Current coverage statistics can be viewed [here](https://ci.ros2.org/job/ci_linux_coverage/lastSuccessfulBuild/cobertura/src_ament_ament_index_ament_index_cpp_src/).\n+\n+A description of how coverage statistics are summarized from this page, can be found in the [\"ROS 2 On-boarding Guide\"](https://index.ros.org/doc/ros2/Contributing/ROS-2-On-boarding-Guide/#note-on-coverage-runs).\n \n ### Performance [4.iv]\n \n@@ -151,7 +154,7 @@ The chart below compares the requirements in the REP-2004 with the current state\n |--|--|--|\n |1| **Version policy** |---|\n |1.i|Version Policy available | ✓ |\n-|1.ii|Stable version |☓|\n+|1.ii|Stable version |✓|\n |1.iii|Declared public API|✓|\n |1.iv|API stability policy|✓|\n |1.v|ABI stability policy|✓|\n@@ -163,8 +166,8 @@ The chart below compares the requirements in the REP-2004 with the current state\n |2.iv| CI policy for change requests | ✓ |\n |2.v| Documentation policy for change requests | ✓ |\n |3| **Documentation** | --- |\n-|3.i| Per feature documentation | ☓ |\n-|3.ii| Per public API item documentation | ☓ |\n+|3.i| Per feature documentation | ✓ |\n+|3.ii| Per public API item documentation | ✓ |\n |3.iii| Declared License(s) | ✓ |\n |3.iv| Copyright in source files| ✓ |\n |3.v.a| Quality declaration linked to README | ✓ |\n@@ -185,6 +188,6 @@ The chart below compares the requirements in the REP-2004 with the current state\n |6| Platform support | --- |\n |6.i| Support targets Tier1 ROS platforms| ✓ |\n |7| Security | --- |\n-|7.i| Vulnerability Disclosure Policy | ☓ |\n+|7.i| Vulnerability Disclosure Policy | ✓ |\n \n-Comparing this table with the [Quality Level Comparison Chart of REP2004](https://github.com/ros-infrastructure/rep/blob/master/rep-2004.rst#quality-level-comparison-chart) lead us to decide that this package qualifies to Quality Level 4.\n+Comparing this table with the [Quality Level Comparison Chart of REP2004](https://github.com/ros-infrastructure/rep/blob/master/rep-2004.rst#quality-level-comparison-chart) lead us to decide that this package qualifies to Quality Level 2."
+        },
+        {
+          "sha": "6dd2cd98f35ca611dfabaa61f9bda205e1293663",
+          "filename": "ament_index_cpp/README.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/55a7f2d40cab0182c52cf9557c21a26c237c998e/ament_index_cpp%2FREADME.md",
+          "raw_url": "https://github.com/ament/ament_index/raw/55a7f2d40cab0182c52cf9557c21a26c237c998e/ament_index_cpp%2FREADME.md",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2FREADME.md?ref=55a7f2d40cab0182c52cf9557c21a26c237c998e",
+          "patch": "@@ -8,4 +8,4 @@ Features are described in detail at [http://docs.ros2.org](http://docs.ros2.org/\n \n ## Quality Declaration\n \n-This package claims to be in the **Quality Level 4** category, see the [Quality Declaration](./Quality_Declaration.md) for more details.\n+This package claims to be in the **Quality Level 2** category, see the [Quality Declaration](./Quality_Declaration.md) for more details."
+        }
+      ]
+    },
+    {
+      "author": "dirk-thomas",
+      "date": "2015-06-25T23:55:08Z",
+      "sha": "b40e423825b15e37ea97d9db737a0100e3bcad67",
+      "message": "add LICENSE and CONTRIBUTING.md files",
+      "files_changed": 2,
+      "additions": 215,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "6f63de9e5d26538616bc55ef3c792626a7699b0d",
+          "filename": "CONTRIBUTING.md",
+          "status": "added",
+          "additions": 13,
+          "deletions": 0,
+          "changes": 13,
+          "blob_url": "https://github.com/ament/ament_index/blob/b40e423825b15e37ea97d9db737a0100e3bcad67/CONTRIBUTING.md",
+          "raw_url": "https://github.com/ament/ament_index/raw/b40e423825b15e37ea97d9db737a0100e3bcad67/CONTRIBUTING.md",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/CONTRIBUTING.md?ref=b40e423825b15e37ea97d9db737a0100e3bcad67",
+          "patch": "@@ -0,0 +1,13 @@\n+Any contribution that you make to this repository will\n+be under the Apache 2 License, as dictated by that\n+[license](http://www.apache.org/licenses/LICENSE-2.0.html):\n+\n+~~~\n+5. Submission of Contributions. Unless You explicitly state otherwise,\n+   any Contribution intentionally submitted for inclusion in the Work\n+   by You to the Licensor shall be under the terms and conditions of\n+   this License, without any additional terms or conditions.\n+   Notwithstanding the above, nothing herein shall supersede or modify\n+   the terms of any separate license agreement you may have executed\n+   with Licensor regarding such Contributions.\n+~~~"
+        },
+        {
+          "sha": "d645695673349e3947e8e5ae42332d0ac3164cd7",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 202,
+          "deletions": 0,
+          "changes": 202,
+          "blob_url": "https://github.com/ament/ament_index/blob/b40e423825b15e37ea97d9db737a0100e3bcad67/LICENSE",
+          "raw_url": "https://github.com/ament/ament_index/raw/b40e423825b15e37ea97d9db737a0100e3bcad67/LICENSE",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/LICENSE?ref=b40e423825b15e37ea97d9db737a0100e3bcad67",
+          "patch": "@@ -0,0 +1,202 @@\n+\n+                                 Apache License\n+                           Version 2.0, January 2004\n+                        http://www.apache.org/licenses/\n+\n+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION\n+\n+   1. Definitions.\n+\n+      \"License\" shall mean the terms and conditions for use, reproduction,\n+      and distribution as defined by Sections 1 through 9 of this document.\n+\n+      \"Licensor\" shall mean the copyright owner or entity authorized by\n+      the copyright owner that is granting the License.\n+\n+      \"Legal Entity\" shall mean the union of the acting entity and all\n+      other entities that control, are controlled by, or are under common\n+      control with that entity. For the purposes of this definition,\n+      \"control\" means (i) the power, direct or indirect, to cause the\n+      direction or management of such entity, whether by contract or\n+      otherwise, or (ii) ownership of fifty percent (50%) or more of the\n+      outstanding shares, or (iii) beneficial ownership of such entity.\n+\n+      \"You\" (or \"Your\") shall mean an individual or Legal Entity\n+      exercising permissions granted by this License.\n+\n+      \"Source\" form shall mean the preferred form for making modifications,\n+      including but not limited to software source code, documentation\n+      source, and configuration files.\n+\n+      \"Object\" form shall mean any form resulting from mechanical\n+      transformation or translation of a Source form, including but\n+      not limited to compiled object code, generated documentation,\n+      and conversions to other media types.\n+\n+      \"Work\" shall mean the work of authorship, whether in Source or\n+      Object form, made available under the License, as indicated by a\n+      copyright notice that is included in or attached to the work\n+      (an example is provided in the Appendix below).\n+\n+      \"Derivative Works\" shall mean any work, whether in Source or Object\n+      form, that is based on (or derived from) the Work and for which the\n+      editorial revisions, annotations, elaborations, or other modifications\n+      represent, as a whole, an original work of authorship. For the purposes\n+      of this License, Derivative Works shall not include works that remain\n+      separable from, or merely link (or bind by name) to the interfaces of,\n+      the Work and Derivative Works thereof.\n+\n+      \"Contribution\" shall mean any work of authorship, including\n+      the original version of the Work and any modifications or additions\n+      to that Work or Derivative Works thereof, that is intentionally\n+      submitted to Licensor for inclusion in the Work by the copyright owner\n+      or by an individual or Legal Entity authorized to submit on behalf of\n+      the copyright owner. For the purposes of this definition, \"submitted\"\n+      means any form of electronic, verbal, or written communication sent\n+      to the Licensor or its representatives, including but not limited to\n+      communication on electronic mailing lists, source code control systems,\n+      and issue tracking systems that are managed by, or on behalf of, the\n+      Licensor for the purpose of discussing and improving the Work, but\n+      excluding communication that is conspicuously marked or otherwise\n+      designated in writing by the copyright owner as \"Not a Contribution.\"\n+\n+      \"Contributor\" shall mean Licensor and any individual or Legal Entity\n+      on behalf of whom a Contribution has been received by Licensor and\n+      subsequently incorporated within the Work.\n+\n+   2. Grant of Copyright License. Subject to the terms and conditions of\n+      this License, each Contributor hereby grants to You a perpetual,\n+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n+      copyright license to reproduce, prepare Derivative Works of,\n+      publicly display, publicly perform, sublicense, and distribute the\n+      Work and such Derivative Works in Source or Object form.\n+\n+   3. Grant of Patent License. Subject to the terms and conditions of\n+      this License, each Contributor hereby grants to You a perpetual,\n+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n+      (except as stated in this section) patent license to make, have made,\n+      use, offer to sell, sell, import, and otherwise transfer the Work,\n+      where such license applies only to those patent claims licensable\n+      by such Contributor that are necessarily infringed by their\n+      Contribution(s) alone or by combination of their Contribution(s)\n+      with the Work to which such Contribution(s) was submitted. If You\n+      institute patent litigation against any entity (including a\n+      cross-claim or counterclaim in a lawsuit) alleging that the Work\n+      or a Contribution incorporated within the Work constitutes direct\n+      or contributory patent infringement, then any patent licenses\n+      granted to You under this License for that Work shall terminate\n+      as of the date such litigation is filed.\n+\n+   4. Redistribution. You may reproduce and distribute copies of the\n+      Work or Derivative Works thereof in any medium, with or without\n+      modifications, and in Source or Object form, provided that You\n+      meet the following conditions:\n+\n+      (a) You must give any other recipients of the Work or\n+          Derivative Works a copy of this License; and\n+\n+      (b) You must cause any modified files to carry prominent notices\n+          stating that You changed the files; and\n+\n+      (c) You must retain, in the Source form of any Derivative Works\n+          that You distribute, all copyright, patent, trademark, and\n+          attribution notices from the Source form of the Work,\n+          excluding those notices that do not pertain to any part of\n+          the Derivative Works; and\n+\n+      (d) If the Work includes a \"NOTICE\" text file as part of its\n+          distribution, then any Derivative Works that You distribute must\n+          include a readable copy of the attribution notices contained\n+          within such NOTICE file, excluding those notices that do not\n+          pertain to any part of the Derivative Works, in at least one\n+          of the following places: within a NOTICE text file distributed\n+          as part of the Derivative Works; within the Source form or\n+          documentation, if provided along with the Derivative Works; or,\n+          within a display generated by the Derivative Works, if and\n+          wherever such third-party notices normally appear. The contents\n+          of the NOTICE file are for informational purposes only and\n+          do not modify the License. You may add Your own attribution\n+          notices within Derivative Works that You distribute, alongside\n+          or as an addendum to the NOTICE text from the Work, provided\n+          that such additional attribution notices cannot be construed\n+          as modifying the License.\n+\n+      You may add Your own copyright statement to Your modifications and\n+      may provide additional or different license terms and conditions\n+      for use, reproduction, or distribution of Your modifications, or\n+      for any such Derivative Works as a whole, provided Your use,\n+      reproduction, and distribution of the Work otherwise complies with\n+      the conditions stated in this License.\n+\n+   5. Submission of Contributions. Unless You explicitly state otherwise,\n+      any Contribution intentionally submitted for inclusion in the Work\n+      by You to the Licensor shall be under the terms and conditions of\n+      this License, without any additional terms or conditions.\n+      Notwithstanding the above, nothing herein shall supersede or modify\n+      the terms of any separate license agreement you may have executed\n+      with Licensor regarding such Contributions.\n+\n+   6. Trademarks. This License does not grant permission to use the trade\n+      names, trademarks, service marks, or product names of the Licensor,\n+      except as required for reasonable and customary use in describing the\n+      origin of the Work and reproducing the content of the NOTICE file.\n+\n+   7. Disclaimer of Warranty. Unless required by applicable law or\n+      agreed to in writing, Licensor provides the Work (and each\n+      Contributor provides its Contributions) on an \"AS IS\" BASIS,\n+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or\n+      implied, including, without limitation, any warranties or conditions\n+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A\n+      PARTICULAR PURPOSE. You are solely responsible for determining the\n+      appropriateness of using or redistributing the Work and assume any\n+      risks associated with Your exercise of permissions under this License.\n+\n+   8. Limitation of Liability. In no event and under no legal theory,\n+      whether in tort (including negligence), contract, or otherwise,\n+      unless required by applicable law (such as deliberate and grossly\n+      negligent acts) or agreed to in writing, shall any Contributor be\n+      liable to You for damages, including any direct, indirect, special,\n+      incidental, or consequential damages of any character arising as a\n+      result of this License or out of the use or inability to use the\n+      Work (including but not limited to damages for loss of goodwill,\n+      work stoppage, computer failure or malfunction, or any and all\n+      other commercial damages or losses), even if such Contributor\n+      has been advised of the possibility of such damages.\n+\n+   9. Accepting Warranty or Additional Liability. While redistributing\n+      the Work or Derivative Works thereof, You may choose to offer,\n+      and charge a fee for, acceptance of support, warranty, indemnity,\n+      or other liability obligations and/or rights consistent with this\n+      License. However, in accepting such obligations, You may act only\n+      on Your own behalf and on Your sole responsibility, not on behalf\n+      of any other Contributor, and only if You agree to indemnify,\n+      defend, and hold each Contributor harmless for any liability\n+      incurred by, or claims asserted against, such Contributor by reason\n+      of your accepting any such warranty or additional liability.\n+\n+   END OF TERMS AND CONDITIONS\n+\n+   APPENDIX: How to apply the Apache License to your work.\n+\n+      To apply the Apache License to your work, attach the following\n+      boilerplate notice, with the fields enclosed by brackets \"[]\"\n+      replaced with your own identifying information. (Don't include\n+      the brackets!)  The text should be enclosed in the appropriate\n+      comment syntax for the file format. We also recommend that a\n+      file or class name and description of purpose be included on the\n+      same \"printed page\" as the copyright notice for easier\n+      identification within third-party archives.\n+\n+   Copyright [yyyy] [name of copyright owner]\n+\n+   Licensed under the Apache License, Version 2.0 (the \"License\");\n+   you may not use this file except in compliance with the License.\n+   You may obtain a copy of the License at\n+\n+       http://www.apache.org/licenses/LICENSE-2.0\n+\n+   Unless required by applicable law or agreed to in writing, software\n+   distributed under the License is distributed on an \"AS IS\" BASIS,\n+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+   See the License for the specific language governing permissions and\n+   limitations under the License."
+        }
+      ]
+    },
+    {
+      "author": "MatthijsBurgh",
+      "date": "2020-07-06T18:23:38Z",
+      "sha": "f9a7be093e2f4b24042bc92b78171e32dffd585b",
+      "message": "Fix document link (#61)\n\nSigned-off-by: Matthijs van der Burgh <MatthijsBurgh@outlook.com>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "a79e7c033beff16d6cc3774f2abfc295ac4832d4",
+          "filename": "ament_index_python/README.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/f9a7be093e2f4b24042bc92b78171e32dffd585b/ament_index_python%2FREADME.md",
+          "raw_url": "https://github.com/ament/ament_index/raw/f9a7be093e2f4b24042bc92b78171e32dffd585b/ament_index_python%2FREADME.md",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2FREADME.md?ref=f9a7be093e2f4b24042bc92b78171e32dffd585b",
+          "patch": "@@ -6,4 +6,4 @@ See [https://github.com/ament/ament_cmake/blob/master/ament_cmake_core/doc/resou\n \n ## Quality Declaration\n \n-This package claims to be in the **Quality Level 4** category, see the [Quality Declaration](./Quality_Declaration.md) for more details.\n+This package claims to be in the **Quality Level 4** category, see the [Quality Declaration](./QUALITY_DECLARATION.md) for more details."
+        }
+      ]
+    },
+    {
+      "author": "nuclearsandwich",
+      "date": "2019-04-11T19:16:26Z",
+      "sha": "0dba2f42c7f9b18a676c96d5643f26d5213513dd",
+      "message": "0.7.0",
+      "files_changed": 3,
+      "additions": 3,
+      "deletions": 3,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "003c921e2ad1971164ba2a869ac86f162420b907",
+          "filename": "ament_index_cpp/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/0dba2f42c7f9b18a676c96d5643f26d5213513dd/ament_index_cpp%2Fpackage.xml",
+          "raw_url": "https://github.com/ament/ament_index/raw/0dba2f42c7f9b18a676c96d5643f26d5213513dd/ament_index_cpp%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fpackage.xml?ref=0dba2f42c7f9b18a676c96d5643f26d5213513dd",
+          "patch": "@@ -2,7 +2,7 @@\n <?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"2\">\n   <name>ament_index_cpp</name>\n-  <version>0.5.1</version>\n+  <version>0.7.0</version>\n   <description>\n     C++ API to access the ament resource index.\n   </description>"
+        },
+        {
+          "sha": "2fbda4f2aee871be11547951ad7a70fe6a6275b6",
+          "filename": "ament_index_python/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/0dba2f42c7f9b18a676c96d5643f26d5213513dd/ament_index_python%2Fpackage.xml",
+          "raw_url": "https://github.com/ament/ament_index/raw/0dba2f42c7f9b18a676c96d5643f26d5213513dd/ament_index_python%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fpackage.xml?ref=0dba2f42c7f9b18a676c96d5643f26d5213513dd",
+          "patch": "@@ -2,7 +2,7 @@\n <?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"2\">\n   <name>ament_index_python</name>\n-  <version>0.5.1</version>\n+  <version>0.7.0</version>\n   <description>\n     Python API to access the ament resource index.\n   </description>"
+        },
+        {
+          "sha": "13d31e2d8bdef93027f7840df196c2dc341580e4",
+          "filename": "ament_index_python/setup.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/0dba2f42c7f9b18a676c96d5643f26d5213513dd/ament_index_python%2Fsetup.py",
+          "raw_url": "https://github.com/ament/ament_index/raw/0dba2f42c7f9b18a676c96d5643f26d5213513dd/ament_index_python%2Fsetup.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fsetup.py?ref=0dba2f42c7f9b18a676c96d5643f26d5213513dd",
+          "patch": "@@ -3,7 +3,7 @@\n \n setup(\n     name='ament_index_python',\n-    version='0.5.1',\n+    version='0.7.0',\n     packages=find_packages(exclude=['test']),\n     install_requires=['setuptools'],\n     zip_safe=True,"
+        }
+      ]
+    },
+    {
+      "author": "Blast545",
+      "date": "2020-01-21T18:57:59Z",
+      "sha": "8f80cddf663225b285e160f33ff14102e530d85f",
+      "message": "Fix resource name autocompleter in ament_index CLI (#42)\n\n* Fix cli tool bug\r\n\r\nSigned-off-by: Jorge J. Perez <jjperez@ekumenlabs.com>\r\n\r\n* Update ament_index_python/ament_index_python/cli.py\r\n\r\nCo-Authored-By: Ivan Santiago Paunovic <ivanpauno@ekumenlabs.com>\r\nSigned-off-by: Jorge J. Perez <jjperez@ekumenlabs.com>\r\n\r\nCo-authored-by: Ivan Santiago Paunovic <ivanpauno@ekumenlabs.com>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "1edfd6296084cdce1e99122c368f099831b96bb3",
+          "filename": "ament_index_python/ament_index_python/cli.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/8f80cddf663225b285e160f33ff14102e530d85f/ament_index_python%2Fament_index_python%2Fcli.py",
+          "raw_url": "https://github.com/ament/ament_index/raw/8f80cddf663225b285e160f33ff14102e530d85f/ament_index_python%2Fament_index_python%2Fcli.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fament_index_python%2Fcli.py?ref=8f80cddf663225b285e160f33ff14102e530d85f",
+          "patch": "@@ -71,7 +71,7 @@ def resource_name_completer(prefix, parsed_args, **kwargs):\n     resource_type = getattr(parsed_args, 'resource_type', None)\n     if not resource_type:\n         return []\n-    return get_resources(resource_type).keys()\n+    return (t for t in get_resources(resource_type).keys() if t.startswith(prefix))\n \n \n if __name__ == '__main__':"
+        }
+      ]
+    },
+    {
+      "author": "Anas Abou Allaban",
+      "date": "2020-02-13T20:48:20Z",
+      "sha": "602d4b154a41010d90ebd43972255299eb3ad108",
+      "message": "Address clang-tidy warnings (#47)\n\n* Address clang-tidy warnings\r\n\r\nSigned-off-by: Anas Abou Allaban <allabana@amazon.com>\r\n\r\n* Uncrustify\r\n\r\nSigned-off-by: Anas Abou Allaban <allabana@amazon.com>",
+      "files_changed": 5,
+      "additions": 8,
+      "deletions": 8,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "eac47c6ab3a448f982aa96fa33bd0e72e8cf8aaf",
+          "filename": "ament_index_cpp/src/get_package_prefix.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ament/ament_index/blob/602d4b154a41010d90ebd43972255299eb3ad108/ament_index_cpp%2Fsrc%2Fget_package_prefix.cpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/602d4b154a41010d90ebd43972255299eb3ad108/ament_index_cpp%2Fsrc%2Fget_package_prefix.cpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fsrc%2Fget_package_prefix.cpp?ref=602d4b154a41010d90ebd43972255299eb3ad108",
+          "patch": "@@ -32,7 +32,7 @@ format_package_not_found_error_message(const std::string & package_name)\n   for (const auto & path : search_paths) {\n     message += path + \", \";\n   }\n-  if (search_paths.size() > 0) {\n+  if (!search_paths.empty()) {\n     message = message.substr(0, message.size() - 2);\n   }\n   return message + \"]\";\n@@ -43,7 +43,7 @@ PackageNotFoundError::PackageNotFoundError(const std::string & _package_name)\n   package_name(_package_name)\n {}\n \n-PackageNotFoundError::~PackageNotFoundError() {}\n+PackageNotFoundError::~PackageNotFoundError() = default;\n \n std::string\n get_package_prefix(const std::string & package_name)"
+        },
+        {
+          "sha": "2539319ed4d89accff326e59a6496715e2177683",
+          "filename": "ament_index_cpp/src/get_resource.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/602d4b154a41010d90ebd43972255299eb3ad108/ament_index_cpp%2Fsrc%2Fget_resource.cpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/602d4b154a41010d90ebd43972255299eb3ad108/ament_index_cpp%2Fsrc%2Fget_resource.cpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fsrc%2Fget_resource.cpp?ref=602d4b154a41010d90ebd43972255299eb3ad108",
+          "patch": "@@ -40,7 +40,7 @@ get_resource(\n     throw std::runtime_error(\"ament_index_cpp::get_resource() resource name must not be empty\");\n   }\n   auto paths = get_search_paths();\n-  for (auto path : paths) {\n+  for (const auto & path : paths) {\n     auto resource_path = rcpputils::fs::path{path} / \"share\" / \"ament_index\" / \"resource_index\" /\n     resource_type / resource_name;\n     std::ifstream s(resource_path.string());"
+        },
+        {
+          "sha": "c5d885edabf55869d4cf8e2ada611ef2a28b9cfe",
+          "filename": "ament_index_cpp/src/get_resources.cpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/ament/ament_index/blob/602d4b154a41010d90ebd43972255299eb3ad108/ament_index_cpp%2Fsrc%2Fget_resources.cpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/602d4b154a41010d90ebd43972255299eb3ad108/ament_index_cpp%2Fsrc%2Fget_resources.cpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fsrc%2Fget_resources.cpp?ref=602d4b154a41010d90ebd43972255299eb3ad108",
+          "patch": "@@ -16,7 +16,7 @@\n \n #ifndef _WIN32\n #include <dirent.h>\n-#include <errno.h>\n+#include <cerrno>\n #else\n #include <windows.h>\n #endif\n@@ -39,7 +39,7 @@ get_resources(const std::string & resource_type)\n   }\n   std::map<std::string, std::string> resources;\n   auto paths = get_search_paths();\n-  for (auto base_path : paths) {\n+  for (const auto & base_path : paths) {\n     auto path =\n       rcpputils::fs::path{base_path} / \"share\" / \"ament_index\" / \"resource_index\" / resource_type;\n \n@@ -49,7 +49,7 @@ get_resources(const std::string & resource_type)\n       continue;\n     }\n     dirent * entry;\n-    while ((entry = readdir(dir)) != NULL) {\n+    while ((entry = readdir(dir)) != nullptr) {\n       // ignore directories\n       auto subdir = opendir((path / entry->d_name).string().c_str());\n       if (subdir) {"
+        },
+        {
+          "sha": "03ee40ce841074acf484c861b49935e4ce8291fa",
+          "filename": "ament_index_cpp/src/get_search_paths.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/602d4b154a41010d90ebd43972255299eb3ad108/ament_index_cpp%2Fsrc%2Fget_search_paths.cpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/602d4b154a41010d90ebd43972255299eb3ad108/ament_index_cpp%2Fsrc%2Fget_search_paths.cpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fsrc%2Fget_search_paths.cpp?ref=602d4b154a41010d90ebd43972255299eb3ad108",
+          "patch": "@@ -60,7 +60,7 @@ get_search_paths()\n       continue;\n     }\n     // skip non existing directories\n-    struct stat s;\n+    struct stat s {};\n     if (stat(tok.c_str(), &s)) {\n       continue;\n     }"
+        },
+        {
+          "sha": "1ed905e99d100ce404504108f20448245beda08e",
+          "filename": "ament_index_cpp/src/has_resource.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/602d4b154a41010d90ebd43972255299eb3ad108/ament_index_cpp%2Fsrc%2Fhas_resource.cpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/602d4b154a41010d90ebd43972255299eb3ad108/ament_index_cpp%2Fsrc%2Fhas_resource.cpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fsrc%2Fhas_resource.cpp?ref=602d4b154a41010d90ebd43972255299eb3ad108",
+          "patch": "@@ -38,7 +38,7 @@ has_resource(\n     throw std::runtime_error(\"ament_index_cpp::has_resource() resource name must not be empty\");\n   }\n   auto paths = get_search_paths();\n-  for (auto path : paths) {\n+  for (const auto & path : paths) {\n     auto resource_path = rcpputils::fs::path{path} / \"share\" / \"ament_index\" / \"resource_index\" /\n     resource_type / resource_name;\n     std::ifstream s(resource_path.string());"
+        }
+      ]
+    },
+    {
+      "author": "piraka9011",
+      "date": "2020-02-11T00:05:27Z",
+      "sha": "5954265704f26a11e6e01b6c61e82e498f15f221",
+      "message": "Refactor paths to use rcpputils filesystem helper (#46)\n\n* Refactor paths to use rcpputils filesystem helper\r\n\r\nSigned-off-by: Anas Abou Allaban <allabana@amazon.com>\r\n\r\n* Header style fixes\r\n\r\nSigned-off-by: Anas Abou Allaban <allabana@amazon.com>\r\n\r\n* Fix pattern variable in windows\r\n\r\nSigned-off-by: Anas Abou Allaban <allabana@amazon.com>\r\n\r\n* Uncrustify and fix windows test\r\n\r\nSigned-off-by: Anas Abou Allaban <aabouallaban@pm.me>",
+      "files_changed": 7,
+      "additions": 31,
+      "deletions": 12,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "2c36bac62e513d9c1b90d648c42b79a8487c1ef6",
+          "filename": "ament_index_cpp/CMakeLists.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/5954265704f26a11e6e01b6c61e82e498f15f221/ament_index_cpp%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ament/ament_index/raw/5954265704f26a11e6e01b6c61e82e498f15f221/ament_index_cpp%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2FCMakeLists.txt?ref=5954265704f26a11e6e01b6c61e82e498f15f221",
+          "patch": "@@ -18,6 +18,7 @@ unless the library was explicitly added as a static library.\"\n   ON)\n \n find_package(ament_cmake REQUIRED)\n+find_package(rcpputils REQUIRED)\n \n add_library(${PROJECT_NAME}\n   src/get_package_prefix.cpp\n@@ -32,6 +33,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE \"AMENT_INDEX_CPP_BUILDING_DLL\n target_include_directories(${PROJECT_NAME} PUBLIC\n   \"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>\"\n   \"$<INSTALL_INTERFACE:include>\")\n+ament_target_dependencies(${PROJECT_NAME} rcpputils)\n \n ament_export_include_directories(include)\n ament_export_interfaces(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)"
+        },
+        {
+          "sha": "55f8fdd9fc99dc7659998579a66a1cf6ae081375",
+          "filename": "ament_index_cpp/package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/5954265704f26a11e6e01b6c61e82e498f15f221/ament_index_cpp%2Fpackage.xml",
+          "raw_url": "https://github.com/ament/ament_index/raw/5954265704f26a11e6e01b6c61e82e498f15f221/ament_index_cpp%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fpackage.xml?ref=5954265704f26a11e6e01b6c61e82e498f15f221",
+          "patch": "@@ -11,6 +11,8 @@\n \n   <buildtool_depend>ament_cmake</buildtool_depend>\n \n+  <depend>rcpputils</depend>\n+  \n   <test_depend>ament_cmake_gtest</test_depend>\n   <test_depend>ament_lint_auto</test_depend>\n   <test_depend>ament_lint_common</test_depend>"
+        },
+        {
+          "sha": "527de9e2071553e87fbf0d4935d5bb700d7e2197",
+          "filename": "ament_index_cpp/src/get_package_share_directory.cpp",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 1,
+          "changes": 6,
+          "blob_url": "https://github.com/ament/ament_index/blob/5954265704f26a11e6e01b6c61e82e498f15f221/ament_index_cpp%2Fsrc%2Fget_package_share_directory.cpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/5954265704f26a11e6e01b6c61e82e498f15f221/ament_index_cpp%2Fsrc%2Fget_package_share_directory.cpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fsrc%2Fget_package_share_directory.cpp?ref=5954265704f26a11e6e01b6c61e82e498f15f221",
+          "patch": "@@ -16,6 +16,8 @@\n \n #include <string>\n \n+#include \"rcpputils/filesystem_helper.hpp\"\n+\n #include \"ament_index_cpp/get_package_prefix.hpp\"\n \n namespace ament_index_cpp\n@@ -24,7 +26,9 @@ namespace ament_index_cpp\n std::string\n get_package_share_directory(const std::string & package_name)\n {\n-  return get_package_prefix(package_name) + \"/share/\" + package_name;\n+  auto share_directory =\n+    rcpputils::fs::path{get_package_prefix(package_name)} / \"share\" / package_name;\n+  return share_directory.string();\n }\n \n }  // namespace ament_index_cpp"
+        },
+        {
+          "sha": "5f2d2bed2674e4d2a61243fae6e66cb9d4081d9d",
+          "filename": "ament_index_cpp/src/get_resource.cpp",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 3,
+          "changes": 8,
+          "blob_url": "https://github.com/ament/ament_index/blob/5954265704f26a11e6e01b6c61e82e498f15f221/ament_index_cpp%2Fsrc%2Fget_resource.cpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/5954265704f26a11e6e01b6c61e82e498f15f221/ament_index_cpp%2Fsrc%2Fget_resource.cpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fsrc%2Fget_resource.cpp?ref=5954265704f26a11e6e01b6c61e82e498f15f221",
+          "patch": "@@ -19,6 +19,8 @@\n #include <stdexcept>\n #include <string>\n \n+#include \"rcpputils/filesystem_helper.hpp\"\n+\n #include \"ament_index_cpp/get_search_paths.hpp\"\n \n namespace ament_index_cpp\n@@ -39,9 +41,9 @@ get_resource(\n   }\n   auto paths = get_search_paths();\n   for (auto path : paths) {\n-    auto resource_path = path + \"/share/ament_index/resource_index/\" +\n-      resource_type + \"/\" + resource_name;\n-    std::ifstream s(resource_path);\n+    auto resource_path = rcpputils::fs::path{path} / \"share\" / \"ament_index\" / \"resource_index\" /\n+    resource_type / resource_name;\n+    std::ifstream s(resource_path.string());\n     if (s.is_open()) {\n       std::stringstream buffer;\n       buffer << s.rdbuf();"
+        },
+        {
+          "sha": "493dfa5dcf45764946b0b26c032fde07a5f9f5e7",
+          "filename": "ament_index_cpp/src/get_resources.cpp",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 4,
+          "changes": 11,
+          "blob_url": "https://github.com/ament/ament_index/blob/5954265704f26a11e6e01b6c61e82e498f15f221/ament_index_cpp%2Fsrc%2Fget_resources.cpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/5954265704f26a11e6e01b6c61e82e498f15f221/ament_index_cpp%2Fsrc%2Fget_resources.cpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fsrc%2Fget_resources.cpp?ref=5954265704f26a11e6e01b6c61e82e498f15f221",
+          "patch": "@@ -24,6 +24,8 @@\n #include <stdexcept>\n #include <string>\n \n+#include \"rcpputils/filesystem_helper.hpp\"\n+\n #include \"ament_index_cpp/get_search_paths.hpp\"\n \n namespace ament_index_cpp\n@@ -38,17 +40,18 @@ get_resources(const std::string & resource_type)\n   std::map<std::string, std::string> resources;\n   auto paths = get_search_paths();\n   for (auto base_path : paths) {\n-    auto path = base_path + \"/share/ament_index/resource_index/\" + resource_type;\n+    auto path =\n+      rcpputils::fs::path{base_path} / \"share\" / \"ament_index\" / \"resource_index\" / resource_type;\n \n #ifndef _WIN32\n-    auto dir = opendir(path.c_str());\n+    auto dir = opendir(path.string().c_str());\n     if (!dir) {\n       continue;\n     }\n     dirent * entry;\n     while ((entry = readdir(dir)) != NULL) {\n       // ignore directories\n-      auto subdir = opendir((path + \"/\" + entry->d_name).c_str());\n+      auto subdir = opendir((path / entry->d_name).string().c_str());\n       if (subdir) {\n         closedir(subdir);\n         continue;\n@@ -69,7 +72,7 @@ get_resources(const std::string & resource_type)\n     closedir(dir);\n \n #else\n-    std::string pattern = path + \"/*\";\n+    const auto pattern = (path / \"*\").string();\n     WIN32_FIND_DATA find_data;\n     HANDLE find_handle = FindFirstFile(pattern.c_str(), &find_data);\n     if (find_handle == INVALID_HANDLE_VALUE) {"
+        },
+        {
+          "sha": "67709808722876813e45bf4bb1ee9977104dcd10",
+          "filename": "ament_index_cpp/src/has_resource.cpp",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 3,
+          "changes": 8,
+          "blob_url": "https://github.com/ament/ament_index/blob/5954265704f26a11e6e01b6c61e82e498f15f221/ament_index_cpp%2Fsrc%2Fhas_resource.cpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/5954265704f26a11e6e01b6c61e82e498f15f221/ament_index_cpp%2Fsrc%2Fhas_resource.cpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fsrc%2Fhas_resource.cpp?ref=5954265704f26a11e6e01b6c61e82e498f15f221",
+          "patch": "@@ -18,6 +18,8 @@\n #include <stdexcept>\n #include <string>\n \n+#include \"rcpputils/filesystem_helper.hpp\"\n+\n #include \"ament_index_cpp/get_search_paths.hpp\"\n \n namespace ament_index_cpp\n@@ -37,9 +39,9 @@ has_resource(\n   }\n   auto paths = get_search_paths();\n   for (auto path : paths) {\n-    auto resource_path = path + \"/share/ament_index/resource_index/\" +\n-      resource_type + \"/\" + resource_name;\n-    std::ifstream s(resource_path);\n+    auto resource_path = rcpputils::fs::path{path} / \"share\" / \"ament_index\" / \"resource_index\" /\n+    resource_type / resource_name;\n+    std::ifstream s(resource_path.string());\n     if (s.is_open()) {\n       if (prefix_path) {\n         *prefix_path = path;"
+        },
+        {
+          "sha": "eaf44fb98344cef85fafbe61625170e36c812d43",
+          "filename": "ament_index_cpp/test/utest.cpp",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 1,
+          "changes": 6,
+          "blob_url": "https://github.com/ament/ament_index/blob/5954265704f26a11e6e01b6c61e82e498f15f221/ament_index_cpp%2Ftest%2Futest.cpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/5954265704f26a11e6e01b6c61e82e498f15f221/ament_index_cpp%2Ftest%2Futest.cpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Ftest%2Futest.cpp?ref=5954265704f26a11e6e01b6c61e82e498f15f221",
+          "patch": "@@ -21,6 +21,8 @@\n #include <stdexcept>\n #include <string>\n \n+#include \"rcpputils/filesystem_helper.hpp\"\n+\n #include \"ament_index_cpp/get_package_prefix.hpp\"\n #include \"ament_index_cpp/get_package_share_directory.hpp\"\n #include \"ament_index_cpp/get_packages_with_prefixes.hpp\"\n@@ -253,8 +255,10 @@ TEST(AmentIndexCpp, get_package_share_directory) {\n   subfolders.push_back(\"prefix2\");  // only contains bar and baz packages\n   set_ament_prefix_path(subfolders);\n   // bar is in both, but prefix 1 takes precedence\n+  const auto subfolder_path =\n+    rcpputils::fs::path{generate_subfolder_path(\"prefix1\")} / \"share\" / \"bar\";\n   EXPECT_EQ(\n-    generate_subfolder_path(\"prefix1\") + \"/share/bar\",\n+    subfolder_path.string(),\n     ament_index_cpp::get_package_share_directory(\"bar\"));\n }\n "
+        }
+      ]
+    },
+    {
+      "author": "mikaelarguedas",
+      "date": "2017-01-04T03:06:09Z",
+      "sha": "a8225676f53e6003789f096cb577bacf59ecf68f",
+      "message": "c++14 (#21)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "08c35fb6c00738b9a928bb8d5bb22b104c99ab1c",
+          "filename": "ament_index_cpp/CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ament/ament_index/blob/a8225676f53e6003789f096cb577bacf59ecf68f/ament_index_cpp%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ament/ament_index/raw/a8225676f53e6003789f096cb577bacf59ecf68f/ament_index_cpp%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2FCMakeLists.txt?ref=a8225676f53e6003789f096cb577bacf59ecf68f",
+          "patch": "@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.5)\n project(ament_index_cpp)\n \n if(NOT WIN32)\n-  set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra\")\n+  set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra\")\n endif()\n \n find_package(ament_cmake REQUIRED)"
+        }
+      ]
+    },
+    {
+      "author": "wjwwood",
+      "date": "2015-11-06T05:29:37Z",
+      "sha": "da6a5f331eb8d0f2c250af6cdac5da7ec0a06e15",
+      "message": "adding .gitignore for __pycache__ files",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "bee8a64b79a99590d5303307144172cfe824fbf7",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ament/ament_index/blob/da6a5f331eb8d0f2c250af6cdac5da7ec0a06e15/.gitignore",
+          "raw_url": "https://github.com/ament/ament_index/raw/da6a5f331eb8d0f2c250af6cdac5da7ec0a06e15/.gitignore",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/.gitignore?ref=da6a5f331eb8d0f2c250af6cdac5da7ec0a06e15",
+          "patch": "@@ -0,0 +1 @@\n+__pycache__"
+        }
+      ]
+    },
+    {
+      "author": "dhood",
+      "date": "2016-04-11T17:15:56Z",
+      "sha": "676bad794bc9a64acc210f10cd9b1dd706e26f1d",
+      "message": "Ignore dot files in get_resources",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "8bf0d91ede84ab298d522ad3fa2416193ff296c5",
+          "filename": "ament_index_python/ament_index_python/__init__.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/ament/ament_index/blob/676bad794bc9a64acc210f10cd9b1dd706e26f1d/ament_index_python%2Fament_index_python%2F__init__.py",
+          "raw_url": "https://github.com/ament/ament_index/raw/676bad794bc9a64acc210f10cd9b1dd706e26f1d/ament_index_python%2Fament_index_python%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fament_index_python%2F__init__.py?ref=676bad794bc9a64acc210f10cd9b1dd706e26f1d",
+          "patch": "@@ -72,7 +72,8 @@ def get_resources(resource_type):\n         resource_path = os.path.join(path, RESOURCE_INDEX_SUBFOLDER, resource_type)\n         if os.path.isdir(resource_path):\n             for filename in os.listdir(resource_path):\n-                if filename not in resources:\n+                if filename not in resources \\\n+                        and not filename.startswith('.'):\n                     resources[filename] = path\n     return resources\n "
+        }
+      ]
+    },
+    {
+      "author": "tfoote",
+      "date": "2016-05-03T21:29:51Z",
+      "sha": "d4a45a6e03d44883cc12e4ded80e9252e8706557",
+      "message": "Merge pull request #15 from dhood/check_readable\n\nCheck resource file is readable",
+      "files_changed": 1,
+      "additions": 11,
+      "deletions": 5,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "356db6bb985bcd68e54c6d507b23d0e45ddc3e66",
+          "filename": "ament_index_python/ament_index_python/__init__.py",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 5,
+          "changes": 16,
+          "blob_url": "https://github.com/ament/ament_index/blob/d4a45a6e03d44883cc12e4ded80e9252e8706557/ament_index_python%2Fament_index_python%2F__init__.py",
+          "raw_url": "https://github.com/ament/ament_index/raw/d4a45a6e03d44883cc12e4ded80e9252e8706557/ament_index_python%2Fament_index_python%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_python%2Fament_index_python%2F__init__.py?ref=d4a45a6e03d44883cc12e4ded80e9252e8706557",
+          "patch": "@@ -43,23 +43,29 @@ def get_resource(resource_type, resource_name):\n     :type resource_name: str\n     :returns: the content (bytes) of the resource\n     :raises: :exc:`EnvironmentError`\n+    :raises: :exc:`OSError`\n     :raises: :exc:`LookupError`\n     \"\"\"\n     assert resource_type, 'The resource type must not be empty'\n-    assert resource_name, 'The resource type must not be empty'\n+    assert resource_name, 'The resource name must not be empty'\n     for path in get_search_paths():\n         resource_path = os.path.join(path, RESOURCE_INDEX_SUBFOLDER, resource_type, resource_name)\n         if os.path.isfile(resource_path):\n-            with open(resource_path, 'r') as h:\n-                content = h.read()\n+            try:\n+                with open(resource_path, 'r') as h:\n+                    content = h.read()\n+            except OSError as e:\n+                raise OSError(\n+                    \"Could not open the resource '%s' of type '%s':\\n%s\"\n+                    % (resource_name, resource_type, e))\n             return content\n     raise LookupError(\n         \"Could not find the resource '%s' of type '%s'\" % (resource_name, resource_type))\n \n \n def get_resources(resource_type):\n     \"\"\"\n-    Get the resource names of all resource of the specified type.\n+    Get the resource names of all resources of the specified type.\n \n     :param resource_type: the type of the resource\n     :type resource_type: str\n@@ -93,7 +99,7 @@ def has_resource(resource_type, resource_name):\n     :raises: :exc:`EnvironmentError`\n     \"\"\"\n     assert resource_type, 'The resource type must not be empty'\n-    assert resource_name, 'The resource type must not be empty'\n+    assert resource_name, 'The resource name must not be empty'\n     for path in get_search_paths():\n         resource_path = os.path.join(path, RESOURCE_INDEX_SUBFOLDER, resource_type, resource_name)\n         if os.path.isfile(resource_path):"
+        }
+      ]
+    },
+    {
+      "author": "esteve",
+      "date": "2016-02-26T03:30:03Z",
+      "sha": "67ac92ff892bd3fcdd45b0d94d3ceb0573fd94a1",
+      "message": "Added missing include",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "7a411aca3f9ccf3868b58cbbe9371308b5829fd1",
+          "filename": "ament_index_cpp/src/get_search_paths.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ament/ament_index/blob/67ac92ff892bd3fcdd45b0d94d3ceb0573fd94a1/ament_index_cpp%2Fsrc%2Fget_search_paths.cpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/67ac92ff892bd3fcdd45b0d94d3ceb0573fd94a1/ament_index_cpp%2Fsrc%2Fget_search_paths.cpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fsrc%2Fget_search_paths.cpp?ref=67ac92ff892bd3fcdd45b0d94d3ceb0573fd94a1",
+          "patch": "@@ -16,6 +16,7 @@\n \n #include <sys/stat.h>\n \n+#include <cstdlib>\n #include <list>\n #include <sstream>\n #include <stdexcept>"
+        }
+      ]
+    },
+    {
+      "author": "Timple",
+      "date": "2026-02-25T09:53:07Z",
+      "sha": "acfcac6161db4237fd2dfffd63f32649dc29504d",
+      "message": "Use get_package_share_path just as python (#112)\n\nSigned-off-by: Tim Clephas <tim.clephas@nobleo.nl>\nCo-authored-by: Alejandro Hernández Cordero <ahcorde@gmail.com>",
+      "files_changed": 6,
+      "additions": 80,
+      "deletions": 11,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "800fce7adf71d21e46b72f64d3501a7e984733c7",
+          "filename": "ament_index_cpp/CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ament/ament_index/blob/acfcac6161db4237fd2dfffd63f32649dc29504d/ament_index_cpp%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ament/ament_index/raw/acfcac6161db4237fd2dfffd63f32649dc29504d/ament_index_cpp%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2FCMakeLists.txt?ref=acfcac6161db4237fd2dfffd63f32649dc29504d",
+          "patch": "@@ -24,6 +24,7 @@ find_package(ament_cmake_gen_version_h REQUIRED)\n add_library(${PROJECT_NAME}\n   src/get_package_prefix.cpp\n   src/get_package_share_directory.cpp\n+  src/get_package_share_path.cpp\n   src/get_packages_with_prefixes.cpp\n   src/get_resource.cpp\n   src/get_resources.cpp"
+        },
+        {
+          "sha": "80663a5425f6b4c82bc375a0e7b8a6039d4ce3ee",
+          "filename": "ament_index_cpp/include/ament_index_cpp/get_package_share_directory.hpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/ament/ament_index/blob/acfcac6161db4237fd2dfffd63f32649dc29504d/ament_index_cpp%2Finclude%2Fament_index_cpp%2Fget_package_share_directory.hpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/acfcac6161db4237fd2dfffd63f32649dc29504d/ament_index_cpp%2Finclude%2Fament_index_cpp%2Fget_package_share_directory.hpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Finclude%2Fament_index_cpp%2Fget_package_share_directory.hpp?ref=acfcac6161db4237fd2dfffd63f32649dc29504d",
+          "patch": "@@ -29,7 +29,7 @@ namespace ament_index_cpp\n  * \\return share path of the package.\n  * \\throws PackageNotFoundError when the given package is not found.\n  */\n-[[deprecated(\"Use get_package_share_directory(..., std::filesystem::path) instead\")]]\n+[[deprecated(\"Use get_package_share_path(...) instead\")]]\n AMENT_INDEX_CPP_PUBLIC\n std::string\n get_package_share_directory(const std::string & package_name);\n@@ -41,6 +41,7 @@ get_package_share_directory(const std::string & package_name);\n  * \\return\n  * \\throws PackageNotFoundError when the given package is not found.\n  */\n+[[deprecated(\"Use get_package_share_path(...) instead\")]]\n AMENT_INDEX_CPP_PUBLIC\n void\n get_package_share_directory(const std::string & package_name, std::filesystem::path & path);"
+        },
+        {
+          "sha": "6dbc2eb5f169cf35b6e78c15cefa804dce7d9d0c",
+          "filename": "ament_index_cpp/include/ament_index_cpp/get_package_share_path.hpp",
+          "status": "added",
+          "additions": 38,
+          "deletions": 0,
+          "changes": 38,
+          "blob_url": "https://github.com/ament/ament_index/blob/acfcac6161db4237fd2dfffd63f32649dc29504d/ament_index_cpp%2Finclude%2Fament_index_cpp%2Fget_package_share_path.hpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/acfcac6161db4237fd2dfffd63f32649dc29504d/ament_index_cpp%2Finclude%2Fament_index_cpp%2Fget_package_share_path.hpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Finclude%2Fament_index_cpp%2Fget_package_share_path.hpp?ref=acfcac6161db4237fd2dfffd63f32649dc29504d",
+          "patch": "@@ -0,0 +1,38 @@\n+// Copyright 2026 Open Source Robotics Foundation, Inc.\n+//\n+// Licensed under the Apache License, Version 2.0 (the \"License\");\n+// you may not use this file except in compliance with the License.\n+// You may obtain a copy of the License at\n+//\n+//     http://www.apache.org/licenses/LICENSE-2.0\n+//\n+// Unless required by applicable law or agreed to in writing, software\n+// distributed under the License is distributed on an \"AS IS\" BASIS,\n+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+// See the License for the specific language governing permissions and\n+// limitations under the License.\n+\n+#ifndef AMENT_INDEX_CPP__GET_PACKAGE_SHARE_PATH_HPP_\n+#define AMENT_INDEX_CPP__GET_PACKAGE_SHARE_PATH_HPP_\n+\n+#include <filesystem>\n+#include <string>\n+\n+#include \"ament_index_cpp/visibility_control.h\"\n+\n+namespace ament_index_cpp\n+{\n+\n+/// Return the share directory of the given package if found.\n+/**\n+ * \\param[in] package_name the name of the package to locate.\n+ * \\return share path of the package.\n+ * \\throws PackageNotFoundError when the given package is not found.\n+ */\n+AMENT_INDEX_CPP_PUBLIC\n+std::filesystem::path\n+get_package_share_path(const std::string & package_name);\n+\n+}  // namespace ament_index_cpp\n+\n+#endif  // AMENT_INDEX_CPP__GET_PACKAGE_SHARE_PATH_HPP_"
+        },
+        {
+          "sha": "f5b5c0c72f597b2e63f974a6cde482c8ae94b736",
+          "filename": "ament_index_cpp/src/get_package_share_directory.cpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 6,
+          "changes": 9,
+          "blob_url": "https://github.com/ament/ament_index/blob/acfcac6161db4237fd2dfffd63f32649dc29504d/ament_index_cpp%2Fsrc%2Fget_package_share_directory.cpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/acfcac6161db4237fd2dfffd63f32649dc29504d/ament_index_cpp%2Fsrc%2Fget_package_share_directory.cpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fsrc%2Fget_package_share_directory.cpp?ref=acfcac6161db4237fd2dfffd63f32649dc29504d",
+          "patch": "@@ -13,6 +13,7 @@\n // limitations under the License.\n \n #include \"ament_index_cpp/get_package_share_directory.hpp\"\n+#include \"ament_index_cpp/get_package_share_path.hpp\"\n \n #include <filesystem>\n #include <string>\n@@ -25,18 +26,14 @@ namespace ament_index_cpp\n std::string\n get_package_share_directory(const std::string & package_name)\n {\n-  std::filesystem::path result;\n-  get_package_share_directory(package_name, result);\n-  return result.string();\n+  return get_package_share_path(package_name).string();\n }\n \n void get_package_share_directory(\n   const std::string & package_name,\n   std::filesystem::path & path)\n {\n-  std::filesystem::path result;\n-  get_package_prefix(package_name, result);\n-  path = result / \"share\" / package_name;\n+  path = get_package_share_path(package_name);\n }\n \n }  // namespace ament_index_cpp"
+        },
+        {
+          "sha": "336026d07f615614d0a18e4826239f3f05f4bbae",
+          "filename": "ament_index_cpp/src/get_package_share_path.cpp",
+          "status": "added",
+          "additions": 33,
+          "deletions": 0,
+          "changes": 33,
+          "blob_url": "https://github.com/ament/ament_index/blob/acfcac6161db4237fd2dfffd63f32649dc29504d/ament_index_cpp%2Fsrc%2Fget_package_share_path.cpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/acfcac6161db4237fd2dfffd63f32649dc29504d/ament_index_cpp%2Fsrc%2Fget_package_share_path.cpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Fsrc%2Fget_package_share_path.cpp?ref=acfcac6161db4237fd2dfffd63f32649dc29504d",
+          "patch": "@@ -0,0 +1,33 @@\n+// Copyright 2026 Open Source Robotics Foundation, Inc.\n+//\n+// Licensed under the Apache License, Version 2.0 (the \"License\");\n+// you may not use this file except in compliance with the License.\n+// You may obtain a copy of the License at\n+//\n+//     http://www.apache.org/licenses/LICENSE-2.0\n+//\n+// Unless required by applicable law or agreed to in writing, software\n+// distributed under the License is distributed on an \"AS IS\" BASIS,\n+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+// See the License for the specific language governing permissions and\n+// limitations under the License.\n+\n+#include \"ament_index_cpp/get_package_share_path.hpp\"\n+\n+#include <filesystem>\n+#include <string>\n+\n+#include \"ament_index_cpp/get_package_prefix.hpp\"\n+\n+namespace ament_index_cpp\n+{\n+\n+std::filesystem::path get_package_share_path(\n+  const std::string & package_name)\n+{\n+  std::filesystem::path result;\n+  get_package_prefix(package_name, result);\n+  return result / \"share\" / package_name;\n+}\n+\n+}  // namespace ament_index_cpp"
+        },
+        {
+          "sha": "82848930c904eecf811dc374a630149afb10a00f",
+          "filename": "ament_index_cpp/test/utest.cpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 4,
+          "changes": 7,
+          "blob_url": "https://github.com/ament/ament_index/blob/acfcac6161db4237fd2dfffd63f32649dc29504d/ament_index_cpp%2Ftest%2Futest.cpp",
+          "raw_url": "https://github.com/ament/ament_index/raw/acfcac6161db4237fd2dfffd63f32649dc29504d/ament_index_cpp%2Ftest%2Futest.cpp",
+          "contents_url": "https://api.github.com/repos/ament/ament_index/contents/ament_index_cpp%2Ftest%2Futest.cpp?ref=acfcac6161db4237fd2dfffd63f32649dc29504d",
+          "patch": "@@ -22,7 +22,7 @@\n #include <string>\n \n #include \"ament_index_cpp/get_package_prefix.hpp\"\n-#include \"ament_index_cpp/get_package_share_directory.hpp\"\n+#include \"ament_index_cpp/get_package_share_path.hpp\"\n #include \"ament_index_cpp/get_packages_with_prefixes.hpp\"\n #include \"ament_index_cpp/get_resource.hpp\"\n #include \"ament_index_cpp/get_resources.hpp\"\n@@ -242,15 +242,14 @@ TEST(AmentIndexCpp, get_package_prefix) {\n     ament_index_cpp::PackageNotFoundError);\n }\n \n-TEST(AmentIndexCpp, get_package_share_directory) {\n+TEST(AmentIndexCpp, get_package_share_path) {\n   // Ensure that a known to exist package is found and the share directory is correct.\n   std::list<std::string> subfolders;\n   subfolders.push_back(\"prefix1\");  // only contains foo and bar packages\n   subfolders.push_back(\"prefix2\");  // only contains bar and baz packages\n   set_ament_prefix_path(subfolders);\n   // bar is in both, but prefix 1 takes precedence\n-  std::filesystem::path path_result;\n-  ament_index_cpp::get_package_share_directory(\"bar\", path_result);\n+  auto path_result = ament_index_cpp::get_package_share_path(\"bar\");\n   EXPECT_EQ(\n     std::filesystem::path(generate_subfolder_path(\"prefix1\")) / \"share\" / \"bar\",\n     path_result);"
+        }
+      ]
+    }
+  ]
+}

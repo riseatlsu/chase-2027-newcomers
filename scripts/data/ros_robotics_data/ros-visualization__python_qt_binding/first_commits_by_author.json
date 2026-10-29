@@ -1,0 +1,1413 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T06:06:49Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ros-visualization",
+    "repo": "python_qt_binding"
+  },
+  "data": [
+    {
+      "author": "ahcorde",
+      "date": "2024-04-25T12:25:54Z",
+      "sha": "4fe5bceb353f5dfcef4f78f9266c0983521bd7ac",
+      "message": "Only suppress Python warnings on new enough CMake (#139)\n\n* Older CMake doesn't have the policy, so skip it there.\r\n\r\nSigned-off-by: Alejandro Hernández Cordero <ahcorde@gmail.com>",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "76241570c307e91f20815dd1680dcdbfed1c0934",
+          "filename": "cmake/shiboken_helper.cmake",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/4fe5bceb353f5dfcef4f78f9266c0983521bd7ac/cmake%2Fshiboken_helper.cmake",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/4fe5bceb353f5dfcef4f78f9266c0983521bd7ac/cmake%2Fshiboken_helper.cmake",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fshiboken_helper.cmake?ref=4fe5bceb353f5dfcef4f78f9266c0983521bd7ac",
+          "patch": "@@ -24,7 +24,9 @@ set(__PYTHON_QT_BINDING_SHIBOKEN_HELPER_INCLUDED TRUE)\n # In CMake 3.27 and later, FindPythonInterp and FindPythonLibs are deprecated.\n # However, Shiboken2 as packaged in Ubuntu 24.04 still use them, so set CMP0148 to\n # \"OLD\" to silence this warning.\n-cmake_policy(SET CMP0148 OLD)\n+if(CMAKE_VERSION VERSION_GREATER_EQUAL \"3.27.0\")\n+  cmake_policy(SET CMP0148 OLD)\n+endif()\n find_package(Shiboken2 QUIET)\n if(Shiboken2_FOUND)\n   message(STATUS \"Found Shiboken2 version ${Shiboken2_VERSION}\")"
+        }
+      ]
+    },
+    {
+      "author": "mosfet80",
+      "date": "2025-10-03T07:57:08Z",
+      "sha": "19eee00ecc5bb7e7e943175f04404c9087a3c864",
+      "message": "fix cmake deprecation (#150)\n\ncmake version < then 3.10 is deprecated",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "9c00505ca19001ad2c8ed31383acbc71082a8ef8",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/19eee00ecc5bb7e7e943175f04404c9087a3c864/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/19eee00ecc5bb7e7e943175f04404c9087a3c864/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/CMakeLists.txt?ref=19eee00ecc5bb7e7e943175f04404c9087a3c864",
+          "patch": "@@ -1,4 +1,4 @@\n-cmake_minimum_required(VERSION 3.5)\n+cmake_minimum_required(VERSION 3.20)\n project(python_qt_binding)\n \n find_package(ament_cmake REQUIRED)"
+        }
+      ]
+    },
+    {
+      "author": "cottsay",
+      "date": "2019-08-16T18:35:43Z",
+      "sha": "da0d50772af8605f2c785d1e67c3d9dec8dea67d",
+      "message": "If present, use the sipconfig suggested sip program (#70)\n\nThe value of `SIP_EXECUTABLE` is not used in the sip invocation within `sip_configure.py`. Instead, the `sip_bin` configuration is loaded from the `sipconfig` Python module.\r\n\r\nInstead of assuming that the sip executable is called `sip` in the CMake which detects whether the sip binding generator is present, try to find the executable in the same way that `sip_configure.py` will.\r\n\r\nSigned-off-by: Scott K Logan <logans@cottsay.net>",
+      "files_changed": 1,
+      "additions": 12,
+      "deletions": 2,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "ad48c143415bdf76a781a07d57df7535ec7c15ae",
+          "filename": "cmake/sip_helper.cmake",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 2,
+          "changes": 14,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/da0d50772af8605f2c785d1e67c3d9dec8dea67d/cmake%2Fsip_helper.cmake",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/da0d50772af8605f2c785d1e67c3d9dec8dea67d/cmake%2Fsip_helper.cmake",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fsip_helper.cmake?ref=da0d50772af8605f2c785d1e67c3d9dec8dea67d",
+          "patch": "@@ -9,9 +9,19 @@ set(Python_ADDITIONAL_VERSIONS \"${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}\"\n find_package(PythonInterp \"${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}\" REQUIRED)\n find_package(PythonLibs \"${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}\" REQUIRED)\n \n-find_program(SIP_EXECUTABLE sip)\n+execute_process(\n+  COMMAND ${PYTHON_EXECUTABLE} -c \"import sipconfig; print(sipconfig.Configuration().sip_bin)\"\n+  OUTPUT_VARIABLE PYTHON_SIP_EXECUTABLE\n+  ERROR_QUIET)\n+\n+if(PYTHON_SIP_EXECUTABLE)\n+  string(STRIP ${PYTHON_SIP_EXECUTABLE} SIP_EXECUTABLE)\n+else()\n+  find_program(SIP_EXECUTABLE sip)\n+endif()\n+\n if(SIP_EXECUTABLE)\n-  message(STATUS \"SIP binding generator available.\")\n+  message(STATUS \"SIP binding generator available at: ${SIP_EXECUTABLE}\")\n   set(sip_helper_FOUND TRUE)\n else()\n   message(WARNING \"SIP binding generator NOT available.\")"
+        }
+      ]
+    },
+    {
+      "author": "clalancette",
+      "date": "2020-06-19T14:55:26Z",
+      "sha": "361dee952bbda33c79cd4e366ae56b0ce4ca81bb",
+      "message": "Add pytest.ini so local tests don't display warning (#93)\n\nSigned-off-by: Chris Lalancette <clalancette@openrobotics.org>",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "fe55d2ed64b588f65868a485437a69503b58e2b2",
+          "filename": "pytest.ini",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/361dee952bbda33c79cd4e366ae56b0ce4ca81bb/pytest.ini",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/361dee952bbda33c79cd4e366ae56b0ce4ca81bb/pytest.ini",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/pytest.ini?ref=361dee952bbda33c79cd4e366ae56b0ce4ca81bb",
+          "patch": "@@ -0,0 +1,2 @@\n+[pytest]\n+junit_family=xunit2"
+        }
+      ]
+    },
+    {
+      "author": "marcoag",
+      "date": "2024-03-28T10:04:22Z",
+      "sha": "29ea65c5c6712fe3dade9fcfb841e49a9d2806e2",
+      "message": "Changelog.\n\nSigned-off-by: Marco A. Gutierrez <marcogg@marcogg.com>",
+      "files_changed": 1,
+      "additions": 6,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "ca3a0b321e9ba4f9fde17e0f241d756f1852b238",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/29ea65c5c6712fe3dade9fcfb841e49a9d2806e2/CHANGELOG.rst",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/29ea65c5c6712fe3dade9fcfb841e49a9d2806e2/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/CHANGELOG.rst?ref=29ea65c5c6712fe3dade9fcfb841e49a9d2806e2",
+          "patch": "@@ -2,6 +2,12 @@\n Changelog for package python_qt_binding\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+Forthcoming\n+-----------\n+* Switch to C++17 for SIP and Shiboken (`#135 <https://github.com/ros-visualization/python_qt_binding/issues/135>`_)\n+* Set hints to find the python version we actually want. (`#134 <https://github.com/ros-visualization/python_qt_binding/issues/134>`_)\n+* Contributors: Chris Lalancette, Christophe Bedard\n+\n 2.1.1 (2024-02-07)\n ------------------\n * Remove unnecessary parentheses around assert. (`#133 <https://github.com/ros-visualization/python_qt_binding/issues/133>`_)"
+        }
+      ]
+    },
+    {
+      "author": "christophebedard",
+      "date": "2024-02-23T20:46:56Z",
+      "sha": "ef7b38b2b78bd3392900f08269119640877945d4",
+      "message": "Switch to C++17 for SIP and Shiboken (#135)\n\nSigned-off-by: Christophe Bedard <christophe.bedard@apex.ai>",
+      "files_changed": 2,
+      "additions": 4,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "14dae5ee439b810213569b0d682207bb8876cf05",
+          "filename": "cmake/shiboken_helper.cmake",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/ef7b38b2b78bd3392900f08269119640877945d4/cmake%2Fshiboken_helper.cmake",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/ef7b38b2b78bd3392900f08269119640877945d4/cmake%2Fshiboken_helper.cmake",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fshiboken_helper.cmake?ref=ef7b38b2b78bd3392900f08269119640877945d4",
+          "patch": "@@ -70,6 +70,7 @@ macro(_shiboken_generator_command VAR GLOBAL TYPESYSTEM INCLUDE_PATH BUILD_DIR)\n   set(${VAR} ${SHIBOKEN_BINARY}\n     --generatorSet=shiboken\n     --enable-pyside-extensions\n+    -std=c++17\n     --include-paths=${INCLUDE_PATH_WITH_COLONS}${SHIBOKEN_HELPER_INCLUDE_DIRS_WITH_COLONS}\n     --typesystem-paths=${PYSIDE_TYPESYSTEMS}\n     --output-directory=${BUILD_DIR} ${GLOBAL} ${TYPESYSTEM})"
+        },
+        {
+          "sha": "5210ee5ed7064a614e62dafc2c282d09eca4fb9d",
+          "filename": "cmake/sip_configure.py",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/ef7b38b2b78bd3392900f08269119640877945d4/cmake%2Fsip_configure.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/ef7b38b2b78bd3392900f08269119640877945d4/cmake%2Fsip_configure.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fsip_configure.py?ref=ef7b38b2b78bd3392900f08269119640877945d4",
+          "patch": "@@ -209,14 +209,14 @@ def split_paths(paths):\n # redirect location of generated library\n makefile._target = '\"%s\"' % os.path.join(output_dir, makefile._target)\n \n-# Force c++14\n+# Force c++17\n if sys.platform == 'win32':\n-    makefile.extra_cxxflags.append('/std:c++14')\n+    makefile.extra_cxxflags.append('/std:c++17')\n     # The __cplusplus flag is not properly set on Windows for backwards\n     # compatibilty. This flag sets it correctly\n     makefile.CXXFLAGS.append('/Zc:__cplusplus')\n else:\n-    makefile.extra_cxxflags.append('-std=c++14')\n+    makefile.extra_cxxflags.append('-std=c++17')\n \n # Finalise the Makefile, preparing it to be saved to disk\n makefile.finalise()"
+        }
+      ]
+    },
+    {
+      "author": "mjcarroll",
+      "date": "2023-03-01T19:31:27Z",
+      "sha": "d8fc6179f0dbb87f464aa18f69588da4b58f1daf",
+      "message": "Revert \"Add windows support for pyside helper (#116)\" (#124)\n\nThis reverts commit 0a7f68ec8cb219233c9a640ca8517af73510949d.",
+      "files_changed": 3,
+      "additions": 5,
+      "deletions": 477,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "919969e5ce06d1978e87672f120e511e2362cdd6",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 1,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/d8fc6179f0dbb87f464aa18f69588da4b58f1daf/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/d8fc6179f0dbb87f464aa18f69588da4b58f1daf/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/CMakeLists.txt?ref=d8fc6179f0dbb87f464aa18f69588da4b58f1daf",
+          "patch": "@@ -11,7 +11,6 @@ install(FILES\n   cmake/shiboken_helper.cmake\n   cmake/sip_configure.py\n   cmake/sip_helper.cmake\n-  cmake/pyside_config.py\n   DESTINATION share/${PROJECT_NAME}/cmake)\n \n if(BUILD_TESTING)"
+        },
+        {
+          "sha": "df6be1512801c96da8b524cc2bd0f87b9de6e7e7",
+          "filename": "cmake/pyside_config.py",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 415,
+          "changes": 415,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/0a7f68ec8cb219233c9a640ca8517af73510949d/cmake%2Fpyside_config.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/0a7f68ec8cb219233c9a640ca8517af73510949d/cmake%2Fpyside_config.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fpyside_config.py?ref=0a7f68ec8cb219233c9a640ca8517af73510949d",
+          "patch": "@@ -1,415 +0,0 @@\n-# Copyright (C) 2022 The Qt Company Ltd.\n-#               2022 Christoph Hellmann Santos\n-# SPDX-License-Identifier: BSD-3-Clause\n-\n-import sysconfig\n-from enum import Enum\n-import glob\n-import os\n-import re\n-import sys\n-\n-\n-PYSIDE = \"pyside2\"\n-PYSIDE_MODULE = \"PySide2\"\n-SHIBOKEN = \"shiboken2\"\n-\n-\n-class Package(Enum):\n-    SHIBOKEN_MODULE = 1\n-    SHIBOKEN_GENERATOR = 2\n-    PYSIDE_MODULE = 3\n-\n-\n-generic_error = (\n-    \"Did you forget to activate your virtualenv? Or perhaps\"\n-    f\" you forgot to build / install {PYSIDE_MODULE} into your currently active Python\"\n-    \" environment?\"\n-)\n-pyside_error = f\"Unable to locate {PYSIDE_MODULE}. {generic_error}\"\n-shiboken_module_error = f\"Unable to locate {SHIBOKEN}-module. {generic_error}\"\n-shiboken_generator_error = f\"Unable to locate shiboken-generator. {generic_error}\"\n-pyside_libs_error = f\"Unable to locate the PySide shared libraries.  {generic_error}\"\n-python_link_error = \"Unable to locate the Python library for linking.\"\n-python_include_error = \"Unable to locate the Python include headers directory.\"\n-\n-options = []\n-\n-# option, function, error, description\n-options.append(\n-    (\n-        \"--shiboken-module-path\",\n-        lambda: find_shiboken_module(),\n-        shiboken_module_error,\n-        \"Print shiboken module location\",\n-    )\n-)\n-options.append(\n-    (\n-        \"--shiboken-generator-path\",\n-        lambda: find_shiboken_generator(),\n-        shiboken_generator_error,\n-        \"Print shiboken generator location\",\n-    )\n-)\n-options.append(\n-    (\n-        \"--pyside-path\",\n-        lambda: find_pyside(),\n-        pyside_error,\n-        f\"Print {PYSIDE_MODULE} location\",\n-    )\n-)\n-\n-options.append(\n-    (\n-        \"--python-include-path\",\n-        lambda: get_python_include_path(),\n-        python_include_error,\n-        \"Print Python include path\",\n-    )\n-)\n-options.append(\n-    (\n-        \"--shiboken-generator-include-path\",\n-        lambda: get_package_include_path(Package.SHIBOKEN_GENERATOR),\n-        pyside_error,\n-        \"Print shiboken generator include paths\",\n-    )\n-)\n-options.append(\n-    (\n-        \"--pyside-include-path\",\n-        lambda: get_package_include_path(Package.PYSIDE_MODULE),\n-        pyside_error,\n-        \"Print PySide6 include paths\",\n-    )\n-)\n-\n-options.append(\n-    (\n-        \"--python-link-flags-qmake\",\n-        lambda: python_link_flags_qmake(),\n-        python_link_error,\n-        \"Print python link flags for qmake\",\n-    )\n-)\n-options.append(\n-    (\n-        \"--python-link-flags-cmake\",\n-        lambda: python_link_flags_cmake(),\n-        python_link_error,\n-        \"Print python link flags for cmake\",\n-    )\n-)\n-\n-options.append(\n-    (\n-        \"--shiboken-module-qmake-lflags\",\n-        lambda: get_package_qmake_lflags(Package.SHIBOKEN_MODULE),\n-        pyside_error,\n-        \"Print shiboken6 shared library link flags for qmake\",\n-    )\n-)\n-options.append(\n-    (\n-        \"--pyside-qmake-lflags\",\n-        lambda: get_package_qmake_lflags(Package.PYSIDE_MODULE),\n-        pyside_error,\n-        \"Print PySide6 shared library link flags for qmake\",\n-    )\n-)\n-\n-options.append(\n-    (\n-        \"--shiboken-module-shared-libraries-qmake\",\n-        lambda: get_shared_libraries_qmake(Package.SHIBOKEN_MODULE),\n-        pyside_libs_error,\n-        \"Print paths of shiboken shared libraries (.so's, .dylib's, .dll's) for qmake\",\n-    )\n-)\n-options.append(\n-    (\n-        \"--shiboken-module-shared-libraries-cmake\",\n-        lambda: get_shared_libraries_cmake(Package.SHIBOKEN_MODULE),\n-        pyside_libs_error,\n-        \"Print paths of shiboken shared libraries (.so's, .dylib's, .dll's) for cmake\",\n-    )\n-)\n-\n-options.append(\n-    (\n-        \"--pyside-shared-libraries-qmake\",\n-        lambda: get_shared_libraries_qmake(Package.PYSIDE_MODULE),\n-        pyside_libs_error,\n-        \"Print paths of f{PYSIDE_MODULE} shared libraries (.so's, .dylib's, .dll's) for qmake\",\n-    )\n-)\n-options.append(\n-    (\n-        \"--pyside-shared-libraries-cmake\",\n-        lambda: get_shared_libraries_cmake(Package.PYSIDE_MODULE),\n-        pyside_libs_error,\n-        f\"Print paths of {PYSIDE_MODULE} shared libraries (.so's, .dylib's, .dll's) for cmake\",\n-    )\n-)\n-\n-options_usage = \"\"\n-for i, (flag, _, _, description) in enumerate(options):\n-    options_usage += f\"    {flag:<45} {description}\"\n-    if i < len(options) - 1:\n-        options_usage += \"\\n\"\n-\n-usage = f\"\"\"\n-Utility to determine include/link options of shiboken/PySide and Python for qmake/CMake projects\n-that would like to embed or build custom shiboken/PySide bindings.\n-\n-Usage: pyside_config.py [option]\n-Options:\n-{options_usage}\n-    -a                                            Print all options and their values\n-    --help/-h                                     Print this help\n-\"\"\"\n-\n-option = sys.argv[1] if len(sys.argv) == 2 else \"-a\"\n-if option == \"-h\" or option == \"--help\":\n-    print(usage)\n-    sys.exit(0)\n-\n-\n-def clean_path(path):\n-    return path if sys.platform != \"win32\" else path.replace(\"\\\\\", \"/\")\n-\n-\n-def shared_library_suffix():\n-    if sys.platform == \"win32\":\n-        return \"lib\"\n-    elif sys.platform == \"darwin\":\n-        return \"dylib\"\n-    # Linux\n-    else:\n-        return \"so.*\"\n-\n-\n-def import_suffixes():\n-    import importlib.machinery\n-\n-    return importlib.machinery.EXTENSION_SUFFIXES\n-\n-\n-def is_debug():\n-    debug_suffix = \"_d.pyd\" if sys.platform == \"win32\" else \"_d.so\"\n-    return any([s.endswith(debug_suffix) for s in import_suffixes()])\n-\n-\n-def shared_library_glob_pattern():\n-    glob = \"*.\" + shared_library_suffix()\n-    return glob if sys.platform == \"win32\" else \"lib\" + glob\n-\n-\n-def filter_shared_libraries(libs_list):\n-    def predicate(lib_name):\n-        basename = os.path.basename(lib_name)\n-        if \"shiboken\" in basename or \"pyside6\" in basename:\n-            return True\n-        return False\n-\n-    result = [lib for lib in libs_list if predicate(lib)]\n-    return result\n-\n-\n-# Return qmake link option for a library file name\n-def link_option(lib):\n-    # On Linux:\n-    # Since we cannot include symlinks with wheel packages\n-    # we are using an absolute path for the libpyside and libshiboken\n-    # libraries when compiling the project\n-    baseName = os.path.basename(lib)\n-    link = \" -l\"\n-    if sys.platform in [\n-        \"linux\",\n-        \"linux2\",\n-    ]:  # Linux: 'libfoo.so' -> '/absolute/path/libfoo.so'\n-        link = lib\n-    elif sys.platform in [\"darwin\"]:  # Darwin: 'libfoo.so' -> '-lfoo'\n-        link += os.path.splitext(baseName[3:])[0]\n-    else:  # Windows: 'libfoo.dll' -> 'libfoo.dll'\n-        link += os.path.splitext(baseName)[0]\n-    return link\n-\n-\n-# Locate PySide6 via sys.path package path.\n-def find_pyside():\n-    return find_package_path(PYSIDE_MODULE)\n-\n-\n-def find_shiboken_module():\n-    return find_package_path(SHIBOKEN)\n-\n-\n-def find_shiboken_generator():\n-    return find_package_path(f\"{SHIBOKEN}_generator\")\n-\n-\n-def find_package(which_package):\n-    if which_package == Package.SHIBOKEN_MODULE:\n-        return find_shiboken_module()\n-    if which_package == Package.SHIBOKEN_GENERATOR:\n-        return find_shiboken_generator()\n-    if which_package == Package.PYSIDE_MODULE:\n-        return find_pyside()\n-    return None\n-\n-\n-def find_package_path(dir_name):\n-    for p in sys.path:\n-        if \"site-\" in p:\n-            package = os.path.join(p, dir_name)\n-            if os.path.exists(package):\n-                return clean_path(os.path.realpath(package))\n-    return None\n-\n-\n-# Return version as \"3.6\"\n-def python_version():\n-    return str(sys.version_info[0]) + \".\" + str(sys.version_info[1])\n-\n-\n-def get_python_include_path():\n-    return sysconfig.get_path(\"include\")\n-\n-\n-def python_link_flags_qmake():\n-    flags = python_link_data()\n-    if sys.platform == \"win32\":\n-        libdir = flags[\"libdir\"]\n-        # This will add the \"~1\" shortcut for directories that\n-        # contain white spaces\n-        # e.g.: \"Program Files\" to \"Progra~1\"\n-        for d in libdir.split(\"\\\\\"):\n-            if \" \" in d:\n-                libdir = libdir.replace(d, d.split(\" \")[0][:-1] + \"~1\")\n-        lib_flags = flags[\"lib\"]\n-        return f\"-L{libdir} -l{lib_flags}\"\n-    elif sys.platform == \"darwin\":\n-        libdir = flags[\"libdir\"]\n-        lib_flags = flags[\"lib\"]\n-        return f\"-L{libdir} -l{lib_flags}\"\n-    else:\n-        # Linux and anything else\n-        libdir = flags[\"libdir\"]\n-        lib_flags = flags[\"lib\"]\n-        return f\"-L{libdir} -l{lib_flags}\"\n-\n-\n-def python_link_flags_cmake():\n-    flags = python_link_data()\n-    libdir = flags[\"libdir\"]\n-    lib = re.sub(r\".dll$\", \".lib\", flags[\"lib\"])\n-    return f\"{libdir};{lib}\"\n-\n-\n-def python_link_data():\n-    # @TODO Fix to work with static builds of Python\n-    libdir = sysconfig.get_config_var(\"LIBDIR\")\n-    if libdir is None:\n-        libdir = os.path.abspath(\n-            os.path.join(sysconfig.get_config_var(\"LIBDEST\"), \"..\", \"libs\")\n-        )\n-    version = python_version()\n-    version_no_dots = version.replace(\".\", \"\")\n-\n-    flags = {}\n-    flags[\"libdir\"] = libdir\n-    if sys.platform == \"win32\":\n-        suffix = \"_d\" if is_debug() else \"\"\n-        flags[\"lib\"] = f\"python{version_no_dots}{suffix}\"\n-\n-    elif sys.platform == \"darwin\":\n-        flags[\"lib\"] = f\"python{version}\"\n-\n-    # Linux and anything else\n-    else:\n-        flags[\"lib\"] = f\"python{version}{sys.abiflags}\"\n-\n-    return flags\n-\n-\n-def get_package_include_path(which_package):\n-    package_path = find_package(which_package)\n-    if package_path is None:\n-        return None\n-\n-    includes = f\"{package_path}/include\"\n-\n-    return includes\n-\n-\n-def get_package_qmake_lflags(which_package):\n-    package_path = find_package(which_package)\n-    if package_path is None:\n-        return None\n-\n-    link = f\"-L{package_path}\"\n-    glob_result = glob.glob(os.path.join(package_path, shared_library_glob_pattern()))\n-    for lib in filter_shared_libraries(glob_result):\n-        link += \" \"\n-        link += link_option(lib)\n-    return link\n-\n-\n-def get_shared_libraries_data(which_package):\n-    package_path = find_package(which_package)\n-    if package_path is None:\n-        return None\n-\n-    glob_result = glob.glob(os.path.join(package_path, shared_library_glob_pattern()))\n-    filtered_libs = filter_shared_libraries(glob_result)\n-    libs = []\n-    if sys.platform == \"win32\":\n-        for lib in filtered_libs:\n-            libs.append(os.path.realpath(lib))\n-    else:\n-        for lib in filtered_libs:\n-            libs.append(lib)\n-    return libs\n-\n-\n-def get_shared_libraries_qmake(which_package):\n-    libs = get_shared_libraries_data(which_package)\n-    if libs is None:\n-        return None\n-\n-    if sys.platform == \"win32\":\n-        if not libs:\n-            return \"\"\n-        dlls = \"\"\n-        for lib in libs:\n-            dll = os.path.splitext(lib)[0] + \".dll\"\n-            dlls += dll + \" \"\n-\n-        return dlls\n-    else:\n-        libs_string = \"\"\n-        for lib in libs:\n-            libs_string += lib + \" \"\n-        return libs_string\n-\n-\n-def get_shared_libraries_cmake(which_package):\n-    libs = get_shared_libraries_data(which_package)\n-    result = \";\".join(libs)\n-    return result\n-\n-\n-print_all = option == \"-a\"\n-for argument, handler, error, _ in options:\n-    if option == argument or print_all:\n-        handler_result = handler()\n-        if handler_result is None:\n-            sys.exit(error)\n-\n-        line = handler_result\n-        if print_all:\n-            line = f\"{argument:<40}: {line}\"\n-        print(line)"
+        },
+        {
+          "sha": "5b96d9f095c08d9d3d2cab3456e33037424c80a1",
+          "filename": "cmake/shiboken_helper.cmake",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 61,
+          "changes": 66,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/d8fc6179f0dbb87f464aa18f69588da4b58f1daf/cmake%2Fshiboken_helper.cmake",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/d8fc6179f0dbb87f464aa18f69588da4b58f1daf/cmake%2Fshiboken_helper.cmake",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fshiboken_helper.cmake?ref=d8fc6179f0dbb87f464aa18f69588da4b58f1daf",
+          "patch": "@@ -8,31 +8,6 @@ set(__PYTHON_QT_BINDING_SHIBOKEN_HELPER_INCLUDED TRUE)\n set(PYTHON_SUFFIX \".cpython-${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}m\")\n set(PYTHON_EXTENSION_SUFFIX \"${PYTHON_SUFFIX}-${CMAKE_CXX_LIBRARY_ARCHITECTURE}\")\n \n-find_package(python_qt_binding REQUIRED)\n-\n-macro(pyside_config option output_var)\n-    if(${ARGC} GREATER 2)\n-        set(is_list ${ARGV2})\n-    else()\n-        set(is_list \"\")\n-    endif()\n-\n-    execute_process(\n-      COMMAND ${Python3_EXECUTABLE} \"${python_qt_binding_DIR}/pyside_config.py\"\n-              ${option}\n-      OUTPUT_VARIABLE ${output_var}\n-      OUTPUT_STRIP_TRAILING_WHITESPACE)\n-\n-    if(\"${${output_var}}\" STREQUAL \"\")\n-        message(FATAL_ERROR \"Error: Calling pyside_config.py ${option} returned no output.\")\n-    endif()\n-    if(is_list)\n-        string(REPLACE \" \" \";\" ${output_var} \"${${output_var}}\")\n-    endif()\n-endmacro()\n-\n-\n-\n find_package(Shiboken2 QUIET)\n if(Shiboken2_FOUND)\n   message(STATUS \"Found Shiboken2 version ${Shiboken2_VERSION}\")\n@@ -41,22 +16,10 @@ if(Shiboken2_FOUND)\n     get_property(SHIBOKEN_LIBRARY TARGET Shiboken2::libshiboken PROPERTY LOCATION)\n     set(SHIBOKEN_BINARY Shiboken2::shiboken2)\n   endif()\n-else()\n-  if(WIN32)\n-    pyside_config(--shiboken-generator-path shiboken_generator_path)\n-    pyside_config(--shiboken-generator-include-path shiboken_include_dir 1)\n-    pyside_config(--shiboken-module-shared-libraries-cmake shiboken_shared_libraries 0)\n-\n-    set(SHIBOKEN_BINARY \"${shiboken_generator_path}/shiboken2${CMAKE_EXECUTABLE_SUFFIX}\")\n-    set(SHIBOKEN_LIBRARY ${shiboken_shared_libraries})\n-    set(SHIBOKEN_INCLUDE_DIR ${shiboken_include_dir})\n-  endif()\n+  message(STATUS \"Using SHIBOKEN_INCLUDE_DIR: ${SHIBOKEN_INCLUDE_DIR}\")\n+  message(STATUS \"Using SHIBOKEN_LIBRARY: ${SHIBOKEN_LIBRARY}\")\n+  message(STATUS \"Using SHIBOKEN_BINARY: ${SHIBOKEN_BINARY}\")\n endif()\n-\n-message(STATUS \"Using SHIBOKEN_INCLUDE_DIR: ${SHIBOKEN_INCLUDE_DIR}\")\n-message(STATUS \"Using SHIBOKEN_LIBRARY: ${SHIBOKEN_LIBRARY}\")\n-message(STATUS \"Using SHIBOKEN_BINARY: ${SHIBOKEN_BINARY}\")\n-\n set(PYTHON_BASENAME \"${PYTHON_SUFFIX}-${CMAKE_CXX_LIBRARY_ARCHITECTURE}\")\n \n find_package(PySide2 QUIET)\n@@ -68,16 +31,7 @@ if(PySide2_FOUND)\n   endif()\n   message(STATUS \"Using PYSIDE_INCLUDE_DIR: ${PYSIDE_INCLUDE_DIR}\")\n   message(STATUS \"Using PYSIDE_LIBRARY: ${PYSIDE_LIBRARY}\")\n-else()\n-  if(WIN32)\n-    pyside_config(--pyside-include-path pyside_include_dir 1)\n-    pyside_config(--pyside-shared-libraries-cmake pyside_shared_libraries 0)\n-    set(PYSIDE_INCLUDE_DIR ${pyside_include_dir})\n-    set(PYSIDE_LIBRARY ${pyside_shared_libraries})\n-  endif()\n endif()\n-message(STATUS \"Using PYSIDE_INCLUDE_DIR: ${PYSIDE_INCLUDE_DIR}\")\n-message(STATUS \"Using PYSIDE_LIBRARY: ${PYSIDE_LIBRARY}\")\n \n set(Python_ADDITIONAL_VERSIONS \"${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}\")\n find_package(PythonLibs \"${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}\")\n@@ -117,8 +71,7 @@ macro(_shiboken_generator_command VAR GLOBAL TYPESYSTEM INCLUDE_PATH BUILD_DIR)\n     --enable-pyside-extensions\n     --include-paths=${INCLUDE_PATH_WITH_COLONS}${SHIBOKEN_HELPER_INCLUDE_DIRS_WITH_COLONS}\n     --typesystem-paths=${PYSIDE_TYPESYSTEMS}\n-    --output-directory=${BUILD_DIR} ${GLOBAL} ${TYPESYSTEM}\n-    --language-level=c++17)\n+    --output-directory=${BUILD_DIR} ${GLOBAL} ${TYPESYSTEM})\n endmacro()\n \n \n@@ -154,16 +107,7 @@ function(shiboken_generator PROJECT_NAME GLOBAL TYPESYSTEM WORKING_DIR GENERATED\n     )\n endfunction()\n \n-function(shiboken_generator_ext PROJECT_NAME GLOBAL TYPESYSTEM WORKING_DIR GENERATED_SRCS INCLUDE_PATH BUILD_DIR)\n-    _shiboken_generator_command(COMMAND \"${GLOBAL}\" \"${TYPESYSTEM}\" \"${INCLUDE_PATH}\" \"${BUILD_DIR}\")\n-    add_custom_command(\n-        OUTPUT ${GENERATED_SRCS}\n-        COMMAND ${COMMAND}\n-      DEPENDS ${GLOBAL} ${TYPESYSTEM}\n-      WORKING_DIRECTORY ${WORKING_DIR}\n-      COMMENT \"Running Shiboken generator for ${PROJECT_NAME} Python bindings...\"\n-    )\n-endfunction()\n+\n #\n # Add the Shiboken/PySide specific include directories.\n #"
+        }
+      ]
+    },
+    {
+      "author": "Crola1702",
+      "date": "2023-03-02T14:31:38Z",
+      "sha": "1e2994c122572912793004de65ab14711c827099",
+      "message": "Fix flake8 linter regression (#125)\n\nSigned-off-by: Crola1702 <cristobal.arroyo@ekumenlabs.com>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b7e0658c49f0d4251f7055e41f56be9d735a0d8f",
+          "filename": "src/python_qt_binding/binding_helper.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/1e2994c122572912793004de65ab14711c827099/src%2Fpython_qt_binding%2Fbinding_helper.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/1e2994c122572912793004de65ab14711c827099/src%2Fpython_qt_binding%2Fbinding_helper.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/src%2Fpython_qt_binding%2Fbinding_helper.py?ref=1e2994c122572912793004de65ab14711c827099",
+          "patch": "@@ -36,8 +36,8 @@\n     # since the 'future' package provides a 'builtins' module in Python 2\n     # this must not be checked second\n     import builtins\n-import platform\n import os\n+import platform\n import sys\n import traceback\n "
+        }
+      ]
+    },
+    {
+      "author": "hellantos",
+      "date": "2023-03-01T15:40:21Z",
+      "sha": "0a7f68ec8cb219233c9a640ca8517af73510949d",
+      "message": "Add windows support for pyside helper (#116)",
+      "files_changed": 3,
+      "additions": 477,
+      "deletions": 5,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e3ddec54a10a889584a38dd5b1c6364200b2381f",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/0a7f68ec8cb219233c9a640ca8517af73510949d/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/0a7f68ec8cb219233c9a640ca8517af73510949d/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/CMakeLists.txt?ref=0a7f68ec8cb219233c9a640ca8517af73510949d",
+          "patch": "@@ -11,6 +11,7 @@ install(FILES\n   cmake/shiboken_helper.cmake\n   cmake/sip_configure.py\n   cmake/sip_helper.cmake\n+  cmake/pyside_config.py\n   DESTINATION share/${PROJECT_NAME}/cmake)\n \n if(BUILD_TESTING)"
+        },
+        {
+          "sha": "df6be1512801c96da8b524cc2bd0f87b9de6e7e7",
+          "filename": "cmake/pyside_config.py",
+          "status": "added",
+          "additions": 415,
+          "deletions": 0,
+          "changes": 415,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/0a7f68ec8cb219233c9a640ca8517af73510949d/cmake%2Fpyside_config.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/0a7f68ec8cb219233c9a640ca8517af73510949d/cmake%2Fpyside_config.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fpyside_config.py?ref=0a7f68ec8cb219233c9a640ca8517af73510949d",
+          "patch": "@@ -0,0 +1,415 @@\n+# Copyright (C) 2022 The Qt Company Ltd.\n+#               2022 Christoph Hellmann Santos\n+# SPDX-License-Identifier: BSD-3-Clause\n+\n+import sysconfig\n+from enum import Enum\n+import glob\n+import os\n+import re\n+import sys\n+\n+\n+PYSIDE = \"pyside2\"\n+PYSIDE_MODULE = \"PySide2\"\n+SHIBOKEN = \"shiboken2\"\n+\n+\n+class Package(Enum):\n+    SHIBOKEN_MODULE = 1\n+    SHIBOKEN_GENERATOR = 2\n+    PYSIDE_MODULE = 3\n+\n+\n+generic_error = (\n+    \"Did you forget to activate your virtualenv? Or perhaps\"\n+    f\" you forgot to build / install {PYSIDE_MODULE} into your currently active Python\"\n+    \" environment?\"\n+)\n+pyside_error = f\"Unable to locate {PYSIDE_MODULE}. {generic_error}\"\n+shiboken_module_error = f\"Unable to locate {SHIBOKEN}-module. {generic_error}\"\n+shiboken_generator_error = f\"Unable to locate shiboken-generator. {generic_error}\"\n+pyside_libs_error = f\"Unable to locate the PySide shared libraries.  {generic_error}\"\n+python_link_error = \"Unable to locate the Python library for linking.\"\n+python_include_error = \"Unable to locate the Python include headers directory.\"\n+\n+options = []\n+\n+# option, function, error, description\n+options.append(\n+    (\n+        \"--shiboken-module-path\",\n+        lambda: find_shiboken_module(),\n+        shiboken_module_error,\n+        \"Print shiboken module location\",\n+    )\n+)\n+options.append(\n+    (\n+        \"--shiboken-generator-path\",\n+        lambda: find_shiboken_generator(),\n+        shiboken_generator_error,\n+        \"Print shiboken generator location\",\n+    )\n+)\n+options.append(\n+    (\n+        \"--pyside-path\",\n+        lambda: find_pyside(),\n+        pyside_error,\n+        f\"Print {PYSIDE_MODULE} location\",\n+    )\n+)\n+\n+options.append(\n+    (\n+        \"--python-include-path\",\n+        lambda: get_python_include_path(),\n+        python_include_error,\n+        \"Print Python include path\",\n+    )\n+)\n+options.append(\n+    (\n+        \"--shiboken-generator-include-path\",\n+        lambda: get_package_include_path(Package.SHIBOKEN_GENERATOR),\n+        pyside_error,\n+        \"Print shiboken generator include paths\",\n+    )\n+)\n+options.append(\n+    (\n+        \"--pyside-include-path\",\n+        lambda: get_package_include_path(Package.PYSIDE_MODULE),\n+        pyside_error,\n+        \"Print PySide6 include paths\",\n+    )\n+)\n+\n+options.append(\n+    (\n+        \"--python-link-flags-qmake\",\n+        lambda: python_link_flags_qmake(),\n+        python_link_error,\n+        \"Print python link flags for qmake\",\n+    )\n+)\n+options.append(\n+    (\n+        \"--python-link-flags-cmake\",\n+        lambda: python_link_flags_cmake(),\n+        python_link_error,\n+        \"Print python link flags for cmake\",\n+    )\n+)\n+\n+options.append(\n+    (\n+        \"--shiboken-module-qmake-lflags\",\n+        lambda: get_package_qmake_lflags(Package.SHIBOKEN_MODULE),\n+        pyside_error,\n+        \"Print shiboken6 shared library link flags for qmake\",\n+    )\n+)\n+options.append(\n+    (\n+        \"--pyside-qmake-lflags\",\n+        lambda: get_package_qmake_lflags(Package.PYSIDE_MODULE),\n+        pyside_error,\n+        \"Print PySide6 shared library link flags for qmake\",\n+    )\n+)\n+\n+options.append(\n+    (\n+        \"--shiboken-module-shared-libraries-qmake\",\n+        lambda: get_shared_libraries_qmake(Package.SHIBOKEN_MODULE),\n+        pyside_libs_error,\n+        \"Print paths of shiboken shared libraries (.so's, .dylib's, .dll's) for qmake\",\n+    )\n+)\n+options.append(\n+    (\n+        \"--shiboken-module-shared-libraries-cmake\",\n+        lambda: get_shared_libraries_cmake(Package.SHIBOKEN_MODULE),\n+        pyside_libs_error,\n+        \"Print paths of shiboken shared libraries (.so's, .dylib's, .dll's) for cmake\",\n+    )\n+)\n+\n+options.append(\n+    (\n+        \"--pyside-shared-libraries-qmake\",\n+        lambda: get_shared_libraries_qmake(Package.PYSIDE_MODULE),\n+        pyside_libs_error,\n+        \"Print paths of f{PYSIDE_MODULE} shared libraries (.so's, .dylib's, .dll's) for qmake\",\n+    )\n+)\n+options.append(\n+    (\n+        \"--pyside-shared-libraries-cmake\",\n+        lambda: get_shared_libraries_cmake(Package.PYSIDE_MODULE),\n+        pyside_libs_error,\n+        f\"Print paths of {PYSIDE_MODULE} shared libraries (.so's, .dylib's, .dll's) for cmake\",\n+    )\n+)\n+\n+options_usage = \"\"\n+for i, (flag, _, _, description) in enumerate(options):\n+    options_usage += f\"    {flag:<45} {description}\"\n+    if i < len(options) - 1:\n+        options_usage += \"\\n\"\n+\n+usage = f\"\"\"\n+Utility to determine include/link options of shiboken/PySide and Python for qmake/CMake projects\n+that would like to embed or build custom shiboken/PySide bindings.\n+\n+Usage: pyside_config.py [option]\n+Options:\n+{options_usage}\n+    -a                                            Print all options and their values\n+    --help/-h                                     Print this help\n+\"\"\"\n+\n+option = sys.argv[1] if len(sys.argv) == 2 else \"-a\"\n+if option == \"-h\" or option == \"--help\":\n+    print(usage)\n+    sys.exit(0)\n+\n+\n+def clean_path(path):\n+    return path if sys.platform != \"win32\" else path.replace(\"\\\\\", \"/\")\n+\n+\n+def shared_library_suffix():\n+    if sys.platform == \"win32\":\n+        return \"lib\"\n+    elif sys.platform == \"darwin\":\n+        return \"dylib\"\n+    # Linux\n+    else:\n+        return \"so.*\"\n+\n+\n+def import_suffixes():\n+    import importlib.machinery\n+\n+    return importlib.machinery.EXTENSION_SUFFIXES\n+\n+\n+def is_debug():\n+    debug_suffix = \"_d.pyd\" if sys.platform == \"win32\" else \"_d.so\"\n+    return any([s.endswith(debug_suffix) for s in import_suffixes()])\n+\n+\n+def shared_library_glob_pattern():\n+    glob = \"*.\" + shared_library_suffix()\n+    return glob if sys.platform == \"win32\" else \"lib\" + glob\n+\n+\n+def filter_shared_libraries(libs_list):\n+    def predicate(lib_name):\n+        basename = os.path.basename(lib_name)\n+        if \"shiboken\" in basename or \"pyside6\" in basename:\n+            return True\n+        return False\n+\n+    result = [lib for lib in libs_list if predicate(lib)]\n+    return result\n+\n+\n+# Return qmake link option for a library file name\n+def link_option(lib):\n+    # On Linux:\n+    # Since we cannot include symlinks with wheel packages\n+    # we are using an absolute path for the libpyside and libshiboken\n+    # libraries when compiling the project\n+    baseName = os.path.basename(lib)\n+    link = \" -l\"\n+    if sys.platform in [\n+        \"linux\",\n+        \"linux2\",\n+    ]:  # Linux: 'libfoo.so' -> '/absolute/path/libfoo.so'\n+        link = lib\n+    elif sys.platform in [\"darwin\"]:  # Darwin: 'libfoo.so' -> '-lfoo'\n+        link += os.path.splitext(baseName[3:])[0]\n+    else:  # Windows: 'libfoo.dll' -> 'libfoo.dll'\n+        link += os.path.splitext(baseName)[0]\n+    return link\n+\n+\n+# Locate PySide6 via sys.path package path.\n+def find_pyside():\n+    return find_package_path(PYSIDE_MODULE)\n+\n+\n+def find_shiboken_module():\n+    return find_package_path(SHIBOKEN)\n+\n+\n+def find_shiboken_generator():\n+    return find_package_path(f\"{SHIBOKEN}_generator\")\n+\n+\n+def find_package(which_package):\n+    if which_package == Package.SHIBOKEN_MODULE:\n+        return find_shiboken_module()\n+    if which_package == Package.SHIBOKEN_GENERATOR:\n+        return find_shiboken_generator()\n+    if which_package == Package.PYSIDE_MODULE:\n+        return find_pyside()\n+    return None\n+\n+\n+def find_package_path(dir_name):\n+    for p in sys.path:\n+        if \"site-\" in p:\n+            package = os.path.join(p, dir_name)\n+            if os.path.exists(package):\n+                return clean_path(os.path.realpath(package))\n+    return None\n+\n+\n+# Return version as \"3.6\"\n+def python_version():\n+    return str(sys.version_info[0]) + \".\" + str(sys.version_info[1])\n+\n+\n+def get_python_include_path():\n+    return sysconfig.get_path(\"include\")\n+\n+\n+def python_link_flags_qmake():\n+    flags = python_link_data()\n+    if sys.platform == \"win32\":\n+        libdir = flags[\"libdir\"]\n+        # This will add the \"~1\" shortcut for directories that\n+        # contain white spaces\n+        # e.g.: \"Program Files\" to \"Progra~1\"\n+        for d in libdir.split(\"\\\\\"):\n+            if \" \" in d:\n+                libdir = libdir.replace(d, d.split(\" \")[0][:-1] + \"~1\")\n+        lib_flags = flags[\"lib\"]\n+        return f\"-L{libdir} -l{lib_flags}\"\n+    elif sys.platform == \"darwin\":\n+        libdir = flags[\"libdir\"]\n+        lib_flags = flags[\"lib\"]\n+        return f\"-L{libdir} -l{lib_flags}\"\n+    else:\n+        # Linux and anything else\n+        libdir = flags[\"libdir\"]\n+        lib_flags = flags[\"lib\"]\n+        return f\"-L{libdir} -l{lib_flags}\"\n+\n+\n+def python_link_flags_cmake():\n+    flags = python_link_data()\n+    libdir = flags[\"libdir\"]\n+    lib = re.sub(r\".dll$\", \".lib\", flags[\"lib\"])\n+    return f\"{libdir};{lib}\"\n+\n+\n+def python_link_data():\n+    # @TODO Fix to work with static builds of Python\n+    libdir = sysconfig.get_config_var(\"LIBDIR\")\n+    if libdir is None:\n+        libdir = os.path.abspath(\n+            os.path.join(sysconfig.get_config_var(\"LIBDEST\"), \"..\", \"libs\")\n+        )\n+    version = python_version()\n+    version_no_dots = version.replace(\".\", \"\")\n+\n+    flags = {}\n+    flags[\"libdir\"] = libdir\n+    if sys.platform == \"win32\":\n+        suffix = \"_d\" if is_debug() else \"\"\n+        flags[\"lib\"] = f\"python{version_no_dots}{suffix}\"\n+\n+    elif sys.platform == \"darwin\":\n+        flags[\"lib\"] = f\"python{version}\"\n+\n+    # Linux and anything else\n+    else:\n+        flags[\"lib\"] = f\"python{version}{sys.abiflags}\"\n+\n+    return flags\n+\n+\n+def get_package_include_path(which_package):\n+    package_path = find_package(which_package)\n+    if package_path is None:\n+        return None\n+\n+    includes = f\"{package_path}/include\"\n+\n+    return includes\n+\n+\n+def get_package_qmake_lflags(which_package):\n+    package_path = find_package(which_package)\n+    if package_path is None:\n+        return None\n+\n+    link = f\"-L{package_path}\"\n+    glob_result = glob.glob(os.path.join(package_path, shared_library_glob_pattern()))\n+    for lib in filter_shared_libraries(glob_result):\n+        link += \" \"\n+        link += link_option(lib)\n+    return link\n+\n+\n+def get_shared_libraries_data(which_package):\n+    package_path = find_package(which_package)\n+    if package_path is None:\n+        return None\n+\n+    glob_result = glob.glob(os.path.join(package_path, shared_library_glob_pattern()))\n+    filtered_libs = filter_shared_libraries(glob_result)\n+    libs = []\n+    if sys.platform == \"win32\":\n+        for lib in filtered_libs:\n+            libs.append(os.path.realpath(lib))\n+    else:\n+        for lib in filtered_libs:\n+            libs.append(lib)\n+    return libs\n+\n+\n+def get_shared_libraries_qmake(which_package):\n+    libs = get_shared_libraries_data(which_package)\n+    if libs is None:\n+        return None\n+\n+    if sys.platform == \"win32\":\n+        if not libs:\n+            return \"\"\n+        dlls = \"\"\n+        for lib in libs:\n+            dll = os.path.splitext(lib)[0] + \".dll\"\n+            dlls += dll + \" \"\n+\n+        return dlls\n+    else:\n+        libs_string = \"\"\n+        for lib in libs:\n+            libs_string += lib + \" \"\n+        return libs_string\n+\n+\n+def get_shared_libraries_cmake(which_package):\n+    libs = get_shared_libraries_data(which_package)\n+    result = \";\".join(libs)\n+    return result\n+\n+\n+print_all = option == \"-a\"\n+for argument, handler, error, _ in options:\n+    if option == argument or print_all:\n+        handler_result = handler()\n+        if handler_result is None:\n+            sys.exit(error)\n+\n+        line = handler_result\n+        if print_all:\n+            line = f\"{argument:<40}: {line}\"\n+        print(line)"
+        },
+        {
+          "sha": "acd9b9a070a4187bd4832510fa801d2be2c45336",
+          "filename": "cmake/shiboken_helper.cmake",
+          "status": "modified",
+          "additions": 61,
+          "deletions": 5,
+          "changes": 66,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/0a7f68ec8cb219233c9a640ca8517af73510949d/cmake%2Fshiboken_helper.cmake",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/0a7f68ec8cb219233c9a640ca8517af73510949d/cmake%2Fshiboken_helper.cmake",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fshiboken_helper.cmake?ref=0a7f68ec8cb219233c9a640ca8517af73510949d",
+          "patch": "@@ -8,6 +8,31 @@ set(__PYTHON_QT_BINDING_SHIBOKEN_HELPER_INCLUDED TRUE)\n set(PYTHON_SUFFIX \".cpython-${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}m\")\n set(PYTHON_EXTENSION_SUFFIX \"${PYTHON_SUFFIX}-${CMAKE_CXX_LIBRARY_ARCHITECTURE}\")\n \n+find_package(python_qt_binding REQUIRED)\n+\n+macro(pyside_config option output_var)\n+    if(${ARGC} GREATER 2)\n+        set(is_list ${ARGV2})\n+    else()\n+        set(is_list \"\")\n+    endif()\n+\n+    execute_process(\n+      COMMAND ${Python3_EXECUTABLE} \"${python_qt_binding_DIR}/pyside_config.py\"\n+              ${option}\n+      OUTPUT_VARIABLE ${output_var}\n+      OUTPUT_STRIP_TRAILING_WHITESPACE)\n+\n+    if(\"${${output_var}}\" STREQUAL \"\")\n+        message(FATAL_ERROR \"Error: Calling pyside_config.py ${option} returned no output.\")\n+    endif()\n+    if(is_list)\n+        string(REPLACE \" \" \";\" ${output_var} \"${${output_var}}\")\n+    endif()\n+endmacro()\n+\n+\n+\n find_package(Shiboken2 QUIET)\n if(Shiboken2_FOUND)\n   message(STATUS \"Found Shiboken2 version ${Shiboken2_VERSION}\")\n@@ -16,10 +41,22 @@ if(Shiboken2_FOUND)\n     get_property(SHIBOKEN_LIBRARY TARGET Shiboken2::libshiboken PROPERTY LOCATION)\n     set(SHIBOKEN_BINARY Shiboken2::shiboken2)\n   endif()\n-  message(STATUS \"Using SHIBOKEN_INCLUDE_DIR: ${SHIBOKEN_INCLUDE_DIR}\")\n-  message(STATUS \"Using SHIBOKEN_LIBRARY: ${SHIBOKEN_LIBRARY}\")\n-  message(STATUS \"Using SHIBOKEN_BINARY: ${SHIBOKEN_BINARY}\")\n+else()\n+  if(WIN32)\n+    pyside_config(--shiboken-generator-path shiboken_generator_path)\n+    pyside_config(--shiboken-generator-include-path shiboken_include_dir 1)\n+    pyside_config(--shiboken-module-shared-libraries-cmake shiboken_shared_libraries 0)\n+\n+    set(SHIBOKEN_BINARY \"${shiboken_generator_path}/shiboken2${CMAKE_EXECUTABLE_SUFFIX}\")\n+    set(SHIBOKEN_LIBRARY ${shiboken_shared_libraries})\n+    set(SHIBOKEN_INCLUDE_DIR ${shiboken_include_dir})\n+  endif()\n endif()\n+\n+message(STATUS \"Using SHIBOKEN_INCLUDE_DIR: ${SHIBOKEN_INCLUDE_DIR}\")\n+message(STATUS \"Using SHIBOKEN_LIBRARY: ${SHIBOKEN_LIBRARY}\")\n+message(STATUS \"Using SHIBOKEN_BINARY: ${SHIBOKEN_BINARY}\")\n+\n set(PYTHON_BASENAME \"${PYTHON_SUFFIX}-${CMAKE_CXX_LIBRARY_ARCHITECTURE}\")\n \n find_package(PySide2 QUIET)\n@@ -31,7 +68,16 @@ if(PySide2_FOUND)\n   endif()\n   message(STATUS \"Using PYSIDE_INCLUDE_DIR: ${PYSIDE_INCLUDE_DIR}\")\n   message(STATUS \"Using PYSIDE_LIBRARY: ${PYSIDE_LIBRARY}\")\n+else()\n+  if(WIN32)\n+    pyside_config(--pyside-include-path pyside_include_dir 1)\n+    pyside_config(--pyside-shared-libraries-cmake pyside_shared_libraries 0)\n+    set(PYSIDE_INCLUDE_DIR ${pyside_include_dir})\n+    set(PYSIDE_LIBRARY ${pyside_shared_libraries})\n+  endif()\n endif()\n+message(STATUS \"Using PYSIDE_INCLUDE_DIR: ${PYSIDE_INCLUDE_DIR}\")\n+message(STATUS \"Using PYSIDE_LIBRARY: ${PYSIDE_LIBRARY}\")\n \n set(Python_ADDITIONAL_VERSIONS \"${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}\")\n find_package(PythonLibs \"${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}\")\n@@ -71,7 +117,8 @@ macro(_shiboken_generator_command VAR GLOBAL TYPESYSTEM INCLUDE_PATH BUILD_DIR)\n     --enable-pyside-extensions\n     --include-paths=${INCLUDE_PATH_WITH_COLONS}${SHIBOKEN_HELPER_INCLUDE_DIRS_WITH_COLONS}\n     --typesystem-paths=${PYSIDE_TYPESYSTEMS}\n-    --output-directory=${BUILD_DIR} ${GLOBAL} ${TYPESYSTEM})\n+    --output-directory=${BUILD_DIR} ${GLOBAL} ${TYPESYSTEM}\n+    --language-level=c++17)\n endmacro()\n \n \n@@ -107,7 +154,16 @@ function(shiboken_generator PROJECT_NAME GLOBAL TYPESYSTEM WORKING_DIR GENERATED\n     )\n endfunction()\n \n-\n+function(shiboken_generator_ext PROJECT_NAME GLOBAL TYPESYSTEM WORKING_DIR GENERATED_SRCS INCLUDE_PATH BUILD_DIR)\n+    _shiboken_generator_command(COMMAND \"${GLOBAL}\" \"${TYPESYSTEM}\" \"${INCLUDE_PATH}\" \"${BUILD_DIR}\")\n+    add_custom_command(\n+        OUTPUT ${GENERATED_SRCS}\n+        COMMAND ${COMMAND}\n+      DEPENDS ${GLOBAL} ${TYPESYSTEM}\n+      WORKING_DIRECTORY ${WORKING_DIR}\n+      COMMENT \"Running Shiboken generator for ${PROJECT_NAME} Python bindings...\"\n+    )\n+endfunction()\n #\n # Add the Shiboken/PySide specific include directories.\n #"
+        }
+      ]
+    },
+    {
+      "author": "srmainwaring",
+      "date": "2023-03-01T15:04:41Z",
+      "sha": "cacbd7b31645218a6a786318d6d380fd02fa2832",
+      "message": "Remove pyqt from default binding order for macOS (#118)\n\n- Suppress debug messages\r\n- Remove pyqt from default binding order\r\n\r\nSigned-off-by: Rhys Mainwaring <rhys.mainwaring@me.com>",
+      "files_changed": 1,
+      "additions": 6,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "0cb904ff49a5e6f0e8f40198dd93802afe8f215e",
+          "filename": "src/python_qt_binding/binding_helper.py",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 1,
+          "changes": 7,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/cacbd7b31645218a6a786318d6d380fd02fa2832/src%2Fpython_qt_binding%2Fbinding_helper.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/cacbd7b31645218a6a786318d6d380fd02fa2832/src%2Fpython_qt_binding%2Fbinding_helper.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/src%2Fpython_qt_binding%2Fbinding_helper.py?ref=cacbd7b31645218a6a786318d6d380fd02fa2832",
+          "patch": "@@ -36,6 +36,7 @@\n     # since the 'future' package provides a 'builtins' module in Python 2\n     # this must not be checked second\n     import builtins\n+import platform\n import os\n import sys\n import traceback\n@@ -50,7 +51,11 @@ def _select_qt_binding(binding_name=None, binding_order=None):\n     global QT_BINDING, QT_BINDING_VERSION\n \n     # order of default bindings can be changed here\n-    DEFAULT_BINDING_ORDER = ['pyqt', 'pyside']\n+    if platform.system() == 'Darwin':\n+        DEFAULT_BINDING_ORDER = ['pyside']\n+    else:\n+        DEFAULT_BINDING_ORDER = ['pyqt', 'pyside']\n+\n     binding_order = binding_order or DEFAULT_BINDING_ORDER\n \n     # determine binding preference"
+        }
+      ]
+    },
+    {
+      "author": "audrow",
+      "date": "2022-11-28T19:46:12Z",
+      "sha": "db96c09268474bc0142cca94f59ed4e68cb86a5e",
+      "message": "[rolling] Update maintainers - 2022-11-07 (#120)\n\n* Add Shane Loretz to CODEOWNERs file\r\n\r\n* Update maintainers to Shane Loretz\r\n\r\nSigned-off-by: Audrow Nash <audrow@openrobotics.org>",
+      "files_changed": 2,
+      "additions": 6,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "2a976b9c42a4588ae70bf6ef21c15e5152effd54",
+          "filename": "CODEOWNERS",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/db96c09268474bc0142cca94f59ed4e68cb86a5e/CODEOWNERS",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/db96c09268474bc0142cca94f59ed4e68cb86a5e/CODEOWNERS",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/CODEOWNERS?ref=db96c09268474bc0142cca94f59ed4e68cb86a5e",
+          "patch": "@@ -0,0 +1,2 @@\n+# This file was generated by https://github.com/audrow/update-ros2-repos\n+* @sloretz"
+        },
+        {
+          "sha": "5cb03b52b6156de4a22ec36c66a5d3486e6139f2",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 1,
+          "changes": 5,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/db96c09268474bc0142cca94f59ed4e68cb86a5e/package.xml",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/db96c09268474bc0142cca94f59ed4e68cb86a5e/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/package.xml?ref=db96c09268474bc0142cca94f59ed4e68cb86a5e",
+          "patch": "@@ -14,13 +14,16 @@\n     independent of which binding provider was actually used which makes\n     it very easy to switch between these.\n   </description>\n+\n   <maintainer email=\"sloretz@openrobotics.org\">Shane Loretz</maintainer>\n+\n   <license>BSD</license>\n \n   <url>http://ros.org/wiki/python_qt_binding</url>\n+\n   <author>Dave Hershberger</author>\n-  <author>Dorian Scholz</author>\n   <author>Dirk Thomas</author>\n+  <author>Dorian Scholz</author>\n   <author>Stephen Brawner</author>\n \n   <buildtool_depend>ament_cmake</buildtool_depend>"
+        }
+      ]
+    },
+    {
+      "author": "paudrow",
+      "date": "2022-05-11T00:17:55Z",
+      "sha": "12607245533bd917441bb98120cca80d5f00a067",
+      "message": "1.2.0\n\nSigned-off-by: Audrow Nash <audrow@hey.com>",
+      "files_changed": 2,
+      "additions": 4,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "5367465b52911306f0dd3fc620c621776487da4f",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/12607245533bd917441bb98120cca80d5f00a067/CHANGELOG.rst",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/12607245533bd917441bb98120cca80d5f00a067/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/CHANGELOG.rst?ref=12607245533bd917441bb98120cca80d5f00a067",
+          "patch": "@@ -2,6 +2,9 @@\n Changelog for package python_qt_binding\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+1.2.0 (2022-05-10)\n+------------------\n+\n 1.1.1 (2021-12-06)\n ------------------\n * Replace PythonInterp to Python3 COMPONENTS (`#108 <https://github.com/ros-visualization/python_qt_binding/issues/108>`_)"
+        },
+        {
+          "sha": "55a4a67a6f851830bb0e109301fd0b1eba22550b",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/12607245533bd917441bb98120cca80d5f00a067/package.xml",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/12607245533bd917441bb98120cca80d5f00a067/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/package.xml?ref=12607245533bd917441bb98120cca80d5f00a067",
+          "patch": "@@ -1,6 +1,6 @@\n <package format=\"2\">\n   <name>python_qt_binding</name>\n-  <version>1.1.1</version>\n+  <version>1.2.0</version>\n   <description>\n     This stack provides Python bindings for Qt.\n     There are two providers: pyside and pyqt.  PySide2 is available under"
+        }
+      ]
+    },
+    {
+      "author": "homalozoa",
+      "date": "2021-11-29T15:25:11Z",
+      "sha": "dbf553b69f47d5c9a4c50783c61ddb21a43ea2e1",
+      "message": "[Fix] Replace PythonInterp to Python3 COMPONENTS (#108)\n\n1. Replace PythonInterp & PythonLibs to COMPONENTS\r\n2. Replace PYTHON_INCLUDE_DIRS to Python3_INCLUDE_DIRS\r\n3. Replace PYTHON_EXECUTABLE to Python3_EXECUTABLE\r\n\r\nSigned-off-by: Homalozoa <nx.tardis@gmail.com>",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 6,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "c589899fca39c5f5b563d3a69de62fef4f792ebd",
+          "filename": "cmake/sip_helper.cmake",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 6,
+          "changes": 10,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/dbf553b69f47d5c9a4c50783c61ddb21a43ea2e1/cmake%2Fsip_helper.cmake",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/dbf553b69f47d5c9a4c50783c61ddb21a43ea2e1/cmake%2Fsip_helper.cmake",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fsip_helper.cmake?ref=dbf553b69f47d5c9a4c50783c61ddb21a43ea2e1",
+          "patch": "@@ -5,12 +5,10 @@ set(__PYTHON_QT_BINDING_SIP_HELPER_INCLUDED TRUE)\n \n set(__PYTHON_QT_BINDING_SIP_HELPER_DIR ${CMAKE_CURRENT_LIST_DIR})\n \n-set(Python_ADDITIONAL_VERSIONS \"${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}\")\n-find_package(PythonInterp \"${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}\" REQUIRED)\n-find_package(PythonLibs \"${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}\" REQUIRED)\n+find_package(Python3 ${Python3_VERSION} REQUIRED COMPONENTS Interpreter Development)\n \n execute_process(\n-  COMMAND ${PYTHON_EXECUTABLE} -c \"import sipconfig; print(sipconfig.Configuration().sip_bin)\"\n+  COMMAND ${Python3_EXECUTABLE} -c \"import sipconfig; print(sipconfig.Configuration().sip_bin)\"\n   OUTPUT_VARIABLE PYTHON_SIP_EXECUTABLE\n   ERROR_QUIET)\n \n@@ -74,14 +72,14 @@ function(build_sip_binding PROJECT_NAME SIP_FILE)\n \n     set(SIP_BUILD_DIR ${sip_BINARY_DIR}/sip/${PROJECT_NAME})\n \n-    set(INCLUDE_DIRS ${${PROJECT_NAME}_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})\n+    set(INCLUDE_DIRS ${${PROJECT_NAME}_INCLUDE_DIRS} ${Python3_INCLUDE_DIRS})\n     set(LIBRARIES ${${PROJECT_NAME}_LIBRARIES})\n     set(LIBRARY_DIRS ${${PROJECT_NAME}_LIBRARY_DIRS})\n     set(LDFLAGS_OTHER ${${PROJECT_NAME}_LDFLAGS_OTHER})\n \n     add_custom_command(\n         OUTPUT ${SIP_BUILD_DIR}/Makefile\n-        COMMAND ${PYTHON_EXECUTABLE} ${sip_SIP_CONFIGURE} ${SIP_BUILD_DIR} ${SIP_FILE} ${sip_LIBRARY_DIR}\n+        COMMAND ${Python3_EXECUTABLE} ${sip_SIP_CONFIGURE} ${SIP_BUILD_DIR} ${SIP_FILE} ${sip_LIBRARY_DIR}\n           \\\"${INCLUDE_DIRS}\\\" \\\"${LIBRARIES}\\\" \\\"${LIBRARY_DIRS}\\\" \\\"${LDFLAGS_OTHER}\\\"\n         DEPENDS ${sip_SIP_CONFIGURE} ${SIP_FILE} ${sip_DEPENDS}\n         WORKING_DIRECTORY ${sip_SOURCE_DIR}"
+        }
+      ]
+    },
+    {
+      "author": "lopsided98",
+      "date": "2021-11-19T15:32:26Z",
+      "sha": "6b5d12e7c39ef74f2b0a0cd9b2e405e3c568068b",
+      "message": "Use PyQt5 module path to find SIP bindings (ROS 2) (#106)\n\n* Use PyQt5 module path to find SIP bindings (#105)\r\n\r\n`sipconfig._pkg_config['default_mod_dir']` is currently used to find the PyQt5 SIP bindings, but this location is determined by where SIP is installed, which may not be the same as where PyQt5 is installed. A real world example of this is in Nix, where each package is installed to a separate isolated directory. Instead, we can use `PyQt5.__path__[0]`, which will always point to the location of the PyQt5 module.\r\n\r\nCo-authored-by: Akash Patel <17132214+acxz@users.noreply.github.com>",
+      "files_changed": 1,
+      "additions": 7,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "708b04c4b100c9150bfa08c5c1792f9db16aa9e5",
+          "filename": "cmake/sip_configure.py",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/6b5d12e7c39ef74f2b0a0cd9b2e405e3c568068b/cmake%2Fsip_configure.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/6b5d12e7c39ef74f2b0a0cd9b2e405e3c568068b/cmake%2Fsip_configure.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fsip_configure.py?ref=6b5d12e7c39ef74f2b0a0cd9b2e405e3c568068b",
+          "patch": "@@ -5,6 +5,7 @@\n import subprocess\n import sys\n \n+import PyQt5\n from PyQt5 import QtCore\n import sipconfig\n \n@@ -61,6 +62,12 @@ def get_sip_dir_flags(config):\n         # sipconfig.Configuration does not have a pyqt_sip_dir or pyqt_sip_flags AttributeError\n         sip_flags = QtCore.PYQT_CONFIGURATION['sip_flags']\n \n+        # Archlinux installs sip files here by default\n+        default_sip_dir = os.path.join(PyQt5.__path__[0], 'bindings')\n+        if os.path.exists(default_sip_dir):\n+            return default_sip_dir, sip_flags\n+\n+        # sip4 installs here by default\n         default_sip_dir = os.path.join(sipconfig._pkg_config['default_sip_dir'], 'PyQt5')\n         if os.path.exists(default_sip_dir):\n             return default_sip_dir, sip_flags"
+        }
+      ]
+    },
+    {
+      "author": "sloretz",
+      "date": "2020-10-29T16:54:57Z",
+      "sha": "3fc729cd55cb531368e11522826643ac89adacf1",
+      "message": "Update maintainers (#96) (#98)\n\nPrevious: @dirk-thomas\r\nNew: @claireyywang, @sloretz\r\n\r\nSigned-off-by: Shane Loretz <sloretz@openrobotics.org>",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "ff16e16b79492b22ade883d80670f336b068f024",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/3fc729cd55cb531368e11522826643ac89adacf1/package.xml",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/3fc729cd55cb531368e11522826643ac89adacf1/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/package.xml?ref=3fc729cd55cb531368e11522826643ac89adacf1",
+          "patch": "@@ -14,7 +14,8 @@\n     independent of which binding provider was actually used which makes\n     it very easy to switch between these.\n   </description>\n-  <maintainer email=\"dthomas@osrfoundation.org\">Dirk Thomas</maintainer>\n+  <maintainer email=\"clairewang@openrobotics.org\">Claire Wang</maintainer>\n+  <maintainer email=\"sloretz@openrobotics.org\">Shane Loretz</maintainer>\n   <license>BSD</license>\n \n   <url>http://ros.org/wiki/python_qt_binding</url>"
+        }
+      ]
+    },
+    {
+      "author": "jacobperron",
+      "date": "2020-05-06T00:51:33Z",
+      "sha": "b1c2d040588ff9824a85a04301bf80e319ec1bb5",
+      "message": "1.0.4",
+      "files_changed": 2,
+      "additions": 10,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "168585fcddbc2ef1741ee6b5af63db29f9af7cba",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 0,
+          "changes": 9,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/b1c2d040588ff9824a85a04301bf80e319ec1bb5/CHANGELOG.rst",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/b1c2d040588ff9824a85a04301bf80e319ec1bb5/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/CHANGELOG.rst?ref=b1c2d040588ff9824a85a04301bf80e319ec1bb5",
+          "patch": "@@ -2,6 +2,15 @@\n Changelog for package python_qt_binding\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+1.0.4 (2020-05-05)\n+------------------\n+* remove obsolete function used for backward compatibility (`#88 <https://github.com/ros-visualization/python_qt_binding/issues/88>`_)\n+* disable Shiboken with CMake < 3.14 (`#87 <https://github.com/ros-visualization/python_qt_binding/issues/87>`_)\n+* fix case of CMake function (`#86 <https://github.com/ros-visualization/python_qt_binding/issues/86>`_)\n+* restore QUIET which was reverted in `#79 <https://github.com/ros-visualization/python_qt_binding/issues/79>`_\n+* use PySide2 and Shiboken2 targets for variables (`#79 <https://github.com/ros-visualization/python_qt_binding/issues/79>`_)\n+* Contributors: Dirk Thomas, Hermann von Kleist\n+\n 1.0.3 (2019-11-12)\n ------------------\n * check if Shiboken2Config.cmake defines a target instead of a variable (`#77 <https://github.com/ros-visualization/python_qt_binding/issues/77>`_)"
+        },
+        {
+          "sha": "00937bf6515434ac86fb7dabd50b65a665b151e6",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/b1c2d040588ff9824a85a04301bf80e319ec1bb5/package.xml",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/b1c2d040588ff9824a85a04301bf80e319ec1bb5/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/package.xml?ref=b1c2d040588ff9824a85a04301bf80e319ec1bb5",
+          "patch": "@@ -1,6 +1,6 @@\n <package format=\"2\">\n   <name>python_qt_binding</name>\n-  <version>1.0.3</version>\n+  <version>1.0.4</version>\n   <description>\n     This stack provides Python bindings for Qt.\n     There are two providers: pyside and pyqt.  PySide2 is available under"
+        }
+      ]
+    },
+    {
+      "author": "dirk-thomas",
+      "date": "2012-01-21T01:25:07Z",
+      "sha": "c81c8b0e24b51fca6d0fd146a2d891fbe70c28a1",
+      "message": "added additional helper for building bindings",
+      "files_changed": 4,
+      "additions": 152,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "2accbd35673b013e3c7502a83f03f0f71f0f2763",
+          "filename": "cmake/shiboken_helper.cmake",
+          "status": "added",
+          "additions": 60,
+          "deletions": 0,
+          "changes": 60,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/c81c8b0e24b51fca6d0fd146a2d891fbe70c28a1/cmake%2Fshiboken_helper.cmake",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/c81c8b0e24b51fca6d0fd146a2d891fbe70c28a1/cmake%2Fshiboken_helper.cmake",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fshiboken_helper.cmake?ref=c81c8b0e24b51fca6d0fd146a2d891fbe70c28a1",
+          "patch": "@@ -0,0 +1,60 @@\n+find_package(GeneratorRunner REQUIRED)\n+find_package(Shiboken REQUIRED)\n+find_package(PySide REQUIRED)\n+find_package(PythonLibs REQUIRED)\n+\n+\n+function(shiboken_generator PROJECT_NAME GLOBAL TYPESYSTEM WORKING_DIR GENERATED_SRCS HDRS INCLUDE_PATH BUILD_DIR)\n+    # See ticket https://code.ros.org/trac/ros-pkg/ticket/5219\n+    set(QT_INCLUDE_DIR_WITH_COLONS \"\")\n+    foreach(dir ${QT_INCLUDE_DIR})\n+        set(QT_INCLUDE_DIR_WITH_COLONS \"${QT_INCLUDE_DIR_WITH_COLONS}:${dir}\")\n+    endforeach()\n+\n+    add_custom_command(\n+        OUTPUT ${GENERATED_SRCS}\n+        COMMAND ${GENERATORRUNNER_BINARY}\n+            --generatorSet=shiboken\n+            --include-paths=${INCLUDE_PATH}:${QT_INCLUDE_DIR_WITH_COLONS}\n+            --typesystem-paths=${PYSIDE_TYPESYSTEMS}\n+            --output-directory=${BUILD_DIR}\n+        ${GLOBAL}\n+        ${TYPESYSTEM}\n+      DEPENDS ${GLOBAL} ${TYPESYSTEM} ${HDRS}\n+      WORKING_DIRECTORY ${WORKING_DIR}\n+      COMMENT \"Running Shiboken generator for ${PROJECT_NAME} Python bindings...\"\n+    )\n+endfunction()\n+\n+\n+function(shiboken_include_directories PROJECT_NAME QT_COMPONENTS)\n+    set(shiboken_INCLUDE_DIRECTORIES\n+        ${PYTHON_INCLUDE_DIR}\n+        ${SHIBOKEN_INCLUDE_DIR}\n+        ${PYSIDE_INCLUDE_DIR}\n+        ${PYSIDE_INCLUDE_DIR}/QtCore\n+        ${PYSIDE_INCLUDE_DIR}/QtGui\n+    )\n+\n+    foreach(component ${QT_COMPONENTS})\n+        set(shiboken_INCLUDE_DIRECTORIES ${shiboken_INCLUDE_DIRECTORIES} ${PYSIDE_INCLUDE_DIR}/${component})\n+    endforeach()\n+\n+    include_directories(${PROJECT_NAME} ${shiboken_INCLUDE_DIRECTORIES})\n+endfunction()\n+\n+\n+function(shiboken_target_link_libraries PROJECT_NAME QT_COMPONENTS)\n+    set(shiboken_LINK_LIBRARIES\n+        ${SHIBOKEN_PYTHON_LIBRARIES}\n+        ${SHIBOKEN_LIBRARY}\n+        ${PYSIDE_LIBRARY}\n+    )\n+ \n+    foreach(component ${QT_COMPONENTS})\n+        string(TOUPPER ${component} component)\n+        set(shiboken_LINK_LIBRARIES ${shiboken_LINK_LIBRARIES} ${QT_${component}_LIBRARY})\n+    endforeach()\n+\n+    target_link_libraries(${PROJECT_NAME} ${shiboken_LINK_LIBRARIES})\n+endfunction()"
+        },
+        {
+          "sha": "1aef64f4b1ba9335cbaf0079730bc5083f884b32",
+          "filename": "cmake/sip_configure.py",
+          "status": "added",
+          "additions": 64,
+          "deletions": 0,
+          "changes": 64,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/c81c8b0e24b51fca6d0fd146a2d891fbe70c28a1/cmake%2Fsip_configure.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/c81c8b0e24b51fca6d0fd146a2d891fbe70c28a1/cmake%2Fsip_configure.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fsip_configure.py?ref=c81c8b0e24b51fca6d0fd146a2d891fbe70c28a1",
+          "patch": "@@ -0,0 +1,64 @@\n+import os\n+import sys\n+import roslib\n+import sipconfig\n+from PyQt4 import pyqtconfig\n+\n+if len(sys.argv) != 8:\n+  print 'usage: %s build-dir sip-file output_dir include_dirs libs lib_dirs ldflags' % (sys.argv[0])\n+  exit(1)\n+\n+# The SIP build folder, the SIP file, the output directory, the include directories, the libraries, the library directories and the linker flags.\n+build_dir, sip_file, output_dir, include_dirs, libs, lib_dirs, ldflags = sys.argv[1:]\n+\n+# The name of the SIP build file generated by SIP and used by the build system.\n+build_file = 'pyqtscripting.sbf'\n+\n+# Get the PyQt configuration information.\n+config = pyqtconfig.Configuration()\n+\n+# Get the extra SIP flags needed by the imported qt module.  Note that\n+# this normally only includes those flags (-x and -t) that relate to SIP's\n+# versioning system.\n+qt_sip_flags = config.pyqt_sip_flags\n+\n+try:\n+  os.makedirs(build_dir)\n+except OSError:\n+  pass\n+\n+# Run SIP to generate the code.  Note that we tell SIP where to find the qt\n+# module's specification files using the -I flag.\n+os.system(' '.join([\n+  config.sip_bin,\n+  '-c', build_dir,\n+  '-b', os.path.join(build_dir, build_file),\n+  '-I', config.pyqt_sip_dir,\n+  '-w',\n+  qt_sip_flags,\n+  sip_file\n+]))\n+\n+# Create the Makefile.  The QtModuleMakefile class provided by the\n+# pyqtconfig module takes care of all the extra preprocessor, compiler and\n+# linker flags needed by the Qt library.\n+makefile = pyqtconfig.QtGuiModuleMakefile(\n+  dir=build_dir,\n+  configuration=config,\n+  build_file=build_file\n+)\n+\n+for include_dir in include_dirs.split(' '):\n+    makefile.extra_include_dirs.append(include_dir)\n+for lib in libs.split(' '):\n+    makefile.extra_libs.append(lib)\n+for lib_dir in lib_dirs.split(' '):\n+    makefile.extra_lib_dirs.append(lib_dir)\n+for ldflag in ldflags.split('\\\\ '):\n+    makefile.LFLAGS.append(ldflag)\n+\n+# redirect location of generated library\n+makefile._target = os.path.join(output_dir, makefile._target)\n+\n+# Generate the Makefile itself\n+makefile.generate()"
+        },
+        {
+          "sha": "066f1abaf570bbec4b4e86e6a266707542e72ae3",
+          "filename": "cmake/sip_helper.cmake",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/c81c8b0e24b51fca6d0fd146a2d891fbe70c28a1/cmake%2Fsip_helper.cmake",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/c81c8b0e24b51fca6d0fd146a2d891fbe70c28a1/cmake%2Fsip_helper.cmake",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fsip_helper.cmake?ref=c81c8b0e24b51fca6d0fd146a2d891fbe70c28a1",
+          "patch": "@@ -0,0 +1,23 @@\n+function(build_sip_binding PROJECT_NAME SIP_CONFIGURE SIP_FILE DEPENDED_SIPS HDRS SOURCE_DIR LIBRARY_DIR BINARY_DIR)\n+    set(SIP_BUILD_DIR ${BINARY_DIR}/sip/${PROJECT_NAME})\n+\n+    set(INCLUDE_DIRS ${${PROJECT_NAME}_INCLUDE_DIRS})\n+    set(LIBRARIES ${${PROJECT_NAME}_LIBRARIES})\n+    set(LIBRARY_DIRS ${${PROJECT_NAME}_LIBRARY_DIRS})\n+    set(LDFLAGS_OTHER ${${PROJECT_NAME}_LDFLAGS_OTHER})\n+\n+    add_custom_command(\n+        OUTPUT ${SIP_BUILD_DIR}/Makefile\n+        COMMAND python ${SIP_CONFIGURE} ${SIP_BUILD_DIR} ${SIP_FILE} ${LIBRARY_DIR} \\\"${INCLUDE_DIRS}\\\" \\\"${LIBRARIES}\\\" \\\"${LIBRARY_DIRS}\\\" \\\"${LDFLAGS_OTHER}\\\"\n+        DEPENDS ${SIP_CONFIGURE} ${DEPENDED_SIPS} ${HDRS}\n+        WORKING_DIRECTORY ${SOURCE_DIR}\n+        COMMENT \"Running SIP generator for ${PROJECT_NAME} Python bindings...\"\n+    )\n+\n+    add_custom_target(lib${PROJECT_NAME}.so ALL\n+        COMMAND make\n+        DEPENDS ${SIP_BUILD_DIR}/Makefile\n+        WORKING_DIRECTORY ${SIP_BUILD_DIR}\n+        COMMENT \"Compiling generated code for ${PROJECT_NAME} Python bindings...\"\n+    )\n+endfunction()"
+        },
+        {
+          "sha": "9af9df1684b83c7fc3152d78adf3945180f2d954",
+          "filename": "manifest.xml",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/c81c8b0e24b51fca6d0fd146a2d891fbe70c28a1/manifest.xml",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/c81c8b0e24b51fca6d0fd146a2d891fbe70c28a1/manifest.xml",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/manifest.xml?ref=c81c8b0e24b51fca6d0fd146a2d891fbe70c28a1",
+          "patch": "@@ -22,4 +22,9 @@ independent of which binding provider was actually used.\n \n   <rosdep name=\"qt4-qmake\"/>\n   <rosdep name=\"python-qt-bindings\"/>\n+\n+  <export>\n+    <cpp cflags=\"-I${prefix}/include\"/> <!-- hack until catkin and CFG_EXTRA enables to pass package information -->\n+  </export>\n+\n </package>"
+        }
+      ]
+    },
+    {
+      "author": "rhaschke",
+      "date": "2020-05-26T22:21:01Z",
+      "sha": "7b140ec3fe785240598f9e7451fac2b007a281e3",
+      "message": "Use magic $(MAKE) variable to suppress build warning (#91)\n\nAccording to the gnu make documentation, a subprocess make should use\r\nthe $(MAKE) variable or +make to tell the parent make process that\r\nthe child is actually a make process as well.\r\n\r\nThis is required to suppress the warning\r\n`warning: jobserver unavailable: using -j1. Add `+' to parent make rule.`",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "8646b7163e330f91cf824e835caeec28c98cb891",
+          "filename": "cmake/sip_helper.cmake",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/7b140ec3fe785240598f9e7451fac2b007a281e3/cmake%2Fsip_helper.cmake",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/7b140ec3fe785240598f9e7451fac2b007a281e3/cmake%2Fsip_helper.cmake",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fsip_helper.cmake?ref=7b140ec3fe785240598f9e7451fac2b007a281e3",
+          "patch": "@@ -94,7 +94,7 @@ function(build_sip_binding PROJECT_NAME SIP_FILE)\n     if(WIN32)\n       set(MAKE_EXECUTABLE NMake.exe)\n     else()\n-      set(MAKE_EXECUTABLE make)\n+      set(MAKE_EXECUTABLE \"\\$(MAKE)\")\n     endif()\n \n     add_custom_command("
+        }
+      ]
+    },
+    {
+      "author": "anton-matosov",
+      "date": "2020-05-26T22:17:39Z",
+      "sha": "5ae703a9f858d332a41b3fcc96062e226978beb5",
+      "message": "Fix linking with non framework builds of qt (e.g. from conda-forge) (#84)\n\n* Fix linking with non framework builds of qt (e.g. from conda-forge)\r\n\r\n* add blank line to fix flake8\r\n\r\n* use single quotes\r\n\r\nCo-authored-by: Dirk Thomas <dirk-thomas@users.noreply.github.com>",
+      "files_changed": 1,
+      "additions": 15,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "98c1b644cdf8e8de731f9eef996b5f769f5945b6",
+          "filename": "cmake/sip_configure.py",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 2,
+          "changes": 17,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/5ae703a9f858d332a41b3fcc96062e226978beb5/cmake%2Fsip_configure.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/5ae703a9f858d332a41b3fcc96062e226978beb5/cmake%2Fsip_configure.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fsip_configure.py?ref=5ae703a9f858d332a41b3fcc96062e226978beb5",
+          "patch": "@@ -8,6 +8,8 @@\n from PyQt5 import QtCore\n import sipconfig\n \n+libqt5_rename = False\n+\n \n class Configuration(sipconfig.Configuration):\n \n@@ -29,13 +31,18 @@ def __init__(self):\n             'qt_winconfig': 'shared exceptions',\n         }\n         if sys.platform == 'darwin':\n-            pyqtconfig['qt_framework'] = 1\n+            if os.path.exists(os.path.join(qtconfig['QT_INSTALL_LIBS'], 'QtCore.framework')):\n+                pyqtconfig['qt_framework'] = 1\n+            else:\n+                global libqt5_rename\n+                libqt5_rename = True\n+\n         sipconfig.Configuration.__init__(self, [pyqtconfig])\n \n         macros = sipconfig._default_macros.copy()\n         macros['INCDIR_QT'] = qtconfig['QT_INSTALL_HEADERS']\n         macros['LIBDIR_QT'] = qtconfig['QT_INSTALL_LIBS']\n-        macros['MOC'] = 'moc-qt5'\n+        macros['MOC'] = 'moc-qt5' if find_executable('moc-qt5') else 'moc'\n         self.set_build_macros(macros)\n \n \n@@ -129,6 +136,12 @@ def custom_platform_lib_function(self, clib, framework=0):\n     # Only add '-l' if a library doesn't already start with '-l' and is not an absolute path\n     if os.path.isabs(clib) or clib.startswith('-l'):\n         return clib\n+\n+    global libqt5_rename\n+    # sip renames libs to Qt5 automatically on Linux, but not on macOS\n+    if libqt5_rename and not framework and clib.startswith('Qt') and not clib.startswith('Qt5'):\n+        return '-lQt5' + clib[2:]\n+\n     return default_platform_lib_function(self, clib, framework)\n \n "
+        }
+      ]
+    },
+    {
+      "author": "stertingen",
+      "date": "2020-02-28T23:38:17Z",
+      "sha": "ff3ef8c76b1051af82aef5a9fc96837d5117f3bf",
+      "message": "Use PySide2 and Shiboken2 targets for variables (#79)\n\n* Inserted blank lines to improve readability\n\n* Set PYSIDE_LIBRARY and PYSIDE_INCLUDE_DIR for Pyside >= 5.12\n\n* Set SHIBOKEN_LIBRARY and SHIBOKEN_INCLUDE_DIR for newer shiboken version\n\n* Moved location where SHIBOKEN_BINARY is set, added message output\n\n* shiboken_helper.cmake: Print PYSIDE_INCLUDE_DIR and SHIBOKEN_INCLUDE_DIR\n\n* shiboken_helper.cmake: Refactor find_package for Shiboken and PySide\n\n* shiboken_helper.cmake: Include current directory, enable pyside ext.\n\n* shiboken_helper.cmake: Fixed compilation on Kinetic/Xenial\n\n* remove unnecessary whitespace changes\n\n* reorder some lines\n\n* condition can check the variable name\n\n* remove conditionally for very old shiboken versions\n\n* add CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES to shiboken invocation\n\nCo-authored-by: Dirk Thomas <dirk-thomas@users.noreply.github.com>",
+      "files_changed": 1,
+      "additions": 26,
+      "deletions": 16,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "ece4d40dbc5cbbb1493fef41d4ea64172820d186",
+          "filename": "cmake/shiboken_helper.cmake",
+          "status": "modified",
+          "additions": 26,
+          "deletions": 16,
+          "changes": 42,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/ff3ef8c76b1051af82aef5a9fc96837d5117f3bf/cmake%2Fshiboken_helper.cmake",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/ff3ef8c76b1051af82aef5a9fc96837d5117f3bf/cmake%2Fshiboken_helper.cmake",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fshiboken_helper.cmake?ref=ff3ef8c76b1051af82aef5a9fc96837d5117f3bf",
+          "patch": "@@ -15,23 +15,33 @@ else()\n   message(FATAL_ERROR \"Unknown Python version: ${PYTHON_VERSION_STRING}\")\n endif()\n set(PYTHON_EXTENSION_SUFFIX \"${PYTHON_SUFFIX}-${CMAKE_CXX_LIBRARY_ARCHITECTURE}\")\n-find_package(Shiboken2 QUIET)\n-if(SHIBOKEN_LIBRARY)\n+find_package(Shiboken2)\n+if(Shiboken2_FOUND)\n+  message(STATUS \"Found Shiboken2 version ${Shiboken2_VERSION}\")\n+  if(NOT ${Shiboken2_VERSION} VERSION_LESS \"5.13\")\n+    get_property(SHIBOKEN_INCLUDE_DIR TARGET Shiboken2::libshiboken PROPERTY INTERFACE_INCLUDE_DIRECTORIES)\n+    get_property(SHIBOKEN_LIBRARY TARGET Shiboken2::libshiboken PROPERTY LOCATION)\n+    SET(SHIBOKEN_BINARY Shiboken2::shiboken2)\n+  endif()\n+  message(STATUS \"Using SHIBOKEN_INCLUDE_DIR: ${SHIBOKEN_INCLUDE_DIR}\")\n   message(STATUS \"Using SHIBOKEN_LIBRARY: ${SHIBOKEN_LIBRARY}\")\n-else()\n-  message(STATUS \"Shiboken2 not found\")\n+  message(STATUS \"Using SHIBOKEN_BINARY: ${SHIBOKEN_BINARY}\")\n endif()\n set(PYTHON_BASENAME \"${PYTHON_SUFFIX}-${CMAKE_CXX_LIBRARY_ARCHITECTURE}\")\n-find_package(PySide2 QUIET)\n-if(PYSIDE_LIBRARY)\n+find_package(PySide2)\n+if(PySide2_FOUND)\n+  message(STATUS \"Found PySide2 version ${PySide2_VERSION}\")\n+  if(NOT ${PySide2_VERSION} VERSION_LESS \"5.13\")\n+    get_property(PYSIDE_INCLUDE_DIR TARGET PySide2::pyside2 PROPERTY INTERFACE_INCLUDE_DIRECTORIES)\n+    get_property(PYSIDE_LIBRARY TARGET PySide2::pyside2 PROPERTY LOCATION)\n+  endif()\n+  message(STATUS \"Using PYSIDE_INCLUDE_DIR: ${PYSIDE_INCLUDE_DIR}\")\n   message(STATUS \"Using PYSIDE_LIBRARY: ${PYSIDE_LIBRARY}\")\n-else()\n-  message(STATUS \"PySide2 not found\")\n endif()\n set(Python_ADDITIONAL_VERSIONS \"${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}\")\n find_package(PythonLibs \"${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}\")\n \n-if(PySide2_FOUND AND PYTHONLIBS_FOUND)\n+if(Shiboken2_FOUND AND PySide2_FOUND AND PYTHONLIBS_FOUND)\n   message(STATUS \"Shiboken binding generator available.\")\n   set(shiboken_helper_FOUND TRUE)\n else()\n@@ -41,15 +51,15 @@ endif()\n \n \n macro(_shiboken_generator_command VAR GLOBAL TYPESYSTEM INCLUDE_PATH BUILD_DIR)\n+  # Add includes from current directory, Qt, PySide and compiler specific dirs\n+  get_directory_property(SHIBOKEN_HELPER_INCLUDE_DIRS INCLUDE_DIRECTORIES)\n+  list(APPEND SHIBOKEN_HELPER_INCLUDE_DIRS ${QT_INCLUDE_DIR} ${PYSIDE_INCLUDE_DIR} ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES})\n   # See ticket https://code.ros.org/trac/ros-pkg/ticket/5219\n-  set(QT_INCLUDE_DIR_WITH_COLONS \"\")\n-  foreach(dir ${QT_INCLUDE_DIR})\n-    set(QT_INCLUDE_DIR_WITH_COLONS \"${QT_INCLUDE_DIR_WITH_COLONS}:${dir}\")\n+  set(SHIBOKEN_HELPER_INCLUDE_DIRS_WITH_COLONS \"\")\n+  foreach(dir ${SHIBOKEN_HELPER_INCLUDE_DIRS})\n+    set(SHIBOKEN_HELPER_INCLUDE_DIRS_WITH_COLONS \"${SHIBOKEN_HELPER_INCLUDE_DIRS_WITH_COLONS}:${dir}\")\n   endforeach()\n-  if(NOT DEFINED SHIBOKEN_BINARY AND TARGET Shiboken2::shiboken2)\n-    set(SHIBOKEN_BINARY Shiboken2::shiboken2)\n-  endif()\n-  set(${VAR} ${SHIBOKEN_BINARY} --generatorSet=shiboken --include-paths=${INCLUDE_PATH}${QT_INCLUDE_DIR_WITH_COLONS} --typesystem-paths=${PYSIDE_TYPESYSTEMS} --output-directory=${BUILD_DIR} ${GLOBAL} ${TYPESYSTEM})\n+  set(${VAR} ${SHIBOKEN_BINARY} --generatorSet=shiboken --enable-pyside-extensions --include-paths=${INCLUDE_PATH}${SHIBOKEN_HELPER_INCLUDE_DIRS_WITH_COLONS} --typesystem-paths=${PYSIDE_TYPESYSTEMS} --output-directory=${BUILD_DIR} ${GLOBAL} ${TYPESYSTEM})\n endmacro()\n \n "
+        }
+      ]
+    },
+    {
+      "author": "no-preserve-root",
+      "date": "2019-10-24T15:58:01Z",
+      "sha": "fa9114875dad2ab2fee6af34d8ab431cdf86c084",
+      "message": "check if Shiboken2Config.cmake defines a target instead of a variable, fixes #69 (#77)",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "a21b714dbe7dbfc26d63f4c4ec1274ea5ccc677b",
+          "filename": "cmake/shiboken_helper.cmake",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/fa9114875dad2ab2fee6af34d8ab431cdf86c084/cmake%2Fshiboken_helper.cmake",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/fa9114875dad2ab2fee6af34d8ab431cdf86c084/cmake%2Fshiboken_helper.cmake",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fshiboken_helper.cmake?ref=fa9114875dad2ab2fee6af34d8ab431cdf86c084",
+          "patch": "@@ -46,6 +46,9 @@ macro(_shiboken_generator_command VAR GLOBAL TYPESYSTEM INCLUDE_PATH BUILD_DIR)\n     foreach(dir ${QT_INCLUDE_DIR})\n         set(QT_INCLUDE_DIR_WITH_COLONS \"${QT_INCLUDE_DIR_WITH_COLONS}:${dir}\")\n     endforeach()\n+    if (NOT DEFINED SHIBOKEN_BINARY AND TARGET Shiboken2::shiboken2)\n+        SET(SHIBOKEN_BINARY Shiboken2::shiboken2)\n+    endif()\n     set(${VAR} ${SHIBOKEN_BINARY} --generatorSet=shiboken --include-paths=${INCLUDE_PATH}${QT_INCLUDE_DIR_WITH_COLONS} --typesystem-paths=${PYSIDE_TYPESYSTEMS} --output-directory=${BUILD_DIR} ${GLOBAL} ${TYPESYSTEM})\n endmacro()\n "
+        }
+      ]
+    },
+    {
+      "author": "hgaiser",
+      "date": "2019-01-02T21:56:59Z",
+      "sha": "3bfc459daa7a8c774decd8cacca1d2ebbbf2fa0f",
+      "message": "Don't add -l prefix if it already exists. (#59)",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "791a58d605eb4e54116f2ca583f6f14cb5229d62",
+          "filename": "cmake/sip_configure.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/3bfc459daa7a8c774decd8cacca1d2ebbbf2fa0f/cmake%2Fsip_configure.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/3bfc459daa7a8c774decd8cacca1d2ebbbf2fa0f/cmake%2Fsip_configure.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fsip_configure.py?ref=3bfc459daa7a8c774decd8cacca1d2ebbbf2fa0f",
+          "patch": "@@ -126,7 +126,8 @@ def get_sip_dir_flags(config):\n def custom_platform_lib_function(self, clib, framework=0):\n     if not clib or clib.isspace():\n         return None\n-    if os.path.isabs(clib):\n+    # Only add '-l' if a library doesn't already start with '-l' and is not an absolute path\n+    if os.path.isabs(clib) or clib.startswith('-l'):\n         return clib\n     return default_platform_lib_function(self, clib, framework)\n "
+        }
+      ]
+    },
+    {
+      "author": "Daniel Wang",
+      "date": "2019-07-23T22:43:36Z",
+      "sha": "c2d826b52277504951bdfe7f2ff32cefc9b661ad",
+      "message": "fixing trivial accidental string concatenation (#66)\n\nSigned-off-by: Daniel Wang <daniel.wang@canonical.com>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "603e1e2ec423409c59bc34911ff6bc3a42b6cd0f",
+          "filename": "src/python_qt_binding/binding_helper.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/c2d826b52277504951bdfe7f2ff32cefc9b661ad/src%2Fpython_qt_binding%2Fbinding_helper.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/c2d826b52277504951bdfe7f2ff32cefc9b661ad/src%2Fpython_qt_binding%2Fbinding_helper.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/src%2Fpython_qt_binding%2Fbinding_helper.py?ref=c2d826b52277504951bdfe7f2ff32cefc9b661ad",
+          "patch": "@@ -82,7 +82,7 @@ def _select_qt_binding(binding_name=None, binding_order=None):\n         'QtQuick',\n         'QtQuickWidgets',\n         'QtScript',\n-        'QtScriptTools'\n+        'QtScriptTools',\n         'QtSensors',\n         'QtSerialPort',\n         'QtSql',"
+        }
+      ]
+    },
+    {
+      "author": "brawner",
+      "date": "2018-10-26T00:07:24Z",
+      "sha": "a527d32d65b0128b52a1d9b4425bc1a109c3b183",
+      "message": "Ros2 port (#52)\n\n* Modifying files for ros2\r\n\r\n* Moving .cmake.em to .cmake\r\n\r\n* Removing QtBindingHelper\r\n\r\n* autopep8\r\n\r\n* Adding tests\r\n\r\n* autopep8 (#51)\r\n\r\n* autopep8\r\n\r\n* wrap\r\n\r\n* autopep8 fixup\r\n\r\n* Adding tests\r\n\r\n* Reverting copyright\r\n\r\n* Updating package.xml\r\n\r\n* Cleaning up\r\n\r\n* Updating package.xml\r\n\r\n* Cmakelists\r\n\r\n* package.xml\r\n\r\n* tests working again\r\n\r\n* package.xml\r\n\r\n* package.xml\r\n\r\n* package.xml\r\n\r\n* package.xml\r\n\r\n* package.xml\r\n\r\n* package.xml\r\n\r\n* package.xml\r\n\r\n* package.xml\r\n\r\n* cmakelists\r\n\r\n* Updating cmake files to work with qt_gui_cpp\r\n\r\n* Building and installing\r\n\r\n* Reverting to original imports\r\n\r\n* Pass flake8\r\n\r\n* Removing install\r\n\r\n* Moving python files back to src\r\n\r\n* Addressing pull request\r\n\r\n* Addressing pull request comments\r\n\r\n* Cleaning up\r\n\r\n* one import per line\r\n\r\n* Addressing pull request comments\r\n\r\n* comment case only",
+      "files_changed": 14,
+      "additions": 158,
+      "deletions": 71,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "656344158ada5b54477d53cf00938381f6be50b2",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 19,
+          "deletions": 5,
+          "changes": 24,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/a527d32d65b0128b52a1d9b4425bc1a109c3b183/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/a527d32d65b0128b52a1d9b4425bc1a109c3b183/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/CMakeLists.txt?ref=a527d32d65b0128b52a1d9b4425bc1a109c3b183",
+          "patch": "@@ -1,13 +1,27 @@\n-cmake_minimum_required(VERSION 2.8.3)\n+cmake_minimum_required(VERSION 3.5)\n project(python_qt_binding)\n \n-find_package(catkin REQUIRED)\n-catkin_package(CFG_EXTRAS python_qt_binding-extras.cmake)\n+find_package(ament_cmake REQUIRED)\n+find_package(ament_cmake_python REQUIRED)\n \n-catkin_python_setup()\n+ament_python_install_package(${PROJECT_NAME}\n+  PACKAGE_DIR src/${PROJECT_NAME})\n \n install(FILES\n   cmake/shiboken_helper.cmake\n   cmake/sip_configure.py\n   cmake/sip_helper.cmake\n-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/cmake)\n+  DESTINATION share/${PROJECT_NAME}/cmake)\n+\n+if(BUILD_TESTING)\n+  find_package(ament_cmake_pytest REQUIRED)\n+  find_package(ament_lint_auto REQUIRED)\n+  ament_lint_auto_find_test_dependencies()\n+\n+  ament_add_pytest_test(python_qt_binding test\n+    APPEND_ENV PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}\n+    TIMEOUT 90\n+)\n+endif()\n+\n+ament_package()"
+        },
+        {
+          "sha": "5fb68cc16f9fda0191bd21ab33b89b0c64309271",
+          "filename": "CONTRIBUTING.md",
+          "status": "added",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/a527d32d65b0128b52a1d9b4425bc1a109c3b183/CONTRIBUTING.md",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/a527d32d65b0128b52a1d9b4425bc1a109c3b183/CONTRIBUTING.md",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/CONTRIBUTING.md?ref=a527d32d65b0128b52a1d9b4425bc1a109c3b183",
+          "patch": "@@ -0,0 +1,3 @@\n+Any contribution that you make to this repository will\n+be under the BSD license.\n+[license](https://opensource.org/licenses/BSD-3-Clause):"
+        },
+        {
+          "sha": "713c7bafea4d0ea6eb602d377ba4e536cf5df2b5",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 24,
+          "deletions": 0,
+          "changes": 24,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/a527d32d65b0128b52a1d9b4425bc1a109c3b183/LICENSE",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/a527d32d65b0128b52a1d9b4425bc1a109c3b183/LICENSE",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/LICENSE?ref=a527d32d65b0128b52a1d9b4425bc1a109c3b183",
+          "patch": "@@ -0,0 +1,24 @@\n+Copyright (c) 2011, Dirk Thomas, Dorian Scholz, TU Darmstadt\n+All rights reserved.\n+\n+Redistribution and use in source and binary forms, with or without\n+modification, are permitted provided that the following conditions are met:\n+    * Redistributions of source code must retain the above copyright\n+      notice, this list of conditions and the following disclaimer.\n+    * Redistributions in binary form must reproduce the above copyright\n+      notice, this list of conditions and the following disclaimer in the\n+      documentation and/or other materials provided with the distribution.\n+    * Neither the name of the <organization> nor the\n+      names of its contributors may be used to endorse or promote products\n+      derived from this software without specific prior written permission.\n+\n+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND\n+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED\n+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\n+DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY\n+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES\n+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND\n+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT\n+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS\n+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+        },
+        {
+          "sha": "a11da30efac7ed3aed744b189ab1a830aaee5e26",
+          "filename": "cmake/python_qt_binding-extras.cmake.em",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 7,
+          "changes": 7,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/49031b313269ff7f2bc5dd6e2bbc1438a68e1c5d/cmake%2Fpython_qt_binding-extras.cmake.em",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/49031b313269ff7f2bc5dd6e2bbc1438a68e1c5d/cmake%2Fpython_qt_binding-extras.cmake.em",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fpython_qt_binding-extras.cmake.em?ref=49031b313269ff7f2bc5dd6e2bbc1438a68e1c5d",
+          "patch": "@@ -1,7 +0,0 @@\n-@[if DEVELSPACE]@\n-# location of cmake files in develspace\n-set(python_qt_binding_EXTRAS_DIR \"@(CMAKE_CURRENT_SOURCE_DIR)/cmake\")\n-@[else]@\n-# location of cmake files in installspace\n-set(python_qt_binding_EXTRAS_DIR \"${python_qt_binding_DIR}\")\n-@[end if]@"
+        },
+        {
+          "sha": "1d8d8e634b2d7d2dbfac2f99d50d5af828d62031",
+          "filename": "cmake/sip_configure.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/a527d32d65b0128b52a1d9b4425bc1a109c3b183/cmake%2Fsip_configure.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/a527d32d65b0128b52a1d9b4425bc1a109c3b183/cmake%2Fsip_configure.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fsip_configure.py?ref=a527d32d65b0128b52a1d9b4425bc1a109c3b183",
+          "patch": "@@ -5,8 +5,8 @@\n import subprocess\n import sys\n \n-import sipconfig\n from PyQt5 import QtCore\n+import sipconfig\n \n \n class Configuration(sipconfig.Configuration):\n@@ -73,6 +73,7 @@ def __init__(self):\n \n # Run SIP to generate the code.  Note that we tell SIP where to find the qt\n # module's specification files using the -I flag.\n+\n cmd = [\n     config.sip_bin,\n     '-c', build_dir,"
+        },
+        {
+          "sha": "d73cf293a8b450ed9ca83b4e637855e59d96b5d7",
+          "filename": "cmake/sip_helper.cmake",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 8,
+          "changes": 15,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/a527d32d65b0128b52a1d9b4425bc1a109c3b183/cmake%2Fsip_helper.cmake",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/a527d32d65b0128b52a1d9b4425bc1a109c3b183/cmake%2Fsip_helper.cmake",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fsip_helper.cmake?ref=a527d32d65b0128b52a1d9b4425bc1a109c3b183",
+          "patch": "@@ -7,7 +7,6 @@ set(__PYTHON_QT_BINDING_SIP_HELPER_DIR ${CMAKE_CURRENT_LIST_DIR})\n \n set(Python_ADDITIONAL_VERSIONS \"${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}\")\n find_package(PythonInterp \"${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}\" REQUIRED)\n-assert(PYTHON_EXECUTABLE)\n find_package(PythonLibs \"${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}\" REQUIRED)\n \n find_program(SIP_EXECUTABLE sip)\n@@ -99,11 +98,11 @@ if(${CMAKE_VERSION} VERSION_LESS 2.8.3)\n     # first set all result variables to empty/FALSE\n     foreach(arg_name ${_singleArgNames} ${_multiArgNames})\n       set(${prefix}_${arg_name})\n-    endforeach(arg_name)\n+    endforeach()\n \n     foreach(option ${_optionNames})\n       set(${prefix}_${option} FALSE)\n-    endforeach(option)\n+    endforeach()\n \n     set(${prefix}_UNPARSED_ARGUMENTS)\n \n@@ -124,9 +123,9 @@ if(${CMAKE_VERSION} VERSION_LESS 2.8.3)\n           elseif(\"${insideValues}\" STREQUAL \"MULTI\")\n             list(APPEND ${prefix}_${currentArgName} ${currentArg})\n           endif()\n-        else(insideValues)\n+        else()\n           list(APPEND ${prefix}_UNPARSED_ARGUMENTS ${currentArg})\n-        endif(insideValues)\n+        endif()\n       else()\n         if(NOT ${optionIndex} EQUAL -1)\n           set(${prefix}_${currentArg} TRUE)\n@@ -142,15 +141,15 @@ if(${CMAKE_VERSION} VERSION_LESS 2.8.3)\n         endif()\n       endif()\n \n-    endforeach(currentArg)\n+    endforeach()\n \n     # propagate the result variables to the caller:\n     foreach(arg_name ${_singleArgNames} ${_multiArgNames} ${_optionNames})\n       set(${prefix}_${arg_name}  ${${prefix}_${arg_name}} PARENT_SCOPE)\n-    endforeach(arg_name)\n+    endforeach()\n     set(${prefix}_UNPARSED_ARGUMENTS ${${prefix}_UNPARSED_ARGUMENTS} PARENT_SCOPE)\n \n-  endfunction(CMAKE_PARSE_ARGUMENTS _options _singleArgs _multiArgs)\n+  endfunction()\n endif()\n \n #"
+        },
+        {
+          "sha": "09fcdc5a7d6e952fe933a9e27444ee46c3f9a276",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 14,
+          "deletions": 8,
+          "changes": 22,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/a527d32d65b0128b52a1d9b4425bc1a109c3b183/package.xml",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/a527d32d65b0128b52a1d9b4425bc1a109c3b183/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/package.xml?ref=a527d32d65b0128b52a1d9b4425bc1a109c3b183",
+          "patch": "@@ -1,10 +1,10 @@\n-<package>\n+<package format=\"2\">\n   <name>python_qt_binding</name>\n   <version>0.3.4</version>\n   <description>\n     This stack provides Python bindings for Qt.\n-    There are two providers: pyside and pyqt.  PySide is released under\n-    the LGPL.  PyQt is released under the GPL.\n+    There are two providers: pyside and pyqt.  PySide2 is available under\n+    the GPL, LGPL and a commercial license.  PyQt is released under the GPL.\n \n     Both the bindings and tools to build bindings are included from each\n     available provider.  For PySide, it is called \"Shiboken\".  For PyQt,\n@@ -21,16 +21,22 @@\n   <author>Dave Hershberger</author>\n   <author>Dorian Scholz</author>\n   <author>Dirk Thomas</author>\n+  <author>Stephen Brawner</author>\n \n-  <buildtool_depend>catkin</buildtool_depend>\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n \n-  <build_depend>rosbuild</build_depend>\n   <build_depend>qtbase5-dev</build_depend>\n-  <build_depend>python-qt5-bindings</build_depend>\n+  <build_depend>python3-qt5-bindings</build_depend>\n \n-  <run_depend>python-qt5-bindings</run_depend>\n+  <exec_depend>python3-qt5-bindings</exec_depend>\n \n+  <test_depend>ament_cmake_pytest</test_depend>\n+  <test_depend>ament_lint_auto</test_depend>\n+  <test_depend>ament_flake8</test_depend>\n+  <test_depend>ament_pep257</test_depend>\n+  <test_depend>python3-pytest</test_depend>\n+  \n   <export>\n-    <rosbuild cmake_directory=\"${prefix}/cmake\"/>\n+    <build_type>ament_cmake</build_type>\n   </export>\n </package>"
+        },
+        {
+          "sha": "4145d81932a076b9f7af4d174ceafa26c102dae2",
+          "filename": "src/python_qt_binding/QtBindingHelper.py",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 39,
+          "changes": 39,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/49031b313269ff7f2bc5dd6e2bbc1438a68e1c5d/src%2Fpython_qt_binding%2FQtBindingHelper.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/49031b313269ff7f2bc5dd6e2bbc1438a68e1c5d/src%2Fpython_qt_binding%2FQtBindingHelper.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/src%2Fpython_qt_binding%2FQtBindingHelper.py?ref=49031b313269ff7f2bc5dd6e2bbc1438a68e1c5d",
+          "patch": "@@ -1,39 +0,0 @@\n-#!/usr/bin/env python\n-\n-# Copyright (c) 2011, Dirk Thomas, Dorian Scholz, TU Darmstadt\n-# All rights reserved.\n-#\n-# Redistribution and use in source and binary forms, with or without\n-# modification, are permitted provided that the following conditions\n-# are met:\n-#\n-#   * Redistributions of source code must retain the above copyright\n-#     notice, this list of conditions and the following disclaimer.\n-#   * Redistributions in binary form must reproduce the above\n-#     copyright notice, this list of conditions and the following\n-#     disclaimer in the documentation and/or other materials provided\n-#     with the distribution.\n-#   * Neither the name of the TU Darmstadt nor the names of its\n-#     contributors may be used to endorse or promote products derived\n-#     from this software without specific prior written permission.\n-#\n-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n-# \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS\n-# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\n-# COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,\n-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,\n-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\n-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN\n-# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n-# POSSIBILITY OF SUCH DAMAGE.\n-\n-from __future__ import print_function\n-\n-print(\n-    'Deprecation warning: the \"python_qt_binding.QtBindingHelper\" module is deprecated and will be removed in the near future.')\n-print('Replace your usage of QtBindingHelper with import statements like:')\n-print('  from python_qt_binding.QtCore import QObject')\n-print('  from python_qt_binding import QtGui, loadUi')"
+        },
+        {
+          "sha": "1e209deea7b56468853f8cff057834909817018f",
+          "filename": "src/python_qt_binding/__init__.py",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 2,
+          "changes": 8,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/a527d32d65b0128b52a1d9b4425bc1a109c3b183/src%2Fpython_qt_binding%2F__init__.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/a527d32d65b0128b52a1d9b4425bc1a109c3b183/src%2Fpython_qt_binding%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/src%2Fpython_qt_binding%2F__init__.py?ref=a527d32d65b0128b52a1d9b4425bc1a109c3b183",
+          "patch": "@@ -52,9 +52,13 @@\n \"\"\"\n \n import sys\n-from .binding_helper import loadUi, QT_BINDING, QT_BINDING_MODULES, QT_BINDING_VERSION  # @UnusedImport\n \n-# register all binding modules as sub modules of this package (python_qt_binding) for easy importing\n+from python_qt_binding.binding_helper import loadUi  # noqa: F401\n+from python_qt_binding.binding_helper import QT_BINDING  # noqa: F401\n+from python_qt_binding.binding_helper import QT_BINDING_MODULES\n+from python_qt_binding.binding_helper import QT_BINDING_VERSION  # noqa: F401\n+\n+# register binding modules as sub modules of this package (python_qt_binding) for easy importing\n for module_name, module in QT_BINDING_MODULES.items():\n     sys.modules[__name__ + '.' + module_name] = module\n     setattr(sys.modules[__name__], module_name, module)"
+        },
+        {
+          "sha": "53b65f885761267d61d229fb25c82755ba1b90c3",
+          "filename": "src/python_qt_binding/binding_helper.py",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 1,
+          "changes": 5,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/a527d32d65b0128b52a1d9b4425bc1a109c3b183/src%2Fpython_qt_binding%2Fbinding_helper.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/a527d32d65b0128b52a1d9b4425bc1a109c3b183/src%2Fpython_qt_binding%2Fbinding_helper.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/src%2Fpython_qt_binding%2Fbinding_helper.py?ref=a527d32d65b0128b52a1d9b4425bc1a109c3b183",
+          "patch": "@@ -236,7 +236,8 @@ def createWidget(self, class_name, parent=None, name=''):\n \n         loader = CustomUiLoader(baseinstance, custom_widgets)\n \n-        # instead of passing the custom widgets, they should be registered using QUiLoader.registerCustomWidget(),\n+        # instead of passing the custom widgets, they should be registered using\n+        # QUiLoader.registerCustomWidget(),\n         # but this does not work in PySide 1.0.6: it simply segfaults...\n         # loader = CustomUiLoader(baseinstance)\n         # custom_widgets = custom_widgets or {}\n@@ -253,6 +254,8 @@ def createWidget(self, class_name, parent=None, name=''):\n \n def loadUi(uifile, baseinstance=None, custom_widgets=None):\n     \"\"\"\n+    Load a provided UI file chosen Python Qt 5 binding.\n+\n     @type uifile: str\n     @param uifile: Absolute path of .ui file\n     @type baseinstance: QWidget"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "test/__init__.py",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/a527d32d65b0128b52a1d9b4425bc1a109c3b183/test%2F__init__.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/a527d32d65b0128b52a1d9b4425bc1a109c3b183/test%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/test%2F__init__.py?ref=a527d32d65b0128b52a1d9b4425bc1a109c3b183"
+        },
+        {
+          "sha": "eff829969534949bd9d5512146a7b0029b4cec84",
+          "filename": "test/test_flake8.py",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/a527d32d65b0128b52a1d9b4425bc1a109c3b183/test%2Ftest_flake8.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/a527d32d65b0128b52a1d9b4425bc1a109c3b183/test%2Ftest_flake8.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/test%2Ftest_flake8.py?ref=a527d32d65b0128b52a1d9b4425bc1a109c3b183",
+          "patch": "@@ -0,0 +1,23 @@\n+# Copyright 2017 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_flake8.main import main\n+import pytest\n+\n+\n+@pytest.mark.flake8\n+@pytest.mark.linter\n+def test_flake8():\n+    rc = main(argv=[])\n+    assert rc == 0, 'Found errors'"
+        },
+        {
+          "sha": "92ba3cab1ec1e14da1938f2bcc8559c6c3a56b82",
+          "filename": "test/test_imports.py",
+          "status": "added",
+          "additions": 33,
+          "deletions": 0,
+          "changes": 33,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/a527d32d65b0128b52a1d9b4425bc1a109c3b183/test%2Ftest_imports.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/a527d32d65b0128b52a1d9b4425bc1a109c3b183/test%2Ftest_imports.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/test%2Ftest_imports.py?ref=a527d32d65b0128b52a1d9b4425bc1a109c3b183",
+          "patch": "@@ -0,0 +1,33 @@\n+# Copyright 2018, PickNik Consulting\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+\n+def test_import_qtcore():\n+    from python_qt_binding import QtCore\n+    assert QtCore is not None\n+\n+\n+def test_import_qtgui():\n+    from python_qt_binding import QtGui\n+    assert QtGui is not None\n+\n+\n+def test_import_qtwidgets():\n+    from python_qt_binding import QtWidgets\n+    assert QtWidgets is not None\n+\n+\n+def test_import_qtobject():\n+    from python_qt_binding.QtCore import QObject\n+    assert QObject is not None"
+        },
+        {
+          "sha": "b234a3840f4c5bd38f043638c8622b8f240e1185",
+          "filename": "test/test_pep257.py",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/a527d32d65b0128b52a1d9b4425bc1a109c3b183/test%2Ftest_pep257.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/a527d32d65b0128b52a1d9b4425bc1a109c3b183/test%2Ftest_pep257.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/test%2Ftest_pep257.py?ref=a527d32d65b0128b52a1d9b4425bc1a109c3b183",
+          "patch": "@@ -0,0 +1,23 @@\n+# Copyright 2015 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_pep257.main import main\n+import pytest\n+\n+\n+@pytest.mark.linter\n+@pytest.mark.pep257\n+def test_pep257():\n+    rc = main(argv=['.', 'test'])\n+    assert rc == 0, 'Found code style errors / warnings'"
+        }
+      ]
+    },
+    {
+      "author": "mlautman",
+      "date": "2018-10-19T23:34:10Z",
+      "sha": "49031b313269ff7f2bc5dd6e2bbc1438a68e1c5d",
+      "message": "autopep8 (#51)\n\n* autopep8\n\n* wrap\n\n* autopep8 fixup",
+      "files_changed": 3,
+      "additions": 26,
+      "deletions": 11,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "ed7aa7c48361c0f726c71f997f23fe7b464017d1",
+          "filename": "cmake/sip_configure.py",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 3,
+          "changes": 15,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/49031b313269ff7f2bc5dd6e2bbc1438a68e1c5d/cmake%2Fsip_configure.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/49031b313269ff7f2bc5dd6e2bbc1438a68e1c5d/cmake%2Fsip_configure.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fsip_configure.py?ref=49031b313269ff7f2bc5dd6e2bbc1438a68e1c5d",
+          "patch": "@@ -10,6 +10,7 @@\n \n \n class Configuration(sipconfig.Configuration):\n+\n     def __init__(self):\n         env = copy(os.environ)\n         env['QT_SELECT'] = '5'\n@@ -37,11 +38,15 @@ def __init__(self):\n         macros['MOC'] = 'moc-qt5'\n         self.set_build_macros(macros)\n \n+\n if len(sys.argv) != 8:\n-    print('usage: %s build-dir sip-file output_dir include_dirs libs lib_dirs ldflags' % sys.argv[0])\n+    print('usage: %s build-dir sip-file output_dir include_dirs libs lib_dirs ldflags' %\n+          sys.argv[0])\n     sys.exit(1)\n \n-# The SIP build folder, the SIP file, the output directory, the include directories, the libraries, the library directories and the linker flags.\n+# The SIP build folder, the SIP file, the output directory, the include\n+# directories, the libraries, the library directories and the linker\n+# flags.\n build_dir, sip_file, output_dir, include_dirs, libs, lib_dirs, ldflags = sys.argv[1:]\n \n # The name of the SIP build file generated by SIP and used by the build system.\n@@ -89,14 +94,17 @@ def __init__(self):\n     qt=['QtCore', 'QtGui']\n )\n \n-# hack to override makefile behavior which always prepend -l to libraries which is wrong for absolute paths\n+# hack to override makefile behavior which always prepend -l to libraries\n+# which is wrong for absolute paths\n default_platform_lib_function = sipconfig.SIPModuleMakefile.platform_lib\n \n \n def custom_platform_lib_function(self, clib, framework=0):\n     if os.path.isabs(clib):\n         return clib\n     return default_platform_lib_function(self, clib, framework)\n+\n+\n sipconfig.SIPModuleMakefile.platform_lib = custom_platform_lib_function\n \n \n@@ -106,6 +114,7 @@ def split_paths(paths):\n     paths = re.split('(?<=[^\\\\\\\\]) ', paths)\n     return paths\n \n+\n for include_dir in split_paths(include_dirs):\n     include_dir = include_dir.replace('\\\\', '')\n     makefile.extra_include_dirs.append(include_dir)"
+        },
+        {
+          "sha": "4145d81932a076b9f7af4d174ceafa26c102dae2",
+          "filename": "src/python_qt_binding/QtBindingHelper.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/49031b313269ff7f2bc5dd6e2bbc1438a68e1c5d/src%2Fpython_qt_binding%2FQtBindingHelper.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/49031b313269ff7f2bc5dd6e2bbc1438a68e1c5d/src%2Fpython_qt_binding%2FQtBindingHelper.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/src%2Fpython_qt_binding%2FQtBindingHelper.py?ref=49031b313269ff7f2bc5dd6e2bbc1438a68e1c5d",
+          "patch": "@@ -32,7 +32,8 @@\n \n from __future__ import print_function\n \n-print('Deprecation warning: the \"python_qt_binding.QtBindingHelper\" module is deprecated and will be removed in the near future.')\n+print(\n+    'Deprecation warning: the \"python_qt_binding.QtBindingHelper\" module is deprecated and will be removed in the near future.')\n print('Replace your usage of QtBindingHelper with import statements like:')\n print('  from python_qt_binding.QtCore import QObject')\n print('  from python_qt_binding import QtGui, loadUi')"
+        },
+        {
+          "sha": "e84cf2fc5b8e9a3247a27c1b6ab82101356674a8",
+          "filename": "src/python_qt_binding/binding_helper.py",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 7,
+          "changes": 19,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/49031b313269ff7f2bc5dd6e2bbc1438a68e1c5d/src%2Fpython_qt_binding%2Fbinding_helper.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/49031b313269ff7f2bc5dd6e2bbc1438a68e1c5d/src%2Fpython_qt_binding%2Fbinding_helper.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/src%2Fpython_qt_binding%2Fbinding_helper.py?ref=49031b313269ff7f2bc5dd6e2bbc1438a68e1c5d",
+          "patch": "@@ -92,7 +92,7 @@ def _select_qt_binding(binding_name=None, binding_order=None):\n         'QtWebEngine',  # Qt 5.6 and higher\n         'QtWebEngineCore',\n         'QtWebEngineWidgets',\n-        'QtWebKitWidgets', # Qt 5.0 - 5.5\n+        'QtWebKitWidgets',  # Qt 5.0 - 5.5\n         'QtWebSockets',\n         'QtX11Extras',\n         'QtXml',\n@@ -111,10 +111,13 @@ def _select_qt_binding(binding_name=None, binding_order=None):\n             else:\n                 error_msgs.append(\"  Binding loader '_load_%s' not found.\" % binding_name)\n         except ImportError as e:\n-            error_msgs.append(\"  ImportError for '%s': %s\\n%s\" % (binding_name, e, traceback.format_exc()))\n+            error_msgs.append(\"  ImportError for '%s': %s\\n%s\" %\n+                              (binding_name, e, traceback.format_exc()))\n \n     if not QT_BINDING:\n-        raise ImportError(\"Could not find Qt binding (looked for: %s):\\n%s\" % (', '.join([\"'%s'\" % b for b in binding_order]), '\\n'.join(error_msgs)))\n+        raise ImportError(\n+            \"Could not find Qt binding (looked for: %s):\\n%s\" %\n+            (', '.join([\"'%s'\" % b for b in binding_order]), '\\n'.join(error_msgs)))\n \n \n def _register_binding_module(module_name, module):\n@@ -222,7 +225,9 @@ def createWidget(self, class_name, parent=None, name=''):\n                     widget = QUiLoader.createWidget(self, class_name, parent, name)\n \n                 if str(type(widget)).find(self.class_aliases.get(class_name, class_name)) < 0:\n-                    sys.modules['QtCore'].qDebug(str('PySide.loadUi(): could not find widget class \"%s\", defaulting to \"%s\"' % (class_name, type(widget))))\n+                    sys.modules['QtCore'].qDebug(\n+                        'PySide.loadUi(): could not find widget class \"%s\", defaulting to \"%s\"' %\n+                        (class_name, type(widget)))\n \n                 if self._base_instance:\n                     setattr(self._base_instance, name, widget)\n@@ -233,9 +238,9 @@ def createWidget(self, class_name, parent=None, name=''):\n \n         # instead of passing the custom widgets, they should be registered using QUiLoader.registerCustomWidget(),\n         # but this does not work in PySide 1.0.6: it simply segfaults...\n-        #loader = CustomUiLoader(baseinstance)\n-        #custom_widgets = custom_widgets or {}\n-        #for custom_widget in custom_widgets.values():\n+        # loader = CustomUiLoader(baseinstance)\n+        # custom_widgets = custom_widgets or {}\n+        # for custom_widget in custom_widgets.values():\n         #    loader.registerCustomWidget(custom_widget)\n \n         ui = loader.load(uifile)"
+        }
+      ]
+    },
+    {
+      "author": "jspricke",
+      "date": "2016-01-10T10:06:25Z",
+      "sha": "88b0da08f1f474d82654545e49d7b8d174abb6e4",
+      "message": "Remove LGPL and GPL from licenses, all code is BSD",
+      "files_changed": 1,
+      "additions": 0,
+      "deletions": 2,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "156b4fa3bbfd7b0948f28bc8939d0ada700c113a",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 2,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/88b0da08f1f474d82654545e49d7b8d174abb6e4/package.xml",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/88b0da08f1f474d82654545e49d7b8d174abb6e4/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/package.xml?ref=88b0da08f1f474d82654545e49d7b8d174abb6e4",
+          "patch": "@@ -16,8 +16,6 @@\n   </description>\n   <maintainer email=\"dthomas@osrfoundation.org\">Dirk Thomas</maintainer>\n   <license>BSD</license>\n-  <license>LGPL</license>\n-  <license>GPL</license>\n \n   <url>http://ros.org/wiki/python_qt_binding</url>\n   <author>Dave Hershberger</author>"
+        }
+      ]
+    },
+    {
+      "author": "machinekoder",
+      "date": "2018-03-30T21:30:55Z",
+      "sha": "04cb54a3782bf7188a87963e20920d80d6fbc50a",
+      "message": "add support for Qt5 modules (#45)\n\n* add support for Qt5 modules\r\n\r\n* remove Qt4.x only modules",
+      "files_changed": 1,
+      "additions": 21,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "388bd8899d27e6be58381ddd0c09836af5df1fb5",
+          "filename": "src/python_qt_binding/binding_helper.py",
+          "status": "modified",
+          "additions": 21,
+          "deletions": 2,
+          "changes": 23,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/04cb54a3782bf7188a87963e20920d80d6fbc50a/src%2Fpython_qt_binding%2Fbinding_helper.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/04cb54a3782bf7188a87963e20920d80d6fbc50a/src%2Fpython_qt_binding%2Fbinding_helper.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/src%2Fpython_qt_binding%2Fbinding_helper.py?ref=04cb54a3782bf7188a87963e20920d80d6fbc50a",
+          "patch": "@@ -65,17 +65,36 @@ def _select_qt_binding(binding_name=None, binding_order=None):\n         'QtWidgets',\n     ]\n     optional_modules = [\n-        'QtDeclarative',\n+        'QtBluetooth',\n+        'QtDBus',\n+        'QtDesigner',\n+        'QtHelp',\n+        'QtLocation',\n         'QtMultimedia',\n+        'QtMultimediaWidgets',\n         'QtNetwork',\n+        'QNetworkAuth',\n+        'QtNfc',\n         'QtOpenGL',\n-        'QtOpenVG',\n+        'QtPositioning',\n+        'QtPrintSupport',\n+        'QtQml',\n+        'QtQuick',\n+        'QtQuickWidgets',\n         'QtScript',\n         'QtScriptTools'\n+        'QtSensors',\n+        'QtSerialPort',\n         'QtSql',\n         'QtSvg',\n+        'QtTest',\n+        'QtWebChannel',\n         'QtWebEngine',  # Qt 5.6 and higher\n+        'QtWebEngineCore',\n+        'QtWebEngineWidgets',\n         'QtWebKitWidgets', # Qt 5.0 - 5.5\n+        'QtWebSockets',\n+        'QtX11Extras',\n         'QtXml',\n         'QtXmlPatterns',\n     ]"
+        }
+      ]
+    },
+    {
+      "author": "riebl",
+      "date": "2017-10-20T20:15:49Z",
+      "sha": "633993813ea58469cb3f40d5ee4940c6213f6092",
+      "message": "prefer qmake-qt5 over qmake",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "5686b00c8af89a59dc767283d4562942c35a8169",
+          "filename": "cmake/sip_configure.py",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/633993813ea58469cb3f40d5ee4940c6213f6092/cmake%2Fsip_configure.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/633993813ea58469cb3f40d5ee4940c6213f6092/cmake%2Fsip_configure.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fsip_configure.py?ref=633993813ea58469cb3f40d5ee4940c6213f6092",
+          "patch": "@@ -1,4 +1,5 @@\n from copy import copy\n+from distutils.spawn import find_executable\n import os\n import re\n import subprocess\n@@ -12,8 +13,9 @@ class Configuration(sipconfig.Configuration):\n     def __init__(self):\n         env = copy(os.environ)\n         env['QT_SELECT'] = '5'\n+        qmake_exe = 'qmake-qt5' if find_executable('qmake-qt5') else 'qmake'\n         qtconfig = subprocess.check_output(\n-            ['qmake', '-query'], env=env, universal_newlines=True)\n+            [qmake_exe, '-query'], env=env, universal_newlines=True)\n         qtconfig = dict(line.split(':', 1) for line in qtconfig.splitlines())\n         pyqtconfig = {\n             'qt_archdata_dir': qtconfig['QT_INSTALL_DATA'],"
+        }
+      ]
+    },
+    {
+      "author": "Ruben Smits",
+      "date": "2016-12-27T11:58:02Z",
+      "sha": "f5b61afc590d4005acac02edebe6114572cf2469",
+      "message": "Fixes failing framework detection on OSX\n\nApparently the framework detection on OSX does not work properly if installed in a non standard location like /usr/local/Cellar/... As Homebrew by default installs Qt5 modules as frameworks this probably does not harm.",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "866a0c52973fef9736ae948c2b8a7db90cab9b69",
+          "filename": "cmake/sip_configure.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/f5b61afc590d4005acac02edebe6114572cf2469/cmake%2Fsip_configure.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/f5b61afc590d4005acac02edebe6114572cf2469/cmake%2Fsip_configure.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fsip_configure.py?ref=f5b61afc590d4005acac02edebe6114572cf2469",
+          "patch": "@@ -25,6 +25,8 @@ def __init__(self):\n             'qt_version': QtCore.QT_VERSION,\n             'qt_winconfig': 'shared',\n         }\n+        if sys.platform == 'darwin':\n+            pyqtconfig['qt_framework'] = 1\n         sipconfig.Configuration.__init__(self, [pyqtconfig])\n \n         macros = sipconfig._default_macros.copy()"
+        }
+      ]
+    },
+    {
+      "author": "Nodd",
+      "date": "2014-09-19T09:04:03Z",
+      "sha": "aaf9be1ca78a02c82258015e07a362170c5a31c0",
+      "message": "__builtin__ became builtins in python3",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "19725d829796ee63048865efdcffc23c81089f41",
+          "filename": "src/python_qt_binding/binding_helper.py",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 2,
+          "changes": 7,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/aaf9be1ca78a02c82258015e07a362170c5a31c0/src%2Fpython_qt_binding%2Fbinding_helper.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/aaf9be1ca78a02c82258015e07a362170c5a31c0/src%2Fpython_qt_binding%2Fbinding_helper.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/src%2Fpython_qt_binding%2Fbinding_helper.py?ref=aaf9be1ca78a02c82258015e07a362170c5a31c0",
+          "patch": "@@ -30,7 +30,10 @@\n # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n # POSSIBILITY OF SUCH DAMAGE.\n \n-import __builtin__\n+try:\n+    import builtins\n+except ImportError:\n+    import __builtin__ as builtins\n import os\n import sys\n \n@@ -100,7 +103,7 @@ def _register_binding_module(module_name, module):\n def _named_import(name):\n     parts = name.split('.')\n     assert(len(parts) >= 2)\n-    module = __builtin__.__import__(name)\n+    module = builtins.__import__(name)\n     for m in parts[1:]:\n         module = module.__dict__[m]\n     module_name = parts[-1]"
+        }
+      ]
+    },
+    {
+      "author": "NikolausDemmel",
+      "date": "2014-07-01T18:07:09Z",
+      "sha": "08ebbbbde3d46fcfe5708df930485dea2b025c4c",
+      "message": "Update sip_helper to use python header dirs\n\nThis fixes https://github.com/ros-visualization/qt_gui_core/pull/46 and https://github.com/ros-visualization/rviz/pull/788; needed at least on OS X, likely some other platforms as well.",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "9ae112e9ba85780e4145cea94fd944610e15fe5c",
+          "filename": "cmake/sip_helper.cmake",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/08ebbbbde3d46fcfe5708df930485dea2b025c4c/cmake%2Fsip_helper.cmake",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/08ebbbbde3d46fcfe5708df930485dea2b025c4c/cmake%2Fsip_helper.cmake",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fsip_helper.cmake?ref=08ebbbbde3d46fcfe5708df930485dea2b025c4c",
+          "patch": "@@ -7,6 +7,7 @@ set(__PYTHON_QT_BINDING_SIP_HELPER_DIR ${CMAKE_CURRENT_LIST_DIR})\n \n find_package(PythonInterp REQUIRED)\n assert(PYTHON_EXECUTABLE)\n+find_package(PythonLibs \"${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}\" REQUIRED)\n \n find_program(SIP_EXECUTABLE sip)\n if(NOT SIP_EXECUTABLE_NOTFOUND)\n@@ -197,7 +198,7 @@ function(build_sip_binding PROJECT_NAME SIP_FILE)\n \n     set(SIP_BUILD_DIR ${sip_BINARY_DIR}/sip/${PROJECT_NAME})\n \n-    set(INCLUDE_DIRS ${${PROJECT_NAME}_INCLUDE_DIRS})\n+    set(INCLUDE_DIRS ${${PROJECT_NAME}_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})\n     set(LIBRARIES ${${PROJECT_NAME}_LIBRARIES})\n     set(LIBRARY_DIRS ${${PROJECT_NAME}_LIBRARY_DIRS})\n     set(LDFLAGS_OTHER ${${PROJECT_NAME}_LDFLAGS_OTHER})"
+        }
+      ]
+    },
+    {
+      "author": "Isaac Saito",
+      "date": "2013-03-15T18:07:21Z",
+      "sha": "d2b6c88e0d91ceb1db9e5366d83e51516c6edb96",
+      "message": "Minor refactoring (if statement optimized)",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 5,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "2647b7826224bd67700efea70f7cbaf6193951d3",
+          "filename": "src/python_qt_binding/binding_helper.py",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 5,
+          "changes": 10,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/d2b6c88e0d91ceb1db9e5366d83e51516c6edb96/src%2Fpython_qt_binding%2Fbinding_helper.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/d2b6c88e0d91ceb1db9e5366d83e51516c6edb96/src%2Fpython_qt_binding%2Fbinding_helper.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/src%2Fpython_qt_binding%2Fbinding_helper.py?ref=d2b6c88e0d91ceb1db9e5366d83e51516c6edb96",
+          "patch": "@@ -42,7 +42,7 @@ def _select_qt_binding(binding_name=None):\n     DEFAULT_BINDING_ORDER = ['pyqt', 'pyside']\n \n     # determine binding preference\n-    if binding_name is not None:\n+    if binding_name:\n         if binding_name not in DEFAULT_BINDING_ORDER:\n             raise ImportError('Qt binding \"%s\" is unknown' % binding_name)\n         DEFAULT_BINDING_ORDER = [binding_name]\n@@ -71,7 +71,7 @@ def _select_qt_binding(binding_name=None):\n     for binding_name in DEFAULT_BINDING_ORDER:\n         try:\n             binding_loader = getattr(sys.modules[__name__], '_load_%s' % binding_name, None)\n-            if binding_loader is not None:\n+            if binding_loader:\n                 QT_BINDING_VERSION = binding_loader(required_modules, optional_modules)\n                 QT_BINDING = binding_name\n                 break\n@@ -80,7 +80,7 @@ def _select_qt_binding(binding_name=None):\n         except ImportError, e:\n             error_msgs.append('  ImportError for \"%s\": %s' % (binding_name, e))\n \n-    if QT_BINDING is None:\n+    if not QT_BINDING:\n         raise ImportError('Could not find Qt binding (looked for \"%s\"):\\n%s' % (DEFAULT_BINDING_ORDER, '\\n'.join(error_msgs)))\n \n \n@@ -198,7 +198,7 @@ def __init__(self, baseinstance=None, custom_widgets=None):\n \n             def createWidget(self, class_name, parent=None, name=''):\n                 # don't create the top-level widget, if a base instance is set\n-                if self._base_instance is not None and parent is None:\n+                if self._base_instance and not parent:\n                     return self._base_instance\n \n                 if class_name in self._custom_widgets:\n@@ -209,7 +209,7 @@ def createWidget(self, class_name, parent=None, name=''):\n                 if str(type(widget)).find(self.class_aliases.get(class_name, class_name)) < 0:\n                     sys.modules['QtCore'].qDebug(str('PySide.loadUi(): could not find widget class \"%s\", defaulting to \"%s\"' % (class_name, type(widget))))\n \n-                if self._base_instance is not None:\n+                if self._base_instance:\n                     setattr(self._base_instance, name, widget)\n \n                 return widget"
+        }
+      ]
+    },
+    {
+      "author": "130s",
+      "date": "2013-03-03T03:18:04Z",
+      "sha": "94c6451f171815b1c57070683d08e225ec2f048b",
+      "message": "maintainer added.",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "bc383e3e80c7d0ee717b819095d48c007c8d7283",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/94c6451f171815b1c57070683d08e225ec2f048b/package.xml",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/94c6451f171815b1c57070683d08e225ec2f048b/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/package.xml?ref=94c6451f171815b1c57070683d08e225ec2f048b",
+          "patch": "@@ -15,6 +15,7 @@\n     it very easy to switch between these.\n   </description>\n   <maintainer email=\"dthomas@willowgarage.com\">Dirk Thomas</maintainer>\n+  <maintainer email=\"130s@lateeye.net\">Isaac Saito</maintainer>\n   <license>BSD</license>\n   <license>LGPL</license>\n   <license>GPL</license>"
+        }
+      ]
+    },
+    {
+      "author": "Aaron Blasdel",
+      "date": "2012-12-21T18:01:09Z",
+      "sha": "79218240262e23f9bc185494d8392d2ddf928e0f",
+      "message": "file missing license header",
+      "files_changed": 1,
+      "additions": 32,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "d4363807a1be034aefac9491bd2295b2bccc9fe9",
+          "filename": "src/python_qt_binding/QtBindingHelper.py",
+          "status": "modified",
+          "additions": 32,
+          "deletions": 0,
+          "changes": 32,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/79218240262e23f9bc185494d8392d2ddf928e0f/src%2Fpython_qt_binding%2FQtBindingHelper.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/79218240262e23f9bc185494d8392d2ddf928e0f/src%2Fpython_qt_binding%2FQtBindingHelper.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/src%2Fpython_qt_binding%2FQtBindingHelper.py?ref=79218240262e23f9bc185494d8392d2ddf928e0f",
+          "patch": "@@ -1,3 +1,35 @@\n+#!/usr/bin/env python\n+\n+# Copyright (c) 2011, Dirk Thomas, Dorian Scholz, TU Darmstadt\n+# All rights reserved.\n+#\n+# Redistribution and use in source and binary forms, with or without\n+# modification, are permitted provided that the following conditions\n+# are met:\n+#\n+#   * Redistributions of source code must retain the above copyright\n+#     notice, this list of conditions and the following disclaimer.\n+#   * Redistributions in binary form must reproduce the above\n+#     copyright notice, this list of conditions and the following\n+#     disclaimer in the documentation and/or other materials provided\n+#     with the distribution.\n+#   * Neither the name of the TU Darmstadt nor the names of its\n+#     contributors may be used to endorse or promote products derived\n+#     from this software without specific prior written permission.\n+#\n+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n+# \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS\n+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\n+# COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,\n+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,\n+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\n+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN\n+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+# POSSIBILITY OF SUCH DAMAGE.\n+\n from __future__ import print_function\n \n print('Deprecation warning: the \"python_qt_binding.QtBindingHelper\" module is deprecated and will be removed in the near future.')"
+        }
+      ]
+    },
+    {
+      "author": "hershwg",
+      "date": "2012-10-12T22:42:05Z",
+      "sha": "9d9ac1d523bada59014ac8b6cf4bea95991fb5da",
+      "message": "package.xml: added missing dependencies and soon-to-be-important rosbuild export line.",
+      "files_changed": 1,
+      "additions": 7,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "db16b21cf9b4de349e0317950af0d76f1a741c95",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 1,
+          "changes": 8,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/9d9ac1d523bada59014ac8b6cf4bea95991fb5da/package.xml",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/9d9ac1d523bada59014ac8b6cf4bea95991fb5da/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/package.xml?ref=9d9ac1d523bada59014ac8b6cf4bea95991fb5da",
+          "patch": "@@ -21,11 +21,17 @@ independent of which binding provider was actually used.\n   <author>Dave Hershberger</author>\n   <author>Dorian Scholz</author>\n   <author email=\"dthomas@willowgarage.com\">Dirk Thomas</author>\n-  <copyright>TU Darmstadt</copyright>\n   <maintainer email=\"dthomas@willowgarage.com\">Dirk Thomas</maintainer>\n   <license>BSD, LGPL, GPL</license>\n   <url>http://ros.org/wiki/python_qt_binding</url>\n \n+  <build_depend>rosbuild</build_depend>\n   <build_depend>catkin</build_depend>\n   <build_depend>qt4-qmake</build_depend>\n+  <build_depend>python-qt-bindings</build_depend>\n+  <run_depend>python-qt-bindings</run_depend>\n+\n+  <export>\n+    <rosbuild cmake_directory=\"${prefix}/cmake\"/>\n+  </export>\n </package>"
+        }
+      ]
+    },
+    {
+      "author": "vrabaud",
+      "date": "2012-09-18T19:26:34Z",
+      "sha": "cb3ccafa4599462a9b86926967a346fe976e8e82",
+      "message": "catkinize the stack",
+      "files_changed": 4,
+      "additions": 35,
+      "deletions": 6,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "91ec38b8e6dfd4faddfb5307f2ae154d59ddb09f",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 14,
+          "deletions": 3,
+          "changes": 17,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/cb3ccafa4599462a9b86926967a346fe976e8e82/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/cb3ccafa4599462a9b86926967a346fe976e8e82/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/CMakeLists.txt?ref=cb3ccafa4599462a9b86926967a346fe976e8e82",
+          "patch": "@@ -1,3 +1,14 @@\n-cmake_minimum_required(VERSION 2.4.6)\n-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)\n-rosbuild_make_distribution(0.1.8)\n+cmake_minimum_required(VERSION 2.8)\n+project(python_qt_bindings)\n+find_package(catkin)\n+catkin_stack()\n+catkin_project(python_qt_bindings)\n+\n+#install targets for all things python\n+catkin_python_setup()\n+\n+install(DIRECTORY cmake\n+        DESTINATION ${CATKIN_PROJECT_SHARE_DESTINATION}\n+        COMPONENT main\n+)\n+"
+        },
+        {
+          "sha": "b75b928f20ef9ea4f509a17db62e4e31b422c27f",
+          "filename": "Makefile",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 1,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/dc4b2897824b9d888782d88e90ba603243c5cbe1/Makefile",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/dc4b2897824b9d888782d88e90ba603243c5cbe1/Makefile",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/Makefile?ref=dc4b2897824b9d888782d88e90ba603243c5cbe1",
+          "patch": "@@ -1 +0,0 @@\n-include $(shell rospack find mk)/cmake.mk\n\\ No newline at end of file"
+        },
+        {
+          "sha": "02c18d72b75095c06999320264fcc816254e9a2d",
+          "filename": "setup.py",
+          "status": "added",
+          "additions": 9,
+          "deletions": 0,
+          "changes": 9,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/cb3ccafa4599462a9b86926967a346fe976e8e82/setup.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/cb3ccafa4599462a9b86926967a346fe976e8e82/setup.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/setup.py?ref=cb3ccafa4599462a9b86926967a346fe976e8e82",
+          "patch": "@@ -0,0 +1,9 @@\n+#!/usr/bin/env python\n+from distutils.core import setup\n+\n+setup(name='Python Qt binding',\n+      version='0.2.0',\n+      description='Qt bindings for ROS',\n+      packages=['python_qt_binding'],\n+      package_dir={'':'src'}\n+)"
+        },
+        {
+          "sha": "062bb2caed3e355563c66257fc0b8ca40bf81791",
+          "filename": "stack.xml",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 2,
+          "changes": 14,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/cb3ccafa4599462a9b86926967a346fe976e8e82/stack.xml",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/cb3ccafa4599462a9b86926967a346fe976e8e82/stack.xml",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/stack.xml?ref=cb3ccafa4599462a9b86926967a346fe976e8e82",
+          "patch": "@@ -1,4 +1,6 @@\n <stack>\n+  <name>python_qt_binding</name>\n+  <version>0.2.0</version>\n   <description brief=\"python_qt_binding\">\n \n This stack provides Python bindings for Qt.\n@@ -15,9 +17,17 @@ Also provided is adapter code to make the user's Python code\n independent of which binding provider was actually used.\n \n   </description>\n-  <author>Dave Hershberger, Dirk Thomas</author>\n+  \n+  <author>Dave Hershberger</author>\n+  <author>Dirk Thomas</author>\n+  <author>Dorian Scholz</author>\n+  <copyright>Willow Garage</copyright>\n+  <maintainer>Dirk Thomas</maintainer>\n   <license>BSD, LGPL, GPL</license>\n-  <review status=\"unreviewed\" notes=\"\"/>\n   <url>http://ros.org/wiki/python_qt_binding</url>\n \n+  <build_depends>catkin</build_depends>\n+  <build_depends>qt4-qmake</build_depends>\n+  <build_depends>python-qt-bindings</build_depends>\n+  <depends>python-qt-bindings</depends>\n </stack>"
+        }
+      ]
+    },
+    {
+      "author": "DorianScholz",
+      "date": "2012-05-10T16:10:59Z",
+      "sha": "896badc31a5ef1e4e46d22f117f0bb9eadeac29b",
+      "message": "updated shiboken_helper.cmake to work with shiboken > 1.1.0 which brings its own generator binary",
+      "files_changed": 1,
+      "additions": 9,
+      "deletions": 2,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "aadbf50bd7b6e6b227b940dce32edf5920f1d1fc",
+          "filename": "cmake/shiboken_helper.cmake",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 2,
+          "changes": 11,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/896badc31a5ef1e4e46d22f117f0bb9eadeac29b/cmake%2Fshiboken_helper.cmake",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/896badc31a5ef1e4e46d22f117f0bb9eadeac29b/cmake%2Fshiboken_helper.cmake",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/cmake%2Fshiboken_helper.cmake?ref=896badc31a5ef1e4e46d22f117f0bb9eadeac29b",
+          "patch": "@@ -1,9 +1,16 @@\n-find_package(GeneratorRunner)\n find_package(Shiboken)\n find_package(PySide)\n find_package(PythonLibs)\n \n-if(GeneratorRunner_FOUND AND Shiboken_FOUND AND PySide_FOUND AND PYTHONLIBS_FOUND)\n+if(Shiboken_FOUND AND (Shiboken_VERSION VERSION_GREATER \"1.1.0\"))\n+  # starting from version 1.1.1 shiboken brings along it's own generator binary\n+  set(GeneratorRunner_FOUND TRUE)\n+  set(GENERATORRUNNER_BINARY ${SHIBOKEN_BINARY})\n+else()\n+  find_package(GeneratorRunner)\n+endif()\n+\n+if(GeneratorRunner_FOUND AND PySide_FOUND AND PYTHONLIBS_FOUND)\n   message(\"Shiboken binding generator available.\")\n   set(shiboken_helper_FOUND TRUE)\n else()"
+        }
+      ]
+    },
+    {
+      "author": "kwc",
+      "date": "2012-04-07T14:39:42Z",
+      "sha": "ac16534c52270f0f631d40a72211502e8e80cf3e",
+      "message": "ros rosdep dependency, 0.1.3",
+      "files_changed": 2,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "c43f81bbc32eb0ed243338d34ce32f3d8720a087",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/ac16534c52270f0f631d40a72211502e8e80cf3e/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/ac16534c52270f0f631d40a72211502e8e80cf3e/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/CMakeLists.txt?ref=ac16534c52270f0f631d40a72211502e8e80cf3e",
+          "patch": "@@ -1,3 +1,3 @@\n cmake_minimum_required(VERSION 2.4.6)\n include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)\n-rosbuild_make_distribution(0.1.2)\n+rosbuild_make_distribution(0.1.3)"
+        },
+        {
+          "sha": "ae00a82086c8978d8410f5736e59b3a2c37f4a79",
+          "filename": "manifest.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/ac16534c52270f0f631d40a72211502e8e80cf3e/manifest.xml",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/ac16534c52270f0f631d40a72211502e8e80cf3e/manifest.xml",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/manifest.xml?ref=ac16534c52270f0f631d40a72211502e8e80cf3e",
+          "patch": "@@ -22,6 +22,7 @@ independent of which binding provider was actually used.\n \n   <depend package=\"rosbuild\"/>\n \n+  <rosdep name=\"ros\"/>\n   <rosdep name=\"qt4-qmake\"/>\n   <rosdep name=\"python-qt-bindings\"/>\n "
+        }
+      ]
+    },
+    {
+      "author": "Dave Hershberger",
+      "date": "2012-01-18T22:14:43Z",
+      "sha": "5128538610b7587d2f8c3be8fe1b46b122712354",
+      "message": "python_qt_binding: first stab at contents of this stack-package.  Not expected to do much yet.",
+      "files_changed": 8,
+      "additions": 280,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "6c85c24b352e77af70205d8ef0121e69ba52bb91",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/5128538610b7587d2f8c3be8fe1b46b122712354/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/5128538610b7587d2f8c3be8fe1b46b122712354/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/CMakeLists.txt?ref=5128538610b7587d2f8c3be8fe1b46b122712354",
+          "patch": "@@ -0,0 +1,3 @@\n+cmake_minimum_required(VERSION 2.4.6)\n+include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)\n+rosbuild_make_distribution(0.1.0)"
+        },
+        {
+          "sha": "b75b928f20ef9ea4f509a17db62e4e31b422c27f",
+          "filename": "Makefile",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/5128538610b7587d2f8c3be8fe1b46b122712354/Makefile",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/5128538610b7587d2f8c3be8fe1b46b122712354/Makefile",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/Makefile?ref=5128538610b7587d2f8c3be8fe1b46b122712354",
+          "patch": "@@ -0,0 +1 @@\n+include $(shell rospack find mk)/cmake.mk\n\\ No newline at end of file"
+        },
+        {
+          "sha": "77cf7d0a22ebbeb2447b8bc6fea0e16f96ed8840",
+          "filename": "mainpage.dox",
+          "status": "added",
+          "additions": 14,
+          "deletions": 0,
+          "changes": 14,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/5128538610b7587d2f8c3be8fe1b46b122712354/mainpage.dox",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/5128538610b7587d2f8c3be8fe1b46b122712354/mainpage.dox",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/mainpage.dox?ref=5128538610b7587d2f8c3be8fe1b46b122712354",
+          "patch": "@@ -0,0 +1,14 @@\n+/**\n+\\mainpage\n+\\htmlinclude manifest.html\n+\n+\\b python_qt_binding is mostly a meta-package, providing python bindings for Qt.\n+There are two providers: pyqt and pyside.  PyQt is released under the\n+GPL, which can be too restrictive.  Therefore this package also\n+provides Pyside when available.  Pyside uses the LGPL license, but is\n+not available via normal debian package channels on Ubuntu Lucid.\n+\n+Both the bindings and tools to build bindings are included from each\n+available provider.  For PyQt, this is called \"SIP\".  For Pyside, it\n+is called \"Shiboken\" (and other tools).\n+*/"
+        },
+        {
+          "sha": "fb706a8febf3a62fd773c258351800196525cd7f",
+          "filename": "manifest.xml",
+          "status": "added",
+          "additions": 25,
+          "deletions": 0,
+          "changes": 25,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/5128538610b7587d2f8c3be8fe1b46b122712354/manifest.xml",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/5128538610b7587d2f8c3be8fe1b46b122712354/manifest.xml",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/manifest.xml?ref=5128538610b7587d2f8c3be8fe1b46b122712354",
+          "patch": "@@ -0,0 +1,25 @@\n+<package>\n+  <description brief=\"Python bindings for the Qt widget library, plus helpers for writing other Python bindings.\">\n+\n+This stack provides python bindings for Qt.\n+There are two providers: pyqt and pyside.  PyQt is released under the\n+GPL, which can be too restrictive.  Therefore this package also\n+provides Pyside when available.  Pyside uses the LGPL license, but is\n+not available via normal debian package channels on Ubuntu Lucid.\n+\n+Both the bindings and tools to build bindings are included from each\n+available provider.  For PyQt, this is called \"SIP\".  For Pyside, it\n+is called \"Shiboken\" (and other tools).\n+\n+Also provided is adapter code to make the user's python code\n+independent of which binding provider was actually used.\n+\n+  </description>\n+  <author>Dave Hershberger, Dirk Thomas</author>\n+  <license>BSD, LGPL, GPL</license>\n+  <review status=\"unreviewed\"/>\n+  <url>http://ros.org/wiki/python_qt_binding</url>\n+\n+  <rosdep name=\"qt4-qmake\"/>\n+  <rosdep name=\"python-qt-bindings\"/>\n+</package>"
+        },
+        {
+          "sha": "3bd5586ea26e61ef489e5256ae75d01414be57d1",
+          "filename": "rosdep.yaml",
+          "status": "added",
+          "additions": 29,
+          "deletions": 0,
+          "changes": 29,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/5128538610b7587d2f8c3be8fe1b46b122712354/rosdep.yaml",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/5128538610b7587d2f8c3be8fe1b46b122712354/rosdep.yaml",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/rosdep.yaml?ref=5128538610b7587d2f8c3be8fe1b46b122712354",
+          "patch": "@@ -0,0 +1,29 @@\n+qt4-qmake:\n+  ubuntu: qt4-qmake\n+  osxbrew:\n+    lion:\n+      homebrew:\n+        packages: [ qt ]\n+########\n+# Python qt bindings.\n+#\n+# There are two providers: pyqt and pyside.  Pyside is only available\n+# for oneiric and pyqt is available for lucid and oneiric.  If on\n+# lucid, we require only pyqt, and if on oneiric we require both (for\n+# our own edification, not because both are necessary as far as any\n+# end-use is concerned).\n+#\n+# Pyside has the better license.  Pyqt is older, so is available on Lucid.\n+#\n+# Pyside packages required:\n+#   python-qt4 python-qt4-dev python-sip-dev python-qt4-gl\n+# Pyqt packages required:\n+#   python-pyside.qtcore python-pyside.qtgui libpyside-dev libshiboken-dev shiboken libgenrunner-dev\n+########\n+python-qt-bindings:\n+  ubuntu:\n+    lucid: python-qt4 python-qt4-dev python-sip-dev python-qt4-gl\n+    oneiric: python-pyside.qtcore python-pyside.qtgui libpyside-dev libshiboken-dev shiboken libgenrunner-dev python-qt4 python-qt4-dev python-sip-dev python-qt4-gl\n+  osxbrew:\n+    homebrew:\n+      packages: [ pyside, shiboken, generatorrunner ]"
+        },
+        {
+          "sha": "313ff943ed046b8927b18db8be57d60b5e6b624f",
+          "filename": "src/python_qt_binding/QtBindingHelper.py",
+          "status": "added",
+          "additions": 184,
+          "deletions": 0,
+          "changes": 184,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/5128538610b7587d2f8c3be8fe1b46b122712354/src%2Fpython_qt_binding%2FQtBindingHelper.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/5128538610b7587d2f8c3be8fe1b46b122712354/src%2Fpython_qt_binding%2FQtBindingHelper.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/src%2Fpython_qt_binding%2FQtBindingHelper.py?ref=5128538610b7587d2f8c3be8fe1b46b122712354",
+          "patch": "@@ -0,0 +1,184 @@\n+#!/usr/bin/env python\n+\n+# Copyright (c) 2011, Dirk Thomas, Dorian Scholz, TU Darmstadt\n+# All rights reserved.\n+#\n+# Redistribution and use in source and binary forms, with or without\n+# modification, are permitted provided that the following conditions\n+# are met:\n+#\n+#   * Redistributions of source code must retain the above copyright\n+#     notice, this list of conditions and the following disclaimer.\n+#   * Redistributions in binary form must reproduce the above\n+#     copyright notice, this list of conditions and the following\n+#     disclaimer in the documentation and/or other materials provided\n+#     with the distribution.\n+#   * Neither the name of the TU Darmstadt nor the names of its\n+#     contributors may be used to endorse or promote products derived\n+#     from this software without specific prior written permission.\n+#\n+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n+# \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS\n+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\n+# COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,\n+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,\n+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\n+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN\n+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+# POSSIBILITY OF SUCH DAMAGE.\n+\n+import os, sys\n+\n+def select_qt_binding(binding_name=None):\n+    global QT_BINDING, QT_BINDING_VERSION\n+\n+    # order of default bindings can be changed here\n+    DEFAULT_BINDING_ORDER = [pyqt, pyside]\n+\n+    # determine binding preference\n+    if binding_name is not None:\n+        bindings = dict((binding.__name__, binding) for binding in DEFAULT_BINDING_ORDER)\n+        if binding_name not in bindings:\n+            raise ImportError('Qt binding \"%s\" is unknown' % binding_name)\n+        DEFAULT_BINDING_ORDER = [bindings[binding_name]]\n+\n+    # try to load preferred bindings\n+    for binding in DEFAULT_BINDING_ORDER:\n+        try:\n+            QT_BINDING_VERSION = binding()\n+            QT_BINDING = binding.__name__\n+            break\n+        except ImportError:\n+            pass\n+\n+    if QT_BINDING is None:\n+        bindings = [binding.__name__ for binding in DEFAULT_BINDING_ORDER]\n+        raise ImportError('Could not find Qt binding (looked for \"%s\")' % bindings)\n+\n+\n+def pyqt():\n+    # set enviroment variable QT_API for matplotlib\n+    os.environ.set('QT_API', 'pyqt')\n+\n+    # select PyQt4 API, see http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/incompatible_apis.html\n+    import sip\n+    sip.setapi('QDate', 2)\n+    sip.setapi('QDateTime', 2)\n+    sip.setapi('QString', 2)\n+    sip.setapi('QTextStream', 2)\n+    sip.setapi('QTime', 2)\n+    sip.setapi('QUrl', 2)\n+    sip.setapi('QVariant', 2)\n+\n+    # register PyQt4 modules\n+    import PyQt4.QtCore, PyQt4.QtGui, PyQt4.QtOpenGL, PyQt4.QtSvg\n+    sys.modules['QtCore'] = PyQt4.QtCore\n+    sys.modules['QtGui'] = PyQt4.QtGui\n+    sys.modules['QtOpenGL'] = PyQt4.QtOpenGL\n+    sys.modules['QtSvg'] = PyQt4.QtSvg\n+\n+    # set some names for compatibility with PySide\n+    sys.modules['QtCore'].Signal = sys.modules['QtCore'].pyqtSignal\n+    sys.modules['QtCore'].Slot = sys.modules['QtCore'].pyqtSlot\n+    sys.modules['QtCore'].Property = sys.modules['QtCore'].pyqtProperty\n+\n+    # try to register PyQt4.Qwt5 module\n+    try:\n+        import PyQt4.Qwt5\n+        sys.modules['Qwt'] = PyQt4.Qwt5\n+    except ImportError:\n+        pass\n+\n+    global loadUi\n+    def loadUi(uifile, baseinstance=None, custom_widgets=None):\n+        from PyQt4 import uic\n+        return uic.loadUi(uifile, baseinstance=baseinstance)\n+\n+    # override specific function to improve compatibility between different bindings\n+    from QtGui import QFileDialog\n+    QFileDialog.getOpenFileName = QFileDialog.getOpenFileNameAndFilter\n+    QFileDialog.getSaveFileName = QFileDialog.getSaveFileNameAndFilter\n+\n+    return PyQt4.QtCore.PYQT_VERSION_STR\n+\n+\n+def pyside():\n+    # set enviroment variable QT_API for matplotlib\n+    os.environ['QT_API'] = 'pyside'\n+\n+    # register PySide modules\n+    import PySide.QtCore, PySide.QtGui, PySide.QtOpenGL, PySide.QtSvg\n+    sys.modules['QtCore'] = PySide.QtCore\n+    sys.modules['QtGui'] = PySide.QtGui\n+    sys.modules['QtOpenGL'] = PySide.QtOpenGL\n+    sys.modules['QtSvg'] = PySide.QtSvg\n+\n+    # set some names for compatibility with PyQt4\n+    sys.modules['QtCore'].pyqtSignal = sys.modules['QtCore'].Signal\n+    sys.modules['QtCore'].pyqtSlot = sys.modules['QtCore'].Slot\n+    sys.modules['QtCore'].pyqtProperty = sys.modules['QtCore'].Property\n+\n+    # try to register PySideQwt module\n+    try:\n+        import PySideQwt\n+        sys.modules['Qwt'] = PySideQwt\n+    except ImportError:\n+        pass\n+\n+    global loadUi\n+    def loadUi(uifile, baseinstance=None, custom_widgets=None):\n+        from PySide.QtUiTools import QUiLoader\n+        from PySide.QtCore import QMetaObject\n+\n+        class CustomUiLoader(QUiLoader):\n+            class_aliases = {\n+                'Line': 'QFrame',\n+            }\n+\n+            def __init__(self, baseinstance=None, custom_widgets=None):\n+                super(CustomUiLoader, self).__init__(baseinstance)\n+                self._base_instance = baseinstance\n+                self._custom_widgets = custom_widgets or {}\n+\n+            def createWidget(self, class_name, parent=None, name=''):\n+                # don't create the top-level widget, if a base instance is set\n+                if self._base_instance is not None and parent is None:\n+                    return self._base_instance\n+\n+                if class_name in self._custom_widgets:\n+                    widget = self._custom_widgets[class_name](parent)\n+                else:\n+                    widget = QUiLoader.createWidget(self, class_name, parent, name)\n+\n+                if str(type(widget)).find(self.class_aliases.get(class_name, class_name)) < 0:\n+                    sys.modules['QtCore'].qDebug(str('PySide.loadUi(): could not find widget class \"%s\", defaulting to \"%s\"' % (class_name, type(widget))))\n+\n+                if self._base_instance is not None:\n+                    setattr(self._base_instance, name, widget)\n+\n+                return widget\n+\n+        loader = CustomUiLoader(baseinstance, custom_widgets)\n+\n+        # instead of passing the custom widgets, they should be registered using QUiLoader.registerCustomWidget(),\n+        # but this does not work in PySide 1.0.6: it simply segfaults...\n+        #loader = CustomUiLoader(baseinstance)\n+        #custom_widgets = custom_widgets or {}\n+        #for custom_widget in custom_widgets.values():\n+        #    loader.registerCustomWidget(custom_widget)\n+\n+        ui = loader.load(uifile)\n+        QMetaObject.connectSlotsByName(ui)\n+        return ui\n+\n+    return PySide.__version__\n+\n+\n+QT_BINDING = None\n+QT_BINDING_VERSION = None\n+\n+select_qt_binding(getattr(sys, 'SELECT_QT_BINDING', None))\n+"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "src/python_qt_binding/__init__.py",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/5128538610b7587d2f8c3be8fe1b46b122712354/src%2Fpython_qt_binding%2F__init__.py",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/5128538610b7587d2f8c3be8fe1b46b122712354/src%2Fpython_qt_binding%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/src%2Fpython_qt_binding%2F__init__.py?ref=5128538610b7587d2f8c3be8fe1b46b122712354"
+        },
+        {
+          "sha": "8f31214af7cc4dae98b8d8c13b200caba3424107",
+          "filename": "stack.xml",
+          "status": "added",
+          "additions": 24,
+          "deletions": 0,
+          "changes": 24,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/5128538610b7587d2f8c3be8fe1b46b122712354/stack.xml",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/5128538610b7587d2f8c3be8fe1b46b122712354/stack.xml",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/stack.xml?ref=5128538610b7587d2f8c3be8fe1b46b122712354",
+          "patch": "@@ -0,0 +1,24 @@\n+<stack>\n+  <description brief=\"python_qt_binding\">\n+\n+This stack provides python bindings for Qt.\n+There are two providers: pyqt and pyside.  PyQt is released under the\n+GPL, which can be too restrictive.  Therefore this package also\n+provides Pyside when available.  Pyside uses the LGPL license, but is\n+not available via normal debian package channels on Ubuntu Lucid.\n+\n+Both the bindings and tools to build bindings are included from each\n+available provider.  For PyQt, this is called &quot;SIP&quot;.  For Pyside, it\n+is called &quot;Shiboken&quot; (and other tools).\n+\n+Also provided is adapter code to make the user's python code\n+independent of which binding provider was actually used.\n+\n+  </description>\n+  <author>Dave Hershberger, Dirk Thomas</author>\n+  <license>BSD,GPL,LGPL</license>  \n+  <review status=\"unreviewed\" notes=\"\"/>\n+  <url>http://ros.org/wiki/python_qt_binding</url>\n+  <depend stack=\"ros\" />\n+\n+</stack>"
+        }
+      ]
+    },
+    {
+      "author": "Ken Conley",
+      "date": "2012-02-20T21:21:22Z",
+      "sha": "aee33b4ebb134a7d8d58a37d632f745cd8850045",
+      "message": "removing rosdep.yaml",
+      "files_changed": 1,
+      "additions": 0,
+      "deletions": 29,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "3bd5586ea26e61ef489e5256ae75d01414be57d1",
+          "filename": "rosdep.yaml",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 29,
+          "changes": 29,
+          "blob_url": "https://github.com/ros-visualization/python_qt_binding/blob/c81c8b0e24b51fca6d0fd146a2d891fbe70c28a1/rosdep.yaml",
+          "raw_url": "https://github.com/ros-visualization/python_qt_binding/raw/c81c8b0e24b51fca6d0fd146a2d891fbe70c28a1/rosdep.yaml",
+          "contents_url": "https://api.github.com/repos/ros-visualization/python_qt_binding/contents/rosdep.yaml?ref=c81c8b0e24b51fca6d0fd146a2d891fbe70c28a1",
+          "patch": "@@ -1,29 +0,0 @@\n-qt4-qmake:\n-  ubuntu: qt4-qmake\n-  osxbrew:\n-    lion:\n-      homebrew:\n-        packages: [ qt ]\n-########\n-# Python qt bindings.\n-#\n-# There are two providers: pyqt and pyside.  Pyside is only available\n-# for oneiric and pyqt is available for lucid and oneiric.  If on\n-# lucid, we require only pyqt, and if on oneiric we require both (for\n-# our own edification, not because both are necessary as far as any\n-# end-use is concerned).\n-#\n-# Pyside has the better license.  Pyqt is older, so is available on Lucid.\n-#\n-# Pyside packages required:\n-#   python-qt4 python-qt4-dev python-sip-dev python-qt4-gl\n-# Pyqt packages required:\n-#   python-pyside.qtcore python-pyside.qtgui libpyside-dev libshiboken-dev shiboken libgenrunner-dev\n-########\n-python-qt-bindings:\n-  ubuntu:\n-    lucid: python-qt4 python-qt4-dev python-sip-dev python-qt4-gl\n-    oneiric: python-pyside.qtcore python-pyside.qtgui libpyside-dev libshiboken-dev shiboken libgenrunner-dev python-qt4 python-qt4-dev python-sip-dev python-qt4-gl\n-  osxbrew:\n-    homebrew:\n-      packages: [ pyside, shiboken, generatorrunner ]"
+        }
+      ]
+    }
+  ]
+}

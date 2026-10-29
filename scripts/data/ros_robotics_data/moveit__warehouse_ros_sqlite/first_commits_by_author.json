@@ -1,0 +1,491 @@
+{
+  "_meta": {
+    "fetched_at": "2026-09-21T19:32:58Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "moveit",
+    "repo": "warehouse_ros_sqlite"
+  },
+  "data": [
+    {
+      "author": "nbbrooks",
+      "date": "2026-06-23T03:21:37Z",
+      "sha": "d316ae80b8c845490da34809c9870d3220747a63",
+      "message": "Update CHANGELOG.rst for 1.0.8 release",
+      "files_changed": 1,
+      "additions": 7,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "5a079dbb35712b2c5c80660475053588dfb0994c",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/d316ae80b8c845490da34809c9870d3220747a63/CHANGELOG.rst",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/d316ae80b8c845490da34809c9870d3220747a63/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/CHANGELOG.rst?ref=d316ae80b8c845490da34809c9870d3220747a63",
+          "patch": "@@ -2,6 +2,13 @@\n Changelog for package warehouse_ros_sqlite\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+Forthcoming\n+-----------\n+* Remove 'system' component from Boost package (`#61 <https://github.com/moveit/warehouse_ros_sqlite/issues/61>`_)\n+  According to https://www.boost.org/releases/1.89.0, the system library is header-only since Boost 1.69 and the corresponding cmake component has been dropped in 1.89.\n+* CI: Update GHA versions (`#60 <https://github.com/moveit/warehouse_ros_sqlite/issues/60>`_)\n+* Contributors: Felix Exner (fexner), mosfet80\n+\n 1.0.7 (2026-04-20)\n ------------------\n * Remove sqlite3_vendor from package.xml"
+        }
+      ]
+    },
+    {
+      "author": "Tobias-Fischer",
+      "date": "2026-07-20T07:39:26Z",
+      "sha": "5e2fd13a4d2743f3916c8872ddf390d1b80dd1ec",
+      "message": "Use Boost targets in warehouse_ros_sqlite (#62)\n\nwarehouse_ros_sqlite only needs Boost headers for the library itself and filesystem/thread for the tests. \nLinking the explicit Boost targets avoids relying on the aggregate ${Boost_LIBRARIES} variable and keeps the target dependencies precise for modern CMake toolchains.\n\nSigned-off-by: Tobias Fischer <info@tobiasfischer.info>\nCo-authored-by: Robert Haschke <rhaschke@users.noreply.github.com>\nCo-authored-by: Daisuke Nishimatsu <nishimarudai@gmail.com>",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 5,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "2c08da990b9e2356315e7894295fecb4c3ad7860",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 5,
+          "changes": 8,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/5e2fd13a4d2743f3916c8872ddf390d1b80dd1ec/CMakeLists.txt",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/5e2fd13a4d2743f3916c8872ddf390d1b80dd1ec/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/CMakeLists.txt?ref=5e2fd13a4d2743f3916c8872ddf390d1b80dd1ec",
+          "patch": "@@ -33,8 +33,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC \"$<BUILD_INTERFACE:${CMAKE_CUR\n \n set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)\n \n-target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${Boost_INCLUDE_DIRS})\n target_link_libraries(${PROJECT_NAME} PUBLIC\n+  Boost::headers\n   class_loader::class_loader\n   rclcpp::rclcpp\n   warehouse_ros::warehouse_ros\n@@ -64,12 +64,10 @@ if(BUILD_TESTING)\n   target_link_libraries(SchemaVersion ${PROJECT_NAME})\n \n   ament_add_gtest(TestLoader test/TestLoader.cpp)\n-  target_link_libraries(TestLoader ${PROJECT_NAME})\n-  target_link_libraries(TestLoader ${Boost_LIBRARIES})\n+  target_link_libraries(TestLoader ${PROJECT_NAME} Boost::filesystem Boost::thread)\n \n   ament_add_gtest(BusyHandler test/BusyHandler.cpp)\n-  target_link_libraries(BusyHandler ${PROJECT_NAME})\n-  target_link_libraries(BusyHandler ${Boost_LIBRARIES})\n+  target_link_libraries(BusyHandler ${PROJECT_NAME} Boost::filesystem Boost::thread)\n \n   find_package(ament_lint_auto REQUIRED)\n   list(APPEND AMENT_LINT_AUTO_EXCLUDE"
+        }
+      ]
+    },
+    {
+      "author": "fmauch",
+      "date": "2026-05-08T11:17:37Z",
+      "sha": "c3847d5f3b001388ad11f2bfb62328d9be1921d1",
+      "message": "Remove 'system' component from Boost package (#61)\n\nAccording to https://www.boost.org/releases/1.89.0, the system library is header-only since Boost 1.69 and the corresponding cmake component has been dropped in 1.89.",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "b8d72794937b1ef35b941bd03a27b01c412aba0d",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/c3847d5f3b001388ad11f2bfb62328d9be1921d1/CMakeLists.txt",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/c3847d5f3b001388ad11f2bfb62328d9be1921d1/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/CMakeLists.txt?ref=c3847d5f3b001388ad11f2bfb62328d9be1921d1",
+          "patch": "@@ -7,7 +7,7 @@ endif()\n \n find_package(ament_cmake REQUIRED)\n find_package(SQLite3 REQUIRED)\n-find_package(Boost REQUIRED COMPONENTS filesystem system thread)\n+find_package(Boost REQUIRED COMPONENTS filesystem thread)\n find_package(class_loader REQUIRED)\n find_package(OpenSSL REQUIRED)\n find_package(rclcpp REQUIRED)"
+        }
+      ]
+    },
+    {
+      "author": "mosfet80",
+      "date": "2026-01-05T10:16:41Z",
+      "sha": "6b22fcd379d570fc1ec9a979abbb3362ffc107ac",
+      "message": "Replace deprecated ament_target_dependencies (#55)",
+      "files_changed": 1,
+      "additions": 8,
+      "deletions": 9,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "d8356e40680b57cdbec7ca05451549182c514120",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 9,
+          "changes": 17,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/6b22fcd379d570fc1ec9a979abbb3362ffc107ac/CMakeLists.txt",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/6b22fcd379d570fc1ec9a979abbb3362ffc107ac/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/CMakeLists.txt?ref=6b22fcd379d570fc1ec9a979abbb3362ffc107ac",
+          "patch": "@@ -1,4 +1,4 @@\n-cmake_minimum_required(VERSION 3.7.2)\n+cmake_minimum_required(VERSION 3.20)\n project(warehouse_ros_sqlite VERSION 1.0.1)\n \n if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n@@ -31,17 +31,16 @@ target_include_directories(${PROJECT_NAME} PUBLIC\n include(GenerateExportHeader)\n generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${PROJECT_NAME}/${PROJECT_NAME}_export.hpp)\n target_include_directories(${PROJECT_NAME} PUBLIC \"$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>\")\n-target_link_libraries(${PROJECT_NAME} OpenSSL::Crypto)\n \n set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)\n-target_link_libraries(${PROJECT_NAME}\n-  SQLite::SQLite3\n-)\n+\n target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${Boost_INCLUDE_DIRS})\n-ament_target_dependencies(${PROJECT_NAME}\n-  class_loader\n-  rclcpp\n-  warehouse_ros\n+target_link_libraries(${PROJECT_NAME} PUBLIC\n+  class_loader::class_loader\n+  rclcpp::rclcpp\n+  warehouse_ros::warehouse_ros\n+  OpenSSL::Crypto\n+  SQLite::SQLite3\n )\n \n install(TARGETS ${PROJECT_NAME}"
+        }
+      ]
+    },
+    {
+      "author": "rhaschke",
+      "date": "2024-08-06T08:28:58Z",
+      "sha": "541b816ca167b97e27178a2355aefd481bfc13a8",
+      "message": "1.0.4",
+      "files_changed": 2,
+      "additions": 7,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "0eca41392c5ec60d8762c040d87a74dbb6f23b25",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/541b816ca167b97e27178a2355aefd481bfc13a8/CHANGELOG.rst",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/541b816ca167b97e27178a2355aefd481bfc13a8/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/CHANGELOG.rst?ref=541b816ca167b97e27178a2355aefd481bfc13a8",
+          "patch": "@@ -2,6 +2,12 @@\n Changelog for package warehouse_ros_sqlite\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+1.0.4 (2024-08-06)\n+------------------\n+* Fix column name escaping (`#44 <https://github.com/ros-planning/warehouse_ros_sqlite/issues/44>`_)\n+* Update CI (`#41 <https://github.com/ros-planning/warehouse_ros_sqlite/issues/41>`_)\n+* Contributors: Bjar Ne, Henning Kayser, Tyler Weaver, Vatan Aksoy Tezer\n+\n 1.0.3 (2022-05-17)\n ------------------\n * Add humble testing CI (`#37 <https://github.com/ros-planning/warehouse_ros_sqlite/issues/37>`_)"
+        },
+        {
+          "sha": "94022deab20f3b00e9f9bdf94ac2791629af523a",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/541b816ca167b97e27178a2355aefd481bfc13a8/package.xml",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/541b816ca167b97e27178a2355aefd481bfc13a8/package.xml",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/package.xml?ref=541b816ca167b97e27178a2355aefd481bfc13a8",
+          "patch": "@@ -1,6 +1,6 @@\n <package format=\"3\">\n   <name>warehouse_ros_sqlite</name>\n-  <version>1.0.3</version>\n+  <version>1.0.4</version>\n   <description>\n     Implementation of warehouse_ros for sqlite\n   </description>"
+        }
+      ]
+    },
+    {
+      "author": "gleichdick",
+      "date": "2020-10-27T12:18:49Z",
+      "sha": "c63a117208dd647b2750d3e3604d13f317d320b8",
+      "message": "initial commit",
+      "files_changed": 18,
+      "additions": 1336,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "9a6ec509a4087ac607ec0836dee711692e8fdeaf",
+          "filename": ".clang-format",
+          "status": "added",
+          "additions": 75,
+          "deletions": 0,
+          "changes": 75,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/c63a117208dd647b2750d3e3604d13f317d320b8/.clang-format",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/c63a117208dd647b2750d3e3604d13f317d320b8/.clang-format",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/.clang-format?ref=c63a117208dd647b2750d3e3604d13f317d320b8",
+          "patch": "@@ -0,0 +1,75 @@\n+---\n+BasedOnStyle:  Google\n+ColumnLimit:    120\n+MaxEmptyLinesToKeep: 1\n+SortIncludes: false\n+\n+Standard:        Auto\n+IndentWidth:     2\n+TabWidth:        2\n+UseTab:          Never\n+AccessModifierOffset: -2\n+ConstructorInitializerIndentWidth: 2\n+NamespaceIndentation: None\n+ContinuationIndentWidth: 4\n+IndentCaseLabels: true\n+IndentFunctionDeclarationAfterType: false\n+\n+AlignEscapedNewlinesLeft: false\n+AlignTrailingComments: true\n+\n+AllowAllParametersOfDeclarationOnNextLine: false\n+ExperimentalAutoDetectBinPacking: false\n+ObjCSpaceBeforeProtocolList: true\n+Cpp11BracedListStyle: false\n+\n+AllowShortBlocksOnASingleLine: true\n+AllowShortIfStatementsOnASingleLine: false\n+AllowShortLoopsOnASingleLine: false\n+AllowShortFunctionsOnASingleLine: None\n+AllowShortCaseLabelsOnASingleLine: false\n+\n+AlwaysBreakTemplateDeclarations: true\n+AlwaysBreakBeforeMultilineStrings: false\n+BreakBeforeBinaryOperators: false\n+BreakBeforeTernaryOperators: false\n+BreakConstructorInitializersBeforeComma: true\n+\n+BinPackParameters: true\n+ConstructorInitializerAllOnOneLineOrOnePerLine: true\n+DerivePointerBinding: false\n+PointerBindsToType: true\n+\n+PenaltyExcessCharacter: 50\n+PenaltyBreakBeforeFirstCallParameter: 30\n+PenaltyBreakComment: 1000\n+PenaltyBreakFirstLessLess: 10\n+PenaltyBreakString: 100\n+PenaltyReturnTypeOnItsOwnLine: 50\n+\n+SpacesBeforeTrailingComments: 2\n+SpacesInParentheses: false\n+SpacesInAngles:  false\n+SpaceInEmptyParentheses: false\n+SpacesInCStyleCastParentheses: false\n+SpaceAfterCStyleCast: false\n+SpaceAfterControlStatementKeyword: true\n+SpaceBeforeAssignmentOperators: true\n+\n+# Configure each individual brace in BraceWrapping\n+BreakBeforeBraces: Custom\n+\n+# Control of individual brace wrapping cases\n+BraceWrapping:\n+    AfterCaseLabel: true\n+    AfterClass: true\n+    AfterControlStatement: true\n+    AfterEnum: true\n+    AfterFunction: true\n+    AfterNamespace: true\n+    AfterStruct: true\n+    AfterUnion: true\n+    BeforeCatch: true\n+    BeforeElse: true\n+    IndentBraces: false\n+..."
+        },
+        {
+          "sha": "808fe85341fb290adec3d2ae6bd29d48ca62c992",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 60,
+          "deletions": 0,
+          "changes": 60,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/c63a117208dd647b2750d3e3604d13f317d320b8/.gitignore",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/c63a117208dd647b2750d3e3604d13f317d320b8/.gitignore",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/.gitignore?ref=c63a117208dd647b2750d3e3604d13f317d320b8",
+          "patch": "@@ -0,0 +1,60 @@\n+*~\n+~$\n+.swp$\n+build/\n+bin/\n+lib/\n+msg_gen/\n+srv_gen/\n+msg/.*Action\\.msg$\n+msg/.*ActionFeedback\\.msg$\n+msg/.*ActionGoal\\.msg$\n+msg/.*ActionResult\\.msg$\n+msg/.*Feedback\\.msg$\n+msg/.*Goal\\.msg$\n+msg/.*Result\\.msg$\n+msg/_.*\\.py$\n+\n+\\.pcd$\n+.pyc$\n+\n+# Generated by dynamic reconfigure\n+\\.cfgc$\n+/cfg/cpp/\n+/cfg/.*\\.py$\n+\n+# Ignore generated docs\n+.dox$\n+.wikidoc$\n+\n+# eclipse stuff\n+.project\n+.cproject\n+\n+# qcreator stuff\n+CMakeLists.txt.user\n+\n+srv/_.*\\.py$\n+\\.pcd$\n+.pyc$\n+qtcreator-*\n+*.user\n+\n+*~$\n+\n+# Emacs\n+.#*\n+\n+# VSCode\n+.vscode\n+\n+# Vim\n+*.swp\n+\n+# Continous Integration\n+.moveit_ci\n+\n+*.pyc\n+\n+#gdb\n+*.gdb"
+        },
+        {
+          "sha": "3d0bd67d180b8dd6f67f54975a5ce683d6f382b4",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 45,
+          "deletions": 0,
+          "changes": 45,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/c63a117208dd647b2750d3e3604d13f317d320b8/CMakeLists.txt",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/c63a117208dd647b2750d3e3604d13f317d320b8/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/CMakeLists.txt?ref=c63a117208dd647b2750d3e3604d13f317d320b8",
+          "patch": "@@ -0,0 +1,45 @@\n+cmake_minimum_required(VERSION 3.7.2)\n+project(warehouse_ros_sqlite)\n+\n+add_compile_options(-std=c++14)\n+\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  add_compile_options(-Wall -Wextra -Wpedantic)\n+endif()\n+\n+find_package(PkgConfig REQUIRED)\n+find_package(Boost REQUIRED COMPONENTS)\n+\n+pkg_check_modules(SQLite3 REQUIRED IMPORTED_TARGET sqlite3)\n+\n+find_package(catkin REQUIRED COMPONENTS\n+  roscpp\n+  rostest\n+  rostime\n+  std_msgs\n+  warehouse_ros\n+  class_loader\n+)\n+\n+\n+catkin_package(\n+  INCLUDE_DIRS include\n+  LIBRARIES ${PROJECT_NAME}\n+  CATKIN_DEPENDS warehouse_ros\n+)\n+\n+add_library(${PROJECT_NAME}\n+  src/database_connection.cpp\n+  src/message_collection_helper.cpp\n+  src/metadata.cpp\n+  src/query.cpp\n+  src/result_iteration_helper.cpp\n+)\n+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)\n+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES} PkgConfig::SQLite3)\n+target_include_directories(${PROJECT_NAME} PUBLIC include)\n+target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})\n+\n+\n+install(FILES sqlite_database_connection_plugin_description.xml\n+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})"
+        },
+        {
+          "sha": "95b66a0e640f7eba49251829657c5cb0cdd3a964",
+          "filename": "LICENSE.txt",
+          "status": "added",
+          "additions": 24,
+          "deletions": 0,
+          "changes": 24,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/c63a117208dd647b2750d3e3604d13f317d320b8/LICENSE.txt",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/c63a117208dd647b2750d3e3604d13f317d320b8/LICENSE.txt",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/LICENSE.txt?ref=c63a117208dd647b2750d3e3604d13f317d320b8",
+          "patch": "@@ -0,0 +1,24 @@\n+Copyright (c) 2020, Bjarne von Horn\n+All rights reserved.\n+\n+Redistribution and use in source and binary forms, with or without\n+modification, are permitted provided that the following conditions are met:\n+* Redistributions of source code must retain the above copyright notice,\n+  this list of conditions and the following disclaimer.\n+* Redistributions in binary form must reproduce the above copyright notice,\n+  this list of conditions and the following disclaimer in the documentation\n+  and/or other materials provided with the distribution.\n+* Neither the name of the copyright holder nor the names of its contributors\n+  may be used to endorse or promote products derived from this software\n+  without specific prior written permission.\n+\n+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,\n+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ARE DISCLAIMED. IN NO EVENT SHALL BJARNE VON HORN BE LIABLE FOR ANY DIRECT,\n+INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES\n+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND\n+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\n+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+        },
+        {
+          "sha": "1e431922d302b48ebfdea08adc1d62a49fedac48",
+          "filename": "include/warehouse_ros_sqlite/database_connection.h",
+          "status": "added",
+          "additions": 72,
+          "deletions": 0,
+          "changes": 72,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/c63a117208dd647b2750d3e3604d13f317d320b8/include%2Fwarehouse_ros_sqlite%2Fdatabase_connection.h",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/c63a117208dd647b2750d3e3604d13f317d320b8/include%2Fwarehouse_ros_sqlite%2Fdatabase_connection.h",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/include%2Fwarehouse_ros_sqlite%2Fdatabase_connection.h?ref=c63a117208dd647b2750d3e3604d13f317d320b8",
+          "patch": "@@ -0,0 +1,72 @@\n+// SPDX-License-Identifier: BSD-3-Clause\n+\n+/*\n+ * Copyright (c) 2020, Bjarne von Horn\n+ * All rights reserved.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ * * Redistributions of source code must retain the above copyright notice,\n+ *   this list of conditions and the following disclaimer.\n+ * * Redistributions in binary form must reproduce the above copyright notice,\n+ *   this list of conditions and the following disclaimer in the documentation\n+ *   and/or other materials provided with the distribution.\n+ * * Neither the name of the copyright holder nor the names of its contributors\n+ *   may be used to endorse or promote products derived from this software\n+ *   without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,\n+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL BJARNE VON HORN BE LIABLE FOR ANY DIRECT,\n+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES\n+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND\n+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\n+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n+ */\n+#pragma once\n+\n+#include <warehouse_ros/database_connection.h>\n+#include <warehouse_ros/message_collection.h>\n+#include <warehouse_ros_sqlite/utils.h>\n+\n+\n+namespace warehouse_ros_sqlite {\n+\n+    class DatabaseConnection : public warehouse_ros::DatabaseConnection\n+{\n+  sqlite3_ptr db_;\n+  std::string uri_;\n+public:\n+  /// \\brief Set database connection params.\n+  bool setParams(const std::string& host, unsigned, float = 60.0) override {\n+    uri_ = host;\n+    return true;\n+  }\n+\n+  /// \\brief Set database connection params.\n+  bool setTimeout(float) override {\n+    return true;\n+  }\n+\n+  /// Setup the database connection. This call assumes setParams() has been previously called.\n+  /// Returns true if the connection was succesfully established.\n+  bool connect() override;\n+\n+  /// Returns whether the database is connected.\n+  bool isConnected() override;\n+\n+  /// \\brief Drop a db and all its collections.\n+  /// A DbClientConnection exception will be thrown if the database is not connected.\n+  void dropDatabase(const std::string& db_name) override;\n+\n+  /// \\brief Return the ROS Message type of a given collection\n+  std::string messageType(const std::string& db_name, const std::string& collection_name) override;\n+\n+protected:\n+  warehouse_ros::MessageCollectionHelper::Ptr openCollectionHelper(const std::string& db_name,\n+                                                            const std::string& collection_name) override;\n+};\n+}"
+        },
+        {
+          "sha": "c21b9a9424ffbaf780519824e3257159504be7e1",
+          "filename": "include/warehouse_ros_sqlite/message_collection_helper.h",
+          "status": "added",
+          "additions": 57,
+          "deletions": 0,
+          "changes": 57,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/c63a117208dd647b2750d3e3604d13f317d320b8/include%2Fwarehouse_ros_sqlite%2Fmessage_collection_helper.h",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/c63a117208dd647b2750d3e3604d13f317d320b8/include%2Fwarehouse_ros_sqlite%2Fmessage_collection_helper.h",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/include%2Fwarehouse_ros_sqlite%2Fmessage_collection_helper.h?ref=c63a117208dd647b2750d3e3604d13f317d320b8",
+          "patch": "@@ -0,0 +1,57 @@\n+// SPDX-License-Identifier: BSD-3-Clause\n+\n+/*\n+ * Copyright (c) 2020, Bjarne von Horn\n+ * All rights reserved.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ * * Redistributions of source code must retain the above copyright notice,\n+ *   this list of conditions and the following disclaimer.\n+ * * Redistributions in binary form must reproduce the above copyright notice,\n+ *   this list of conditions and the following disclaimer in the documentation\n+ *   and/or other materials provided with the distribution.\n+ * * Neither the name of the copyright holder nor the names of its contributors\n+ *   may be used to endorse or promote products derived from this software\n+ *   without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,\n+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL BJARNE VON HORN BE LIABLE FOR ANY DIRECT,\n+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES\n+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND\n+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\n+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n+ */\n+#pragma once\n+\n+#include <warehouse_ros/message_collection.h>\n+#include <warehouse_ros_sqlite/utils.h>\n+\n+namespace warehouse_ros_sqlite\n+{\n+class MessageCollectionHelper : public warehouse_ros::MessageCollectionHelper\n+{\n+  sqlite3_ptr db_;\n+  std::string name_;\n+public:\n+  MessageCollectionHelper() = default;\n+  MessageCollectionHelper(sqlite3_ptr db, const std::string& name) : db_(std::move(db)), name_(name) {}\n+  bool initialize(const std::string& datatype, const std::string& md5) override;\n+  void insert(char* msg, size_t msg_size, warehouse_ros::Metadata::ConstPtr metadata) override;\n+  warehouse_ros::ResultIteratorHelper::Ptr query(warehouse_ros::Query::ConstPtr query, const std::string& sort_by = \"\",\n+                                  bool ascending = true) const override;\n+  unsigned removeMessages(warehouse_ros::Query::ConstPtr query) override;\n+  void modifyMetadata(warehouse_ros::Query::ConstPtr q, warehouse_ros::Metadata::ConstPtr m) override;\n+  unsigned count() override;\n+  warehouse_ros::Query::Ptr createQuery() const override;\n+  warehouse_ros::Metadata::Ptr createMetadata() const override;\n+  std::string collectionName() const override { return name_; }\n+private:\n+  std::string find_md5sum();\n+};\n+\n+}  // namespace warehouse_ros_sqlite"
+        },
+        {
+          "sha": "e535a5e21c4f8864624accc049f3b5002a49a0ff",
+          "filename": "include/warehouse_ros_sqlite/metadata.h",
+          "status": "added",
+          "additions": 66,
+          "deletions": 0,
+          "changes": 66,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/c63a117208dd647b2750d3e3604d13f317d320b8/include%2Fwarehouse_ros_sqlite%2Fmetadata.h",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/c63a117208dd647b2750d3e3604d13f317d320b8/include%2Fwarehouse_ros_sqlite%2Fmetadata.h",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/include%2Fwarehouse_ros_sqlite%2Fmetadata.h?ref=c63a117208dd647b2750d3e3604d13f317d320b8",
+          "patch": "@@ -0,0 +1,66 @@\n+// SPDX-License-Identifier: BSD-3-Clause\n+\n+/*\n+ * Copyright (c) 2020, Bjarne von Horn\n+ * All rights reserved.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ * * Redistributions of source code must retain the above copyright notice,\n+ *   this list of conditions and the following disclaimer.\n+ * * Redistributions in binary form must reproduce the above copyright notice,\n+ *   this list of conditions and the following disclaimer in the documentation\n+ *   and/or other materials provided with the distribution.\n+ * * Neither the name of the copyright holder nor the names of its contributors\n+ *   may be used to endorse or promote products derived from this software\n+ *   without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,\n+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL BJARNE VON HORN BE LIABLE FOR ANY DIRECT,\n+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES\n+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND\n+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\n+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n+ */\n+#pragma once\n+\n+#include <warehouse_ros/metadata.h>\n+#include <boost/variant.hpp>\n+#include <map>\n+\n+extern \"C\" {\n+struct sqlite3_stmt;\n+}\n+\n+namespace warehouse_ros_sqlite\n+{\n+class Metadata : public warehouse_ros::Metadata\n+{\n+public:\n+  using Variant = boost::variant<std::nullptr_t, std::string, double, int>;\n+  void append(const std::string& name, const std::string& val) override;\n+  void append(const std::string& name, const double val) override;\n+  void append(const std::string& name, const int val) override;\n+  void append(const std::string& name, const bool val) override;\n+  std::string lookupString(const std::string& name) const override;\n+  double lookupDouble(const std::string& name) const override;\n+  int lookupInt(const std::string& name) const override;\n+  bool lookupBool(const std::string& name) const override;\n+  bool lookupField(const std::string& name) const override;\n+  std::set<std::string> lookupFieldNames() const override;\n+  void append(const std::string& name, sqlite3_stmt* stmt, int col);\n+  const auto& data() const { return data_; }\n+\n+private:\n+  // ordered map for reproducible iterating\n+  std::map<std::string, Variant> data_;\n+\n+  template <typename R>\n+  R doLookup(const std::string& name) const;\n+};\n+\n+}  // namespace warehouse_ros_sqlite"
+        },
+        {
+          "sha": "4f4bbdc6ec5ac01ed76bf92b12842c556e5d95db",
+          "filename": "include/warehouse_ros_sqlite/query.h",
+          "status": "added",
+          "additions": 77,
+          "deletions": 0,
+          "changes": 77,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/c63a117208dd647b2750d3e3604d13f317d320b8/include%2Fwarehouse_ros_sqlite%2Fquery.h",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/c63a117208dd647b2750d3e3604d13f317d320b8/include%2Fwarehouse_ros_sqlite%2Fquery.h",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/include%2Fwarehouse_ros_sqlite%2Fquery.h?ref=c63a117208dd647b2750d3e3604d13f317d320b8",
+          "patch": "@@ -0,0 +1,77 @@\n+// SPDX-License-Identifier: BSD-3-Clause\n+\n+/*\n+ * Copyright (c) 2020, Bjarne von Horn\n+ * All rights reserved.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ * * Redistributions of source code must retain the above copyright notice,\n+ *   this list of conditions and the following disclaimer.\n+ * * Redistributions in binary form must reproduce the above copyright notice,\n+ *   this list of conditions and the following disclaimer in the documentation\n+ *   and/or other materials provided with the distribution.\n+ * * Neither the name of the copyright holder nor the names of its contributors\n+ *   may be used to endorse or promote products derived from this software\n+ *   without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,\n+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL BJARNE VON HORN BE LIABLE FOR ANY DIRECT,\n+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES\n+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND\n+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\n+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n+ */\n+#pragma once\n+\n+#include <warehouse_ros/metadata.h>\n+\n+#include <boost/variant.hpp>\n+#include <sstream>\n+\n+#include <warehouse_ros_sqlite/utils.h>\n+\n+namespace warehouse_ros_sqlite\n+{\n+class Query : public warehouse_ros::Query\n+{\n+public:\n+  Query();\n+  using Variant = boost::variant<std::string, double, int>;\n+  void append(const std::string& name, const std::string& val) override;\n+  void append(const std::string& name, const double val) override;\n+  void append(const std::string& name, const int val) override;\n+  void append(const std::string& name, const bool val) override;\n+  void appendLT(const std::string& name, const double val) override;\n+  void appendLT(const std::string& name, const int val) override;\n+  void appendLTE(const std::string& name, const double val) override;\n+  void appendLTE(const std::string& name, const int val) override;\n+  void appendGT(const std::string& name, const double val) override;\n+  void appendGT(const std::string& name, const int val) override;\n+  void appendGTE(const std::string& name, const double val) override;\n+  void appendGTE(const std::string& name, const int val) override;\n+  void appendRange(const std::string& name, const double lower, const double upper) override;\n+  void appendRange(const std::string& name, const int lower, const int upper) override;\n+  void appendRangeInclusive(const std::string& name, const double lower, const double upper) override;\n+  void appendRangeInclusive(const std::string& name, const int lower, const int upper) override;\n+\n+  sqlite3_stmt_ptr prepare(sqlite3* db_conn, const std::string& intro, const std::string& outro = \"\") const;\n+\n+private:\n+  template <typename T>\n+  void doappend(const std::string& name, const char* op, T val)\n+  {\n+    values_.emplace_back(val);\n+    if (values_.size() > 0)\n+      query_ << \" AND \";\n+    query_ << name << op << '?';\n+  }\n+  std::vector<Variant> values_;\n+  std::stringstream query_;\n+};\n+\n+}  // namespace warehouse_ros_sqlite"
+        },
+        {
+          "sha": "057a4aa0ed40707e11e1871d0a8b06a13f9a8a86",
+          "filename": "include/warehouse_ros_sqlite/result_iteration_helper.h",
+          "status": "added",
+          "additions": 55,
+          "deletions": 0,
+          "changes": 55,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/c63a117208dd647b2750d3e3604d13f317d320b8/include%2Fwarehouse_ros_sqlite%2Fresult_iteration_helper.h",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/c63a117208dd647b2750d3e3604d13f317d320b8/include%2Fwarehouse_ros_sqlite%2Fresult_iteration_helper.h",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/include%2Fwarehouse_ros_sqlite%2Fresult_iteration_helper.h?ref=c63a117208dd647b2750d3e3604d13f317d320b8",
+          "patch": "@@ -0,0 +1,55 @@\n+// SPDX-License-Identifier: BSD-3-Clause\n+\n+/*\n+ * Copyright (c) 2020, Bjarne von Horn\n+ * All rights reserved.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ * * Redistributions of source code must retain the above copyright notice,\n+ *   this list of conditions and the following disclaimer.\n+ * * Redistributions in binary form must reproduce the above copyright notice,\n+ *   this list of conditions and the following disclaimer in the documentation\n+ *   and/or other materials provided with the distribution.\n+ * * Neither the name of the copyright holder nor the names of its contributors\n+ *   may be used to endorse or promote products derived from this software\n+ *   without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,\n+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL BJARNE VON HORN BE LIABLE FOR ANY DIRECT,\n+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES\n+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND\n+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\n+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n+ */\n+#pragma once\n+\n+#include <warehouse_ros/query_results.h>\n+#include <warehouse_ros_sqlite/utils.h>\n+\n+namespace warehouse_ros_sqlite\n+{\n+class ResultIteratorHelper : public warehouse_ros::ResultIteratorHelper\n+{\n+  sqlite3_stmt_ptr stmt_;\n+  std::vector<std::pair<std::string, int>> metadata_cols_;\n+  void init_metadata_cols();\n+\n+public:\n+  ResultIteratorHelper() = default;\n+  ResultIteratorHelper(sqlite3_stmt_ptr stmt)\n+    : stmt_(std::move(stmt))\n+  {\n+    init_metadata_cols();\n+  }\n+  bool next() override;\n+  bool hasData() const override;\n+  warehouse_ros::Metadata::ConstPtr metadata() const override;\n+  std::string message() const override;\n+};\n+\n+}  // namespace warehouse_ros_sqlite"
+        },
+        {
+          "sha": "8e73e269d07a22262aafbc792218436edd4466f0",
+          "filename": "include/warehouse_ros_sqlite/utils.h",
+          "status": "added",
+          "additions": 60,
+          "deletions": 0,
+          "changes": 60,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/c63a117208dd647b2750d3e3604d13f317d320b8/include%2Fwarehouse_ros_sqlite%2Futils.h",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/c63a117208dd647b2750d3e3604d13f317d320b8/include%2Fwarehouse_ros_sqlite%2Futils.h",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/include%2Fwarehouse_ros_sqlite%2Futils.h?ref=c63a117208dd647b2750d3e3604d13f317d320b8",
+          "patch": "@@ -0,0 +1,60 @@\n+// SPDX-License-Identifier: BSD-3-Clause\n+\n+/*\n+ * Copyright (c) 2020, Bjarne von Horn\n+ * All rights reserved.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ * * Redistributions of source code must retain the above copyright notice,\n+ *   this list of conditions and the following disclaimer.\n+ * * Redistributions in binary form must reproduce the above copyright notice,\n+ *   this list of conditions and the following disclaimer in the documentation\n+ *   and/or other materials provided with the distribution.\n+ * * Neither the name of the copyright holder nor the names of its contributors\n+ *   may be used to endorse or promote products derived from this software\n+ *   without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,\n+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL BJARNE VON HORN BE LIABLE FOR ANY DIRECT,\n+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES\n+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND\n+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\n+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n+ */\n+#pragma once\n+\n+#include <memory>\n+\n+extern \"C\" {\n+struct sqlite3_stmt;\n+struct sqlite3;\n+}\n+\n+namespace warehouse_ros_sqlite\n+{\n+struct sqlite3_stmt_deleter\n+{\n+  void operator()(sqlite3_stmt* stmt) const;\n+};\n+void sqlite3_delete(sqlite3* db);\n+\n+using sqlite3_stmt_ptr = std::unique_ptr<sqlite3_stmt, sqlite3_stmt_deleter>;\n+using sqlite3_ptr = std::shared_ptr<sqlite3>;\n+\n+namespace schema\n+{\n+constexpr const char* MetadataColumnPrefix = \"M_\";\n+constexpr const char* DataColumnName = \"Data\";\n+constexpr const char* TableNamePrefix = \"T_\";\n+constexpr const char* MD5TableName = \"MessageMD5s\";\n+constexpr const char* MD5TableIndexColumn = \"TableName\";\n+constexpr const char* MD5TableMD5Column = \"MessageMD5\";\n+const int DataColumnIndex = 0;\n+}  // namespace schema\n+\n+}  // namespace warehouse_ros_sqlite"
+        },
+        {
+          "sha": "ec2ba6dbf6111cc102147328e931488a1445fa73",
+          "filename": "include/warehouse_ros_sqlite/variant.h",
+          "status": "added",
+          "additions": 85,
+          "deletions": 0,
+          "changes": 85,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/c63a117208dd647b2750d3e3604d13f317d320b8/include%2Fwarehouse_ros_sqlite%2Fvariant.h",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/c63a117208dd647b2750d3e3604d13f317d320b8/include%2Fwarehouse_ros_sqlite%2Fvariant.h",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/include%2Fwarehouse_ros_sqlite%2Fvariant.h?ref=c63a117208dd647b2750d3e3604d13f317d320b8",
+          "patch": "@@ -0,0 +1,85 @@\n+// SPDX-License-Identifier: BSD-3-Clause\n+\n+/*\n+ * Copyright (c) 2020, Bjarne von Horn\n+ * All rights reserved.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ * * Redistributions of source code must retain the above copyright notice,\n+ *   this list of conditions and the following disclaimer.\n+ * * Redistributions in binary form must reproduce the above copyright notice,\n+ *   this list of conditions and the following disclaimer in the documentation\n+ *   and/or other materials provided with the distribution.\n+ * * Neither the name of the copyright holder nor the names of its contributors\n+ *   may be used to endorse or promote products derived from this software\n+ *   without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,\n+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL BJARNE VON HORN BE LIABLE FOR ANY DIRECT,\n+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES\n+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND\n+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\n+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n+ */\n+\n+#pragma once\n+\n+#include <boost/variant.hpp>\n+#include <string>\n+\n+extern \"C\" {\n+struct sqlite3_stmt;\n+}\n+\n+namespace warehouse_ros_sqlite\n+{\n+class BindVisitor : boost::static_visitor<int>\n+{\n+  sqlite3_stmt* stmt_;\n+  int idx_;\n+\n+public:\n+  BindVisitor(sqlite3_stmt* stmt, int start_idx = 1) : stmt_(stmt), idx_(start_idx)\n+  {\n+  }\n+  int operator()(int i);\n+  int operator()(double d);\n+  int operator()(const std::string& s);\n+  int operator()(std::nullptr_t);\n+  int get_total_binds() const { return idx_ - 1; }\n+};\n+\n+namespace detail\n+{\n+template <typename R, typename T>\n+R NullValueGet(T)\n+{\n+  throw boost::bad_get();\n+}\n+template <typename R>\n+typename std::enable_if<!std::is_same<R, std::nullptr_t>::value, R>::type NullValueGet(R r)\n+{\n+  return std::forward<R>(r);\n+}\n+template <typename R>\n+R NullValueGet(std::nullptr_t)\n+{\n+  return R();\n+}\n+}  // namespace detail\n+\n+template <typename R>\n+struct NullValueVisitor : boost::static_visitor<R>\n+{\n+  template <typename T>\n+  R operator()(T t) const\n+  {\n+    return detail::NullValueGet<R, T>(std::forward<T>(t));\n+  }\n+};\n+}  // namespace warehouse_ros_sqlite"
+        },
+        {
+          "sha": "ae0037a671e1a622e9ee826b0e9d2d95547eab5a",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 30,
+          "deletions": 0,
+          "changes": 30,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/c63a117208dd647b2750d3e3604d13f317d320b8/package.xml",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/c63a117208dd647b2750d3e3604d13f317d320b8/package.xml",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/package.xml?ref=c63a117208dd647b2750d3e3604d13f317d320b8",
+          "patch": "@@ -0,0 +1,30 @@\n+<package format=\"2\">\n+  <name>warehouse_ros_sqlite</name>\n+  <version>0.0.0</version>\n+  <description>\n+    Implementation of warehouse_ros for sqlite\n+  </description>\n+  <author>Bjarne von Horn</author>\n+  <maintainer email=\"moveit_releasers@googlegroups.com\">MoveIt Release Team</maintainer>\n+\n+  <license>BSD</license>\n+  <url>http://ros.org/wiki/warehouse_ros</url>\n+\n+  <buildtool_depend>catkin</buildtool_depend>\n+\n+  <build_depend>libsqlite3-dev</build_depend>\n+\n+  <depend>warehouse_ros</depend>\n+  <depend>roscpp</depend>\n+  <depend>rostime</depend>\n+  <depend>std_msgs</depend>\n+  <depend>class_loader</depend>\n+\n+  <test_depend>rostest</test_depend>\n+\n+  <exec_depend>sqlite3</exec_depend>\n+\n+  <export>\n+    <warehouse_ros plugin=\"${prefix}/sqlite_database_connection_plugin_description.xml\"/>\n+  </export>\n+</package>"
+        },
+        {
+          "sha": "9da751c9ae8c7284855185defb7861aa123f27d2",
+          "filename": "sqlite_database_connection_plugin_description.xml",
+          "status": "added",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/c63a117208dd647b2750d3e3604d13f317d320b8/sqlite_database_connection_plugin_description.xml",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/c63a117208dd647b2750d3e3604d13f317d320b8/sqlite_database_connection_plugin_description.xml",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/sqlite_database_connection_plugin_description.xml?ref=c63a117208dd647b2750d3e3604d13f317d320b8",
+          "patch": "@@ -0,0 +1,7 @@\n+<library path=\"libwarehouse_ros_sqlite\">\n+  <class type=\"warehouse_ros_sqlite::SQLiteDatabaseConnection\" base_class_type=\"warehouse_ros::DatabaseConnection\">\n+    <description>\n+    \tThis is an implementation of warehouse_ros for SQLite\n+    </description>\n+  </class>\n+</library>"
+        },
+        {
+          "sha": "c032778ba2b516284eaaa640df5a674e4d4d3ac0",
+          "filename": "src/database_connection.cpp",
+          "status": "added",
+          "additions": 88,
+          "deletions": 0,
+          "changes": 88,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/c63a117208dd647b2750d3e3604d13f317d320b8/src%2Fdatabase_connection.cpp",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/c63a117208dd647b2750d3e3604d13f317d320b8/src%2Fdatabase_connection.cpp",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/src%2Fdatabase_connection.cpp?ref=c63a117208dd647b2750d3e3604d13f317d320b8",
+          "patch": "@@ -0,0 +1,88 @@\n+// SPDX-License-Identifier: BSD-3-Clause\n+\n+/*\n+ * Copyright (c) 2020, Bjarne von Horn\n+ * All rights reserved.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ * * Redistributions of source code must retain the above copyright notice,\n+ *   this list of conditions and the following disclaimer.\n+ * * Redistributions in binary form must reproduce the above copyright notice,\n+ *   this list of conditions and the following disclaimer in the documentation\n+ *   and/or other materials provided with the distribution.\n+ * * Neither the name of the copyright holder nor the names of its contributors\n+ *   may be used to endorse or promote products derived from this software\n+ *   without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,\n+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL BJARNE VON HORN BE LIABLE FOR ANY DIRECT,\n+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES\n+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND\n+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\n+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n+ */\n+#include <warehouse_ros_sqlite/database_connection.h>\n+\n+#include <warehouse_ros_sqlite/message_collection_helper.h>\n+#include <warehouse_ros_sqlite/utils.h>\n+\n+#include <boost/make_shared.hpp>\n+#include <pluginlib/class_list_macros.h>\n+#include <sqlite3.h>\n+\n+/// Setup the database connection. This call assumes setParams() has been previously called.\n+/// Returns true if the connection was succesfully established.\n+bool warehouse_ros_sqlite::DatabaseConnection::connect()\n+{\n+  sqlite3* s = nullptr;\n+  if (sqlite3_open(uri_.c_str(), &s) != SQLITE_OK)\n+  {\n+    return false;\n+  }\n+  db_.reset(s, warehouse_ros_sqlite::sqlite3_delete);\n+  return true;\n+}\n+\n+/// Returns whether the database is connected.\n+bool warehouse_ros_sqlite::DatabaseConnection::isConnected()\n+{\n+  return static_cast<bool>(db_);\n+}\n+\n+/// \\brief Drop a db and all its collections.\n+/// A DbClientConnection exception will be thrown if the database is not connected.\n+void warehouse_ros_sqlite::DatabaseConnection::dropDatabase(const std::string& db_name)\n+{\n+}\n+\n+/// \\brief Return the ROS Message type of a given collection\n+std::string warehouse_ros_sqlite::DatabaseConnection::messageType(const std::string& db_name,\n+                                                                  const std::string& collection_name)\n+{\n+}\n+\n+warehouse_ros::MessageCollectionHelper::Ptr\n+warehouse_ros_sqlite::DatabaseConnection::openCollectionHelper(const std::string& db_name,\n+                                                               const std::string& collection_name)\n+{\n+  return boost::make_shared<warehouse_ros_sqlite::MessageCollectionHelper>(db_, collection_name);\n+}\n+\n+void warehouse_ros_sqlite::sqlite3_stmt_deleter::operator()(sqlite3_stmt* stmt) const\n+{\n+  sqlite3_finalize(stmt);\n+}\n+void warehouse_ros_sqlite::sqlite3_delete(sqlite3* db)\n+{\n+  if (sqlite3_close(db) != SQLITE_OK)\n+  {\n+    ROS_ERROR(\"sqlite connection closed when still in use\");\n+  }\n+}\n+\n+PLUGINLIB_EXPORT_CLASS(warehouse_ros_sqlite::DatabaseConnection, warehouse_ros::DatabaseConnection)"
+        },
+        {
+          "sha": "30e1f84bc34e05072646cdd571709b442b1a218f",
+          "filename": "src/message_collection_helper.cpp",
+          "status": "added",
+          "additions": 167,
+          "deletions": 0,
+          "changes": 167,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/c63a117208dd647b2750d3e3604d13f317d320b8/src%2Fmessage_collection_helper.cpp",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/c63a117208dd647b2750d3e3604d13f317d320b8/src%2Fmessage_collection_helper.cpp",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/src%2Fmessage_collection_helper.cpp?ref=c63a117208dd647b2750d3e3604d13f317d320b8",
+          "patch": "@@ -0,0 +1,167 @@\n+// SPDX-License-Identifier: BSD-3-Clause\n+\n+/*\n+ * Copyright (c) 2020, Bjarne von Horn\n+ * All rights reserved.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ * * Redistributions of source code must retain the above copyright notice,\n+ *   this list of conditions and the following disclaimer.\n+ * * Redistributions in binary form must reproduce the above copyright notice,\n+ *   this list of conditions and the following disclaimer in the documentation\n+ *   and/or other materials provided with the distribution.\n+ * * Neither the name of the copyright holder nor the names of its contributors\n+ *   may be used to endorse or promote products derived from this software\n+ *   without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,\n+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL BJARNE VON HORN BE LIABLE FOR ANY DIRECT,\n+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES\n+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND\n+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\n+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n+ */\n+#include <warehouse_ros_sqlite/message_collection_helper.h>\n+\n+#include <warehouse_ros_sqlite/query.h>\n+#include <warehouse_ros_sqlite/metadata.h>\n+#include <warehouse_ros_sqlite/result_iteration_helper.h>\n+#include <warehouse_ros_sqlite/variant.h>\n+\n+#include <boost/make_shared.hpp>\n+#include <sqlite3.h>\n+#include <sstream>\n+\n+std::string warehouse_ros_sqlite::MessageCollectionHelper::find_md5sum()\n+{\n+  sqlite3_stmt* stmt = nullptr;\n+  std::ostringstream query_builder;\n+  query_builder << \"SELECT \" << schema::MD5TableMD5Column << \" FROM \" << schema::MD5TableName << \" WHERE \"\n+                << schema::MD5TableIndexColumn << \" = ?;\";\n+  const auto query = query_builder.str();\n+  if (sqlite3_prepare_v2(db_.get(), query.c_str(), query.size() + 1, &stmt, nullptr) != SQLITE_OK)\n+  {\n+    throw std::runtime_error(\"\");\n+  }\n+  sqlite3_stmt_ptr stmt_ptr(stmt);\n+  if (sqlite3_bind_text(stmt, 1, name_.c_str(), name_.size(), SQLITE_STATIC) != SQLITE_OK)\n+  {\n+    throw std::runtime_error(\"\");\n+  }\n+  if (sqlite3_step(stmt) == SQLITE_ROW)\n+  {\n+    return std::string(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1)), sqlite3_column_bytes(stmt, 1));\n+  }\n+  return \"\";\n+}\n+\n+bool warehouse_ros_sqlite::MessageCollectionHelper::initialize(const std::string& datatype, const std::string& md5)\n+{\n+  using namespace warehouse_ros_sqlite::schema;\n+  const auto current_md5 = find_md5sum();\n+  if (!current_md5.empty())\n+  {\n+    return current_md5 == md5;\n+  }\n+  std::ostringstream query_builder;\n+  query_builder << \"BEGIN TRANSACTION; CREATE TABLE \" << TableNamePrefix << name_ << \"; INSERT INTO \" << MD5TableName\n+                << \" ( \" << MD5TableIndexColumn << \" , \" << MD5TableMD5Column << \") VALUES (\" << name_ << \" , \" << md5\n+                << \"); COMMIT TRANSACTION;\";\n+  const auto query = query_builder.str();\n+  return sqlite3_exec(db_.get(), query.c_str(), nullptr, nullptr, nullptr) == SQLITE_OK;\n+}\n+void warehouse_ros_sqlite::MessageCollectionHelper::insert(char* msg, size_t msg_size,\n+                                                           warehouse_ros::Metadata::ConstPtr metadata)\n+{\n+  auto meta = reinterpret_cast<const warehouse_ros_sqlite::Metadata*>(metadata.get());\n+  if (!meta || !msg || !msg_size)\n+    throw std::runtime_error(\"\");\n+  std::ostringstream query;\n+  query << \"INSERT INTO \" << schema::TableNamePrefix << name_ << \"(\";\n+  query << schema::DataColumnName << \",\";\n+\n+  const auto& data = meta->data();\n+  for (const auto& kv : data)\n+  {\n+    query << \", \" << std::get<0>(kv);\n+  }\n+  query << \") VALUES ( ? \";\n+  for (size_t i = 0; i < data.size(); ++i)\n+    query << \", ? \";\n+  query << \");\";\n+\n+  sqlite3_stmt* stmt = nullptr;\n+  const auto query_str = query.str();\n+  if (sqlite3_prepare_v2(db_.get(), query_str.c_str(), query_str.size() + 1, &stmt, nullptr) != SQLITE_OK)\n+    throw std::runtime_error(\"\");\n+  const sqlite3_stmt_ptr stmt_guard(stmt);\n+\n+  if (sqlite3_bind_blob(stmt, 1, msg, msg_size, SQLITE_STATIC) != SQLITE_OK)\n+    throw std::runtime_error(\"\");\n+  warehouse_ros_sqlite::BindVisitor visitor(stmt, 2);\n+  for (const auto& kv: data)\n+  {\n+    if (boost::apply_visitor(visitor, std::get<1>(kv)) != SQLITE_OK)\n+      throw std::runtime_error(\"\");\n+  }\n+\n+  assert(sqlite3_bind_parameter_count(stmt) == visitor.get_total_binds());\n+  if (sqlite3_step(stmt) != SQLITE_DONE)\n+      throw std::runtime_error(\"\");\n+}\n+warehouse_ros::ResultIteratorHelper::Ptr\n+warehouse_ros_sqlite::MessageCollectionHelper::query(warehouse_ros::Query::ConstPtr query, const std::string& sort_by,\n+                                                     bool ascending) const\n+{\n+  std::string outro;\n+  if (!sort_by.empty())\n+  {\n+    outro += \" ORDER BY \" + sort_by;\n+  }\n+  if (!ascending)\n+  {\n+    outro += \" DESC\";\n+  }\n+  auto query_ptr = dynamic_cast<const warehouse_ros_sqlite::Query*>(query.get());\n+  assert(query_ptr);\n+  std::ostringstream intro;\n+  intro << \"SELECT * FROM \" << schema::TableNamePrefix << name_ << \" WHERE \";\n+  auto stmt = query_ptr->prepare(db_.get(), intro.str(), outro);\n+  switch (sqlite3_step(stmt.get()))\n+  {\n+    case SQLITE_DONE:\n+    case SQLITE_ROW:\n+      break;\n+    default:\n+      throw std::runtime_error(\"\");\n+  }\n+  return boost::make_shared<warehouse_ros_sqlite::ResultIteratorHelper>(std::move(stmt));\n+}\n+unsigned warehouse_ros_sqlite::MessageCollectionHelper::removeMessages(warehouse_ros::Query::ConstPtr query)\n+{\n+  auto pquery = dynamic_cast<warehouse_ros_sqlite::Query const*>(query.get());\n+  if (!pquery)\n+    throw std::runtime_error(\"Query was not initialized by createQuery()\");\n+  auto stmt = pquery->prepare(db_.get(), \"DELETE FROM \" + name_ + \"WHERE \");\n+  return sqlite3_changes(db_.get());\n+}\n+void warehouse_ros_sqlite::MessageCollectionHelper::modifyMetadata(warehouse_ros::Query::ConstPtr q,\n+                                                                   warehouse_ros::Metadata::ConstPtr m)\n+{\n+}\n+unsigned warehouse_ros_sqlite::MessageCollectionHelper::count()\n+{\n+}\n+warehouse_ros::Query::Ptr warehouse_ros_sqlite::MessageCollectionHelper::createQuery() const\n+{\n+  return boost::make_shared<warehouse_ros_sqlite::Query>();\n+}\n+warehouse_ros::Metadata::Ptr warehouse_ros_sqlite::MessageCollectionHelper::createMetadata() const\n+{\n+  return boost::make_shared<warehouse_ros_sqlite::Metadata>();\n+}"
+        },
+        {
+          "sha": "ec7a5f131388f1a517fb36d4106960d9da9220e3",
+          "filename": "src/metadata.cpp",
+          "status": "added",
+          "additions": 110,
+          "deletions": 0,
+          "changes": 110,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/c63a117208dd647b2750d3e3604d13f317d320b8/src%2Fmetadata.cpp",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/c63a117208dd647b2750d3e3604d13f317d320b8/src%2Fmetadata.cpp",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/src%2Fmetadata.cpp?ref=c63a117208dd647b2750d3e3604d13f317d320b8",
+          "patch": "@@ -0,0 +1,110 @@\n+// SPDX-License-Identifier: BSD-3-Clause\n+\n+/*\n+ * Copyright (c) 2020, Bjarne von Horn\n+ * All rights reserved.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ * * Redistributions of source code must retain the above copyright notice,\n+ *   this list of conditions and the following disclaimer.\n+ * * Redistributions in binary form must reproduce the above copyright notice,\n+ *   this list of conditions and the following disclaimer in the documentation\n+ *   and/or other materials provided with the distribution.\n+ * * Neither the name of the copyright holder nor the names of its contributors\n+ *   may be used to endorse or promote products derived from this software\n+ *   without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,\n+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL BJARNE VON HORN BE LIABLE FOR ANY DIRECT,\n+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES\n+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND\n+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\n+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n+ */\n+#include <warehouse_ros_sqlite/metadata.h>\n+\n+#include <sqlite3.h>\n+\n+#include <warehouse_ros_sqlite/variant.h>\n+#include <warehouse_ros_sqlite/utils.h>\n+\n+template <typename R>\n+R warehouse_ros_sqlite::Metadata::doLookup(const std::string& name) const\n+{\n+  const auto res = data_.find(name);\n+  if (res == data_.end())\n+  {\n+    throw std::range_error(\"\");\n+  }\n+  return boost::apply_visitor(warehouse_ros_sqlite::NullValueVisitor<R>(), res->second);\n+}\n+\n+void warehouse_ros_sqlite::Metadata::append(const std::string& name, const std::string& val)\n+{\n+  data_[name] = val;\n+}\n+void warehouse_ros_sqlite::Metadata::append(const std::string& name, const double val)\n+{\n+  data_[name] = val;\n+}\n+void warehouse_ros_sqlite::Metadata::append(const std::string& name, const int val)\n+{\n+  data_[name] = val;\n+}\n+void warehouse_ros_sqlite::Metadata::append(const std::string& name, const bool val)\n+{\n+  data_[name] = static_cast<int>(val);\n+}\n+std::string warehouse_ros_sqlite::Metadata::lookupString(const std::string& name) const\n+{\n+  return doLookup<std::string>(name);\n+}\n+double warehouse_ros_sqlite::Metadata::lookupDouble(const std::string& name) const\n+{\n+  return doLookup<double>(name);\n+}\n+int warehouse_ros_sqlite::Metadata::lookupInt(const std::string& name) const\n+{\n+  return doLookup<int>(name);\n+}\n+bool warehouse_ros_sqlite::Metadata::lookupBool(const std::string& name) const\n+{\n+  return static_cast<bool>(doLookup<int>(name));\n+}\n+bool warehouse_ros_sqlite::Metadata::lookupField(const std::string& name) const\n+{\n+  return (data_.find(name) != data_.end());\n+}\n+std::set<std::string> warehouse_ros_sqlite::Metadata::lookupFieldNames() const\n+{\n+  std::set<std::string> ans;\n+  std::transform(data_.begin(), data_.end(), std::inserter(ans, ans.end()), [](const auto& it) { return it.first; });\n+  return ans;\n+}\n+\n+void warehouse_ros_sqlite::Metadata::append(const std::string& name, sqlite3_stmt* stmt, int col)\n+{\n+  switch (sqlite3_column_type(stmt, col))\n+  {\n+    case SQLITE_NULL:\n+      data_[name] = nullptr;\n+      break;\n+    case SQLITE_BLOB:\n+      data_[name] =\n+          std::string(reinterpret_cast<const char*>(sqlite3_column_blob(stmt, col)), sqlite3_column_bytes(stmt, col));\n+      break;\n+    case SQLITE_INTEGER:\n+      data_[name] = sqlite3_column_int(stmt, col);\n+      break;\n+    case SQLITE_FLOAT:\n+      data_[name] = sqlite3_column_double(stmt, col);\n+      break;\n+    default:\n+      throw std::runtime_error(\"unknown datatype\");\n+  }\n+}"
+        },
+        {
+          "sha": "85e6072bffc5ff7088ef9d3feee8f6de24f9584c",
+          "filename": "src/query.cpp",
+          "status": "added",
+          "additions": 152,
+          "deletions": 0,
+          "changes": 152,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/c63a117208dd647b2750d3e3604d13f317d320b8/src%2Fquery.cpp",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/c63a117208dd647b2750d3e3604d13f317d320b8/src%2Fquery.cpp",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/src%2Fquery.cpp?ref=c63a117208dd647b2750d3e3604d13f317d320b8",
+          "patch": "@@ -0,0 +1,152 @@\n+// SPDX-License-Identifier: BSD-3-Clause\n+\n+/*\n+ * Copyright (c) 2020, Bjarne von Horn\n+ * All rights reserved.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ * * Redistributions of source code must retain the above copyright notice,\n+ *   this list of conditions and the following disclaimer.\n+ * * Redistributions in binary form must reproduce the above copyright notice,\n+ *   this list of conditions and the following disclaimer in the documentation\n+ *   and/or other materials provided with the distribution.\n+ * * Neither the name of the copyright holder nor the names of its contributors\n+ *   may be used to endorse or promote products derived from this software\n+ *   without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,\n+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL BJARNE VON HORN BE LIABLE FOR ANY DIRECT,\n+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES\n+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND\n+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\n+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n+ */\n+#include <warehouse_ros_sqlite/query.h>\n+\n+#include <sqlite3.h>\n+#include <iomanip>\n+#include <boost/variant/static_visitor.hpp>\n+#include <warehouse_ros/exceptions.h>\n+#include <warehouse_ros_sqlite/variant.h>\n+\n+int warehouse_ros_sqlite::BindVisitor::operator()(int i)\n+{\n+  return sqlite3_bind_int64(stmt_, idx_++, i);\n+}\n+int warehouse_ros_sqlite::BindVisitor::operator()(double d)\n+{\n+  return sqlite3_bind_double(stmt_, idx_++, d);\n+}\n+int warehouse_ros_sqlite::BindVisitor::operator()(const std::string& s)\n+{\n+  return sqlite3_bind_blob64(stmt_, idx_++, s.data(), s.size(), SQLITE_STATIC);\n+}\n+int warehouse_ros_sqlite::BindVisitor::operator()(std::nullptr_t)\n+{\n+  return sqlite3_bind_null(stmt_, idx_++);\n+}\n+\n+warehouse_ros_sqlite::Query::Query()\n+{\n+}\n+\n+warehouse_ros_sqlite::sqlite3_stmt_ptr warehouse_ros_sqlite::Query::prepare(sqlite3* db_conn, const std::string& intro, const std::string& outro ) const\n+{\n+  sqlite3_stmt* stmt = nullptr;\n+  const auto query = intro + query_.str() + outro + \";\";\n+  if (sqlite3_prepare_v2(db_conn, query.c_str(), query.size() + 1 /* null terminator*/, &stmt, nullptr) != SQLITE_OK)\n+  {\n+    throw warehouse_ros::WarehouseRosException(\"Prepare query failed\");\n+  }\n+  warehouse_ros_sqlite::sqlite3_stmt_ptr ans(stmt);\n+\n+  if (sqlite3_bind_parameter_count(stmt) != values_.size())\n+  {\n+    throw warehouse_ros::WarehouseRosException(\"Prepare query failed, parameter count mismatch\");\n+  }\n+\n+  warehouse_ros_sqlite::BindVisitor visitor(stmt);\n+  for (const auto& value : values_)\n+  {\n+    if (boost::apply_visitor(visitor, value) != SQLITE_OK)\n+    {\n+      throw warehouse_ros::WarehouseRosException(\"Binding parameter to query failed\");\n+    }\n+  }\n+\n+  return ans;\n+}\n+\n+void warehouse_ros_sqlite::Query::append(const std::string& name, const std::string& val)\n+{\n+  doappend(name, \" == \", val);\n+}\n+void warehouse_ros_sqlite::Query::append(const std::string& name, const double val)\n+{\n+  doappend(name, \" == \", val);\n+}\n+void warehouse_ros_sqlite::Query::append(const std::string& name, const int val)\n+{\n+  doappend(name, \" == \", val);\n+}\n+void warehouse_ros_sqlite::Query::append(const std::string& name, const bool val)\n+{\n+  doappend(name, \" == \", static_cast<int>(val));\n+}\n+void warehouse_ros_sqlite::Query::appendLT(const std::string& name, const double val)\n+{\n+  doappend(name, \" < \", val);\n+}\n+void warehouse_ros_sqlite::Query::appendLT(const std::string& name, const int val)\n+{\n+  doappend(name, \" < \", val);\n+}\n+void warehouse_ros_sqlite::Query::appendLTE(const std::string& name, const double val)\n+{\n+  doappend(name, \" <= \", val);\n+}\n+void warehouse_ros_sqlite::Query::appendLTE(const std::string& name, const int val)\n+{\n+  doappend(name, \" <= \", val);\n+}\n+void warehouse_ros_sqlite::Query::appendGT(const std::string& name, const double val)\n+{\n+  doappend(name, \" > \", val);\n+}\n+void warehouse_ros_sqlite::Query::appendGT(const std::string& name, const int val)\n+{\n+  doappend(name, \" > \", val);\n+}\n+void warehouse_ros_sqlite::Query::appendGTE(const std::string& name, const double val)\n+{\n+  doappend(name, \" >= \", val);\n+}\n+void warehouse_ros_sqlite::Query::appendGTE(const std::string& name, const int val)\n+{\n+  doappend(name, \" >= \", val);\n+}\n+void warehouse_ros_sqlite::Query::appendRange(const std::string& name, const double lower, const double upper)\n+{\n+  doappend(name, \" > \", lower);\n+  doappend(name, \" < \", upper);\n+}\n+void warehouse_ros_sqlite::Query::appendRange(const std::string& name, const int lower, const int upper)\n+{\n+  doappend(name, \" > \", lower);\n+  doappend(name, \" < \", upper);\n+}\n+void warehouse_ros_sqlite::Query::appendRangeInclusive(const std::string& name, const double lower, const double upper)\n+{\n+  doappend(name, \" >= \", lower);\n+  doappend(name, \" <= \", upper);\n+}\n+void warehouse_ros_sqlite::Query::appendRangeInclusive(const std::string& name, const int lower, const int upper)\n+{\n+  doappend(name, \" >= \", lower);\n+  doappend(name, \" <= \", upper);\n+}"
+        },
+        {
+          "sha": "a167104eda2d30fe7546256991e8f0672751a16d",
+          "filename": "src/result_iteration_helper.cpp",
+          "status": "added",
+          "additions": 106,
+          "deletions": 0,
+          "changes": 106,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/c63a117208dd647b2750d3e3604d13f317d320b8/src%2Fresult_iteration_helper.cpp",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/c63a117208dd647b2750d3e3604d13f317d320b8/src%2Fresult_iteration_helper.cpp",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/src%2Fresult_iteration_helper.cpp?ref=c63a117208dd647b2750d3e3604d13f317d320b8",
+          "patch": "@@ -0,0 +1,106 @@\n+// SPDX-License-Identifier: BSD-3-Clause\n+\n+/*\n+ * Copyright (c) 2020, Bjarne von Horn\n+ * All rights reserved.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ * * Redistributions of source code must retain the above copyright notice,\n+ *   this list of conditions and the following disclaimer.\n+ * * Redistributions in binary form must reproduce the above copyright notice,\n+ *   this list of conditions and the following disclaimer in the documentation\n+ *   and/or other materials provided with the distribution.\n+ * * Neither the name of the copyright holder nor the names of its contributors\n+ *   may be used to endorse or promote products derived from this software\n+ *   without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,\n+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL BJARNE VON HORN BE LIABLE FOR ANY DIRECT,\n+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES\n+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND\n+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\n+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n+ */\n+#include <warehouse_ros_sqlite/result_iteration_helper.h>\n+\n+#include <warehouse_ros_sqlite/metadata.h>\n+\n+#include <sqlite3.h>\n+#include <cassert>\n+\n+#include <cstring>\n+#include <boost/make_shared.hpp>\n+\n+bool warehouse_ros_sqlite::ResultIteratorHelper::next()\n+{\n+  switch (sqlite3_step(stmt_.get()))\n+  {\n+    case SQLITE_ROW:\n+\n+      return true;\n+    case SQLITE_DONE:\n+      stmt_.reset();\n+      return false;\n+    default:\n+      throw std::runtime_error(\"sqlite3_step()\");\n+  }\n+}\n+bool warehouse_ros_sqlite::ResultIteratorHelper::hasData() const\n+{\n+  if (!stmt_)\n+    return false;\n+  switch (sqlite3_column_type(stmt_.get(), schema::DataColumnIndex))\n+  {\n+    case SQLITE_BLOB:\n+      return sqlite3_column_bytes(stmt_.get(), schema::DataColumnIndex) != 0;\n+    case SQLITE_NULL:\n+      return false;\n+    default:\n+      throw std::runtime_error(\"Data Column has wrong data type\");\n+  }\n+}\n+\n+warehouse_ros::Metadata::ConstPtr warehouse_ros_sqlite::ResultIteratorHelper::metadata() const\n+{\n+  assert(static_cast<bool>(stmt_));\n+  auto ans = boost::make_shared<warehouse_ros_sqlite::Metadata>();\n+  for (const auto& col_pair : metadata_cols_)\n+  {\n+    ans->append(std::get<0>(col_pair), stmt_.get(), std::get<1>(col_pair));\n+  }\n+  return ans;\n+}\n+\n+std::string warehouse_ros_sqlite::ResultIteratorHelper::message() const\n+{\n+  if (!hasData())\n+    return std::string();\n+  return std::string(reinterpret_cast<const char*>(sqlite3_column_blob(stmt_.get(), schema::DataColumnIndex)),\n+                     sqlite3_column_bytes(stmt_.get(), schema::DataColumnIndex));\n+}\n+\n+namespace\n+{\n+int constexpr strlength(const char* str)\n+{\n+  return *str ? 1 + strlength(str + 1) : 0;\n+}\n+}  // namespace\n+\n+void warehouse_ros_sqlite::ResultIteratorHelper::init_metadata_cols()\n+{\n+  constexpr int max_length = strlength(schema::MetadataColumnPrefix);\n+  for (int i = 0; i < sqlite3_column_count(stmt_.get()); ++i)\n+  {\n+    const char* col_name = sqlite3_column_name(stmt_.get(), i);\n+    if (std::strncmp(schema::MetadataColumnPrefix, col_name, max_length) == 0)\n+    {\n+      metadata_cols_.emplace_back(col_name, i);\n+    }\n+  }\n+}"
+        }
+      ]
+    },
+    {
+      "author": "henningkayser",
+      "date": "2021-10-12T09:55:40Z",
+      "sha": "2537c94b80fbaaac0834c9ec0fcd9558e01fcde5",
+      "message": "1.0.2",
+      "files_changed": 2,
+      "additions": 65,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "af2bbc427c60e8593f81e80bb8d07843e1634523",
+          "filename": "CHANGELOG.rst",
+          "status": "added",
+          "additions": 64,
+          "deletions": 0,
+          "changes": 64,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/2537c94b80fbaaac0834c9ec0fcd9558e01fcde5/CHANGELOG.rst",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/2537c94b80fbaaac0834c9ec0fcd9558e01fcde5/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/CHANGELOG.rst?ref=2537c94b80fbaaac0834c9ec0fcd9558e01fcde5",
+          "patch": "@@ -0,0 +1,64 @@\n+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n+Changelog for package warehouse_ros_sqlite\n+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n+\n+1.0.2 (2021-10-12)\n+------------------\n+* Update CMakeLists.txt\n+* Adapt github URLs in README\n+* Fix whitespaces in codecov script\n+* Enable pre-commit in CI\n+* Enable prerelease tests\n+* Add pre-commit config\n+* Switch to upstream warehouse_ros\n+* Contributors: Bjar Ne, Nisala Kalupahana\n+\n+1.0.1 (2021-06-21)\n+---------------------------------\n+* ROS 2 Port\n+* Remove duplicate header guard\n+* Silence CMake warning\n+* Delete LICENSE.txt\n+* Add ROS2 launch config to README\n+* partially update readme\n+* Enable codecov\n+* Switch to github workflow\n+* Switch to sqlite3_vendor\n+* Contributors: Bjar Ne\n+\n+1.0.0 (2020-11-14)\n+------------------\n+* version bump\n+* add busy handler for concurrent writes to db\n+* Test warehouse plugin loading\n+* fix clang-format\n+* Export interfaces (dllexport/visibility=hidden)\n+* fix clang-tidy\n+* Versioning of the database scheme\n+* Adapt scheme to be more precise\n+* Readme and notes on database schema\n+* fix clang-format\n+* Fix query with ordering\n+* Use proper exception types\n+* implemented dropping databases\n+* Support multiple databases with name mangling\n+  The collection name and the database name are mangled and concatenated\n+  to support multiple databases.\n+  SQLite only supports one database per file.\n+* rollback on initialization error\n+* Fix validation of stored MD5 sum\n+* SQL String escaping\n+* query tests and bugfix\n+* test change of metadata\n+* test and fix Null value metadata handling\n+* test and fix MD5 validation\n+* local warehouse_ros package\n+* Add first API test\n+* more fixes\n+* add clang-tidy config\n+* clang-tidy fixes\n+* fixes\n+* enable travis\n+* more stuff\n+* initial commit\n+* Contributors: Bjar Ne"
+        },
+        {
+          "sha": "ba3f073344c9750c670a3e2a707147dfe3fe8d0a",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/2537c94b80fbaaac0834c9ec0fcd9558e01fcde5/package.xml",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/2537c94b80fbaaac0834c9ec0fcd9558e01fcde5/package.xml",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/package.xml?ref=2537c94b80fbaaac0834c9ec0fcd9558e01fcde5",
+          "patch": "@@ -1,6 +1,6 @@\n <package format=\"3\">\n   <name>warehouse_ros_sqlite</name>\n-  <version>1.0.1</version>\n+  <version>1.0.2</version>\n   <description>\n     Implementation of warehouse_ros for sqlite\n   </description>"
+        }
+      ]
+    },
+    {
+      "author": "tylerjw",
+      "date": "2022-05-24T17:03:32Z",
+      "sha": "901a62e263b1a210db7c9f4a952b14d9e83b93b2",
+      "message": "Merge pull request #39 from vatanaksoytezer/vatan/humble_main\n\nHumble main CI and prerelease",
+      "files_changed": 2,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "38680bd4a5e70da7eaff1f1fbf1a9a0696fe8963",
+          "filename": ".github/workflows/build_and_test.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/901a62e263b1a210db7c9f4a952b14d9e83b93b2/.github%2Fworkflows%2Fbuild_and_test.yaml",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/901a62e263b1a210db7c9f4a952b14d9e83b93b2/.github%2Fworkflows%2Fbuild_and_test.yaml",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/.github%2Fworkflows%2Fbuild_and_test.yaml?ref=901a62e263b1a210db7c9f4a952b14d9e83b93b2",
+          "patch": "@@ -26,6 +26,7 @@ jobs:\n           - {ROS_DISTRO: rolling, ROS_REPO: testing, CCOV_UPLOAD: false}\n           - {ROS_DISTRO: galactic, ROS_REPO: main, CCOV_UPLOAD: false}\n           - {ROS_DISTRO: galactic, ROS_REPO: testing, CCOV_UPLOAD: false}\n+          - {ROS_DISTRO: humble, ROS_REPO: main, CCOV_UPLOAD: false}\n           - {ROS_DISTRO: humble, ROS_REPO: testing, CCOV_UPLOAD: false}\n     env:\n       CCACHE_DIR: ${{ github.workspace }}/.ccache"
+        },
+        {
+          "sha": "5aa993a5edfbf7e64f762d223d327aaf06c25a7b",
+          "filename": ".github/workflows/prerelease.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/901a62e263b1a210db7c9f4a952b14d9e83b93b2/.github%2Fworkflows%2Fprerelease.yaml",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/901a62e263b1a210db7c9f4a952b14d9e83b93b2/.github%2Fworkflows%2Fprerelease.yaml",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/.github%2Fworkflows%2Fprerelease.yaml?ref=901a62e263b1a210db7c9f4a952b14d9e83b93b2",
+          "patch": "@@ -11,7 +11,7 @@ jobs:\n     strategy:\n       fail-fast: false\n       matrix:\n-        distro: [foxy, galactic, rolling]\n+        distro: [foxy, galactic, humble, rolling]\n \n     env:\n       ROS_DISTRO: ${{ matrix.distro }}"
+        }
+      ]
+    },
+    {
+      "author": "Vatan Aksoy Tezer",
+      "date": "2022-05-17T15:03:37Z",
+      "sha": "fe521fbda8d16e10624255419827505a0511f12b",
+      "message": "Add humble testing CI (#37)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "fd8f1f23fd2faf02087a2555b2863cabccbbd622",
+          "filename": ".github/workflows/build_and_test.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/fe521fbda8d16e10624255419827505a0511f12b/.github%2Fworkflows%2Fbuild_and_test.yaml",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/fe521fbda8d16e10624255419827505a0511f12b/.github%2Fworkflows%2Fbuild_and_test.yaml",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/.github%2Fworkflows%2Fbuild_and_test.yaml?ref=fe521fbda8d16e10624255419827505a0511f12b",
+          "patch": "@@ -26,6 +26,7 @@ jobs:\n           - {ROS_DISTRO: rolling, ROS_REPO: testing, CCOV_UPLOAD: false}\n           - {ROS_DISTRO: galactic, ROS_REPO: main, CCOV_UPLOAD: false}\n           - {ROS_DISTRO: galactic, ROS_REPO: testing, CCOV_UPLOAD: false}\n+          - {ROS_DISTRO: humble, ROS_REPO: testing, CCOV_UPLOAD: false}\n     env:\n       CCACHE_DIR: ${{ github.workspace }}/.ccache\n       BASEDIR: ${{ github.workspace }}/.work"
+        }
+      ]
+    },
+    {
+      "author": "nkalupahana",
+      "date": "2021-07-30T19:47:19Z",
+      "sha": "4e9f36d166c1c123d52a3c839e4579278e548b24",
+      "message": "Update CMakeLists.txt",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "86cc770b6fde33c4a49df4ad0d27982a2a618f35",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/moveit/warehouse_ros_sqlite/blob/4e9f36d166c1c123d52a3c839e4579278e548b24/CMakeLists.txt",
+          "raw_url": "https://github.com/moveit/warehouse_ros_sqlite/raw/4e9f36d166c1c123d52a3c839e4579278e548b24/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/moveit/warehouse_ros_sqlite/contents/CMakeLists.txt?ref=4e9f36d166c1c123d52a3c839e4579278e548b24",
+          "patch": "@@ -8,7 +8,7 @@ endif()\n find_package(ament_cmake REQUIRED)\n find_package(sqlite3_vendor REQUIRED)\n find_package(SQLite3 REQUIRED)\n-find_package(Boost REQUIRED COMPONENTS filesystem)\n+find_package(Boost REQUIRED COMPONENTS filesystem system thread)\n find_package(class_loader REQUIRED)\n find_package(OpenSSL REQUIRED)\n find_package(rclcpp REQUIRED)"
+        }
+      ]
+    }
+  ]
+}

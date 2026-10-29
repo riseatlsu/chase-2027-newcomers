@@ -1,0 +1,918 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T04:40:21Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "astuff",
+    "repo": "avt_vimba_camera"
+  },
+  "data": [
+    {
+      "author": "MikoMikarro",
+      "date": "2023-05-29T13:51:52Z",
+      "sha": "095642d40fa521d93ce4e96d1c4abb3779116b73",
+      "message": "Adding framerate control for Vimba v6 (#121)\n\n* Adding framerate control for Vimva v6\r\n\r\n* Update AvtVimbaCamera.cfg\r\n\r\nchanged white spacing to align all parameters\r\n\r\n* Update Mako_G-319.launch",
+      "files_changed": 5,
+      "additions": 12,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "802e703234bdcf9ebf93eedf2cddb431ca44ec21",
+          "filename": "cfg/AvtVimbaCamera.cfg",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/095642d40fa521d93ce4e96d1c4abb3779116b73/cfg%2FAvtVimbaCamera.cfg",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/095642d40fa521d93ce4e96d1c4abb3779116b73/cfg%2FAvtVimbaCamera.cfg",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/cfg%2FAvtVimbaCamera.cfg?ref=095642d40fa521d93ce4e96d1c4abb3779116b73",
+          "patch": "@@ -160,6 +160,7 @@ exposure_mode_enum = gen.enum([gen.const(\"Timed\", str_t, \"Timed\", \"[Default] Cam\n # ACQUISITION\n gen.add(\"acquisition_mode\",       str_t,    SensorLevels.RECONFIGURE_STOP,    \"Camera acquisition mode\", \"Continuous\", edit_method = acquisition_mode_enum)\n gen.add(\"acquisition_rate\",       double_t, SensorLevels.RECONFIGURE_RUNNING, \"Sets the expected triggering rate in externally triggered mode.\", 10, 1, 35)\n+gen.add(\"acquisition_rate_enable\",bool_t, SensorLevels.RECONFIGURE_RUNNING, \"Allows to fix acquisition rate, if available\", False)\n # TRIGGER\n gen.add(\"trigger_source\",         str_t,    SensorLevels.RECONFIGURE_STOP,    \"Camera trigger source\", \"FixedRate\", edit_method = trigger_source_enum)\n gen.add(\"trigger_mode\",           str_t,    SensorLevels.RECONFIGURE_STOP,    \"Camera trigger mode\", \"On\", edit_method = trigger_mode_enum)"
+        },
+        {
+          "sha": "bb4abfbf5b1221fa0bc68d523462ba7a01e3cb05",
+          "filename": "launch/Mako_G-319.launch",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/095642d40fa521d93ce4e96d1c4abb3779116b73/launch%2FMako_G-319.launch",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/095642d40fa521d93ce4e96d1c4abb3779116b73/launch%2FMako_G-319.launch",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/launch%2FMako_G-319.launch?ref=095642d40fa521d93ce4e96d1c4abb3779116b73",
+          "patch": "@@ -5,6 +5,7 @@\n   <arg name=\"guid\" default=\"\" doc=\"The GUID for the camera to connect to\"/>\n   <arg name=\"camera_info_url\" default=\"file://$(find avt_vimba_camera)/calibrations/calibration_example.yaml\"/>\n   <arg name=\"acquisition_rate\" default=\"10\" doc=\"Camera framerate (Hz)\"/>\n+  <arg name=\"acquisition_rate_enable\" default=\"False\" doc=\"Allow fixed camera framerate\"/>\n \n   <include file=\"$(find avt_vimba_camera)/launch/mono_camera.launch\">\n     <arg name=\"name\" value=\"$(arg name)\"/>\n@@ -13,6 +14,7 @@\n     <arg name=\"guid\" value=\"$(arg guid)\"/>\n     <arg name=\"camera_info_url\" value=\"$(arg camera_info_url)\"/>\n     <arg name=\"acquisition_rate\" value=\"$(arg acquisition_rate)\"/>\n+    <arg name=\"acquisition_rate_enable\" value=\"$(arg acquisition_rate_enable)\"/>\n \n     <!-- Params specific to Mako G-319 -->\n     <arg name=\"pixel_format\" value=\"BayerRG8\"/>"
+        },
+        {
+          "sha": "bf1bcc7bda13b4063055473474a4c40e93a3e99b",
+          "filename": "launch/mono_camera.launch",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/095642d40fa521d93ce4e96d1c4abb3779116b73/launch%2Fmono_camera.launch",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/095642d40fa521d93ce4e96d1c4abb3779116b73/launch%2Fmono_camera.launch",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/launch%2Fmono_camera.launch?ref=095642d40fa521d93ce4e96d1c4abb3779116b73",
+          "patch": "@@ -17,6 +17,7 @@\n   <!-- Acquisition -->\n   <arg name=\"acquisition_mode\" default=\"Continuous\"/>\n   <arg name=\"acquisition_rate\" default=\"10\"/>\n+  <arg name=\"acquisition_rate_enable\" default=\"False\"/>\n   <!-- Trigger -->\n   <arg name=\"trigger_source\" default=\"FixedRate\"/>\n   <arg name=\"trigger_mode\" default=\"On\"/>\n@@ -93,6 +94,7 @@\n \n     <param name=\"acquisition_mode\" value=\"$(arg acquisition_mode)\"/>\n     <param name=\"acquisition_rate\" value=\"$(arg acquisition_rate)\"/>\n+    <param name=\"acquisition_rate_enable\" value=\"$(arg acquisition_rate_enable)\"/>\n \n     <param name=\"trigger_source\" value=\"$(arg trigger_source)\"/>\n     <param name=\"trigger_mode\" value=\"$(arg trigger_mode)\"/>"
+        },
+        {
+          "sha": "7248600033d9deec7f911eceed1e4d91d8a13c2a",
+          "filename": "launch/mono_camera_nodelet.launch",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/095642d40fa521d93ce4e96d1c4abb3779116b73/launch%2Fmono_camera_nodelet.launch",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/095642d40fa521d93ce4e96d1c4abb3779116b73/launch%2Fmono_camera_nodelet.launch",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/launch%2Fmono_camera_nodelet.launch?ref=095642d40fa521d93ce4e96d1c4abb3779116b73",
+          "patch": "@@ -14,6 +14,7 @@\n   <!-- Acquisition -->\n   <arg name=\"acquisition_mode\" default=\"Continuous\"/>\n   <arg name=\"acquisition_rate\" default=\"10\"/>\n+  <arg name=\"acquisition_rate_enable\" default=\"False\"/>\n   <!-- Trigger -->\n   <arg name=\"trigger_source\" default=\"FixedRate\"/>\n   <arg name=\"trigger_mode\" default=\"On\"/>\n@@ -93,6 +94,7 @@\n \n     <param name=\"acquisition_mode\" value=\"$(arg acquisition_mode)\"/>\n     <param name=\"acquisition_rate\" value=\"$(arg acquisition_rate)\"/>\n+    <param name=\"acquisition_rate_enable\" value=\"$(arg acquisition_rate_enable)\"/>\n \n     <param name=\"trigger_source\" value=\"$(arg trigger_source)\"/>\n     <param name=\"trigger_mode\" value=\"$(arg trigger_mode)\"/>"
+        },
+        {
+          "sha": "6188d2af03542052f090a0f8c722a8d0100c6e1a",
+          "filename": "src/avt_vimba_camera.cpp",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/095642d40fa521d93ce4e96d1c4abb3779116b73/src%2Favt_vimba_camera.cpp",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/095642d40fa521d93ce4e96d1c4abb3779116b73/src%2Favt_vimba_camera.cpp",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/src%2Favt_vimba_camera.cpp?ref=095642d40fa521d93ce4e96d1c4abb3779116b73",
+          "patch": "@@ -837,9 +837,14 @@ void AvtVimbaCamera::updateAcquisitionConfig(Config& config)\n   {\n     configureFeature(\"AcquisitionMode\", config.acquisition_mode, config.acquisition_mode);\n   }\n+  if (config.acquisition_rate_enable != config_.acquisition_rate_enable || on_init_)\n+  {\n+    configureFeature(\"AcquisitionFrameRateEnable\", static_cast<bool>(config.acquisition_rate_enable), config.acquisition_rate_enable); \n+  }\n   if (config.acquisition_rate != config_.acquisition_rate || on_init_)\n   {\n     configureFeature(\"AcquisitionFrameRateAbs\", static_cast<float>(config.acquisition_rate), config.acquisition_rate);\n+    configureFeature(\"AcquisitionFrameRate\", static_cast<float>(config.acquisition_rate), config.acquisition_rate); // NEW  CAMERAS USE THIS PARAMETER\n   }\n   if (config.trigger_mode != config_.trigger_mode || on_init_)\n   {"
+        }
+      ]
+    },
+    {
+      "author": "dagata-mining",
+      "date": "2022-10-11T15:23:23Z",
+      "sha": "dbf72afc8b05526236262158f06a0dae81c9b91e",
+      "message": "BUG FIX Issue #104 - Passing Variables and not constant in Trigger::PrepareActionCommand (#108)\n\nCo-authored-by: Dagata_Mining <agrenier@pointlaz.com>",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "11d01f97cf9a8be1cb2d5d717e470308b2c950ab",
+          "filename": "src/trigger.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/dbf72afc8b05526236262158f06a0dae81c9b91e/src%2Ftrigger.cpp",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/dbf72afc8b05526236262158f06a0dae81c9b91e/src%2Ftrigger.cpp",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/src%2Ftrigger.cpp?ref=dbf72afc8b05526236262158f06a0dae81c9b91e",
+          "patch": "@@ -70,8 +70,8 @@ void Trigger::InitializeAddress()\n \n bool Trigger::PrepareActionCommand()\n {\n-  return (SetIntFeatureValue(\"ActionDeviceKey\", 1) && SetIntFeatureValue(\"ActionGroupKey\", 1) &&\n-          SetIntFeatureValue(\"ActionGroupMask\", 1));\n+  return (SetIntFeatureValue(\"ActionDeviceKey\", action_device_key_) && SetIntFeatureValue(\"ActionGroupKey\", action_group_key_) &&\n+          SetIntFeatureValue(\"ActionGroupMask\", action_group_mask_));\n }\n \n // Sets an integer feature value on the vimba system"
+        }
+      ]
+    },
+    {
+      "author": "PhilippSchmaelzle",
+      "date": "2022-08-10T15:49:39Z",
+      "sha": "d3303a10a03dfd6b5293a0e6ea02eaf5f38112e6",
+      "message": "Nodelet parameter namespace (#102)\n\n* Provide reconfiguration server with knowledge of private parameters\r\n\r\n* Manager has to be passed with global name reference",
+      "files_changed": 2,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "1136e14debf4858686b2ec9d2a8221f9891c5f0b",
+          "filename": "include/avt_vimba_camera/mono_camera.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/d3303a10a03dfd6b5293a0e6ea02eaf5f38112e6/include%2Favt_vimba_camera%2Fmono_camera.h",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/d3303a10a03dfd6b5293a0e6ea02eaf5f38112e6/include%2Favt_vimba_camera%2Fmono_camera.h",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/include%2Favt_vimba_camera%2Fmono_camera.h?ref=d3303a10a03dfd6b5293a0e6ea02eaf5f38112e6",
+          "patch": "@@ -77,7 +77,7 @@ class MonoCamera\n   // Dynamic reconfigure\n   typedef avt_vimba_camera::AvtVimbaCameraConfig Config;\n   typedef dynamic_reconfigure::Server<Config> ReconfigureServer;\n-  ReconfigureServer reconfigure_server_;\n+  ReconfigureServer reconfigure_server_{nhp_};\n \n   // Camera configuration\n   Config camera_config_;"
+        },
+        {
+          "sha": "88a128bc414375f0e99457dcb32f2476e186b964",
+          "filename": "launch/mono_camera_nodelet.launch",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/d3303a10a03dfd6b5293a0e6ea02eaf5f38112e6/launch%2Fmono_camera_nodelet.launch",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/d3303a10a03dfd6b5293a0e6ea02eaf5f38112e6/launch%2Fmono_camera_nodelet.launch",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/launch%2Fmono_camera_nodelet.launch?ref=d3303a10a03dfd6b5293a0e6ea02eaf5f38112e6",
+          "patch": "@@ -80,7 +80,7 @@\n \n   <!-- Image processing -->\n   <include if=\"$(arg image_proc)\" ns=\"$(arg name)\" file=\"$(find image_proc)/launch/image_proc.launch\">\n-    <arg name=\"manager\" value=\"avt_vimba_nodelet_manager\"/>\n+    <arg name=\"manager\" value=\"/avt_vimba_nodelet_manager\"/>\n   </include>\n \n   <!-- The mono camera nodelet -->"
+        }
+      ]
+    },
+    {
+      "author": "icolwell-as",
+      "date": "2019-08-19T22:36:06Z",
+      "sha": "d0357fa96051e36ba43ce6f2f11db74350375bf3",
+      "message": "Changelog for upcoming release",
+      "files_changed": 1,
+      "additions": 13,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "996e3686303393dfdf5c8bb2aa8c7fc232d4fd4e",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 0,
+          "changes": 13,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/d0357fa96051e36ba43ce6f2f11db74350375bf3/CHANGELOG.rst",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/d0357fa96051e36ba43ce6f2f11db74350375bf3/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/CHANGELOG.rst?ref=d0357fa96051e36ba43ce6f2f11db74350375bf3",
+          "patch": "@@ -2,6 +2,19 @@\n Changelog for package avt_vimba_camera\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+Forthcoming\n+-----------\n+* Merge pull request `#35 <https://github.com/astuff/avt_vimba_camera/issues/35>`_ from willcbaker/feature/nodelet\n+  Feature/nodelet\n+* Update nodelet launch files\n+* Add nodelet\n+* Fix `#31 <https://github.com/astuff/avt_vimba_camera/issues/31>`_\n+* Merge pull request `#30 <https://github.com/astuff/avt_vimba_camera/issues/30>`_ from chewwt/armv8\n+  add support for armv8\n+* add support for armv8\n+* Change frame observer to shared ptr\n+* Contributors: Miquel Massot, Will Baker, ruth\n+\n 0.0.10 (2017-08-16)\n -------------------\n * Merge pull request `#26 <https://github.com/srv/avt_vimba_camera/issues/26>`_ from 130s/k/add_ci"
+        }
+      ]
+    },
+    {
+      "author": "jilinzhouas",
+      "date": "2022-02-15T20:28:07Z",
+      "sha": "6d6c21be6a73f3449877d49957f5efc5bf1252fa",
+      "message": "[#75] Fix a bug in function getTriggerModeInt() (#77)\n\n- Return Invalid mode if the input mode_str is undefined.\r\n- It returned an underfined mode (local variable) before in this case",
+      "files_changed": 2,
+      "additions": 8,
+      "deletions": 7,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "32f53b71fbe098542369d8ad9777f60ca2405cb4",
+          "filename": "include/avt_vimba_camera/avt_vimba_camera.h",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/6d6c21be6a73f3449877d49957f5efc5bf1252fa/include%2Favt_vimba_camera%2Favt_vimba_camera.h",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/6d6c21be6a73f3449877d49957f5efc5bf1252fa/include%2Favt_vimba_camera%2Favt_vimba_camera.h",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/include%2Favt_vimba_camera%2Favt_vimba_camera.h?ref=6d6c21be6a73f3449877d49957f5efc5bf1252fa",
+          "patch": "@@ -54,6 +54,7 @@ namespace avt_vimba_camera\n {\n enum FrameStartTriggerMode\n {\n+  Invalid,\n   Freerun,\n   FixedRate,\n   Software,\n@@ -154,7 +155,7 @@ class AvtVimbaCamera\n   void configureFeature(const std::string& feature_str, const std::string& val_in, std::string& val_out);\n \n   bool runCommand(const std::string& command_str);\n-  int getTriggerModeInt(std::string mode_str);\n+  int getTriggerModeInt(const std::string& mode_str);\n   void printAllCameraFeatures(const CameraPtr& camera);\n \n   void updateAcquisitionConfig(Config& config);"
+        },
+        {
+          "sha": "cc47de82d1d42a22b1a60f0cea178b8f39575248",
+          "filename": "src/avt_vimba_camera.cpp",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 6,
+          "changes": 12,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/6d6c21be6a73f3449877d49957f5efc5bf1252fa/src%2Favt_vimba_camera.cpp",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/6d6c21be6a73f3449877d49957f5efc5bf1252fa/src%2Favt_vimba_camera.cpp",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/src%2Favt_vimba_camera.cpp?ref=6d6c21be6a73f3449877d49957f5efc5bf1252fa",
+          "patch": "@@ -41,8 +41,8 @@\n namespace avt_vimba_camera\n {\n static const char* AutoMode[] = { \"Off\", \"Once\", \"Continuous\" };\n-static const char* TriggerMode[] = { \"Freerun\", \"FixedRate\", \"Software\", \"Line0\", \"Line1\",  \"Line2\",\n-                                     \"Line3\",   \"Line4\",     \"Action0\",  \"Action1\" };\n+static const char* TriggerMode[] = { \"Invalid\", \"Freerun\", \"FixedRate\", \"Software\", \"Line0\",  \"Line1\",\n+                                     \"Line2\",   \"Line3\",   \"Line4\",     \"Action0\",  \"Action1\" };\n static const char* AcquisitionMode[] = { \"Continuous\", \"SingleFrame\", \"MultiFrame\", \"Recorder\" };\n static const char* PixelFormatMode[] = { \"Mono8\",           \"Mono10\",          \"Mono10Packed\",    \"Mono12\",\n                                          \"Mono12Packed\",    \"BayerGR8\",        \"BayerRG8\",        \"BayerGB8\",\n@@ -652,9 +652,9 @@ bool AvtVimbaCamera::runCommand(const std::string& command_str)\n   }\n }\n \n-int AvtVimbaCamera::getTriggerModeInt(std::string mode_str)\n+int AvtVimbaCamera::getTriggerModeInt(const std::string& mode_str)\n {\n-  int mode;\n+  int mode = Invalid;\n   if (mode_str == TriggerMode[Freerun])\n   {\n     mode = Freerun;\n@@ -669,7 +669,7 @@ int AvtVimbaCamera::getTriggerModeInt(std::string mode_str)\n   }\n   else if (mode_str == TriggerMode[SyncIn0])\n   {\n-    mode = SyncIn0;;\n+    mode = SyncIn0;\n   }\n   else if (mode_str == TriggerMode[SyncIn1])\n   {\n@@ -1206,7 +1206,7 @@ void AvtVimbaCamera::updateUSBGPIOConfig(Config& config)\n   {\n     ROS_INFO(\"Updating USB GPIO config:\");\n   }\n-  if (config.line_selector != config_.line_selector|| on_init_)\n+  if (config.line_selector != config_.line_selector || on_init_)\n   {\n     configureFeature(\"LineSelector\", config.line_selector, config.line_selector);\n   }"
+        }
+      ]
+    },
+    {
+      "author": "gbartyzel",
+      "date": "2021-12-09T15:55:06Z",
+      "sha": "c63397d589052b7302b00a4ecfed3fcf3cf40924",
+      "message": "Added features required to run USB cameras (#54)",
+      "files_changed": 5,
+      "additions": 59,
+      "deletions": 7,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "c9375ab91d04930630bd449019b89f02fa18819c",
+          "filename": "cfg/AvtVimbaCamera.cfg",
+          "status": "modified",
+          "additions": 20,
+          "deletions": 4,
+          "changes": 24,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/c63397d589052b7302b00a4ecfed3fcf3cf40924/cfg%2FAvtVimbaCamera.cfg",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/c63397d589052b7302b00a4ecfed3fcf3cf40924/cfg%2FAvtVimbaCamera.cfg",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/cfg%2FAvtVimbaCamera.cfg?ref=c63397d589052b7302b00a4ecfed3fcf3cf40924",
+          "patch": "@@ -11,9 +11,10 @@ gen = ParameterGenerator()\n \n trigger_source_enum = gen.enum([\n   gen.const(\"Freerun\",   str_t, \"Freerun\",   \"Run at maximum frame rate\"),\n-  gen.const(\"Line1\",     str_t, \"Line1\",     \"External trigger on SyncIn1 line\"),\n-  gen.const(\"Line2\",     str_t, \"Line2\",     \"External trigger on SyncIn2 line\"),\n-  gen.const(\"Line3\",     str_t, \"Line3\",     \"External trigger on SyncIn3 line\"),\n+  gen.const(\"Line0\",     str_t, \"Line0\",     \"External trigger on SyncIn0/Line0 line\"),\n+  gen.const(\"Line1\",     str_t, \"Line1\",     \"External trigger on SyncIn1/Line1 line\"),\n+  gen.const(\"Line2\",     str_t, \"Line2\",     \"External trigger on SyncIn2/Line2 line\"),\n+  gen.const(\"Line3\",     str_t, \"Line3\",     \"External trigger on SyncIn3/Line3 line\"),\n   gen.const(\"Line4\",     str_t, \"Line4\",     \"External trigger on SyncIn4 line\"),\n   gen.const(\"FixedRate\", str_t, \"FixedRate\", \"Camera self-triggers at a fixed frame rate defined by `~AcquisitionFrameRateAbs`\"),\n   gen.const(\"Software\",  str_t, \"Software\",  \"Software inititated image capture\"),\n@@ -129,6 +130,18 @@ sync_source_enum = gen.enum([\n   gen.const(\"LineIn2\",                 str_t, \"LineIn2\", \"\")\n ],\"Sync-out signal\")\n \n+line_selector_enum = gen.enum([\n+  gen.const(\"USBLine0\",  str_t, \"Line0\", \"\"),\n+  gen.const(\"USBLine1\",  str_t, \"Line1\", \"\"),\n+  gen.const(\"USBLine2\",  str_t, \"Line2\", \"\"),\n+  gen.const(\"USBLine3\",  str_t, \"Line3\", \"\"),\n+],\"Line selector\")\n+\n+line_mode_enum = gen.enum([\n+  gen.const(\"Output\", str_t, \"Output\", \"\"),\n+  gen.const(\"Input\",  str_t, \"Input\", \"\")\n+],\"Line mode\")\n+\n exposure_alg_enum = gen.enum([\n   gen.const(\"Mean\", str_t, \"Mean\", \"[Default] The arithmetic mean of the histogram of the current image is compared to ExposureAutoTarget, and the next image adjusted in exposure time to meet this target. Bright areas are allowed to saturate\"),\n   gen.const(\"FitRange\", str_t, \"FitRange\", \"The histogram of the current image is measured, and the exposure time of the next image is adjusted so bright areas are not saturated\")\n@@ -192,11 +205,14 @@ gen.add(\"pixel_format\",           str_t,    SensorLevels.RECONFIGURE_CLOSE,   \"F\n gen.add(\"stream_bytes_per_second\",int_t,    SensorLevels.RECONFIGURE_RUNNING, \"Limits the data rate of the camera.\", 124000000, 1, 125000000)\n # PTP\n gen.add(\"ptp_mode\",               str_t,    SensorLevels.RECONFIGURE_RUNNING, \"Controls the PTP behavior of the clock port.\", \"Off\", edit_method=ptp_mode_enum)\n-# GPIO\n+# GIGE GPIO\n gen.add(\"sync_in_selector\",       str_t,    SensorLevels.RECONFIGURE_STOP,    \"Selects the sync-out line to control\", \"SyncIn1\", edit_method=sync_in_selector_enum)\n gen.add(\"sync_out_polarity\",      str_t,    SensorLevels.RECONFIGURE_STOP,    \"Polarity applied to the sync-out line specified by `sync_out_selector`\",  \"Normal\", edit_method=polarity_enum)\n gen.add(\"sync_out_selector\",      str_t,    SensorLevels.RECONFIGURE_STOP,    \"Selects the sync-out line to control\", \"SyncOut1\", edit_method=sync_out_selector_enum)\n gen.add(\"sync_out_source\",        str_t,    SensorLevels.RECONFIGURE_STOP,    \"Signal source of the sync-out line specified by `sync_out_selector`\", \"GPO\", edit_method=sync_source_enum)\n+# USB GPIO\n+gen.add(\"line_selector\",          str_t,    SensorLevels.RECONFIGURE_STOP,    \"Selects the line to control\", \"Line0\", edit_method=line_selector_enum)\n+gen.add(\"line_mode\",              str_t,    SensorLevels.RECONFIGURE_STOP,    \"Controls the mode of the line specified by `line_selector`\", \"Input\", edit_method=line_mode_enum)\n # IRIS\n gen.add(\"iris_auto_target\",       int_t,    SensorLevels.RECONFIGURE_RUNNING, \"This is the target image mean value, in percent.\", 50, 0, 100)\n gen.add(\"iris_mode\",              str_t,    SensorLevels.RECONFIGURE_RUNNING, \"Set the iris mode. Disabled: no iris control. Video: enable video iris. VideoOpen: fully open a video iris. VideoClose: fully close a video iris.\",  \"Continuous\", edit_method = auto_enum)"
+        },
+        {
+          "sha": "27d4a0d3888280415314f35396a05ae0db6e0bce",
+          "filename": "include/avt_vimba_camera/avt_vimba_camera.h",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/c63397d589052b7302b00a4ecfed3fcf3cf40924/include%2Favt_vimba_camera%2Favt_vimba_camera.h",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/c63397d589052b7302b00a4ecfed3fcf3cf40924/include%2Favt_vimba_camera%2Favt_vimba_camera.h",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/include%2Favt_vimba_camera%2Favt_vimba_camera.h?ref=c63397d589052b7302b00a4ecfed3fcf3cf40924",
+          "patch": "@@ -57,6 +57,7 @@ enum FrameStartTriggerMode\n   Freerun,\n   FixedRate,\n   Software,\n+  SyncIn0,\n   SyncIn1,\n   SyncIn2,\n   SyncIn3,\n@@ -166,6 +167,7 @@ class AvtVimbaCamera\n   void updatePixelFormatConfig(Config& config);\n   void updatePtpModeConfig(Config& config);\n   void updateGPIOConfig(Config& config);\n+  void updateUSBGPIOConfig(Config& config);\n   void updateIrisConfig(Config& config);\n \n   void getCurrentState(diagnostic_updater::DiagnosticStatusWrapper& stat);"
+        },
+        {
+          "sha": "e2dcd06d5eb9d94013eda128f31594e1e7e46ff2",
+          "filename": "launch/mono_camera.launch",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/c63397d589052b7302b00a4ecfed3fcf3cf40924/launch%2Fmono_camera.launch",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/c63397d589052b7302b00a4ecfed3fcf3cf40924/launch%2Fmono_camera.launch",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/launch%2Fmono_camera.launch?ref=c63397d589052b7302b00a4ecfed3fcf3cf40924",
+          "patch": "@@ -69,6 +69,9 @@\n   <arg name=\"sync_out_polarity\" default=\"Normal\"/>\n   <arg name=\"sync_out_selector\" default=\"SyncOut1\"/>\n   <arg name=\"sync_out_source\" default=\"GPO\"/>\n+  <!-- USB GPIO -->\n+  <arg name=\"line_selector\" default=\"Line0\"/>\n+  <arg name=\"line_mode\" default=\"Input\"/>\n   <!-- Iris -->\n   <arg name=\"iris_auto_target\" default=\"50\"/>\n   <arg name=\"iris_mode\" default=\"Continuous\"/>\n@@ -143,6 +146,9 @@\n     <param name=\"sync_out_selector\" value=\"$(arg sync_out_selector)\"/>\n     <param name=\"sync_out_source\" value=\"$(arg sync_out_source)\"/>\n \n+    <param name=\"line_selector\" value=\"$(arg line_selector)\"/>\n+    <param name=\"line_mode\" value=\"$(arg line_mode)\"/>\n+\n     <param name=\"iris_auto_target\" value=\"$(arg iris_auto_target)\"/>\n     <param name=\"iris_mode\" value=\"$(arg iris_mode)\"/>\n     <param name=\"iris_video_level_min\" value=\"$(arg iris_video_level_min)\"/>"
+        },
+        {
+          "sha": "e414d32ad4454ac0279bdede4b05fabdec44f651",
+          "filename": "launch/mono_camera_nodelet.launch",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/c63397d589052b7302b00a4ecfed3fcf3cf40924/launch%2Fmono_camera_nodelet.launch",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/c63397d589052b7302b00a4ecfed3fcf3cf40924/launch%2Fmono_camera_nodelet.launch",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/launch%2Fmono_camera_nodelet.launch?ref=c63397d589052b7302b00a4ecfed3fcf3cf40924",
+          "patch": "@@ -66,6 +66,9 @@\n   <arg name=\"sync_out_polarity\" default=\"Normal\"/>\n   <arg name=\"sync_out_selector\" default=\"SyncOut1\"/>\n   <arg name=\"sync_out_source\" default=\"GPO\"/>\n+  <!-- USB GPIO -->\n+  <arg name=\"line_selector\" default=\"Line0\"/>\n+  <arg name=\"line_mode\" default=\"Input\"/>\n   <!-- Iris -->\n   <arg name=\"iris_auto_target\" default=\"50\"/>\n   <arg name=\"iris_mode\" default=\"Continuous\"/>\n@@ -143,6 +146,9 @@\n     <param name=\"sync_out_selector\" value=\"$(arg sync_out_selector)\"/>\n     <param name=\"sync_out_source\" value=\"$(arg sync_out_source)\"/>\n \n+    <param name=\"line_selector\" value=\"$(arg line_selector)\"/>\n+    <param name=\"line_mode\" value=\"$(arg line_mode)\"/>\n+\n     <param name=\"iris_auto_target\" value=\"$(arg iris_auto_target)\"/>\n     <param name=\"iris_mode\" value=\"$(arg iris_mode)\"/>\n     <param name=\"iris_video_level_min\" value=\"$(arg iris_video_level_min)\"/>"
+        },
+        {
+          "sha": "577df90e8e5b7dfa0dacc4238da4ec3c38d94e0f",
+          "filename": "src/avt_vimba_camera.cpp",
+          "status": "modified",
+          "additions": 25,
+          "deletions": 3,
+          "changes": 28,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/c63397d589052b7302b00a4ecfed3fcf3cf40924/src%2Favt_vimba_camera.cpp",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/c63397d589052b7302b00a4ecfed3fcf3cf40924/src%2Favt_vimba_camera.cpp",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/src%2Favt_vimba_camera.cpp?ref=c63397d589052b7302b00a4ecfed3fcf3cf40924",
+          "patch": "@@ -41,7 +41,7 @@\n namespace avt_vimba_camera\n {\n static const char* AutoMode[] = { \"Off\", \"Once\", \"Continuous\" };\n-static const char* TriggerMode[] = { \"Freerun\", \"FixedRate\", \"Software\", \"Line1\",  \"Line2\",\n+static const char* TriggerMode[] = { \"Freerun\", \"FixedRate\", \"Software\", \"Line0\", \"Line1\",  \"Line2\",\n                                      \"Line3\",   \"Line4\",     \"Action0\",  \"Action1\" };\n static const char* AcquisitionMode[] = { \"Continuous\", \"SingleFrame\", \"MultiFrame\", \"Recorder\" };\n static const char* PixelFormatMode[] = { \"Mono8\",           \"Mono10\",          \"Mono10Packed\",    \"Mono12\",\n@@ -155,7 +155,7 @@ void AvtVimbaCamera::start(const std::string& ip_str, const std::string& guid_st\n   int trigger_source_int = getTriggerModeInt(trigger_source);\n \n   if (trigger_source_int == Freerun || trigger_source_int == FixedRate || trigger_source_int == SyncIn1 ||\n-      trigger_source_int == Action0 || trigger_source_int == Action1)\n+      trigger_source_int == Action0 || trigger_source_int == Action1 || trigger_source_int == Software)\n   {\n     // Create a frame observer for this camera\n     SP_SET(frame_obs_ptr_,\n@@ -667,6 +667,10 @@ int AvtVimbaCamera::getTriggerModeInt(std::string mode_str)\n   {\n     mode = Software;\n   }\n+  else if (mode_str == TriggerMode[SyncIn0])\n+  {\n+    mode = SyncIn0;;\n+  }\n   else if (mode_str == TriggerMode[SyncIn1])\n   {\n     mode = SyncIn1;\n@@ -857,6 +861,7 @@ void AvtVimbaCamera::updateConfig(Config& config)\n   updateROIConfig(config);\n   updateBandwidthConfig(config);\n   updateGPIOConfig(config);\n+  updateUSBGPIOConfig(config);\n   updatePtpModeConfig(config);\n   updatePixelFormatConfig(config);\n   updateAcquisitionConfig(config);\n@@ -1169,7 +1174,7 @@ void AvtVimbaCamera::updatePixelFormatConfig(Config& config)\n   }\n }\n \n-/** Change the GPIO configuration */\n+/** Change the Gige GPIO configuration */\n void AvtVimbaCamera::updateGPIOConfig(Config& config)\n {\n   if (on_init_)\n@@ -1194,6 +1199,23 @@ void AvtVimbaCamera::updateGPIOConfig(Config& config)\n   }\n }\n \n+/** Change the USB GPIO configuration */\n+void AvtVimbaCamera::updateUSBGPIOConfig(Config& config)\n+{\n+  if (on_init_)\n+  {\n+    ROS_INFO(\"Updating USB GPIO config:\");\n+  }\n+  if (config.line_selector != config_.line_selector|| on_init_)\n+  {\n+    configureFeature(\"LineSelector\", config.line_selector, config.line_selector);\n+  }\n+  if (config.line_mode != config_.line_mode || on_init_)\n+  {\n+    configureFeature(\"LineMode\", config.line_mode, config.line_mode);\n+  }\n+}\n+\n void AvtVimbaCamera::getCurrentState(diagnostic_updater::DiagnosticStatusWrapper& stat)\n {\n   stat.add(\"ID\", guid_);"
+        }
+      ]
+    },
+    {
+      "author": "vbrebion",
+      "date": "2020-11-17T16:13:24Z",
+      "sha": "bbdbdb3235dee0130e525805909172678330f208",
+      "message": "Fixed 'escalating to SIGTERM' when closing (#22)\n\nThe issue was comming from the signal handler for the SIGINT event.\r\nIndeed, it was always activated, and thus would catch our ctrl+C presses while not exiting the application.\r\nMade it enabled only for the few lines where it is needed, and re-enabled the default one just after to make the application exit correctly",
+      "files_changed": 1,
+      "additions": 6,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "0484a298d6ea89672e9ae3016327307abb53c0e2",
+          "filename": "src/avt_vimba_camera.cpp",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 2,
+          "changes": 8,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/bbdbdb3235dee0130e525805909172678330f208/src%2Favt_vimba_camera.cpp",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/bbdbdb3235dee0130e525805909172678330f208/src%2Favt_vimba_camera.cpp",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/src%2Favt_vimba_camera.cpp?ref=bbdbdb3235dee0130e525805909172678330f208",
+          "patch": "@@ -123,8 +123,6 @@ AvtVimbaCamera::AvtVimbaCamera(std::string name) {\n   show_debug_prints_ = false;\n   name_ = name;\n \n-  signal(SIGINT, intHandler);\n-\n   camera_state_ = OPENING;\n \n   updater_.setHardwareID(\"unknown\");\n@@ -309,6 +307,9 @@ CameraPtr AvtVimbaCamera::openCamera(std::string id_str) {\n   CameraPtr camera;\n   VimbaSystem& vimba_system(VimbaSystem::GetInstance());\n \n+  // set handler to catch ctrl+c presses\n+  sighandler_t oldHandler = signal(SIGINT, intHandler);\n+\n   // get camera\n   VmbErrorType err = vimba_system.GetCameraByID(id_str.c_str(), camera);\n   while (err != VmbErrorSuccess) {\n@@ -341,6 +342,9 @@ CameraPtr AvtVimbaCamera::openCamera(std::string id_str) {\n     }\n   }\n \n+  // set previous handler back\n+  signal(SIGINT, oldHandler);\n+\n   std::string cam_id, cam_name, cam_model, cam_sn, cam_int_id;\n   VmbInterfaceType cam_int_type;\n   VmbAccessModeType accessMode;  // = VmbAccessModeNone;"
+        }
+      ]
+    },
+    {
+      "author": "miquelmassot",
+      "date": "2014-02-19T07:52:01Z",
+      "sha": "bc9f5181be9caae67196e42cfa685dcd19211873",
+      "message": "first commit",
+      "files_changed": 2,
+      "additions": 217,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "8a6fa36db4b44b40071201105ab2f54e4ae8a447",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 169,
+          "deletions": 0,
+          "changes": 169,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/bc9f5181be9caae67196e42cfa685dcd19211873/CMakeLists.txt",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/bc9f5181be9caae67196e42cfa685dcd19211873/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/CMakeLists.txt?ref=bc9f5181be9caae67196e42cfa685dcd19211873",
+          "patch": "@@ -0,0 +1,169 @@\n+cmake_minimum_required(VERSION 2.8.3)\n+project(avt_vimba_ros)\n+\n+## Find catkin macros and libraries\n+## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)\n+## is used, also find other catkin packages\n+find_package(catkin REQUIRED COMPONENTS\n+  camera_calibration_parsers\n+  diagnostic_updater\n+  driver_base\n+  dynamic_reconfigure\n+  image_greometry\n+  image_transport\n+  roscpp\n+  sensor_msgs\n+  std_msgs\n+)\n+\n+## System dependencies are found with CMake's conventions\n+# find_package(Boost REQUIRED COMPONENTS system)\n+\n+\n+## Uncomment this if the package has a setup.py. This macro ensures\n+## modules and global scripts declared therein get installed\n+## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html\n+# catkin_python_setup()\n+\n+################################################\n+## Declare ROS messages, services and actions ##\n+################################################\n+\n+## To declare and build messages, services or actions from within this\n+## package, follow these steps:\n+## * Let MSG_DEP_SET be the set of packages whose message types you use in\n+##   your messages/services/actions (e.g. std_msgs, actionlib_msgs, ...).\n+## * In the file package.xml:\n+##   * add a build_depend and a run_depend tag for each package in MSG_DEP_SET\n+##   * If MSG_DEP_SET isn't empty the following dependencies might have been\n+##     pulled in transitively but can be declared for certainty nonetheless:\n+##     * add a build_depend tag for \"message_generation\"\n+##     * add a run_depend tag for \"message_runtime\"\n+## * In this file (CMakeLists.txt):\n+##   * add \"message_generation\" and every package in MSG_DEP_SET to\n+##     find_package(catkin REQUIRED COMPONENTS ...)\n+##   * add \"message_runtime\" and every package in MSG_DEP_SET to\n+##     catkin_package(CATKIN_DEPENDS ...)\n+##   * uncomment the add_*_files sections below as needed\n+##     and list every .msg/.srv/.action file to be processed\n+##   * uncomment the generate_messages entry below\n+##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)\n+\n+## Generate messages in the 'msg' folder\n+# add_message_files(\n+#   FILES\n+#   Message1.msg\n+#   Message2.msg\n+# )\n+\n+## Generate services in the 'srv' folder\n+# add_service_files(\n+#   FILES\n+#   Service1.srv\n+#   Service2.srv\n+# )\n+\n+## Generate actions in the 'action' folder\n+# add_action_files(\n+#   FILES\n+#   Action1.action\n+#   Action2.action\n+# )\n+\n+## Generate added messages and services with any dependencies listed here\n+# generate_messages(\n+#   DEPENDENCIES\n+#   sensor_msgs#   std_msgs\n+# )\n+\n+###################################\n+## catkin specific configuration ##\n+###################################\n+## The catkin_package macro generates cmake config files for your package\n+## Declare things to be passed to dependent projects\n+## INCLUDE_DIRS: uncomment this if you package contains header files\n+## LIBRARIES: libraries you create in this project that dependent projects also need\n+## CATKIN_DEPENDS: catkin_packages dependent projects also need\n+## DEPENDS: system dependencies of this project that dependent projects also need\n+catkin_package(\n+#  INCLUDE_DIRS include\n+#  LIBRARIES avt_vimba_ros\n+#  CATKIN_DEPENDS camera_calibration_parsers diagnostic_updater driver_base dynamic_reconfigure image_greometry image_transport roscpp sensor_msgs std_msgs\n+#  DEPENDS system_lib\n+)\n+\n+###########\n+## Build ##\n+###########\n+\n+## Specify additional locations of header files\n+## Your package locations should be listed before other locations\n+# include_directories(include)\n+include_directories(\n+  ${catkin_INCLUDE_DIRS}\n+)\n+\n+## Declare a cpp library\n+# add_library(avt_vimba_ros\n+#   src/${PROJECT_NAME}/avt_vimba_ros.cpp\n+# )\n+\n+## Declare a cpp executable\n+# add_executable(avt_vimba_ros_node src/avt_vimba_ros_node.cpp)\n+\n+## Add cmake target dependencies of the executable/library\n+## as an example, message headers may need to be generated before nodes\n+# add_dependencies(avt_vimba_ros_node avt_vimba_ros_generate_messages_cpp)\n+\n+## Specify libraries to link a library or executable target against\n+# target_link_libraries(avt_vimba_ros_node\n+#   ${catkin_LIBRARIES}\n+# )\n+\n+#############\n+## Install ##\n+#############\n+\n+# all install targets should use catkin DESTINATION variables\n+# See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html\n+\n+## Mark executable scripts (Python etc.) for installation\n+## in contrast to setup.py, you can choose the destination\n+# install(PROGRAMS\n+#   scripts/my_python_script\n+#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n+# )\n+\n+## Mark executables and/or libraries for installation\n+# install(TARGETS avt_vimba_ros avt_vimba_ros_node\n+#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n+#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n+#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n+# )\n+\n+## Mark cpp header files for installation\n+# install(DIRECTORY include/${PROJECT_NAME}/\n+#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}\n+#   FILES_MATCHING PATTERN \"*.h\"\n+#   PATTERN \".svn\" EXCLUDE\n+# )\n+\n+## Mark other files for installation (e.g. launch and bag files, etc.)\n+# install(FILES\n+#   # myfile1\n+#   # myfile2\n+#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}\n+# )\n+\n+#############\n+## Testing ##\n+#############\n+\n+## Add gtest based cpp test target and link libraries\n+# catkin_add_gtest(${PROJECT_NAME}-test test/test_avt_vimba_ros.cpp)\n+# if(TARGET ${PROJECT_NAME}-test)\n+#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})\n+# endif()\n+\n+## Add folders to be run by python nosetests\n+# catkin_add_nosetests(test)"
+        },
+        {
+          "sha": "189d6ba7c82613945d8f2e8dac5cde65ece67b39",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 48,
+          "deletions": 0,
+          "changes": 48,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/bc9f5181be9caae67196e42cfa685dcd19211873/package.xml",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/bc9f5181be9caae67196e42cfa685dcd19211873/package.xml",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/package.xml?ref=bc9f5181be9caae67196e42cfa685dcd19211873",
+          "patch": "@@ -0,0 +1,48 @@\n+<?xml version=\"1.0\"?>\n+<package>\n+  <name>avt_vimba_ros</name>\n+  <version>0.0.1</version>\n+  <description>This package is a wrapper of the Allied Vision Technologies (AVT) VIMBA GigEth and Firewire SDK.</description>\n+\n+  <maintainer email=\"miquel.massot@uib.cat\">Miquel Massot</maintainer>\n+\n+  <license>BSD</license>\n+\n+  <url type=\"website\">http://wiki.ros.org/avt_vimba_ros</url>\n+\n+  <author email=\"miquel.massot@gmail.com\">Miquel Massot</author>\n+  <author>Allied Vision Technologies</author>\n+\n+\n+  <!-- The *_depend tags are used to specify dependencies -->\n+  <!-- Dependencies can be catkin packages or system dependencies -->\n+  <!-- Examples: -->\n+  <!-- Use build_depend for packages you need at compile time: -->\n+  <!--   <build_depend>message_generation</build_depend> -->\n+  <!-- Use buildtool_depend for build tool packages: -->\n+  <!--   <buildtool_depend>catkin</buildtool_depend> -->\n+  <!-- Use run_depend for packages you need at runtime: -->\n+  <!--   <run_depend>message_runtime</run_depend> -->\n+  <!-- Use test_depend for packages you need only for testing: -->\n+  <!--   <test_depend>gtest</test_depend> -->\n+  <buildtool_depend>catkin</buildtool_depend>\n+  <build_depend>camera_calibration_parsers</build_depend>\n+  <build_depend>diagnostic_updater</build_depend>\n+  <build_depend>driver_base</build_depend>\n+  <build_depend>dynamic_reconfigure</build_depend>\n+  <build_depend>image_greometry</build_depend>\n+  <build_depend>image_transport</build_depend>\n+  <build_depend>roscpp</build_depend>\n+  <build_depend>sensor_msgs</build_depend>\n+  <build_depend>std_msgs</build_depend>\n+  <run_depend>camera_calibration_parsers</run_depend>\n+  <run_depend>diagnostic_updater</run_depend>\n+  <run_depend>driver_base</run_depend>\n+  <run_depend>dynamic_reconfigure</run_depend>\n+  <run_depend>image_greometry</run_depend>\n+  <run_depend>image_transport</run_depend>\n+  <run_depend>roscpp</run_depend>\n+  <run_depend>sensor_msgs</run_depend>\n+  <run_depend>std_msgs</run_depend>\n+\n+</package>"
+        }
+      ]
+    },
+    {
+      "author": "Will Baker",
+      "date": "2018-06-05T20:19:31Z",
+      "sha": "5b86f9b099b5e8904652b31e6c0df31ed70a14ed",
+      "message": "Add nodelet",
+      "files_changed": 10,
+      "additions": 108,
+      "deletions": 5,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "81af900720f2a92ec3fa65a0f8cb58728b35e8b8",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 2,
+          "changes": 14,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/5b86f9b099b5e8904652b31e6c0df31ed70a14ed/CMakeLists.txt",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/5b86f9b099b5e8904652b31e6c0df31ed70a14ed/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/CMakeLists.txt?ref=5b86f9b099b5e8904652b31e6c0df31ed70a14ed",
+          "patch": "@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS\n   sensor_msgs\n   std_msgs\n   polled_camera\n+  nodelet\n )\n \n #Get architecture\n@@ -113,12 +114,20 @@ add_executable(sync_node\n \n add_dependencies_and_linkings(sync_node)\n \n+add_library(avt_camera_nodelets\n+  src/nodes/mono_camera_nodelet.cpp\n+  src/nodes/stereo_camera_nodelet.cpp\n+  src/stereo_camera.cpp\n+  src/avt_vimba_camera.cpp\n+  src/frame_observer.cpp)\n+add_dependencies_and_linkings(avt_camera_nodelets)\n+\n #############\n ## Install ##\n #############\n \n ## Mark executables and/or libraries for installation\n-install(TARGETS mono_camera_node stereo_camera_node\n+install(TARGETS mono_camera_node stereo_camera_node avt_camera_nodelets\n   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n@@ -133,7 +142,9 @@ install(DIRECTORY include\n \n ## Mark other files for installation (e.g. launch and bag files, etc.)\n install(FILES\n+  plugins.xml\n   launch/mono_camera.launch\n+  launch/mono_camera_nodelet.launch\n   launch/stereo_camera_one_node.launch\n   launch/stereo_camera_two_nodes.launch\n   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}\n@@ -164,4 +175,3 @@ elseif(\"${ARCH}\" STREQUAL armv8)\n     DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n   )\n endif()\n-"
+        },
+        {
+          "sha": "97fb6109ce5d29f0a314ef841aa3b5e27669aa1e",
+          "filename": "include/avt_vimba_camera/mono_camera.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/5b86f9b099b5e8904652b31e6c0df31ed70a14ed/include%2Favt_vimba_camera%2Fmono_camera.h",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/5b86f9b099b5e8904652b31e6c0df31ed70a14ed/include%2Favt_vimba_camera%2Fmono_camera.h",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/include%2Favt_vimba_camera%2Fmono_camera.h?ref=5b86f9b099b5e8904652b31e6c0df31ed70a14ed",
+          "patch": "@@ -49,7 +49,7 @@\n namespace avt_vimba_camera {\n class MonoCamera {\n  public:\n-  MonoCamera(ros::NodeHandle nh, ros::NodeHandle nhp);\n+  MonoCamera(ros::NodeHandle& nh, ros::NodeHandle& nhp);\n   ~MonoCamera(void);\n \n  private:"
+        },
+        {
+          "sha": "7b3c761a43d43419357c036df68bbd378d17d49e",
+          "filename": "include/avt_vimba_camera/mono_camera_nodelet.h",
+          "status": "added",
+          "additions": 16,
+          "deletions": 0,
+          "changes": 16,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/5b86f9b099b5e8904652b31e6c0df31ed70a14ed/include%2Favt_vimba_camera%2Fmono_camera_nodelet.h",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/5b86f9b099b5e8904652b31e6c0df31ed70a14ed/include%2Favt_vimba_camera%2Fmono_camera_nodelet.h",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/include%2Favt_vimba_camera%2Fmono_camera_nodelet.h?ref=5b86f9b099b5e8904652b31e6c0df31ed70a14ed",
+          "patch": "@@ -0,0 +1,16 @@\n+#include <nodelet/nodelet.h>\n+#include \"avt_vimba_camera/mono_camera.h\"\n+\n+namespace avt_vimba_camera\n+{\n+\n+    class MonoCameraNodelet : public nodelet::Nodelet\n+    {\n+        public:\n+            virtual void onInit();\n+            virtual ~MonoCameraNodelet();\n+        private:\n+            MonoCamera* camera_;\n+    };\n+\n+}"
+        },
+        {
+          "sha": "c068c6d8b44c30462eeda265682c8fcbc117dde0",
+          "filename": "include/avt_vimba_camera/stereo_camera_nodelet.h",
+          "status": "added",
+          "additions": 16,
+          "deletions": 0,
+          "changes": 16,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/5b86f9b099b5e8904652b31e6c0df31ed70a14ed/include%2Favt_vimba_camera%2Fstereo_camera_nodelet.h",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/5b86f9b099b5e8904652b31e6c0df31ed70a14ed/include%2Favt_vimba_camera%2Fstereo_camera_nodelet.h",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/include%2Favt_vimba_camera%2Fstereo_camera_nodelet.h?ref=5b86f9b099b5e8904652b31e6c0df31ed70a14ed",
+          "patch": "@@ -0,0 +1,16 @@\n+#include <nodelet/nodelet.h>\n+#include \"avt_vimba_camera/stereo_camera.h\"\n+\n+namespace avt_vimba_camera\n+{\n+\n+    class StereoCameraNodelet : public nodelet::Nodelet\n+    {\n+        public:\n+            virtual void onInit();\n+            virtual ~StereoCameraNodelet();\n+        private:\n+            StereoCamera* camera_;\n+    };\n+\n+}"
+        },
+        {
+          "sha": "9c1de7950538a15c21e64610dd9fa3d4fee8c996",
+          "filename": "launch/mono_camera_nodelet.launch",
+          "status": "added",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/5b86f9b099b5e8904652b31e6c0df31ed70a14ed/launch%2Fmono_camera_nodelet.launch",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/5b86f9b099b5e8904652b31e6c0df31ed70a14ed/launch%2Fmono_camera_nodelet.launch",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/launch%2Fmono_camera_nodelet.launch?ref=5b86f9b099b5e8904652b31e6c0df31ed70a14ed",
+          "patch": "@@ -0,0 +1,5 @@\n+<launch>\n+  <node pkg=\"nodelet\" type=\"nodelet\" name=\"avt_vimba_nodelet_manager\"  args=\"manager\" output=\"screen\"/>\n+\n+  <node pkg=\"nodelet\" type=\"nodelet\" name=\"mono_camera\" args=\"load avt_vimba_camera/MonoCameraNodelet avt_vimba_nodelet_manager\" output=\"screen\"/>\n+</launch>"
+        },
+        {
+          "sha": "2e2feaae96afa4bfca65088b87a612932bb5d9f6",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/5b86f9b099b5e8904652b31e6c0df31ed70a14ed/package.xml",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/5b86f9b099b5e8904652b31e6c0df31ed70a14ed/package.xml",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/package.xml?ref=5b86f9b099b5e8904652b31e6c0df31ed70a14ed",
+          "patch": "@@ -24,6 +24,7 @@\n   <build_depend>sensor_msgs</build_depend>\n   <build_depend>std_msgs</build_depend>\n   <build_depend>polled_camera</build_depend>\n+  <build_depend>nodelet</build_depend>\n   <!--build_depend>libvimba</build_depend-->\n   <run_depend>camera_info_manager</run_depend>\n   <run_depend>diagnostic_updater</run_depend>\n@@ -35,6 +36,11 @@\n   <run_depend>sensor_msgs</run_depend>\n   <run_depend>std_msgs</run_depend>\n   <run_depend>polled_camera</run_depend>\n+  <run_depend>nodelet</run_depend>\n+\n   <!--run_depend>libvimba</run_depend-->\n+  <export>\n+    <nodelet plugin=\"${prefix}/plugins.xml\" />\n+  </export>\n \n </package>"
+        },
+        {
+          "sha": "f70b98ed860ce52adcd73d07e67ba2bbc03b2d76",
+          "filename": "plugins.xml",
+          "status": "added",
+          "additions": 12,
+          "deletions": 0,
+          "changes": 12,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/5b86f9b099b5e8904652b31e6c0df31ed70a14ed/plugins.xml",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/5b86f9b099b5e8904652b31e6c0df31ed70a14ed/plugins.xml",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/plugins.xml?ref=5b86f9b099b5e8904652b31e6c0df31ed70a14ed",
+          "patch": "@@ -0,0 +1,12 @@\n+<library path=\"lib/libavt_camera_nodelets\">\n+  <class name=\"avt_vimba_camera/MonoCameraNodelet\" type=\"avt_vimba_camera::MonoCameraNodelet\" base_class_type=\"nodelet::Nodelet\">\n+    <description>\n+      MonoCamera Nodelet\n+    </description>\n+  </class>\n+  <class name=\"avt_vimba_camera/StereoCameraNodelet\" type=\"avt_vimba_camera::StereoCameraNodelet\" base_class_type=\"nodelet::Nodelet\">\n+    <description>\n+      StereoCamera Nodelet\n+    </description>\n+  </class>\n+</library>"
+        },
+        {
+          "sha": "73d1dc2f140655b35fc8fb03e24ff707c15ceb67",
+          "filename": "src/mono_camera.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/5b86f9b099b5e8904652b31e6c0df31ed70a14ed/src%2Fmono_camera.cpp",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/5b86f9b099b5e8904652b31e6c0df31ed70a14ed/src%2Fmono_camera.cpp",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/src%2Fmono_camera.cpp?ref=5b86f9b099b5e8904652b31e6c0df31ed70a14ed",
+          "patch": "@@ -36,7 +36,7 @@\n \n namespace avt_vimba_camera {\n \n-MonoCamera::MonoCamera(ros::NodeHandle nh, ros::NodeHandle nhp) : nh_(nh), nhp_(nhp), it_(nhp), cam_(ros::this_node::getName()) {\n+MonoCamera::MonoCamera(ros::NodeHandle& nh, ros::NodeHandle& nhp) : nh_(nh), nhp_(nhp), it_(nhp), cam_(ros::this_node::getName()) {\n   // Prepare node handle for the camera\n   // TODO use nodelets with getMTNodeHandle()\n \n@@ -127,7 +127,7 @@ void MonoCamera::updateCameraInfo(const avt_vimba_camera::AvtVimbaCameraConfig&\n   int binning_or_decimation_y = std::max(config.binning_y, config.decimation_y);\n \n   // Set the operational parameters in CameraInfo (binning, ROI)\n-  ci.height    = config.height; \n+  ci.height    = config.height;\n   ci.width     = config.width;\n   ci.binning_x = binning_or_decimation_x;\n   ci.binning_y = binning_or_decimation_y;"
+        },
+        {
+          "sha": "9b44b8e62cdd9c14bdbdaef26a3431d1b9fe3e96",
+          "filename": "src/nodes/mono_camera_nodelet.cpp",
+          "status": "added",
+          "additions": 18,
+          "deletions": 0,
+          "changes": 18,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/5b86f9b099b5e8904652b31e6c0df31ed70a14ed/src%2Fnodes%2Fmono_camera_nodelet.cpp",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/5b86f9b099b5e8904652b31e6c0df31ed70a14ed/src%2Fnodes%2Fmono_camera_nodelet.cpp",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/src%2Fnodes%2Fmono_camera_nodelet.cpp?ref=5b86f9b099b5e8904652b31e6c0df31ed70a14ed",
+          "patch": "@@ -0,0 +1,18 @@\n+#include <pluginlib/class_list_macros.h>\n+#include \"avt_vimba_camera/mono_camera_nodelet.h\"\n+\n+namespace avt_vimba_camera\n+{\n+    void MonoCameraNodelet::onInit()\n+    {\n+        NODELET_DEBUG(\"Initializing nodelet...\");\n+\t\t\t\tcamera_ = new MonoCamera(getMTNodeHandle(), getMTPrivateNodeHandle());\n+    }\n+\n+    MonoCameraNodelet::~MonoCameraNodelet()\n+    {\n+      \tdelete camera_;\n+    }\n+}\n+\n+PLUGINLIB_EXPORT_CLASS(avt_vimba_camera::MonoCameraNodelet, nodelet::Nodelet)"
+        },
+        {
+          "sha": "19bb3a0e45fdf8c9bad813caec3436846aa39446",
+          "filename": "src/nodes/stereo_camera_nodelet.cpp",
+          "status": "added",
+          "additions": 20,
+          "deletions": 0,
+          "changes": 20,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/5b86f9b099b5e8904652b31e6c0df31ed70a14ed/src%2Fnodes%2Fstereo_camera_nodelet.cpp",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/5b86f9b099b5e8904652b31e6c0df31ed70a14ed/src%2Fnodes%2Fstereo_camera_nodelet.cpp",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/src%2Fnodes%2Fstereo_camera_nodelet.cpp?ref=5b86f9b099b5e8904652b31e6c0df31ed70a14ed",
+          "patch": "@@ -0,0 +1,20 @@\n+#include <pluginlib/class_list_macros.h>\n+#include \"avt_vimba_camera/stereo_camera_nodelet.h\"\n+#include <boost/thread.hpp>\n+\n+namespace avt_vimba_camera\n+{\n+    void StereoCameraNodelet::onInit()\n+    {\n+        NODELET_DEBUG(\"Initializing nodelet...\");\n+\t\t\t\tcamera_ = new StereoCamera(getMTNodeHandle(), getMTPrivateNodeHandle());\n+        boost::thread stereoThread(&avt_vimba_camera::StereoCamera::run, camera_);\n+    }\n+\n+    StereoCameraNodelet::~StereoCameraNodelet()\n+    {\n+        delete camera_;\n+    }\n+}\n+\n+PLUGINLIB_EXPORT_CLASS(avt_vimba_camera::StereoCameraNodelet, nodelet::Nodelet)"
+        }
+      ]
+    },
+    {
+      "author": "chewwt",
+      "date": "2017-12-16T15:37:04Z",
+      "sha": "4174bd9c53b0bd365727439883ebaf8092269320",
+      "message": "add support for armv8",
+      "files_changed": 4,
+      "additions": 154,
+      "deletions": 100,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "68992c5fb45d84412152dab287b1b45823212d02",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 0,
+          "changes": 12,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/4174bd9c53b0bd365727439883ebaf8092269320/CMakeLists.txt",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/4174bd9c53b0bd365727439883ebaf8092269320/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/CMakeLists.txt?ref=4174bd9c53b0bd365727439883ebaf8092269320",
+          "patch": "@@ -65,6 +65,12 @@ function(add_dependencies_and_linkings arg)\n       ${CMAKE_CURRENT_SOURCE_DIR}/lib/arm_32bit/libVimbaC.so\n       ${CMAKE_CURRENT_SOURCE_DIR}/lib/arm_32bit/libVimbaCPP.so\n     )\n+  elseif(\"${ARCH}\" STREQUAL armv8)\n+    target_link_libraries(${arg}\n+      ${catkin_LIBRARIES}\n+      ${CMAKE_CURRENT_SOURCE_DIR}/lib/arm_64bit/libVimbaC.so\n+      ${CMAKE_CURRENT_SOURCE_DIR}/lib/arm_64bit/libVimbaCPP.so\n+    )\n   else()\n     message(FATAL_ERROR \"[libvimba]: Architecture ${ARCH} not suported. Exiting...\")\n   endif()\n@@ -139,5 +145,11 @@ elseif(\"${ARCH}\" STREQUAL armv7)\n     ${CMAKE_CURRENT_SOURCE_DIR}/lib/arm_32bit/libVimbaCPP.so\n     DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n   )\n+elseif(\"${ARCH}\" STREQUAL armv8)\n+  install(FILES\n+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/arm_64bit/libVimbaC.so\n+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/arm_64bit/libVimbaCPP.so\n+    DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n+  )\n endif()\n "
+        },
+        {
+          "sha": "e36c45ff7aec0a83313670db3d18d1d440ee3465",
+          "filename": "cmake/TargetArchitecture.cmake",
+          "status": "modified",
+          "additions": 142,
+          "deletions": 100,
+          "changes": 242,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/4174bd9c53b0bd365727439883ebaf8092269320/cmake%2FTargetArchitecture.cmake",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/4174bd9c53b0bd365727439883ebaf8092269320/cmake%2FTargetArchitecture.cmake",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/cmake%2FTargetArchitecture.cmake?ref=4174bd9c53b0bd365727439883ebaf8092269320",
+          "patch": "@@ -1,122 +1,164 @@\n-# Architecture detection borrowed from: https://github.com/petroules/solar-cmake/blob/master/TargetArch.cmake\n+# Architecture detection adapted from https://github.com/EddieRingle/inlinebench/blob/master/scripts/cmake/modules/TargetArch.cmake\n+# Copyright 2012 Jake Petroules\n+# via: https://github.com/petroules/solar-cmake\n+#\n+# Modifications by Eddie Ringle (circa 2013)\n+# * ARMv8 detection\n+# * MIPS detection\n+#\n # Based on the Qt 5 processor detection code, so should be very accurate\n # https://qt.gitorious.org/qt/qtbase/blobs/master/src/corelib/global/qprocessordetection.h\n-# Currently handles arm (v5, v6, v7), x86 (32/64), ia64, and ppc (32/64)\n+# Currently handles arm (v5, v6, v7, v8), x86 (32/64), ia64, mips, and ppc (32/64)\n+\n+#\n+# Sets a given output variable to one of the following values:\n+# * armv8\n+# * armv7\n+# * armv6\n+# * armv5\n+# * arm\n+# * i386\n+# * x86_64\n+# * ia64\n+# * mips\n+# * ppc64\n+# * ppc\n+# * unknown\n+#\n \n # Regarding POWER/PowerPC, just as is noted in the Qt source,\n # \"There are many more known variants/revisions that we do not handle/detect.\"\n \n set(archdetect_c_code \"\n-#if defined(__arm__) || defined(__TARGET_ARCH_ARM)\n-#if defined(__ARM_ARCH_7__) \\\\\n-|| defined(__ARM_ARCH_7A__) \\\\\n-|| defined(__ARM_ARCH_7R__) \\\\\n-|| defined(__ARM_ARCH_7M__) \\\\\n-|| (defined(__TARGET_ARCH_ARM) && __TARGET_ARCH_ARM-0 >= 7)\n-#error cmake_ARCH armv7\n-#elif defined(__ARM_ARCH_6__) \\\\\n-|| defined(__ARM_ARCH_6J__) \\\\\n-|| defined(__ARM_ARCH_6T2__) \\\\\n-|| defined(__ARM_ARCH_6Z__) \\\\\n-|| defined(__ARM_ARCH_6K__) \\\\\n-|| defined(__ARM_ARCH_6ZK__) \\\\\n-|| defined(__ARM_ARCH_6M__) \\\\\n-|| (defined(__TARGET_ARCH_ARM) && __TARGET_ARCH_ARM-0 >= 6)\n-#error cmake_ARCH armv6\n-#elif defined(__ARM_ARCH_5TEJ__) \\\\\n-|| (defined(__TARGET_ARCH_ARM) && __TARGET_ARCH_ARM-0 >= 5)\n-#error cmake_ARCH armv5\n-#else\n-#error cmake_ARCH arm\n-#endif\n+#if defined(__arm__) || defined(__TARGET_ARCH_ARM) || defined(_M_ARM) || defined(__arm64__) || defined(__aarch64__)\n+        #if defined(__ARM64_ARCH_8__) \\\\\n+        || defined(__aarch64__)\n+                #error cmake_ARCH armv8\n+        #elif defined(__ARM_ARCH_7__) \\\\\n+        || defined(__ARM_ARCH_7A__) \\\\\n+        || defined(__ARM_ARCH_7R__) \\\\\n+        || defined(__ARM_ARCH_7M__) \\\\\n+        || (defined(__TARGET_ARCH_ARM) && __TARGET_ARCH_ARM-0 >= 7)\n+        #error cmake_ARCH armv7\n+    #elif defined(__ARM_ARCH_6__) \\\\\n+        || defined(__ARM_ARCH_6J__) \\\\\n+        || defined(__ARM_ARCH_6T2__) \\\\\n+        || defined(__ARM_ARCH_6Z__) \\\\\n+        || defined(__ARM_ARCH_6K__) \\\\\n+        || defined(__ARM_ARCH_6ZK__) \\\\\n+        || defined(__ARM_ARCH_6M__) \\\\\n+        || (defined(__TARGET_ARCH_ARM) && __TARGET_ARCH_ARM-0 >= 6)\n+        #error cmake_ARCH armv6\n+    #elif defined(__ARM_ARCH_5TEJ__) \\\\\n+        || (defined(__TARGET_ARCH_ARM) && __TARGET_ARCH_ARM-0 >= 5)\n+        #error cmake_ARCH armv5\n+    #else\n+        #error cmake_ARCH arm\n+    #endif\n #elif defined(__i386) || defined(__i386__) || defined(_M_IX86)\n-#error cmake_ARCH i386\n+    #error cmake_ARCH i386\n #elif defined(__x86_64) || defined(__x86_64__) || defined(__amd64) || defined(_M_X64)\n-#error cmake_ARCH x86_64\n+    #error cmake_ARCH x86_64\n #elif defined(__ia64) || defined(__ia64__) || defined(_M_IA64)\n-#error cmake_ARCH ia64\n+    #error cmake_ARCH ia64\n+#elif defined(__mips) || defined(__mips__) || defined(_M_MRX000)\n+        #error cmake_ARCH mips\n #elif defined(__ppc__) || defined(__ppc) || defined(__powerpc__) \\\\\n-|| defined(_ARCH_COM) || defined(_ARCH_PWR) || defined(_ARCH_PPC) \\\\\n-|| defined(_M_MPPC) || defined(_M_PPC)\n-#if defined(__ppc64__) || defined(__powerpc64__) || defined(__64BIT__)\n-#error cmake_ARCH ppc64\n-#else\n-#error cmake_ARCH ppc\n-#endif\n+      || defined(_ARCH_COM) || defined(_ARCH_PWR) || defined(_ARCH_PPC)  \\\\\n+      || defined(_M_MPPC) || defined(_M_PPC)\n+    #if defined(__ppc64__) || defined(__powerpc64__) || defined(__64BIT__)\n+        #error cmake_ARCH ppc64\n+    #else\n+        #error cmake_ARCH ppc\n+    #endif\n #endif\n \n #error cmake_ARCH unknown\n \")\n \n+# Set ppc_support to TRUE before including this file or ppc and ppc64\n+# will be treated as invalid architectures since they are no longer supported by Apple\n+\n function(target_architecture output_var)\n-  # On OS X we use CMAKE_OSX_ARCHITECTURES *if* it was set\n-  # First let's normalize the order of the values\n-  if(APPLE AND CMAKE_OSX_ARCHITECTURES)\n-    foreach(osx_arch ${CMAKE_OSX_ARCHITECTURES})\n-      if(\"${osx_arch}\" STREQUAL \"ppc\" AND ppc_support)\n-        set(osx_arch_ppc TRUE)\n-      elseif(\"${osx_arch}\" STREQUAL \"i386\")\n-        set(osx_arch_i386 TRUE)\n-      elseif(\"${osx_arch}\" STREQUAL \"x86_64\")\n-        set(osx_arch_x86_64 TRUE)\n-      elseif(\"${osx_arch}\" STREQUAL \"ppc64\" AND ppc_support)\n-        set(osx_arch_ppc64 TRUE)\n-      else()\n-        message(FATAL_ERROR \"Invalid OS X arch name: ${osx_arch}\")\n-      endif()\n-    endforeach()\n-\n-    # Now add all the architectures in our normalized order\n-    if(osx_arch_ppc)\n-      list(APPEND ARCH ppc)\n-    endif()\n+    if(APPLE AND CMAKE_OSX_ARCHITECTURES)\n+        # On OS X we use CMAKE_OSX_ARCHITECTURES *if* it was set\n+        # First let's normalize the order of the values\n \n-    if(osx_arch_i386)\n-      list(APPEND ARCH i386)\n-    endif()\n+        # Note that it's not possible to compile PowerPC applications if you are using\n+        # the OS X SDK version 10.6 or later - you'll need 10.4/10.5 for that, so we\n+        # disable it by default\n+        # See this page for more information:\n+        # http://stackoverflow.com/questions/5333490/how-can-we-restore-ppc-ppc64-as-well-as-full-10-4-10-5-sdk-support-to-xcode-4\n \n-    if(osx_arch_x86_64)\n-      list(APPEND ARCH x86_64)\n-    endif()\n+        # Architecture defaults to i386 or ppc on OS X 10.5 and earlier, depending on the CPU type detected at runtime.\n+        # On OS X 10.6+ the default is x86_64 if the CPU supports it, i386 otherwise.\n \n-    if(osx_arch_ppc64)\n-      list(APPEND ARCH ppc64)\n-    endif()\n-  else()\n-    file(WRITE \"${CMAKE_BINARY_DIR}/arch.c\" \"${archdetect_c_code}\")\n-\n-    enable_language(C)\n-\n-    # Detect the architecture in a rather creative way...\n-    # This compiles a small C program which is a series of ifdefs that selects a\n-    # particular #error preprocessor directive whose message string contains the\n-    # target architecture. The program will always fail to compile (both because\n-    # file is not a valid C program, and obviously because of the presence of the\n-    # #error preprocessor directives... but by exploiting the preprocessor in this\n-    # way, we can detect the correct target architecture even when cross-compiling,\n-    # since the program itself never needs to be run (only the compiler/preprocessor)\n-    try_run(\n-      run_result_unused\n-      compile_result_unused\n-      \"${CMAKE_BINARY_DIR}\"\n-      \"${CMAKE_BINARY_DIR}/arch.c\"\n-      COMPILE_OUTPUT_VARIABLE ARCH\n-      CMAKE_FLAGS CMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}\n-    )\n-\n-    # Parse the architecture name from the compiler output\n-    string(REGEX MATCH \"cmake_ARCH ([a-zA-Z0-9_]+)\" ARCH \"${ARCH}\")\n-\n-    # Get rid of the value marker leaving just the architecture name\n-    string(REPLACE \"cmake_ARCH \" \"\" ARCH \"${ARCH}\")\n-\n-    # If we are compiling with an unknown architecture this variable should\n-    # already be set to \"unknown\" but in the case that it's empty (i.e. due\n-    # to a typo in the code), then set it to unknown\n-    if (NOT ARCH)\n-      set(ARCH unknown)\n+        foreach(osx_arch ${CMAKE_OSX_ARCHITECTURES})\n+            if(\"${osx_arch}\" STREQUAL \"ppc\" AND ppc_support)\n+                set(osx_arch_ppc TRUE)\n+            elseif(\"${osx_arch}\" STREQUAL \"i386\")\n+                set(osx_arch_i386 TRUE)\n+            elseif(\"${osx_arch}\" STREQUAL \"x86_64\")\n+                set(osx_arch_x86_64 TRUE)\n+            elseif(\"${osx_arch}\" STREQUAL \"ppc64\" AND ppc_support)\n+                set(osx_arch_ppc64 TRUE)\n+            else()\n+                message(FATAL_ERROR \"Invalid OS X arch name: ${osx_arch}\")\n+            endif()\n+        endforeach()\n+\n+        # Now add all the architectures in our normalized order\n+        if(osx_arch_ppc)\n+            list(APPEND ARCH ppc)\n+        endif()\n+\n+        if(osx_arch_i386)\n+            list(APPEND ARCH i386)\n+        endif()\n+\n+        if(osx_arch_x86_64)\n+            list(APPEND ARCH x86_64)\n+        endif()\n+\n+        if(osx_arch_ppc64)\n+            list(APPEND ARCH ppc64)\n+        endif()\n+    else()\n+        file(WRITE \"${CMAKE_BINARY_DIR}/arch.c\" \"${archdetect_c_code}\")\n+\n+        enable_language(C)\n+\n+        # Detect the architecture in a rather creative way...\n+        # This compiles a small C program which is a series of ifdefs that selects a\n+        # particular #error preprocessor directive whose message string contains the\n+        # target architecture. The program will always fail to compile (both because\n+        # file is not a valid C program, and obviously because of the presence of the\n+        # #error preprocessor directives... but by exploiting the preprocessor in this\n+        # way, we can detect the correct target architecture even when cross-compiling,\n+        # since the program itself never needs to be run (only the compiler/preprocessor)\n+        try_run(\n+            run_result_unused\n+            compile_result_unused\n+            \"${CMAKE_BINARY_DIR}\"\n+            \"${CMAKE_BINARY_DIR}/arch.c\"\n+            COMPILE_OUTPUT_VARIABLE ARCH\n+            CMAKE_FLAGS CMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}\n+        )\n+\n+        # Parse the architecture name from the compiler output\n+        string(REGEX MATCH \"cmake_ARCH ([a-zA-Z0-9_]+)\" ARCH \"${ARCH}\")\n+\n+        # Get rid of the value marker leaving just the architecture name\n+        string(REPLACE \"cmake_ARCH \" \"\" ARCH \"${ARCH}\")\n+\n+        # If we are compiling with an unknown architecture this variable should\n+        # already be set to \"unknown\" but in the case that it's empty (i.e. due\n+        # to a typo in the code), then set it to unknown\n+        if (NOT ARCH)\n+            set(ARCH unknown)\n+        endif()\n     endif()\n-  endif()\n \n-  set(${output_var} \"${ARCH}\" PARENT_SCOPE)\n-endfunction()\n\\ No newline at end of file\n+    set(${output_var} \"${ARCH}\" PARENT_SCOPE)\n+endfunction()\n+"
+        },
+        {
+          "sha": "a8b08269ac7721362171250903a32feed18a9b26",
+          "filename": "lib/arm_64bit/libVimbaC.so",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/4174bd9c53b0bd365727439883ebaf8092269320/lib%2Farm_64bit%2FlibVimbaC.so",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/4174bd9c53b0bd365727439883ebaf8092269320/lib%2Farm_64bit%2FlibVimbaC.so",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/lib%2Farm_64bit%2FlibVimbaC.so?ref=4174bd9c53b0bd365727439883ebaf8092269320"
+        },
+        {
+          "sha": "348f5c2db36af134d1fe50530c8ddf84e39950cb",
+          "filename": "lib/arm_64bit/libVimbaCPP.so",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/4174bd9c53b0bd365727439883ebaf8092269320/lib%2Farm_64bit%2FlibVimbaCPP.so",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/4174bd9c53b0bd365727439883ebaf8092269320/lib%2Farm_64bit%2FlibVimbaCPP.so",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/lib%2Farm_64bit%2FlibVimbaCPP.so?ref=4174bd9c53b0bd365727439883ebaf8092269320"
+        }
+      ]
+    },
+    {
+      "author": "130s",
+      "date": "2017-08-02T18:54:35Z",
+      "sha": "d4b3930969ddc56ee020a51dc5052d6483726ae4",
+      "message": "[CI] Add config for ROS Kinetic (and Lunar as an option).",
+      "files_changed": 1,
+      "additions": 31,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "2a882ba6bb99d30a97c983d205a49b61ac18b43a",
+          "filename": ".travis.yml",
+          "status": "added",
+          "additions": 31,
+          "deletions": 0,
+          "changes": 31,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/d4b3930969ddc56ee020a51dc5052d6483726ae4/.travis.yml",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/d4b3930969ddc56ee020a51dc5052d6483726ae4/.travis.yml",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/.travis.yml?ref=d4b3930969ddc56ee020a51dc5052d6483726ae4",
+          "patch": "@@ -0,0 +1,31 @@\n+# Generic UWSim Travis Continuous Integration Configuration File\n+# This config file for Travis CI utilizes ros-industrial/industrial_ci package.\n+# For more info for the package, see https://github.com/ros-industrial/industrial_ci/blob/master/README.rst\n+sudo: required \n+services:\n+  - docker\n+language: generic \n+compiler:\n+  - gcc\n+notifications:\n+  email:\n+    recipients:\n+      - gm130s@gmail.com\n+env:\n+  matrix:\n+    - ROS_DISTRO=\"kinetic\"  ROS_REPOSITORY_PATH=http://packages.ros.org/ros/ubuntu\n+    - ROS_DISTRO=\"kinetic\"  ROS_REPOSITORY_PATH=http://packages.ros.org/ros-shadow-fixed/ubuntu\n+    - ROS_DISTRO=\"kinetic\"  PRERELEASE=true\n+    - ROS_DISTRO=\"lunar\"  ROS_REPOSITORY_PATH=http://packages.ros.org/ros/ubuntu\n+    - ROS_DISTRO=\"lunar\"  ROS_REPOSITORY_PATH=http://packages.ros.org/ros-shadow-fixed/ubuntu\n+    - ROS_DISTRO=\"lunar\"  PRERELEASE=true\n+matrix:\n+  allow_failures:\n+    - env: ROS_DISTRO=\"kinetic\"  PRERELEASE=true\n+    - env: ROS_DISTRO=\"lunar\"  ROS_REPOSITORY_PATH=http://packages.ros.org/ros/ubuntu\n+    - env: ROS_DISTRO=\"lunar\"  ROS_REPOSITORY_PATH=http://packages.ros.org/ros-shadow-fixed/ubuntu\n+    - env: ROS_DISTRO=\"lunar\"  PRERELEASE=true\n+install:\n+  - git clone https://github.com/ros-industrial/industrial_ci.git .ci_config\n+script:\n+  - .ci_config/travis.sh"
+        }
+      ]
+    },
+    {
+      "author": "mintar",
+      "date": "2017-07-20T13:40:00Z",
+      "sha": "457182fdd799219df45a9656268f60b53909766d",
+      "message": "Open camera on init\n\nWithout this patch, the camera is never opened. This bug was introduced in 63f868791.",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "14d9640c20b71bfbb3fd32644d7dc408a0e567e9",
+          "filename": "src/avt_vimba_camera.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/457182fdd799219df45a9656268f60b53909766d/src%2Favt_vimba_camera.cpp",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/457182fdd799219df45a9656268f60b53909766d/src%2Favt_vimba_camera.cpp",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/src%2Favt_vimba_camera.cpp?ref=457182fdd799219df45a9656268f60b53909766d",
+          "patch": "@@ -298,6 +298,7 @@ CameraPtr AvtVimbaCamera::openCamera(std::string id_str) {\n   }\n \n   if (VmbErrorSuccess == err) {\n+    err = camera->Open(VmbAccessModeFull);\n     while (err != VmbErrorSuccess && keepRunning) {\n       ROS_WARN_STREAM(\"Could not open camera. Retrying every second...\");\n       err = camera->Open(VmbAccessModeFull);"
+        }
+      ]
+    },
+    {
+      "author": "SparusII",
+      "date": "2016-02-26T08:05:47Z",
+      "sha": "6cbc4c66f3f2a699aae4412298ea0a43dbbdebdc",
+      "message": "changed stereo camera launchfile",
+      "files_changed": 2,
+      "additions": 56,
+      "deletions": 101,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "0fdf71523e4d592397f702797a391aa6831a88f7",
+          "filename": "launch/stereo_camera.launch",
+          "status": "modified",
+          "additions": 56,
+          "deletions": 39,
+          "changes": 95,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/6cbc4c66f3f2a699aae4412298ea0a43dbbdebdc/launch%2Fstereo_camera.launch",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/6cbc4c66f3f2a699aae4412298ea0a43dbbdebdc/launch%2Fstereo_camera.launch",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/launch%2Fstereo_camera.launch?ref=6cbc4c66f3f2a699aae4412298ea0a43dbbdebdc",
+          "patch": "@@ -1,46 +1,63 @@\n <launch>\n \n \t<group ns=\"stereo\">\n-\t\t<node name=\"stereo_image_proc\" pkg=\"stereo_image_proc\" type=\"stereo_image_proc\">\n-\t\t\t<!-- <param name=\"queue_size\" value=\"5\"/>\n-\t\t\t<param name=\"approximate_sync\" value=\"true\"/> -->\n+\t\t<node name=\"stereo_image_proc\" pkg=\"stereo_image_proc\" type=\"stereo_image_proc\"/>\n+\n+\t\t<!-- <group ns=\"left\">\n+\t\t\t<node name=\"image_proc\" pkg=\"image_proc\" type=\"image_proc\"/>\n+\t\t</group> -->\n+\n+\t\t<!-- <group ns=\"right\">\n+\t\t\t<node name=\"image_proc\" pkg=\"image_proc\" type=\"image_proc\"/>\n+\t\t</group>  -->\n+\n+\n+\t\t<node name=\"left\" pkg=\"avt_vimba_camera\" type=\"mono_camera_node\" output=\"screen\">\n+\t\t\t<param name=\"guid\" value=\"50-0503343289\"/>\n+\t\t\t<param name=\"ip_address\" value=\"\"/>\n+\t\t\t<param name=\"camera_info_url\" value=\"file://$(find avt_vimba_camera)/calibrations/calibration_50-0503343289.yaml\"/>\n+\t\t\t<param name=\"frame_id\" value=\"left_optical\"/>\n+\t\t\t<param name=\"trig_timestamp_topic\" value=\"\"/>\n+\t\t\t<param name=\"trigger_source\" value=\"FixedRate\"/>\n+\t\t\t<!--param name=\"sync_out_source\" value=\"Acquiring\"/-->\n+\t\t\t<param name=\"sync_out_source\" value=\"Exposing\"/>\n+\t\t\t<param name=\"sync_out_polarity\" value=\"Normal\"/>\n+\t\t\t<param name=\"acquisition_mode\" value=\"Continuous\"/>\n+\t\t\t<param name=\"acquisition_rate\" value=\"10\"/>\n+\t\t\t<param name=\"pixel_format\" value=\"BayerRG8\"/>\n+\t\t\t<param name=\"auto_exposure\" value=\"Auto\"/>\n+\t\t\t<param name=\"auto_gain\" value=\"Auto\"/>\n+\t\t\t<param name=\"auto_whitebalance\" value=\"Auto\"/>\n+\t\t\t<param name=\"x_offset\" value=\"8\"/>\n+\t\t\t<param name=\"y_offset\" value=\"9\"/>\n+\t\t\t<param name=\"width\" value=\"1920\"/>\n+\t\t\t<param name=\"height\" value=\"1440\"/>\n+\t\t\t<param name=\"ptp_mode\" value=\"Master\"/>\n+\t\t\t<param name=\"stream_bytes_per_second\" value=\"45000000\"/>\n \t\t</node>\n-\t</group>\n-\n-\t<node name=\"stereo\" pkg=\"avt_vimba_camera\" type=\"stereo_camera_node\" output=\"screen\">\n-\n-\t\t<!-- Static params -->\n-\t\t<param name=\"left_guid\" value=\"50-0503343290\"/>\n-\t\t<param name=\"right_guid\" value=\"50-0503343289\"/>\n-\t\t<param name=\"left_camera_info_url\" value=\"file://$(find avt_vimba_camera)/calibrations/calibration_50-0503343290.yaml\"/>\n-\t\t<param name=\"right_camera_info_url\" value=\"file://$(find avt_vimba_camera)/calibrations/calibration_50-0503343289.yaml\"/>\n-\n-\t\t<!-- Sync params -->\n-\t\t<param name=\"master_out_source\" value=\"Exposing\"/>\n-\t\t<param name=\"slave_trigger_source\" value=\"Line1\"/>\n-\t\t<!-- <param name=\"slave_trigger_source\" value=\"FixedRate\"/> -->\n-\t\t<param name=\"slave_in_source\" value=\"SyncIn1\"/>\n-\n-\t\t<param name=\"show_debug_prints\" value=\"true\"/>\n-\n-\t\t<!-- Dynamic reconfigure params -->\n-\t\t<param name=\"frame_id\" value=\"stereo\"/>\n-\t\t<param name=\"trig_timestamp_topic\" value=\"\"/>\n-\t\t<param name=\"trigger_source\" value=\"FixedRate\"/>\n-\t\t<param name=\"acquisition_mode\" value=\"Continuous\"/>\n-\t\t<param name=\"acquisition_rate\" value=\"10\"/>\n-\t\t<param name=\"pixel_format\" value=\"BayerRG8\"/>\n-\t\t<param name=\"exposure\" value=\"1000\"/>\n-\t\t<param name=\"gain\" value=\"0\"/>\n-\t\t<param name=\"exposure_auto\" value=\"Continuous\"/>\n-\t\t<param name=\"gain_auto\" value=\"Continuous\"/>\n-\t\t<param name=\"whitebalance_auto\" value=\"Continuous\"/>\n-\t\t<param name=\"x_offset\" value=\"8\"/>\n-\t\t<param name=\"y_offset\" value=\"9\"/>\n-\t\t<param name=\"width\" value=\"1920\"/>\n-\t\t<param name=\"height\" value=\"1440\"/>\n-\t\t<param name=\"stream_bytes_per_second\" value=\"45000000\"/>\n-\t</node>\n \n+\t\t<node name=\"right\" pkg=\"avt_vimba_camera\" type=\"mono_camera_node\" output=\"screen\">\n+\t\t\t<param name=\"guid\" value=\"50-0503343290\"/>\n+\t\t\t<param name=\"ip_address\" value=\"\"/>\n+\t\t\t<param name=\"camera_info_url\" value=\"file://$(find avt_vimba_camera)/calibrations/calibration_50-0503343290.yaml\"/>\n+\t\t\t<param name=\"frame_id\" value=\"right_optical\"/>\n+\t\t\t<param name=\"trig_timestamp_topic\" value=\"\"/>\n+\t\t\t<param name=\"trigger_source\" value=\"Line1\"/>\n+\t\t\t<param name=\"trigger_selector\" value=\"AcquisitionStart\"/>\n+\t\t\t<param name=\"trigger_mode\" value=\"On\"/>\n+\t\t\t<param name=\"sync_in_selector\" value=\"SyncIn1\"/>\n+\t\t\t<param name=\"acquisition_mode\" value=\"Continuous\"/>\n+\t\t\t<param name=\"pixel_format\" value=\"BayerRG8\"/>\n+\t\t\t<param name=\"auto_exposure\" value=\"Auto\"/>\n+\t\t\t<param name=\"auto_gain\" value=\"Auto\"/>\n+\t\t\t<param name=\"auto_whitebalance\" value=\"Auto\"/>\n+\t\t\t<param name=\"x_offset\" value=\"8\"/>\n+\t\t\t<param name=\"y_offset\" value=\"9\"/>\n+\t\t\t<param name=\"width\" value=\"1920\"/>\n+\t\t\t<param name=\"height\" value=\"1440\"/>\n+\t\t\t<param name=\"ptp_mode\" value=\"Slave\"/>\n+\t\t\t<param name=\"stream_bytes_per_second\" value=\"45000000\"/>\n+\t\t</node>\n+\t</group>\n </launch>\n "
+        },
+        {
+          "sha": "b8c696f262f6358dbbc110ea00e8b93aa8a84acf",
+          "filename": "launch/testing_stereo_camera.launch",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 62,
+          "changes": 62,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/4d03339aaec77b210636f1de4bd7957bd2839666/launch%2Ftesting_stereo_camera.launch",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/4d03339aaec77b210636f1de4bd7957bd2839666/launch%2Ftesting_stereo_camera.launch",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/launch%2Ftesting_stereo_camera.launch?ref=4d03339aaec77b210636f1de4bd7957bd2839666",
+          "patch": "@@ -1,62 +0,0 @@\n-<launch>\n-\n-\t<group ns=\"stereo\">\n-\t\t<node name=\"stereo_image_proc\" pkg=\"stereo_image_proc\" type=\"stereo_image_proc\"/>\n-\n-\t\t<!-- <group ns=\"left\">\n-\t\t\t<node name=\"image_proc\" pkg=\"image_proc\" type=\"image_proc\"/>\n-\t\t</group> -->\n-\n-\t\t<!-- <group ns=\"right\">\n-\t\t\t<node name=\"image_proc\" pkg=\"image_proc\" type=\"image_proc\"/>\n-\t\t</group>  -->\n-\n-\n-\t\t<node name=\"left\" pkg=\"avt_vimba_camera\" type=\"avt_vimba_camera_node\" output=\"screen\">\n-\t\t\t<param name=\"guid\" value=\"50-0503343290\"/>\n-\t\t\t<param name=\"ip_address\" value=\"\"/>\n-\t\t\t<param name=\"camera_info_url\" value=\"file://$(find avt_vimba_camera)/calibrations/calibration_50-0503343290.yaml\"/>\n-\t\t\t<param name=\"frame_id\" value=\"left_optical\"/>\n-\t\t\t<param name=\"trig_timestamp_topic\" value=\"\"/>\n-\t\t\t<param name=\"trigger_source\" value=\"FixedRate\"/>\n-\t\t\t<param name=\"sync_out_source\" value=\"Acquiring\"/>\n-\t\t\t<param name=\"sync_out_polarity\" value=\"Normal\"/>\n-\t\t\t<param name=\"acquisition_mode\" value=\"Continuous\"/>\n-\t\t\t<param name=\"acquisition_rate\" value=\"10\"/>\n-\t\t\t<param name=\"pixel_format\" value=\"BayerRG8\"/>\n-\t\t\t<param name=\"auto_exposure\" value=\"Auto\"/>\n-\t\t\t<param name=\"auto_gain\" value=\"Auto\"/>\n-\t\t\t<param name=\"auto_whitebalance\" value=\"Auto\"/>\n-\t\t\t<param name=\"x_offset\" value=\"8\"/>\n-\t\t\t<param name=\"y_offset\" value=\"9\"/>\n-\t\t\t<param name=\"width\" value=\"1920\"/>\n-\t\t\t<param name=\"height\" value=\"1440\"/>\n-\t\t\t<param name=\"ptp_mode\" value=\"Master\"/>\n-\t\t\t<param name=\"stream_bytes_per_second\" value=\"45000000\"/>\n-\t\t</node>\n-\n-\t\t<node name=\"right\" pkg=\"avt_vimba_camera\" type=\"avt_vimba_camera_node\" output=\"screen\">\n-\t\t\t<param name=\"guid\" value=\"50-0503343289\"/>\n-\t\t\t<param name=\"ip_address\" value=\"\"/>\n-\t\t\t<param name=\"camera_info_url\" value=\"file://$(find avt_vimba_camera)/calibrations/calibration_50-0503343289.yaml\"/>\n-\t\t\t<param name=\"frame_id\" value=\"right_optical\"/>\n-\t\t\t<param name=\"trig_timestamp_topic\" value=\"\"/>\n-\t\t\t<param name=\"trigger_source\" value=\"Line1\"/>\n-\t\t\t<param name=\"trigger_selector\" value=\"AcquisitionStart\"/>\n-\t\t\t<param name=\"trigger_mode\" value=\"On\"/>\n-\t\t\t<param name=\"sync_in_selector\" value=\"SyncIn1\"/>\n-\t\t\t<param name=\"acquisition_mode\" value=\"Continuous\"/>\n-\t\t\t<param name=\"pixel_format\" value=\"BayerRG8\"/>\n-\t\t\t<param name=\"auto_exposure\" value=\"Auto\"/>\n-\t\t\t<param name=\"auto_gain\" value=\"Auto\"/>\n-\t\t\t<param name=\"auto_whitebalance\" value=\"Auto\"/>\n-\t\t\t<param name=\"x_offset\" value=\"8\"/>\n-\t\t\t<param name=\"y_offset\" value=\"9\"/>\n-\t\t\t<param name=\"width\" value=\"1920\"/>\n-\t\t\t<param name=\"height\" value=\"1440\"/>\n-\t\t\t<param name=\"ptp_mode\" value=\"Slave\"/>\n-\t\t\t<param name=\"stream_bytes_per_second\" value=\"45000000\"/>\n-\t\t</node>\n-\t</group>\n-</launch>\n-"
+        }
+      ]
+    },
+    {
+      "author": "shaun-edwards",
+      "date": "2017-06-04T01:17:06Z",
+      "sha": "9e0e177f7d177338e3d9ac593280bf10a72a2e1d",
+      "message": "Fixed crashing of dynamic reconfigure",
+      "files_changed": 1,
+      "additions": 0,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": null,
+          "filename": "cfg/AvtVimbaCamera.cfg",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/9e0e177f7d177338e3d9ac593280bf10a72a2e1d/cfg%2FAvtVimbaCamera.cfg",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/9e0e177f7d177338e3d9ac593280bf10a72a2e1d/cfg%2FAvtVimbaCamera.cfg",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/cfg%2FAvtVimbaCamera.cfg?ref=9e0e177f7d177338e3d9ac593280bf10a72a2e1d"
+        }
+      ]
+    },
+    {
+      "author": "agoins",
+      "date": "2017-03-30T22:31:12Z",
+      "sha": "b6b35eb88531b45eeadf0849f681d461b0e09ed8",
+      "message": "Fixed dynamic reconfigure configuration that did not allow camera parameters to be updated",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "5115a16c96b63fe9cbfa9017c6a9156fb8cb4c27",
+          "filename": "cfg/AvtVimbaCamera.cfg",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/b6b35eb88531b45eeadf0849f681d461b0e09ed8/cfg%2FAvtVimbaCamera.cfg",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/b6b35eb88531b45eeadf0849f681d461b0e09ed8/cfg%2FAvtVimbaCamera.cfg",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/cfg%2FAvtVimbaCamera.cfg?ref=b6b35eb88531b45eeadf0849f681d461b0e09ed8",
+          "patch": "@@ -136,7 +136,7 @@ gen.add(\"sync_out_selector\",    str_t,    SensorLevels.RECONFIGURE_STOP, \"Select\n gen.add(\"sync_out_source\",      str_t,    SensorLevels.RECONFIGURE_STOP, \"Signal source of the sync-out line specified by `sync_out_selector`\", \"GPO\", edit_method=sync_source_enum)\n # IRIS\n gen.add(\"iris_auto_target\",     int_t,    SensorLevels.RECONFIGURE_RUNNING, \"This is the target image mean value, in percent.\", 50, 0, 100)\n-gen.add(\"iris_mode\",            str_t,    SensorLevels.RECONFIGURE_RUNNING, \"Set the iris mode. Disabled: no iris control. Video: enable video iris. VideoOpen: fully open a video iris. VideoClose: fully close a video iris.\",  edit_method = auto_enum)\n+gen.add(\"iris_mode\",            str_t,    SensorLevels.RECONFIGURE_RUNNING, \"Set the iris mode. Disabled: no iris control. Video: enable video iris. VideoOpen: fully open a video iris. VideoClose: fully close a video iris.\",  \"Continuous\", edit_method = auto_enum)\n gen.add(\"iris_video_level_min\", int_t,    SensorLevels.RECONFIGURE_RUNNING, \"Minimum video iris level output by the camera, in approximately mV pp. A higher minimum value slows the adjustment time but prevents excessive overshoot.\", 110, 0, 150)\n gen.add(\"iris_video_level_max\", int_t,    SensorLevels.RECONFIGURE_RUNNING, \"Maximum video iris level output by the camera, in approximately mV pp. A lower minimum value slows the adjustment time but prevents excessive overshoot.\", 110, 0, 150)\n "
+        }
+      ]
+    },
+    {
+      "author": "josepqp",
+      "date": "2016-09-14T10:54:48Z",
+      "sha": "55877bddf14dd5699662fd61478d421d68bfbc04",
+      "message": "1) Added ARM 32 bits libraries\n2) Modified CMakeList.txt to compile with ARM 32 bits\n3) Added Iris Parameter",
+      "files_changed": 7,
+      "additions": 52,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "f2324d5c0a64a5dea8b6de813a698781c372072d",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/55877bddf14dd5699662fd61478d421d68bfbc04/CMakeLists.txt",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/55877bddf14dd5699662fd61478d421d68bfbc04/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/CMakeLists.txt?ref=55877bddf14dd5699662fd61478d421d68bfbc04",
+          "patch": "@@ -127,4 +127,11 @@ elseif(\"${ARCH}\" STREQUAL x86_64)\n     ${CMAKE_CURRENT_SOURCE_DIR}/lib/64bit/libVimbaCPP.so\n     DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n   )\n+elseif(\"${ARCH}\" STREQUAL armv7)\n+  install(FILES\n+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/arm_32bit/libVimbaC.so\n+    ${CMAKE_CURRENT_SOURCE_DIR}/lib/arm_32bit/libVimbaCPP.so\n+    DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n+  )\n endif()\n+"
+        },
+        {
+          "sha": "59ccb39014152fce971d0bc97bca22cfa5e0f864",
+          "filename": "cfg/AvtVimbaCamera.cfg",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/55877bddf14dd5699662fd61478d421d68bfbc04/cfg%2FAvtVimbaCamera.cfg",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/55877bddf14dd5699662fd61478d421d68bfbc04/cfg%2FAvtVimbaCamera.cfg",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/cfg%2FAvtVimbaCamera.cfg?ref=55877bddf14dd5699662fd61478d421d68bfbc04",
+          "patch": "@@ -134,5 +134,10 @@ gen.add(\"sync_in_selector\",     str_t,    SensorLevels.RECONFIGURE_STOP, \"Select\n gen.add(\"sync_out_polarity\",    str_t,    SensorLevels.RECONFIGURE_STOP, \"Polarity applied to the sync-out line specified by `sync_out_selector`\",  \"Normal\", edit_method=polarity_enum)\n gen.add(\"sync_out_selector\",    str_t,    SensorLevels.RECONFIGURE_STOP, \"Selects the sync-out line to control\", \"SyncOut1\", edit_method=sync_out_selector_enum)\n gen.add(\"sync_out_source\",      str_t,    SensorLevels.RECONFIGURE_STOP, \"Signal source of the sync-out line specified by `sync_out_selector`\", \"GPO\", edit_method=sync_source_enum)\n+# IRIS\n+gen.add(\"iris_auto_target\",     int_t,    SensorLevels.RECONFIGURE_RUNNING, \"This is the target image mean value, in percent.\", 50, 0, 100)\n+gen.add(\"iris_mode\",            str_t,    SensorLevels.RECONFIGURE_RUNNING, \"Set the iris mode. Disabled: no iris control. Video: enable video iris. VideoOpen: fully open a video iris. VideoClose: fully close a video iris.\",  edit_method = auto_enum)\n+gen.add(\"iris_video_level_min\", int_t,    SensorLevels.RECONFIGURE_RUNNING, \"Minimum video iris level output by the camera, in approximately mV pp. A higher minimum value slows the adjustment time but prevents excessive overshoot.\", 110, 0, 150)\n+gen.add(\"iris_video_level_max\", int_t,    SensorLevels.RECONFIGURE_RUNNING, \"Maximum video iris level output by the camera, in approximately mV pp. A lower minimum value slows the adjustment time but prevents excessive overshoot.\", 110, 0, 150)\n \n exit(gen.generate(PACKAGE, NODE, CONFIG))"
+        },
+        {
+          "sha": "d2f14bfcbe732f467cfe1dd037a94f97d9204958",
+          "filename": "include/avt_vimba_camera/avt_vimba_camera.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/55877bddf14dd5699662fd61478d421d68bfbc04/include%2Favt_vimba_camera%2Favt_vimba_camera.h",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/55877bddf14dd5699662fd61478d421d68bfbc04/include%2Favt_vimba_camera%2Favt_vimba_camera.h",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/include%2Favt_vimba_camera%2Favt_vimba_camera.h?ref=55877bddf14dd5699662fd61478d421d68bfbc04",
+          "patch": "@@ -171,6 +171,7 @@ class AvtVimbaCamera {\n   void updatePixelFormatConfig(Config& config);\n   void updatePtpModeConfig(Config& config);\n   void updateGPIOConfig(Config& config);\n+  void updateIrisConfig(Config& config);\n \n   void getCurrentState(diagnostic_updater::DiagnosticStatusWrapper &stat);\n "
+        },
+        {
+          "sha": "6ffeed50d82ddc11b40916877257698333ad49fb",
+          "filename": "include/avt_vimba_camera/vimba_ros.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/55877bddf14dd5699662fd61478d421d68bfbc04/include%2Favt_vimba_camera%2Fvimba_ros.h",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/55877bddf14dd5699662fd61478d421d68bfbc04/include%2Favt_vimba_camera%2Fvimba_ros.h",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/include%2Favt_vimba_camera%2Fvimba_ros.h?ref=55877bddf14dd5699662fd61478d421d68bfbc04",
+          "patch": "@@ -170,7 +170,7 @@ class VimbaROS {\n     void updatePixelFormatConfig(const Config& config, FeaturePtrVector feature_ptr_vec);\n     void updateGPIOConfig(const Config& config, FeaturePtrVector feature_ptr_vec);\n     void updatePtpModeConfig(const Config& config, FeaturePtrVector feature_ptr_vec);\n-\n+    void updateIrisConfig(const Config& config, FeaturePtrVector feature_ptr_vec);\n \n     void start(Config& config);\n     void stop();"
+        },
+        {
+          "sha": "7033ea6d888f4010527a6daae013454d3ddf3c3e",
+          "filename": "lib/arm_32bit/libVimbaC.so",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/55877bddf14dd5699662fd61478d421d68bfbc04/lib%2Farm_32bit%2FlibVimbaC.so",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/55877bddf14dd5699662fd61478d421d68bfbc04/lib%2Farm_32bit%2FlibVimbaC.so",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/lib%2Farm_32bit%2FlibVimbaC.so?ref=55877bddf14dd5699662fd61478d421d68bfbc04"
+        },
+        {
+          "sha": "28935c9b31ada6d8ea36d99c6ed6673f93cd0600",
+          "filename": "lib/arm_32bit/libVimbaCPP.so",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/55877bddf14dd5699662fd61478d421d68bfbc04/lib%2Farm_32bit%2FlibVimbaCPP.so",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/55877bddf14dd5699662fd61478d421d68bfbc04/lib%2Farm_32bit%2FlibVimbaCPP.so",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/lib%2Farm_32bit%2FlibVimbaCPP.so?ref=55877bddf14dd5699662fd61478d421d68bfbc04"
+        },
+        {
+          "sha": "4034ce348b1dc72d99cc1846935388a8c7a0a2d8",
+          "filename": "src/avt_vimba_camera.cpp",
+          "status": "modified",
+          "additions": 38,
+          "deletions": 0,
+          "changes": 38,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/55877bddf14dd5699662fd61478d421d68bfbc04/src%2Favt_vimba_camera.cpp",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/55877bddf14dd5699662fd61478d421d68bfbc04/src%2Favt_vimba_camera.cpp",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/src%2Favt_vimba_camera.cpp?ref=55877bddf14dd5699662fd61478d421d68bfbc04",
+          "patch": "@@ -246,6 +246,7 @@ void AvtVimbaCamera::updateConfig(Config& config) {\n   updatePtpModeConfig(config);\n   updatePixelFormatConfig(config);\n   updateAcquisitionConfig(config);\n+  updateIrisConfig(config);\n   config_ = config;\n \n   if (on_init_) {\n@@ -798,6 +799,43 @@ void AvtVimbaCamera::updateAcquisitionConfig(Config& config) {\n   }\n }\n \n+/* Update the Iris config */\n+void AvtVimbaCamera::updateIrisConfig(Config& config) {\n+  bool changed = false;\n+  if (config.iris_auto_target != config_.iris_auto_target || on_init_) {\n+    changed = true;\n+    setFeatureValue(\"IrisAutoTarget\", static_cast<float>(config.iris_auto_target));\n+  }\n+  if (config.iris_mode != config_.iris_mode || on_init_) {\n+    changed = true;\n+    setFeatureValue(\"IrisMode\", config.iris_mode.c_str());\n+  }\n+//  if (config.iris_video_level != config_.iris_video_level || on_init_) {\n+//    changed = true;\n+//    setFeatureValue(\"IrisVideoLevel\",\n+//                    static_cast<VmbInt64_t>(config.iris_video_level));\n+//  }\n+  if (config.iris_video_level_max != config_.iris_video_level_max || on_init_) {\n+    changed = true;\n+    setFeatureValue(\"IrisVideoLevelMax\", static_cast<float>(config.iris_video_level_max));\n+  }\n+  if (config.iris_video_level_min != config_.iris_video_level_min || on_init_) {\n+    changed = true;\n+    setFeatureValue(\"IrisVideoLevelMin\",\n+                    static_cast<VmbInt64_t>(config.iris_video_level_min));\n+  }\n+  if(changed && show_debug_prints_){\n+    ROS_INFO_STREAM(\"New Iris config (\" << config.frame_id << \") : \"\n+      << \"\\n\\tIrisAutoTarget    : \" << config.iris_auto_target          << \" was \" << config_.iris_auto_target\n+//      << \"\\n\\tIrisMode          : \" << config.iris_mode               << \" was \" << config_.iris_mode\n+//      << \"\\n\\tIrisVideoLevel    : \" << config.iris_video_level        << \" was \" << config_.iris_video_level\n+//      << \"\\n\\tIrisVideoLevelMax : \" << config.iris_video_level_max      << \" was \" << config_.iris_video_level_max\n+//      << \"\\n\\tIrisVideoLevelMin : \" << config.iris_video_level_min      << \" was \" << config_.iris_video_level_min\n+);\n+  }\n+}\n+\n+\n /** Change the Exposure configuration */\n void AvtVimbaCamera::updateExposureConfig(Config& config) {\n   bool changed = false;"
+        }
+      ]
+    },
+    {
+      "author": "plnegre",
+      "date": "2016-05-30T10:52:57Z",
+      "sha": "71c015f0fa1a6ca03ce7db10f63931132fd09baa",
+      "message": "Left and right callback in a separate thread",
+      "files_changed": 2,
+      "additions": 26,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "58ea5b5840525d4f606f755bcbcf61b00eaca74d",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 19,
+          "deletions": 0,
+          "changes": 19,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/71c015f0fa1a6ca03ce7db10f63931132fd09baa/CMakeLists.txt",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/71c015f0fa1a6ca03ce7db10f63931132fd09baa/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/CMakeLists.txt?ref=71c015f0fa1a6ca03ce7db10f63931132fd09baa",
+          "patch": "@@ -1,6 +1,25 @@\n cmake_minimum_required(VERSION 2.8.3)\n project(avt_vimba_camera)\n \n+set(CMAKE_C_FLAGS \"${CMAKE_C_FLAGS}  -Wall  -O3 -march=native \")\n+set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Wall   -O3 -march=native\")\n+\n+# Check C++11 or C++0x support\n+include(CheckCXXCompilerFlag)\n+CHECK_CXX_COMPILER_FLAG(\"-std=c++11\" COMPILER_SUPPORTS_CXX11)\n+CHECK_CXX_COMPILER_FLAG(\"-std=c++0x\" COMPILER_SUPPORTS_CXX0X)\n+if(COMPILER_SUPPORTS_CXX11)\n+   set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -std=c++11\")\n+   add_definitions(-DCOMPILEDWITHC11)\n+   message(STATUS \"Using flag -std=c++11.\")\n+elseif(COMPILER_SUPPORTS_CXX0X)\n+   set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -std=c++0x\")\n+   add_definitions(-DCOMPILEDWITHC0X)\n+   message(STATUS \"Using flag -std=c++0x.\")\n+else()\n+   message(FATAL_ERROR \"The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.\")\n+endif()\n+\n find_package(catkin REQUIRED COMPONENTS\n   #libvimba\n   camera_info_manager"
+        },
+        {
+          "sha": "2a45f258518e0f9994dc21cb8c21910960c22d55",
+          "filename": "src/stereo_camera.cpp",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 3,
+          "changes": 10,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/71c015f0fa1a6ca03ce7db10f63931132fd09baa/src%2Fstereo_camera.cpp",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/71c015f0fa1a6ca03ce7db10f63931132fd09baa/src%2Fstereo_camera.cpp",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/src%2Fstereo_camera.cpp?ref=71c015f0fa1a6ca03ce7db10f63931132fd09baa",
+          "patch": "@@ -34,7 +34,7 @@\n #include <driver_base/SensorLevels.h>\n \n #include <boost/bind.hpp>\n-#include <boost/thread/thread.hpp>\n+#include <thread>\n \n namespace avt_vimba_camera {\n \n@@ -52,8 +52,12 @@ StereoCamera::StereoCamera(ros::NodeHandle nh, ros::NodeHandle nhp)\n   synced_frames_ = 0;\n \n   // Set the frame callbacks\n-  left_cam_.setCallback(boost::bind(&avt_vimba_camera::StereoCamera::leftFrameCallback, this, _1));\n-  right_cam_.setCallback(boost::bind(&avt_vimba_camera::StereoCamera::rightFrameCallback, this, _1));\n+  std::thread left_thread([&]() {\n+    left_cam_.setCallback(boost::bind(&avt_vimba_camera::StereoCamera::leftFrameCallback, this, _1));\n+  });\n+  std::thread right_thread([&]() {\n+    right_cam_.setCallback(boost::bind(&avt_vimba_camera::StereoCamera::rightFrameCallback, this, _1));\n+  });\n \n   // Get the parameters\n   nhp_.param(\"left_ip\", left_ip_, std::string(\"\"));"
+        }
+      ]
+    },
+    {
+      "author": "lucasb-eyer",
+      "date": "2015-04-22T09:10:48Z",
+      "sha": "ea7a1e8c7a84a5ff010c48eb9040e5cf1dd64b94",
+      "message": "Set the frame_id of the image header, too.",
+      "files_changed": 2,
+      "additions": 3,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "1ac7b5300381155bbed52733d908c66d84256f5d",
+          "filename": "src/mono_camera.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/ea7a1e8c7a84a5ff010c48eb9040e5cf1dd64b94/src%2Fmono_camera.cpp",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/ea7a1e8c7a84a5ff010c48eb9040e5cf1dd64b94/src%2Fmono_camera.cpp",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/src%2Fmono_camera.cpp?ref=ea7a1e8c7a84a5ff010c48eb9040e5cf1dd64b94",
+          "patch": "@@ -77,6 +77,7 @@ void MonoCamera::frameCallback(const FramePtr& vimba_frame_ptr) {\n     if (api_.frameToImage(vimba_frame_ptr, img)) {\n       sensor_msgs::CameraInfo ci = info_man_->getCameraInfo();\n       ci.header.stamp = img.header.stamp = ros_time;\n+      img.header.frame_id = ci.header.frame_id;\n       pub_.publish(img, ci);\n     } else {\n       ROS_WARN_STREAM(\"Function frameToImage returned 0. No image published.\");"
+        },
+        {
+          "sha": "1c50d99608e9f1b75117f3a75b92cf3b71603201",
+          "filename": "src/stereo_camera.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/ea7a1e8c7a84a5ff010c48eb9040e5cf1dd64b94/src%2Fstereo_camera.cpp",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/ea7a1e8c7a84a5ff010c48eb9040e5cf1dd64b94/src%2Fstereo_camera.cpp",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/src%2Fstereo_camera.cpp?ref=ea7a1e8c7a84a5ff010c48eb9040e5cf1dd64b94",
+          "patch": "@@ -149,8 +149,10 @@ void StereoCamera::sync(void) {\n \n       lci.header.stamp = ros_time;\n       left_img_.header.stamp = ros_time;\n+      left_img_.header.frame_id = lci.header.frame_id;\n       rci.header.stamp = ros_time;\n       right_img_.header.stamp = ros_time;\n+      right_img_.header.frame_id = rci.header.frame_id;\n       left_pub_.publish(left_img_, lci);\n       right_pub_.publish(right_img_, rci);\n       // pub_freq_->tick(ros_time);"
+        }
+      ]
+    },
+    {
+      "author": "SPENCER-Freiburg Laptop",
+      "date": "2014-10-30T09:39:47Z",
+      "sha": "02df92e79402376599dffeef51088de8c12b7ede",
+      "message": "Fix names/values of auto settings.",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 3,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "81172994683fcfd12f9a6fa5abfc186823542f95",
+          "filename": "launch/avt_vimba_camera.launch",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/02df92e79402376599dffeef51088de8c12b7ede/launch%2Favt_vimba_camera.launch",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/02df92e79402376599dffeef51088de8c12b7ede/launch%2Favt_vimba_camera.launch",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/launch%2Favt_vimba_camera.launch?ref=02df92e79402376599dffeef51088de8c12b7ede",
+          "patch": "@@ -54,9 +54,9 @@\n \t\t\t2. Once\n \t\t\t3. Continuous\n \t\t-->\n-\t\t<param name=\"auto_exposure\" value=\"Auto\"/>\n-\t\t<param name=\"auto_gain\" value=\"Auto\"/>\n-\t\t<param name=\"auto_whitebalance\" value=\"Auto\"/>\n+\t\t<param name=\"exposure_auto\" value=\"Continuous\"/>\n+\t\t<param name=\"gain_auto\" value=\"Continuous\"/>\n+\t\t<param name=\"whitebalance_auto\" value=\"Continuous\"/>\n \n \t\t<param name=\"binning_x\" value=\"1\"/>\n \t\t<param name=\"binning_y\" value=\"1\"/>"
+        }
+      ]
+    },
+    {
+      "author": "pkok",
+      "date": "2014-10-28T13:13:04Z",
+      "sha": "0f9087df3066cdf52c1d18c3b6703849940a5bba",
+      "message": "Allow user to connect by specifying either GUID or IP address.",
+      "files_changed": 2,
+      "additions": 5,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e34e76865c1f047c95c647a01c9a0236858405ea",
+          "filename": "cfg/AvtVimbaCamera.cfg",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/0f9087df3066cdf52c1d18c3b6703849940a5bba/cfg%2FAvtVimbaCamera.cfg",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/0f9087df3066cdf52c1d18c3b6703849940a5bba/cfg%2FAvtVimbaCamera.cfg",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/cfg%2FAvtVimbaCamera.cfg?ref=0f9087df3066cdf52c1d18c3b6703849940a5bba",
+          "patch": "@@ -71,8 +71,8 @@ sync_source_enum = gen.enum([ gen.const(\"GPO\", str_t, \"GPO\", \"\"),\n \t\t\t\t\t\t\t  gen.const(\"LineIn2\",                 str_t, \"LineIn2\", \"\")],\"Sync-out signal\")\n \n #       Name                    Type      Reconfiguration level             Description         Default   Min   Max\n-gen.add(\"guid\",\t\t\t\t\tstr_t,    SensorLevels.RECONFIGURE_CLOSE,   \"Global Unique ID of camera, XX-XXXXXXXXXX digits\",\"50-0503328910\")\n-gen.add(\"ip_address\",\t\t\tstr_t,    SensorLevels.RECONFIGURE_CLOSE,   \"IP of camera, four pairs of two digits separated by points: 192.168.1.3\",\"192.168.3.103\")\n+gen.add(\"guid\",\t\t\t\t\tstr_t,    SensorLevels.RECONFIGURE_CLOSE,   \"Global Unique ID of camera, XX-XXXXXXXXXX digits\",\"\")\n+gen.add(\"ip_address\",\t\t\tstr_t,    SensorLevels.RECONFIGURE_CLOSE,   \"IP of camera, four pairs of two digits separated by points: 192.168.1.3\",\"\")\n # ROS\n gen.add(\"camera_info_url\", \t\tstr_t,    SensorLevels.RECONFIGURE_RUNNING, \"Camera calibration URL for this video_mode (uncalibrated if null).\",\"camera_info.yaml\")\n gen.add(\"frame_id\",             str_t,    SensorLevels.RECONFIGURE_RUNNING, \"The optical camera TF frame set in message headers.\", \"camera\")"
+        },
+        {
+          "sha": "f4e0950cb6a0fb15a32f755096165c18153c7e91",
+          "filename": "src/vimba_ros.cpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/0f9087df3066cdf52c1d18c3b6703849940a5bba/src%2Fvimba_ros.cpp",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/0f9087df3066cdf52c1d18c3b6703849940a5bba/src%2Fvimba_ros.cpp",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/src%2Fvimba_ros.cpp?ref=0f9087df3066cdf52c1d18c3b6703849940a5bba",
+          "patch": "@@ -115,6 +115,9 @@ void VimbaROS::start(Config& config) {\n     // Only guid available\n     ROS_INFO_STREAM(\"Trying to open camera by ID: \" << guid_str);\n     vimba_camera_ptr_ = openCamera(guid_str);\n+  } else {\n+    // No identifying info (GUID and IP) are available\n+    ROS_ERROR(\"Can't connect to the camera: at least GUID or IP need to be set.\");\n   }\n \n   // Get all cam properties we need for initialization"
+        }
+      ]
+    },
+    {
+      "author": "cottsay",
+      "date": "2014-03-25T19:37:09Z",
+      "sha": "7b1f2917da1ae7f1764711605e46f4b8f52d2f40",
+      "message": "Fix 32-bit compiles\n\nThere is no such thing as x86_32 architecture. Most Linux distros report i386 for 32-bit machines.",
+      "files_changed": 2,
+      "additions": 0,
+      "deletions": 0,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "0230995ae73e3fb704a98aa53ac4c0e397161629",
+          "filename": "lib/i386bit/libVimbaC.so",
+          "status": "renamed",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/7b1f2917da1ae7f1764711605e46f4b8f52d2f40/lib%2Fi386bit%2FlibVimbaC.so",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/7b1f2917da1ae7f1764711605e46f4b8f52d2f40/lib%2Fi386bit%2FlibVimbaC.so",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/lib%2Fi386bit%2FlibVimbaC.so?ref=7b1f2917da1ae7f1764711605e46f4b8f52d2f40",
+          "previous_filename": "lib/x86_32bit/libVimbaC.so"
+        },
+        {
+          "sha": "84ccd3b09e30bab190dbb307cf3dfb0a4b2d311b",
+          "filename": "lib/i386bit/libVimbaCPP.so",
+          "status": "renamed",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/astuff/avt_vimba_camera/blob/7b1f2917da1ae7f1764711605e46f4b8f52d2f40/lib%2Fi386bit%2FlibVimbaCPP.so",
+          "raw_url": "https://github.com/astuff/avt_vimba_camera/raw/7b1f2917da1ae7f1764711605e46f4b8f52d2f40/lib%2Fi386bit%2FlibVimbaCPP.so",
+          "contents_url": "https://api.github.com/repos/astuff/avt_vimba_camera/contents/lib%2Fi386bit%2FlibVimbaCPP.so?ref=7b1f2917da1ae7f1764711605e46f4b8f52d2f40",
+          "previous_filename": "lib/x86_32bit/libVimbaCPP.so"
+        }
+      ]
+    }
+  ]
+}

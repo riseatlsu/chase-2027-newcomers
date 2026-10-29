@@ -1,0 +1,83 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T05:49:39Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "neobotix",
+    "repo": "neo_nav2_bringup"
+  },
+  "data": [
+    {
+      "author": "padhupradheep",
+      "date": "2021-10-19T14:48:18Z",
+      "sha": "691d5ff3f825f1f4e2b787007f5be6280b4922c4",
+      "message": "Initial commit",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "29d03ffd8b7a2470d643a7662e6af9ef183d5d8b",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/neobotix/neo_nav2_bringup/blob/691d5ff3f825f1f4e2b787007f5be6280b4922c4/README.md",
+          "raw_url": "https://github.com/neobotix/neo_nav2_bringup/raw/691d5ff3f825f1f4e2b787007f5be6280b4922c4/README.md",
+          "contents_url": "https://api.github.com/repos/neobotix/neo_nav2_bringup/contents/README.md?ref=691d5ff3f825f1f4e2b787007f5be6280b4922c4",
+          "patch": "@@ -0,0 +1,2 @@\n+# neo_nav2_bringup\n+Common nav2 bringup package for all the robots"
+        }
+      ]
+    },
+    {
+      "author": "AdarshKaran",
+      "date": "2025-04-09T09:50:40Z",
+      "sha": "082bae2608db775a0dedf478e8b74c0750cc367d",
+      "message": "Refactored rviz launch file (#28)\n\n* Refactored rviz launch file\n\n* Removed contributor tag from package.xml\n\n* Added the start_rviz node to the navigation_neo.launch.py file and the necessary launch argument, removed changelog\n\n* Added the missing declare_use_rviz_cmd action in navigation_neo.launch.py",
+      "files_changed": 3,
+      "additions": 93,
+      "deletions": 44,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "904d01fc7051b7681ddc8ec26cefd05fddd09644",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/neobotix/neo_nav2_bringup/blob/082bae2608db775a0dedf478e8b74c0750cc367d/README.md",
+          "raw_url": "https://github.com/neobotix/neo_nav2_bringup/raw/082bae2608db775a0dedf478e8b74c0750cc367d/README.md",
+          "contents_url": "https://api.github.com/repos/neobotix/neo_nav2_bringup/contents/README.md?ref=082bae2608db775a0dedf478e8b74c0750cc367d",
+          "patch": "@@ -4,3 +4,5 @@ Common nav2 bringup package for all the robots\n Boiler plate launch files for the Nav2\n \n You can find the documentation for this package here: https://neobotix-docs.de/ros/packages/neo_nav2_bringup.html\n+\n+---"
+        },
+        {
+          "sha": "a2996cd79dabbc8a065f390276340f4b387c18b3",
+          "filename": "launch/navigation_neo.launch.py",
+          "status": "modified",
+          "additions": 24,
+          "deletions": 3,
+          "changes": 27,
+          "blob_url": "https://github.com/neobotix/neo_nav2_bringup/blob/082bae2608db775a0dedf478e8b74c0750cc367d/launch%2Fnavigation_neo.launch.py",
+          "raw_url": "https://github.com/neobotix/neo_nav2_bringup/raw/082bae2608db775a0dedf478e8b74c0750cc367d/launch%2Fnavigation_neo.launch.py",
+          "contents_url": "https://api.github.com/repos/neobotix/neo_nav2_bringup/contents/launch%2Fnavigation_neo.launch.py?ref=082bae2608db775a0dedf478e8b74c0750cc367d",
+          "patch": "@@ -12,12 +12,15 @@\n # See the License for the specific language governing permissions and\n # limitations under the License.\n \n+# Contributor: Adarsh Karan K P\n+\n import os\n \n from ament_index_python.packages import get_package_share_directory\n \n from launch import LaunchDescription\n-from launch.actions import DeclareLaunchArgument, GroupAction, SetEnvironmentVariable, GroupAction\n+from launch.actions import DeclareLaunchArgument, GroupAction, GroupAction, IncludeLaunchDescription\n+from launch.launch_description_sources import PythonLaunchDescriptionSource\n from launch.conditions import IfCondition\n from launch.substitutions import LaunchConfiguration, PythonExpression\n from launch_ros.actions import Node\n@@ -33,6 +36,7 @@ def generate_launch_description():\n     autostart = LaunchConfiguration('autostart')\n     params_file = LaunchConfiguration('params_file')\n     use_multi_robots = LaunchConfiguration('use_multi_robots')\n+    use_rviz = LaunchConfiguration('use_rviz')\n \n     lifecycle_nodes = ['controller_server',\n                        'planner_server',\n@@ -77,7 +81,11 @@ def generate_launch_description():\n     declare_use_multi_robots_cmd =  DeclareLaunchArgument(\n         'use_multi_robots', default_value='False',\n         description='A flag to remove the remappings')\n-\n+    \n+    declare_use_rviz_cmd = DeclareLaunchArgument(\n+        'use_rviz', default_value='True',\n+        description='Launch RViz for visualization'\n+        )\n     load_nodes = GroupAction(\n         condition=IfCondition(PythonExpression(['not ', use_multi_robots])),\n         actions=[\n@@ -169,6 +177,18 @@ def generate_launch_description():\n         ]\n     )\n \n+    # Start RViz if use_rviz is True\n+    start_rviz = IncludeLaunchDescription(\n+        condition=IfCondition(use_rviz),\n+        launch_description_source=PythonLaunchDescriptionSource(\n+            [bringup_dir, '/launch/rviz_launch.py']),\n+        launch_arguments={\n+            'namespace': namespace,\n+            'use_namespace': use_multi_robots,\n+            'use_sim_time': use_sim_time,\n+            'rviz_output': 'log',\n+        }.items(),\n+    )\n     # Create the launch description and populate\n     ld = LaunchDescription()\n \n@@ -178,9 +198,10 @@ def generate_launch_description():\n     ld.add_action(declare_params_file_cmd)\n     ld.add_action(declare_autostart_cmd)\n     ld.add_action(declare_use_multi_robots_cmd)\n-\n+    ld.add_action(declare_use_rviz_cmd)\n     # Add the actions to launch all of the navigation nodes\n     ld.add_action(load_nodes)\n     ld.add_action(load_nodes_multi_robot)\n+    ld.add_action(start_rviz)\n \n     return ld"
+        },
+        {
+          "sha": "0f46bf751d509211ba4689c9785f93b85b633eb4",
+          "filename": "launch/rviz_launch.py",
+          "status": "modified",
+          "additions": 67,
+          "deletions": 41,
+          "changes": 108,
+          "blob_url": "https://github.com/neobotix/neo_nav2_bringup/blob/082bae2608db775a0dedf478e8b74c0750cc367d/launch%2Frviz_launch.py",
+          "raw_url": "https://github.com/neobotix/neo_nav2_bringup/raw/082bae2608db775a0dedf478e8b74c0750cc367d/launch%2Frviz_launch.py",
+          "contents_url": "https://api.github.com/repos/neobotix/neo_nav2_bringup/contents/launch%2Frviz_launch.py?ref=082bae2608db775a0dedf478e8b74c0750cc367d",
+          "patch": "@@ -12,45 +12,36 @@\n # See the License for the specific language governing permissions and\n # limitations under the License.\n \n+# Contributor: Adarsh Karan K P\n+\n import os\n \n from ament_index_python.packages import get_package_share_directory\n \n from launch import LaunchDescription\n-from launch.actions import DeclareLaunchArgument, EmitEvent, RegisterEventHandler\n-from launch.conditions import IfCondition, UnlessCondition\n+from launch.launch_context import LaunchContext\n+from launch.actions import DeclareLaunchArgument, EmitEvent, RegisterEventHandler, OpaqueFunction\n+from launch.conditions import IfCondition\n from launch.event_handlers import OnProcessExit\n from launch.events import Shutdown\n from launch.substitutions import LaunchConfiguration, PythonExpression\n from launch_ros.actions import Node\n from nav2_common.launch import ReplaceString\n \n-\n-def generate_launch_description():\n-    # Get the launch directory\n-    bringup_dir = get_package_share_directory('neo_nav2_bringup')\n-\n-    # Create the launch configuration variables\n-    namespace = LaunchConfiguration('namespace')\n-    use_namespace = LaunchConfiguration('use_namespace')\n-    rviz_config_file = LaunchConfiguration('rviz_config')\n-\n-    # Declare the launch arguments\n-    declare_namespace_cmd = DeclareLaunchArgument(\n-        'namespace',\n-        default_value='',\n-        description=('Top-level namespace. The value will be used to replace the '\n-                     '<robot_namespace> keyword on the rviz config file.'))\n-\n-    declare_use_namespace_cmd = DeclareLaunchArgument(\n-        'use_namespace',\n-        default_value='False',\n-        description='Whether to apply a namespace to the navigation stack')\n-\n-    declare_rviz_config_file_cmd = DeclareLaunchArgument(\n-        'rviz_config',\n-        default_value=os.path.join(bringup_dir, 'rviz', 'single_robot.rviz'),\n-        description='Full path to the RVIZ config file to use')\n+def execution_stage(\n+        context: LaunchContext,\n+        namespace, \n+        use_namespace,\n+        rviz_config_file,\n+        rviz_output):\n+    \n+    rviz_output = str(rviz_output.perform(context))\n+    \n+    # When the rviz_output is log, stdout and stderr will not be shown in the terminal \n+    if rviz_output == 'log':\n+        rviz_output_dict = {'both': 'log'}\n+    else:\n+        rviz_output_dict = {'both': 'screen'}\n \n     namespaced_rviz_config_file = ReplaceString(\n             source_file=rviz_config_file,\n@@ -66,35 +57,70 @@ def generate_launch_description():\n         condition=IfCondition(use_namespace),\n         namespace=namespace,\n         arguments=['-d', namespaced_rviz_config_file],\n-        output='screen',\n+        output=rviz_output_dict,\n         )\n \n     start_rviz_cmd = Node(\n         package='rviz2',\n         executable='rviz2',\n         condition=IfCondition(PythonExpression(['not ', use_namespace])),\n         arguments=['-d', no_namespaced_rviz_config_file],\n-        output='screen',\n+        output=rviz_output_dict,\n         )\n \n     exit_event_handler_namespaced = RegisterEventHandler(\n         event_handler=OnProcessExit(\n             target_action=start_namespaced_rviz_cmd,\n             on_exit=EmitEvent(event=Shutdown(reason='rviz exited'))))\n \n-    # Create the launch description and populate\n-    ld = LaunchDescription()\n+    launch_actions = [\n+        start_namespaced_rviz_cmd,\n+        start_rviz_cmd,\n+        exit_event_handler_namespaced\n+    ]\n \n-    # Declare the launch options\n-    ld.add_action(declare_namespace_cmd)\n-    ld.add_action(declare_use_namespace_cmd)\n-    ld.add_action(declare_rviz_config_file_cmd)\n+    return launch_actions\n \n-    # Add any conditioned actions\n-    ld.add_action(start_namespaced_rviz_cmd)\n-    ld.add_action(start_rviz_cmd)\n+def generate_launch_description():\n+    # Declare the launch arguments\n+    declare_namespace_cmd = DeclareLaunchArgument(\n+        'namespace',\n+        default_value='',\n+        description=('Top-level namespace. The value will be used to replace the '\n+                     '<robot_namespace> keyword on the rviz config file.'))\n \n-    # Add other nodes and processes we need\n-    ld.add_action(exit_event_handler_namespaced)\n+    declare_use_namespace_cmd = DeclareLaunchArgument(\n+        'use_namespace',\n+        default_value='False',\n+        description='Whether to apply a namespace to the navigation stack')\n \n+    declare_rviz_config_file_cmd = DeclareLaunchArgument(\n+        'rviz_config',\n+        default_value=os.path.join(\n+            get_package_share_directory('neo_nav2_bringup'),\n+            'rviz', \n+            'single_robot.rviz'),\n+        description='Full path to the RVIZ config file to use')\n+    \n+    declare_rviz_output_cmd = DeclareLaunchArgument(\n+        'rviz_output',\n+        default_value='screen',\n+        description='Output type for RViz node (screen or log)')\n+\n+    opq_function = OpaqueFunction(function=execution_stage,\n+                              args=[\n+                                  LaunchConfiguration('namespace'),\n+                                  LaunchConfiguration('use_namespace'),\n+                                  LaunchConfiguration('rviz_config'),\n+                                  LaunchConfiguration('rviz_output')\n+                              ])\n+    \n+    ld = LaunchDescription([\n+        declare_namespace_cmd,\n+        declare_use_namespace_cmd,\n+        declare_rviz_config_file_cmd,\n+        declare_rviz_output_cmd,\n+        opq_function\n+    ])\n     return ld\n+"
+        }
+      ]
+    }
+  ]
+}

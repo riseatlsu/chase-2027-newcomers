@@ -1,0 +1,419 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T03:22:15Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "open-navigation",
+    "repo": "opennav_docking"
+  },
+  "data": [
+    {
+      "author": "HannesBachter",
+      "date": "2026-01-20T16:41:57Z",
+      "sha": "44ad8f877c4567698b4e9735126dd22072826276",
+      "message": "improve logging with more verbosity in SimpleChargingDock (#88)\n\nSigned-off-by: Hannes Bachter <hannes.bachter@neura-robotics.com>\nCo-authored-by: Hannes Bachter <hannes.bachter@neura-robotics.com>",
+      "files_changed": 1,
+      "additions": 13,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "910d13c366e437a21b0f71e37997579fe5237ced",
+          "filename": "opennav_docking/src/simple_charging_dock.cpp",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 3,
+          "changes": 16,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/44ad8f877c4567698b4e9735126dd22072826276/opennav_docking%2Fsrc%2Fsimple_charging_dock.cpp",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/44ad8f877c4567698b4e9735126dd22072826276/opennav_docking%2Fsrc%2Fsimple_charging_dock.cpp",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/opennav_docking%2Fsrc%2Fsimple_charging_dock.cpp?ref=44ad8f877c4567698b4e9735126dd22072826276",
+          "patch": "@@ -181,7 +181,10 @@ bool SimpleChargingDock::getRefinedPose(geometry_msgs::msg::PoseStamped & pose,\n   // Validate that external pose is new enough\n   auto timeout = rclcpp::Duration::from_seconds(external_detection_timeout_);\n   if (node_->now() - detected.header.stamp > timeout) {\n-    RCLCPP_WARN(node_->get_logger(), \"Lost detection or did not detect: timeout exceeded\");\n+    RCLCPP_WARN(\n+      node_->get_logger(), \"Lost detection or did not detect: \"\n+      \"timeout exceeded (is %2.2f seconds old)\",\n+      static_cast<float>((node_->now() - detected.header.stamp).seconds()));\n     return false;\n   }\n \n@@ -194,12 +197,19 @@ bool SimpleChargingDock::getRefinedPose(geometry_msgs::msg::PoseStamped & pose,\n           pose.header.frame_id, detected.header.frame_id,\n           detected.header.stamp, rclcpp::Duration::from_seconds(0.2)))\n       {\n-        RCLCPP_WARN(node_->get_logger(), \"Failed to transform detected dock pose\");\n+        RCLCPP_WARN(\n+          node_->get_logger(), \"Failed to transform detected dock pose: \"\n+          \"cannot transform %s to %s (at time %2.2f s)\",\n+          detected.header.frame_id.c_str(),\n+          pose.header.frame_id.c_str(),\n+          static_cast<float>(\n+            detected.header.stamp.sec + detected.header.stamp.nanosec * 1e-9\n+        ));\n         return false;\n       }\n       tf2_buffer_->transform(detected, detected, pose.header.frame_id);\n     } catch (const tf2::TransformException & ex) {\n-      RCLCPP_WARN(node_->get_logger(), \"Failed to transform detected dock pose\");\n+      RCLCPP_WARN(node_->get_logger(), \"Failed to transform detected dock pose: %s\", ex.what());\n       return false;\n     }\n   }"
+        }
+      ]
+    },
+    {
+      "author": "matttburk",
+      "date": "2025-12-09T01:32:19Z",
+      "sha": "3ead239298391f9ca9fa1a1877ef8fc80cd9d790",
+      "message": "Set pose_topic for FollowObject goal message (#91)\n\nSet goal_msg.pose_topic to '/detected_dynamic_pose' so it is sent to server properly.",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "30015f068385a4cd2899f5d02cf0fdeb34251e25",
+          "filename": "opennav_following_demo/demo.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/3ead239298391f9ca9fa1a1877ef8fc80cd9d790/opennav_following_demo%2Fdemo.py",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/3ead239298391f9ca9fa1a1877ef8fc80cd9d790/opennav_following_demo%2Fdemo.py",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/opennav_following_demo%2Fdemo.py?ref=3ead239298391f9ca9fa1a1877ef8fc80cd9d790",
+          "patch": "@@ -58,6 +58,7 @@ def send_goal(self):\n             self.get_logger().info('\"FollowObject\" action server not available, waiting...')\n \n         goal_msg = FollowObject.Goal()\n+        goal_msg.pose_topic = '/detected_dynamic_pose'\n         future = self.follow_action_client.send_goal_async(\n             goal_msg, feedback_callback=self.action_feedback_callback)\n         self.goal_handle = future.result()"
+        }
+      ]
+    },
+    {
+      "author": "ajtudela",
+      "date": "2024-07-15T15:49:31Z",
+      "sha": "c8ed2864eb22e68008c9d217f61dd0eeab019780",
+      "message": "Export pose_filter and plugins (#52)\n\nSigned-off-by: Alberto Tudela <ajtudela@gmail.com>",
+      "files_changed": 2,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "a0a2342bfa6b87f746b33cf97a29b844858ba330",
+          "filename": "opennav_docking/CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/c8ed2864eb22e68008c9d217f61dd0eeab019780/opennav_docking%2FCMakeLists.txt",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/c8ed2864eb22e68008c9d217f61dd0eeab019780/opennav_docking%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/opennav_docking%2FCMakeLists.txt?ref=c8ed2864eb22e68008c9d217f61dd0eeab019780",
+          "patch": "@@ -129,6 +129,6 @@ if(BUILD_TESTING)\n endif()\n \n ament_export_include_directories(include)\n-ament_export_libraries(${library_name})\n+ament_export_libraries(${library_name} pose_filter)\n ament_export_dependencies(${dependencies})\n ament_package()"
+        },
+        {
+          "sha": "8971717f31b3c769319fab7176ecef2021cbe528",
+          "filename": "opennav_docking/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/c8ed2864eb22e68008c9d217f61dd0eeab019780/opennav_docking%2Fpackage.xml",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/c8ed2864eb22e68008c9d217f61dd0eeab019780/opennav_docking%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/opennav_docking%2Fpackage.xml?ref=c8ed2864eb22e68008c9d217f61dd0eeab019780",
+          "patch": "@@ -33,5 +33,6 @@\n \n   <export>\n     <build_type>ament_cmake</build_type>\n+    <opennav_docking plugin=\"${prefix}/plugins.xml\" />\n   </export>\n </package>"
+        }
+      ]
+    },
+    {
+      "author": "traversaro",
+      "date": "2025-01-21T22:50:43Z",
+      "sha": "8d438aa3a81caa11da4d9ecbe940c21f5cf4964d",
+      "message": "Add support for compilation on Windows (#80)",
+      "files_changed": 2,
+      "additions": 13,
+      "deletions": 2,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "1408ba73b06f03a3d6a6d8d0263efaa4c2b90eac",
+          "filename": "opennav_docking/CMakeLists.txt",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 1,
+          "changes": 8,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/8d438aa3a81caa11da4d9ecbe940c21f5cf4964d/opennav_docking%2FCMakeLists.txt",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/8d438aa3a81caa11da4d9ecbe940c21f5cf4964d/opennav_docking%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/opennav_docking%2FCMakeLists.txt?ref=8d438aa3a81caa11da4d9ecbe940c21f5cf4964d",
+          "patch": "@@ -26,7 +26,13 @@ find_package(opennav_docking_core REQUIRED)\n \n # potentially replace with nav2_common, nav2_package()\n set(CMAKE_CXX_STANDARD 17)\n-add_compile_options(-Wall -Wextra -Wpedantic -Werror -Wdeprecated -fPIC -Wshadow -Wnull-dereference)\n+\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  add_compile_options(-Wall -Wextra -Wpedantic -Werror -Wdeprecated -fPIC -Wshadow -Wnull-dereference)\n+endif()\n+if(MSVC)\n+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)\n+endif()\n \n include_directories(\n   include"
+        },
+        {
+          "sha": "80cb82709813ee22926259c31985744e92490bef",
+          "filename": "opennav_docking_bt/CMakeLists.txt",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 1,
+          "changes": 7,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/8d438aa3a81caa11da4d9ecbe940c21f5cf4964d/opennav_docking_bt%2FCMakeLists.txt",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/8d438aa3a81caa11da4d9ecbe940c21f5cf4964d/opennav_docking_bt%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/opennav_docking_bt%2FCMakeLists.txt?ref=8d438aa3a81caa11da4d9ecbe940c21f5cf4964d",
+          "patch": "@@ -16,7 +16,12 @@ find_package(behaviortree_cpp REQUIRED)\n \n # potentially replace with nav2_common, nav2_package()\n set(CMAKE_CXX_STANDARD 17)\n-add_compile_options(-Wall -Wextra -Wpedantic -Werror -Wdeprecated -fPIC -Wshadow -Wnull-dereference)\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  add_compile_options(-Wall -Wextra -Wpedantic -Werror -Wdeprecated -fPIC -Wshadow -Wnull-dereference)\n+endif()\n+if(MSVC)\n+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)\n+endif()\n \n include_directories(\n   include"
+        }
+      ]
+    },
+    {
+      "author": "SteveMacenski",
+      "date": "2024-01-08T22:54:08Z",
+      "sha": "1591e72af79abca781dbb7a17d849f27de6b9127",
+      "message": "Initial commit",
+      "files_changed": 2,
+      "additions": 203,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 201,
+          "deletions": 0,
+          "changes": 201,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/1591e72af79abca781dbb7a17d849f27de6b9127/LICENSE",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/1591e72af79abca781dbb7a17d849f27de6b9127/LICENSE",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/LICENSE?ref=1591e72af79abca781dbb7a17d849f27de6b9127",
+          "patch": "@@ -0,0 +1,201 @@\n+                                 Apache License\n+                           Version 2.0, January 2004\n+                        http://www.apache.org/licenses/\n+\n+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION\n+\n+   1. Definitions.\n+\n+      \"License\" shall mean the terms and conditions for use, reproduction,\n+      and distribution as defined by Sections 1 through 9 of this document.\n+\n+      \"Licensor\" shall mean the copyright owner or entity authorized by\n+      the copyright owner that is granting the License.\n+\n+      \"Legal Entity\" shall mean the union of the acting entity and all\n+      other entities that control, are controlled by, or are under common\n+      control with that entity. For the purposes of this definition,\n+      \"control\" means (i) the power, direct or indirect, to cause the\n+      direction or management of such entity, whether by contract or\n+      otherwise, or (ii) ownership of fifty percent (50%) or more of the\n+      outstanding shares, or (iii) beneficial ownership of such entity.\n+\n+      \"You\" (or \"Your\") shall mean an individual or Legal Entity\n+      exercising permissions granted by this License.\n+\n+      \"Source\" form shall mean the preferred form for making modifications,\n+      including but not limited to software source code, documentation\n+      source, and configuration files.\n+\n+      \"Object\" form shall mean any form resulting from mechanical\n+      transformation or translation of a Source form, including but\n+      not limited to compiled object code, generated documentation,\n+      and conversions to other media types.\n+\n+      \"Work\" shall mean the work of authorship, whether in Source or\n+      Object form, made available under the License, as indicated by a\n+      copyright notice that is included in or attached to the work\n+      (an example is provided in the Appendix below).\n+\n+      \"Derivative Works\" shall mean any work, whether in Source or Object\n+      form, that is based on (or derived from) the Work and for which the\n+      editorial revisions, annotations, elaborations, or other modifications\n+      represent, as a whole, an original work of authorship. For the purposes\n+      of this License, Derivative Works shall not include works that remain\n+      separable from, or merely link (or bind by name) to the interfaces of,\n+      the Work and Derivative Works thereof.\n+\n+      \"Contribution\" shall mean any work of authorship, including\n+      the original version of the Work and any modifications or additions\n+      to that Work or Derivative Works thereof, that is intentionally\n+      submitted to Licensor for inclusion in the Work by the copyright owner\n+      or by an individual or Legal Entity authorized to submit on behalf of\n+      the copyright owner. For the purposes of this definition, \"submitted\"\n+      means any form of electronic, verbal, or written communication sent\n+      to the Licensor or its representatives, including but not limited to\n+      communication on electronic mailing lists, source code control systems,\n+      and issue tracking systems that are managed by, or on behalf of, the\n+      Licensor for the purpose of discussing and improving the Work, but\n+      excluding communication that is conspicuously marked or otherwise\n+      designated in writing by the copyright owner as \"Not a Contribution.\"\n+\n+      \"Contributor\" shall mean Licensor and any individual or Legal Entity\n+      on behalf of whom a Contribution has been received by Licensor and\n+      subsequently incorporated within the Work.\n+\n+   2. Grant of Copyright License. Subject to the terms and conditions of\n+      this License, each Contributor hereby grants to You a perpetual,\n+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n+      copyright license to reproduce, prepare Derivative Works of,\n+      publicly display, publicly perform, sublicense, and distribute the\n+      Work and such Derivative Works in Source or Object form.\n+\n+   3. Grant of Patent License. Subject to the terms and conditions of\n+      this License, each Contributor hereby grants to You a perpetual,\n+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n+      (except as stated in this section) patent license to make, have made,\n+      use, offer to sell, sell, import, and otherwise transfer the Work,\n+      where such license applies only to those patent claims licensable\n+      by such Contributor that are necessarily infringed by their\n+      Contribution(s) alone or by combination of their Contribution(s)\n+      with the Work to which such Contribution(s) was submitted. If You\n+      institute patent litigation against any entity (including a\n+      cross-claim or counterclaim in a lawsuit) alleging that the Work\n+      or a Contribution incorporated within the Work constitutes direct\n+      or contributory patent infringement, then any patent licenses\n+      granted to You under this License for that Work shall terminate\n+      as of the date such litigation is filed.\n+\n+   4. Redistribution. You may reproduce and distribute copies of the\n+      Work or Derivative Works thereof in any medium, with or without\n+      modifications, and in Source or Object form, provided that You\n+      meet the following conditions:\n+\n+      (a) You must give any other recipients of the Work or\n+          Derivative Works a copy of this License; and\n+\n+      (b) You must cause any modified files to carry prominent notices\n+          stating that You changed the files; and\n+\n+      (c) You must retain, in the Source form of any Derivative Works\n+          that You distribute, all copyright, patent, trademark, and\n+          attribution notices from the Source form of the Work,\n+          excluding those notices that do not pertain to any part of\n+          the Derivative Works; and\n+\n+      (d) If the Work includes a \"NOTICE\" text file as part of its\n+          distribution, then any Derivative Works that You distribute must\n+          include a readable copy of the attribution notices contained\n+          within such NOTICE file, excluding those notices that do not\n+          pertain to any part of the Derivative Works, in at least one\n+          of the following places: within a NOTICE text file distributed\n+          as part of the Derivative Works; within the Source form or\n+          documentation, if provided along with the Derivative Works; or,\n+          within a display generated by the Derivative Works, if and\n+          wherever such third-party notices normally appear. The contents\n+          of the NOTICE file are for informational purposes only and\n+          do not modify the License. You may add Your own attribution\n+          notices within Derivative Works that You distribute, alongside\n+          or as an addendum to the NOTICE text from the Work, provided\n+          that such additional attribution notices cannot be construed\n+          as modifying the License.\n+\n+      You may add Your own copyright statement to Your modifications and\n+      may provide additional or different license terms and conditions\n+      for use, reproduction, or distribution of Your modifications, or\n+      for any such Derivative Works as a whole, provided Your use,\n+      reproduction, and distribution of the Work otherwise complies with\n+      the conditions stated in this License.\n+\n+   5. Submission of Contributions. Unless You explicitly state otherwise,\n+      any Contribution intentionally submitted for inclusion in the Work\n+      by You to the Licensor shall be under the terms and conditions of\n+      this License, without any additional terms or conditions.\n+      Notwithstanding the above, nothing herein shall supersede or modify\n+      the terms of any separate license agreement you may have executed\n+      with Licensor regarding such Contributions.\n+\n+   6. Trademarks. This License does not grant permission to use the trade\n+      names, trademarks, service marks, or product names of the Licensor,\n+      except as required for reasonable and customary use in describing the\n+      origin of the Work and reproducing the content of the NOTICE file.\n+\n+   7. Disclaimer of Warranty. Unless required by applicable law or\n+      agreed to in writing, Licensor provides the Work (and each\n+      Contributor provides its Contributions) on an \"AS IS\" BASIS,\n+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or\n+      implied, including, without limitation, any warranties or conditions\n+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A\n+      PARTICULAR PURPOSE. You are solely responsible for determining the\n+      appropriateness of using or redistributing the Work and assume any\n+      risks associated with Your exercise of permissions under this License.\n+\n+   8. Limitation of Liability. In no event and under no legal theory,\n+      whether in tort (including negligence), contract, or otherwise,\n+      unless required by applicable law (such as deliberate and grossly\n+      negligent acts) or agreed to in writing, shall any Contributor be\n+      liable to You for damages, including any direct, indirect, special,\n+      incidental, or consequential damages of any character arising as a\n+      result of this License or out of the use or inability to use the\n+      Work (including but not limited to damages for loss of goodwill,\n+      work stoppage, computer failure or malfunction, or any and all\n+      other commercial damages or losses), even if such Contributor\n+      has been advised of the possibility of such damages.\n+\n+   9. Accepting Warranty or Additional Liability. While redistributing\n+      the Work or Derivative Works thereof, You may choose to offer,\n+      and charge a fee for, acceptance of support, warranty, indemnity,\n+      or other liability obligations and/or rights consistent with this\n+      License. However, in accepting such obligations, You may act only\n+      on Your own behalf and on Your sole responsibility, not on behalf\n+      of any other Contributor, and only if You agree to indemnify,\n+      defend, and hold each Contributor harmless for any liability\n+      incurred by, or claims asserted against, such Contributor by reason\n+      of your accepting any such warranty or additional liability.\n+\n+   END OF TERMS AND CONDITIONS\n+\n+   APPENDIX: How to apply the Apache License to your work.\n+\n+      To apply the Apache License to your work, attach the following\n+      boilerplate notice, with the fields enclosed by brackets \"[]\"\n+      replaced with your own identifying information. (Don't include\n+      the brackets!)  The text should be enclosed in the appropriate\n+      comment syntax for the file format. We also recommend that a\n+      file or class name and description of purpose be included on the\n+      same \"printed page\" as the copyright notice for easier\n+      identification within third-party archives.\n+\n+   Copyright [yyyy] [name of copyright owner]\n+\n+   Licensed under the Apache License, Version 2.0 (the \"License\");\n+   you may not use this file except in compliance with the License.\n+   You may obtain a copy of the License at\n+\n+       http://www.apache.org/licenses/LICENSE-2.0\n+\n+   Unless required by applicable law or agreed to in writing, software\n+   distributed under the License is distributed on an \"AS IS\" BASIS,\n+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+   See the License for the specific language governing permissions and\n+   limitations under the License."
+        },
+        {
+          "sha": "b9cf1fd95f63badc62b5714b016413823c57ae03",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/1591e72af79abca781dbb7a17d849f27de6b9127/README.md",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/1591e72af79abca781dbb7a17d849f27de6b9127/README.md",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/README.md?ref=1591e72af79abca781dbb7a17d849f27de6b9127",
+          "patch": "@@ -0,0 +1,2 @@\n+# opennav_docking\n+Docking framework for Nav2 (Sponsored by NVIDIA)"
+        }
+      ]
+    },
+    {
+      "author": "redvinaa",
+      "date": "2024-07-02T15:25:09Z",
+      "sha": "3fb0491f5a356ef79f9cf131654b0d8cdf3326bb",
+      "message": "Add dock id (#46)\n\n* Implement dock id\r\n\r\n* Update tests\r\n\r\n* Update docs\r\n\r\n* Implement requested changes",
+      "files_changed": 10,
+      "additions": 30,
+      "deletions": 8,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "c3642ad37eea0ddfb24c033b7c85054b64049d6a",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 1,
+          "changes": 6,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/3fb0491f5a356ef79f9cf131654b0d8cdf3326bb/README.md",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/3fb0491f5a356ef79f9cf131654b0d8cdf3326bb/README.md",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/README.md?ref=3fb0491f5a356ef79f9cf131654b0d8cdf3326bb",
+          "patch": "@@ -96,10 +96,12 @@ dock1:\n   type: \"dockv3\"\n   frame: map\n   pose: [0.3, 0.3, 0.0]\n+  id: \"kitchen_dock\"\n dock2:\n   type: \"dockv1\"\n   frame: map\n   pose: [0.0, 0.0, 0.4]\n+  id: \"42\"\n ```\n \n If you'd prefer to specify the docks using an external file, you may use the `dock_database` parameter to specify the filepath to the yaml file. The file should be laid out like:\n@@ -110,13 +112,15 @@ docks:\n     type: \"dockv3\"\n     frame: map\n     pose: [0.3, 0.3, 0.0]\n+    id: \"kitchen_dock\"\n   dock2:\n     type: \"dockv1\"\n     frame: map\n     pose: [0.0, 0.0, 0.4]\n+    id: \"42\"\n ```\n \n-Note that you may leave the `type` to an empty string **if** there is only one type of dock being used. The `frame` will also default to `map` if not otherwise specified. The `type` and `pose` fields are required. Note also that these can be in any frame, not just map (i.e. `odom`, `base_link`, etc) in both the database and action requests.\n+Note that you may leave the `type` to an empty string **if** there is only one type of dock being used. The `frame` will also default to `map` if not otherwise specified. The `type` and `pose` fields are required. Note also that these can be in any frame, not just map (i.e. `odom`, `base_link`, etc) in both the database and action requests. You may also specify the `id` field, for example to select the associated AprilTag. If the dock plugin does not use it, you can leave it unspecified.\n \n ## Dock Plugin API\n "
+        },
+        {
+          "sha": "2b877442f59e538d785b83b85962d7a3919ba121",
+          "filename": "opennav_docking/include/opennav_docking/simple_charging_dock.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/3fb0491f5a356ef79f9cf131654b0d8cdf3326bb/opennav_docking%2Finclude%2Fopennav_docking%2Fsimple_charging_dock.hpp",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/3fb0491f5a356ef79f9cf131654b0d8cdf3326bb/opennav_docking%2Finclude%2Fopennav_docking%2Fsimple_charging_dock.hpp",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/opennav_docking%2Finclude%2Fopennav_docking%2Fsimple_charging_dock.hpp?ref=3fb0491f5a356ef79f9cf131654b0d8cdf3326bb",
+          "patch": "@@ -81,7 +81,7 @@ class SimpleChargingDock : public opennav_docking_core::ChargingDock\n    * @param pose The initial estimate of the dock pose.\n    * @param frame The frame of the initial estimate.\n    */\n-  virtual bool getRefinedPose(geometry_msgs::msg::PoseStamped & pose);\n+  virtual bool getRefinedPose(geometry_msgs::msg::PoseStamped & pose, std::string id);\n \n   /**\n    * @copydoc opennav_docking_core::ChargingDock::isDocked"
+        },
+        {
+          "sha": "430181e68cb8b27a0ee79d9616e936532ca49b94",
+          "filename": "opennav_docking/include/opennav_docking/types.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/3fb0491f5a356ef79f9cf131654b0d8cdf3326bb/opennav_docking%2Finclude%2Fopennav_docking%2Ftypes.hpp",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/3fb0491f5a356ef79f9cf131654b0d8cdf3326bb/opennav_docking%2Finclude%2Fopennav_docking%2Ftypes.hpp",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/opennav_docking%2Finclude%2Fopennav_docking%2Ftypes.hpp?ref=3fb0491f5a356ef79f9cf131654b0d8cdf3326bb",
+          "patch": "@@ -39,6 +39,7 @@ struct Dock\n   geometry_msgs::msg::Pose pose;\n   std::string frame;\n   std::string type;\n+  std::string id;\n   opennav_docking_core::ChargingDock::Ptr plugin{nullptr};\n };\n "
+        },
+        {
+          "sha": "ce0b566003664e6763c5f98ab97463836fd7f8c6",
+          "filename": "opennav_docking/include/opennav_docking/utils.hpp",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 0,
+          "changes": 9,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/3fb0491f5a356ef79f9cf131654b0d8cdf3326bb/opennav_docking%2Finclude%2Fopennav_docking%2Futils.hpp",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/3fb0491f5a356ef79f9cf131654b0d8cdf3326bb/opennav_docking%2Finclude%2Fopennav_docking%2Futils.hpp",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/opennav_docking%2Finclude%2Fopennav_docking%2Futils.hpp?ref=3fb0491f5a356ef79f9cf131654b0d8cdf3326bb",
+          "patch": "@@ -95,6 +95,10 @@ inline bool parseDockFile(\n     curr_dock.pose.position.y = pose_arr[1];\n     curr_dock.pose.orientation = orientationAroundZAxis(pose_arr[2]);\n \n+    if (dock_attribs[\"id\"]) {\n+      curr_dock.id = dock_attribs[\"id\"].as<std::string>();\n+    }\n+\n     // Insert into dock instance database\n     dock_db.emplace(dock_name, curr_dock);\n   }\n@@ -141,6 +145,11 @@ inline bool parseDockParams(\n     curr_dock.pose.position.y = pose_arr[1];\n     curr_dock.pose.orientation = orientationAroundZAxis(pose_arr[2]);\n \n+    if (!node->has_parameter(dock_name + \".id\")) {\n+      node->declare_parameter(dock_name + \".id\", \"\");\n+    }\n+    node->get_parameter(dock_name + \".id\", curr_dock.id);\n+\n     // Insert into dock instance database\n     dock_db.emplace(dock_name, curr_dock);\n   }"
+        },
+        {
+          "sha": "75d428e7cc3642860703deb6b1bcf2c4b0f133e7",
+          "filename": "opennav_docking/src/docking_server.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/3fb0491f5a356ef79f9cf131654b0d8cdf3326bb/opennav_docking%2Fsrc%2Fdocking_server.cpp",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/3fb0491f5a356ef79f9cf131654b0d8cdf3326bb/opennav_docking%2Fsrc%2Fdocking_server.cpp",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/opennav_docking%2Fsrc%2Fdocking_server.cpp?ref=3fb0491f5a356ef79f9cf131654b0d8cdf3326bb",
+          "patch": "@@ -364,7 +364,7 @@ void DockingServer::doInitialPerception(Dock * dock, geometry_msgs::msg::PoseSta\n   rclcpp::Rate loop_rate(controller_frequency_);\n   auto start = this->now();\n   auto timeout = rclcpp::Duration::from_seconds(initial_perception_timeout_);\n-  while (!dock->plugin->getRefinedPose(dock_pose)) {\n+  while (!dock->plugin->getRefinedPose(dock_pose, dock->id)) {\n     if (this->now() - start > timeout) {\n       throw opennav_docking_core::FailedToDetectDock(\"Failed initial dock detection\");\n     }\n@@ -400,7 +400,7 @@ bool DockingServer::approachDock(Dock * dock, geometry_msgs::msg::PoseStamped &\n     }\n \n     // Update perception\n-    if (!dock->plugin->getRefinedPose(dock_pose)) {\n+    if (!dock->plugin->getRefinedPose(dock_pose, dock->id)) {\n       throw opennav_docking_core::FailedToDetectDock(\"Failed dock detection\");\n     }\n "
+        },
+        {
+          "sha": "3ff04db47f5cb0e1eacb0321b19129a4c60c8e9d",
+          "filename": "opennav_docking/src/simple_charging_dock.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/3fb0491f5a356ef79f9cf131654b0d8cdf3326bb/opennav_docking%2Fsrc%2Fsimple_charging_dock.cpp",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/3fb0491f5a356ef79f9cf131654b0d8cdf3326bb/opennav_docking%2Fsrc%2Fsimple_charging_dock.cpp",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/opennav_docking%2Fsrc%2Fsimple_charging_dock.cpp?ref=3fb0491f5a356ef79f9cf131654b0d8cdf3326bb",
+          "patch": "@@ -166,7 +166,7 @@ geometry_msgs::msg::PoseStamped SimpleChargingDock::getStagingPose(\n   return staging_pose;\n }\n \n-bool SimpleChargingDock::getRefinedPose(geometry_msgs::msg::PoseStamped & pose)\n+bool SimpleChargingDock::getRefinedPose(geometry_msgs::msg::PoseStamped & pose, std::string /*id*/)\n {\n   // If using not detection, set the dock pose to the static fixed-frame version\n   if (!use_external_detection_pose_) {"
+        },
+        {
+          "sha": "2e92bf51add3f0b741b5119abbe96900fc558ad4",
+          "filename": "opennav_docking/test/test_dock_file.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/3fb0491f5a356ef79f9cf131654b0d8cdf3326bb/opennav_docking%2Ftest%2Ftest_dock_file.yaml",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/3fb0491f5a356ef79f9cf131654b0d8cdf3326bb/opennav_docking%2Ftest%2Ftest_dock_file.yaml",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/opennav_docking%2Ftest%2Ftest_dock_file.yaml?ref=3fb0491f5a356ef79f9cf131654b0d8cdf3326bb",
+          "patch": "@@ -6,3 +6,4 @@ docks:\n   dock2:\n     type: \"dockv1\"\n     pose: [0.0, 0.0, 0.4]\n+    id: \"2\""
+        },
+        {
+          "sha": "e778d72a07e2250439d4a847d6493bf04c58479b",
+          "filename": "opennav_docking/test/test_simple_charging_dock.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/3fb0491f5a356ef79f9cf131654b0d8cdf3326bb/opennav_docking%2Ftest%2Ftest_simple_charging_dock.cpp",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/3fb0491f5a356ef79f9cf131654b0d8cdf3326bb/opennav_docking%2Ftest%2Ftest_simple_charging_dock.cpp",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/opennav_docking%2Ftest%2Ftest_simple_charging_dock.cpp?ref=3fb0491f5a356ef79f9cf131654b0d8cdf3326bb",
+          "patch": "@@ -219,7 +219,7 @@ TEST(SimpleChargingDockTests, RefinedPoseTest)\n \n   // Timestamps are outdated; this is after timeout\n   EXPECT_FALSE(dock->isDocked());\n-  EXPECT_FALSE(dock->getRefinedPose(pose));\n+  EXPECT_FALSE(dock->getRefinedPose(pose, \"\"));\n \n   geometry_msgs::msg::PoseStamped detected_pose;\n   detected_pose.header.stamp = node->now();\n@@ -230,7 +230,7 @@ TEST(SimpleChargingDockTests, RefinedPoseTest)\n   rclcpp::spin_some(node->get_node_base_interface());\n \n   pose.header.frame_id = \"my_frame\";\n-  EXPECT_TRUE(dock->getRefinedPose(pose));\n+  EXPECT_TRUE(dock->getRefinedPose(pose, \"\"));\n   EXPECT_NEAR(pose.pose.position.x, 0.1, 0.01);\n   EXPECT_NEAR(pose.pose.position.y, -0.1, 0.01);\n "
+        },
+        {
+          "sha": "f8474e9374093877d46f86559863cce4096a8ac0",
+          "filename": "opennav_docking/test/test_utils.cpp",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/3fb0491f5a356ef79f9cf131654b0d8cdf3326bb/opennav_docking%2Ftest%2Ftest_utils.cpp",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/3fb0491f5a356ef79f9cf131654b0d8cdf3326bb/opennav_docking%2Ftest%2Ftest_utils.cpp",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/opennav_docking%2Ftest%2Ftest_utils.cpp?ref=3fb0491f5a356ef79f9cf131654b0d8cdf3326bb",
+          "patch": "@@ -60,6 +60,9 @@ TEST(UtilsTests, parseDockParams2)\n   node->declare_parameter(\"dockC.pose\", rclcpp::ParameterValue(dock_pose));\n   node->declare_parameter(\"dockD.pose\", rclcpp::ParameterValue(dock_pose));\n \n+  // Don't declare C, check if empty string default\n+  node->declare_parameter(\"dockD.id\", rclcpp::ParameterValue(\"D\"));\n+\n   std::vector<std::string> docks_param;\n   node->get_parameter(\"docks\", docks_param);\n \n@@ -69,6 +72,8 @@ TEST(UtilsTests, parseDockParams2)\n   EXPECT_EQ(db[\"dockC\"].type, std::string(\"typeA\"));\n   EXPECT_EQ(db[\"dockC\"].pose.position.x, 0.3);\n   EXPECT_EQ(db[\"dockC\"].pose.position.y, 0.3);\n+  EXPECT_EQ(db[\"dockC\"].id, std::string(\"\"));\n+  EXPECT_EQ(db[\"dockD\"].id, std::string(\"D\"));\n }\n \n TEST(UtilsTests, parseDockParams3)\n@@ -108,6 +113,8 @@ TEST(UtilsTests, parseDockFile)\n   EXPECT_EQ(db[\"dock2\"].pose.position.x, 0.0);\n   EXPECT_EQ(db[\"dock2\"].pose.position.y, 0.0);\n   EXPECT_NE(db[\"dock2\"].pose.orientation.w, 1.0);\n+  EXPECT_EQ(db[\"dock1\"].id, std::string(\"\"));\n+  EXPECT_EQ(db[\"dock2\"].id, std::string(\"2\"));\n }\n \n TEST(UtilsTests, testgetDockPoseStamped)"
+        },
+        {
+          "sha": "bb4b62295e6e00c48c177c5abafc486da289eac1",
+          "filename": "opennav_docking/test/testing_dock.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/3fb0491f5a356ef79f9cf131654b0d8cdf3326bb/opennav_docking%2Ftest%2Ftesting_dock.cpp",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/3fb0491f5a356ef79f9cf131654b0d8cdf3326bb/opennav_docking%2Ftest%2Ftesting_dock.cpp",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/opennav_docking%2Ftest%2Ftesting_dock.cpp?ref=3fb0491f5a356ef79f9cf131654b0d8cdf3326bb",
+          "patch": "@@ -72,7 +72,7 @@ class TestFailureDock : public opennav_docking_core::ChargingDock\n     return geometry_msgs::msg::PoseStamped();\n   }\n \n-  virtual bool getRefinedPose(geometry_msgs::msg::PoseStamped &)\n+  virtual bool getRefinedPose(geometry_msgs::msg::PoseStamped &, std::string)\n   {\n     // Always return false to trigger a timeout, when no exceptions are thrown\n     return false;"
+        }
+      ]
+    },
+    {
+      "author": "griswaldbrooks",
+      "date": "2024-05-30T20:14:18Z",
+      "sha": "963d6e1a7be61561da940b187538bd7e3f6cf1cc",
+      "message": "Typos in README.md (#41)\n\nFix some typos",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "37aa56d3d4e8f0da45f46b3f313d0eae038e0aa6",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/963d6e1a7be61561da940b187538bd7e3f6cf1cc/README.md",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/963d6e1a7be61561da940b187538bd7e3f6cf1cc/README.md",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/README.md?ref=963d6e1a7be61561da940b187538bd7e3f6cf1cc",
+          "patch": "@@ -56,7 +56,7 @@ If you wish for the docking server to stage your robot at the the dock's staging\n Else, you can send your robot to this pose and it will be skipped as long as the robot is within the prestaging tolerances. \n You may set the maximum time for navigation using `max_staging_time`.\n \n-In return, you obtain the `num_retries`, for the number of attempted retries of the action; `success`, if the action worked and the robot is successfully charging; and `errro_code` to return a semantically meaningful error code about what kind of error occurred, if any. See `DockRobot.action` for more details. \n+In return, you obtain the `num_retries`, for the number of attempted retries of the action; `success`, if the action worked and the robot is successfully charging; and `error_code` to return a semantically meaningful error code about what kind of error occurred, if any. See `DockRobot.action` for more details. \n \n While the action is performing, you can obtain feedback about the current `state` of docking, how much time `docking_time` has elapsed, and the current number of retries attempted.\n \n@@ -165,7 +165,7 @@ some robots.\n \n `getRefinedPose` can be used in two ways. \n 1. A blind approach where the returned dock pose will simply be equal to whatever was passed in from the dock database. This may work with a reduced success rate on a real robot (due to global localization error), but is useful for initial testing and simulation.\n-2. The more realistic use case is to use an AR marker, dock pose detection algorithm, etc. Tthe plugin will subscribe to a `geometry_msgs/PoseStamped` topic `detected_dock_pose`. This can be used with the `image_proc/TrackMarkerNode` for Apriltags or other custom detectors for your dock. It is unlikely the detected pose is actually the pose you want to dock with, so several parameters are supplied to represent your docked pose relative to the detected feature's pose.\n+2. The more realistic use case is to use an AR marker, dock pose detection algorithm, etc. The plugin will subscribe to a `geometry_msgs/PoseStamped` topic `detected_dock_pose`. This can be used with the `image_proc/TrackMarkerNode` for Apriltags or other custom detectors for your dock. It is unlikely the detected pose is actually the pose you want to dock with, so several parameters are supplied to represent your docked pose relative to the detected feature's pose.\n \n During the docking approach, there are two options for detecting `isDocked`:\n 1. We can check the joint states of the wheels if the current has spiked above a set threshold to indicate that the robot has made contact with the dock or other physical object."
+        }
+      ]
+    },
+    {
+      "author": "nv-renjieshao",
+      "date": "2024-05-02T17:42:06Z",
+      "sha": "55b8761876741e0003a18b475ebbe0820483d40e",
+      "message": "Make the docking server resumable. (#39)\n\n* Make the docking server resumable.\r\n\r\nMove tf2_buffer_ reset to on_cleanup. Initialize tf_listener_ in on_activate\r\n\r\n* Move  tf2_listener_ creation to on_activate",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "c70e4b29aabe32f1de997cf41f48ce8807acdf67",
+          "filename": "opennav_docking/src/docking_server.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/55b8761876741e0003a18b475ebbe0820483d40e/opennav_docking%2Fsrc%2Fdocking_server.cpp",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/55b8761876741e0003a18b475ebbe0820483d40e/opennav_docking%2Fsrc%2Fdocking_server.cpp",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/opennav_docking%2Fsrc%2Fdocking_server.cpp?ref=55b8761876741e0003a18b475ebbe0820483d40e",
+          "patch": "@@ -63,7 +63,6 @@ DockingServer::on_configure(const rclcpp_lifecycle::State & /*state*/)\n \n   vel_publisher_ = std::make_unique<nav2_util::TwistPublisher>(node, \"cmd_vel\", 1);\n   tf2_buffer_ = std::make_shared<tf2_ros::Buffer>(node->get_clock());\n-  tf2_listener_ = std::make_unique<tf2_ros::TransformListener>(*tf2_buffer_);\n \n   double action_server_result_timeout;\n   nav2_util::declare_parameter_if_not_declared(\n@@ -103,6 +102,7 @@ DockingServer::on_activate(const rclcpp_lifecycle::State & /*state*/)\n \n   auto node = shared_from_this();\n \n+  tf2_listener_ = std::make_unique<tf2_ros::TransformListener>(*tf2_buffer_);\n   dock_db_->activate();\n   navigator_->activate();\n   vel_publisher_->on_activate();\n@@ -133,7 +133,6 @@ DockingServer::on_deactivate(const rclcpp_lifecycle::State & /*state*/)\n \n   dyn_params_handler_.reset();\n   tf2_listener_.reset();\n-  tf2_buffer_.reset();\n \n   // Destroy bond connection\n   destroyBond();\n@@ -145,6 +144,7 @@ nav2_util::CallbackReturn\n DockingServer::on_cleanup(const rclcpp_lifecycle::State & /*state*/)\n {\n   RCLCPP_INFO(get_logger(), \"Cleaning up %s\", get_name());\n+  tf2_buffer_.reset();\n   docking_action_server_.reset();\n   undocking_action_server_.reset();\n   dock_db_.reset();"
+        }
+      ]
+    },
+    {
+      "author": "mikeferguson",
+      "date": "2024-01-17T22:18:55Z",
+      "sha": "f340738378aafe9aa2b1aba0160570f1e4ade6fd",
+      "message": "mocking out control loops",
+      "files_changed": 5,
+      "additions": 151,
+      "deletions": 12,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "4acfa87a94287fe01677ab45027b08c58c792e5d",
+          "filename": "opennav_docking/include/opennav_docking/docking_server.hpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/f340738378aafe9aa2b1aba0160570f1e4ade6fd/opennav_docking%2Finclude%2Fopennav_docking%2Fdocking_server.hpp",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/f340738378aafe9aa2b1aba0160570f1e4ade6fd/opennav_docking%2Finclude%2Fopennav_docking%2Fdocking_server.hpp",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/opennav_docking%2Finclude%2Fopennav_docking%2Fdocking_server.hpp?ref=f340738378aafe9aa2b1aba0160570f1e4ade6fd",
+          "patch": "@@ -27,6 +27,7 @@\n #include \"opennav_docking/types.hpp\"\n #include \"opennav_docking/dock_database.hpp\"\n #include \"opennav_docking/navigator.hpp\"\n+#include \"opennav_docking_core/controller.hpp\"\n #include \"opennav_docking_core/charging_dock.hpp\"\n \n namespace opennav_docking\n@@ -125,6 +126,7 @@ class DockingServer : public nav2_util::LifecycleNode\n \n   std::unique_ptr<DockDatabase> dock_db_;\n   std::unique_ptr<Navigator> navigator_;\n+  std::unique_ptr<opennav_docking_core::Controller> controller_;\n   std::string curr_dock_type_;\n };\n "
+        },
+        {
+          "sha": "1317897ba72b61253cdc9a28fd4a71299177c21c",
+          "filename": "opennav_docking/include/opennav_docking/types.hpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/f340738378aafe9aa2b1aba0160570f1e4ade6fd/opennav_docking%2Finclude%2Fopennav_docking%2Ftypes.hpp",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/f340738378aafe9aa2b1aba0160570f1e4ade6fd/opennav_docking%2Finclude%2Fopennav_docking%2Ftypes.hpp",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/opennav_docking%2Finclude%2Fopennav_docking%2Ftypes.hpp?ref=f340738378aafe9aa2b1aba0160570f1e4ade6fd",
+          "patch": "@@ -30,9 +30,9 @@ typedef opennav_docking_msgs::action::UndockRobot UndockRobot;\n */\n struct Dock\n {\n-  geometry_msgs::msg::PoseStamped getDocksStagingPose()\n+  geometry_msgs::msg::PoseStamped getStagingPose()\n   {\n-    return this->plugin->getDocksStagingPose(this->pose, this->frame);\n+    return this->plugin->getStagingPose(this->pose, this->frame);\n   }\n \n   geometry_msgs::msg::Pose pose;"
+        },
+        {
+          "sha": "43c2c0def22ba98b1061faeadb5051beed0f8da2",
+          "filename": "opennav_docking/src/docking_server.cpp",
+          "status": "modified",
+          "additions": 39,
+          "deletions": 9,
+          "changes": 48,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/f340738378aafe9aa2b1aba0160570f1e4ade6fd/opennav_docking%2Fsrc%2Fdocking_server.cpp",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/f340738378aafe9aa2b1aba0160570f1e4ade6fd/opennav_docking%2Fsrc%2Fdocking_server.cpp",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/opennav_docking%2Fsrc%2Fdocking_server.cpp?ref=f340738378aafe9aa2b1aba0160570f1e4ade6fd",
+          "patch": "@@ -176,18 +176,45 @@ void DockingServer::dockRobot()\n     }\n \n     // (2) Send robot to its staging pose\n-    navigator_->goToPose(dock->getDocksStagingPose(), rclcpp::Duration(goal->max_staging_time));\n+    navigator_->goToPose(dock->getStagingPose(), rclcpp::Duration(goal->max_staging_time));\n \n-    // (3) Fergs: Detect dock pose using sensors, Get docking pose relative to dock's pose from plugin. (TODO plugin for dead reckoning too)\n+    // Construct initial estimate of where the dock is located\n+    geometry_msgs::msg::PoseStamped dock_pose;\n+    dock_pose.pose = dock->pose;\n+    dock_pose.header.frame_id = dock->frame;\n \n-    // (4) Fergs: main loop here - make preemptable/cancelable. TODO\n-\n-\n-\n-\n-    // (5) Wait for contact to conduct charging (TODO process to enable charging if not automatic) TODO\n+    // Get initial detection of dock before proceeding to move\n+    while (!dock->plugin->getRefinedPose(dock_pose))\n+    {\n+      // TODO: add timeout\n+    }\n \n-    // (6) Check if charging. Yes -> success. No -> retry to limit going back to (1). TODO\n+    // Docking control loop: while not docked, run controller\n+    while (rclcpp::ok()) {\n+      // Stop controlling when successfully charging\n+      if (dock->plugin->isCharging()) {\n+        break;\n+      }\n+\n+      // Update perception\n+      if (!dock->plugin->getRefinedPose(dock_pose))\n+      {\n+        // TODO: handle loss of perception\n+      }\n+\n+      // Use the dock pose to determine where to put the robot base\n+      geometry_msgs::msg::PoseStamped target_pose = dock->plugin->getTargetPose(dock_pose);\n+\n+      // TODO: transform target_pose into base_link frame\n+\n+      // Run controller\n+      geometry_msgs::msg::Twist command;\n+      if (!controller_->computeVelocityCommand(target_pose.pose, command))\n+      {\n+        // If controller has reached/failed goal but we are not yet charging, retry\n+        // TODO\n+      }\n+    }\n \n   } catch (DockingException & e) {  // TODO(sm): set contextual error codes + number range\n     RCLCPP_ERROR(get_logger(), \"Invalid mode set: %s\", e.what());\n@@ -247,12 +274,15 @@ void DockingServer::undockRobot()\n       \"Attempting to undock robot from charger of type %s.\", dock->getName().c_str());\n \n     // (2) Check if path to undock is clear  TODO\n+\n+\n   \n     // (3) Fergs: Send robot to its staging pose, asked dock API (controller). check max_duration. TODO\n       // (2.0) Make sure docking relative pose in right frame (docked pose -> staging pose, not dock itself pose)\n       // (2.1) In loop, check that we are no longer charging in state TODO\n \n \n+\n     // (4) return charge level TODO\n   } catch (DockingException & e) {  // TODO(sm): set contextual error codes+ number range\n     RCLCPP_ERROR(get_logger(), \"Invalid mode set: %s\", e.what());"
+        },
+        {
+          "sha": "dd7a38249b6066da9427b9e59603a53ef4310830",
+          "filename": "opennav_docking_core/include/opennav_docking_core/charging_dock.hpp",
+          "status": "modified",
+          "additions": 29,
+          "deletions": 1,
+          "changes": 30,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/f340738378aafe9aa2b1aba0160570f1e4ade6fd/opennav_docking_core%2Finclude%2Fopennav_docking_core%2Fcharging_dock.hpp",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/f340738378aafe9aa2b1aba0160570f1e4ade6fd/opennav_docking_core%2Finclude%2Fopennav_docking_core%2Fcharging_dock.hpp",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/opennav_docking_core%2Finclude%2Fopennav_docking_core%2Fcharging_dock.hpp?ref=f340738378aafe9aa2b1aba0160570f1e4ade6fd",
+          "patch": "@@ -72,9 +72,37 @@ class ChargingDock\n    * @param frame Dock's frame of pose\n    * @return PoseStamped of staging pose in the specified frame\n    */\n-  virtual geometry_msgs::msg::PoseStamped getDocksStagingPose(\n+  virtual geometry_msgs::msg::PoseStamped getStagingPose(\n     const geometry_msgs::msg::Pose & pose, const std::string & frame) = 0;\n \n+  /**\n+   * @brief Method to obtain the refined pose of the dock, usually based on sensors\n+   * @param pose The initial estimate of the dock pose.\n+   * @param frame The frame of the initial estimate.\n+   */\n+  virtual bool getRefinedPose(geometry_msgs::msg::PoseStamped & pose) = 0;\n+\n+  /**\n+   * @brief Method to obtain the target pose for the robot from a refined dock pose.\n+   */\n+  virtual geometry_msgs::msg::PoseStamped getTargetPose(\n+    const geometry_msgs::msg::PoseStamped & dock_pose) = 0;\n+\n+  /**\n+   * @brief Are we charging? If a charge dock requires any sort of negotiation\n+   * to begin charging, that should happen inside this function as this function\n+   * will be called repeatedly within the docking loop.\n+   *\n+   * NOTE: this function is expected to return QUICKLY. Blocking here will block\n+   * the docking controller loop.\n+   */\n+  virtual bool isCharging() = 0;\n+\n+  /**\n+   * @brief Similar to isCharging() but called when undocking.\n+   */\n+  virtual bool hasStoppedCharging() = 0;\n+\n   std::string getName() {return name_;}\n \n protected:"
+        },
+        {
+          "sha": "d918dfa1ddcbb65db886165e270dc4814dded1ea",
+          "filename": "opennav_docking_core/include/opennav_docking_core/controller.hpp",
+          "status": "added",
+          "additions": 79,
+          "deletions": 0,
+          "changes": 79,
+          "blob_url": "https://github.com/open-navigation/opennav_docking/blob/f340738378aafe9aa2b1aba0160570f1e4ade6fd/opennav_docking_core%2Finclude%2Fopennav_docking_core%2Fcontroller.hpp",
+          "raw_url": "https://github.com/open-navigation/opennav_docking/raw/f340738378aafe9aa2b1aba0160570f1e4ade6fd/opennav_docking_core%2Finclude%2Fopennav_docking_core%2Fcontroller.hpp",
+          "contents_url": "https://api.github.com/repos/open-navigation/opennav_docking/contents/opennav_docking_core%2Finclude%2Fopennav_docking_core%2Fcontroller.hpp?ref=f340738378aafe9aa2b1aba0160570f1e4ade6fd",
+          "patch": "@@ -0,0 +1,79 @@\n+// Copyright (c) 2024 Open Navigation LLC\n+//\n+// Licensed under the Apache License, Version 2.0 (the \"License\");\n+// you may not use this file except in compliance with the License.\n+// You may obtain a copy of the License at\n+//\n+//     http://www.apache.org/licenses/LICENSE-2.0\n+//\n+// Unless required by applicable law or agreed to in writing, software\n+// distributed under the License is distributed on an \"AS IS\" BASIS,\n+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+// See the License for the specific language governing permissions and\n+// limitations under the License.\n+\n+#ifndef OPENNAV_DOCKING_CORE__CONTROLLER_HPP_\n+#define OPENNAV_DOCKING_CORE__CONTROLLER_HPP_\n+\n+#include <memory>\n+#include <string>\n+\n+#include \"rclcpp/rclcpp.hpp\"\n+#include \"geometry_msgs/msg/twist.hpp\"\n+#include \"geometry_msgs/msg/pose.hpp\"\n+#include \"nav2_util/lifecycle_node.hpp\"\n+#include \"tf2_ros/buffer.h\"\n+\n+namespace opennav_docking_core\n+{\n+/**\n+ * @class opennav_docking_core::Controller\n+ * @brief Control law for approaching a dock target\n+ */\n+class Controller\n+{\n+public:\n+  using Ptr = std::shared_ptr<Controller>;\n+\n+  /**\n+   * @param parent pointer to user's node\n+   * @param name The name of this planner\n+   * @param tf A pointer to a TF buffer\n+   */\n+  virtual void configure(\n+    const rclcpp_lifecycle::LifecycleNode::WeakPtr & parent,\n+    const std::string & name, std::shared_ptr<tf2_ros::Buffer> tf) = 0;\n+\n+  /**\n+   * @brief A destructor for opennav_docking_core::Controller\n+   */\n+  ~Controller() = default;\n+\n+  /**\n+   * @brief Method to cleanup resources used on shutdown.\n+   */\n+  virtual void cleanup() = 0;\n+\n+  /**\n+   * @brief Method to active Behavior and any threads involved in execution.\n+   */\n+  virtual void activate() = 0;\n+\n+  /**\n+   * @brief Method to deactive Behavior and any threads involved in execution.\n+   */\n+  virtual void deactivate() = 0;\n+\n+  /**\n+   * @brief Compute control velocities.\n+   * @param target Target pose, in robot-centric frame.\n+   * @param command Computed command to execute for this update cycle.\n+   */\n+  virtual bool computeVelocityCommand(\n+    const geometry_msgs::msg::Pose & target,\n+    geometry_msgs::msg::Twist & command);\n+};\n+\n+}  // namespace opennav_docking_core\n+\n+#endif  // OPENNAV_DOCKING_CORE__CONTROLLER_HPP_"
+        }
+      ]
+    }
+  ]
+}

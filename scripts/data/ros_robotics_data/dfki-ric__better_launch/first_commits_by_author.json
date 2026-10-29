@@ -1,0 +1,442 @@
+{
+  "_meta": {
+    "fetched_at": "2026-09-24T14:51:59Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "dfki-ric",
+    "repo": "better_launch",
+    "refreshed_at": "2026-09-24T14:51:59Z",
+    "refresh_note": "incrementally added 1 author(s) missing from a prior stale cache"
+  },
+  "data": [
+    {
+      "author": "Nikolas Dahn",
+      "date": "2024-10-17T09:36:08Z",
+      "sha": "cc392e866b33d6353d5b679d0d5d69f36ab478b2",
+      "message": "Initial commit",
+      "files_changed": 7,
+      "additions": 511,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "better_ros_launch/__init__.py",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/dfki-ric/better_launch/blob/cc392e866b33d6353d5b679d0d5d69f36ab478b2/better_ros_launch%2F__init__.py",
+          "raw_url": "https://github.com/dfki-ric/better_launch/raw/cc392e866b33d6353d5b679d0d5d69f36ab478b2/better_ros_launch%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/dfki-ric/better_launch/contents/better_ros_launch%2F__init__.py?ref=cc392e866b33d6353d5b679d0d5d69f36ab478b2"
+        },
+        {
+          "sha": "854ceb9790962609cfad3dfe218265e1ccda72a3",
+          "filename": "better_ros_launch/better_launch.py",
+          "status": "added",
+          "additions": 132,
+          "deletions": 0,
+          "changes": 132,
+          "blob_url": "https://github.com/dfki-ric/better_launch/blob/cc392e866b33d6353d5b679d0d5d69f36ab478b2/better_ros_launch%2Fbetter_launch.py",
+          "raw_url": "https://github.com/dfki-ric/better_launch/raw/cc392e866b33d6353d5b679d0d5d69f36ab478b2/better_ros_launch%2Fbetter_launch.py",
+          "contents_url": "https://api.github.com/repos/dfki-ric/better_launch/contents/better_ros_launch%2Fbetter_launch.py?ref=cc392e866b33d6353d5b679d0d5d69f36ab478b2",
+          "patch": "@@ -0,0 +1,132 @@\n+import inspect\n+from contextlib import contextmanager\n+from collections import deque\n+\n+from elements import Group, Composer, Node\n+\n+\n+def launch_this(launch_func):\n+    # TODO should make the function compatible with the ros2 launch system, e.g.\n+    # declare arguments, create a stub launch description, etc. Also should expose \n+    # some kind of interface so that it can be included by other better_launch \n+    # scripts.\n+    def generate_launch_description(_better_launch_instance = None):\n+        from launch import LaunchDescription\n+        from launch.actions import DeclareLaunchArgument\n+\n+        ld = LaunchDescription()\n+\n+        # Declare launch arguments from the function signature\n+        sig = inspect.signature(launch_func)\n+        for param in sig.parameters:\n+            default = None\n+            if default is not Parameter.empty:\n+                default = str(param.default)\n+            \n+            ld.add_action(DeclareLaunchArgument(param.name, default_value=default))\n+\n+        # TODO custom action to execute launch_func and pass it the declared arguments\n+        ld.add_action(...)\n+        return ld\n+\n+    return generate_launch_description\n+\n+\n+class _BetterLaunchMeta(type):\n+    # Allows reusing an already existing BetterLaunch instance. \n+    # Important for launch file includes.\n+    def __call__(cls, *args, **kwargs):\n+        existing_instance = kwargs.pop(\"_better_launch_instance\", None)\n+        if existing_instance:\n+            return existing_instance\n+        \n+        obj = cls.__new__(cls, *args, **kwargs)\n+        obj.__init__(*args, **kwargs)\n+        return obj\n+\n+\n+class BetterLaunch(metaclass=_BetterLaunchMeta):\n+    def __init__(self, ns: str = \"/\", launch_args: dict = None):\n+        if launch_args is None:\n+            frame = inspect.currentframe()\n+            try:\n+                # Get the caller's locals\n+                launch_args = {k:v for k,v in frame.f_back.f_locals if not k.startswith(\"_\")}\n+            finally:\n+                del frame\n+\n+        self.all_args = launch_args\n+\n+        if ns is None:\n+            ns = \"/\"\n+        elif not ns.startswith(\"/\"):\n+            ns = \"/\" + ns\n+\n+        self._container_stack = deque()\n+        self._container_stack.append(Group(ns))\n+\n+    def find(self, pkg: str, filename: str = None, dir: str = None):\n+        # TODO\n+        pass\n+\n+    def node(self, pkg: str, exec: str, name: str = None, *, anonymous: bool = False, **kwargs):\n+        # TODO establish namespace and remaps for nested groups\n+        for container in reversed(self._container_stack):\n+            if isinstance(container, Group):\n+                return container.add_node(pkg, exec, name, anonymous = anonymous, **kwargs)\n+        else:\n+            raise RuntimeException(\"Launcher did not contain a group, this should never happen!\")\n+\n+    def component(self, pkg: str, plugin: str, **kwargs):\n+        for container in reversed(self._container_stack):\n+            # Run inside the most recent composable container, if available\n+            if isinstance(container, Composer):\n+                return container.add_component(pkg, plugin, name=name, **kwargs)\n+        else:\n+            raise RuntimeException(\"Tried to run a composable without a composer\")\n+\n+    def include(self, pkg: str, launch_file: str, pass_all_args: bool = True, **kwargs):\n+        global_args = dict(globals())\n+        if pass_all_args:\n+            local_args = self.all_args\n+        else:\n+            local_args = kwargs\n+\n+        file_path = ...\n+        if launch_file.endswith(\".py\"):\n+            # Check if the launch file uses better_launch\n+            with open(file_path) as f:\n+                content = f.read()\n+                if \"better_launch\" in content:\n+                    try:\n+                        code = compile(content, launch_file, \"exec\")\n+                        # TODO mechanism for passing instance not fully defined yet\n+                        global_args[\"_better_launcher_instance\"] = self\n+                        exec(code, global_args, local_args)\n+                        return\n+                    except Exception as e:\n+                        # TODO log\n+                        raise e\n+        \n+        # Assume a normal ros2 launch file\n+        # TODO\n+\n+    @contextmanager\n+    def group(self, ns: str = None, remap: dict[str, str] = None):\n+        group = Group(self, ns, remap)\n+        self._container_stack.append(group)\n+        try:\n+            yield group\n+        finally:\n+            self._container_stack.pop()\n+\n+    @contextmanager\n+    def compose(self, name: str, language: str = \"cpp\"):\n+        composer = Composer(self, name, language)\n+        self._container_stack.append(composer)\n+        try:\n+            yield composer\n+        finally:\n+            self._container_stack.pop()\n+\n+    # TODO Common stuff like joint_state_publisher, robot_state_publisher, moveit, rviz, gazebo"
+        },
+        {
+          "sha": "72dd202166093008346e15d6252eb012be2f8bf2",
+          "filename": "better_ros_launch/concept.py",
+          "status": "added",
+          "additions": 28,
+          "deletions": 0,
+          "changes": 28,
+          "blob_url": "https://github.com/dfki-ric/better_launch/blob/cc392e866b33d6353d5b679d0d5d69f36ab478b2/better_ros_launch%2Fconcept.py",
+          "raw_url": "https://github.com/dfki-ric/better_launch/raw/cc392e866b33d6353d5b679d0d5d69f36ab478b2/better_ros_launch%2Fconcept.py",
+          "contents_url": "https://api.github.com/repos/dfki-ric/better_launch/contents/better_ros_launch%2Fconcept.py?ref=cc392e866b33d6353d5b679d0d5d69f36ab478b2",
+          "patch": "@@ -0,0 +1,28 @@\n+from better_launch import BetterLaunch, launch_this\n+\n+\n+@launch_this\n+def launch(\n+    main_node_name: str,\n+    samples: int = 100,\n+    freq: float = 20,\n+    start_all: bool = True,\n+    *,\n+    **kwargs\n+):\n+    # Also offer a \"BetterLaunchDescription\" class that generates the launch description instead of \n+    # starting everything immediately\n+    bl = BetterLaunch()\n+\n+    with bl.group(ns=\"test\"):\n+        bl.node(\"mypkg\", \"test.py\", main_node_name)\n+\n+        if start_all:\n+            bl.include(\"otherpkg\", \"otherpkg.launch.py\", **bl.all_args)\n+\n+        with bl.compose():\n+            # Automatically detects\n+            bl.component(\"mypkg\", \"mypkg::Composable\")\n+            bl.component(\"myotherpkg\", \"mypotherkg::Composable\")\n+\n+        bl.lifecycle_node(\"my_lifecycle_pkg\", \"lifecycle_node.py\", target_state=bl.LIFECYCLE_STARTED)"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "better_ros_launch/elements/__init__.py",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/dfki-ric/better_launch/blob/cc392e866b33d6353d5b679d0d5d69f36ab478b2/better_ros_launch%2Felements%2F__init__.py",
+          "raw_url": "https://github.com/dfki-ric/better_launch/raw/cc392e866b33d6353d5b679d0d5d69f36ab478b2/better_ros_launch%2Felements%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/dfki-ric/better_launch/contents/better_ros_launch%2Felements%2F__init__.py?ref=cc392e866b33d6353d5b679d0d5d69f36ab478b2"
+        },
+        {
+          "sha": "edde2149d894d6b6aa09b44d33604af977cbae2d",
+          "filename": "better_ros_launch/elements/composer.py",
+          "status": "added",
+          "additions": 22,
+          "deletions": 0,
+          "changes": 22,
+          "blob_url": "https://github.com/dfki-ric/better_launch/blob/cc392e866b33d6353d5b679d0d5d69f36ab478b2/better_ros_launch%2Felements%2Fcomposer.py",
+          "raw_url": "https://github.com/dfki-ric/better_launch/raw/cc392e866b33d6353d5b679d0d5d69f36ab478b2/better_ros_launch%2Felements%2Fcomposer.py",
+          "contents_url": "https://api.github.com/repos/dfki-ric/better_launch/contents/better_ros_launch%2Felements%2Fcomposer.py?ref=cc392e866b33d6353d5b679d0d5d69f36ab478b2",
+          "patch": "@@ -0,0 +1,22 @@\n+from .node import execute_node\n+\n+\n+# TODO should composer inherit from group?\n+class Composer:\n+    def __init__(self, launcher, name: str, language: str):\n+        # NOTE: does not support referencing an already existing instance. If you want to reuse\n+        # the container, just keep a reference to it.\n+        self.launcher = launcher\n+        self.name = name\n+        self.language = language\n+\n+    def start(self):\n+        package = f\"rcl{self.language}_components\"\n+        executable = \"component_container\"\n+        execute_node(self.launcher, package, executable, name=self.name)\n+\n+    def add_component(self, package: str, plugin: str, **kwargs):\n+        # TODO call the load_node service\n+        # TODO handle group namespaces, remaps, etc.\n+        # See https://github.com/ros2/launch_ros/blob/rolling/launch_ros/launch_ros/actions/load_composable_nodes.py\n+        pass"
+        },
+        {
+          "sha": "b6211f0a57b3e8d65b8d4f2bc23918a0f38359ca",
+          "filename": "better_ros_launch/elements/group.py",
+          "status": "added",
+          "additions": 10,
+          "deletions": 0,
+          "changes": 10,
+          "blob_url": "https://github.com/dfki-ric/better_launch/blob/cc392e866b33d6353d5b679d0d5d69f36ab478b2/better_ros_launch%2Felements%2Fgroup.py",
+          "raw_url": "https://github.com/dfki-ric/better_launch/raw/cc392e866b33d6353d5b679d0d5d69f36ab478b2/better_ros_launch%2Felements%2Fgroup.py",
+          "contents_url": "https://api.github.com/repos/dfki-ric/better_launch/contents/better_ros_launch%2Felements%2Fgroup.py?ref=cc392e866b33d6353d5b679d0d5d69f36ab478b2",
+          "patch": "@@ -0,0 +1,10 @@\n+\n+class Group:\n+    def __init__(self, launcher, ns: str = None, remap: dict[str, str] = None):\n+        self.launcher = launcher\n+        self.ns = ns or \"\"\n+        self.remap = dict(remap or {})\n+\n+    def add_node(self, pkg: str, exec: str, name: str = None, *, anonymous: bool = False, **kwargs):\n+        # TODO\n+        pass"
+        },
+        {
+          "sha": "307efcbc73522b63ece74055957ff2155a4ba828",
+          "filename": "better_ros_launch/elements/node.py",
+          "status": "added",
+          "additions": 319,
+          "deletions": 0,
+          "changes": 319,
+          "blob_url": "https://github.com/dfki-ric/better_launch/blob/cc392e866b33d6353d5b679d0d5d69f36ab478b2/better_ros_launch%2Felements%2Fnode.py",
+          "raw_url": "https://github.com/dfki-ric/better_launch/raw/cc392e866b33d6353d5b679d0d5d69f36ab478b2/better_ros_launch%2Felements%2Fnode.py",
+          "contents_url": "https://api.github.com/repos/dfki-ric/better_launch/contents/better_ros_launch%2Felements%2Fnode.py?ref=cc392e866b33d6353d5b679d0d5d69f36ab478b2",
+          "patch": "@@ -0,0 +1,319 @@\n+import asyncio\n+import io\n+import logging\n+import os\n+import platform\n+import signal\n+import traceback\n+from typing import Any, Callable\n+from osrf_pycommon.process_utils import async_execute_process\n+from osrf_pycommon.process_utils import AsyncSubprocessProtocol\n+\n+\n+class _ProcessProtocol(AsyncSubprocessProtocol):\n+    def __init__(\n+        self, \n+        logger, \n+        stdout_logger, \n+        stderr_logger, \n+        *, \n+        output_format: str = '[{this.logger.name}] {line}', \n+        cache_output: bool = True, \n+        **kwargs\n+    ):\n+        super().__init__(**kwargs)\n+        self.pid = None\n+        self.logger = logger\n+        self.stdout_logger = stdout_logger\n+        self.stderr_logger = stderr_logger\n+        self.stdout_buffer = io.StringIO()\n+        self.stderr_buffer = io.StringIO()\n+        self.output_format = output_format\n+\n+        if cache_output:\n+            self.on_stdout = self._on_stdout_cached\n+        else:\n+            self.on_stdout = self._on_stdout_direct\n+\n+    def connection_made(self, transport):\n+        self.pid = transport.get_pid()\n+        self.logger.info(f'process started with pid [{self.pid}]')\n+        super().connection_made(transport)\n+\n+    def on_stdout_received(self, data: bytes) -> None:\n+        text = data.decode(errors=\"replace\")\n+        self.on_stdout(self.stdout_logger, self.stdout_buffer, text)\n+\n+    def on_stderr_received(self, data: bytes) -> None:\n+        text = data.decode(errors=\"replace\")\n+        self.on_stderr(self.stderr_logger, self.stderr_buffer, text)\n+\n+    def on_process_exited(self, returncode) -> None:\n+        pass\n+\n+    def _on_stdout_cached(self, logger, buffer, text: str) -> None:\n+        last_cursor = buffer.tell()\n+        buffer.seek(0, os.SEEK_END)  # go to end of buffer\n+        buffer.write(text)\n+        buffer.seek(last_cursor)\n+        new_cursor = last_cursor\n+        for line in buffer:\n+            if not line.endswith(os.linesep):\n+                break\n+            new_cursor = buffer.tell()\n+            logger.info(\n+                self.output_format.format(line=line[:-len(os.linesep)], this=self)\n+            )\n+        buffer.seek(new_cursor)\n+\n+    def _on_stdout_direct(\n+        self, logger: logging.Logger, buffer: io.TextIOBase, text: str\n+    ) -> None:\n+        if buffer.closed:\n+            # buffer was probably closed by _flush_direct on shutdown. Output without buffering.\n+            logger.info(self.output_format.format(line=text, this=self))\n+        else:\n+            buffer.write(text)\n+            buffer.seek(0)\n+            last_line = None\n+            for line in buffer:\n+                if line.endswith(os.linesep):\n+                    logger.info(self.output_format.format(line=line[:-len(os.linesep)], this=self))\n+                else:\n+                    last_line = line\n+                    break\n+            buffer.seek(0)\n+            buffer.truncate(0)\n+            if last_line is not None:\n+                buffer.write(last_line)\n+\n+    def flush_output_buffers(self):\n+        for line in self.stdout_buffer:\n+            self.stdout_logger.info(\n+                self.output_format.format(line=line, this=self)\n+            )\n+\n+        for line in self.stderr_buffer:\n+            self.stderr_logger.info(\n+                self.output_format.format(line=line, this=self)\n+            )\n+\n+        # the respawned process needs to reuse these StringIO resources,\n+        # close them only after receiving the shutdown\n+        if self.shutdown_future is None or self.shutdown_future.done():\n+            self.stdout_buffer.close()\n+            self.stderr_buffer.close()\n+        else:\n+            self.stdout_buffer.seek(0)\n+            self.stdout_buffer.truncate(0)\n+            self.stderr_buffer.seek(0)\n+            self.stderr_buffer.truncate(0)\n+\n+\n+async def _execute_process(context):\n+    if log_cmd:\n+        logger.info(f\"Starting process '{context.cmd}' (cwd='{context.cwd}', env='{context.env}')\")\n+\n+    try:\n+        transport, subprocess_protocol = await async_execute_process(\n+            lambda **kwargs: _ProcessProtocol(\n+                context.logger, \n+                context.on_stdout, \n+                context.on_stderr, \n+                **kwargs\n+            ),\n+            cmd=context.cmd,\n+            cwd=context.cwd,\n+            env=context.env,\n+            shell=context.shell,\n+            emulate_tty=context.emulate_tty,\n+            stderr_to_stdout=context.stderr_to_stdout,\n+        )\n+    except Exception:\n+        logger.error(f'An exception occurred while executing process:\\n{traceback.format_exc()}')\n+        self.__cleanup()  # TODO\n+        return\n+\n+    pid = transport.get_pid()\n+    await context.emit_event(ProcessStarted(**process_event_args))  # TODO\n+    returncode = await subprocess_protocol.complete\n+\n+    if returncode == 0:\n+        logger.info(f'Process has finished cleanly [pid {pid}]')\n+    else:\n+        logger.error(f\"Process has died [pid {pid}, exit code {returncode}, cmd '{cmd}']\")\n+    \n+    await context.emit_event(ProcessExited(returncode=returncode, **process_event_args))  # TODO\n+\n+    # respawn the process if necessary\n+    if not context.is_shutdown\\  # TODO\n+            and context.shutdown_future is not None\\  # TODO\n+            and not context.shutdown_future.done()\\\n+            (max_respawns < 0 or context.respawn_retries < max_respawns):\n+        \n+        context.respawn_retries += 1  # TODO\n+        if respawn_delay > 0.0:\n+            # wait for a timeout to respawn the process\n+            # and handle shutdown event with future\n+            # to make sure `ros2 launch` exit in time\n+            await asyncio.wait((context.shutdown_future,), timeout=respawn_delay)\n+\n+        if not context.shutdown_future.done():\n+            context.asyncio_loop.create_task(_execute_process(context, cmd, cwd, env, logger))  # TODO\n+            return\n+\n+    self.__cleanup()  # TODO\n+\n+\n+class Node:\n+    def __init__(self, \n+        launcher, \n+        pkg: str, \n+        exec: str,\n+        name: str,\n+        node_args: dict[str, Any] = None, \n+        *, \n+        env: dict[str, str] = None, \n+        log_cmd: bool = True,\n+        on_exit: Callable = None,\n+        max_respawns: int = 0, \n+        respawn_delay: float = 0.0, \n+        use_shell: bool = False, \n+        emulate_tty: bool = False, \n+        stderr_to_stdout: bool = False,\n+    ):\n+        self.launcher = launcher\n+\n+        self.logger = launcher.get_logger(name)\n+        self.stdout_logger, self.stderr_logger = launcher.get_output_loggers(name)\n+\n+        self.completed_future = launcher.asyncio_loop.create_future()  # TODO\n+        self.shutdown_future = launcher.asyncio_loop.create_future()\n+        self.on_exit = on_exit\n+\n+        # TODO\n+        path_to_pkg = ...\n+        cmd = ...\n+        cwd = ...\n+        env = ...\n+\n+        # TODO register callbacks\n+\n+    def start(self):\n+        if self.is_shutdown:\n+            self.logger.warning(f\"Node {self.cmd} will not be started as the launcher has already shut down\")\n+            return\n+\n+        try:\n+            self.asyncio_loop.create_task(_execute_process(self))  # TODO\n+        except Exception:\n+            for event_handler in event_handlers:\n+                context.unregister_event_handler(event_handler)\n+            raise\n+\n+    @property\n+    def is_shutdown(self):\n+        return self.launcher.is_shutdown()\n+\n+    @property\n+    def is_running(self):\n+        # TODO\n+        pass\n+    \n+    # TODO all callbacks in launch_ros check whether the event matches the process, do we need that?\n+    def on_signal_process(self, sig):\n+        # TODO\n+        typed_event = cast(SignalProcess, context.locals.event)\n+        if not typed_event.process_matcher(self):\n+            # this event was not intended for this process\n+            return None\n+\n+        if self.process_details is None:\n+            raise RuntimeError('Signal event received before execution.')\n+        if self._subprocess_transport is None:\n+            raise RuntimeError('Signal event received before subprocess transport available.')\n+        if self._subprocess_protocol.complete.done():\n+            # the process is done or is cleaning up, no need to signal\n+            self.logger.debug(\n+                \"signal '{}' not set to '{}' because it is already closing\".format(\n+                    typed_event.signal_name, self.process_details['name']),\n+            )\n+            return None\n+\n+        if platform.system() == 'Windows' and sig == signal.SIGINT:\n+            # TODO(wjwwood): remove this when/if SIGINT is fixed on Windows\n+            self.logger.warning(\n+                \"'SIGINT' sent to process[{}] not supported on Windows, escalating to 'SIGTERM'\"\n+                .format(self.process_details['name']),\n+            )\n+            typed_event = SignalProcess(\n+                signal_number=signal.SIGTERM,\n+                process_matcher=lambda process: True)\n+        \n+        self.logger.info(\"sending signal '{}' to process[{}]\".format(\n+            typed_event.signal_name, self.process_details['name']\n+        ))\n+\n+        try:\n+            if sig == signal.SIGKILL:\n+                self._subprocess_transport.kill()  # works on both Windows and POSIX\n+                return None\n+\n+            self._subprocess_transport.send_signal(sig)\n+            return None\n+        except ProcessLookupError:\n+            self.logger.debug(\n+                \"signal '{}' not sent to '{}' because it has closed already\".format(\n+                    typed_event.signal_name, self.process_details['name']\n+                )\n+            )\n+\n+    def on_shutdown(self):\n+        # TODO schedule sigterm and sigkill signals\n+        if self.shutdown_future is None or self.shutdown_future.done():\n+            # Execution not started or already done, nothing to do.\n+            return None\n+\n+        if self.completed_future is None:\n+            # Execution not started so nothing to do, but self.shutdown_future should prevent\n+            # execution from starting in the future.\n+            self.shutdown_future.set_result(None)\n+            return None\n+\n+        if self.completed_future.done():\n+            # If already done, then nothing to do.\n+            self.shutdown_future.set_result(None)\n+            return None\n+\n+        # Defer shut down if the process is scheduled to be started\n+        if (self.process_details is None or self._subprocess_transport is None):\n+            # Do not set shutdown result, as event is postponed\n+            context.register_event_handler(  # TODO\n+                OnProcessStart(\n+                    on_start=lambda event, context:\n+                    self._shutdown_process(context, send_sigint=send_sigint)))\n+            return None\n+\n+        self.shutdown_future.set_result(None)\n+\n+    def on_process_exit():\n+        if self.on_exit:\n+            self.on_exit()  # TODO\n+        # TODO\n+        flush()\n+\n+    def cleanup(self):\n+        # Cancel any pending timers we started.\n+        if self.sigterm_timer is not None:  # TODO\n+            self.sigterm_timer.cancel()\n+        if self.sigkill_timer is not None:  # TODO\n+            self.sigkill_timer.cancel()\n+        \n+        # Close subprocess transport if any.\n+        if self._subprocess_transport is not None:  # TODO\n+            self._subprocess_transport.close()\n+        \n+        # Signal that we're done to the launch system.\n+        self.completed_future.set_result(None)\n+\n+    "
+        }
+      ]
+    },
+    {
+      "author": "ndahn",
+      "date": "2025-08-01T16:31:52Z",
+      "sha": "a5e7cef4772cd6be2759d5e272cc9a3ea18d9f4c",
+      "message": "(auto) Paper PDF Draft",
+      "files_changed": 1,
+      "additions": 0,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "b9caf2df9c605fd46e477c1b97aa7c5348a95d18",
+          "filename": "docs/paper.pdf",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/dfki-ric/better_launch/blob/a5e7cef4772cd6be2759d5e272cc9a3ea18d9f4c/docs%2Fpaper.pdf",
+          "raw_url": "https://github.com/dfki-ric/better_launch/raw/a5e7cef4772cd6be2759d5e272cc9a3ea18d9f4c/docs%2Fpaper.pdf",
+          "contents_url": "https://api.github.com/repos/dfki-ric/better_launch/contents/docs%2Fpaper.pdf?ref=a5e7cef4772cd6be2759d5e272cc9a3ea18d9f4c"
+        }
+      ]
+    },
+    {
+      "author": "Hampuztt",
+      "date": "2026-01-01T23:43:25Z",
+      "sha": "2fb2d7c5991a3c670baa77b5eeb8c3ed14f95386",
+      "message": "Fixed log truncation bug",
+      "files_changed": 1,
+      "additions": 9,
+      "deletions": 5,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "a9067d538e695ce509416993502cd8d5de1218c2",
+          "filename": "better_launch/utils/better_logging.py",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 5,
+          "changes": 14,
+          "blob_url": "https://github.com/dfki-ric/better_launch/blob/2fb2d7c5991a3c670baa77b5eeb8c3ed14f95386/better_launch%2Futils%2Fbetter_logging.py",
+          "raw_url": "https://github.com/dfki-ric/better_launch/raw/2fb2d7c5991a3c670baa77b5eeb8c3ed14f95386/better_launch%2Futils%2Fbetter_logging.py",
+          "contents_url": "https://api.github.com/repos/dfki-ric/better_launch/contents/better_launch%2Futils%2Fbetter_logging.py?ref=2fb2d7c5991a3c670baa77b5eeb8c3ed14f95386",
+          "patch": "@@ -221,11 +221,15 @@ def format(self, record: logging.LogRecord) -> str:\n             record.levelno\n         )\n \n-        if self.max_message_length > 0:\n-            msg = record.getMessage()\n-            if msg > self.max_message_length:\n-                record.msg = msg[: self.max_message_length] + \"…\"\n-\n+        msg = record.getMessage()\n+        if self.max_message_length > 0 and len(msg) > self.max_message_length:\n+            msg = msg[: self.max_message_length] + \"...\"\n+        record.msg = msg\n+        # The message has already been formatted with its arguments above.\n+        # Clearing record.args prevents the next formatter from attempting\n+        # a second '%' substitution on the truncated text, which could crash\n+        # if any format placeholders were removed during truncation.\n+        record.args = None\n         return super().format(record)\n \n "
+        }
+      ]
+    },
+    {
+      "author": "jobo8505",
+      "date": "2025-11-24T14:11:06Z",
+      "sha": "71e78811be31a5442cfd5d99f180646070739908",
+      "message": "improve CONTRIBUTING.md",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 5,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "78df685b1b902cf98fbb8ae9f933648d715295d7",
+          "filename": "CONTRIBUTING.md",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 5,
+          "changes": 9,
+          "blob_url": "https://github.com/dfki-ric/better_launch/blob/71e78811be31a5442cfd5d99f180646070739908/CONTRIBUTING.md",
+          "raw_url": "https://github.com/dfki-ric/better_launch/raw/71e78811be31a5442cfd5d99f180646070739908/CONTRIBUTING.md",
+          "contents_url": "https://api.github.com/repos/dfki-ric/better_launch/contents/CONTRIBUTING.md?ref=71e78811be31a5442cfd5d99f180646070739908",
+          "patch": "@@ -18,7 +18,7 @@ The preferred way to contribute to *better_launch* is to fork the\n \n 3. Clone this copy to your local disk:\n \n-        $ git clone git@github.com:dfki-rc/better_launch.git\n+        $ git clone git@github.com:<your_github_account>/better_launch.git\n \n 4. Create a branch to hold your changes:\n \n@@ -27,7 +27,7 @@ The preferred way to contribute to *better_launch* is to fork the\n     and start making changes. Never work in the ``master`` branch!\n \n 5. Work on this copy, on your computer, using Git to do the version\n-   control. When you're done editing, do::\n+   control. When you're done editing, do:\n \n         $ git add modified_files\n         $ git commit\n@@ -36,9 +36,8 @@ The preferred way to contribute to *better_launch* is to fork the\n \n        $ git push -u origin my-feature\n \n-Finally, go to the web page of the your fork of the bolero repo,\n-and click 'Pull request' to send your changes to the maintainers for review.\n-request.\n+6. Finally, go to the web page of your fork of the better_launch repo,\n+   and click 'Pull request' to send your changes to the maintainers for a review.\n \n ## Merge Policy\n Developers have to submit pull requests. Those will be reviewed by at least"
+        }
+      ]
+    },
+    {
+      "author": "Flova",
+      "date": "2025-11-24T09:31:35Z",
+      "sha": "3e6136cca08518e9556414fc77791a63b2d2dd1f",
+      "message": "Add ament_cmake_python package requirement",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "6a336195f3c7c47ae2dabd0336f5febb46f95f7b",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/dfki-ric/better_launch/blob/3e6136cca08518e9556414fc77791a63b2d2dd1f/CMakeLists.txt",
+          "raw_url": "https://github.com/dfki-ric/better_launch/raw/3e6136cca08518e9556414fc77791a63b2d2dd1f/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/dfki-ric/better_launch/contents/CMakeLists.txt?ref=3e6136cca08518e9556414fc77791a63b2d2dd1f",
+          "patch": "@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.5)\n project(better_launch)\n \n find_package(ament_cmake REQUIRED)\n+find_package(ament_cmake_python REQUIRED)\n \n # Run via `colcon test --packages-select better_launch`. \n # Examine results with `colcon test-result --all`"
+        }
+      ]
+    },
+    {
+      "author": "Tim Redick",
+      "date": "2025-11-21T07:14:21Z",
+      "sha": "78e97a716f569edb8b923ab64415fc1e0abd0209",
+      "message": "Fix DeprecationWarning: 'MultiCommand' is deprecated and will be removed in Click 9.0. Use 'Group' instead.",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "9c348797114d2d7346efb1f9c0aa53a64f288ae8",
+          "filename": "bin/bl",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/dfki-ric/better_launch/blob/78e97a716f569edb8b923ab64415fc1e0abd0209/bin%2Fbl",
+          "raw_url": "https://github.com/dfki-ric/better_launch/raw/78e97a716f569edb8b923ab64415fc1e0abd0209/bin%2Fbl",
+          "contents_url": "https://api.github.com/repos/dfki-ric/better_launch/contents/bin%2Fbl?ref=78e97a716f569edb8b923ab64415fc1e0abd0209",
+          "patch": "@@ -407,7 +407,7 @@ def get_launchfile_command(launchfile: LaunchFile, ctx: click.Context) -> click.\n     return cmd\n \n \n-class LaunchfileSelectionCLI(click.MultiCommand):\n+class LaunchfileSelectionCLI(click.Group):\n     def __init__(self, package: str, **kwargs):\n         \"\"\"This subcommand will handle selecting a launch file from the provided ROS package.\n \n@@ -484,7 +484,7 @@ class LaunchfileSelectionCLI(click.MultiCommand):\n         return executables\n \n \n-class PackageSelectionCLI(click.MultiCommand):\n+class PackageSelectionCLI(click.Group):\n     def __init__(self, **kwargs):\n         \"\"\"This subcommand will help in selecting a ROS package.\"\"\"\n         options = ["
+        }
+      ]
+    },
+    {
+      "author": "jboegeholz",
+      "date": "2025-09-24T13:52:29Z",
+      "sha": "f24cac235595e0138104f9621c93b953dbca8029",
+      "message": "fix call of example launch file in README.md",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "cad6cab15a2be2e009c0f58375b5d217a61c2cae",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/dfki-ric/better_launch/blob/f24cac235595e0138104f9621c93b953dbca8029/README.md",
+          "raw_url": "https://github.com/dfki-ric/better_launch/raw/f24cac235595e0138104f9621c93b953dbca8029/README.md",
+          "contents_url": "https://api.github.com/repos/dfki-ric/better_launch/contents/README.md?ref=f24cac235595e0138104f9621c93b953dbca8029",
+          "patch": "@@ -234,7 +234,7 @@ See the single line of shortcuts at the bottom? That's the TUI, and it will neve\n \n ```bash\n # Run this line to see it in action!\n-bl better_launch 02_ui.py\n+bl better_launch 02_ui.launch.py\n ```\n \n The TUI is also able to manage nodes started from different shells and processes, even if they have been started by ROS2 or other means. To do so, pass the `manage_foreign_nodes` flag to the wrapper or command line. Be aware though that this will not capture their output - to get their output you will have to use the *takeover* action from the TUI, which will restart the node process with the original arguments."
+        }
+      ]
+    },
+    {
+      "author": "skasperski",
+      "date": "2025-06-26T09:01:08Z",
+      "sha": "8d888ee0c5b255af037b4c749a22965f7de5c8a4",
+      "message": "Added spawn_controller.",
+      "files_changed": 1,
+      "additions": 23,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "908b482d3200a086d8ba6ab6db6fcbfef275c430",
+          "filename": "better_launch/convenience.py",
+          "status": "modified",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/dfki-ric/better_launch/blob/8d888ee0c5b255af037b4c749a22965f7de5c8a4/better_launch%2Fconvenience.py",
+          "raw_url": "https://github.com/dfki-ric/better_launch/raw/8d888ee0c5b255af037b4c749a22965f7de5c8a4/better_launch%2Fconvenience.py",
+          "contents_url": "https://api.github.com/repos/dfki-ric/better_launch/contents/better_launch%2Fconvenience.py?ref=8d888ee0c5b255af037b4c749a22965f7de5c8a4",
+          "patch": "@@ -289,3 +289,26 @@ def run_command(cmd: str, args: str | list[str] = None) -> str:\n         run.extend(args)\n \n     return subprocess.check_output(run, stderr=subprocess.STDOUT).decode().rstrip(\"\\n\")\n+\n+def spawn_controller(controller: str, manager: str = \"controller_manager\") -> Node:\n+    \"\"\"Spawn the specified controller. \n+\n+    Parameters\n+    ----------\n+    controller : str\n+        The controller to spwawn.\n+    manager : str\n+        The name of the controller_manager node.\n+\n+    Returns\n+    -------\n+    Node\n+        The node running the spawner process.\n+    \"\"\"\n+    bl = BetterLaunch.instance()\n+    return bl.node(\n+        package=\"controller_manager\",\n+        executable=\"spawner\",\n+        raw=True,\n+        cmd_args=[controller, \"--controller-manager\", manager]\n+    )"
+        }
+      ]
+    },
+    {
+      "author": "Jquinny",
+      "date": "2025-10-21T17:41:20Z",
+      "sha": "1f7f1c383a61ce1f56735f1d1026e115081a94f7",
+      "message": "fix: missing third capture group",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "a2ec55f33deacf6c11514a485bd9d563569949d6",
+          "filename": "better_launch/gazebo.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/dfki-ric/better_launch/blob/1f7f1c383a61ce1f56735f1d1026e115081a94f7/better_launch%2Fgazebo.py",
+          "raw_url": "https://github.com/dfki-ric/better_launch/raw/1f7f1c383a61ce1f56735f1d1026e115081a94f7/better_launch%2Fgazebo.py",
+          "contents_url": "https://api.github.com/repos/dfki-ric/better_launch/contents/better_launch%2Fgazebo.py?ref=1f7f1c383a61ce1f56735f1d1026e115081a94f7",
+          "patch": "@@ -574,7 +574,7 @@ def from_string(cls, bridge: str, remaps: dict[str, str] = None) -> \"GazeboBridg\n         ValueError\n             If the bridge string doesn't match the expected pattern.\n         \"\"\"\n-        m = re.match(r\"(.+)@(.+)[\\[\\]@](.+)\", bridge)\n+        m = re.match(r\"(.+)@(.+)([\\[\\]@])(.+)\", bridge)\n \n         if not m:\n             raise ValueError(bridge + \" is not a valid bridge string\")"
+        }
+      ]
+    },
+    {
+      "author": "InigoMoreno",
+      "date": "2025-09-24T14:30:05Z",
+      "sha": "0f3a4293d78c8b1eefdb1f320ff2ac89899a828d",
+      "message": "Add rosdep keys",
+      "files_changed": 1,
+      "additions": 10,
+      "deletions": 3,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "28d2e484b6d0bd464a57d663c271ad5f38bc29d4",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 3,
+          "changes": 13,
+          "blob_url": "https://github.com/dfki-ric/better_launch/blob/0f3a4293d78c8b1eefdb1f320ff2ac89899a828d/package.xml",
+          "raw_url": "https://github.com/dfki-ric/better_launch/raw/0f3a4293d78c8b1eefdb1f320ff2ac89899a828d/package.xml",
+          "contents_url": "https://api.github.com/repos/dfki-ric/better_launch/contents/package.xml?ref=0f3a4293d78c8b1eefdb1f320ff2ac89899a828d",
+          "patch": "@@ -2,18 +2,18 @@\n <package format=\"2\">\n   <name>better_launch</name>\n   <version>1.0.2</version>\n-  \n+\n   <description>\n     A better replacement for the ROS2 launch system: intuitive, simple, memorable.\n   </description>\n \n   <url type=\"website\">https://dfki-ric.github.io/better_launch/</url>\n   <url type=\"repository\">https://github.com/dfki-ric/better_launch</url>\n   <url type=\"bugtracker\">https://github.com/dfki-ric/better_launch/issues</url>\n-  \n+\n   <author email=\"nikolas.dahn@gmail.com\">Nikolas Dahn</author>\n   <maintainer email=\"nikolas.dahn@gmail.com\">Nikolas Dahn</maintainer>\n-  \n+\n   <license>MIT</license>\n \n   <buildtool_depend>ament_cmake_python</buildtool_depend>\n@@ -24,6 +24,13 @@\n   <depend>lifecycle_msgs</depend>\n   <depend>composition_interfaces</depend>\n   <depend>rclpy</depend>\n+  <depend>python3-click</depend>\n+  <depend>python3-yaml</depend>\n+  <depend>python3-setproctitle</depend>\n+  <depend>python3-psutil</depend>\n+  <depend>python3-prompt-toolkit</depend>\n+  <depend>python3-osrf-pycommon</depend>\n+  <depend>python3-docstring-parser</depend>\n \n   <export>\n     <build_type>ament_cmake</build_type>"
+        }
+      ]
+    },
+    {
+      "author": "aserbremen",
+      "date": "2025-08-06T07:51:15Z",
+      "sha": "c207017640785cd058d1b3f90b9f6d87f8e22251",
+      "message": "moved --log-level to the end of final_cmd of the node process",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "1d18810d059c1efc72cc0fcd423be28bf5b17a67",
+          "filename": "better_launch/elements/node.py",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/dfki-ric/better_launch/blob/c207017640785cd058d1b3f90b9f6d87f8e22251/better_launch%2Felements%2Fnode.py",
+          "raw_url": "https://github.com/dfki-ric/better_launch/raw/c207017640785cd058d1b3f90b9f6d87f8e22251/better_launch%2Felements%2Fnode.py",
+          "contents_url": "https://api.github.com/repos/dfki-ric/better_launch/contents/better_launch%2Felements%2Fnode.py?ref=c207017640785cd058d1b3f90b9f6d87f8e22251",
+          "patch": "@@ -164,9 +164,6 @@ def start(self) -> None:\n                 final_cmd.extend(self.cmd_args)\n \n             if not self.raw:\n-                if self.node_log_level is not None:\n-                    final_cmd += [\"--log-level\", self.node_log_level]\n-\n                 final_cmd += [\"--ros-args\"]\n \n                 # Attach node parameters\n@@ -180,6 +177,9 @@ def start(self) -> None:\n                     # launch_ros/actions/node.py:481\n                     final_cmd.extend([\"-r\", f\"{src}:={dst}\"])\n \n+                if self.node_log_level is not None:\n+                    final_cmd += [\"--log-level\", self.node_log_level]\n+\n             # If an env is specified ROS2 lets it completely replace the host env. We cover this\n             # through an additional flag, as often you just want to make certain overrides.\n             # launch/descriptions/executable.py:199"
+        }
+      ]
+    },
+    {
+      "author": "danielskatz",
+      "date": "2025-08-01T18:28:09Z",
+      "sha": "205d254125743c279b84de82b1f9473b97be98fd",
+      "message": "Update paper.md",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 4,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "79174afe5f9127ffd20f94edef4f735a44d16750",
+          "filename": "docs/paper.md",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 4,
+          "changes": 8,
+          "blob_url": "https://github.com/dfki-ric/better_launch/blob/205d254125743c279b84de82b1f9473b97be98fd/docs%2Fpaper.md",
+          "raw_url": "https://github.com/dfki-ric/better_launch/raw/205d254125743c279b84de82b1f9473b97be98fd/docs%2Fpaper.md",
+          "contents_url": "https://api.github.com/repos/dfki-ric/better_launch/contents/docs%2Fpaper.md?ref=205d254125743c279b84de82b1f9473b97be98fd",
+          "patch": "@@ -9,7 +9,7 @@ authors:\n       affiliation: \"1\"\n affiliations:\n     - index: 1\n-      name: German Research Center for Artificial Intelligence\n+      name: German Research Center for Artificial Intelligence, Germany\n date: 1 August 2025\n bibliography: paper.bib\n ---\n@@ -29,11 +29,11 @@ On one hand, being able to write launch files in python is a nice feature which\n - convoluted and obscure internals\n - etc.\n \n-There are of course good reasons for the way the launch system has been implemented, at least on a superficial level. According to the design document, the intent is to treat launch files as \"a description of what will happen\" without executing anything. This is so that tools can \"visualize and modify the launch description\". The recently released @launchmap is able to do just that. However, given that users may define their own launch actions without a common way of inspecting them, it could be argued that even this use case is not well supported right now. There is also no good argument why the same couldn't be achieved using e.g. python's inspect module and/or a non-declarative syntax.\n+There are of course good reasons for the way the launch system has been implemented, at least on a superficial level. According to the design document, the intent is to treat launch files as \"a description of what will happen\" without executing anything. This is so that tools can \"visualize and modify the launch description\". The recently released LauncMmap [@launchmap] is able to do just that. However, given that users may define their own launch actions without a common way of inspecting them, it could be argued that even this use case is not well supported right now. There is also no good argument why the same couldn't be achieved using e.g. python's inspect module and/or a non-declarative syntax.\n \n # Existing Remedies\n \n-The issues in user friendliness have led to the emergence of several packages that simplify writing launch files, e.g. @simple_launch and @launch_generator, while other packages like the popular @generate_parameter_library are dedicated to particular aspects of the launch process. However, in the end they all face the same issues mentioned above, as they just represent different ways of generating the launch descriptions.\n+The issues in user friendliness have led to the emergence of several packages that simplify writing launch files, e.g. Simple_launch [@simple_launch] and Launch-generator [@launch_generator], while other packages like the popular Generate_parameter_library [@generate_parameter_library] are dedicated to particular aspects of the launch process. However, in the end they all face the same issues mentioned above, as they just represent different ways of generating the launch descriptions.\n \n # better_launch\n \n@@ -46,7 +46,7 @@ In order to actually resolve these issues I have written *better_launch*, a comp\n - *better_launch* comes with a replacement for `ros2 launch` called `bl`, which is both faster than its counterpart and provides additional features. For example, `bl` enables auto completion for launch parameters and uses the launch function's docstring to generate a `--help` text.\n - To improve usability, *better_launch* reformats and colors terminal output by default. \n - Unless killed with SIGKILL, *better_launch* will not leave zombie processes behind. \n-- *better_launch* provides an optional and unobtrusive **terminal UI** reminiscent of @rosmon, which can be used for stopping and restarting nodes, triggering life cycle transitions, list a node's subscribed topics, dynamically adjust the logging level, and more.\n+- *better_launch* provides an optional and unobtrusive **terminal UI** reminiscent of Rosmon [@rosmon], which can be used for stopping and restarting nodes, triggering life cycle transitions, list a node's subscribed topics, dynamically adjust the logging level, and more.\n \n ![Screenshot of the TUI](../media/tui.png){height=\"60%\"}\n "
+        }
+      ]
+    },
+    {
+      "author": "Prithvi-Sanghamreddy",
+      "date": "2025-01-23T13:03:03Z",
+      "sha": "1478fb745156c13e6ae9ff9d49473e4d00b6461d",
+      "message": "added functions",
+      "files_changed": 1,
+      "additions": 103,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "a8990315045b02a68fb3dec6e91847e38db57f91",
+          "filename": "better_launch/convenience.py",
+          "status": "modified",
+          "additions": 103,
+          "deletions": 1,
+          "changes": 104,
+          "blob_url": "https://github.com/dfki-ric/better_launch/blob/1478fb745156c13e6ae9ff9d49473e4d00b6461d/better_launch%2Fconvenience.py",
+          "raw_url": "https://github.com/dfki-ric/better_launch/raw/1478fb745156c13e6ae9ff9d49473e4d00b6461d/better_launch%2Fconvenience.py",
+          "contents_url": "https://api.github.com/repos/dfki-ric/better_launch/contents/better_launch%2Fconvenience.py?ref=1478fb745156c13e6ae9ff9d49473e4d00b6461d",
+          "patch": "@@ -1 +1,103 @@\n-# TODO Create convenience module for common stuff like joint_state_publisher, robot_state_publisher, moveit, rviz, gazebo (see simple_launch)\n\\ No newline at end of file\n+# TODO Create convenience module for common stuff like joint_state_publisher, robot_state_publisher, moveit, rviz, gazebo (see simple_launch)\n+\n+from better_launch import BetterLaunch\n+import subprocess\n+\n+class convenience_module:\n+    def __init__(self, launcher: BetterLaunch):\n+        self.launcher = launcher\n+\n+    \n+    def joint_state_publisher(self, use_gui = True, **node_args):\n+        '''\n+        Adds a joint_state_publisher / joint_state_publisher_gui with passed arguments as parameters\n+        Assumes some robot_description topic is published inside the namespace\n+        '''\n+        if type(use_gui) == bool:\n+            use_gui = str(use_gui)\n+\n+        self.launcher.node('joint_state_publisher', parameters = node_args, condition=UnlessCondition(use_gui))\n+        self.launcher.node('joint_state_publisher_gui', parameters = node_args, condition=IfCondition(use_gui))\n+\n+    def rviz(self, config_file = None, warnings = False):\n+        '''\n+        Runs RViz with the given config file and warning level\n+        '''\n+        args = [] if config_file is None else ['-d', config_file]\n+        if not warnings:\n+            args += ['--ros-args', '--log-level', 'FATAL']\n+        self.launcher.node('rviz2', 'rviz2', arguments = args)\n+\n+\n+    def add_moveit(self, config_pkg: str, config_file: str):\n+        moveit_launch_file_path = self.launcher.find(config_pkg, f'{config_file}.launch.py')\n+        self.launcher.include(config_pkg, moveit_launch_file_path)\n+\n+   \n+   import subprocess\n+\n+def robot_description(self, package=None, description_file=None, description_dir=None, xacro_args=None):\n+    '''\n+    Returns the robot description after potential xacro parse if the file ends with xacro or xacro args are defined.\n+    '''\n+    # Retrieve the full path to the description file using a method that resolves the path based on the input parameters\n+    description_file = self.launcher.find(package, description_file, description_dir)\n+\n+    # If the file is a URDF and no xacro arguments are provided, simply read and return the file content\n+    if type(description_file) == str and description_file.endswith('urdf') and xacro_args is None:\n+            with open(description_file) as f:\n+                urdf_xml = f.read()\n+            return urdf_xml\n+\n+    cmd = ['xacro', description_file]\n+    if xacro_args:\n+        cmd += xacro_args if isinstance(xacro_args, list) else [xacro_args]\n+    try:\n+        with subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as proc:\n+            stdout, stderr = proc.communicate() \n+\n+            if proc.returncode == 0:  \n+                return stdout  \n+            else:\n+                \n+                print(f\"Error processing xacro: {stderr}\")\n+                return None  \n+    except Exception as e:\n+        \n+        print(f\"Failed to execute xacro command: {e}\")\n+        return None\n+\n+#currently working...............................\n+    def robot_state_publisher(self, package=None, description_file=None, description_dir=None,\n+                              xacro_args=None, **node_args):\n+        '''\n+        Add a robot state publisher node to the launch tree using the given description (urdf / xacro) file.\n+\n+        * package -- is the name of the package that contains the description file (if None then assume an absolute description file)\n+        * description_file -- is the name of the urdf/xacro file\n+        * description_dir -- the name of the directory containing the file (None to have it found)\n+        * xacro_args -- arguments passed to xacro (will force use of xacro)\n+        * node_args -- any additional node arguments such as remappings or parameters\n+        '''\n+\n+        urdf_xml = robot_description(package, description_file, description_dir, xacro_args)\n+\n+        if 'parameters' in node_args:\n+            # already some parameters, change to list of dictionaries\n+            node_args['parameters'] = adapt_type(node_args['parameters'], NODE_PARAMS)\n+            + [{'robot_description': urdf_xml}]\n+        else:\n+            node_args['parameters'] = [{'robot_description': urdf_xml}]\n+\n+        # Launch the robot state publisher with the desired URDF\n+        self.launcher.node(\"robot_state_publisher\", **node_args)\n+\n+\n+    def add_gazebo(self, world_file: str, paused: bool = True):\n+        gazebo_args = {\n+            'world': world_file,\n+            'paused': 'true' if paused else 'false'\n+        }\n+        self.launcher.node(pkg='gazebo_ros', exec='gzserver', name='gazebo', node_args=gazebo_args)\n+        self.launcher.node(pkg='gazebo_ros', exec='gzclient', name='gazebo_gui')\n+"
+        }
+      ]
+    },
+    {
+      "author": "tomcreutz",
+      "date": "2025-02-18T13:11:27Z",
+      "sha": "3f24e8e322f8cde614f1b862f1914bf0e394fabf",
+      "message": "Fixes bl cli script import error",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "4b6ea5e54a33fe843df89a0331fc5fd1adf69a6e",
+          "filename": "scripts/bl",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/dfki-ric/better_launch/blob/3f24e8e322f8cde614f1b862f1914bf0e394fabf/scripts%2Fbl",
+          "raw_url": "https://github.com/dfki-ric/better_launch/raw/3f24e8e322f8cde614f1b862f1914bf0e394fabf/scripts%2Fbl",
+          "contents_url": "https://api.github.com/repos/dfki-ric/better_launch/contents/scripts%2Fbl?ref=3f24e8e322f8cde614f1b862f1914bf0e394fabf",
+          "patch": "@@ -36,9 +36,9 @@ try:\n \n     get_parameter_value = lambda s: get_parameter_value_humble(string_value=s)\n     parameter_value_to_python = lambda p: get_value_humble(parameter_value=p)\n-except:\n+except ImportError:\n     # Jazzy\n-    from rclpy import get_parameter_value, parameter_value_to_python\n+    from rclpy.parameter import get_parameter_value, parameter_value_to_python\n \n \n from better_launch import __version__"
+        }
+      ]
+    },
+    {
+      "author": "AroRobot",
+      "date": "2025-10-21T17:41:20Z",
+      "sha": "1f7f1c383a61ce1f56735f1d1026e115081a94f7",
+      "message": "fix: missing third capture group",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "a2ec55f33deacf6c11514a485bd9d563569949d6",
+          "filename": "better_launch/gazebo.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/dfki-ric/better_launch/blob/1f7f1c383a61ce1f56735f1d1026e115081a94f7/better_launch%2Fgazebo.py",
+          "raw_url": "https://github.com/dfki-ric/better_launch/raw/1f7f1c383a61ce1f56735f1d1026e115081a94f7/better_launch%2Fgazebo.py",
+          "contents_url": "https://api.github.com/repos/dfki-ric/better_launch/contents/better_launch%2Fgazebo.py?ref=1f7f1c383a61ce1f56735f1d1026e115081a94f7",
+          "patch": "@@ -574,7 +574,7 @@ def from_string(cls, bridge: str, remaps: dict[str, str] = None) -> \"GazeboBridg\n         ValueError\n             If the bridge string doesn't match the expected pattern.\n         \"\"\"\n-        m = re.match(r\"(.+)@(.+)[\\[\\]@](.+)\", bridge)\n+        m = re.match(r\"(.+)@(.+)([\\[\\]@])(.+)\", bridge)\n \n         if not m:\n             raise ValueError(bridge + \" is not a valid bridge string\")"
+        }
+      ]
+    }
+  ]
+}

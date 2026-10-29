@@ -1,0 +1,165 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T06:46:28Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "Tanneguydv",
+    "repo": "tf_tree_terminal"
+  },
+  "data": [
+    {
+      "author": "Tanneguydv",
+      "date": "2025-12-23T10:12:03Z",
+      "sha": "4d7994fe5ed1340733e2c0e9169381060339321b",
+      "message": "first commit",
+      "files_changed": 12,
+      "additions": 297,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "7e99e367f8443d86e5e8825b9fda39dfbb39630d",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/Tanneguydv/tf_tree_terminal/blob/4d7994fe5ed1340733e2c0e9169381060339321b/.gitignore",
+          "raw_url": "https://github.com/Tanneguydv/tf_tree_terminal/raw/4d7994fe5ed1340733e2c0e9169381060339321b/.gitignore",
+          "contents_url": "https://api.github.com/repos/Tanneguydv/tf_tree_terminal/contents/.gitignore?ref=4d7994fe5ed1340733e2c0e9169381060339321b",
+          "patch": "@@ -0,0 +1 @@\n+*.pyc\n\\ No newline at end of file"
+        },
+        {
+          "sha": "554af9542be9a7de651f7f92df36da8b0aa7bf40",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 21,
+          "deletions": 0,
+          "changes": 21,
+          "blob_url": "https://github.com/Tanneguydv/tf_tree_terminal/blob/4d7994fe5ed1340733e2c0e9169381060339321b/LICENSE",
+          "raw_url": "https://github.com/Tanneguydv/tf_tree_terminal/raw/4d7994fe5ed1340733e2c0e9169381060339321b/LICENSE",
+          "contents_url": "https://api.github.com/repos/Tanneguydv/tf_tree_terminal/contents/LICENSE?ref=4d7994fe5ed1340733e2c0e9169381060339321b",
+          "patch": "@@ -0,0 +1,21 @@\n+MIT License\n+\n+Copyright (c) 2025 Tanneguy de Villemagne\n+\n+Permission is hereby granted, free of charge, to any person obtaining a copy\n+of this software and associated documentation files (the \"Software\"), to deal\n+in the Software without restriction, including without limitation the rights\n+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n+copies of the Software, and to permit persons to whom the Software is\n+furnished to do so, subject to the following conditions:\n+\n+The above copyright notice and this permission notice shall be included in all\n+copies or substantial portions of the Software.\n+\n+THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n+SOFTWARE.\n\\ No newline at end of file"
+        },
+        {
+          "sha": "fc5024b3fe46e662e94c5c1f509e943f5d898867",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 59,
+          "deletions": 0,
+          "changes": 59,
+          "blob_url": "https://github.com/Tanneguydv/tf_tree_terminal/blob/4d7994fe5ed1340733e2c0e9169381060339321b/README.md",
+          "raw_url": "https://github.com/Tanneguydv/tf_tree_terminal/raw/4d7994fe5ed1340733e2c0e9169381060339321b/README.md",
+          "contents_url": "https://api.github.com/repos/Tanneguydv/tf_tree_terminal/contents/README.md?ref=4d7994fe5ed1340733e2c0e9169381060339321b",
+          "patch": "@@ -0,0 +1,59 @@\n+# TF Tree Terminal\n+\n+A simple ROS 2 Python tool that prints the current TF tree to your terminal using a recursive \"folder-like\" structure. This is useful for quickly verifying frame hierarchies without needing a GUI (Rviz) or generating PDF files.\n+\n+## Features\n+- **Terminal Based**: No GUI required.\n+- **Tree Visualization**: Uses Unicode characters (`├──`, `└──`, `│`) to show parent-child relationships clearly.\n+- **Auto-Exit**: Collects data for 2 seconds and then exits automatically.\n+- **Robust**: Handles both dictionary and list formats returned by the TF buffer across different ROS 2 versions.\n+\n+## Installation\n+\n+1. Navigate to your ROS 2 workspace:\n+   ```bash\n+   cd ~/ros2_ws/src\n+    ```\n+\n+2. Clone or move this package into the `src` folder.\n+\n+3. Build the package:\n+\n+    ```bash\n+    cd ~/ros2_ws\n+    colcon build --packages-select tf_tree_terminal\n+    source install/setup.bash\n+    ```\n+\n+## Usage\n+\n+Simply run the executable:\n+\n+    ros2 run tf_tree_terminal show\n+\n+### Saving to a file\n+To export the tree to a text file for documentation:\n+\n+    ros2 run tf_tree_terminal show ~/path/to/save/tree.txt\n+\n+### Example Output\n+\n+```text\n+--- Terminal TF Tree ---\n+map\n+└── odom\n+    └── base_footprint\n+        └── base_link\n+            ├── camera_link\n+            ├── chassis_link\n+            │   ├── front_axle\n+            │   └── rear_axle\n+            └── velodyne_link\n+------------------------\n+\n+```\n+\n+## How it works\n+\n+The node initializes a `tf2_ros` Buffer and Listener. It waits for 2 seconds to allow the buffer to fill with broadcasted transforms, parses the frame data into a recursive tree structure, and prints it using a depth-first search (DFS) algorithm to ensure correct indentation.\n+"
+        },
+        {
+          "sha": "d6be2d500f231442128da25454b0bdda3ece74d9",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/Tanneguydv/tf_tree_terminal/blob/4d7994fe5ed1340733e2c0e9169381060339321b/package.xml",
+          "raw_url": "https://github.com/Tanneguydv/tf_tree_terminal/raw/4d7994fe5ed1340733e2c0e9169381060339321b/package.xml",
+          "contents_url": "https://api.github.com/repos/Tanneguydv/tf_tree_terminal/contents/package.xml?ref=4d7994fe5ed1340733e2c0e9169381060339321b",
+          "patch": "@@ -0,0 +1,23 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n+  <name>tf_tree_terminal</name>\n+  <version>1.0.0</version>\n+  <description>A lightweight ROS 2 utility to visualize the Coordinate Transform (TF) tree directly in the terminal with a folder-style structure.</description>\n+  <maintainer email=\"tanneguydv@gmail.com\">Your Name</maintainer>\n+  <license>MIT License</license>\n+\n+  <depend>rclpy</depend>\n+  <depend>tf2_ros</depend>\n+  \n+  <exec_depend>python3-yaml</exec_depend>\n+\n+  <test_depend>ament_copyright</test_depend>\n+  <test_depend>ament_flake8</test_depend>\n+  <test_depend>ament_pep257</test_depend>\n+  <test_depend>python3-pytest</test_depend>\n+\n+  <export>\n+    <build_type>ament_python</build_type>\n+  </export>\n+</package>\n\\ No newline at end of file"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "resource/tf_tree_terminal",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/Tanneguydv/tf_tree_terminal/blob/4d7994fe5ed1340733e2c0e9169381060339321b/resource%2Ftf_tree_terminal",
+          "raw_url": "https://github.com/Tanneguydv/tf_tree_terminal/raw/4d7994fe5ed1340733e2c0e9169381060339321b/resource%2Ftf_tree_terminal",
+          "contents_url": "https://api.github.com/repos/Tanneguydv/tf_tree_terminal/contents/resource%2Ftf_tree_terminal?ref=4d7994fe5ed1340733e2c0e9169381060339321b"
+        },
+        {
+          "sha": "2f75f451d3209a937ed4668a0ea57ad5b5889cb2",
+          "filename": "setup.cfg",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/Tanneguydv/tf_tree_terminal/blob/4d7994fe5ed1340733e2c0e9169381060339321b/setup.cfg",
+          "raw_url": "https://github.com/Tanneguydv/tf_tree_terminal/raw/4d7994fe5ed1340733e2c0e9169381060339321b/setup.cfg",
+          "contents_url": "https://api.github.com/repos/Tanneguydv/tf_tree_terminal/contents/setup.cfg?ref=4d7994fe5ed1340733e2c0e9169381060339321b",
+          "patch": "@@ -0,0 +1,4 @@\n+[develop]\n+script_dir=$base/lib/tf_tree_terminal\n+[install]\n+install_scripts=$base/lib/tf_tree_terminal"
+        },
+        {
+          "sha": "6a0659d92897a3020b56cc42542d5052120d9f0b",
+          "filename": "setup.py",
+          "status": "added",
+          "additions": 26,
+          "deletions": 0,
+          "changes": 26,
+          "blob_url": "https://github.com/Tanneguydv/tf_tree_terminal/blob/4d7994fe5ed1340733e2c0e9169381060339321b/setup.py",
+          "raw_url": "https://github.com/Tanneguydv/tf_tree_terminal/raw/4d7994fe5ed1340733e2c0e9169381060339321b/setup.py",
+          "contents_url": "https://api.github.com/repos/Tanneguydv/tf_tree_terminal/contents/setup.py?ref=4d7994fe5ed1340733e2c0e9169381060339321b",
+          "patch": "@@ -0,0 +1,26 @@\n+from setuptools import find_packages, setup\n+\n+package_name = 'tf_tree_terminal'\n+\n+setup(\n+    name=package_name,\n+    version='1.0.0',\n+    packages=find_packages(exclude=['test']),\n+    data_files=[\n+        ('share/ament_index/resource_index/packages',\n+            ['resource/' + package_name]),\n+        ('share/' + package_name, ['package.xml']),\n+    ],\n+    install_requires=['setuptools'],\n+    zip_safe=True,\n+    maintainer='Tanneguy de Villemagne',\n+    maintainer_email='tanneguydv@gmail.com',\n+    description='A lightweight ROS 2 utility to visualize the Coordinate Transform (TF) tree directly in the terminal with a folder-style structure.',\n+    license='MIT License',\n+    tests_require=['pytest'],\n+    entry_points={\n+        'console_scripts': [\n+            'show = tf_tree_terminal.tree_node:main'\n+        ],\n+    },\n+)"
+        },
+        {
+          "sha": "97a39196e84db97954341162a6d2e7f771d938c0",
+          "filename": "test/test_copyright.py",
+          "status": "added",
+          "additions": 25,
+          "deletions": 0,
+          "changes": 25,
+          "blob_url": "https://github.com/Tanneguydv/tf_tree_terminal/blob/4d7994fe5ed1340733e2c0e9169381060339321b/test%2Ftest_copyright.py",
+          "raw_url": "https://github.com/Tanneguydv/tf_tree_terminal/raw/4d7994fe5ed1340733e2c0e9169381060339321b/test%2Ftest_copyright.py",
+          "contents_url": "https://api.github.com/repos/Tanneguydv/tf_tree_terminal/contents/test%2Ftest_copyright.py?ref=4d7994fe5ed1340733e2c0e9169381060339321b",
+          "patch": "@@ -0,0 +1,25 @@\n+# Copyright 2015 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_copyright.main import main\n+import pytest\n+\n+\n+# Remove the `skip` decorator once the source file(s) have a copyright header\n+@pytest.mark.skip(reason='No copyright header has been placed in the generated source file.')\n+@pytest.mark.copyright\n+@pytest.mark.linter\n+def test_copyright():\n+    rc = main(argv=['.', 'test'])\n+    assert rc == 0, 'Found errors'"
+        },
+        {
+          "sha": "27ee1078ff077cc3a0fec75b7d023101a68164d1",
+          "filename": "test/test_flake8.py",
+          "status": "added",
+          "additions": 25,
+          "deletions": 0,
+          "changes": 25,
+          "blob_url": "https://github.com/Tanneguydv/tf_tree_terminal/blob/4d7994fe5ed1340733e2c0e9169381060339321b/test%2Ftest_flake8.py",
+          "raw_url": "https://github.com/Tanneguydv/tf_tree_terminal/raw/4d7994fe5ed1340733e2c0e9169381060339321b/test%2Ftest_flake8.py",
+          "contents_url": "https://api.github.com/repos/Tanneguydv/tf_tree_terminal/contents/test%2Ftest_flake8.py?ref=4d7994fe5ed1340733e2c0e9169381060339321b",
+          "patch": "@@ -0,0 +1,25 @@\n+# Copyright 2017 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_flake8.main import main_with_errors\n+import pytest\n+\n+\n+@pytest.mark.flake8\n+@pytest.mark.linter\n+def test_flake8():\n+    rc, errors = main_with_errors(argv=[])\n+    assert rc == 0, \\\n+        'Found %d code style errors / warnings:\\n' % len(errors) + \\\n+        '\\n'.join(errors)"
+        },
+        {
+          "sha": "b234a3840f4c5bd38f043638c8622b8f240e1185",
+          "filename": "test/test_pep257.py",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/Tanneguydv/tf_tree_terminal/blob/4d7994fe5ed1340733e2c0e9169381060339321b/test%2Ftest_pep257.py",
+          "raw_url": "https://github.com/Tanneguydv/tf_tree_terminal/raw/4d7994fe5ed1340733e2c0e9169381060339321b/test%2Ftest_pep257.py",
+          "contents_url": "https://api.github.com/repos/Tanneguydv/tf_tree_terminal/contents/test%2Ftest_pep257.py?ref=4d7994fe5ed1340733e2c0e9169381060339321b",
+          "patch": "@@ -0,0 +1,23 @@\n+# Copyright 2015 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_pep257.main import main\n+import pytest\n+\n+\n+@pytest.mark.linter\n+@pytest.mark.pep257\n+def test_pep257():\n+    rc = main(argv=['.', 'test'])\n+    assert rc == 0, 'Found code style errors / warnings'"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "tf_tree_terminal/__init__.py",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/Tanneguydv/tf_tree_terminal/blob/4d7994fe5ed1340733e2c0e9169381060339321b/tf_tree_terminal%2F__init__.py",
+          "raw_url": "https://github.com/Tanneguydv/tf_tree_terminal/raw/4d7994fe5ed1340733e2c0e9169381060339321b/tf_tree_terminal%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/Tanneguydv/tf_tree_terminal/contents/tf_tree_terminal%2F__init__.py?ref=4d7994fe5ed1340733e2c0e9169381060339321b"
+        },
+        {
+          "sha": "cad35e7b346aea5254a5b41c1babe15afe7f0adb",
+          "filename": "tf_tree_terminal/tree_node.py",
+          "status": "added",
+          "additions": 90,
+          "deletions": 0,
+          "changes": 90,
+          "blob_url": "https://github.com/Tanneguydv/tf_tree_terminal/blob/4d7994fe5ed1340733e2c0e9169381060339321b/tf_tree_terminal%2Ftree_node.py",
+          "raw_url": "https://github.com/Tanneguydv/tf_tree_terminal/raw/4d7994fe5ed1340733e2c0e9169381060339321b/tf_tree_terminal%2Ftree_node.py",
+          "contents_url": "https://api.github.com/repos/Tanneguydv/tf_tree_terminal/contents/tf_tree_terminal%2Ftree_node.py?ref=4d7994fe5ed1340733e2c0e9169381060339321b",
+          "patch": "@@ -0,0 +1,90 @@\n+import rclpy\n+from rclpy.node import Node\n+from tf2_ros import Buffer, TransformListener\n+import yaml\n+import sys\n+import os\n+\n+class TFTreeTerminal(Node):\n+    def __init__(self):\n+        super().__init__('tf_tree_terminal')\n+        self.tf_buffer = Buffer()\n+        self.tf_listener = TransformListener(self.tf_buffer, self)\n+        \n+        self.get_logger().info(\"Buffering TF data for 2 seconds...\")\n+        self.timer = self.create_timer(2.0, self.timer_callback)\n+        \n+        # Check if a filename was provided as an argument\n+        self.output_file = sys.argv[1] if len(sys.argv) > 1 else None\n+\n+    def timer_callback(self):\n+        self.display_tree()\n+        raise SystemExit\n+\n+    def display_tree(self):\n+        yaml_data = self.tf_buffer.all_frames_as_yaml()\n+        \n+        if not yaml_data or yaml_data in [\"{}\", \"[]\"]:\n+            print(\"\\nNo TF tree detected.\")\n+            return\n+\n+        data = yaml.safe_load(yaml_data)\n+        tree = {}\n+        child_frames = set()\n+\n+        items = data.items() if isinstance(data, dict) else []\n+        if isinstance(data, list):\n+            for entry in data:\n+                items.extend(entry.items())\n+\n+        for frame_id, details in items:\n+            parent = details.get('parent')\n+            if parent:\n+                if parent not in tree: tree[parent] = []\n+                tree[parent].append(frame_id)\n+                child_frames.add(frame_id)\n+\n+        roots = [f for f in tree.keys() if f not in child_frames]\n+\n+        # Prepare output buffer\n+        output_lines = [\"--- ROS 2 TF Tree Snapshot ---\"]\n+        for root in roots:\n+            self._build_tree_string(root, tree, output_lines)\n+        output_lines.append(\"------------------------------\")\n+\n+        # Join lines into one string\n+        final_output = \"\\n\".join(output_lines)\n+\n+        # Print to terminal\n+        print(final_output)\n+\n+        # Save to file if requested\n+        if self.output_file:\n+            try:\n+                with open(self.output_file, 'w') as f:\n+                    f.write(final_output)\n+                print(f\"\\n[INFO] Tree saved to: {os.path.abspath(self.output_file)}\")\n+            except Exception as e:\n+                print(f\"\\n[ERROR] Could not save to file: {e}\")\n+\n+    def _build_tree_string(self, frame, tree, lines, indent=\"\", is_last=True, is_root=True):\n+        marker = \"\" if is_root else (\"└── \" if is_last else \"├── \")\n+        lines.append(f\"{indent}{marker}{frame}\")\n+\n+        new_indent = indent + (\"\" if is_root else (\"    \" if is_last else \"│   \"))\n+        \n+        if frame in tree:\n+            children = sorted(tree[frame])\n+            for i, child in enumerate(children):\n+                self._build_tree_string(child, tree, lines, new_indent, i == len(children)-1, False)\n+\n+def main():\n+    rclpy.init()\n+    node = TFTreeTerminal()\n+    try:\n+        rclpy.spin(node)\n+    except (SystemExit, KeyboardInterrupt):\n+        pass\n+    finally:\n+        node.destroy_node()\n+        rclpy.shutdown()\n\\ No newline at end of file"
+        }
+      ]
+    }
+  ]
+}

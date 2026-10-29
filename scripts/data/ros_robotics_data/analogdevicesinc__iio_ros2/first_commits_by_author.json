@@ -1,0 +1,179 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T04:36:06Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "analogdevicesinc",
+    "repo": "iio_ros2"
+  },
+  "data": [
+    {
+      "author": "Adrian-Stanea",
+      "date": "2025-02-17T11:33:19Z",
+      "sha": "9794e6aec4bf51253a35f06f36b65c2cbd7b0962",
+      "message": "package.xml: add missing dependencies\n\n- Added missing metadata for the libiio dependency. This ensures the\npackage builds correctly with the .deb file and allows for .deb generation\nin future releases within rosindex.\n\npacakge.xml: add metadata for libiio dependency\n\nSigned-off-by: Adrian-Stanea <Adrian.Stanea@analog.com>",
+      "files_changed": 1,
+      "additions": 8,
+      "deletions": 2,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "d266d60bb3b2995b521bc8a5d8c12bc6d97f6125",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 2,
+          "changes": 10,
+          "blob_url": "https://github.com/analogdevicesinc/iio_ros2/blob/9794e6aec4bf51253a35f06f36b65c2cbd7b0962/package.xml",
+          "raw_url": "https://github.com/analogdevicesinc/iio_ros2/raw/9794e6aec4bf51253a35f06f36b65c2cbd7b0962/package.xml",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/iio_ros2/contents/package.xml?ref=9794e6aec4bf51253a35f06f36b65c2cbd7b0962",
+          "patch": "@@ -9,15 +9,21 @@\n \n   <buildtool_depend>ament_cmake</buildtool_depend>\n   <buildtool_depend>rosidl_default_generators</buildtool_depend>\n+\n   <exec_depend>rosidl_default_runtime</exec_depend>\n-  <member_of_group>rosidl_interface_packages</member_of_group>\n+\n+  <depend>rosidl_typesupport_introspection_cpp</depend>\n \n   <depend>rclcpp</depend>\n-  <depend>adi_iio_interfaces</depend>\n+  <depend>std_msgs</depend>\n+  <!-- Build using rosdep key of libiio resolved by package managers -->\n+  <depend>libiio-dev</depend>\n \n   <test_depend>ament_lint_auto</test_depend>\n   <test_depend>ament_lint_common</test_depend>\n \n+  <member_of_group>rosidl_interface_packages</member_of_group>\n+\n   <export>\n     <build_type>ament_cmake</build_type>\n   </export>"
+        }
+      ]
+    },
+    {
+      "author": "adisuciu",
+      "date": "2025-01-27T13:38:51Z",
+      "sha": "fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6",
+      "message": "adi_iio: initial revision\n\nSigned-off-by: Adrian Suciu <adrian.suciu@analog.com>",
+      "files_changed": 11,
+      "additions": 678,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "607f288fe3ef240bdc4cf2777ce5eed2b6c49d1c",
+          "filename": ".gitignore",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/analogdevicesinc/iio_ros2/blob/fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6/.gitignore",
+          "raw_url": "https://github.com/analogdevicesinc/iio_ros2/raw/fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6/.gitignore",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/iio_ros2/contents/.gitignore?ref=fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6",
+          "patch": "@@ -49,3 +49,5 @@ qtcreator-*\n \n # Catkin custom files\n CATKIN_IGNORE\n+\n+.vscode/*"
+        },
+        {
+          "sha": "aba0b5e721104878705d85d09576e8053c7a382e",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 68,
+          "deletions": 0,
+          "changes": 68,
+          "blob_url": "https://github.com/analogdevicesinc/iio_ros2/blob/fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6/CMakeLists.txt",
+          "raw_url": "https://github.com/analogdevicesinc/iio_ros2/raw/fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/iio_ros2/contents/CMakeLists.txt?ref=fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6",
+          "patch": "@@ -0,0 +1,68 @@\n+cmake_minimum_required(VERSION 3.8)\n+project(adi_iio)\n+\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  add_compile_options(-Wall -Wextra -Wpedantic)\n+endif()\n+\n+# find dependencies\n+find_package(ament_cmake REQUIRED)\n+find_package(rclcpp REQUIRED)\n+find_package(std_msgs REQUIRED)\n+find_package(adi_iio_interfaces REQUIRED)\n+find_path(\n+\tIIO_INCLUDE_DIRS\n+\tNAMES iio.h\n+\tHINTS ${CMAKE_INSTALL_PREFIX}/include\n+\t      /include\n+\t      /usr/include\n+\t      /usr/local/include\n+\t      /opt/local/include\n+\t      REQUIRED\n+)\n+\n+find_library(\n+\tIIO_LIBRARIES\n+\tNAMES iio libiio\n+\tHINTS ${CMAKE_INSTALL_PREFIX}/lib\n+\t      /usr/lib\n+\t      /usr/lib64\n+\t      /usr/local/lib\n+\t      /usr/local/lib64\n+\t      /opt/local/lib\n+\t      /opt/local/lib64\n+\t      REQUIRED\n+)\n+\n+add_executable(${PROJECT_NAME} \n+\t\tsrc/iio_node.cpp \n+\t\tsrc/adi_iio.cpp \n+\t\tsrc/iio_attr_topic.cpp\n+\t\tsrc/attr_publisher.cpp)\n+\n+target_include_directories(${PROJECT_NAME} \n+\t\t\t\t\t\t\tPUBLIC ${IIO_INCLUDE_DIRS}\n+\t\t\t\t\t\t\t$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>\n+\t\t\t\t\t\t\t$<INSTALL_INTERFACE:include>)\n+target_link_libraries(${PROJECT_NAME} ${IIO_LIBRARIES})\n+ament_target_dependencies(${PROJECT_NAME} rclcpp adi_iio_interfaces std_msgs)\n+\n+install(TARGETS\n+\tadi_iio\n+  DESTINATION lib/${PROJECT_NAME}\n+)\n+\n+\n+if(BUILD_TESTING)\n+  find_package(ament_lint_auto REQUIRED)\n+  # the following line skips the linter which checks for copyrights\n+  # comment the line when a copyright and license is added to all source files\n+  set(ament_cmake_copyright_FOUND TRUE)\n+  # the following line skips cpplint (only works in a git repo)\n+  # comment the line when this package is in a git repo and when\n+  # a copyright and license is added to all source files\n+  set(ament_cmake_cpplint_FOUND TRUE)\n+  ament_lint_auto_find_test_dependencies()\n+endif()\n+\n+ament_package()"
+        },
+        {
+          "sha": "f54bc24e2146e1df371bfc988dcb81a1961b6cc1",
+          "filename": "include/adi_iio/attr_publisher.hpp",
+          "status": "added",
+          "additions": 35,
+          "deletions": 0,
+          "changes": 35,
+          "blob_url": "https://github.com/analogdevicesinc/iio_ros2/blob/fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6/include%2Fadi_iio%2Fattr_publisher.hpp",
+          "raw_url": "https://github.com/analogdevicesinc/iio_ros2/raw/fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6/include%2Fadi_iio%2Fattr_publisher.hpp",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/iio_ros2/contents/include%2Fadi_iio%2Fattr_publisher.hpp?ref=fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6",
+          "patch": "@@ -0,0 +1,35 @@\n+#ifndef ATTR_PUBLISHER_HPP\n+#define ATTR_PUBLISHER_HPP\n+\n+#include <string>\n+#include <memory>\n+#include <rclcpp/rclcpp.hpp>\n+#include <std_msgs/msg/string.hpp>\n+\n+#include \"adi_iio/iio_node.hpp\"\n+\n+#define QOS_QUEUE_SIZE 10\n+\n+class AttrPubSub {\n+    public:\n+    virtual ~AttrPubSub() {}\n+    virtual void publish(std::string msg) = 0;\n+    virtual void update(const std_msgs::msg::String & msg) = 0;\n+};\n+\n+class StringPubSub : public AttrPubSub {\n+public:\n+    StringPubSub(std::shared_ptr<IIONode> nh, UpdateCallback *up, std::string topic);\n+    virtual ~StringPubSub();\n+    void publish(std::string msg) override;\n+    void update(const std_msgs::msg::String & msg) override;\n+\n+private:\n+    std::shared_ptr<IIONode> m_nh;\n+    UpdateCallback* m_updateCallback;\n+    std::string m_topic;\n+    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr m_pub;\n+    rclcpp::Subscription<std_msgs::msg::String>::SharedPtr m_sub;\n+};\n+\n+#endif\n\\ No newline at end of file"
+        },
+        {
+          "sha": "0609ec60138b7408b3969dd9a2d080127d1d7cd0",
+          "filename": "include/adi_iio/iio_attr_topic.hpp",
+          "status": "added",
+          "additions": 50,
+          "deletions": 0,
+          "changes": 50,
+          "blob_url": "https://github.com/analogdevicesinc/iio_ros2/blob/fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6/include%2Fadi_iio%2Fiio_attr_topic.hpp",
+          "raw_url": "https://github.com/analogdevicesinc/iio_ros2/raw/fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6/include%2Fadi_iio%2Fiio_attr_topic.hpp",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/iio_ros2/contents/include%2Fadi_iio%2Fiio_attr_topic.hpp?ref=fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6",
+          "patch": "@@ -0,0 +1,50 @@\n+#ifndef IIO_ATTR_TOPIC_HPP\n+#define IIO_ATTR_TOPIC_HPP\n+\n+#include <rclcpp/rclcpp.hpp>\n+#include <std_msgs/msg/string.hpp>\n+#include <thread>\n+#include \"iio.h\"\n+#include <memory>\n+\n+class IIONode;\n+class AttrPubSub;\n+\n+class UpdateCallback {\n+    public:\n+    virtual ~UpdateCallback() {};\n+    virtual void update(std::string msg) = 0;\n+};\n+\n+class IIOAttrTopic : public UpdateCallback {\n+public:\n+    typedef enum {\n+        TYPE_STRING,\n+        TYPE_INT,\n+        TYPE_DOUBLE,\n+        TYPE_BOOL\n+    } topicType_t;\n+\n+    IIOAttrTopic(std::shared_ptr<IIONode> nh, std::string attrPath, topicType_t type, int loopRate);\n+    virtual ~IIOAttrTopic();\n+\n+    void publishingLoop();\n+    void update(std::string msg) override;\n+\n+private:\n+    std::mutex m_mutex;\n+    rclcpp::TimerBase::SharedPtr timer_;\n+\n+    std::shared_ptr<IIONode> m_nh;\n+    std::string m_attrPath;\n+    topicType_t m_topicType;\n+    std::unique_ptr<AttrPubSub> m_pub;\n+\n+    std::thread m_th;\n+    std::string last_val;\n+    bool m_stopThread;\n+    rclcpp::Rate m_loopRate;\n+\n+};\n+\n+#endif"
+        },
+        {
+          "sha": "9244fd21f8660416699084658f56432c144ff2a6",
+          "filename": "include/adi_iio/iio_node.hpp",
+          "status": "added",
+          "additions": 54,
+          "deletions": 0,
+          "changes": 54,
+          "blob_url": "https://github.com/analogdevicesinc/iio_ros2/blob/fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6/include%2Fadi_iio%2Fiio_node.hpp",
+          "raw_url": "https://github.com/analogdevicesinc/iio_ros2/raw/fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6/include%2Fadi_iio%2Fiio_node.hpp",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/iio_ros2/contents/include%2Fadi_iio%2Fiio_node.hpp?ref=fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6",
+          "patch": "@@ -0,0 +1,54 @@\n+#ifndef IIO_NODE_HPP\n+#define IIO_NODE_HPP\n+\n+#include <chrono>\n+#include <functional>\n+#include <string>\n+#include <map>\n+#include <memory>\n+\n+#include <rclcpp/rclcpp.hpp>\n+#include \"adi_iio_interfaces/srv/attr_read_string.hpp\"\n+#include \"adi_iio_interfaces/srv/attr_write_string.hpp\"\n+#include \"adi_iio_interfaces/srv/attr_enable_topic.hpp\"\n+#include \"adi_iio_interfaces/srv/attr_disable_topic.hpp\"\n+#include \"iio.h\"\n+\n+class IIOAttrTopic;\n+\n+class IIONode : public rclcpp::Node\n+{\n+public:\n+\n+  IIONode();\n+  virtual ~IIONode();\n+\n+  // service handlers\n+  bool rwAttrPath(std::string path, std::string &result, bool write = false, std::string value = \"\");\n+  void attrReadSrv(const std::shared_ptr<adi_iio_interfaces::srv::AttrReadString::Request> request,\n+            std::shared_ptr<adi_iio_interfaces::srv::AttrReadString::Response>  response);\n+\n+  void attrWriteSrv(const std::shared_ptr<adi_iio_interfaces::srv::AttrWriteString::Request> request,\n+          std::shared_ptr<adi_iio_interfaces::srv::AttrWriteString::Response>  response);\n+  \n+  void attrEnableTopicSrv(const std::shared_ptr<adi_iio_interfaces::srv::AttrEnableTopic::Request> request,\n+          std::shared_ptr<adi_iio_interfaces::srv::AttrEnableTopic::Response>  response);\n+  \n+  void attrDisableTopicSrv(const std::shared_ptr<adi_iio_interfaces::srv::AttrDisableTopic::Request> request, \n+          std::shared_ptr<adi_iio_interfaces::srv::AttrDisableTopic::Response>  response);\n+\n+\n+  // getters\n+  std::string uri();\n+  bool initialized();\n+\n+private:\n+  bool m_initialized;\n+  std::string m_uri;\n+  iio_context *m_ctx;\n+\n+  std::map<std::string, std::shared_ptr<IIOAttrTopic>> m_attrTopicMap;\n+  \n+};\n+\n+#endif\n\\ No newline at end of file"
+        },
+        {
+          "sha": "639696f886816167de4b0b8d9374274ed4e83cbd",
+          "filename": "launch/dev_adi_iio_launch.py",
+          "status": "added",
+          "additions": 16,
+          "deletions": 0,
+          "changes": 16,
+          "blob_url": "https://github.com/analogdevicesinc/iio_ros2/blob/fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6/launch%2Fdev_adi_iio_launch.py",
+          "raw_url": "https://github.com/analogdevicesinc/iio_ros2/raw/fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6/launch%2Fdev_adi_iio_launch.py",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/iio_ros2/contents/launch%2Fdev_adi_iio_launch.py?ref=fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6",
+          "patch": "@@ -0,0 +1,16 @@\n+from launch import LaunchDescription\n+from launch_ros.actions import Node\n+\n+def generate_launch_description():\n+    return LaunchDescription([\n+        Node(\n+            package='adi_iio',\n+            executable='adi_iio',\n+            name='sensor',\n+            output='screen',\n+            emulate_tty=True,\n+            parameters=[\n+                {'uri': 'ip:192.168.2.1'}\n+            ]\n+        )\n+    ])"
+        },
+        {
+          "sha": "71e3647f6b7edd7054b817a3e1e58ed8c05f34d6",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 21,
+          "deletions": 0,
+          "changes": 21,
+          "blob_url": "https://github.com/analogdevicesinc/iio_ros2/blob/fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6/package.xml",
+          "raw_url": "https://github.com/analogdevicesinc/iio_ros2/raw/fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6/package.xml",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/iio_ros2/contents/package.xml?ref=fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6",
+          "patch": "@@ -0,0 +1,21 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n+  <name>adi_iio</name>\n+  <version>1.0.0</version>\n+  <description>ROS package to interface with IIO devices </description>\n+  <maintainer email=\"adrian.suciu@analog.com\">adi</maintainer>\n+  <license>BSD</license>\n+\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+\n+  <depend>rclcpp</depend>\n+  <depend>adi_iio_interfaces</depend>\n+\n+  <test_depend>ament_lint_auto</test_depend>\n+  <test_depend>ament_lint_common</test_depend>\n+\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n+</package>"
+        },
+        {
+          "sha": "8f09a12d80fbd616cb854dc9debbbfcc5b923eaa",
+          "filename": "src/adi_iio.cpp",
+          "status": "added",
+          "additions": 44,
+          "deletions": 0,
+          "changes": 44,
+          "blob_url": "https://github.com/analogdevicesinc/iio_ros2/blob/fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6/src%2Fadi_iio.cpp",
+          "raw_url": "https://github.com/analogdevicesinc/iio_ros2/raw/fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6/src%2Fadi_iio.cpp",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/iio_ros2/contents/src%2Fadi_iio.cpp?ref=fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6",
+          "patch": "@@ -0,0 +1,44 @@\n+#include <rclcpp/rclcpp.hpp>\n+#include \"adi_iio_interfaces/srv/attr_read_string.hpp\"\n+#include \"adi_iio_interfaces/srv/attr_write_string.hpp\"\n+#include \"adi_iio/iio_node.hpp\"\n+\n+int main(int argc, char ** argv)\n+{\n+  rclcpp::init(argc, argv);\n+\n+  std::shared_ptr<IIONode> node = std::make_shared<IIONode>();\n+\n+  if (!node->initialized()) {\n+        RCLCPP_FATAL(rclcpp::get_logger(\"rclcpp\"), \"Node initialization failed.\");\n+        return EXIT_FAILURE; // Fail if the node isn't properly initialized\n+    }\n+\n+\n+  rclcpp::Service<adi_iio_interfaces::srv::AttrReadString>::SharedPtr attrReadSrv =\n+    node->create_service<adi_iio_interfaces::srv::AttrReadString>(\n+      std::string(node->get_name())+\"/AttrReadString\", \n+      std::bind(&IIONode::attrReadSrv, node, std::placeholders::_1, std::placeholders::_2));\n+\n+  rclcpp::Service<adi_iio_interfaces::srv::AttrWriteString>::SharedPtr attrWriteSrv =\n+    node->create_service<adi_iio_interfaces::srv::AttrWriteString>(\n+      std::string(node->get_name())+\"/AttrWriteString\", \n+      std::bind(&IIONode::attrWriteSrv, node, std::placeholders::_1, std::placeholders::_2));\n+\n+  rclcpp::Service<adi_iio_interfaces::srv::AttrEnableTopic>::SharedPtr attrEnableTopicSrv =\n+    node->create_service<adi_iio_interfaces::srv::AttrEnableTopic>(\n+    std::string(node->get_name())+\"/AttrEnableTopic\", \n+    std::bind(&IIONode::attrEnableTopicSrv, node, std::placeholders::_1, std::placeholders::_2));\n+\n+  rclcpp::Service<adi_iio_interfaces::srv::AttrDisableTopic>::SharedPtr attrDisableTopicSrv =\n+    node->create_service<adi_iio_interfaces::srv::AttrDisableTopic>(\n+    std::string(node->get_name())+\"/AttrDisableTopic\", \n+    std::bind(&IIONode::attrDisableTopicSrv, node, std::placeholders::_1, std::placeholders::_2));\n+\n+\n+  RCLCPP_INFO(rclcpp::get_logger(\"rclcpp\"), \"IIO Node\");\n+\n+  rclcpp::spin(node);\n+  rclcpp::shutdown();\n+  return 0;\n+}"
+        },
+        {
+          "sha": "8eeabc6cdac8d651ddead78e1bf1d0aa5cd3e831",
+          "filename": "src/attr_publisher.cpp",
+          "status": "added",
+          "additions": 34,
+          "deletions": 0,
+          "changes": 34,
+          "blob_url": "https://github.com/analogdevicesinc/iio_ros2/blob/fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6/src%2Fattr_publisher.cpp",
+          "raw_url": "https://github.com/analogdevicesinc/iio_ros2/raw/fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6/src%2Fattr_publisher.cpp",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/iio_ros2/contents/src%2Fattr_publisher.cpp?ref=fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6",
+          "patch": "@@ -0,0 +1,34 @@\n+#include \"adi_iio/iio_attr_topic.hpp\"\n+#include \"adi_iio/attr_publisher.hpp\"\n+\n+using std::placeholders::_1;\n+\n+StringPubSub::StringPubSub(std::shared_ptr<IIONode> nh, UpdateCallback *up, std::string topic)\n+{\n+  RCLCPP_INFO(rclcpp::get_logger(\"rclcpp\"), \"Created string publisher \");\n+  m_topic = topic;\n+  m_nh = nh;\n+  m_updateCallback = up;\n+  m_pub = m_nh->create_publisher<std_msgs::msg::String>(topic + \"/read\", QOS_QUEUE_SIZE);\n+  m_sub = m_nh->create_subscription<std_msgs::msg::String>(\n+       topic + \"/write\", QOS_QUEUE_SIZE, std::bind(&StringPubSub::update, this, _1));\n+}\n+\n+StringPubSub::~StringPubSub()\n+{\n+  RCLCPP_INFO(rclcpp::get_logger(\"rclcpp\"), \"Deleted string publisher \");\n+  // shared ptr lifetime should delete this publisher automatically\n+}\n+\n+void StringPubSub::publish(std::string msg)\n+{\n+  RCLCPP_INFO(rclcpp::get_logger(\"rclcpp\"), \"Publishing msg %s on topic %s\", msg.c_str(), m_topic.c_str());  \n+  auto message = std_msgs::msg::String();\n+  message.data = msg;\n+  m_pub->publish(message);\n+}\n+\n+void StringPubSub::update(const std_msgs::msg::String & msg)\n+{\n+  m_updateCallback->update(msg.data);\n+}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "c95d38756515835b746a5cdfa941dd2c75220d42",
+          "filename": "src/iio_attr_topic.cpp",
+          "status": "added",
+          "additions": 53,
+          "deletions": 0,
+          "changes": 53,
+          "blob_url": "https://github.com/analogdevicesinc/iio_ros2/blob/fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6/src%2Fiio_attr_topic.cpp",
+          "raw_url": "https://github.com/analogdevicesinc/iio_ros2/raw/fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6/src%2Fiio_attr_topic.cpp",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/iio_ros2/contents/src%2Fiio_attr_topic.cpp?ref=fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6",
+          "patch": "@@ -0,0 +1,53 @@\n+#include \"adi_iio/iio_attr_topic.hpp\"\n+#include \"adi_iio/iio_node.hpp\"\n+#include \"adi_iio/attr_publisher.hpp\"\n+#include <memory>\n+\n+IIOAttrTopic::IIOAttrTopic(std::shared_ptr<IIONode> nh, std::string attrPath, topicType_t type, int loopRate)\n+  : m_loopRate(loopRate)\n+{\n+    RCLCPP_INFO(rclcpp::get_logger(\"rclcpp\"), \"Created IIOAttrTopic\");  \n+  m_nh = nh;\n+  m_attrPath = attrPath;\n+  m_topicType = type;\n+  m_stopThread = false;\n+\n+  // Start the thread for the publishing loop\n+  m_pub = std::make_unique<StringPubSub>(m_nh, this, m_attrPath);\n+  m_th = std::thread(&IIOAttrTopic::publishingLoop, this);  \n+}\n+\n+IIOAttrTopic::~IIOAttrTopic()\n+{\n+  // Stop the thread gracefully\n+\n+  m_stopThread = true;\n+  if (m_th.joinable())\n+  {\n+    m_th.join();\n+  }\n+  RCLCPP_INFO(rclcpp::get_logger(\"rclcpp\"), \"Deleted IIOAttrTopic\");  \n+}\n+\n+void IIOAttrTopic::publishingLoop()\n+{\n+  while (rclcpp::ok() && !m_stopThread)\n+  {\n+    m_mutex.lock();\n+    \n+    std::string msg;\n+    m_nh->rwAttrPath(m_attrPath, msg);\n+    last_val = msg;\n+    m_pub->publish(msg);\n+    m_mutex.unlock();\n+    // Sleep to maintain the loop rate\n+    m_loopRate.sleep();\n+  }\n+}\n+\n+void IIOAttrTopic::update(std::string msg) {\n+  m_mutex.lock();\n+  std::string result;\n+  m_nh->rwAttrPath(m_attrPath, result, true, msg);\n+  m_mutex.unlock();\n+}"
+        },
+        {
+          "sha": "3805744487c4c9fcc1cc1c906395695eee3a5fea",
+          "filename": "src/iio_node.cpp",
+          "status": "added",
+          "additions": 301,
+          "deletions": 0,
+          "changes": 301,
+          "blob_url": "https://github.com/analogdevicesinc/iio_ros2/blob/fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6/src%2Fiio_node.cpp",
+          "raw_url": "https://github.com/analogdevicesinc/iio_ros2/raw/fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6/src%2Fiio_node.cpp",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/iio_ros2/contents/src%2Fiio_node.cpp?ref=fd6c458aefbe1a82d6d095d3c8d0fb74a8bf00e6",
+          "patch": "@@ -0,0 +1,301 @@\n+#include \"adi_iio/iio_node.hpp\"\n+#include \"adi_iio/iio_attr_topic.hpp\"\n+#include <memory>\n+\n+using namespace std::chrono_literals;\n+\n+#define MAX_ATTR_SIZE 4095\n+/*\n+BufferTopic.srv\n+\n+string buffer_path\n+int buffer_size\n+bool enable\n+---\n+bool success\n+string message\n+\n+\n+parameter\n+----\n+\"URI\"\n+\n+*/\n+\n+IIONode::IIONode() : Node(\"adi_iio_node\")\n+{\n+  m_initialized = false;\n+  this->declare_parameter<std::string>(\"uri\", \"local:\");\n+  m_uri = this->get_parameter(\"uri\").as_string();\n+\n+  m_ctx = iio_create_context_from_uri(m_uri.c_str());\n+\n+  if (m_ctx != nullptr)\n+  {\n+    RCLCPP_INFO(rclcpp::get_logger(\"rclcpp\"), \"creating context %p from uri %s\", (void*)m_ctx, m_uri.c_str());\n+    m_initialized = true;\n+  }\n+  else\n+  {\n+    RCLCPP_ERROR(rclcpp::get_logger(\"rclcpp\"), \"cannot create context from uri %s\", m_uri.c_str());\n+  }\n+}\n+\n+IIONode::~IIONode()\n+{\n+}\n+\n+bool IIONode::initialized()\n+{\n+  return m_initialized;\n+}\n+\n+bool IIONode::rwAttrPath(std::string path, std::string& result, bool write, std::string value)\n+{\n+  bool ret = false;\n+  std::string str = path;\n+  std::stringstream ss(str);\n+  std::string segment;\n+  std::vector<std::string> segments;\n+\n+  iio_device* dev = nullptr;\n+  iio_channel* ch = nullptr;\n+\n+  while (std::getline(ss, segment, '/'))\n+  {\n+    segments.push_back(segment);  // Push each part of the string into the vector\n+  }\n+\n+  char* val;\n+  char attr_val[MAX_ATTR_SIZE];\n+  int ret1;\n+  switch (segments.size())\n+  {\n+    case 1:  // context_attribute\n+      val = (char*)iio_context_get_attr_value(m_ctx, segments[0].c_str());\n+      if (val)\n+      {\n+        ret = true;\n+        result = val;\n+        RCLCPP_INFO(rclcpp::get_logger(\"rclcpp\"), \"read context attribute \\\"%s\\\" with value \\\"%s\\\"\",\n+                    segments[0].c_str(), val);\n+      }\n+      else\n+      {\n+        ret = false;\n+        result = \"\";\n+        RCLCPP_WARN(rclcpp::get_logger(\"rclcpp\"), \"could not find context attribute \\\"%s\\\"\", segments[0].c_str());\n+      }\n+\n+      if (write)\n+      {\n+        ret = false;\n+        RCLCPP_WARN(rclcpp::get_logger(\"rclcpp\"), \"context attributes cannot be written\");\n+      }\n+      break;\n+\n+    case 2:  // device_attribute\n+      dev = iio_context_find_device(m_ctx, segments[0].c_str());\n+      if (!dev)\n+      {\n+        RCLCPP_WARN(rclcpp::get_logger(\"rclcpp\"), \"could not find device \\\"%s\\\"\", segments[0].c_str());\n+        break;\n+      }\n+      if (write)\n+      {\n+        ret1 = iio_device_attr_write(dev, segments[1].c_str(), value.c_str());\n+        if (ret1 > 0)\n+        {\n+          RCLCPP_INFO(rclcpp::get_logger(\"rclcpp\"),\n+                      \"wrote device attribute \\\"%s\\\" from device \\\"%s\\\" with value \\\"%s\\\"\", segments[1].c_str(),\n+                      segments[0].c_str(), value.c_str());\n+        }\n+        else\n+        {\n+          result = strerror(-ret1);\n+          ret = false;\n+          RCLCPP_WARN(rclcpp::get_logger(\"rclcpp\"),\n+                      \"could not write attribute \\\"%s\\\" in device \\\"%s\\\" with value \\\"%s\\\" - errno %d - %s\",\n+                      segments[1].c_str(), segments[0].c_str(), value.c_str(), ret1, result.c_str());\n+          break;\n+        }\n+      }\n+\n+      ret1 = iio_device_attr_read(dev, segments[1].c_str(), attr_val, MAX_ATTR_SIZE);\n+      if (ret1 > 0)\n+      {\n+        result = attr_val;\n+        ret = true;\n+        RCLCPP_INFO(rclcpp::get_logger(\"rclcpp\"), \"read device attribute \\\"%s\\\" from device \\\"%s\\\" with value \\\"%s\\\"\",\n+                    segments[1].c_str(), segments[0].c_str(), attr_val);\n+      }\n+      else\n+      {\n+        result = strerror(-ret1);\n+        ret = false;\n+        RCLCPP_WARN(rclcpp::get_logger(\"rclcpp\"), \"could not read attribute \\\"%s\\\" in device \\\"%s\\\" - errno %d - %s\",\n+                    segments[1].c_str(), segments[0].c_str(), ret1, result.c_str());\n+      }\n+      break;\n+\n+    case 3:  // channel_attribute\n+      dev = iio_context_find_device(m_ctx, segments[0].c_str());\n+      if (!dev)\n+      {\n+        RCLCPP_WARN(rclcpp::get_logger(\"rclcpp\"), \"could not find device \\\"%s\\\"\", segments[0].c_str());\n+        break;\n+      }\n+\n+      if (segments[1].find(\"input_\") == 0)\n+      {\n+        ch = iio_device_find_channel(dev, segments[1].substr(strlen(\"input_\")).c_str(), false);\n+      }\n+      else if (segments[1].find(\"output_\") == 0)\n+      {\n+        ch = iio_device_find_channel(dev, segments[1].substr(strlen(\"output_\")).c_str(), true);\n+      }\n+      else\n+      {\n+        ch = iio_device_find_channel(dev, segments[1].c_str(), false);\n+        if (!ch)\n+        {\n+          ch = iio_device_find_channel(dev, segments[1].c_str(), true);\n+        }\n+      }\n+\n+      if (!ch)\n+      {\n+        RCLCPP_WARN(rclcpp::get_logger(\"rclcpp\"), \"could not find channel \\\"%s\\\"\", segments[1].c_str());\n+        break;\n+      }\n+\n+      if (write)\n+      {\n+        ret1 = iio_channel_attr_write(ch, segments[2].c_str(), value.c_str());\n+        if (ret1 > 0)\n+        {\n+          RCLCPP_INFO(rclcpp::get_logger(\"rclcpp\"),\n+                      \"wrote channel attribute \\\"%s\\\" from channel \\\"%s\\\" device \\\"%s\\\" with value \\\"%s\\\"\",\n+                      segments[2].c_str(), segments[1].c_str(), segments[0].c_str(), value.c_str());\n+        }\n+        else\n+        {\n+          result = strerror(-ret1);\n+          ret = false;\n+          RCLCPP_WARN(rclcpp::get_logger(\"rclcpp\"),\n+                      \"could not write attribute \\\"%s\\\" from channel \\\"%s\\\" device \\\"%s\\\" with value \\\"%s\\\"- errno %d \"\n+                      \"- %s\",\n+                      segments[2].c_str(), segments[1].c_str(), segments[0].c_str(), value.c_str(), ret1,\n+                      result.c_str());\n+          break;\n+        }\n+      }\n+\n+      ret1 = iio_channel_attr_read(ch, segments[2].c_str(), attr_val, MAX_ATTR_SIZE);\n+      if (ret1 > 0)\n+      {\n+        result = attr_val;\n+        ret = true;\n+        RCLCPP_INFO(rclcpp::get_logger(\"rclcpp\"),\n+                    \"read channel attribute \\\"%s\\\" from channel \\\"%s\\\" device \\\"%s\\\" with value \\\"%s\\\"\",\n+                    segments[2].c_str(), segments[1].c_str(), segments[0].c_str(), attr_val);\n+      }\n+      else\n+      {\n+        result = strerror(-ret1);\n+        ret = false;\n+        RCLCPP_WARN(rclcpp::get_logger(\"rclcpp\"),\n+                    \"could not read attribute \\\"%s\\\" from channel \\\"%s\\\" device \\\"%s\\\" - errno %d - %s\",\n+                    segments[2].c_str(), segments[1].c_str(), segments[0].c_str(), ret1, result.c_str());\n+      }\n+\n+      break;\n+    default:\n+      result = \"Service requires attr_path\";\n+      ret = false;\n+      break;\n+  }\n+\n+  return ret;\n+}\n+\n+void IIONode::attrReadSrv(const std::shared_ptr<adi_iio_interfaces::srv::AttrReadString::Request> request,  // CHANGE\n+                          std::shared_ptr<adi_iio_interfaces::srv::AttrReadString::Response> response)\n+{\n+  RCLCPP_INFO(rclcpp::get_logger(\"rclcpp\"), \"Service request read attr: %s\", request->attr_path.c_str());\n+  std::string result;\n+  response->success = rwAttrPath(request->attr_path, result);\n+  response->message = result;\n+}\n+\n+void IIONode::attrWriteSrv(const std::shared_ptr<adi_iio_interfaces::srv::AttrWriteString::Request> request,  // CHANGE\n+                           std::shared_ptr<adi_iio_interfaces::srv::AttrWriteString::Response> response)\n+{\n+  RCLCPP_INFO(rclcpp::get_logger(\"rclcpp\"), \"Service request write attr %s value %s\", request->attr_path.c_str(),\n+              request->value.c_str());\n+  std::string result;\n+  response->success = rwAttrPath(request->attr_path, result, true, request->value);\n+  response->message = result;\n+}\n+\n+ /*AttrTopicEnable.srv\n+  string attr_path\n+  int loop_rate\n+  ---------------\n+  bool success\n+  string message*/\n+\n+void IIONode::attrEnableTopicSrv(const std::shared_ptr<adi_iio_interfaces::srv::AttrEnableTopic::Request> request,\n+                                 std::shared_ptr<adi_iio_interfaces::srv::AttrEnableTopic::Response> response)\n+{\n+  RCLCPP_INFO(rclcpp::get_logger(\"rclcpp\"), \"Service request enable topic %s with type %s with loop_rate %d Hz\",\n+              request->attr_path.c_str(), request->attr_path.c_str(), request->loop_rate);\n+\n+  std::string result;\n+  response->success = rwAttrPath(request->attr_path, result);\n+  response->message = result;\n+\n+  if(response->success) {\n+    if(m_attrTopicMap.find(request->attr_path) != m_attrTopicMap.end()) {\n+      m_attrTopicMap.erase(request->attr_path);\n+    }\n+  \n+    m_attrTopicMap.insert({ request->attr_path,   \n+    std::make_shared<IIOAttrTopic>(std::dynamic_pointer_cast<IIONode>(shared_from_this()), request->attr_path, IIOAttrTopic::TYPE_STRING, 1)});\n+\n+    response->success = true;\n+    response->message = \"Success\";\n+  }\n+}\n+\n+  /*\n+  AttrTopicDisable.srv\n+  string attr_path\n+  ---\n+  bool success\n+  string message\n+  */\n+  \n+void IIONode::attrDisableTopicSrv(const std::shared_ptr<adi_iio_interfaces::srv::AttrDisableTopic::Request> request,\n+                                  std::shared_ptr<adi_iio_interfaces::srv::AttrDisableTopic::Response> response)\n+{\n+\n+  RCLCPP_INFO(rclcpp::get_logger(\"rclcpp\"), \"Service request disable topic %s \",\n+              request->attr_path.c_str());\n+  if(m_attrTopicMap.find(request->attr_path) != m_attrTopicMap.end()) {\n+    m_attrTopicMap.erase(request->attr_path);\n+    response->success = true;\n+    response->message = \"Success\";\n+  } else {\n+    response->success = false;\n+    response->message = \"Topic not found\";\n+  }\n+\n+\n+\n+}\n+\n+std::string IIONode::uri()\n+{\n+  return m_uri;\n+}"
+        }
+      ]
+    }
+  ]
+}

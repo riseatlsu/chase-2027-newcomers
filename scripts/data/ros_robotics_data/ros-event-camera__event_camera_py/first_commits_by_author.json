@@ -1,0 +1,179 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T04:58:38Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ros-event-camera",
+    "repo": "event_camera_py"
+  },
+  "data": [
+    {
+      "author": "berndpfrommer",
+      "date": "2022-10-20T14:08:18Z",
+      "sha": "e9d5efa0df6a36dc713842b60a8337a3fd3328fe",
+      "message": "first draft",
+      "files_changed": 8,
+      "additions": 368,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "1aa199dc981bddf6606e646c1309bf1f3a1de5e2",
+          "filename": ".clang-format",
+          "status": "added",
+          "additions": 20,
+          "deletions": 0,
+          "changes": 20,
+          "blob_url": "https://github.com/ros-event-camera/event_camera_py/blob/e9d5efa0df6a36dc713842b60a8337a3fd3328fe/.clang-format",
+          "raw_url": "https://github.com/ros-event-camera/event_camera_py/raw/e9d5efa0df6a36dc713842b60a8337a3fd3328fe/.clang-format",
+          "contents_url": "https://api.github.com/repos/ros-event-camera/event_camera_py/contents/.clang-format?ref=e9d5efa0df6a36dc713842b60a8337a3fd3328fe",
+          "patch": "@@ -0,0 +1,20 @@\n+---\n+Language: Cpp\n+BasedOnStyle: Google\n+\n+AccessModifierOffset: -2\n+AlignAfterOpenBracket: AlwaysBreak\n+BraceWrapping:\n+  AfterClass: true\n+  AfterFunction: true\n+  AfterNamespace: true\n+  AfterStruct: true\n+BreakBeforeBraces: Custom\n+ColumnLimit: 100\n+ConstructorInitializerIndentWidth: 0\n+ContinuationIndentWidth: 2\n+DerivePointerAlignment: false\n+PointerAlignment: Middle\n+ReflowComments: false\n+...\n+"
+        },
+        {
+          "sha": "b24f5e6ed0d676ec9c5f7fe45d6d62da5f102d09",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 29,
+          "deletions": 0,
+          "changes": 29,
+          "blob_url": "https://github.com/ros-event-camera/event_camera_py/blob/e9d5efa0df6a36dc713842b60a8337a3fd3328fe/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-event-camera/event_camera_py/raw/e9d5efa0df6a36dc713842b60a8337a3fd3328fe/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-event-camera/event_camera_py/contents/CMakeLists.txt?ref=e9d5efa0df6a36dc713842b60a8337a3fd3328fe",
+          "patch": "@@ -0,0 +1,29 @@\n+#\n+# Copyright 2022 Bernd Pfrommer <bernd.pfrommer@gmail.com>\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+cmake_minimum_required(VERSION 3.5)\n+project(event_array_py)\n+\n+if(DEFINED ENV{ROS_VERSION})\n+  if($ENV{ROS_VERSION} EQUAL \"2\")\n+    include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CMakeListsROS2.txt)\n+  elseif($ENV{ROS_VERSION} EQUAL \"1\")\n+    include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CMakeListsROS1.txt)\n+  else()\n+    message(ERROR \"invalid ROS_VERSION environment variable: $ENV{ROS_VERSION}\")\n+  endif()\n+else()\n+  message(ERROR \"ROS_VERSION environment variable is not set!\")\n+endif()"
+        },
+        {
+          "sha": "c8670260202a583fee5824b3faab31e3dddb82f2",
+          "filename": "cmake/CMakeListsROS1.txt",
+          "status": "added",
+          "additions": 45,
+          "deletions": 0,
+          "changes": 45,
+          "blob_url": "https://github.com/ros-event-camera/event_camera_py/blob/e9d5efa0df6a36dc713842b60a8337a3fd3328fe/cmake%2FCMakeListsROS1.txt",
+          "raw_url": "https://github.com/ros-event-camera/event_camera_py/raw/e9d5efa0df6a36dc713842b60a8337a3fd3328fe/cmake%2FCMakeListsROS1.txt",
+          "contents_url": "https://api.github.com/repos/ros-event-camera/event_camera_py/contents/cmake%2FCMakeListsROS1.txt?ref=e9d5efa0df6a36dc713842b60a8337a3fd3328fe",
+          "patch": "@@ -0,0 +1,45 @@\n+#\n+# Copyright 2022 Bernd Pfrommer <bernd.pfrommer@gmail.com>\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+set(CMAKE_CXX_STANDARD 17)\n+\n+add_compile_options(-Wall -Wextra -Wpedantic -Werror)\n+\n+add_definitions(-DUSING_ROS_1)\n+\n+find_package(catkin REQUIRED COMPONENTS\n+  pybind11_catkin\n+  event_array_msgs\n+  event_array_codecs\n+  )\n+\n+catkin_package(\n+    LIBRARIES\n+    CATKIN_DEPENDS pybind11_catkin\n+)\n+\n+include_directories(\n+  include\n+  ${catkin_INCLUDE_DIRS}\n+  )\n+\n+pybind_add_module(event_array_decoder MODULE src/decoder.cpp)\n+\n+\n+install(TARGETS\n+  event_array_decoder\n+  LIBRARY DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n+  )\n+"
+        },
+        {
+          "sha": "e72ff46678d6cd8958deac9f17aaf53088c1c091",
+          "filename": "include/event_array_py/decoder.h",
+          "status": "added",
+          "additions": 54,
+          "deletions": 0,
+          "changes": 54,
+          "blob_url": "https://github.com/ros-event-camera/event_camera_py/blob/e9d5efa0df6a36dc713842b60a8337a3fd3328fe/include%2Fevent_array_py%2Fdecoder.h",
+          "raw_url": "https://github.com/ros-event-camera/event_camera_py/raw/e9d5efa0df6a36dc713842b60a8337a3fd3328fe/include%2Fevent_array_py%2Fdecoder.h",
+          "contents_url": "https://api.github.com/repos/ros-event-camera/event_camera_py/contents/include%2Fevent_array_py%2Fdecoder.h?ref=e9d5efa0df6a36dc713842b60a8337a3fd3328fe",
+          "patch": "@@ -0,0 +1,54 @@\n+// -*-c++-*--------------------------------------------------------------------\n+// Copyright 2022 Bernd Pfrommer <bernd.pfrommer@gmail.com>\n+//\n+// Licensed under the Apache License, Version 2.0 (the \"License\");\n+// you may not use this file except in compliance with the License.\n+// You may obtain a copy of the License at\n+//\n+//     http://www.apache.org/licenses/LICENSE-2.0\n+//\n+// Unless required by applicable law or agreed to in writing, software\n+// distributed under the License is distributed on an \"AS IS\" BASIS,\n+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+// See the License for the specific language governing permissions and\n+// limitations under the License.\n+\n+#ifndef EVENT_ARRAY_PY__DECODER_H_\n+#define EVENT_ARRAY_PY__DECODER_H_\n+\n+#include <event_array_codecs/decoder.h>\n+#include <event_array_codecs/decoder_factory.h>\n+#include <event_array_py/event_cd.h>\n+#include <pybind11/numpy.h>\n+#include <pybind11/pybind11.h>\n+\n+#include <string>\n+#include <vector>\n+\n+class Decoder : public event_array_codecs::EventProcessor\n+{\n+public:\n+  Decoder();\n+  // inherited from EventProcessor\n+  void eventCD(uint64_t sensor_time, uint16_t ex, uint16_t ey, uint8_t polarity) override;\n+  void eventExtTrigger(uint64_t sensor_time, uint8_t edge, uint8_t id) override;\n+  void finished() override {}\n+  void rawData(const char *, size_t) override {}\n+  // own methods\n+  void decode(const std::string & encoding, uint64_t timeBase, pybind11::bytes);\n+  pybind11::array_t<EventCD> get_cd_events();\n+\n+  size_t get_num_cd_off() const { return (numCDEvents_[0]); }\n+  size_t get_num_cd_on() const { return (numCDEvents_[1]); }\n+  size_t get_num_trigger_rising() const { return (numTriggerEvents_[0]); }\n+  size_t get_num_trigger_falling() const { return (numTriggerEvents_[1]); }\n+\n+private:\n+  event_array_codecs::DecoderFactory<Decoder> decoderFactory_;\n+  size_t numCDEvents_[2] = {0, 0};\n+  size_t numTriggerEvents_[2] = {0, 0};\n+  std::vector<EventCD> * cdEvents_{0};\n+  size_t maxSizeCD_{0};\n+};\n+\n+#endif  // EVENT_ARRAY_PY__DECODER_H_"
+        },
+        {
+          "sha": "0990361c844b16e3e645165e9d994d230abb2084",
+          "filename": "include/event_array_py/event_cd.h",
+          "status": "added",
+          "additions": 32,
+          "deletions": 0,
+          "changes": 32,
+          "blob_url": "https://github.com/ros-event-camera/event_camera_py/blob/e9d5efa0df6a36dc713842b60a8337a3fd3328fe/include%2Fevent_array_py%2Fevent_cd.h",
+          "raw_url": "https://github.com/ros-event-camera/event_camera_py/raw/e9d5efa0df6a36dc713842b60a8337a3fd3328fe/include%2Fevent_array_py%2Fevent_cd.h",
+          "contents_url": "https://api.github.com/repos/ros-event-camera/event_camera_py/contents/include%2Fevent_array_py%2Fevent_cd.h?ref=e9d5efa0df6a36dc713842b60a8337a3fd3328fe",
+          "patch": "@@ -0,0 +1,32 @@\n+// -*-c++-*--------------------------------------------------------------------\n+// Copyright 2022 Bernd Pfrommer <bernd.pfrommer@gmail.com>\n+//\n+// Licensed under the Apache License, Version 2.0 (the \"License\");\n+// you may not use this file except in compliance with the License.\n+// You may obtain a copy of the License at\n+//\n+//     http://www.apache.org/licenses/LICENSE-2.0\n+//\n+// Unless required by applicable law or agreed to in writing, software\n+// distributed under the License is distributed on an \"AS IS\" BASIS,\n+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+// See the License for the specific language governing permissions and\n+// limitations under the License.\n+\n+#ifndef EVENT_ARRAY_PY__EVENT_CD_H_\n+#define EVENT_ARRAY_PY__EVENT_CD_H_\n+\n+#include <cstdint>\n+\n+struct EventCD\n+{\n+  EventCD(uint16_t xa = 0, uint16_t ya = 0, int8_t pa = 0, int32_t ta = 0)\n+  : x(xa), y(ya), p(pa), t(ta)\n+  {\n+  }\n+  uint16_t x;\n+  uint16_t y;\n+  int8_t p;\n+  int32_t t;\n+};\n+#endif  // EVENT_ARRAY_PY__EVENT_CD_H_"
+        },
+        {
+          "sha": "51f5421cb3fef723c92e0c1edb16ac042c502903",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 46,
+          "deletions": 0,
+          "changes": 46,
+          "blob_url": "https://github.com/ros-event-camera/event_camera_py/blob/e9d5efa0df6a36dc713842b60a8337a3fd3328fe/package.xml",
+          "raw_url": "https://github.com/ros-event-camera/event_camera_py/raw/e9d5efa0df6a36dc713842b60a8337a3fd3328fe/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-event-camera/event_camera_py/contents/package.xml?ref=e9d5efa0df6a36dc713842b60a8337a3fd3328fe",
+          "patch": "@@ -0,0 +1,46 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n+  <name>event_array_py</name>\n+  <version>1.0.0</version>\n+  <description>Python access for event_array_msgs.</description>\n+  <maintainer email=\"bernd.pfrommer@gmail.com\">Bernd Pfrommer</maintainer>\n+  <license>Apache License 2.0</license>\n+  <author email=\"bernd.pfrommer@gmail.com\">Bernd Pfrommer</author>\n+\n+  <!-- ROS2 dependencies -->\n+  <buildtool_depend condition=\"$ROS_VERSION == 2\">ament_cmake</buildtool_depend>\n+  <buildtool_depend condition=\"$ROS_VERSION == 2\">ament_cmake_ros</buildtool_depend>\n+  <buildtool_depend condition=\"$ROS_VERSION == 2\">ament_cmake_auto</buildtool_depend>\n+  <test_depend condition=\"$ROS_VERSION == 2\">ament_lint_auto</test_depend>\n+  <test_depend condition=\"$ROS_VERSION == 2\">ament_lint_common</test_depend>\n+\n+  <!-- ROS1 dependencies -->\n+  <buildtool_depend condition=\"$ROS_VERSION == 1\">catkin</buildtool_depend>\n+  <build_depend condition=\"$ROS_VERSION == 1\">pybind11_catkin</build_depend>\n+  <exec_depend condition=\"$ROS_VERSION == 1\">pybind11_catkin</exec_depend>\n+\n+  <!--\n+  <buildtool_depend>python_cmake_module</buildtool_depend>\n+  <build_depend>pybind11_vendor</build_depend>\n+  -->\n+\n+  <!--\n+  <exec_depend>ament_index_python</exec_depend>\n+  <exec_depend>rpyutils</exec_depend>\n+\n+  <test_depend>python3-pytest</test_depend>\n+  <doc_depend>python3-sphinx</doc_depend>\n+  <doc_depend>python3-sphinx-rtd-theme</doc_depend>\n+  -->\n+\n+  <!-- common ROS1/ROS2 dependencies -->\n+  <depend>event_array_msgs</depend>\n+  <depend>event_array_codecs</depend>\n+\n+  <export>\n+    <!-- this is crucial else the package will not be registered! -->\n+    <build_type condition=\"$ROS_VERSION == 1\">catkin</build_type>\n+    <build_type condition=\"$ROS_VERSION == 2\">ament_cmake</build_type>\n+  </export>\n+</package>"
+        },
+        {
+          "sha": "7284f07e6762ef3432210c74cfcd84fbff3391b9",
+          "filename": "src/decoder.cpp",
+          "status": "added",
+          "additions": 89,
+          "deletions": 0,
+          "changes": 89,
+          "blob_url": "https://github.com/ros-event-camera/event_camera_py/blob/e9d5efa0df6a36dc713842b60a8337a3fd3328fe/src%2Fdecoder.cpp",
+          "raw_url": "https://github.com/ros-event-camera/event_camera_py/raw/e9d5efa0df6a36dc713842b60a8337a3fd3328fe/src%2Fdecoder.cpp",
+          "contents_url": "https://api.github.com/repos/ros-event-camera/event_camera_py/contents/src%2Fdecoder.cpp?ref=e9d5efa0df6a36dc713842b60a8337a3fd3328fe",
+          "patch": "@@ -0,0 +1,89 @@\n+// -*-c++-*--------------------------------------------------------------------\r\n+// Copyright 2022 Bernd Pfrommer <bernd.pfrommer@gmail.com>\r\n+//\r\n+// Licensed under the Apache License, Version 2.0 (the \"License\");\r\n+// you may not use this file except in compliance with the License.\r\n+// You may obtain a copy of the License at\r\n+//\r\n+//     http://www.apache.org/licenses/LICENSE-2.0\r\n+//\r\n+// Unless required by applicable law or agreed to in writing, software\r\n+// distributed under the License is distributed on an \"AS IS\" BASIS,\r\n+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\r\n+// See the License for the specific language governing permissions and\r\n+// limitations under the License.\r\n+\r\n+#include <event_array_codecs/decoder.h>\r\n+#include <event_array_py/decoder.h>\r\n+#include <pybind11/numpy.h>\r\n+#include <pybind11/pybind11.h>\r\n+\r\n+#include <cstdint>\r\n+#include <iostream>\r\n+\r\n+Decoder::Decoder() {}\r\n+\r\n+void Decoder::decode(const std::string & encoding, uint64_t timeBase, pybind11::bytes events)\r\n+{\r\n+  auto decoder = decoderFactory_.getInstance(encoding);\r\n+  if (decoder) {\r\n+    decoder->setTimeBase(timeBase);\r\n+    decoder->setTimeMultiplier(1);  // report in usecs instead of nanoseconds\r\n+    const size_t bufSize = PyByteArray_GET_SIZE(events.ptr());\r\n+    // for some reason this returns a bad pointer\r\n+    // const uint8_t *buf = reinterpret_cast<uint8_t *>(PyByteArray_AsString(events.ptr()));\r\n+    // TODO(Bernd): avoid the memory copy here\r\n+    const std::string foo(events);  // creates unnecessary copy!\r\n+    delete cdEvents_;               // in case events have not been picked up\r\n+    cdEvents_ = new std::vector<EventCD>();\r\n+    // TODO(Bernd): use hack here to avoid initializing the memory\r\n+    cdEvents_->reserve(maxSizeCD_);\r\n+    const uint8_t * buf = reinterpret_cast<const uint8_t *>(&foo[0]);\r\n+    decoder->decode(buf, bufSize, this);\r\n+  }\r\n+}\r\n+\r\n+pybind11::array_t<EventCD> Decoder::get_cd_events()\r\n+{\r\n+  if (cdEvents_) {\r\n+    auto p = cdEvents_;\r\n+    auto cap =\r\n+      pybind11::capsule(p, [](void * v) { delete reinterpret_cast<std::vector<EventCD> *>(v); });\r\n+    cdEvents_ = 0;  // clear out\r\n+    return (pybind11::array_t<EventCD>(p->size(), p->data(), cap));\r\n+  }\r\n+  return (pybind11::array_t<EventCD>());\r\n+}\r\n+\r\n+void Decoder::eventCD(uint64_t sensor_time, uint16_t ex, uint16_t ey, uint8_t polarity)\r\n+{\r\n+  cdEvents_->push_back(EventCD(ex, ey, polarity, sensor_time / 1000));\r\n+  maxSizeCD_ = std::max(cdEvents_->size(), maxSizeCD_);\r\n+  numCDEvents_[std::min(polarity, uint8_t(1))]++;\r\n+}\r\n+\r\n+void Decoder::eventExtTrigger(uint64_t sensor_time, uint8_t edge, uint8_t id)\r\n+{\r\n+  (void)sensor_time;\r\n+  (void)edge;\r\n+  (void)id;\r\n+  numTriggerEvents_[std::min(edge, uint8_t(1))]++;\r\n+}\r\n+\r\n+PYBIND11_MODULE(event_array_decoder, m)\r\n+{\r\n+  PYBIND11_NUMPY_DTYPE(EventCD, x, y, p, t);\r\n+\r\n+  pybind11::class_<Decoder>(m, \"Decoder\")\r\n+    .def(pybind11::init<>())\r\n+    .def(\"decode\", &Decoder::decode, \"Decode event array message\")\r\n+    .def(\"get_cd_events\", &Decoder::get_cd_events, \"Get decoded CD events\")\r\n+    .def(\"get_num_cd_on\", &Decoder::get_num_cd_on, \"Get number of ON events\")\r\n+    .def(\"get_num_cd_off\", &Decoder::get_num_cd_off, \"Get number of OFF events\")\r\n+    .def(\r\n+      \"get_num_trigger_rising\", &Decoder::get_num_trigger_rising,\r\n+      \"Get number of rising edge trigger events\")\r\n+    .def(\r\n+      \"get_num_trigger_falling\", &Decoder::get_num_trigger_falling,\r\n+      \"Get number of falling edge trigger events\");\r\n+}\r"
+        },
+        {
+          "sha": "6c8026c75f8b07c01c2f9e79da812577667c746f",
+          "filename": "src/decoder_test_ros1.py",
+          "status": "added",
+          "additions": 53,
+          "deletions": 0,
+          "changes": 53,
+          "blob_url": "https://github.com/ros-event-camera/event_camera_py/blob/e9d5efa0df6a36dc713842b60a8337a3fd3328fe/src%2Fdecoder_test_ros1.py",
+          "raw_url": "https://github.com/ros-event-camera/event_camera_py/raw/e9d5efa0df6a36dc713842b60a8337a3fd3328fe/src%2Fdecoder_test_ros1.py",
+          "contents_url": "https://api.github.com/repos/ros-event-camera/event_camera_py/contents/src%2Fdecoder_test_ros1.py?ref=e9d5efa0df6a36dc713842b60a8337a3fd3328fe",
+          "patch": "@@ -0,0 +1,53 @@\n+#!/usr/bin/env python3\n+# -----------------------------------------------------------------------------\n+# Copyright 2022 Bernd Pfrommer <bernd.pfrommer@gmail.com>\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+#\n+#\n+\"\"\"Test decoder on data.\"\"\"\n+\n+import argparse\n+import rosbag\n+import time\n+from event_array_decoder import Decoder\n+\n+\n+def test_decoder(fname, topic):\n+    bag = rosbag.Bag(fname)\n+    decoder = Decoder()\n+    t0 = time.time()\n+    for topic, msg, t in bag.read_messages(topics=topic):\n+        decoder.decode(msg.encoding, msg.time_base, msg.events)\n+        events = decoder.get_cd_events()\n+        print(events)\n+    t1 = time.time()\n+    bag.close()\n+    print(f\"ON events: {decoder.get_num_cd_on()} \",\n+          f\"OFF events: {decoder.get_num_cd_off()}\")\n+    n = decoder.get_num_cd_on() + decoder.get_num_cd_off()\n+    dt = t1 - t0\n+    rate = n / dt\n+    print(f\"Total events: {n} in time: {dt:3f} rate: {rate * 1e-6} Mevs\")\n+\n+\n+if __name__ == '__main__':\n+    parser = argparse.ArgumentParser(\n+        description='read and decode events from bag.')\n+    parser.add_argument('--bag', '-b', action='store', default=None,\n+                        required=True, help='bag file to read events from')\n+    parser.add_argument('--topic', help='Event topic to read',\n+                        default='/event_camera/events', type=str)\n+    args = parser.parse_args()\n+\n+    test_decoder(args.bag, args.topic)"
+        }
+      ]
+    },
+    {
+      "author": "k-chaney",
+      "date": "2023-08-18T14:40:27Z",
+      "sha": "c87de22dc1459adfa0611410c1c8d5f403acc5e8",
+      "message": "Updated decode function to zero copy\n\n- updated decode function to what should be a zero copy\n  - grab the base pointer from the original object type instead of\n    casting to a numpy array first\n\n- Expanded tests for ros1\n  - Now includes decode, decode_bytes, and decode_array",
+      "files_changed": 2,
+      "additions": 100,
+      "deletions": 11,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "6a15899c1b2f83ef3c83f0d1f323a889193b009b",
+          "filename": "include/event_camera_py/decoder.h",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 3,
+          "changes": 8,
+          "blob_url": "https://github.com/ros-event-camera/event_camera_py/blob/c87de22dc1459adfa0611410c1c8d5f403acc5e8/include%2Fevent_camera_py%2Fdecoder.h",
+          "raw_url": "https://github.com/ros-event-camera/event_camera_py/raw/c87de22dc1459adfa0611410c1c8d5f403acc5e8/include%2Fevent_camera_py%2Fdecoder.h",
+          "contents_url": "https://api.github.com/repos/ros-event-camera/event_camera_py/contents/include%2Fevent_camera_py%2Fdecoder.h?ref=c87de22dc1459adfa0611410c1c8d5f403acc5e8",
+          "patch": "@@ -35,11 +35,13 @@ class Decoder\n   Decoder() = default;\n   void decode(pybind11::object msg)\n   {\n-    pybind11::array_t<uint8_t> events = get_attr<pybind11::array_t<uint8_t>>(msg, \"events\");\n+    pybind11::bytes event_bytes = get_attr<pybind11::bytes>(msg, \"events\");\n+    const uint8_t * buf = reinterpret_cast<const uint8_t *>(PyBytes_AsString(event_bytes.ptr()));\n+\n     do_full_decode(\n       get_attr<std::string>(msg, \"encoding\"), get_attr<uint32_t>(msg, \"width\"),\n-      get_attr<uint32_t>(msg, \"height\"), get_attr<uint64_t>(msg, \"time_base\"), events.data(),\n-      events.size());\n+      get_attr<uint32_t>(msg, \"height\"), get_attr<uint64_t>(msg, \"time_base\"), buf,\n+      PyBytes_Size(event_bytes.ptr()));\n   }\n \n   std::tuple<bool, uint64_t> decode_until(pybind11::object msg, uint64_t untilTime)"
+        },
+        {
+          "sha": "254fb55a2d589084ab825e51fca2030c7ad9d16f",
+          "filename": "tests/test_ros1_1.py",
+          "status": "modified",
+          "additions": 95,
+          "deletions": 8,
+          "changes": 103,
+          "blob_url": "https://github.com/ros-event-camera/event_camera_py/blob/c87de22dc1459adfa0611410c1c8d5f403acc5e8/tests%2Ftest_ros1_1.py",
+          "raw_url": "https://github.com/ros-event-camera/event_camera_py/raw/c87de22dc1459adfa0611410c1c8d5f403acc5e8/tests%2Ftest_ros1_1.py",
+          "contents_url": "https://api.github.com/repos/ros-event-camera/event_camera_py/contents/tests%2Ftest_ros1_1.py?ref=c87de22dc1459adfa0611410c1c8d5f403acc5e8",
+          "patch": "@@ -18,10 +18,35 @@\n import numpy as np\n from event_camera_py import Decoder\n \n+def test_decode(bag, topic):\n+    decoder = Decoder()\n+    num_on_events = 0\n+    num_off_events = 0\n+    num_up_trig = 0\n+    num_down_trig = 0\n+    sum_time = 0\n+    for topic, msg, t in bag.read_messages(topics=topic):\n+        decoder.decode(msg)\n+        cd_events = decoder.get_cd_events()\n+        trig_events = decoder.get_ext_trig_events()\n+        if cd_events.shape[0] > 0:\n+            num_off_events += np.count_nonzero(cd_events['p'] == 0)\n+            num_on_events += np.count_nonzero(cd_events['p'] == 1)\n+            sum_time += np.sum(cd_events['t'])\n+        if trig_events.shape[0] > 0:\n+            num_up_trig += np.count_nonzero(trig_events['p'] == 0)\n+            num_down_trig += np.count_nonzero(trig_events['p'] == 1)\n+            sum_time += np.sum(trig_events['t'])\n \n-def test_readbag():\n-    topic = '/event_camera/events'\n-    bag = rosbag.Bag('tests/test_events_ros1_1.bag')\n+    return {\n+            \"num_off_events\": num_off_events,\n+            \"num_on_events\": num_on_events,\n+            \"num_up_trig\": num_up_trig,\n+            \"num_down_trig\": num_down_trig,\n+            \"sum_time\": sum_time,\n+           }\n+\n+def test_decode_bytes(bag, topic):\n     decoder = Decoder()\n     num_on_events = 0\n     num_off_events = 0\n@@ -42,8 +67,70 @@ def test_readbag():\n             num_down_trig += np.count_nonzero(trig_events['p'] == 1)\n             sum_time += np.sum(trig_events['t'])\n \n-    assert(num_off_events == 218291)\n-    assert(num_on_events == 125183)\n-    assert(num_up_trig == 2078)\n-    assert(num_down_trig == 2079)\n-    assert(sum_time == 2885601049874)\n+    return {\n+            \"num_off_events\": num_off_events,\n+            \"num_on_events\": num_on_events,\n+            \"num_up_trig\": num_up_trig,\n+            \"num_down_trig\": num_down_trig,\n+            \"sum_time\": sum_time,\n+           }\n+\n+def test_decode_array(bag, topic):\n+    decoder = Decoder()\n+    num_on_events = 0\n+    num_off_events = 0\n+    num_up_trig = 0\n+    num_down_trig = 0\n+    sum_time = 0\n+    for topic, msg, t in bag.read_messages(topics=topic):\n+        decoder.decode_array(msg.encoding, msg.width, msg.height,\n+                             msg.time_base, np.frombuffer(msg.events, dtype=np.uint8))\n+        cd_events = decoder.get_cd_events()\n+        trig_events = decoder.get_ext_trig_events()\n+        if cd_events.shape[0] > 0:\n+            num_off_events += np.count_nonzero(cd_events['p'] == 0)\n+            num_on_events += np.count_nonzero(cd_events['p'] == 1)\n+            sum_time += np.sum(cd_events['t'])\n+        if trig_events.shape[0] > 0:\n+            num_up_trig += np.count_nonzero(trig_events['p'] == 0)\n+            num_down_trig += np.count_nonzero(trig_events['p'] == 1)\n+            sum_time += np.sum(trig_events['t'])\n+\n+    return {\n+            \"num_off_events\": num_off_events,\n+            \"num_on_events\": num_on_events,\n+            \"num_up_trig\": num_up_trig,\n+            \"num_down_trig\": num_down_trig,\n+            \"sum_time\": sum_time,\n+           }\n+\n+def test_readbag(verbose=False):\n+    if verbose:\n+        print(\"Starting ROS1 read test\")\n+\n+    topic = '/event_camera/events'\n+    bag_name = 'tests/test_events_ros1_1.bag'\n+    if verbose:\n+        print(\"Opening bag :: \" + bag_name)\n+\n+    bag = rosbag.Bag('tests/test_events_ros1_1.bag')\n+\n+    tests = {\n+            \"decode\": test_decode(bag, topic),\n+            \"decode_bytes\": test_decode_bytes(bag, topic),\n+            \"decode_array\": test_decode_array(bag, topic),\n+            }\n+\n+    for method, result in tests.items():\n+        if verbose:\n+            print(\"Results :: [%s]\" % method)\n+            print(result)\n+\n+        assert(result['num_off_events'] == 218291)\n+        assert(result['num_on_events'] == 125183)\n+        assert(result['num_up_trig'] == 2078)\n+        assert(result['num_down_trig'] == 2079)\n+        assert(result['sum_time'] == 2885601049874)\n+\n+if __name__ == \"__main__\":\n+    test_readbag(True)"
+        }
+      ]
+    },
+    {
+      "author": "fcladera",
+      "date": "2023-02-09T04:34:34Z",
+      "sha": "a24b8e332eb1e6bf74ed691b7b6d4c13b4bfbb8b",
+      "message": "events type is bytes, not bytearray",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "7f1fcdfa6f566be9d28f227b455637c48ff08448",
+          "filename": "src/decoder.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-event-camera/event_camera_py/blob/a24b8e332eb1e6bf74ed691b7b6d4c13b4bfbb8b/src%2Fdecoder.cpp",
+          "raw_url": "https://github.com/ros-event-camera/event_camera_py/raw/a24b8e332eb1e6bf74ed691b7b6d4c13b4bfbb8b/src%2Fdecoder.cpp",
+          "contents_url": "https://api.github.com/repos/ros-event-camera/event_camera_py/contents/src%2Fdecoder.cpp?ref=a24b8e332eb1e6bf74ed691b7b6d4c13b4bfbb8b",
+          "patch": "@@ -32,7 +32,7 @@ void Decoder::decode_bytes(\n   if (decoder) {\n     decoder->setTimeBase(timeBase);\n     decoder->setTimeMultiplier(1);  // report in usecs instead of nanoseconds\n-    const size_t bufSize = PyByteArray_GET_SIZE(events.ptr());\n+    const size_t bufSize = PyBytes_Size(events.ptr());\n     // for some reason this returns a bad pointer\n     // const uint8_t *buf = reinterpret_cast<uint8_t *>(PyByteArray_AsString(events.ptr()));\n     // TODO(Bernd): avoid the memory copy here"
+        }
+      ]
+    }
+  ]
+}

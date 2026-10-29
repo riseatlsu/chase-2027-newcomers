@@ -1,0 +1,742 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T05:57:55Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "PickNikRobotics",
+    "repo": "pick_ik"
+  },
+  "data": [
+    {
+      "author": "riv-mjohnson",
+      "date": "2025-01-14T02:44:32Z",
+      "sha": "b30065814650fec70e8e5185b9861c2198dfe0c3",
+      "message": "Adds header file for pick_ik_plugin (#79)",
+      "files_changed": 2,
+      "additions": 451,
+      "deletions": 369,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "79f3b8168466a43c75d3225671fde0cb72bfa159",
+          "filename": "include/pick_ik/pick_ik_plugin.hpp",
+          "status": "added",
+          "additions": 105,
+          "deletions": 0,
+          "changes": 105,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/b30065814650fec70e8e5185b9861c2198dfe0c3/include%2Fpick_ik%2Fpick_ik_plugin.hpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/b30065814650fec70e8e5185b9861c2198dfe0c3/include%2Fpick_ik%2Fpick_ik_plugin.hpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/include%2Fpick_ik%2Fpick_ik_plugin.hpp?ref=b30065814650fec70e8e5185b9861c2198dfe0c3",
+          "patch": "@@ -0,0 +1,105 @@\n+#pragma once\n+\n+#include <pick_ik/robot.hpp>\n+\n+#include <moveit/kinematics_base/kinematics_base.h>\n+\n+namespace pick_ik {\n+\n+class ParamListener;\n+\n+class PickIKPlugin : public kinematics::KinematicsBase {\n+    rclcpp::Node::SharedPtr node_;\n+    std::shared_ptr<ParamListener> parameter_listener_;\n+    moveit::core::JointModelGroup const* jmg_;\n+\n+    std::vector<std::string> joint_names_;\n+    std::vector<std::string> link_names_;\n+    std::vector<size_t> tip_link_indices_;\n+    Robot robot_;\n+\n+    mutable std::mutex fk_mutex_;\n+\n+   public:\n+    virtual bool initialize(rclcpp::Node::SharedPtr const& node,\n+                            moveit::core::RobotModel const& robot_model,\n+                            std::string const& group_name,\n+                            std::string const& base_frame,\n+                            std::vector<std::string> const& tip_frames,\n+                            double search_discretization);\n+\n+    virtual bool searchPositionIK(\n+        std::vector<geometry_msgs::msg::Pose> const& ik_poses,\n+        std::vector<double> const& ik_seed_state,\n+        double timeout,\n+        std::vector<double> const&,\n+        std::vector<double>& solution,\n+        IKCallbackFn const& solution_callback,\n+        IKCostFn const& cost_function,\n+        moveit_msgs::msg::MoveItErrorCodes& error_code,\n+        kinematics::KinematicsQueryOptions const& options = kinematics::KinematicsQueryOptions(),\n+        moveit::core::RobotState const* context_state = nullptr) const;\n+\n+    virtual std::vector<std::string> const& getJointNames() const;\n+\n+    virtual std::vector<std::string> const& getLinkNames() const;\n+\n+    virtual bool getPositionFK(std::vector<std::string> const&,\n+                               std::vector<double> const&,\n+                               std::vector<geometry_msgs::msg::Pose>&) const;\n+\n+    virtual bool getPositionIK(geometry_msgs::msg::Pose const&,\n+                               std::vector<double> const&,\n+                               std::vector<double>&,\n+                               moveit_msgs::msg::MoveItErrorCodes&,\n+                               kinematics::KinematicsQueryOptions const&) const;\n+\n+    virtual bool searchPositionIK(geometry_msgs::msg::Pose const& ik_pose,\n+                                  std::vector<double> const& ik_seed_state,\n+                                  double timeout,\n+                                  std::vector<double>& solution,\n+                                  moveit_msgs::msg::MoveItErrorCodes& error_code,\n+                                  kinematics::KinematicsQueryOptions const& options =\n+                                      kinematics::KinematicsQueryOptions()) const;\n+\n+    virtual bool searchPositionIK(geometry_msgs::msg::Pose const& ik_pose,\n+                                  std::vector<double> const& ik_seed_state,\n+                                  double timeout,\n+                                  std::vector<double> const& consistency_limits,\n+                                  std::vector<double>& solution,\n+                                  moveit_msgs::msg::MoveItErrorCodes& error_code,\n+                                  kinematics::KinematicsQueryOptions const& options =\n+                                      kinematics::KinematicsQueryOptions()) const;\n+\n+    virtual bool searchPositionIK(geometry_msgs::msg::Pose const& ik_pose,\n+                                  std::vector<double> const& ik_seed_state,\n+                                  double timeout,\n+                                  std::vector<double>& solution,\n+                                  IKCallbackFn const& solution_callback,\n+                                  moveit_msgs::msg::MoveItErrorCodes& error_code,\n+                                  kinematics::KinematicsQueryOptions const& options =\n+                                      kinematics::KinematicsQueryOptions()) const;\n+\n+    virtual bool searchPositionIK(geometry_msgs::msg::Pose const& ik_pose,\n+                                  std::vector<double> const& ik_seed_state,\n+                                  double timeout,\n+                                  std::vector<double> const& consistency_limits,\n+                                  std::vector<double>& solution,\n+                                  IKCallbackFn const& solution_callback,\n+                                  moveit_msgs::msg::MoveItErrorCodes& error_code,\n+                                  kinematics::KinematicsQueryOptions const& options =\n+                                      kinematics::KinematicsQueryOptions()) const;\n+\n+    virtual bool searchPositionIK(\n+        std::vector<geometry_msgs::msg::Pose> const& ik_poses,\n+        std::vector<double> const& ik_seed_state,\n+        double timeout,\n+        std::vector<double> const& consistency_limits,\n+        std::vector<double>& solution,\n+        IKCallbackFn const& solution_callback,\n+        moveit_msgs::msg::MoveItErrorCodes& error_code,\n+        kinematics::KinematicsQueryOptions const& options = kinematics::KinematicsQueryOptions(),\n+        moveit::core::RobotState const* context_state = NULL) const;\n+};\n+\n+}  // namespace pick_ik"
+        },
+        {
+          "sha": "c322beb2eecedbaecd8ee58f02e3f5ad42b9c512",
+          "filename": "src/pick_ik_plugin.cpp",
+          "status": "modified",
+          "additions": 346,
+          "deletions": 369,
+          "changes": 715,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/b30065814650fec70e8e5185b9861c2198dfe0c3/src%2Fpick_ik_plugin.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/b30065814650fec70e8e5185b9861c2198dfe0c3/src%2Fpick_ik_plugin.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/src%2Fpick_ik_plugin.cpp?ref=b30065814650fec70e8e5185b9861c2198dfe0c3",
+          "patch": "@@ -2,14 +2,13 @@\n #include <pick_ik/goal.hpp>\n #include <pick_ik/ik_gradient.hpp>\n #include <pick_ik/ik_memetic.hpp>\n-#include <pick_ik/robot.hpp>\n+#include <pick_ik/pick_ik_plugin.hpp>\n \n #include <pick_ik_parameters.hpp>\n #include <pluginlib/class_list_macros.hpp>\n #include <rclcpp/rclcpp.hpp>\n \n #include <chrono>\n-#include <moveit/kinematics_base/kinematics_base.h>\n #include <moveit/robot_model/joint_model_group.h>\n #include <moveit/robot_state/robot_state.h>\n #include <string>\n@@ -20,408 +19,386 @@ namespace {\n auto const LOGGER = rclcpp::get_logger(\"pick_ik\");\n }\n \n-class PickIKPlugin : public kinematics::KinematicsBase {\n-    rclcpp::Node::SharedPtr node_;\n-    std::shared_ptr<ParamListener> parameter_listener_;\n-    moveit::core::JointModelGroup const* jmg_;\n-\n-    std::vector<std::string> joint_names_;\n-    std::vector<std::string> link_names_;\n-    std::vector<size_t> tip_link_indices_;\n-    Robot robot_;\n-\n-    mutable std::mutex fk_mutex_;\n-\n-   public:\n-    virtual bool initialize(rclcpp::Node::SharedPtr const& node,\n-                            moveit::core::RobotModel const& robot_model,\n-                            std::string const& group_name,\n-                            std::string const& base_frame,\n-                            std::vector<std::string> const& tip_frames,\n-                            double search_discretization) {\n-        node_ = node;\n-        parameter_listener_ = std::make_shared<ParamListener>(\n-            node,\n-            std::string(\"robot_description_kinematics.\").append(group_name));\n-\n-        // Initialize internal state of base class KinematicsBase\n-        // Creates these internal state variables:\n-        // robot_model_ <- shared_ptr to RobotModel\n-        // robot_description_ <- empty string\n-        // group_name_ <- group_name string\n-        // base_frame_ <- base_frame without leading /\n-        // tip_frames_ <- tip_frames without leading /\n-        // redundant_joint_discretization_ <- vector initialized with\n-        // search_discretization\n-        storeValues(robot_model, group_name, base_frame, tip_frames, search_discretization);\n-\n-        // Initialize internal state\n-        jmg_ = robot_model_->getJointModelGroup(group_name);\n-        if (!jmg_) {\n-            RCLCPP_ERROR(LOGGER, \"failed to get joint model group %s\", group_name.c_str());\n-            return false;\n-        }\n+bool PickIKPlugin::initialize(rclcpp::Node::SharedPtr const& node,\n+                              moveit::core::RobotModel const& robot_model,\n+                              std::string const& group_name,\n+                              std::string const& base_frame,\n+                              std::vector<std::string> const& tip_frames,\n+                              double search_discretization) {\n+    node_ = node;\n+    parameter_listener_ = std::make_shared<ParamListener>(\n+        node,\n+        std::string(\"robot_description_kinematics.\").append(group_name));\n+\n+    // Initialize internal state of base class KinematicsBase\n+    // Creates these internal state variables:\n+    // robot_model_ <- shared_ptr to RobotModel\n+    // robot_description_ <- empty string\n+    // group_name_ <- group_name string\n+    // base_frame_ <- base_frame without leading /\n+    // tip_frames_ <- tip_frames without leading /\n+    // redundant_joint_discretization_ <- vector initialized with\n+    // search_discretization\n+    storeValues(robot_model, group_name, base_frame, tip_frames, search_discretization);\n+\n+    // Initialize internal state\n+    jmg_ = robot_model_->getJointModelGroup(group_name);\n+    if (!jmg_) {\n+        RCLCPP_ERROR(LOGGER, \"failed to get joint model group %s\", group_name.c_str());\n+        return false;\n+    }\n \n-        // Joint names come from jmg\n-        for (auto* joint_model : jmg_->getJointModels()) {\n-            if (joint_model->getName() != base_frame_ &&\n-                joint_model->getType() != moveit::core::JointModel::UNKNOWN &&\n-                joint_model->getType() != moveit::core::JointModel::FIXED) {\n-                joint_names_.push_back(joint_model->getName());\n-            }\n+    // Joint names come from jmg\n+    for (auto* joint_model : jmg_->getJointModels()) {\n+        if (joint_model->getName() != base_frame_ &&\n+            joint_model->getType() != moveit::core::JointModel::UNKNOWN &&\n+            joint_model->getType() != moveit::core::JointModel::FIXED) {\n+            joint_names_.push_back(joint_model->getName());\n         }\n+    }\n \n-        // link_names are the same as tip frames\n-        // TODO: why do we need to set this\n-        link_names_ = tip_frames_;\n+    // link_names are the same as tip frames\n+    // TODO: why do we need to set this\n+    link_names_ = tip_frames_;\n \n-        // Create our internal Robot object from the robot model\n-        tip_link_indices_ =\n-            get_link_indices(robot_model_, tip_frames_)\n-                .or_else([](auto const& error) { throw std::invalid_argument(error); })\n-                .value();\n-        robot_ = Robot::from(robot_model_, jmg_, tip_link_indices_);\n+    // Create our internal Robot object from the robot model\n+    tip_link_indices_ = get_link_indices(robot_model_, tip_frames_)\n+                            .or_else([](auto const& error) { throw std::invalid_argument(error); })\n+                            .value();\n+    robot_ = Robot::from(robot_model_, jmg_, tip_link_indices_);\n \n-        return true;\n-    }\n+    return true;\n+}\n \n-    virtual bool searchPositionIK(\n-        std::vector<geometry_msgs::msg::Pose> const& ik_poses,\n-        std::vector<double> const& ik_seed_state,\n-        double timeout,\n-        std::vector<double> const&,\n-        std::vector<double>& solution,\n-        IKCallbackFn const& solution_callback,\n-        IKCostFn const& cost_function,\n-        moveit_msgs::msg::MoveItErrorCodes& error_code,\n-        kinematics::KinematicsQueryOptions const& options = kinematics::KinematicsQueryOptions(),\n-        moveit::core::RobotState const* context_state = nullptr) const {\n-        (void)context_state;  // not used\n-\n-        // Read current ROS parameters\n-        auto params = parameter_listener_->get_params();\n-\n-        auto const goal_frames = [&]() {\n-            auto robot_state = moveit::core::RobotState(robot_model_);\n-            robot_state.setToDefaultValues();\n-            robot_state.setJointGroupPositions(jmg_, ik_seed_state);\n-            robot_state.update();\n-            return transform_poses_to_frames(robot_state, ik_poses, getBaseFrame());\n-        }();\n-\n-        // Test functions to determine if we are at our goal frame\n-        auto const test_position = (params.position_scale > 0);\n-        std::optional<double> position_threshold = std::nullopt;\n-        if (test_position) {\n-            position_threshold = params.position_threshold;\n-        }\n-        auto const test_rotation = (params.rotation_scale > 0);\n-        std::optional<double> orientation_threshold = std::nullopt;\n-        if (test_rotation) {\n-            orientation_threshold = params.orientation_threshold;\n-        }\n-        auto const frame_tests =\n-            make_frame_tests(goal_frames, position_threshold, orientation_threshold);\n+bool PickIKPlugin::searchPositionIK(std::vector<geometry_msgs::msg::Pose> const& ik_poses,\n+                                    std::vector<double> const& ik_seed_state,\n+                                    double timeout,\n+                                    std::vector<double> const&,\n+                                    std::vector<double>& solution,\n+                                    IKCallbackFn const& solution_callback,\n+                                    IKCostFn const& cost_function,\n+                                    moveit_msgs::msg::MoveItErrorCodes& error_code,\n+                                    kinematics::KinematicsQueryOptions const& options,\n+                                    moveit::core::RobotState const* context_state) const {\n+    (void)context_state;  // not used\n+\n+    // Read current ROS parameters\n+    auto params = parameter_listener_->get_params();\n+\n+    auto const goal_frames = [&]() {\n+        auto robot_state = moveit::core::RobotState(robot_model_);\n+        robot_state.setToDefaultValues();\n+        robot_state.setJointGroupPositions(jmg_, ik_seed_state);\n+        robot_state.update();\n+        return transform_poses_to_frames(robot_state, ik_poses, getBaseFrame());\n+    }();\n+\n+    // Test functions to determine if we are at our goal frame\n+    auto const test_position = (params.position_scale > 0);\n+    std::optional<double> position_threshold = std::nullopt;\n+    if (test_position) {\n+        position_threshold = params.position_threshold;\n+    }\n+    auto const test_rotation = (params.rotation_scale > 0);\n+    std::optional<double> orientation_threshold = std::nullopt;\n+    if (test_rotation) {\n+        orientation_threshold = params.orientation_threshold;\n+    }\n+    auto const frame_tests =\n+        make_frame_tests(goal_frames, position_threshold, orientation_threshold);\n \n-        // Cost functions used for optimizing towards goal frames\n-        auto const pose_cost_functions =\n-            make_pose_cost_functions(goal_frames, params.position_scale, params.rotation_scale);\n+    // Cost functions used for optimizing towards goal frames\n+    auto const pose_cost_functions =\n+        make_pose_cost_functions(goal_frames, params.position_scale, params.rotation_scale);\n \n-        // forward kinematics function\n-        auto const fk_fn = make_fk_fn(robot_model_, jmg_, fk_mutex_, tip_link_indices_);\n+    // forward kinematics function\n+    auto const fk_fn = make_fk_fn(robot_model_, jmg_, fk_mutex_, tip_link_indices_);\n \n-        // Create goals (weighted cost functions)\n-        auto goals = std::vector<Goal>{};\n-        if (params.center_joints_weight > 0.0) {\n-            goals.push_back(Goal{make_center_joints_cost_fn(robot_), params.center_joints_weight});\n-        }\n-        if (params.avoid_joint_limits_weight > 0.0) {\n+    // Create goals (weighted cost functions)\n+    auto goals = std::vector<Goal>{};\n+    if (params.center_joints_weight > 0.0) {\n+        goals.push_back(Goal{make_center_joints_cost_fn(robot_), params.center_joints_weight});\n+    }\n+    if (params.avoid_joint_limits_weight > 0.0) {\n+        goals.push_back(\n+            Goal{make_avoid_joint_limits_cost_fn(robot_), params.avoid_joint_limits_weight});\n+    }\n+    if (params.minimal_displacement_weight > 0.0) {\n+        goals.push_back(Goal{make_minimal_displacement_cost_fn(robot_, ik_seed_state),\n+                             params.minimal_displacement_weight});\n+    }\n+    if (cost_function) {\n+        for (auto const& pose : ik_poses) {\n             goals.push_back(\n-                Goal{make_avoid_joint_limits_cost_fn(robot_), params.avoid_joint_limits_weight});\n-        }\n-        if (params.minimal_displacement_weight > 0.0) {\n-            goals.push_back(Goal{make_minimal_displacement_cost_fn(robot_, ik_seed_state),\n-                                 params.minimal_displacement_weight});\n+                Goal{make_ik_cost_fn(pose, cost_function, robot_model_, jmg_, ik_seed_state), 1.0});\n         }\n-        if (cost_function) {\n-            for (auto const& pose : ik_poses) {\n-                goals.push_back(\n-                    Goal{make_ik_cost_fn(pose, cost_function, robot_model_, jmg_, ik_seed_state),\n-                         1.0});\n-            }\n+    }\n+\n+    // test if this is a valid solution\n+    auto const solution_fn =\n+        make_is_solution_test_fn(frame_tests, goals, params.cost_threshold, fk_fn);\n+\n+    // single function used by gradient descent to calculate cost of solution\n+    auto const cost_fn = make_cost_fn(pose_cost_functions, goals, fk_fn);\n+\n+    // Set up initial optimization variables\n+    bool done_optimizing = false;\n+    bool found_valid_solution = false;\n+    double remaining_timeout = timeout;\n+    std::chrono::duration<double> total_optim_time{0.0};\n+    std::chrono::duration<double> const total_timeout{timeout};\n+    auto last_optim_time = std::chrono::system_clock::now();\n+\n+    // If the initial state is not valid, restart from a random valid state.\n+    auto init_state = ik_seed_state;\n+    if (!robot_.is_valid_configuration(init_state)) {\n+        RCLCPP_WARN(\n+            LOGGER,\n+            \"Initial guess exceeds joint limits. Regenerating a random valid configuration.\");\n+        robot_.set_random_valid_configuration(init_state);\n+    }\n+\n+    // Optimize until a valid solution is found or we have timed out.\n+    while (!done_optimizing) {\n+        // Search for a solution using either the local or global solver.\n+        std::optional<std::vector<double>> maybe_solution;\n+        if (params.mode == \"global\") {\n+            MemeticIkParams ik_params;\n+            ik_params.population_size = static_cast<size_t>(params.memetic_population_size);\n+            ik_params.elite_size = static_cast<size_t>(params.memetic_elite_size);\n+            ik_params.wipeout_fitness_tol = params.memetic_wipeout_fitness_tol;\n+            ik_params.stop_optimization_on_valid_solution =\n+                params.stop_optimization_on_valid_solution;\n+            ik_params.num_threads = static_cast<size_t>(params.memetic_num_threads);\n+            ik_params.stop_on_first_soln = params.memetic_stop_on_first_solution;\n+            ik_params.max_generations = static_cast<int>(params.memetic_max_generations);\n+            ik_params.max_time = remaining_timeout;\n+\n+            ik_params.gd_params.step_size = params.gd_step_size;\n+            ik_params.gd_params.min_cost_delta = params.gd_min_cost_delta;\n+            ik_params.gd_params.max_iterations = static_cast<int>(params.memetic_gd_max_iters);\n+            ik_params.gd_params.max_time = params.memetic_gd_max_time;\n+\n+            maybe_solution = ik_memetic(ik_seed_state,\n+                                        robot_,\n+                                        cost_fn,\n+                                        solution_fn,\n+                                        ik_params,\n+                                        options.return_approximate_solution,\n+                                        false /* No debug print */);\n+        } else if (params.mode == \"local\") {\n+            GradientIkParams gd_params;\n+            gd_params.step_size = params.gd_step_size;\n+            gd_params.min_cost_delta = params.gd_min_cost_delta;\n+            gd_params.max_time = remaining_timeout;\n+            gd_params.max_iterations = static_cast<int>(params.gd_max_iters);\n+            gd_params.stop_optimization_on_valid_solution =\n+                params.stop_optimization_on_valid_solution;\n+\n+            maybe_solution = ik_gradient(ik_seed_state,\n+                                         robot_,\n+                                         cost_fn,\n+                                         solution_fn,\n+                                         gd_params,\n+                                         options.return_approximate_solution);\n+        } else {\n+            RCLCPP_ERROR(LOGGER, \"Invalid solver mode: %s\", params.mode.c_str());\n+            return false;\n         }\n \n-        // test if this is a valid solution\n-        auto const solution_fn =\n-            make_is_solution_test_fn(frame_tests, goals, params.cost_threshold, fk_fn);\n-\n-        // single function used by gradient descent to calculate cost of solution\n-        auto const cost_fn = make_cost_fn(pose_cost_functions, goals, fk_fn);\n-\n-        // Set up initial optimization variables\n-        bool done_optimizing = false;\n-        bool found_valid_solution = false;\n-        double remaining_timeout = timeout;\n-        std::chrono::duration<double> total_optim_time{0.0};\n-        std::chrono::duration<double> const total_timeout{timeout};\n-        auto last_optim_time = std::chrono::system_clock::now();\n-\n-        // If the initial state is not valid, restart from a random valid state.\n-        auto init_state = ik_seed_state;\n-        if (!robot_.is_valid_configuration(init_state)) {\n-            RCLCPP_WARN(\n-                LOGGER,\n-                \"Initial guess exceeds joint limits. Regenerating a random valid configuration.\");\n-            robot_.set_random_valid_configuration(init_state);\n+        if (maybe_solution.has_value()) {\n+            // Set the output parameter solution.\n+            // Assumes that the angles were already wrapped by the solver.\n+            error_code.val = error_code.SUCCESS;\n+            solution = maybe_solution.value();\n+        } else {\n+            error_code.val = error_code.NO_IK_SOLUTION;\n+            solution = ik_seed_state;\n         }\n \n-        // Optimize until a valid solution is found or we have timed out.\n-        while (!done_optimizing) {\n-            // Search for a solution using either the local or global solver.\n-            std::optional<std::vector<double>> maybe_solution;\n-            if (params.mode == \"global\") {\n-                MemeticIkParams ik_params;\n-                ik_params.population_size = static_cast<size_t>(params.memetic_population_size);\n-                ik_params.elite_size = static_cast<size_t>(params.memetic_elite_size);\n-                ik_params.wipeout_fitness_tol = params.memetic_wipeout_fitness_tol;\n-                ik_params.stop_optimization_on_valid_solution =\n-                    params.stop_optimization_on_valid_solution;\n-                ik_params.num_threads = static_cast<size_t>(params.memetic_num_threads);\n-                ik_params.stop_on_first_soln = params.memetic_stop_on_first_solution;\n-                ik_params.max_generations = static_cast<int>(params.memetic_max_generations);\n-                ik_params.max_time = remaining_timeout;\n-\n-                ik_params.gd_params.step_size = params.gd_step_size;\n-                ik_params.gd_params.min_cost_delta = params.gd_min_cost_delta;\n-                ik_params.gd_params.max_iterations = static_cast<int>(params.memetic_gd_max_iters);\n-                ik_params.gd_params.max_time = params.memetic_gd_max_time;\n-\n-                maybe_solution = ik_memetic(ik_seed_state,\n-                                            robot_,\n-                                            cost_fn,\n-                                            solution_fn,\n-                                            ik_params,\n-                                            options.return_approximate_solution,\n-                                            false /* No debug print */);\n-            } else if (params.mode == \"local\") {\n-                GradientIkParams gd_params;\n-                gd_params.step_size = params.gd_step_size;\n-                gd_params.min_cost_delta = params.gd_min_cost_delta;\n-                gd_params.max_time = remaining_timeout;\n-                gd_params.max_iterations = static_cast<int>(params.gd_max_iters);\n-                gd_params.stop_optimization_on_valid_solution =\n-                    params.stop_optimization_on_valid_solution;\n-\n-                maybe_solution = ik_gradient(ik_seed_state,\n-                                             robot_,\n-                                             cost_fn,\n-                                             solution_fn,\n-                                             gd_params,\n-                                             options.return_approximate_solution);\n-            } else {\n-                RCLCPP_ERROR(LOGGER, \"Invalid solver mode: %s\", params.mode.c_str());\n-                return false;\n+        // If using an approximate solution, check against the maximum allowable pose and joint\n+        // thresholds. If the approximate solution is too far from the goal frame,\n+        // fall back to the initial state.\n+        if (options.return_approximate_solution) {\n+            // Check pose thresholds\n+            std::optional<double> approximate_solution_position_threshold = std::nullopt;\n+            if (test_position) {\n+                approximate_solution_position_threshold =\n+                    params.approximate_solution_position_threshold;\n             }\n-\n-            if (maybe_solution.has_value()) {\n-                // Set the output parameter solution.\n-                // Assumes that the angles were already wrapped by the solver.\n-                error_code.val = error_code.SUCCESS;\n-                solution = maybe_solution.value();\n-            } else {\n-                error_code.val = error_code.NO_IK_SOLUTION;\n-                solution = ik_seed_state;\n+            std::optional<double> approximate_solution_orientation_threshold = std::nullopt;\n+            if (test_rotation) {\n+                approximate_solution_orientation_threshold =\n+                    params.approximate_solution_orientation_threshold;\n+            }\n+            auto const approx_frame_tests =\n+                make_frame_tests(goal_frames,\n+                                 approximate_solution_position_threshold,\n+                                 approximate_solution_orientation_threshold);\n+\n+            // If we have no cost threshold, we don't need to check the goals\n+            if (params.approximate_solution_cost_threshold <= 0.0) {\n+                goals.clear();\n             }\n \n-            // If using an approximate solution, check against the maximum allowable pose and joint\n-            // thresholds. If the approximate solution is too far from the goal frame,\n-            // fall back to the initial state.\n-            if (options.return_approximate_solution) {\n-                // Check pose thresholds\n-                std::optional<double> approximate_solution_position_threshold = std::nullopt;\n-                if (test_position) {\n-                    approximate_solution_position_threshold =\n-                        params.approximate_solution_position_threshold;\n-                }\n-                std::optional<double> approximate_solution_orientation_threshold = std::nullopt;\n-                if (test_rotation) {\n-                    approximate_solution_orientation_threshold =\n-                        params.approximate_solution_orientation_threshold;\n-                }\n-                auto const approx_frame_tests =\n-                    make_frame_tests(goal_frames,\n-                                     approximate_solution_position_threshold,\n-                                     approximate_solution_orientation_threshold);\n-\n-                // If we have no cost threshold, we don't need to check the goals\n-                if (params.approximate_solution_cost_threshold <= 0.0) {\n-                    goals.clear();\n-                }\n-\n-                auto const approx_solution_fn =\n-                    make_is_solution_test_fn(frame_tests,\n-                                             goals,\n-                                             params.approximate_solution_cost_threshold,\n-                                             fk_fn);\n-\n-                bool approx_solution_valid = approx_solution_fn(solution);\n-\n-                // Check joint thresholds\n-                if (approx_solution_valid && params.approximate_solution_joint_threshold > 0.0) {\n-                    for (size_t i = 0; i < solution.size(); ++i) {\n-                        if (std::abs(solution[i] - ik_seed_state[i]) >\n-                            params.approximate_solution_joint_threshold) {\n-                            approx_solution_valid = false;\n-                            break;\n-                        }\n+            auto const approx_solution_fn =\n+                make_is_solution_test_fn(frame_tests,\n+                                         goals,\n+                                         params.approximate_solution_cost_threshold,\n+                                         fk_fn);\n+\n+            bool approx_solution_valid = approx_solution_fn(solution);\n+\n+            // Check joint thresholds\n+            if (approx_solution_valid && params.approximate_solution_joint_threshold > 0.0) {\n+                for (size_t i = 0; i < solution.size(); ++i) {\n+                    if (std::abs(solution[i] - ik_seed_state[i]) >\n+                        params.approximate_solution_joint_threshold) {\n+                        approx_solution_valid = false;\n+                        break;\n                     }\n                 }\n-\n-                if (!approx_solution_valid) {\n-                    error_code.val = error_code.NO_IK_SOLUTION;\n-                    solution = ik_seed_state;\n-                }\n             }\n \n-            // Execute solution callback only on successful solution.\n-            auto const found_solution = error_code.val == error_code.SUCCESS;\n-            if (solution_callback && found_solution) {\n-                solution_callback(ik_poses.front(), solution, error_code);\n-            }\n-            found_valid_solution = error_code.val == error_code.SUCCESS;\n-\n-            // Check for timeout.\n-            auto const current_time = std::chrono::system_clock::now();\n-            total_optim_time += (current_time - last_optim_time);\n-            last_optim_time = current_time;\n-            bool const timeout_elapsed = (total_optim_time >= total_timeout);\n-\n-            // If we found a valid solution or hit the timeout, we are done optimizing.\n-            // Otherwise, pick a random new initial seed and keep optimizing with the remaining\n-            // time.\n-            if (found_valid_solution || timeout_elapsed) {\n-                done_optimizing = true;\n-            } else {\n-                robot_.set_random_valid_configuration(init_state);\n-                remaining_timeout = timeout - total_optim_time.count();\n+            if (!approx_solution_valid) {\n+                error_code.val = error_code.NO_IK_SOLUTION;\n+                solution = ik_seed_state;\n             }\n         }\n \n-        return found_valid_solution;\n+        // Execute solution callback only on successful solution.\n+        auto const found_solution = error_code.val == error_code.SUCCESS;\n+        if (solution_callback && found_solution) {\n+            solution_callback(ik_poses.front(), solution, error_code);\n+        }\n+        found_valid_solution = error_code.val == error_code.SUCCESS;\n+\n+        // Check for timeout.\n+        auto const current_time = std::chrono::system_clock::now();\n+        total_optim_time += (current_time - last_optim_time);\n+        last_optim_time = current_time;\n+        bool const timeout_elapsed = (total_optim_time >= total_timeout);\n+\n+        // If we found a valid solution or hit the timeout, we are done optimizing.\n+        // Otherwise, pick a random new initial seed and keep optimizing with the remaining\n+        // time.\n+        if (found_valid_solution || timeout_elapsed) {\n+            done_optimizing = true;\n+        } else {\n+            robot_.set_random_valid_configuration(init_state);\n+            remaining_timeout = timeout - total_optim_time.count();\n+        }\n     }\n \n-    virtual std::vector<std::string> const& getJointNames() const { return joint_names_; }\n+    return found_valid_solution;\n+}\n \n-    virtual std::vector<std::string> const& getLinkNames() const { return link_names_; }\n+std::vector<std::string> const& PickIKPlugin::getJointNames() const { return joint_names_; }\n \n-    virtual bool getPositionFK(std::vector<std::string> const&,\n-                               std::vector<double> const&,\n-                               std::vector<geometry_msgs::msg::Pose>&) const {\n-        return false;\n-    }\n+std::vector<std::string> const& PickIKPlugin::getLinkNames() const { return link_names_; }\n \n-    virtual bool getPositionIK(geometry_msgs::msg::Pose const&,\n-                               std::vector<double> const&,\n-                               std::vector<double>&,\n-                               moveit_msgs::msg::MoveItErrorCodes&,\n-                               kinematics::KinematicsQueryOptions const&) const {\n-        return false;\n-    }\n+bool PickIKPlugin::getPositionFK(std::vector<std::string> const&,\n+                                 std::vector<double> const&,\n+                                 std::vector<geometry_msgs::msg::Pose>&) const {\n+    return false;\n+}\n \n-    virtual bool searchPositionIK(geometry_msgs::msg::Pose const& ik_pose,\n-                                  std::vector<double> const& ik_seed_state,\n-                                  double timeout,\n-                                  std::vector<double>& solution,\n-                                  moveit_msgs::msg::MoveItErrorCodes& error_code,\n-                                  kinematics::KinematicsQueryOptions const& options =\n-                                      kinematics::KinematicsQueryOptions()) const {\n-        return searchPositionIK(std::vector<geometry_msgs::msg::Pose>{ik_pose},\n-                                ik_seed_state,\n-                                timeout,\n-                                std::vector<double>(),\n-                                solution,\n-                                IKCallbackFn(),\n-                                error_code,\n-                                options);\n-    }\n+bool PickIKPlugin::getPositionIK(geometry_msgs::msg::Pose const&,\n+                                 std::vector<double> const&,\n+                                 std::vector<double>&,\n+                                 moveit_msgs::msg::MoveItErrorCodes&,\n+                                 kinematics::KinematicsQueryOptions const&) const {\n+    return false;\n+}\n \n-    virtual bool searchPositionIK(geometry_msgs::msg::Pose const& ik_pose,\n-                                  std::vector<double> const& ik_seed_state,\n-                                  double timeout,\n-                                  std::vector<double> const& consistency_limits,\n-                                  std::vector<double>& solution,\n-                                  moveit_msgs::msg::MoveItErrorCodes& error_code,\n-                                  kinematics::KinematicsQueryOptions const& options =\n-                                      kinematics::KinematicsQueryOptions()) const {\n-        return searchPositionIK(std::vector<geometry_msgs::msg::Pose>{ik_pose},\n-                                ik_seed_state,\n-                                timeout,\n-                                consistency_limits,\n-                                solution,\n-                                IKCallbackFn(),\n-                                error_code,\n-                                options);\n-    }\n+bool PickIKPlugin::searchPositionIK(geometry_msgs::msg::Pose const& ik_pose,\n+                                    std::vector<double> const& ik_seed_state,\n+                                    double timeout,\n+                                    std::vector<double>& solution,\n+                                    moveit_msgs::msg::MoveItErrorCodes& error_code,\n+                                    kinematics::KinematicsQueryOptions const& options) const {\n+    return searchPositionIK(std::vector<geometry_msgs::msg::Pose>{ik_pose},\n+                            ik_seed_state,\n+                            timeout,\n+                            std::vector<double>(),\n+                            solution,\n+                            IKCallbackFn(),\n+                            error_code,\n+                            options);\n+}\n \n-    virtual bool searchPositionIK(geometry_msgs::msg::Pose const& ik_pose,\n-                                  std::vector<double> const& ik_seed_state,\n-                                  double timeout,\n-                                  std::vector<double>& solution,\n-                                  IKCallbackFn const& solution_callback,\n-                                  moveit_msgs::msg::MoveItErrorCodes& error_code,\n-                                  kinematics::KinematicsQueryOptions const& options =\n-                                      kinematics::KinematicsQueryOptions()) const {\n-        return searchPositionIK(std::vector<geometry_msgs::msg::Pose>{ik_pose},\n-                                ik_seed_state,\n-                                timeout,\n-                                std::vector<double>(),\n-                                solution,\n-                                solution_callback,\n-                                error_code,\n-                                options);\n-    }\n+bool PickIKPlugin::searchPositionIK(geometry_msgs::msg::Pose const& ik_pose,\n+                                    std::vector<double> const& ik_seed_state,\n+                                    double timeout,\n+                                    std::vector<double> const& consistency_limits,\n+                                    std::vector<double>& solution,\n+                                    moveit_msgs::msg::MoveItErrorCodes& error_code,\n+                                    kinematics::KinematicsQueryOptions const& options) const {\n+    return searchPositionIK(std::vector<geometry_msgs::msg::Pose>{ik_pose},\n+                            ik_seed_state,\n+                            timeout,\n+                            consistency_limits,\n+                            solution,\n+                            IKCallbackFn(),\n+                            error_code,\n+                            options);\n+}\n \n-    virtual bool searchPositionIK(geometry_msgs::msg::Pose const& ik_pose,\n-                                  std::vector<double> const& ik_seed_state,\n-                                  double timeout,\n-                                  std::vector<double> const& consistency_limits,\n-                                  std::vector<double>& solution,\n-                                  IKCallbackFn const& solution_callback,\n-                                  moveit_msgs::msg::MoveItErrorCodes& error_code,\n-                                  kinematics::KinematicsQueryOptions const& options =\n-                                      kinematics::KinematicsQueryOptions()) const {\n-        return searchPositionIK(std::vector<geometry_msgs::msg::Pose>{ik_pose},\n-                                ik_seed_state,\n-                                timeout,\n-                                consistency_limits,\n-                                solution,\n-                                solution_callback,\n-                                error_code,\n-                                options);\n-    }\n+bool PickIKPlugin::searchPositionIK(geometry_msgs::msg::Pose const& ik_pose,\n+                                    std::vector<double> const& ik_seed_state,\n+                                    double timeout,\n+                                    std::vector<double>& solution,\n+                                    IKCallbackFn const& solution_callback,\n+                                    moveit_msgs::msg::MoveItErrorCodes& error_code,\n+                                    kinematics::KinematicsQueryOptions const& options) const {\n+    return searchPositionIK(std::vector<geometry_msgs::msg::Pose>{ik_pose},\n+                            ik_seed_state,\n+                            timeout,\n+                            std::vector<double>(),\n+                            solution,\n+                            solution_callback,\n+                            error_code,\n+                            options);\n+}\n \n-    virtual bool searchPositionIK(\n-        std::vector<geometry_msgs::msg::Pose> const& ik_poses,\n-        std::vector<double> const& ik_seed_state,\n-        double timeout,\n-        std::vector<double> const& consistency_limits,\n-        std::vector<double>& solution,\n-        IKCallbackFn const& solution_callback,\n-        moveit_msgs::msg::MoveItErrorCodes& error_code,\n-        kinematics::KinematicsQueryOptions const& options = kinematics::KinematicsQueryOptions(),\n-        moveit::core::RobotState const* context_state = NULL) const {\n-        return searchPositionIK(ik_poses,\n-                                ik_seed_state,\n-                                timeout,\n-                                consistency_limits,\n-                                solution,\n-                                solution_callback,\n-                                IKCostFn(),\n-                                error_code,\n-                                options,\n-                                context_state);\n-    }\n-};\n+bool PickIKPlugin::searchPositionIK(geometry_msgs::msg::Pose const& ik_pose,\n+                                    std::vector<double> const& ik_seed_state,\n+                                    double timeout,\n+                                    std::vector<double> const& consistency_limits,\n+                                    std::vector<double>& solution,\n+                                    IKCallbackFn const& solution_callback,\n+                                    moveit_msgs::msg::MoveItErrorCodes& error_code,\n+                                    kinematics::KinematicsQueryOptions const& options) const {\n+    return searchPositionIK(std::vector<geometry_msgs::msg::Pose>{ik_pose},\n+                            ik_seed_state,\n+                            timeout,\n+                            consistency_limits,\n+                            solution,\n+                            solution_callback,\n+                            error_code,\n+                            options);\n+}\n+\n+bool PickIKPlugin::searchPositionIK(std::vector<geometry_msgs::msg::Pose> const& ik_poses,\n+                                    std::vector<double> const& ik_seed_state,\n+                                    double timeout,\n+                                    std::vector<double> const& consistency_limits,\n+                                    std::vector<double>& solution,\n+                                    IKCallbackFn const& solution_callback,\n+                                    moveit_msgs::msg::MoveItErrorCodes& error_code,\n+                                    kinematics::KinematicsQueryOptions const& options,\n+                                    moveit::core::RobotState const* context_state) const {\n+    return searchPositionIK(ik_poses,\n+                            ik_seed_state,\n+                            timeout,\n+                            consistency_limits,\n+                            solution,\n+                            solution_callback,\n+                            IKCostFn(),\n+                            error_code,\n+                            options,\n+                            context_state);\n+}\n \n }  // namespace pick_ik\n "
+        }
+      ]
+    },
+    {
+      "author": "sea-bass",
+      "date": "2022-09-28T18:10:43Z",
+      "sha": "1e16be80d606a2eb6eaaca7fa135c011df92bb5f",
+      "message": "Fix plugin casing in XML description (#5)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "b1571598a4ed9155be16dd1b9e2dfcec05fbe8c1",
+          "filename": "pick_ik_kinematics_description.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/1e16be80d606a2eb6eaaca7fa135c011df92bb5f/pick_ik_kinematics_description.xml",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/1e16be80d606a2eb6eaaca7fa135c011df92bb5f/pick_ik_kinematics_description.xml",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/pick_ik_kinematics_description.xml?ref=1e16be80d606a2eb6eaaca7fa135c011df92bb5f",
+          "patch": "@@ -1,4 +1,4 @@\n <library path=\"pick_ik_plugin\">\n-    <class name=\"pick_ik/PickIkPlugin\" type=\"pick_ik::PickIkPlugin\" base_class_type=\"kinematics::KinematicsBase\">\n+    <class name=\"pick_ik/PickIkPlugin\" type=\"pick_ik::PickIKPlugin\" base_class_type=\"kinematics::KinematicsBase\">\n     </class>\n </library>"
+        }
+      ]
+    },
+    {
+      "author": "mosfet80",
+      "date": "2024-11-30T18:05:25Z",
+      "sha": "4522a3ebd97132b9b746ce05468f8c80595013a9",
+      "message": "Update .pre-commit-config.yaml (#75)",
+      "files_changed": 5,
+      "additions": 13,
+      "deletions": 13,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "72f0e1a44c1e0b08acef955214a61af3aeceff80",
+          "filename": ".devcontainer/Dockerfile",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/4522a3ebd97132b9b746ce05468f8c80595013a9/.devcontainer%2FDockerfile",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/4522a3ebd97132b9b746ce05468f8c80595013a9/.devcontainer%2FDockerfile",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/.devcontainer%2FDockerfile?ref=4522a3ebd97132b9b746ce05468f8c80595013a9",
+          "patch": "@@ -78,7 +78,7 @@ RUN groupadd --gid $GID $USER \\\n RUN python3 -m pip install -U \\\n     pre-commit\n \n-# isntall development tooling\n+# install development tooling\n RUN --mount=type=cache,target=/var/cache/apt,id=apt \\\n     apt-get update && apt-get upgrade -y \\\n     && apt-get install -q -y --no-install-recommends \\"
+        },
+        {
+          "sha": "a770ff565e316efac3025f82591631cff1d25864",
+          "filename": ".github/workflows/ci.yaml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/4522a3ebd97132b9b746ce05468f8c80595013a9/.github%2Fworkflows%2Fci.yaml",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/4522a3ebd97132b9b746ce05468f8c80595013a9/.github%2Fworkflows%2Fci.yaml",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/.github%2Fworkflows%2Fci.yaml?ref=4522a3ebd97132b9b746ce05468f8c80595013a9",
+          "patch": "@@ -13,9 +13,9 @@ jobs:\n       CCACHE_DIR: ${{ github.workspace }}/.ccache\n     steps:\n       - name: Check out the repo\n-        uses: actions/checkout@v3\n+        uses: actions/checkout@v4\n       - name: Cache ccache\n-        uses: pat-s/always-upload-cache@v3.0.1\n+        uses: pat-s/always-upload-cache@v3.0.11\n         with:\n           path: ${{ env.CCACHE_DIR }}\n           key: ccache-${{ github.sha }}-${{ github.run_id }}"
+        },
+        {
+          "sha": "f7bd11389c523c37e8695f7708248568f9ba4882",
+          "filename": ".github/workflows/docker.yaml",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 4,
+          "changes": 8,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/4522a3ebd97132b9b746ce05468f8c80595013a9/.github%2Fworkflows%2Fdocker.yaml",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/4522a3ebd97132b9b746ce05468f8c80595013a9/.github%2Fworkflows%2Fdocker.yaml",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/.github%2Fworkflows%2Fdocker.yaml?ref=4522a3ebd97132b9b746ce05468f8c80595013a9",
+          "patch": "@@ -15,18 +15,18 @@ jobs:\n     runs-on: ubuntu-22.04\n     steps:\n       - name: Check out the repo\n-        uses: actions/checkout@v3\n+        uses: actions/checkout@v4\n       - name: Set up Docker Buildx\n         id: buildx\n-        uses: docker/setup-buildx-action@v2\n+        uses: docker/setup-buildx-action@v3\n       - name: Login to Github Container Registry\n-        uses: docker/login-action@v2\n+        uses: docker/login-action@v3\n         with:\n           registry: ghcr.io\n           username: ${{ github.repository_owner }}\n           password: ${{ secrets.GITHUB_TOKEN }}\n       - name: Build and push\n-        uses: docker/build-push-action@v3\n+        uses: docker/build-push-action@v6\n         with:\n           context: .\n           file: .devcontainer/Dockerfile"
+        },
+        {
+          "sha": "d29917af3718732a48af40bea8eb7292b656171a",
+          "filename": ".github/workflows/format.yaml",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/4522a3ebd97132b9b746ce05468f8c80595013a9/.github%2Fworkflows%2Fformat.yaml",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/4522a3ebd97132b9b746ce05468f8c80595013a9/.github%2Fworkflows%2Fformat.yaml",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/.github%2Fworkflows%2Fformat.yaml?ref=4522a3ebd97132b9b746ce05468f8c80595013a9",
+          "patch": "@@ -10,8 +10,8 @@ jobs:\n     name: pre-commit\n     runs-on: ubuntu-22.04\n     steps:\n-      - uses: actions/checkout@v3\n-      - uses: actions/setup-python@v3\n+      - uses: actions/checkout@v4\n+      - uses: actions/setup-python@v5\n       - name: Install clang-format-14\n         run: sudo apt-get install clang-format-14\n-      - uses: pre-commit/action@v3.0.0\n+      - uses: pre-commit/action@v3.0.1"
+        },
+        {
+          "sha": "f953c07845a92e110087cd6930fee9af40269376",
+          "filename": ".pre-commit-config.yaml",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/4522a3ebd97132b9b746ce05468f8c80595013a9/.pre-commit-config.yaml",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/4522a3ebd97132b9b746ce05468f8c80595013a9/.pre-commit-config.yaml",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/.pre-commit-config.yaml?ref=4522a3ebd97132b9b746ce05468f8c80595013a9",
+          "patch": "@@ -1,7 +1,7 @@\n repos:\n   # Standard hooks\n   - repo: https://github.com/pre-commit/pre-commit-hooks\n-    rev: v3.4.0\n+    rev: v5.0.0\n     hooks:\n       - id: check-added-large-files\n       - id: check-ast\n@@ -31,7 +31,7 @@ repos:\n       - id: trailing-whitespace\n \n   - repo: https://github.com/psf/black\n-    rev: 20.8b1\n+    rev: 24.10.0\n     hooks:\n       - id: black\n \n@@ -46,7 +46,7 @@ repos:\n         args: ['-fallback-style=none', '-i']\n \n   - repo: https://github.com/codespell-project/codespell\n-    rev: v2.0.0\n+    rev: v2.3.0\n     hooks:\n       - id: codespell\n         args: ['--write-changes', '--ignore-words=.codespell_words']"
+        }
+      ]
+    },
+    {
+      "author": "timonegk",
+      "date": "2024-09-30T14:12:01Z",
+      "sha": "0ed7cb3e6ea722f23249c4aa86594d344d8206af",
+      "message": "Fix timeout calculation if solution callback fails (#73)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "d58609252616270fa25f1c9128236c8c3e7613da",
+          "filename": "src/pick_ik_plugin.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/0ed7cb3e6ea722f23249c4aa86594d344d8206af/src%2Fpick_ik_plugin.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/0ed7cb3e6ea722f23249c4aa86594d344d8206af/src%2Fpick_ik_plugin.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/src%2Fpick_ik_plugin.cpp?ref=0ed7cb3e6ea722f23249c4aa86594d344d8206af",
+          "patch": "@@ -303,7 +303,7 @@ class PickIKPlugin : public kinematics::KinematicsBase {\n                 done_optimizing = true;\n             } else {\n                 robot_.set_random_valid_configuration(init_state);\n-                remaining_timeout -= total_optim_time.count();\n+                remaining_timeout = timeout - total_optim_time.count();\n             }\n         }\n "
+        }
+      ]
+    },
+    {
+      "author": "amalnanavati",
+      "date": "2024-09-30T14:11:49Z",
+      "sha": "5b6dffc148712abab99bebc8e4e12e3163787419",
+      "message": "Remove incorrect override of tip_frames (#68)",
+      "files_changed": 1,
+      "additions": 0,
+      "deletions": 7,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b43d84ef46e601db1ef61c535fb688f2458aace8",
+          "filename": "src/pick_ik_plugin.cpp",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 7,
+          "changes": 7,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/5b6dffc148712abab99bebc8e4e12e3163787419/src%2Fpick_ik_plugin.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/5b6dffc148712abab99bebc8e4e12e3163787419/src%2Fpick_ik_plugin.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/src%2Fpick_ik_plugin.cpp?ref=5b6dffc148712abab99bebc8e4e12e3163787419",
+          "patch": "@@ -71,13 +71,6 @@ class PickIKPlugin : public kinematics::KinematicsBase {\n             }\n         }\n \n-        // If jmg has tip frames, set tip_frames_ to jmg tip frames\n-        // consider removing these lines as they might be unnecessary\n-        // as tip_frames_ is set by the call to storeValues above\n-        auto jmg_tips = std::vector<std::string>{};\n-        jmg_->getEndEffectorTips(jmg_tips);\n-        if (!jmg_tips.empty()) tip_frames_ = jmg_tips;\n-\n         // link_names are the same as tip frames\n         // TODO: why do we need to set this\n         link_names_ = tip_frames_;"
+        }
+      ]
+    },
+    {
+      "author": "Robotawi",
+      "date": "2023-06-26T12:57:42Z",
+      "sha": "9904c89d9bcf9e857952db12040399c201779e97",
+      "message": "Merge pull request #54 from PickNikRobotics/pr-fix-joint-ordering\n\nSwitch from `std::set` to `std::vector` to prevent joint name alphabetization",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "1064b1935b104176c4c86813596eb1adc0ece3ca",
+          "filename": "src/robot.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/9904c89d9bcf9e857952db12040399c201779e97/src%2Frobot.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/9904c89d9bcf9e857952db12040399c201779e97/src%2Frobot.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/src%2Frobot.cpp?ref=9904c89d9bcf9e857952db12040399c201779e97",
+          "patch": "@@ -99,11 +99,11 @@ auto get_active_variable_indices(std::shared_ptr<moveit::core::RobotModel const>\n     // For each of the active joints in the joint model group\n     // If those are in the ones we are using and the joint is not a mimic\n     // Then get all the variable names from the joint moodel\n-    auto active_variable_names = std::set<std::string>{};\n+    auto active_variable_names = std::vector<std::string>{};\n     for (auto const* joint_model : jmg->getActiveJointModels()) {\n         if (joint_usage[joint_model->getJointIndex()] && !joint_model->getMimic()) {\n             for (auto& name : joint_model->getVariableNames()) {\n-                active_variable_names.insert(name);\n+                active_variable_names.push_back(name);\n             }\n         }\n     }"
+        }
+      ]
+    },
+    {
+      "author": "SammyRamone",
+      "date": "2023-06-02T11:43:03Z",
+      "sha": "807b04e47a33452032d161933236843d3f11566d",
+      "message": "Fix searchPositionIK usage of IKCostFn (#44)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "89de3adbf2e1f47ee28d2c4746e6f3053c69e874",
+          "filename": "src/pick_ik_plugin.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/807b04e47a33452032d161933236843d3f11566d/src%2Fpick_ik_plugin.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/807b04e47a33452032d161933236843d3f11566d/src%2Fpick_ik_plugin.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/src%2Fpick_ik_plugin.cpp?ref=807b04e47a33452032d161933236843d3f11566d",
+          "patch": "@@ -98,7 +98,7 @@ class PickIKPlugin : public kinematics::KinematicsBase {\n         std::vector<double> const&,\n         std::vector<double>& solution,\n         IKCallbackFn const& solution_callback,\n-        IKCostFn cost_function,\n+        IKCostFn const& cost_function,\n         moveit_msgs::msg::MoveItErrorCodes& error_code,\n         kinematics::KinematicsQueryOptions const& options = kinematics::KinematicsQueryOptions(),\n         moveit::core::RobotState const* context_state = nullptr) const {"
+        }
+      ]
+    },
+    {
+      "author": "Erik Holum",
+      "date": "2023-03-31T19:58:28Z",
+      "sha": "b1cec6433b22e88c9e113e38e71cc05dfab5445b",
+      "message": "Remove unnecessary preprocessor macro (#40)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 4,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "62c80528701a0b2c173be5ebd27851f74994b079",
+          "filename": "src/ik_memetic.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 4,
+          "changes": 5,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/b1cec6433b22e88c9e113e38e71cc05dfab5445b/src%2Fik_memetic.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/b1cec6433b22e88c9e113e38e71cc05dfab5445b/src%2Fik_memetic.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/src%2Fik_memetic.cpp?ref=b1cec6433b22e88c9e113e38e71cc05dfab5445b",
+          "patch": "@@ -43,11 +43,8 @@ MemeticIk::MemeticIk(std::vector<double> const& initial_guess,\n bool MemeticIk::checkWipeout() {\n     // Handle wipeouts if no progress is being made.\n     if (previous_fitness_.has_value()) {\n-#pragma GCC diagnostic push\n-#pragma GCC diagnostic ignored \"-Wmaybe-uninitialized\"\n         bool const improved =\n-            (best_curr_.fitness < *previous_fitness_ - params_.wipeout_fitness_tol);\n-#pragma GCC diagnostic pop\n+            (best_curr_.fitness < previous_fitness_.value() - params_.wipeout_fitness_tol);\n         if (!improved) {\n             return true;\n         }"
+        }
+      ]
+    },
+    {
+      "author": "tylerjw",
+      "date": "2022-08-22T03:02:21Z",
+      "sha": "077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+      "message": "Initial commit\n\nSigned-off-by: Tyler Weaver <tylerjw@gmail.com>",
+      "files_changed": 27,
+      "additions": 1418,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "9096082f705e529122199f3be459813eac236e3f",
+          "filename": ".clang-format",
+          "status": "added",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/.clang-format",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/.clang-format",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/.clang-format?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,7 @@\n+BasedOnStyle:  Google\n+\n+DerivePointerAlignment: false\n+QualifierAlignment: Right\n+ReferenceAlignment: Pointer\n+SpaceAroundPointerQualifiers: Default\n+PointerAlignment: Left"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": ".codespell_words",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/.codespell_words",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/.codespell_words",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/.codespell_words?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e"
+        },
+        {
+          "sha": "d181756ee43f34910e3b6aac83a1beb0bce45a4f",
+          "filename": ".pre-commit-config.yaml",
+          "status": "added",
+          "additions": 56,
+          "deletions": 0,
+          "changes": 56,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/.pre-commit-config.yaml",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/.pre-commit-config.yaml",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/.pre-commit-config.yaml?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,56 @@\n+repos:\n+  # Standard hooks\n+  - repo: https://github.com/pre-commit/pre-commit-hooks\n+    rev: v3.4.0\n+    hooks:\n+      - id: check-added-large-files\n+      - id: check-ast\n+      - id: check-byte-order-marker\n+      - id: check-builtin-literals\n+      - id: check-case-conflict\n+      - id: check-docstring-first\n+      - id: check-executables-have-shebangs\n+      - id: check-json\n+      - id: check-executables-have-shebangs\n+      - id: pretty-format-json\n+      - id: check-merge-conflict\n+      - id: check-symlinks\n+      - id: check-toml\n+      - id: check-vcs-permalinks\n+      - id: check-yaml\n+      - id: debug-statements\n+      - id: destroyed-symlinks\n+      - id: detect-private-key\n+      - id: end-of-file-fixer\n+      - id: mixed-line-ending\n+      - id: fix-byte-order-marker\n+      - id: fix-encoding-pragma\n+      - id: forbid-new-submodules\n+      - id: mixed-line-ending\n+      - id: name-tests-test\n+      - id: no-commit-to-branch\n+      - id: requirements-txt-fixer\n+      - id: sort-simple-yaml\n+      - id: trailing-whitespace\n+\n+  - repo: https://github.com/psf/black\n+    rev: 20.8b1\n+    hooks:\n+      - id: black\n+\n+  - repo: local\n+    hooks:\n+      - id: clang-format\n+        name: clang-format\n+        description: Format files with ClangFormat 14.\n+        entry: clang-format-14\n+        language: system\n+        files: \\.(c|cc|cxx|cpp|frag|glsl|h|hpp|hxx|ih|ispc|ipp|java|js|m|proto|vert)$\n+        args: ['-fallback-style=none', '-i']\n+\n+  - repo: https://github.com/codespell-project/codespell\n+    rev: v2.0.0\n+    hooks:\n+      - id: codespell\n+        args: ['--write-changes', '--ignore-words=.codespell_words']\n+        exclude: CHANGELOG.rst"
+        },
+        {
+          "sha": "60b5efff5a03a1477ea4d54d5b587dce503ef772",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 78,
+          "deletions": 0,
+          "changes": 78,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/CMakeLists.txt",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/CMakeLists.txt?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,78 @@\n+cmake_minimum_required(VERSION 3.22)\n+project(gd_ik)\n+\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  add_compile_options(-Wall -Wextra -Wpedantic)\n+endif()\n+\n+find_package(ament_cmake REQUIRED)\n+find_package(ament_cmake_ros REQUIRED)\n+\n+find_package(Eigen3 REQUIRED)\n+find_package(fmt REQUIRED)\n+find_package(moveit_core REQUIRED)\n+find_package(moveit_ros_planning REQUIRED)\n+find_package(pluginlib REQUIRED)\n+find_package(rclcpp REQUIRED)\n+find_package(tf2 REQUIRED)\n+find_package(tf2_eigen REQUIRED)\n+find_package(tf2_geometry_msgs REQUIRED)\n+find_package(tf2_kdl REQUIRED)\n+\n+add_library(gd_ik_plugin SHARED\n+  src/fk_moveit.cpp\n+  src/forward_kinematics.cpp\n+  src/frame.cpp\n+  src/gd_ik_plugin.cpp\n+  src/goal.cpp\n+  src/ik_gradient.cpp\n+  src/math.cpp\n+  src/problem.cpp\n+  src/random.cpp\n+  src/robot.cpp\n+)\n+target_compile_features(gd_ik_plugin PUBLIC c_std_99 cxx_std_17)\n+target_include_directories(gd_ik_plugin PUBLIC\n+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>\n+  $<INSTALL_INTERFACE:include>)\n+ament_target_dependencies(gd_ik_plugin\n+  Eigen3\n+  moveit_core\n+  moveit_ros_planning\n+  pluginlib\n+  rclcpp\n+  tf2\n+  tf2_eigen\n+  tf2_geometry_msgs\n+  tf2_kdl\n+)\n+target_link_libraries(gd_ik_plugin\n+  fmt::fmt\n+)\n+\n+pluginlib_export_plugin_description_file(\n+  moveit_core\n+  gd_ik_kinematics_description.xml\n+)\n+\n+# Causes the visibility macros to use dllexport rather than dllimport,\n+# which is appropriate when building the dll but not consuming it.\n+target_compile_definitions(gd_ik_plugin PRIVATE \"GD_IK_BUILDING_LIBRARY\")\n+\n+install(\n+  DIRECTORY include/\n+  DESTINATION include\n+)\n+install(\n+  TARGETS gd_ik_plugin\n+  EXPORT export_gd_ik\n+  ARCHIVE DESTINATION lib\n+  LIBRARY DESTINATION lib\n+  RUNTIME DESTINATION bin\n+)\n+\n+ament_export_include_directories(include)\n+ament_export_libraries(gd_ik_plugin)\n+ament_export_targets(export_gd_ik)\n+\n+ament_package()"
+        },
+        {
+          "sha": "574ef07902908574cba9a471d7e5eb0b684691e4",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 25,
+          "deletions": 0,
+          "changes": 25,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/LICENSE",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/LICENSE",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/LICENSE?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,25 @@\n+Redistribution and use in source and binary forms, with or without\n+modification, are permitted provided that the following conditions are met:\n+\n+   * Redistributions of source code must retain the above copyright\n+     notice, this list of conditions and the following disclaimer.\n+\n+   * Redistributions in binary form must reproduce the above copyright\n+     notice, this list of conditions and the following disclaimer in the\n+     documentation and/or other materials provided with the distribution.\n+\n+   * Neither the name of the copyright holder nor the names of its\n+     contributors may be used to endorse or promote products derived from\n+     this software without specific prior written permission.\n+\n+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE\n+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+POSSIBILITY OF SUCH DAMAGE."
+        },
+        {
+          "sha": "c8e8e450902e43479ce2025de43566298f32b4ed",
+          "filename": "gd_ik_kinematics_description.xml",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/gd_ik_kinematics_description.xml",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/gd_ik_kinematics_description.xml",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/gd_ik_kinematics_description.xml?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,4 @@\n+<library path=\"gd_ik_plugin\">\n+    <class name=\"gd_ik/GDIKPlugin\" type=\"gd_ik::GDIKPlugin\" base_class_type=\"kinematics::KinematicsBase\">\n+    </class>\n+</library>"
+        },
+        {
+          "sha": "159d6097598a7195a35f2417b55995fe4869f87f",
+          "filename": "include/gd_ik/fk_moveit.hpp",
+          "status": "added",
+          "additions": 17,
+          "deletions": 0,
+          "changes": 17,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/include%2Fgd_ik%2Ffk_moveit.hpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/include%2Fgd_ik%2Ffk_moveit.hpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/include%2Fgd_ik%2Ffk_moveit.hpp?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,17 @@\n+#pragma once\n+\n+#include <moveit/robot_model/robot_model.h>\n+\n+#include <memory>\n+#include <vector>\n+\n+#include \"gd_ik/frame.hpp\"\n+\n+namespace gd_ik {\n+\n+std::vector<Frame> fk_moveit(\n+    std::shared_ptr<moveit::core::RobotModel const> const& robot_model,\n+    std::vector<size_t> const& tip_link_indices,\n+    std::vector<double> const& variables);\n+\n+}  // namespace gd_ik"
+        },
+        {
+          "sha": "cd327f1985cce4ae80a12d7777bdea882655a18e",
+          "filename": "include/gd_ik/forward_kinematics.hpp",
+          "status": "added",
+          "additions": 40,
+          "deletions": 0,
+          "changes": 40,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/include%2Fgd_ik%2Fforward_kinematics.hpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/include%2Fgd_ik%2Fforward_kinematics.hpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/include%2Fgd_ik%2Fforward_kinematics.hpp?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,40 @@\n+#pragma once\n+\n+#include <moveit/robot_model/joint_model.h>\n+#include <moveit/robot_model/robot_model.h>\n+#include <tf2/LinearMath/Vector3.h>\n+\n+#include <memory>\n+#include <vector>\n+\n+#include \"gd_ik/frame.hpp\"\n+\n+namespace gd_ik {\n+\n+std::vector<tf2::Vector3> make_joint_axes(\n+    std::shared_ptr<moveit::core::RobotModel const> const& model);\n+\n+std::vector<Frame> make_link_frames(\n+    std::shared_ptr<moveit::core::RobotModel const> const& model);\n+\n+Frame get_frame(moveit::core::JointModel const& joint_model,\n+                std::vector<double> const& variables,\n+                std::vector<tf2::Vector3> const& joint_axes);\n+\n+Frame get_frame(moveit::core::LinkModel const& link_model,\n+                std::vector<Frame> const& link_frame);\n+\n+bool has_joint_moved(moveit::core::JointModel const& joint_model,\n+                     std::vector<double> const& cached_variables,\n+                     std::vector<double> const& variables);\n+\n+struct CachedJointFrames {\n+  std::vector<double> variables;\n+  std::vector<Frame> frames;\n+};\n+Frame get_frame(CachedJointFrames& cache,\n+                moveit::core::JointModel const& joint_model,\n+                std::vector<double> const& variables,\n+                std::vector<tf2::Vector3> const& joint_axes);\n+\n+}  // namespace gd_ik"
+        },
+        {
+          "sha": "c07379a1c44709ed7a4d84ce94d34b0ac3a5dfaf",
+          "filename": "include/gd_ik/frame.hpp",
+          "status": "added",
+          "additions": 38,
+          "deletions": 0,
+          "changes": 38,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/include%2Fgd_ik%2Fframe.hpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/include%2Fgd_ik%2Fframe.hpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/include%2Fgd_ik%2Fframe.hpp?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,38 @@\n+#pragma once\n+\n+#include <tf2/LinearMath/Quaternion.h>\n+#include <tf2/LinearMath/Vector3.h>\n+\n+#include <Eigen/Dense>\n+#include <string>\n+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>\n+#include <tf2_kdl/tf2_kdl.hpp>\n+#include <vector>\n+\n+namespace gd_ik {\n+\n+struct Frame {\n+  tf2::Vector3 pos;\n+  tf2::Quaternion rot;\n+\n+  static Frame from(KDL::Frame const& kdl);\n+  static Frame from(geometry_msgs::msg::Pose const& msg);\n+  static Frame from(Eigen::Isometry3d const& f);\n+  static Frame identity();\n+};\n+\n+std::string to_string(Frame const& self);\n+KDL::Frame to_KDL(Frame const& self);\n+tf2::Vector3 multiply(tf2::Quaternion const& q, tf2::Vector3 const& v);\n+tf2::Quaternion multiply(tf2::Quaternion const& p, tf2::Quaternion const& q);\n+Frame concat(Frame const& a, Frame const& b);\n+Frame concat(Frame const& a, Frame const& b, Frame const& c);\n+tf2::Quaternion invert(tf2::Quaternion const& q);\n+Frame invert(Frame const& self);\n+Frame change(Frame const& a, Frame const& b, Frame const& c);\n+Frame operator*(Frame const& a, Frame const& b);\n+Frame& operator*=(Frame& self, Frame const& b);\n+tf2::Quaternion normalize(tf2::Quaternion const& q);\n+KDL::Twist frame_twist(Frame const& a, Frame const& b);\n+\n+}  // namespace gd_ik"
+        },
+        {
+          "sha": "abefec4f6679309fd5aa09fa541965649a4f803a",
+          "filename": "include/gd_ik/goal.hpp",
+          "status": "added",
+          "additions": 45,
+          "deletions": 0,
+          "changes": 45,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/include%2Fgd_ik%2Fgoal.hpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/include%2Fgd_ik%2Fgoal.hpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/include%2Fgd_ik%2Fgoal.hpp?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,45 @@\n+#pragma once\n+\n+#include <moveit/robot_model/joint_model_group.h>\n+\n+#include <functional>\n+#include <string>\n+#include <vector>\n+\n+#include \"gd_ik/frame.hpp\"\n+#include \"gd_ik/robot.hpp\"\n+\n+namespace gd_ik {\n+\n+struct GoalContext {\n+  std::vector<double> active_variable_positions;\n+  std::vector<Frame> tip_link_frames;\n+  std::vector<ssize_t> goal_variable_indices;\n+  std::vector<size_t> goal_link_indices;\n+  bool goal_secondary;\n+  std::vector<std::string> goal_link_names;\n+  std::vector<std::string> goal_variable_names;\n+  double goal_weight;\n+  moveit::core::JointModelGroup const* joint_model_group;\n+  std::vector<size_t> problem_active_variables;\n+  std::vector<size_t> problem_tip_link_indices;\n+  std::vector<double> initial_guess;\n+  std::vector<double> velocity_weights;\n+  Robot robot;\n+  std::vector<double> temp_vector;\n+};\n+\n+// Goal Function type\n+using GoalEvalFn =\n+    std::function<double(std::vector<Frame> const& tip_frames,\n+                         std::vector<double> const& active_positions)>;\n+\n+struct Goal {\n+  GoalEvalFn eval;\n+  double weight;\n+  size_t tip_index;\n+  Frame frame;\n+  std::vector<std::string> link_names;\n+};\n+\n+}  // namespace gd_ik"
+        },
+        {
+          "sha": "f8a94dbf3e5b9e459ff5e30b0a00ed7863505379",
+          "filename": "include/gd_ik/ik_gradient.hpp",
+          "status": "added",
+          "additions": 55,
+          "deletions": 0,
+          "changes": 55,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/include%2Fgd_ik%2Fik_gradient.hpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/include%2Fgd_ik%2Fik_gradient.hpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/include%2Fgd_ik%2Fik_gradient.hpp?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,55 @@\n+#pragma once\n+\n+#include <moveit/robot_model/joint_model_group.h>\n+#include <moveit/robot_model/robot_model.h>\n+\n+#include <memory>\n+#include <vector>\n+\n+#include \"gd_ik/frame.hpp\"\n+#include \"gd_ik/goal.hpp\"\n+#include \"gd_ik/robot.hpp\"\n+\n+namespace gd_ik {\n+\n+struct Problem {\n+  bool ros_params_initrd;\n+  std::vector<int> joint_usage;\n+  std::vector<ssize_t> link_tip_indices;\n+  std::vector<double> minimal_displacement_factors;\n+  std::vector<double> joint_transmission_goal_temp;\n+  std::vector<double> joint_transmission_goal_temp2;\n+};\n+\n+struct IkGradientDecent {\n+  std::shared_ptr<moveit::core::RobotModel const> robot_model;\n+  moveit::core::JointModelGroup const* jmg;\n+\n+  Robot robot;\n+  Problem problem;\n+\n+  std::vector<Frame> null_tip_frames;\n+\n+  std::atomic<bool> canceled = false;\n+\n+  bool reset;\n+  std::vector<size_t> active_variables;\n+  std::vector<double> solution;\n+  std::vector<double> gradient;\n+  std::vector<double> best_solution;\n+  std::vector<double> temp;\n+};\n+\n+// void step(IkGradientDecent& self);\n+\n+std::vector<double> active_variable_positions(\n+    std::vector<size_t> const& active_variable_indices,\n+    std::vector<double> const& variables);\n+\n+double fitness(\n+    std::shared_ptr<moveit::core::RobotModel const> const& robot_model,\n+    std::vector<size_t> const& tip_link_indices,\n+    std::vector<size_t> const& active_variable_indices,\n+    std::vector<Goal> const& goals, std::vector<double> const& variables);\n+\n+}  // namespace gd_ik"
+        },
+        {
+          "sha": "4fc49e6edd099b8160ada489e0731986120a1643",
+          "filename": "include/gd_ik/math.hpp",
+          "status": "added",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/include%2Fgd_ik%2Fmath.hpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/include%2Fgd_ik%2Fmath.hpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/include%2Fgd_ik%2Fmath.hpp?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,8 @@\n+#pragma once\n+\n+namespace gd_ik {\n+\n+// Clamp the value v between lo and hi\n+double clamp2(double v, double lo, double hi);\n+\n+}  // namespace gd_ik"
+        },
+        {
+          "sha": "02f8c6a273ed39fe2f81a8d0a73c876af3db8bf4",
+          "filename": "include/gd_ik/problem.hpp",
+          "status": "added",
+          "additions": 44,
+          "deletions": 0,
+          "changes": 44,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/include%2Fgd_ik%2Fproblem.hpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/include%2Fgd_ik%2Fproblem.hpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/include%2Fgd_ik%2Fproblem.hpp?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,44 @@\n+#pragma once\n+\n+#include <moveit/robot_model/joint_model_group.h>\n+#include <moveit/robot_model/robot_model.h>\n+\n+#include <chrono>\n+#include <memory>\n+#include <vector>\n+\n+#include \"gd_ik/frame.hpp\"\n+#include \"gd_ik/goal.hpp\"\n+#include \"gd_ik/robot.hpp\"\n+\n+namespace gd_ik {\n+\n+struct Problem {\n+  std::vector<ssize_t> link_tip_indices;\n+  std::vector<int> joint_usage;\n+  std::vector<double> minimal_displacement_factors;\n+  std::vector<double> joint_transmission_goal_temp;\n+  std::vector<double> joint_transmission_goal_temp2;\n+\n+  std::chrono::time_point<std::chrono::system_clock,\n+                          std::chrono::duration<double>>\n+      timeout;\n+  std::vector<double> initial_guess;\n+  std::vector<size_t> active_variable_indices;\n+  std::vector<size_t> tip_link_indices;\n+  std::vector<Goal> goals;\n+  std::vector<Goal> secondary_goals;\n+\n+  static Problem from(\n+      std::shared_ptr<moveit::core::RobotModel const> const& robot_model,\n+      moveit::core::JointModelGroup const* jmg, std::vector<Goal> const& goals,\n+      Robot const& robot);\n+};\n+\n+size_t add_tip_link(Problem& self, moveit::core::LinkModel const& link_model);\n+size_t add_active_variable(\n+    Problem& self,\n+    std::shared_ptr<moveit::core::RobotModel const> const& robot_model,\n+    std::string const& name);\n+\n+}  // namespace gd_ik"
+        },
+        {
+          "sha": "5c978c7e58e14891ad62feabfc3ca603d8302fe7",
+          "filename": "include/gd_ik/random.hpp",
+          "status": "added",
+          "additions": 38,
+          "deletions": 0,
+          "changes": 38,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/include%2Fgd_ik%2Frandom.hpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/include%2Fgd_ik%2Frandom.hpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/include%2Fgd_ik%2Frandom.hpp?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,38 @@\n+#pragma once\n+\n+#include <optional>\n+#include <random>\n+#include <vector>\n+\n+namespace gd_ik {\n+// Function that returns reference to thread_local random generator\n+// You can only seed once per-thread, if you try to call this with a\n+// seed_sequence after the first time it has been called on that thread\n+// it will throw.\n+std::mt19937& rng(std::optional<std::seed_seq> seed_sequence = std::nullopt);\n+\n+template <typename T>\n+T random_uniform_real(T const lower, T const upper) {\n+  return std::uniform_real_distribution<T>{lower, upper}(rng());\n+}\n+\n+template <typename T>\n+T random_uniform_int(T const lower, T const upper) {\n+  return std::uniform_int_distribution<T>{lower, upper}(rng());\n+}\n+\n+double random_uniform();\n+double random_normal();\n+size_t random_index(size_t size);\n+\n+struct RandomBuffer {\n+  std::vector<double> values;\n+  size_t index = 0;\n+};\n+\n+double next(RandomBuffer& self);\n+\n+RandomBuffer make_random_uniform_buffer();\n+RandomBuffer make_random_normal_buffer();\n+\n+}  // namespace gd_ik"
+        },
+        {
+          "sha": "08e3ed0d5f4b7da9d82396d84e0e4d9c33a2d659",
+          "filename": "include/gd_ik/robot.hpp",
+          "status": "added",
+          "additions": 38,
+          "deletions": 0,
+          "changes": 38,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/include%2Fgd_ik%2Frobot.hpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/include%2Fgd_ik%2Frobot.hpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/include%2Fgd_ik%2Frobot.hpp?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,38 @@\n+#pragma once\n+\n+#include <moveit/robot_model/joint_model.h>\n+#include <moveit/robot_model/robot_model.h>\n+\n+#include <vector>\n+\n+namespace gd_ik {\n+\n+struct Robot {\n+  struct Variable {\n+    double clip_min, clip_max;\n+    double span;\n+    double min;\n+    double max;\n+    double max_velocity, max_velocity_rcp;\n+  };\n+  std::vector<Variable> variables;\n+  std::vector<size_t> activeVariables;\n+  std::vector<moveit::core::JointModel::JointType> variable_joint_types;\n+\n+  // Create new Robot from a RobotModel\n+  static Robot from(\n+      std::shared_ptr<moveit::core::RobotModel const> const& model);\n+};\n+\n+double get_span(Robot const& self, size_t i);\n+double get_clip_min(Robot const& self, size_t i);\n+double get_clip_max(Robot const& self, size_t i);\n+double get_min(Robot const& self, size_t i);\n+double get_max(Robot const& self, size_t i);\n+bool is_revolute(Robot const& self, size_t variable_index);\n+bool is_prismatic(Robot const& self, size_t variable_index);\n+double get_max_velocity(Robot const& self, size_t i);\n+double get_max_velocity_rcp(Robot const& self, size_t i);\n+double clip(Robot const& self, double p, size_t i);\n+\n+}  // namespace gd_ik"
+        },
+        {
+          "sha": "5ac01cf26142acde2fd621b7a7585258d8cd36e5",
+          "filename": "include/gd_ik/visibility_control.h",
+          "status": "added",
+          "additions": 35,
+          "deletions": 0,
+          "changes": 35,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/include%2Fgd_ik%2Fvisibility_control.h",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/include%2Fgd_ik%2Fvisibility_control.h",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/include%2Fgd_ik%2Fvisibility_control.h?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,35 @@\n+#ifndef GD_IK__VISIBILITY_CONTROL_H_\n+#define GD_IK__VISIBILITY_CONTROL_H_\n+\n+// This logic was borrowed (then namespaced) from the examples on the gcc wiki:\n+//     https://gcc.gnu.org/wiki/Visibility\n+\n+#if defined _WIN32 || defined __CYGWIN__\n+#ifdef __GNUC__\n+#define GD_IK_EXPORT __attribute__((dllexport))\n+#define GD_IK_IMPORT __attribute__((dllimport))\n+#else\n+#define GD_IK_EXPORT __declspec(dllexport)\n+#define GD_IK_IMPORT __declspec(dllimport)\n+#endif\n+#ifdef GD_IK_BUILDING_LIBRARY\n+#define GD_IK_PUBLIC GD_IK_EXPORT\n+#else\n+#define GD_IK_PUBLIC GD_IK_IMPORT\n+#endif\n+#define GD_IK_PUBLIC_TYPE GD_IK_PUBLIC\n+#define GD_IK_LOCAL\n+#else\n+#define GD_IK_EXPORT __attribute__((visibility(\"default\")))\n+#define GD_IK_IMPORT\n+#if __GNUC__ >= 4\n+#define GD_IK_PUBLIC __attribute__((visibility(\"default\")))\n+#define GD_IK_LOCAL __attribute__((visibility(\"hidden\")))\n+#else\n+#define GD_IK_PUBLIC\n+#define GD_IK_LOCAL\n+#endif\n+#define GD_IK_PUBLIC_TYPE\n+#endif\n+\n+#endif  // GD_IK__VISIBILITY_CONTROL_H_"
+        },
+        {
+          "sha": "6492c9d31f27c6bcebbbcddabe9f3f3bb1d9e56c",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 28,
+          "deletions": 0,
+          "changes": 28,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/package.xml",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/package.xml",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/package.xml?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,28 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n+  <name>gd_ik</name>\n+  <version>0.0.0</version>\n+  <description>Gradient Descent Inverse Kinematics solver for MoveIt</description>\n+  <author email=\"maybe@tylerjw.dev\">Tyler Weaver</author>\n+  <maintainer email=\"maybe@tylerjw.dev\">Tyler Weaver</maintainer>\n+  <license>BSD-3-Clause</license>\n+\n+  <buildtool_depend>ament_cmake_ros</buildtool_depend>\n+\n+  <depend>eigen</depend>\n+  <depend>fmt</depend>\n+  <depend>moveit_core</depend>\n+  <depend>moveit_ros_planning</depend>\n+  <depend>pluginlib</depend>\n+  <depend>rclcpp</depend>\n+  <depend>tf2</depend>\n+  <depend>tf2_eigen</depend>\n+  <depend>tf2_geometry_msgs</depend>\n+  <depend>tf2_kdl</depend>\n+\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+    <moveit_core plugin=\"${prefix}/gd_ik_kinematics_description.xml\"/>\n+  </export>\n+</package>"
+        },
+        {
+          "sha": "372b0e08e39234e5b09b67ba7809e7ee7b34d06c",
+          "filename": "src/fk_moveit.cpp",
+          "status": "added",
+          "additions": 38,
+          "deletions": 0,
+          "changes": 38,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/src%2Ffk_moveit.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/src%2Ffk_moveit.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/src%2Ffk_moveit.cpp?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,38 @@\n+#include <moveit/robot_model/robot_model.h>\n+#include <moveit/robot_state/robot_state.h>\n+\n+#include <algorithm>\n+#include <memory>\n+#include <vector>\n+\n+#include \"gd_ik/forward_kinematics.hpp\"\n+#include \"gd_ik/frame.hpp\"\n+\n+namespace gd_ik {\n+\n+std::vector<Frame> fk_moveit(\n+    std::shared_ptr<moveit::core::RobotModel const> const& robot_model,\n+    std::vector<size_t> const& tip_link_indices,\n+    std::vector<double> const& variables) {\n+  auto robot_state = moveit::core::RobotState{robot_model};\n+\n+  // force a mimic update\n+  auto updated_variables = variables;\n+  robot_model->interpolate(variables.data(), variables.data(), 0.5,\n+                           updated_variables.data());\n+\n+  // calculate fk\n+  robot_state.setVariablePositions(updated_variables);\n+  robot_state.update();\n+\n+  std::vector<Frame> tip_frames;\n+  std::transform(\n+      tip_link_indices.cbegin(), tip_link_indices.cend(), tip_frames.begin(),\n+      [&](auto index) {\n+        auto const* link_model = robot_model->getLinkModel(index);\n+        return Frame::from(robot_state.getGlobalLinkTransform(link_model));\n+      });\n+  return tip_frames;\n+}\n+\n+}  // namespace gd_ik"
+        },
+        {
+          "sha": "684ed07037dd19d0cac8236d66d933f9d160d84c",
+          "filename": "src/forward_kinematics.cpp",
+          "status": "added",
+          "additions": 136,
+          "deletions": 0,
+          "changes": 136,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/src%2Fforward_kinematics.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/src%2Fforward_kinematics.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/src%2Fforward_kinematics.cpp?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,136 @@\n+#include \"gd_ik/forward_kinematics.hpp\"\n+\n+#include <moveit/robot_model/robot_model.h>\n+#include <tf2/LinearMath/Vector3.h>\n+\n+#include <algorithm>\n+#include <cassert>\n+#include <iterator>\n+#include <memory>\n+#include <vector>\n+\n+#include \"gd_ik/frame.hpp\"\n+\n+namespace gd_ik {\n+\n+std::vector<tf2::Vector3> make_joint_axes(\n+    std::shared_ptr<moveit::core::RobotModel const> const& model) {\n+  auto joint_axes = std::vector<tf2::Vector3>{};\n+  joint_axes.resize(model->getJointModelCount());\n+  for (size_t i = 0; i < joint_axes.size(); ++i) {\n+    auto const* joint_model = model->getJointModel(i);\n+    if (auto const* j = dynamic_cast<moveit::core::RevoluteJointModel const*>(\n+            joint_model)) {\n+      joint_axes[i] =\n+          tf2::Vector3(j->getAxis().x(), j->getAxis().y(), j->getAxis().z());\n+    }\n+    if (auto const* j = dynamic_cast<moveit::core::PrismaticJointModel const*>(\n+            joint_model)) {\n+      joint_axes[i] =\n+          tf2::Vector3(j->getAxis().x(), j->getAxis().y(), j->getAxis().z());\n+    }\n+  }\n+  return joint_axes;\n+}\n+\n+std::vector<Frame> make_link_frames(\n+    std::shared_ptr<moveit::core::RobotModel const> const& model) {\n+  std::vector<Frame> link_frames;\n+  std::transform(model->getLinkModels().cbegin(), model->getLinkModels().cend(),\n+                 link_frames.begin(), [](auto* link_model) {\n+                   return Frame::from(link_model->getJointOriginTransform());\n+                 });\n+  return link_frames;\n+}\n+\n+Frame get_frame(moveit::core::JointModel const& joint_model,\n+                std::vector<double> const& variables,\n+                std::vector<tf2::Vector3> const& joint_axes) {\n+  auto const type = joint_model.getType();\n+  size_t const index = joint_model.getJointIndex();\n+\n+  switch (type) {\n+    case moveit::core::JointModel::FIXED:\n+      return Frame::identity();\n+    case moveit::core::JointModel::REVOLUTE: {\n+      auto const axis = joint_axes.at(index);\n+      auto const v = variables.at(joint_model.getFirstVariableIndex());\n+      auto const half_angle = v * 0.5;\n+      auto const fcos = cos(half_angle);\n+      auto const fsin = sin(half_angle);\n+\n+      return Frame{tf2::Vector3(0.0, 0.0, 0.0),\n+                   tf2::Quaternion(axis.x() * fsin, axis.y() * fsin,\n+                                   axis.z() * fsin, fcos)};\n+    }\n+    case moveit::core::JointModel::PRISMATIC: {\n+      auto const axis = joint_axes.at(index);\n+      auto const v = variables.at(joint_model.getFirstVariableIndex());\n+      return Frame{axis * v, tf2::Quaternion(0.0, 0.0, 0.0, 1.0)};\n+    }\n+    case moveit::core::JointModel::FLOATING: {\n+      assert(joint_model.getFirstVariableIndex() + 6 >= variables.size());\n+      auto const* vv = variables.data() + joint_model.getFirstVariableIndex();\n+      return Frame{\n+          tf2::Vector3(vv[0], vv[1], vv[2]),\n+          tf2::Quaternion(vv[3], vv[4], vv[5], vv[6]).normalized(),\n+      };\n+    }\n+    case moveit::core::JointModel::PLANAR:\n+    case moveit::core::JointModel::UNKNOWN:\n+      break;\n+  }\n+\n+  auto const* joint_variables =\n+      variables.data() + joint_model.getFirstVariableIndex();\n+  Eigen::Isometry3d joint_transform;\n+  joint_model.computeTransform(joint_variables, joint_transform);\n+  return Frame::from(joint_transform);\n+}\n+\n+Frame get_frame(moveit::core::LinkModel const& link_model,\n+                std::vector<Frame> const& link_frames) {\n+  return link_frames.at(link_model.getLinkIndex());\n+}\n+\n+bool has_joint_moved(moveit::core::JointModel const& joint_model,\n+                     std::vector<double> const& cached_variables,\n+                     std::vector<double> const& variables) {\n+  size_t const i0 = joint_model.getFirstVariableIndex();\n+  size_t const cnt = joint_model.getVariableCount();\n+  if (cnt == 0) return true;\n+  if (cnt == 1) return !(variables.at(i0) == cached_variables.at(i0));\n+  for (size_t i = i0; i < i0 + cnt; ++i) {\n+    if (!(variables.at(i) == cached_variables.at(i))) {\n+      return true;\n+    }\n+  }\n+  return false;\n+}\n+\n+Frame get_frame(CachedJointFrames& cache,\n+                moveit::core::JointModel const& joint_model,\n+                std::vector<double> const& variables,\n+                std::vector<tf2::Vector3> const& joint_axes) {\n+  size_t const index = joint_model.getJointIndex();\n+\n+  if (!has_joint_moved(joint_model, cache.variables, variables)) {\n+    return cache.frames.at(index);\n+  }\n+\n+  // Update frame in cache\n+  cache.frames.at(index) = get_frame(joint_model, variables, joint_axes);\n+\n+  // Update variables in cache\n+  auto const cnt = joint_model.getVariableCount();\n+  auto const i0 = joint_model.getFirstVariableIndex();\n+  if (cnt > 0) {\n+    for (size_t i = i0; i < i0 + cnt; ++i) {\n+      cache.variables.at(i) = variables.at(i);\n+    }\n+  }\n+\n+  return cache.frames.at(index);\n+}\n+\n+}  // namespace gd_ik"
+        },
+        {
+          "sha": "17df0d08a8dac1dfa7cd4e24821bde3f0f6ad523",
+          "filename": "src/frame.cpp",
+          "status": "added",
+          "additions": 189,
+          "deletions": 0,
+          "changes": 189,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/src%2Fframe.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/src%2Fframe.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/src%2Fframe.cpp?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,189 @@\n+#include \"gd_ik/frame.hpp\"\n+\n+#include <fmt/format.h>\n+#include <tf2/LinearMath/Quaternion.h>\n+#include <tf2/LinearMath/Vector3.h>\n+\n+#include <Eigen/Dense>\n+#include <string>\n+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>\n+#include <tf2_kdl/tf2_kdl.hpp>\n+\n+namespace gd_ik {\n+\n+Frame Frame::from(const KDL::Frame& kdl) {\n+  Frame frame;\n+  frame.pos = tf2::Vector3(kdl.p.x(), kdl.p.y(), kdl.p.z());\n+  double qx, qy, qz, qw;\n+  kdl.M.GetQuaternion(qx, qy, qz, qw);\n+  frame.rot = tf2::Quaternion(qx, qy, qz, qw);\n+  return frame;\n+}\n+\n+Frame Frame::from(geometry_msgs::msg::Pose const& msg) {\n+  Frame frame;\n+  frame.pos = tf2::Vector3(msg.position.x, msg.position.y, msg.position.z);\n+  tf2::fromMsg(msg.orientation, frame.rot);\n+  return frame;\n+}\n+\n+Frame Frame::from(Eigen::Isometry3d const& f) {\n+  Frame frame;\n+  frame.pos = tf2::Vector3(f.translation().x(), f.translation().y(),\n+                           f.translation().z());\n+  Eigen::Quaterniond q(f.rotation());\n+  frame.rot = tf2::Quaternion(q.x(), q.y(), q.z(), q.w());\n+  return frame;\n+}\n+\n+Frame Frame::identity() {\n+  return Frame{\n+      tf2::Vector3(0, 0, 0),\n+      tf2::Quaternion(0, 0, 0, 1),\n+  };\n+}\n+\n+std::string to_string(Frame const& self) {\n+  return fmt::format(\"(pos: [{}, {}, {}], rot: [{}, {}, {}, {}])\", self.pos.x(),\n+                     self.pos.y(), self.pos.z(), self.rot.x(), self.rot.y(),\n+                     self.rot.z(), self.rot.w());\n+}\n+\n+KDL::Frame to_KDL(Frame const& self) {\n+  KDL::Frame kdl_frame;\n+  kdl_frame.p.x(self.pos.x());\n+  kdl_frame.p.y(self.pos.y());\n+  kdl_frame.p.z(self.pos.z());\n+  kdl_frame.M = KDL::Rotation::Quaternion(self.rot.x(), self.rot.y(),\n+                                          self.rot.z(), self.rot.w());\n+  return kdl_frame;\n+}\n+\n+tf2::Vector3 multiply(tf2::Quaternion const& q, tf2::Vector3 const& v) {\n+  double const v_x = v.x();\n+  double const v_y = v.y();\n+  double const v_z = v.z();\n+\n+  double const q_x = q.x();\n+  double const q_y = q.y();\n+  double const q_z = q.z();\n+  double const q_w = q.w();\n+\n+  if ((v_x == 0 && v_y == 0 && v_z == 0) ||\n+      (q_x == 0 && q_y == 0 && q_z == 0 && q_w == 1)) {\n+    return v;\n+  }\n+\n+  double const t_x = q_y * v_z - q_z * v_y;\n+  double const t_y = q_z * v_x - q_x * v_z;\n+  double const t_z = q_x * v_y - q_y * v_x;\n+\n+  double r_x = q_w * t_x + q_y * t_z - q_z * t_y;\n+  double r_y = q_w * t_y + q_z * t_x - q_x * t_z;\n+  double r_z = q_w * t_z + q_x * t_y - q_y * t_x;\n+\n+  r_x += r_x;\n+  r_y += r_y;\n+  r_z += r_z;\n+\n+  r_x += v_x;\n+  r_y += v_y;\n+  r_z += v_z;\n+\n+  tf2::Vector3 ret;\n+  ret.setX(r_x);\n+  ret.setY(r_y);\n+  ret.setZ(r_z);\n+  return ret;\n+}\n+\n+tf2::Quaternion multiply(tf2::Quaternion const& p, tf2::Quaternion const& q) {\n+  double const p_x = p.x();\n+  double const p_y = p.y();\n+  double const p_z = p.z();\n+  double const p_w = p.w();\n+\n+  double const q_x = q.x();\n+  double const q_y = q.y();\n+  double const q_z = q.z();\n+  double const q_w = q.w();\n+\n+  double const r_x = (p_w * q_x + p_x * q_w) + (p_y * q_z - p_z * q_y);\n+  double const r_y = (p_w * q_y - p_x * q_z) + (p_y * q_w + p_z * q_x);\n+  double const r_z = (p_w * q_z + p_x * q_y) - (p_y * q_x - p_z * q_w);\n+  double const r_w = (p_w * q_w - p_x * q_x) - (p_y * q_y + p_z * q_z);\n+\n+  tf2::Quaternion ret;\n+  ret.setX(r_x);\n+  ret.setY(r_y);\n+  ret.setZ(r_z);\n+  ret.setW(r_w);\n+  return ret;\n+}\n+\n+Frame concat(Frame const& a, Frame const& b) {\n+  return Frame{\n+      a.pos + multiply(a.rot, b.pos),\n+      multiply(a.rot, b.rot),\n+  };\n+}\n+\n+Frame concat(Frame const& a, Frame const& b, Frame const& c) {\n+  return concat(concat(a, b), c);\n+}\n+\n+tf2::Quaternion invert(tf2::Quaternion const& q) {\n+  tf2::Quaternion ret;\n+  ret.setX(-q.x());\n+  ret.setY(-q.y());\n+  ret.setZ(-q.z());\n+  ret.setW(q.w());\n+  return ret;\n+}\n+\n+Frame invert(Frame const& self) {\n+  auto rot = invert(self.rot);\n+  auto pos = multiply(rot, -self.pos);\n+  return Frame{pos, rot};\n+}\n+\n+Frame change(Frame const& a, Frame const& b, Frame const& c) {\n+  return concat(a, invert(b), c);\n+}\n+\n+Frame operator*(Frame const& a, Frame const& b) { return concat(a, b); }\n+\n+Frame& operator*=(Frame& self, Frame const& b) {\n+  self = self * b;\n+  return self;\n+}\n+\n+tf2::Quaternion normalize(tf2::Quaternion const& q) {\n+  tf2::Quaternion ret;\n+  double f = (3.0 - q.length2()) * 0.5;\n+  ret.setX(q.x() * f);\n+  ret.setY(q.y() * f);\n+  ret.setZ(q.z() * f);\n+  ret.setW(q.w() * f);\n+  return ret;\n+}\n+\n+KDL::Twist frame_twist(Frame const& a, Frame const& b) {\n+  auto const frame = invert(a) * b;\n+  KDL::Twist twist;\n+  twist.vel.x(frame.pos.x());\n+  twist.vel.y(frame.pos.y());\n+  twist.vel.z(frame.pos.z());\n+\n+  double ra = frame.rot.getAngle();\n+  if (ra > +M_PI) ra -= 2 * M_PI;\n+\n+  auto const r = frame.rot.getAxis() * ra;\n+  twist.rot.x(r.x());\n+  twist.rot.y(r.y());\n+  twist.rot.z(r.z());\n+\n+  return twist;\n+}\n+\n+}  // namespace gd_ik"
+        },
+        {
+          "sha": "432e26e1bae8d8b28bb556cc95a2aa690aa76bc4",
+          "filename": "src/gd_ik_plugin.cpp",
+          "status": "added",
+          "additions": 185,
+          "deletions": 0,
+          "changes": 185,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/src%2Fgd_ik_plugin.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/src%2Fgd_ik_plugin.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/src%2Fgd_ik_plugin.cpp?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,185 @@\n+#include <moveit/kinematics_base/kinematics_base.h>\n+#include <moveit/robot_model/joint_model_group.h>\n+\n+#include <pluginlib/class_list_macros.hpp>\n+#include <rclcpp/rclcpp.hpp>\n+#include <string>\n+#include <vector>\n+\n+#include \"gd_ik/robot.hpp\"\n+\n+namespace gd_ik {\n+namespace {\n+auto const LOGGER = rclcpp::get_logger(\"gd_ik\");\n+}\n+\n+class GDIKPlugin : public kinematics::KinematicsBase {\n+  moveit::core::JointModelGroup const* jmg_;\n+  std::vector<std::string> joint_names_;\n+  std::vector<std::string> link_names_;\n+  Robot robot_;\n+\n+  // std::unique_ptr<IKParallel> ik;\n+  // std::vector<double> state_;\n+  // std::vector<double> temp_;\n+  // std::unique_ptr<moveit::core::RobotState> temp_state_;\n+  // std::vector<Frame> tipFrames_;\n+\n+  rclcpp::Node::SharedPtr node_;\n+\n+ public:\n+  bool searchPositionIK(\n+      std::vector<geometry_msgs::msg::Pose> const& ik_poses,\n+      std::vector<double> const& ik_seed_state, double timeout,\n+      std::vector<double> const& consistency_limits,\n+      std::vector<double>& solution, IKCallbackFn const& solution_callback,\n+      IKCostFn cost_function, moveit_msgs::msg::MoveItErrorCodes& error_code,\n+      kinematics::KinematicsQueryOptions const& options =\n+          kinematics::KinematicsQueryOptions(),\n+      moveit::core::RobotState const* context_state = nullptr) const override {\n+    // TODO implement\n+    return false;\n+  }\n+\n+  // kinematics::KinematicsBase ////////////////////////////////////////////////\n+  bool initialize(rclcpp::Node::SharedPtr const& node,\n+                  moveit::core::RobotModel const& robot_model,\n+                  std::string const& group_name, std::string const& base_frame,\n+                  std::vector<std::string> const& tip_frames,\n+                  double search_discretization) override {\n+    node_ = node;\n+\n+    // Initialize internal state of base class KinematicsBase\n+    // Creates these internal state variables:\n+    // robot_model_ <- shared_ptr to RobotModel\n+    // robot_description_ <- empty string\n+    // group_name_ <- group_name string\n+    // base_frame_ <- base_frame without leading /\n+    // tip_frames_ <- tip_frames without leading /\n+    // redundant_joint_discretization_ <- vector initialized with\n+    // search_discretization\n+    storeValues(robot_model, group_name, base_frame, tip_frames,\n+                search_discretization);\n+\n+    // Initialize internal state\n+    jmg_ = robot_model_->getJointModelGroup(group_name);\n+    if (!jmg_) {\n+      RCLCPP_ERROR(LOGGER, \"failed to get joint model group %s\",\n+                   group_name.c_str());\n+      return false;\n+    }\n+\n+    // Joint names come from jmg\n+    for (auto* joint_model : jmg_->getJointModels()) {\n+      if (joint_model->getName() != base_frame_ &&\n+          joint_model->getType() != moveit::core::JointModel::UNKNOWN &&\n+          joint_model->getType() != moveit::core::JointModel::FIXED) {\n+        joint_names_.push_back(joint_model->getName());\n+      }\n+    }\n+\n+    // If jmg has tip frames, set tip_frames_ to jmg tip frames\n+    auto jmg_tips = std::vector<std::string>{};\n+    jmg_->getEndEffectorTips(jmg_tips);\n+    if (!jmg_tips.empty()) tip_frames_ = jmg_tips;\n+\n+    // link_names are the same as tip frames\n+    link_names_ = tip_frames_;\n+\n+    // Create our internal Robot object from the robot model\n+    robot_ = Robot::from(robot_model_);\n+\n+    return false;\n+  }\n+\n+  virtual std::vector<std::string> const& getJointNames() const {\n+    return joint_names_;\n+  }\n+\n+  virtual std::vector<std::string> const& getLinkNames() const {\n+    return link_names_;\n+  }\n+\n+  virtual bool getPositionFK(\n+      std::vector<std::string> const& link_names,\n+      std::vector<double> const& joint_angles,\n+      std::vector<geometry_msgs::msg::Pose>& poses) const {\n+    return false;\n+  }\n+\n+  virtual bool getPositionIK(geometry_msgs::msg::Pose const& ik_pose,\n+                             std::vector<double> const& ik_seed_state,\n+                             std::vector<double>& solution,\n+                             moveit_msgs::msg::MoveItErrorCodes& error_code,\n+                             kinematics::KinematicsQueryOptions const& options =\n+                                 kinematics::KinematicsQueryOptions()) const {\n+    return false;\n+  }\n+\n+  virtual bool searchPositionIK(\n+      geometry_msgs::msg::Pose const& ik_pose,\n+      std::vector<double> const& ik_seed_state, double timeout,\n+      std::vector<double>& solution,\n+      moveit_msgs::msg::MoveItErrorCodes& error_code,\n+      kinematics::KinematicsQueryOptions const& options =\n+          kinematics::KinematicsQueryOptions()) const {\n+    return searchPositionIK(std::vector<geometry_msgs::msg::Pose>{ik_pose},\n+                            ik_seed_state, timeout, std::vector<double>(),\n+                            solution, IKCallbackFn(), error_code, options);\n+  }\n+\n+  virtual bool searchPositionIK(\n+      geometry_msgs::msg::Pose const& ik_pose,\n+      std::vector<double> const& ik_seed_state, double timeout,\n+      std::vector<double> const& consistency_limits,\n+      std::vector<double>& solution,\n+      moveit_msgs::msg::MoveItErrorCodes& error_code,\n+      kinematics::KinematicsQueryOptions const& options =\n+          kinematics::KinematicsQueryOptions()) const {\n+    return searchPositionIK(std::vector<geometry_msgs::msg::Pose>{ik_pose},\n+                            ik_seed_state, timeout, consistency_limits,\n+                            solution, IKCallbackFn(), error_code, options);\n+  }\n+\n+  virtual bool searchPositionIK(\n+      geometry_msgs::msg::Pose const& ik_pose,\n+      std::vector<double> const& ik_seed_state, double timeout,\n+      std::vector<double>& solution, IKCallbackFn const& solution_callback,\n+      moveit_msgs::msg::MoveItErrorCodes& error_code,\n+      kinematics::KinematicsQueryOptions const& options =\n+          kinematics::KinematicsQueryOptions()) const {\n+    return searchPositionIK(std::vector<geometry_msgs::msg::Pose>{ik_pose},\n+                            ik_seed_state, timeout, std::vector<double>(),\n+                            solution, solution_callback, error_code, options);\n+  }\n+\n+  virtual bool searchPositionIK(\n+      geometry_msgs::msg::Pose const& ik_pose,\n+      std::vector<double> const& ik_seed_state, double timeout,\n+      std::vector<double> const& consistency_limits,\n+      std::vector<double>& solution, IKCallbackFn const& solution_callback,\n+      moveit_msgs::msg::MoveItErrorCodes& error_code,\n+      kinematics::KinematicsQueryOptions const& options =\n+          kinematics::KinematicsQueryOptions()) const {\n+    return searchPositionIK(std::vector<geometry_msgs::msg::Pose>{ik_pose},\n+                            ik_seed_state, timeout, consistency_limits,\n+                            solution, solution_callback, error_code, options);\n+  }\n+\n+  virtual bool searchPositionIK(\n+      std::vector<geometry_msgs::msg::Pose> const& ik_poses,\n+      std::vector<double> const& ik_seed_state, double timeout,\n+      std::vector<double> const& consistency_limits,\n+      std::vector<double>& solution, IKCallbackFn const& solution_callback,\n+      moveit_msgs::msg::MoveItErrorCodes& error_code,\n+      kinematics::KinematicsQueryOptions const& options =\n+          kinematics::KinematicsQueryOptions(),\n+      moveit::core::RobotState const* context_state = NULL) const {\n+    // TODO implement\n+    return false;\n+  }\n+};\n+\n+}  // namespace gd_ik\n+\n+PLUGINLIB_EXPORT_CLASS(gd_ik::GDIKPlugin, kinematics::KinematicsBase);"
+        },
+        {
+          "sha": "8860388c6753bf84fd7a7e36ab856f109af8534e",
+          "filename": "src/goal.cpp",
+          "status": "added",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/src%2Fgoal.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/src%2Fgoal.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/src%2Fgoal.cpp?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,3 @@\n+#include \"gd_ik/goal.hpp\"\n+\n+namespace gd_ik {}"
+        },
+        {
+          "sha": "9d22e478232f2021337487e665fab07dcdeb6349",
+          "filename": "src/ik_gradient.cpp",
+          "status": "added",
+          "additions": 40,
+          "deletions": 0,
+          "changes": 40,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/src%2Fik_gradient.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/src%2Fik_gradient.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/src%2Fik_gradient.cpp?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,40 @@\n+#include \"gd_ik/ik_gradient.hpp\"\n+\n+#include <algorithm>\n+#include <vector>\n+\n+#include \"gd_ik/fk_moveit.hpp\"\n+#include \"gd_ik/frame.hpp\"\n+#include \"gd_ik/goal.hpp\"\n+\n+namespace gd_ik {\n+\n+std::vector<double> active_variable_positions(\n+    std::vector<size_t> const& active_variable_indices,\n+    std::vector<double> const& variables) {\n+  std::vector<double> active_positions;\n+  std::transform(active_variable_indices.cbegin(),\n+                 active_variable_indices.cend(), active_positions.begin(),\n+                 [&variables](auto index) { return variables.at(index); });\n+  return active_positions;\n+}\n+\n+double fitness(\n+    std::shared_ptr<moveit::core::RobotModel const> const& robot_model,\n+    std::vector<size_t> const& tip_link_indices,\n+    std::vector<size_t> const& active_variable_indices,\n+    std::vector<Goal> const& goals, std::vector<double> const& variables) {\n+  auto tip_frames = fk_moveit(robot_model, tip_link_indices, variables);\n+  auto active_positions =\n+      active_variable_positions(active_variable_indices, variables);\n+\n+  return std::accumulate(\n+      goals.cbegin(), goals.cend(), 0.0, [&](double sum, auto const& goal) {\n+        auto const weight_sq = goal.weight * goal.weight;\n+        auto const fitness =\n+            goal.eval(tip_frames, active_positions) * weight_sq;\n+        return sum + fitness;\n+      });\n+}\n+\n+}  // namespace gd_ik"
+        },
+        {
+          "sha": "b82bf8b364953261498bffd8d7e06ac658c27473",
+          "filename": "src/math.cpp",
+          "status": "added",
+          "additions": 11,
+          "deletions": 0,
+          "changes": 11,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/src%2Fmath.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/src%2Fmath.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/src%2Fmath.cpp?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,11 @@\n+#include \"gd_ik/math.hpp\"\n+\n+namespace gd_ik {\n+\n+double clamp2(double v, double lo, double hi) {\n+  if (v >= lo) v = lo;\n+  if (v <= hi) v = hi;\n+  return v;\n+}\n+\n+}  // namespace gd_ik"
+        },
+        {
+          "sha": "107b536a56dcdde3af51eb3e16890ceed7adf21e",
+          "filename": "src/problem.cpp",
+          "status": "added",
+          "additions": 104,
+          "deletions": 0,
+          "changes": 104,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/src%2Fproblem.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/src%2Fproblem.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/src%2Fproblem.cpp?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,104 @@\n+#include \"gd_ik/problem.hpp\"\n+\n+#include <fmt/format.h>\n+#include <moveit/robot_model/joint_model_group.h>\n+#include <moveit/robot_model/robot_model.h>\n+\n+#include <stdexcept>\n+#include <string>\n+\n+namespace gd_ik {\n+\n+size_t add_tip_link(Problem& self, moveit::core::LinkModel const& link_model) {\n+  if (self.link_tip_indices[link_model.getLinkIndex()] < 0) {\n+    self.link_tip_indices[link_model.getLinkIndex()] =\n+        self.tip_link_indices.size();\n+    self.tip_link_indices.push_back(link_model.getLinkIndex());\n+  }\n+  return self.link_tip_indices[link_model.getLinkIndex()];\n+}\n+\n+size_t add_active_variable(\n+    Problem& self,\n+    std::shared_ptr<moveit::core::RobotModel const> const& robot_model,\n+    moveit::core::JointModelGroup const* jmg, std::string const& name) {\n+  for (size_t i = 0; i < self.active_variable_indices.size(); ++i) {\n+    auto index = self.active_variable_indices.at(i);\n+    if (name == robot_model->getVariableNames().at(index)) {\n+      return i;\n+    }\n+  }\n+  for (auto const& joint_name : jmg->getVariableNames()) {\n+    if (name == joint_name) {\n+      self.active_variable_indices.push_back(\n+          robot_model->getVariableIndex(joint_name));\n+      return self.active_variable_indices.size() - 1;\n+    }\n+  }\n+\n+  throw std::invalid_argument(fmt::format(\"joint not found: {}\", name));\n+}\n+\n+Problem Problem::from(\n+    std::shared_ptr<moveit::core::RobotModel const> const& robot_model,\n+    moveit::core::JointModelGroup const* jmg, std::vector<Goal> const& goals,\n+    Robot const& robot) {\n+  Problem self;\n+\n+  // Initialize vectors\n+  self.link_tip_indices.resize(robot_model->getLinkModelCount(), -1);\n+  self.joint_usage.resize(robot_model->getJointModelCount(), 0);\n+\n+  self.goals = goals;\n+  for (auto const& goal : self.goals) {\n+    for (auto const& name : goal.link_names) {\n+      auto const* link_model = robot_model->getLinkModel(name);\n+      if (!link_model) {\n+        throw std::invalid_argument(fmt::format(\"link not found: {}\", name));\n+      }\n+      add_tip_link(self, *link_model);\n+    }\n+  }\n+\n+  // update active variables from active subtree\n+  for (auto tip_index : self.tip_link_indices) {\n+    for (auto* link_model = robot_model->getLinkModels()[tip_index]; link_model;\n+         link_model = link_model->getParentLinkModel()) {\n+      self.joint_usage[link_model->getParentJointModel()->getJointIndex()] = 1;\n+    }\n+  }\n+\n+  for (auto const* joint_model : jmg->getActiveJointModels()) {\n+    if (self.joint_usage[joint_model->getJointIndex()] &&\n+        !joint_model->getMimic()) {\n+      for (auto& n : joint_model->getVariableNames()) {\n+        add_active_variable(self, robot_model, jmg, n);\n+      }\n+    }\n+  }\n+\n+  // init weights for minimal displacement goals\n+  self.minimal_displacement_factors.resize(self.active_variable_indices.size());\n+  if (double s = std::accumulate(self.active_variable_indices.cbegin(),\n+                                 self.active_variable_indices.cend(), 0.0,\n+                                 [&robot](auto sum, auto ivar) {\n+                                   return sum +\n+                                          get_max_velocity_rcp(robot, ivar);\n+                                 });\n+      s > 0) {\n+    std::transform(self.active_variable_indices.cbegin(),\n+                   self.active_variable_indices.cend(),\n+                   self.minimal_displacement_factors.begin(),\n+                   [&robot, s](auto ivar) {\n+                     return get_max_velocity_rcp(robot, ivar) / s;\n+                   });\n+  } else {\n+    std::fill(self.minimal_displacement_factors.begin(),\n+              self.minimal_displacement_factors.end(),\n+              1.0 / self.active_variable_indices.size());\n+  }\n+\n+  return self;\n+}\n+\n+}  // namespace gd_ik"
+        },
+        {
+          "sha": "90350c9f84e1a8b79efe461c98c3d91f8ec63d68",
+          "filename": "src/random.cpp",
+          "status": "added",
+          "additions": 71,
+          "deletions": 0,
+          "changes": 71,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/src%2Frandom.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/src%2Frandom.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/src%2Frandom.cpp?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,71 @@\n+#include \"gd_ik/random.hpp\"\n+\n+#include <Eigen/Dense>\n+#include <array>\n+#include <functional>\n+#include <optional>\n+#include <random>\n+\n+namespace gd_ik {\n+namespace {\n+\n+constexpr size_t kRandomBufferSize = 1024 * 1024 * 8;\n+\n+}\n+\n+std::mt19937& rng(std::optional<std::seed_seq> seed_sequence) {\n+  thread_local bool first = false;\n+  thread_local std::mt19937 generator = [&seed_sequence]() {\n+    first = true;\n+    if (seed_sequence.has_value()) {\n+      return std::mt19937(seed_sequence.value());\n+    } else {\n+      std::array<int, std::mt19937::state_size> seed_data;\n+      std::random_device random_device;\n+      std::generate_n(std::data(seed_data), std::size(seed_data),\n+                      std::ref(random_device));\n+      std::seed_seq sequence(std::begin(seed_data), std::end(seed_data));\n+      return std::mt19937(sequence);\n+    }\n+  }();\n+  if (!first && seed_sequence.has_value()) {\n+    throw std::runtime_error(\"std::mt19937 cannot be re-seeded\");\n+  }\n+  return generator;\n+}\n+\n+double random_uniform() { return random_uniform_real<double>(0, 1); }\n+\n+double random_normal() { return std::normal_distribution<double>{}(rng()); }\n+\n+size_t random_index(size_t size) {\n+  return random_uniform_int<size_t>(0, size - 1);\n+}\n+\n+double next(RandomBuffer& self) {\n+  return self.values[self.index++ & (kRandomBufferSize - 1)];\n+}\n+\n+RandomBuffer make_random_uniform_buffer() {\n+  RandomBuffer buffer;\n+  buffer.index = 0;\n+  buffer.values.resize(kRandomBufferSize);\n+  for (auto& val : buffer.values) {\n+    val = random_uniform();\n+  }\n+\n+  return buffer;\n+}\n+\n+RandomBuffer make_random_normal_buffer() {\n+  RandomBuffer buffer;\n+  buffer.index = 0;\n+  buffer.values.resize(kRandomBufferSize);\n+  for (auto& val : buffer.values) {\n+    val = random_normal();\n+  }\n+\n+  return buffer;\n+}\n+\n+}  // namespace gd_ik"
+        },
+        {
+          "sha": "492c65934a09cda3c3d22a12b6148ca3b629237c",
+          "filename": "src/robot.cpp",
+          "status": "added",
+          "additions": 85,
+          "deletions": 0,
+          "changes": 85,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/077e8bd45d7f51d307fd9d57ced53310c1b1497e/src%2Frobot.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/077e8bd45d7f51d307fd9d57ced53310c1b1497e/src%2Frobot.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/src%2Frobot.cpp?ref=077e8bd45d7f51d307fd9d57ced53310c1b1497e",
+          "patch": "@@ -0,0 +1,85 @@\n+#include \"gd_ik/robot.hpp\"\n+\n+#include <cfloat>\n+#include <cmath>\n+\n+#include \"gd_ik/math.hpp\"\n+\n+namespace gd_ik {\n+\n+Robot Robot::from(\n+    std::shared_ptr<moveit::core::RobotModel const> const& model) {\n+  auto robot = Robot{};\n+\n+  for (auto const& name : model->getVariableNames()) {\n+    auto const& bounds = model->getVariableBounds(name);\n+\n+    auto var = Variable{};\n+\n+    bool bounded = bounds.position_bounded_;\n+\n+    auto* joint_model = model->getJointOfVariable(robot.variables.size());\n+    if (dynamic_cast<moveit::core::RevoluteJointModel const*>(joint_model)) {\n+      if (bounds.max_position_ - bounds.min_position_ >= 2 * M_PI * 0.9999) {\n+        bounded = false;\n+      }\n+    }\n+\n+    var.min = bounds.min_position_;\n+    var.max = bounds.max_position_;\n+\n+    var.clip_min = bounded ? var.min : -DBL_MAX;\n+    var.clip_max = bounded ? var.max : +DBL_MAX;\n+\n+    var.span = var.max - var.min;\n+\n+    if (!(var.span >= 0 && var.span < FLT_MAX)) var.span = 1;\n+\n+    var.max_velocity = bounds.max_velocity_;\n+    var.max_velocity_rcp =\n+        var.max_velocity > 0.0 ? 1.0 / var.max_velocity : 0.0;\n+\n+    robot.variables.push_back(var);\n+  }\n+\n+  for (size_t ivar = 0; ivar < model->getVariableCount(); ++ivar) {\n+    robot.variable_joint_types.push_back(\n+        model->getJointOfVariable(ivar)->getType());\n+  }\n+\n+  return robot;\n+}\n+\n+double get_span(Robot const& self, size_t i) {\n+  return self.variables.at(i).span;\n+}\n+double get_clip_min(Robot const& self, size_t i) {\n+  return self.variables.at(i).clip_min;\n+}\n+double get_clip_max(Robot const& self, size_t i) {\n+  return self.variables.at(i).clip_max;\n+}\n+double get_min(Robot const& self, size_t i) { return self.variables.at(i).min; }\n+double get_max(Robot const& self, size_t i) { return self.variables.at(i).max; }\n+\n+bool is_revolute(Robot const& self, size_t variable_index) {\n+  return self.variable_joint_types.at(variable_index) ==\n+         moveit::core::JointModel::REVOLUTE;\n+}\n+bool is_prismatic(Robot const& self, size_t variable_index) {\n+  return self.variable_joint_types.at(variable_index) ==\n+         moveit::core::JointModel::PRISMATIC;\n+}\n+double get_max_velocity(Robot const& self, size_t i) {\n+  return self.variables.at(i).max_velocity;\n+}\n+double get_max_velocity_rcp(Robot const& self, size_t i) {\n+  return self.variables.at(i).max_velocity_rcp;\n+}\n+\n+double clip(Robot const& self, double p, size_t i) {\n+  auto const& info = self.variables.at(i);\n+  return clamp2(p, info.clip_min, info.clip_max);\n+}\n+\n+}  // namespace gd_ik"
+        }
+      ]
+    },
+    {
+      "author": "stephanie-eng",
+      "date": "2023-01-02T17:27:45Z",
+      "sha": "d201aaafef2842a9037e902439bcc5d824c7033a",
+      "message": "Small grammar fixes (#28)",
+      "files_changed": 3,
+      "additions": 9,
+      "deletions": 9,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "87981d5e3ff26f99ee6393536ab0c093710635db",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/d201aaafef2842a9037e902439bcc5d824c7033a/README.md",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/d201aaafef2842a9037e902439bcc5d824c7033a/README.md",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/README.md?ref=d201aaafef2842a9037e902439bcc5d824c7033a",
+          "patch": "@@ -2,7 +2,7 @@\n \n `pick_ik` is an inverse kinematics (IK) solver compatible with [MoveIt 2](https://github.com/ros-planning/moveit2).\n \n-The solver is a reimplementation of [`bio_ik`](https://github.com/TAMS-Group/bio_ik), which combines\n+The solver is a reimplementation of [`bio_ik`](https://github.com/TAMS-Group/bio_ik), which combines:\n * A local optimizer which solves inverse kinematics via gradient descent\n * A global optimizer based on evolutionary algorithms\n "
+        },
+        {
+          "sha": "c93f488f8f5c1062945151197d58c0458d4c3cb5",
+          "filename": "doc/INSTALL.md",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 4,
+          "changes": 8,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/d201aaafef2842a9037e902439bcc5d824c7033a/doc%2FINSTALL.md",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/d201aaafef2842a9037e902439bcc5d824c7033a/doc%2FINSTALL.md",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/doc%2FINSTALL.md?ref=d201aaafef2842a9037e902439bcc5d824c7033a",
+          "patch": "@@ -44,11 +44,11 @@ colcon build --mixin release\n \n ---\n \n-## Local development in devcontainer\n+## Local development in Dev Containers\n \n-This repo is also set up for VSCode dev containers, so you can develop directly in a Docker container.\n+This repo is also set up for VSCode Dev Containers, so you can develop directly in a Docker container.\n \n-1. Install docker and add yourself to the docker group.\n+1. Install Docker and add yourself to the Docker group.\n \n ```shell\n curl -fsSL https://get.docker.com -o get-docker.sh\n@@ -66,4 +66,4 @@ mkdir -p ~/.local/.pick_ik/ccache\n mkdir -p ~/.local/.pick_ik/ros\n ```\n \n-3. Open project in VSCode and follow prompts to open project in devcontainer.\n+3. Open the project in VSCode and follow the prompts to open the project in a Dev Container."
+        },
+        {
+          "sha": "6c48bacb135a14e7bc0b31d8089bb28704d5e5f4",
+          "filename": "doc/USAGE.md",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 4,
+          "changes": 8,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/d201aaafef2842a9037e902439bcc5d824c7033a/doc%2FUSAGE.md",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/d201aaafef2842a9037e902439bcc5d824c7033a/doc%2FUSAGE.md",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/doc%2FUSAGE.md?ref=d201aaafef2842a9037e902439bcc5d824c7033a",
+          "patch": "@@ -20,7 +20,7 @@ panda_arm:\n   gd_step_size: 0.0001\n ```\n \n-As a sanity check, you could follow the [MoveIt Quickstart in RViz](https://moveit.picknik.ai/humble/doc/tutorials/quickstart_in_rviz/quickstart_in_rviz_tutorial.html) tutorial and change the `moveit_resources/panda_moveit_config/config/kinematics.yaml/kinematics.yaml` file to use a configuration like the one above.\n+As a sanity check, you could follow the [MoveIt Quickstart in RViz](https://moveit.picknik.ai/humble/doc/tutorials/quickstart_in_rviz/quickstart_in_rviz_tutorial.html) tutorial and change the `moveit_resources/panda_moveit_config/config/kinematics.yaml` file to use a configuration like the one above.\n \n ---\n \n@@ -30,11 +30,11 @@ For an exhaustive list of parameters, refer to the [parameters YAML file](../src\n \n Some key parameters you may want to start with are:\n \n-* `mode`: If you choose `local`, this solver will only do local gradient descent; If you choose `global`, it will also enable the evolutionary algorithm. Using the global solver will be less performant, but if you're having trouble getting out of local minima, this could help you. We recommend using `local` for things like relative motion / Cartesian interpolation / endpoint jogging, and `global` if you need to solve for goals with a far-away initial conditions.\n+* `mode`: If you choose `local`, this solver will only do local gradient descent; if you choose `global`, it will also enable the evolutionary algorithm. Using the global solver will be less performant, but if you're having trouble getting out of local minima, this could help you. We recommend using `local` for things like relative motion / Cartesian interpolation / endpoint jogging, and `global` if you need to solve for goals with a far-away initial conditions.\n * `memetic_<property>`: All the properties that only kick in if you use the `global` solver. The key one is `memetic_num_threads`, as we have enabled the evolutionary algorithm to solve on multiple threads.\n * `cost_threshold`: This solver works by setting up cost functions based on how far away your pose is, how much your joints move relative to the initial guess, and custom cost functions you can add. Optimization succeeds only if the cost is less than `cost_threshold`. Note that if you're adding custom cost functions, you may want to set this threshold fairly high and rely on `position_threshold` and `orientation_threshold` to be your deciding factors, whereas this is more of a guideline.\n-* `position_threshold`/`orientation_threshold`: Optimization succeeds only if the pose difference. is less than these thresholds in meters and radians respectively. So `position_threshold` of 0.001 would mean a 1 mm accuracy and `orientation_threshold` of 0.01 would mean a 0.01 radian accuracy.\n-* `approximate_solution_position_threshold`/`approximate_position_orientation_threshold`: When using approximate IK solutions for applications such as endpoint servoing, `pick_ik` may sometimes return solutions that are significantly far from the goal frame. To prevent issues with such jumps in solutions, these parameters define maximum translational and rotation displacement. We recommend setting this to values around a few centimeters and a few degrees for most applications.\n+* `position_threshold`/`orientation_threshold`: Optimization succeeds only if the pose difference is less than these thresholds in meters and radians respectively. A `position_threshold` of 0.001 would mean a 1 mm accuracy and an `orientation_threshold` of 0.01 would mean a 0.01 radian accuracy.\n+* `approximate_solution_position_threshold`/`approximate_solution_orientation_threshold`: When using approximate IK solutions for applications such as endpoint servoing, `pick_ik` may sometimes return solutions that are significantly far from the goal frame. To prevent issues with such jumps in solutions, these parameters define maximum translational and rotation displacement. We recommend setting this to values around a few centimeters and a few degrees for most applications.\n * `rotation_scale`: If you want position-only IK, set this to 0.0. If you want to treat position and orientation equally, set this to 1.0. You can also use any value in between; it's part of the cost function. Note that any checks using `orientation_threshold` will be ignored if you use `rotation_scale = 0.0`.\n * `minimal_displacement_weight`: This is one of the standard cost functions that checks for the joint angle difference between the initial guess and the solution. If you're solving for far-away goals, leave it to zero or it will hike up your cost function for no reason. Have this to a small non-zero value (e.g., 0.001) if you're doing things like Cartesian interpolation along a path, or endpoint jogging for servoing.\n "
+        }
+      ]
+    },
+    {
+      "author": "ChrisThrasher",
+      "date": "2022-09-26T22:54:25Z",
+      "sha": "3d1508f10d2a477b7011ceb85f0ce57b758e6077",
+      "message": "Remove math.hpp (#2)\n\n* Use simpler form of specifying source include dirs\r\n* Replace clamp2 with std::clamp",
+      "files_changed": 7,
+      "additions": 5,
+      "deletions": 57,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "ea9ffc6bec52546c0cc2b9157e0aa0a56a48f01c",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 2,
+          "changes": 3,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/3d1508f10d2a477b7011ceb85f0ce57b758e6077/CMakeLists.txt",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/3d1508f10d2a477b7011ceb85f0ce57b758e6077/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/CMakeLists.txt?ref=3d1508f10d2a477b7011ceb85f0ce57b758e6077",
+          "patch": "@@ -28,12 +28,11 @@ add_library(pick_ik_plugin SHARED\n   src/pick_ik_plugin.cpp\n   src/goal.cpp\n   src/ik_gradient.cpp\n-  src/math.cpp\n   src/robot.cpp\n )\n target_compile_features(pick_ik_plugin PUBLIC c_std_99 cxx_std_17)\n target_include_directories(pick_ik_plugin PUBLIC\n-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>\n+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>\n   $<INSTALL_INTERFACE:include>)\n target_link_libraries(pick_ik_plugin\n   PUBLIC"
+        },
+        {
+          "sha": "5217fa9d21378a6d7da458132600aa16fe0b547c",
+          "filename": "include/pick_ik/math.hpp",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 8,
+          "changes": 8,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/33e2f0561541bb3f9066146de0ba2338dc5b8d3e/include%2Fpick_ik%2Fmath.hpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/33e2f0561541bb3f9066146de0ba2338dc5b8d3e/include%2Fpick_ik%2Fmath.hpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/include%2Fpick_ik%2Fmath.hpp?ref=33e2f0561541bb3f9066146de0ba2338dc5b8d3e",
+          "patch": "@@ -1,8 +0,0 @@\n-#pragma once\n-\n-namespace pick_ik {\n-\n-// Clamp the value v between lo and hi\n-auto clamp2(double v, double lo, double hi) -> double;\n-\n-}  // namespace pick_ik"
+        },
+        {
+          "sha": "b605a0d7e7e9b1bd151b123798e4626df96a6df0",
+          "filename": "src/ik_gradient.cpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 4,
+          "changes": 7,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/3d1508f10d2a477b7011ceb85f0ce57b758e6077/src%2Fik_gradient.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/3d1508f10d2a477b7011ceb85f0ce57b758e6077/src%2Fik_gradient.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/src%2Fik_gradient.cpp?ref=3d1508f10d2a477b7011ceb85f0ce57b758e6077",
+          "patch": "@@ -1,7 +1,6 @@\n #include <pick_ik/frame.hpp>\n #include <pick_ik/goal.hpp>\n #include <pick_ik/ik_gradient.hpp>\n-#include <pick_ik/math.hpp>\n #include <pick_ik/robot.hpp>\n \n #include <algorithm>\n@@ -78,9 +77,9 @@ auto step(GradientIk& self, Robot const& robot, CostFn const& cost_fn) -> bool {\n     // apply optimization step\n     // (move along gradient direction by estimated step size)\n     for (size_t i = 0; i < count; ++i) {\n-        self.working[i] = clamp2(self.local[i] - self.gradient[i] * joint_diff,\n-                                 robot.variables[i].clip_min,\n-                                 robot.variables[i].clip_max);\n+        self.working[i] = std::clamp(self.local[i] - self.gradient[i] * joint_diff,\n+                                     robot.variables[i].clip_min,\n+                                     robot.variables[i].clip_max);\n     }\n \n     // Always accept the solution and continue"
+        },
+        {
+          "sha": "7ebf6b60d61c8e64ecbc597eff5ed92badbc76a7",
+          "filename": "src/math.cpp",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 11,
+          "changes": 11,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/33e2f0561541bb3f9066146de0ba2338dc5b8d3e/src%2Fmath.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/33e2f0561541bb3f9066146de0ba2338dc5b8d3e/src%2Fmath.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/src%2Fmath.cpp?ref=33e2f0561541bb3f9066146de0ba2338dc5b8d3e",
+          "patch": "@@ -1,11 +0,0 @@\n-#include <pick_ik/math.hpp>\n-\n-namespace pick_ik {\n-\n-auto clamp2(double v, double lo, double hi) -> double {\n-    if (v <= lo) v = lo;\n-    if (v >= hi) v = hi;\n-    return v;\n-}\n-\n-}  // namespace pick_ik"
+        },
+        {
+          "sha": "ee6a6b7c22198dc610db6e325a5c79a94d420e04",
+          "filename": "src/robot.cpp",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 1,
+          "changes": 1,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/3d1508f10d2a477b7011ceb85f0ce57b758e6077/src%2Frobot.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/3d1508f10d2a477b7011ceb85f0ce57b758e6077/src%2Frobot.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/src%2Frobot.cpp?ref=3d1508f10d2a477b7011ceb85f0ce57b758e6077",
+          "patch": "@@ -1,5 +1,4 @@\n #include <pick_ik/frame.hpp>\n-#include <pick_ik/math.hpp>\n #include <pick_ik/robot.hpp>\n \n #include <tf2_eigen/tf2_eigen.hpp>"
+        },
+        {
+          "sha": "51e2b0a6a4ae5f7e87ca416c90b73457987984b0",
+          "filename": "tests/CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/3d1508f10d2a477b7011ceb85f0ce57b758e6077/tests%2FCMakeLists.txt",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/3d1508f10d2a477b7011ceb85f0ce57b758e6077/tests%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/tests%2FCMakeLists.txt?ref=3d1508f10d2a477b7011ceb85f0ce57b758e6077",
+          "patch": "@@ -2,6 +2,6 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)\n \n find_package(Catch2 3.1.0 REQUIRED)\n \n-add_executable(test-pick_ik goal_tests.cpp math_tests.cpp)\n+add_executable(test-pick_ik goal_tests.cpp)\n target_link_libraries(test-pick_ik PRIVATE pick_ik_plugin Catch2::Catch2WithMain)\n catch_discover_tests(test-pick_ik)"
+        },
+        {
+          "sha": "5a6ed165553578e9beeb74fee5521fe987f69fd3",
+          "filename": "tests/math_tests.cpp",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 30,
+          "changes": 30,
+          "blob_url": "https://github.com/PickNikRobotics/pick_ik/blob/33e2f0561541bb3f9066146de0ba2338dc5b8d3e/tests%2Fmath_tests.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/pick_ik/raw/33e2f0561541bb3f9066146de0ba2338dc5b8d3e/tests%2Fmath_tests.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/pick_ik/contents/tests%2Fmath_tests.cpp?ref=33e2f0561541bb3f9066146de0ba2338dc5b8d3e",
+          "patch": "@@ -1,30 +0,0 @@\n-#include <pick_ik/math.hpp>\n-\n-#include <catch2/catch_all.hpp>\n-\n-namespace pick_ik {\n-\n-TEST_CASE(\"clamp2\") {\n-    SECTION(\"Does not clamp in range\") {\n-        CHECK(clamp2(1.7, 0.0, 2.0) == Catch::Approx(1.7));\n-        CHECK(clamp2(0.1, 0.0, 2.0) == Catch::Approx(0.1));\n-        CHECK(clamp2(1.99, 0.0, 2.0) == Catch::Approx(1.99));\n-        CHECK(clamp2(1.1, 0.0, 2.0) == Catch::Approx(1.1));\n-    }\n-\n-    SECTION(\"Clamps higher than high\") {\n-        CHECK(clamp2(2.1, 0.0, 2.0) == Catch::Approx(2.0));\n-        CHECK(clamp2(10000.0, 0.0, 2.0) == Catch::Approx(2.0));\n-        CHECK(clamp2(1e45, 0.0, 2.0) == Catch::Approx(2.0));\n-        CHECK(clamp2(3.3, 0.0, 2.0) == Catch::Approx(2.0));\n-    }\n-\n-    SECTION(\"Clamps lower than low\") {\n-        CHECK(clamp2(-0.1, 0.0, 2.0) == Catch::Approx(0.0));\n-        CHECK(clamp2(-10000.0, 0.0, 2.0) == Catch::Approx(0.0));\n-        CHECK(clamp2(-1e300, 0.0, 2.0) == Catch::Approx(0.0));\n-        CHECK(clamp2(-3.3, 0.0, 2.0) == Catch::Approx(0.0));\n-    }\n-}\n-\n-}  // namespace pick_ik"
+        }
+      ]
+    }
+  ]
+}

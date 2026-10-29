@@ -1,0 +1,407 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T04:23:52Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "mikeferguson",
+    "repo": "robot_calibration"
+  },
+  "data": [
+    {
+      "author": "mikeferguson",
+      "date": "2014-11-09T09:50:01Z",
+      "sha": "3ec8eafaec0b42e3e3f21d1edd659c56f88c278c",
+      "message": "Initial commit",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "583745d1bde941dbe023d589742b6eb9206600a4",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/mikeferguson/robot_calibration/blob/3ec8eafaec0b42e3e3f21d1edd659c56f88c278c/README.md",
+          "raw_url": "https://github.com/mikeferguson/robot_calibration/raw/3ec8eafaec0b42e3e3f21d1edd659c56f88c278c/README.md",
+          "contents_url": "https://api.github.com/repos/mikeferguson/robot_calibration/contents/README.md?ref=3ec8eafaec0b42e3e3f21d1edd659c56f88c278c",
+          "patch": "@@ -0,0 +1,4 @@\n+robot_calibration\n+=================\n+\n+Generic calibration for robots"
+        }
+      ]
+    },
+    {
+      "author": "Tacha-S",
+      "date": "2025-03-17T12:34:39Z",
+      "sha": "87593d4bfa5896dc5a88b5317ea975f490c354aa",
+      "message": "Fix initial magnetic field strength unit (#194)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "baf8638c88a1ed7299d6346d084e3d41f13387db",
+          "filename": "robot_calibration/src/nodes/magnetometer_calibration.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/mikeferguson/robot_calibration/blob/87593d4bfa5896dc5a88b5317ea975f490c354aa/robot_calibration%2Fsrc%2Fnodes%2Fmagnetometer_calibration.cpp",
+          "raw_url": "https://github.com/mikeferguson/robot_calibration/raw/87593d4bfa5896dc5a88b5317ea975f490c354aa/robot_calibration%2Fsrc%2Fnodes%2Fmagnetometer_calibration.cpp",
+          "contents_url": "https://api.github.com/repos/mikeferguson/robot_calibration/contents/robot_calibration%2Fsrc%2Fnodes%2Fmagnetometer_calibration.cpp?ref=87593d4bfa5896dc5a88b5317ea975f490c354aa",
+          "patch": "@@ -199,7 +199,7 @@ int main(int argc, char** argv)\n   }\n   double* free_params = new double[num_params];\n   // Set initial estimate of magnetic field strength\n-  free_params[0] = 0.45;\n+  free_params[0] = 0.000045;\n   // Setup initial estimates of hard iron offsets (bias)\n   {\n     double bias_x = 0.0;"
+        }
+      ]
+    },
+    {
+      "author": "glpuga",
+      "date": "2021-12-12T14:10:28Z",
+      "sha": "ce377f2d6bbd4f5b95a3125307340858d962fa19",
+      "message": "Add exception when the chain cannot be created (#105)",
+      "files_changed": 3,
+      "additions": 110,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "7f2477b2a8a2269c7baabd58593381605e87ec09",
+          "filename": "robot_calibration/src/models.cpp",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 1,
+          "changes": 7,
+          "blob_url": "https://github.com/mikeferguson/robot_calibration/blob/ce377f2d6bbd4f5b95a3125307340858d962fa19/robot_calibration%2Fsrc%2Fmodels.cpp",
+          "raw_url": "https://github.com/mikeferguson/robot_calibration/raw/ce377f2d6bbd4f5b95a3125307340858d962fa19/robot_calibration%2Fsrc%2Fmodels.cpp",
+          "contents_url": "https://api.github.com/repos/mikeferguson/robot_calibration/contents/robot_calibration%2Fsrc%2Fmodels.cpp?ref=ce377f2d6bbd4f5b95a3125307340858d962fa19",
+          "patch": "@@ -17,6 +17,7 @@\n \n // Author: Michael Ferguson\n \n+#include <ros/console.h>\n #include <robot_calibration/models/chain.h>\n #include <robot_calibration/models/camera3d.h>\n \n@@ -42,7 +43,11 @@ ChainModel::ChainModel(const std::string& name, KDL::Tree model, std::string roo\n {\n   // Create a KDL::Chain\n   if (!model.getChain(root, tip, chain_))\n-    std::cerr << \"Failed to get chain\" << std::endl;\n+  {\n+    auto error_msg = std::string{\"Failed to build a chain model from \"} + root + \" to \" + tip + \", check the link names\";\n+    ROS_ERROR(\"%s\", error_msg.c_str());\n+    throw std::runtime_error(error_msg);\n+  }\n }\n \n std::vector<geometry_msgs::PointStamped> ChainModel::project("
+        },
+        {
+          "sha": "c390ac18a84c6f42462805df4004ef44eb4efd0c",
+          "filename": "robot_calibration/test/CMakeLists.txt",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/mikeferguson/robot_calibration/blob/ce377f2d6bbd4f5b95a3125307340858d962fa19/robot_calibration%2Ftest%2FCMakeLists.txt",
+          "raw_url": "https://github.com/mikeferguson/robot_calibration/raw/ce377f2d6bbd4f5b95a3125307340858d962fa19/robot_calibration%2Ftest%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/mikeferguson/robot_calibration/contents/robot_calibration%2Ftest%2FCMakeLists.txt?ref=ce377f2d6bbd4f5b95a3125307340858d962fa19",
+          "patch": "@@ -9,6 +9,13 @@ target_link_libraries(calibration_offset_parser_tests robot_calibration\n                                                       ${orocos_kdl_LIBRARIES}\n                                                       ${tinyxml_LIBRARIES})\n \n+catkin_add_gtest(chain_model_tests chain_model_tests.cpp)\n+target_link_libraries(chain_model_tests robot_calibration\n+                                     ${Boost_LIBRARIES}\n+                                     ${catkin_LIBRARIES}\n+                                     ${CERES_LIBRARIES}\n+                                     ${orocos_kdl_LIBRARIES})\n+\n catkin_add_gtest(rotation_tests rotation_tests.cpp)\n target_link_libraries(rotation_tests robot_calibration\n                                      ${Boost_LIBRARIES}"
+        },
+        {
+          "sha": "3174f7c7f90ca5ec28d111788d3c1c0a0f44d246",
+          "filename": "robot_calibration/test/chain_model_tests.cpp",
+          "status": "added",
+          "additions": 97,
+          "deletions": 0,
+          "changes": 97,
+          "blob_url": "https://github.com/mikeferguson/robot_calibration/blob/ce377f2d6bbd4f5b95a3125307340858d962fa19/robot_calibration%2Ftest%2Fchain_model_tests.cpp",
+          "raw_url": "https://github.com/mikeferguson/robot_calibration/raw/ce377f2d6bbd4f5b95a3125307340858d962fa19/robot_calibration%2Ftest%2Fchain_model_tests.cpp",
+          "contents_url": "https://api.github.com/repos/mikeferguson/robot_calibration/contents/robot_calibration%2Ftest%2Fchain_model_tests.cpp?ref=ce377f2d6bbd4f5b95a3125307340858d962fa19",
+          "patch": "@@ -0,0 +1,97 @@\n+/*\n+ * Copyright (C) 2018 Michael Ferguson\n+ *\n+ * Licensed under the Apache License, Version 2.0 (the \"License\");\n+ * you may not use this file except in compliance with the License.\n+ * You may obtain a copy of the License at\n+ *\n+ *     http://www.apache.org/licenses/LICENSE-2.0\n+ *\n+ * Unless required by applicable law or agreed to in writing, software\n+ * distributed under the License is distributed on an \"AS IS\" BASIS,\n+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+ * See the License for the specific language governing permissions and\n+ * limitations under the License.\n+ */\n+\n+// Author: Gerardo Puga\n+\n+#include <gtest/gtest.h>\n+#include <robot_calibration/models/camera3d.h>\n+#include <robot_calibration/models/chain.h>\n+\n+#include <kdl_parser/kdl_parser.hpp>\n+\n+namespace {\n+\n+namespace test {\n+\n+using robot_calibration::Camera3dModel;\n+using robot_calibration::ChainModel;\n+\n+std::string robot_description =\n+    \"<?xml version='1.0' ?>\"\n+    \"<robot name='test'>\"\n+    \"  <link name='link_0'/>\"\n+    \"  <joint name='first_joint' type='fixed'>\"\n+    \"    <origin rpy='0 0 0' xyz='1 1 1'/>\"\n+    \"    <parent link='link_0'/>\"\n+    \"    <child link='link_1'/>\"\n+    \"  </joint>\"\n+    \"  <link name='link_1'/>\"\n+    \"  <joint name='second_joint' type='revolute'>\"\n+    \"    <origin rpy='0 0 0' xyz='0 0 0'/>\"\n+    \"    <axis xyz='0 0 1'/>\"\n+    \"    <limit effort='30' lower='-1.57' upper='1.57' velocity='0.524'/>\"\n+    \"    <parent link='link_1'/>\"\n+    \"    <child link='link_2'/>\"\n+    \"  </joint>\"\n+    \"  <link name='link_2'/>\"\n+    \"  <joint name='third_joint' type='fixed'>\"\n+    \"    <origin rpy='0 -1.5 0' xyz='0 0 0.0526'/>\"\n+    \"    <parent link='link_2'/>\"\n+    \"    <child link='link_3'/>\"\n+    \"  </joint>\"\n+    \"  <link name='link_3'/>\"\n+    \"</robot>\";\n+\n+TEST(ChainModelTests, BadChainThrows)\n+{\n+  KDL::Tree tree;\n+\n+  ASSERT_TRUE(kdl_parser::treeFromString(robot_description, tree));\n+\n+  ASSERT_NO_THROW({ auto uut = ChainModel(\"uut\", tree, \"link_0\", \"link_3\"); });\n+\n+  ASSERT_THROW({ auto uut = ChainModel(\"uut\", tree, \"link_99\", \"link_3\"); },\n+               std::runtime_error);\n+\n+  ASSERT_THROW({ auto uut = ChainModel(\"uut\", tree, \"link_0\", \"link_99\"); },\n+               std::runtime_error);\n+}\n+\n+TEST(Camera3dModelTests, BadChainThrows)\n+{\n+  KDL::Tree tree;\n+\n+  ASSERT_TRUE(kdl_parser::treeFromString(robot_description, tree));\n+\n+  ASSERT_NO_THROW(\n+      { auto uut = Camera3dModel(\"uut\", tree, \"link_0\", \"link_3\"); });\n+\n+  ASSERT_THROW({ auto uut = Camera3dModel(\"uut\", tree, \"link_99\", \"link_3\"); },\n+               std::runtime_error);\n+\n+  ASSERT_THROW({ auto uut = Camera3dModel(\"uut\", tree, \"link_0\", \"link_99\"); },\n+               std::runtime_error);\n+}\n+\n+};  // namespace test\n+\n+};  // namespace\n+\n+int main(int argc, char **argv)\n+{\n+  testing::InitGoogleTest(&argc, argv);\n+  return RUN_ALL_TESTS();\n+}"
+        }
+      ]
+    },
+    {
+      "author": "AndyZe",
+      "date": "2021-08-10T02:35:10Z",
+      "sha": "413e7316506320a329c4d85c3865be9fd63ce330",
+      "message": "Document base_link, model frame parameter (#97)",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "c05a22a322d98f09d9b19dae72c798b966e86ee0",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 1,
+          "changes": 5,
+          "blob_url": "https://github.com/mikeferguson/robot_calibration/blob/413e7316506320a329c4d85c3865be9fd63ce330/README.md",
+          "raw_url": "https://github.com/mikeferguson/robot_calibration/raw/413e7316506320a329c4d85c3865be9fd63ce330/README.md",
+          "contents_url": "https://api.github.com/repos/mikeferguson/robot_calibration/contents/README.md?ref=413e7316506320a329c4d85c3865be9fd63ce330",
+          "patch": "@@ -58,9 +58,12 @@ YAML file specifies the details needed for data capture:\n The second configuration file specifies the configuration for optimization.\n This specifies several items:\n \n+ * base_link - Frame used for internal calculations. Typically, the root of the\n+   URDF is used. Often `base_link`.\n  * models - Models define how to reproject points. The basic model is a\n    kinematic chain. Additional models can reproject through a kinematic\n-   chain and then a sensor, such as a 3d camera.\n+   chain and then a sensor, such as a 3d camera. For IK chains, `frame` parameter\n+   is the tip of the IK chain.\n  * free_params - Defines the names of single-value free parameters. These\n    can be the names of a joint for which the joint offset should be calculated,\n    camera parameters such as focal lengths, or other parameters, such as"
+        }
+      ]
+    },
+    {
+      "author": "Naoki-Hiraoka",
+      "date": "2019-08-18T09:36:32Z",
+      "sha": "016cc2ad75254896e4cac2b1738c506f90a6ab49",
+      "message": "allow multiple checkerboards",
+      "files_changed": 2,
+      "additions": 6,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "1f9d0510f3df2b782ba0e31dcbed8f64d1e9f8cc",
+          "filename": "robot_calibration/include/robot_calibration/capture/checkerboard_finder.h",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/mikeferguson/robot_calibration/blob/016cc2ad75254896e4cac2b1738c506f90a6ab49/robot_calibration%2Finclude%2Frobot_calibration%2Fcapture%2Fcheckerboard_finder.h",
+          "raw_url": "https://github.com/mikeferguson/robot_calibration/raw/016cc2ad75254896e4cac2b1738c506f90a6ab49/robot_calibration%2Finclude%2Frobot_calibration%2Fcapture%2Fcheckerboard_finder.h",
+          "contents_url": "https://api.github.com/repos/mikeferguson/robot_calibration/contents/robot_calibration%2Finclude%2Frobot_calibration%2Fcapture%2Fcheckerboard_finder.h?ref=016cc2ad75254896e4cac2b1738c506f90a6ab49",
+          "patch": "@@ -65,6 +65,8 @@ class CheckerboardFinder : public FeatureFinder\n \n   bool output_debug_;   /// Should we output debug image/cloud?\n \n+  std::string frame_id_;   /// Name of checkerboard frame\n+\n   std::string camera_sensor_name_;\n   std::string chain_sensor_name_;\n };"
+        },
+        {
+          "sha": "fd95901b16a31c42eec414bcc95892d858d89f60",
+          "filename": "robot_calibration/src/finders/checkerboard_finder.cpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 1,
+          "changes": 5,
+          "blob_url": "https://github.com/mikeferguson/robot_calibration/blob/016cc2ad75254896e4cac2b1738c506f90a6ab49/robot_calibration%2Fsrc%2Ffinders%2Fcheckerboard_finder.cpp",
+          "raw_url": "https://github.com/mikeferguson/robot_calibration/raw/016cc2ad75254896e4cac2b1738c506f90a6ab49/robot_calibration%2Fsrc%2Ffinders%2Fcheckerboard_finder.cpp",
+          "contents_url": "https://api.github.com/repos/mikeferguson/robot_calibration/contents/robot_calibration%2Fsrc%2Ffinders%2Fcheckerboard_finder.cpp?ref=016cc2ad75254896e4cac2b1738c506f90a6ab49",
+          "patch": "@@ -58,6 +58,9 @@ bool CheckerboardFinder::init(const std::string& name,\n   // Should we include debug image/cloud in observations\n   nh.param<bool>(\"debug\", output_debug_, false);\n \n+  // Name of checkerboard frame that will be used during optimization\n+  nh.param<std::string>(\"frame_id\", frame_id_, \"checkerboard\");\n+\n   // Name of the sensor model that will be used during optimization\n   nh.param<std::string>(\"camera_sensor_name\", camera_sensor_name_, \"camera\");\n   nh.param<std::string>(\"chain_sensor_name\", chain_sensor_name_, \"arm\");\n@@ -201,7 +204,7 @@ bool CheckerboardFinder::findInternal(robot_calibration_msgs::CalibrationData *\n \n     // Fill in the headers\n     rgbd.header = cloud_.header;\n-    world.header.frame_id = \"checkerboard\";\n+    world.header.frame_id = frame_id_;\n \n     // Fill in message\n     sensor_msgs::PointCloud2ConstIterator<float> xyz(cloud_, \"x\");"
+        }
+      ]
+    },
+    {
+      "author": "d-walsh",
+      "date": "2019-06-18T22:09:56Z",
+      "sha": "ca785f1beb4873b409e247882adbe2393b1f67c1",
+      "message": "Fixed isnan() error on Kinetic",
+      "files_changed": 2,
+      "additions": 10,
+      "deletions": 10,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "85e7d35f287ebeb82516dc082097d06eb85e5158",
+          "filename": "robot_calibration/src/finders/checkerboard_finder.cpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/mikeferguson/robot_calibration/blob/ca785f1beb4873b409e247882adbe2393b1f67c1/robot_calibration%2Fsrc%2Ffinders%2Fcheckerboard_finder.cpp",
+          "raw_url": "https://github.com/mikeferguson/robot_calibration/raw/ca785f1beb4873b409e247882adbe2393b1f67c1/robot_calibration%2Fsrc%2Ffinders%2Fcheckerboard_finder.cpp",
+          "contents_url": "https://api.github.com/repos/mikeferguson/robot_calibration/contents/robot_calibration%2Fsrc%2Ffinders%2Fcheckerboard_finder.cpp?ref=ca785f1beb4873b409e247882adbe2393b1f67c1",
+          "patch": "@@ -217,9 +217,9 @@ bool CheckerboardFinder::findInternal(robot_calibration_msgs::CalibrationData *\n       rgbd.point.z = (xyz + index)[Z];\n \n       // Do not accept NANs\n-      if (isnan(rgbd.point.x) ||\n-          isnan(rgbd.point.y) ||\n-          isnan(rgbd.point.z))\n+      if (std::isnan(rgbd.point.x) ||\n+          std::isnan(rgbd.point.y) ||\n+          std::isnan(rgbd.point.z))\n       {\n         ROS_ERROR_STREAM(\"NAN point on \" << i);\n         return false;"
+        },
+        {
+          "sha": "4eca145cacd6d8ceae6c1cb78ffcfaaee651c793",
+          "filename": "robot_calibration/src/finders/led_finder.cpp",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 7,
+          "changes": 14,
+          "blob_url": "https://github.com/mikeferguson/robot_calibration/blob/ca785f1beb4873b409e247882adbe2393b1f67c1/robot_calibration%2Fsrc%2Ffinders%2Fled_finder.cpp",
+          "raw_url": "https://github.com/mikeferguson/robot_calibration/raw/ca785f1beb4873b409e247882adbe2393b1f67c1/robot_calibration%2Fsrc%2Ffinders%2Fled_finder.cpp",
+          "contents_url": "https://api.github.com/repos/mikeferguson/robot_calibration/contents/robot_calibration%2Fsrc%2Ffinders%2Fled_finder.cpp?ref=ca785f1beb4873b409e247882adbe2393b1f67c1",
+          "patch": "@@ -467,9 +467,9 @@ bool LedFinder::CloudDifferenceTracker::isFound(\n   point += max_idx_;\n \n   // AND the current index is a valid point in the cloud.\n-  if (isnan(point[X]) ||\n-      isnan(point[Y]) ||\n-      isnan(point[Z]))\n+  if (std::isnan(point[X]) ||\n+      std::isnan(point[Y]) ||\n+      std::isnan(point[Z]))\n   {\n     return false;\n   }\n@@ -492,9 +492,9 @@ bool LedFinder::CloudDifferenceTracker::getRefinedCentroid(\n   centroid.point.z = (iter + max_idx_)[Z];\n \n   // Do not accept NANs\n-  if (isnan(centroid.point.x) ||\n-      isnan(centroid.point.y) ||\n-      isnan(centroid.point.z))\n+  if (std::isnan(centroid.point.x) ||\n+      std::isnan(centroid.point.y) ||\n+      std::isnan(centroid.point.z))\n   {\n     return false;\n   }\n@@ -511,7 +511,7 @@ bool LedFinder::CloudDifferenceTracker::getRefinedCentroid(\n     // Using highly likely points\n     if (diff_[i] > (max_*0.75))\n     {\n-      if (isnan(point[X]) || isnan(point[Y]) || isnan(point[Z]))\n+      if (std::isnan(point[X]) || std::isnan(point[Y]) || std::isnan(point[Z]))\n       {\n         continue;\n       }"
+        }
+      ]
+    },
+    {
+      "author": "saurabhbansal90",
+      "date": "2018-06-25T08:55:16Z",
+      "sha": "8ad71474ce9f719b71e230f41fc3686ffbfe8b64",
+      "message": "Update led_finder.cpp",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e6f00b5870082b1e438ebad1c9035259448bedf7",
+          "filename": "robot_calibration/src/finders/led_finder.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/mikeferguson/robot_calibration/blob/8ad71474ce9f719b71e230f41fc3686ffbfe8b64/robot_calibration%2Fsrc%2Ffinders%2Fled_finder.cpp",
+          "raw_url": "https://github.com/mikeferguson/robot_calibration/raw/8ad71474ce9f719b71e230f41fc3686ffbfe8b64/robot_calibration%2Fsrc%2Ffinders%2Fled_finder.cpp",
+          "contents_url": "https://api.github.com/repos/mikeferguson/robot_calibration/contents/robot_calibration%2Fsrc%2Ffinders%2Fled_finder.cpp?ref=8ad71474ce9f719b71e230f41fc3686ffbfe8b64",
+          "patch": "@@ -185,7 +185,7 @@ bool LedFinder::find(robot_calibration_msgs::CalibrationData * msg)\n   while (true)\n   {\n     // Toggle LED to next state\n-    code_idx = (code_idx + 1) % 8;\n+    code_idx = (code_idx + 1) % codes_.size();\n     command.led_code = codes_[code_idx];\n     client_->sendGoal(command);\n     client_->waitForResult(ros::Duration(10.0));"
+        }
+      ]
+    },
+    {
+      "author": "Guilherme Lawless",
+      "date": "2018-02-09T10:30:09Z",
+      "sha": "20aae7cba0c090fc33216a1228c9bcc6df46790e",
+      "message": "Fix broken OpenCV linking in ROS Kinetic",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 2,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "da75794c5ab961d1a2789ed35eec82526b22119e",
+          "filename": "robot_calibration/CMakeLists.txt",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 2,
+          "changes": 7,
+          "blob_url": "https://github.com/mikeferguson/robot_calibration/blob/20aae7cba0c090fc33216a1228c9bcc6df46790e/robot_calibration%2FCMakeLists.txt",
+          "raw_url": "https://github.com/mikeferguson/robot_calibration/raw/20aae7cba0c090fc33216a1228c9bcc6df46790e/robot_calibration%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/mikeferguson/robot_calibration/contents/robot_calibration%2FCMakeLists.txt?ref=20aae7cba0c090fc33216a1228c9bcc6df46790e",
+          "patch": "@@ -19,6 +19,7 @@ endif ()\n \n find_package(orocos_kdl)\n find_package(Ceres REQUIRED)\n+find_package(OpenCV REQUIRED)\n find_package(catkin REQUIRED\n   COMPONENTS\n     actionlib\n@@ -89,7 +90,8 @@ target_link_libraries(robot_calibration ${Boost_LIBRARIES}\n                                         ${catkin_LIBRARIES}\n                                         ${CERES_LIBRARIES}\n                                         ${tinyxml_LIBRARIES}\n-                                        ${orocos_kdl_LIBRARIES})\n+                                        ${orocos_kdl_LIBRARIES}\n+                                        ${OpenCV_LIBS})\n add_dependencies(robot_calibration robot_calibration_msgs_gencpp)\n \n add_executable(calibrate src/calibrate.cpp)\n@@ -98,7 +100,8 @@ target_link_libraries(calibrate robot_calibration\n                                 ${catkin_LIBRARIES}\n                                 ${CERES_LIBRARIES}\n                                 ${tinyxml_LIBRARIES}\n-                                ${orocos_kdl_LIBRARIES})\n+                                ${orocos_kdl_LIBRARIES}\n+                                ${OpenCV_LIBS})\n add_dependencies(calibrate robot_calibration)\n \n add_subdirectory(test)"
+        }
+      ]
+    },
+    {
+      "author": "narora1",
+      "date": "2015-06-22T23:58:32Z",
+      "sha": "6a293337dd161d78334406c08fd5be05ae28301e",
+      "message": "Ground Plane calibration added",
+      "files_changed": 10,
+      "additions": 362,
+      "deletions": 10,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e3331aece230a5f2e7506df57b2cba47edc9cff9",
+          "filename": "robot_calibration/CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/mikeferguson/robot_calibration/blob/6a293337dd161d78334406c08fd5be05ae28301e/robot_calibration%2FCMakeLists.txt",
+          "raw_url": "https://github.com/mikeferguson/robot_calibration/raw/6a293337dd161d78334406c08fd5be05ae28301e/robot_calibration%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/mikeferguson/robot_calibration/contents/robot_calibration%2FCMakeLists.txt?ref=6a293337dd161d78334406c08fd5be05ae28301e",
+          "patch": "@@ -76,6 +76,7 @@ add_library(robot_calibration src/calibration_offset_parser.cpp\n                               src/checkerboard_finder.cpp\n                               src/feature_finder.cpp\n                               src/led_finder.cpp\n+                              src/ground_plane_finder.cpp\t\n                               src/models.cpp\n                               src/optimization_params.cpp\n                               src/optimizer.cpp)"
+        },
+        {
+          "sha": "e201a32b73cc1843971aec194be3508790322e29",
+          "filename": "robot_calibration/include/robot_calibration/camera_info.h",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/mikeferguson/robot_calibration/blob/6a293337dd161d78334406c08fd5be05ae28301e/robot_calibration%2Finclude%2Frobot_calibration%2Fcamera_info.h",
+          "raw_url": "https://github.com/mikeferguson/robot_calibration/raw/6a293337dd161d78334406c08fd5be05ae28301e/robot_calibration%2Finclude%2Frobot_calibration%2Fcamera_info.h",
+          "contents_url": "https://api.github.com/repos/mikeferguson/robot_calibration/contents/robot_calibration%2Finclude%2Frobot_calibration%2Fcamera_info.h?ref=6a293337dd161d78334406c08fd5be05ae28301e",
+          "patch": "@@ -43,6 +43,13 @@ enum {CAMERA_PARAMS_CX_INDEX=0,\n       CAMERA_PARAMS_Z_SCALE_INDEX=4,\n       CAMERA_PARAMS_Z_OFFSET_INDEX=5};\n \n+enum {CAMERA_INFO_D_1=0,\n+      CAMERA_INFO_D_2=1,\n+      CAMERA_INFO_D_3=2,\n+      CAMERA_INFO_D_4=3,\n+      CAMERA_INFO_D_5=4};\n+\n+\n /** @brief Update the camera calibration with the new offsets */\n inline sensor_msgs::CameraInfo updateCameraInfo(double camera_fx, double camera_fy,\n                                                 double camera_cx, double camera_cy,"
+        },
+        {
+          "sha": "3338958c8c315f84229730d78c97f935d70f76a8",
+          "filename": "robot_calibration/include/robot_calibration/capture/ground_plane_finder.h",
+          "status": "added",
+          "additions": 51,
+          "deletions": 0,
+          "changes": 51,
+          "blob_url": "https://github.com/mikeferguson/robot_calibration/blob/6a293337dd161d78334406c08fd5be05ae28301e/robot_calibration%2Finclude%2Frobot_calibration%2Fcapture%2Fground_plane_finder.h",
+          "raw_url": "https://github.com/mikeferguson/robot_calibration/raw/6a293337dd161d78334406c08fd5be05ae28301e/robot_calibration%2Finclude%2Frobot_calibration%2Fcapture%2Fground_plane_finder.h",
+          "contents_url": "https://api.github.com/repos/mikeferguson/robot_calibration/contents/robot_calibration%2Finclude%2Frobot_calibration%2Fcapture%2Fground_plane_finder.h?ref=6a293337dd161d78334406c08fd5be05ae28301e",
+          "patch": "@@ -0,0 +1,51 @@\n+/*\n+ * Copyright (C) 2014-2015 Fetch Robotics Inc.\n+ *\n+ * Licensed under the Apache License, Version 2.0 (the \"License\");\n+ * you may not use this file except in compliance with the License.\n+ * You may obtain a copy of the License at\n+ *\n+ *     http://www.apache.org/licenses/LICENSE-2.0\n+ *\n+ * Unless required by applicable law or agreed to in writing, software\n+ * distributed under the License is distributed on an \"AS IS\" BASIS,\n+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+ * See the License for the specific language governing permissions and\n+ * limitations under the License.\n+ */\n+\n+#ifndef ROBOT_CALIBRATION_CAPTURE_GROUND_PLANE_FINDER_H\n+#define ROBOT_CALIBRATION_CAPTURE_GROUND_PLANE_FINDER_H\n+\n+#include <ros/ros.h>\n+#include <robot_calibration/capture/depth_camera.h>\n+#include <robot_calibration/capture/feature_finder.h>\n+#include <robot_calibration_msgs/CalibrationData.h>\n+#include <cv_bridge/cv_bridge.h>\n+\n+namespace robot_calibration\n+{\n+\n+class GroundPlaneFinder : public FeatureFinder\n+{\n+public:\n+  GroundPlaneFinder(ros::NodeHandle & n);\n+\n+  bool find(robot_calibration_msgs::CalibrationData * msg);\n+\n+private:\n+  void cameraCallback(const sensor_msgs::PointCloud2& cloud);\n+\n+  bool waitForCloud();\n+\n+  ros::Subscriber subscriber_;\n+  ros::Publisher publisher_;\n+\n+  bool waiting_;\n+  sensor_msgs::PointCloud2 cloud_;\n+  DepthCameraInfoManager depth_camera_manager_;\n+};\n+\n+}  // namespace robot_calibration\n+\n+#endif  // ROBOT_CALIBRATION_CAPTURE_GROUND_PLANE_FINDER_H"
+        },
+        {
+          "sha": "e2810a830403c9a13f6f4c74ffba800e2534efcd",
+          "filename": "robot_calibration/include/robot_calibration/ceres/ground_plane_error.h",
+          "status": "added",
+          "additions": 85,
+          "deletions": 0,
+          "changes": 85,
+          "blob_url": "https://github.com/mikeferguson/robot_calibration/blob/6a293337dd161d78334406c08fd5be05ae28301e/robot_calibration%2Finclude%2Frobot_calibration%2Fceres%2Fground_plane_error.h",
+          "raw_url": "https://github.com/mikeferguson/robot_calibration/raw/6a293337dd161d78334406c08fd5be05ae28301e/robot_calibration%2Finclude%2Frobot_calibration%2Fceres%2Fground_plane_error.h",
+          "contents_url": "https://api.github.com/repos/mikeferguson/robot_calibration/contents/robot_calibration%2Finclude%2Frobot_calibration%2Fceres%2Fground_plane_error.h?ref=6a293337dd161d78334406c08fd5be05ae28301e",
+          "patch": "@@ -0,0 +1,85 @@\n+/*\n+ * Copyright (C) 2015 Fetch Robotics Inc.\n+ * Copyright (C) 2013-2014 Unbounded Robotics Inc.\n+ *\n+ * Licensed under the Apache License, Version 2.0 (the \"License\");\n+ * you may not use this file except in compliance with the License.\n+ * You may obtain a copy of the License at\n+ *\n+ *     http://www.apache.org/licenses/LICENSE-2.0\n+ *\n+ * Unless required by applicable law or agreed to in writing, software\n+ * distributed under the License is distributed on an \"AS IS\" BASIS,\n+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+ * See the License for the specific language governing permissions and\n+ * limitations under the License.\n+ */\n+\n+#ifndef ROBOT_CALIBRATION_CERES_GROUND_PLANE_ERROR_H\n+#define ROBOT_CALIBRATION_CERES_GROUND_PLANE_ERROR_H\n+\n+#include <string>\n+#include <ceres/ceres.h>\n+#include <robot_calibration/calibration_offset_parser.h>\n+#include <robot_calibration/models/camera3d.h>\n+#include <robot_calibration/models/chain.h>\n+#include <robot_calibration_msgs/CalibrationData.h>\n+\n+namespace robot_calibration\n+{\n+\n+struct GroundPlaneError\n+{\n+  GroundPlaneError(Camera3dModel* camera_model,\n+                   CalibrationOffsetParser* offsets,\n+                   robot_calibration_msgs::CalibrationData& data,\n+                   double z)\n+  {\n+    camera_model_ = camera_model;\n+    z_ = z;\n+    offsets_ = offsets;\n+    data_ = data;\n+  }\n+\n+  virtual ~GroundPlaneError() {}\n+\n+  bool operator()(double const * const * free_params,\n+                  double* residuals) const\n+  {\n+    // Update calibration offsets based on free params\n+    offsets_->update(free_params[0]);\n+\n+    // Project the camera observations\n+    std::vector<geometry_msgs::PointStamped> camera_pts =\n+        camera_model_->project(data_, *offsets_);\n+\n+    // Compute residuals\n+    for (size_t i = 0; i < camera_pts.size() ; ++i)\n+    {\n+      residuals[i] = camera_pts[i].point.z - z_;  // if camera_pts is in base frame\n+    }\n+    return true;\n+  }\n+\n+  static ceres::CostFunction* Create(Camera3dModel* camera_model,\n+                                     double z ,\n+                                     CalibrationOffsetParser* offsets,\n+                                     robot_calibration_msgs::CalibrationData& data)\n+  {\n+    ceres::DynamicNumericDiffCostFunction<GroundPlaneError> * func;\n+    func = new ceres::DynamicNumericDiffCostFunction<GroundPlaneError>(\n+                    new GroundPlaneError(camera_model, offsets, data, z));\n+    func->AddParameterBlock(offsets->size());\n+    func->SetNumResiduals(data.observations[0].features.size());\n+\n+    return static_cast<ceres::CostFunction*>(func);\n+  }\n+\n+  Camera3dModel * camera_model_;\n+  double z_;\n+  CalibrationOffsetParser * offsets_;\n+  robot_calibration_msgs::CalibrationData data_;\n+};\n+}  // namespace robot_calibration\n+\n+#endif  // ROBOT_CALIBRATION_CAPTURE_GROUND_PLANE_FINDER_H"
+        },
+        {
+          "sha": "3a1c0819a2ce36f37a64dc71b660680b10f3027f",
+          "filename": "robot_calibration/include/robot_calibration/ceres/optimizer.h",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/mikeferguson/robot_calibration/blob/6a293337dd161d78334406c08fd5be05ae28301e/robot_calibration%2Finclude%2Frobot_calibration%2Fceres%2Foptimizer.h",
+          "raw_url": "https://github.com/mikeferguson/robot_calibration/raw/6a293337dd161d78334406c08fd5be05ae28301e/robot_calibration%2Finclude%2Frobot_calibration%2Fceres%2Foptimizer.h",
+          "contents_url": "https://api.github.com/repos/mikeferguson/robot_calibration/contents/robot_calibration%2Finclude%2Frobot_calibration%2Fceres%2Foptimizer.h?ref=6a293337dd161d78334406c08fd5be05ae28301e",
+          "patch": "@@ -29,11 +29,11 @@\n #include <robot_calibration/calibration_offset_parser.h>\n #include <robot_calibration/ceres/optimization_params.h>\n #include <robot_calibration/ceres/camera3d_to_arm_error.h>\n+#include <robot_calibration/ceres/ground_plane_error.h>\n #include <robot_calibration/ceres/data_functions.h>\n #include <robot_calibration/ceres/outrageous_error.h>\n #include <robot_calibration/models/camera3d.h>\n #include <robot_calibration/models/chain.h>\n-\n #include <boost/shared_ptr.hpp>\n #include <string>\n #include <map>\n@@ -85,4 +85,4 @@ class Optimizer\n \n }  // namespace robot_calibration\n \n-#endif  // ROBOT_CALIBRATION_CERES_OPTIMIZER_H\n\\ No newline at end of file\n+#endif  // ROBOT_CALIBRATION_CERES_OPTIMIZER_H"
+        },
+        {
+          "sha": "46c6e1bd2e03da47059bba89fc55a35628aed582",
+          "filename": "robot_calibration/scripts/capture_poses",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 5,
+          "changes": 12,
+          "blob_url": "https://github.com/mikeferguson/robot_calibration/blob/6a293337dd161d78334406c08fd5be05ae28301e/robot_calibration%2Fscripts%2Fcapture_poses",
+          "raw_url": "https://github.com/mikeferguson/robot_calibration/raw/6a293337dd161d78334406c08fd5be05ae28301e/robot_calibration%2Fscripts%2Fcapture_poses",
+          "contents_url": "https://api.github.com/repos/mikeferguson/robot_calibration/contents/robot_calibration%2Fscripts%2Fcapture_poses?ref=6a293337dd161d78334406c08fd5be05ae28301e",
+          "patch": "@@ -25,12 +25,14 @@ import rospy\n import rosbag\n \n from sensor_msgs.msg import JointState\n+from robot_calibration_msgs.msg import CaptureConfig\n+\n \n class CapturePoses:\n     last_state_ = None # last joint states\n \n     def __init__(self):\n-        self.last_state_ = JointState()\n+        self.last_state_ = CaptureConfig()\n \n         rospy.init_node('capture_calibration_poses')\n         rospy.Subscriber(\"joint_states\", JointState, self.stateCb)\n@@ -60,11 +62,11 @@ class CapturePoses:\n         \"\"\" Callback for joint_states messages \"\"\"\n         for joint, position in zip(msg.name, msg.position):\n             try:\n-                idx = self.last_state_.name.index(joint)\n-                self.last_state_.position[idx] = position\n+                idx = self.last_state_.joint_states.name.index(joint)\n+                self.last_state_.joint_states.position[idx] = position\n             except ValueError:\n-                self.last_state_.name.append(joint)\n-                self.last_state_.position.append(position)\n+                self.last_state_.joint_states.name.append(joint)\n+                self.last_state_.joint_states.position.append(position)\n \n if __name__=='__main__':\n     CapturePoses()"
+        },
+        {
+          "sha": "7f73c230e7f2c58bff73c797f4a27a24b3dd8a1c",
+          "filename": "robot_calibration/src/feature_finder.cpp",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/mikeferguson/robot_calibration/blob/6a293337dd161d78334406c08fd5be05ae28301e/robot_calibration%2Fsrc%2Ffeature_finder.cpp",
+          "raw_url": "https://github.com/mikeferguson/robot_calibration/raw/6a293337dd161d78334406c08fd5be05ae28301e/robot_calibration%2Fsrc%2Ffeature_finder.cpp",
+          "contents_url": "https://api.github.com/repos/mikeferguson/robot_calibration/contents/robot_calibration%2Fsrc%2Ffeature_finder.cpp?ref=6a293337dd161d78334406c08fd5be05ae28301e",
+          "patch": "@@ -19,6 +19,7 @@\n #include <robot_calibration/capture/feature_finder.h>\n #include <robot_calibration/capture/led_finder.h>\n #include <robot_calibration/capture/checkerboard_finder.h>\n+#include <robot_calibration/capture/ground_plane_finder.h>\n \n namespace robot_calibration\n {\n@@ -71,6 +72,11 @@ bool loadFeatureFinders(ros::NodeHandle& nh,\n       ROS_INFO(\"  New robot_calibration/LedFinder: %s\", name.c_str());\n       finder.reset(new robot_calibration::LedFinder(finder_handle));\n     }\n+    else if (type == \"robot_calibration/GroundPlaneFinder\")\n+    {\n+      ROS_INFO(\"  New robot_calibration/GroundPlaneFinder: %s\", name.c_str());\n+      finder.reset(new robot_calibration::GroundPlaneFinder(finder_handle));\n+    }\n     else if (type == \"robot_calibration/CheckerboardFinder\")\n     {\n       ROS_INFO(\"  New robot_calibration/CheckerboardFinder: %s\", name.c_str());"
+        },
+        {
+          "sha": "2d6b4874a78df1410dbffbe89ea1477816136476",
+          "filename": "robot_calibration/src/ground_plane_finder.cpp",
+          "status": "added",
+          "additions": 164,
+          "deletions": 0,
+          "changes": 164,
+          "blob_url": "https://github.com/mikeferguson/robot_calibration/blob/6a293337dd161d78334406c08fd5be05ae28301e/robot_calibration%2Fsrc%2Fground_plane_finder.cpp",
+          "raw_url": "https://github.com/mikeferguson/robot_calibration/raw/6a293337dd161d78334406c08fd5be05ae28301e/robot_calibration%2Fsrc%2Fground_plane_finder.cpp",
+          "contents_url": "https://api.github.com/repos/mikeferguson/robot_calibration/contents/robot_calibration%2Fsrc%2Fground_plane_finder.cpp?ref=6a293337dd161d78334406c08fd5be05ae28301e",
+          "patch": "@@ -0,0 +1,164 @@\n+/*\n+ * Copyright (C) 2015 Fetch Robotics Inc.\n+ * Copyright (C) 2013-2014 Unbounded Robotics Inc.\n+ *\n+ * Licensed under the Apache License, Version 2.0 (the \"License\");\n+ * you may not use this file except in compliance with the License.\n+ * You may obtain a copy of the License at\n+ *\n+ *     http://www.apache.org/licenses/LICENSE-2.0\n+ *\n+ * Unless required by applicable law or agreed to in writing, software\n+ * distributed under the License is distributed on an \"AS IS\" BASIS,\n+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+ * See the License for the specific language governing permissions and\n+ * limitations under the License.\n+ */\n+\n+#include <robot_calibration/capture/ground_plane_finder.h>\n+#include <sensor_msgs/point_cloud2_iterator.h>\n+#include <math.h>\n+\n+namespace robot_calibration\n+{\n+\n+const unsigned X = 0;\n+const unsigned Y = 1;\n+const unsigned Z = 2;\n+\n+GroundPlaneFinder::GroundPlaneFinder(ros::NodeHandle & nh) :\n+  FeatureFinder(nh),\n+  waiting_(false)\n+{\n+  std::string topic_name;\n+  nh.param<std::string>(\"topic\", topic_name, \"/points\");\n+  subscriber_ = nh.subscribe(topic_name,\n+                            1,\n+                            &GroundPlaneFinder::cameraCallback,\n+                            this);\n+\n+  publisher_ = nh.advertise<sensor_msgs::PointCloud2>(\"ground_plane_points\", 10);\n+  if (!depth_camera_manager_.init(nh))\n+  {\n+    // Error will be printed in manager\n+    throw;\n+  }\n+}\n+\n+void GroundPlaneFinder::cameraCallback(const sensor_msgs::PointCloud2& cloud)\n+{\n+  if (waiting_)\n+  {\n+    cloud_ = cloud;\n+    size_t j = 0;\n+    for (size_t i = 0; i < cloud.data.size(); i++)\n+    {\n+      if (!std::isfinite(cloud.data[i]))\n+        continue;\n+      cloud_.data[j] = cloud.data[i];\n+      j++;\n+    }\n+    if (j != cloud_.data.size ())\n+    {\n+      cloud_.data.resize(j);\n+    }\n+\n+    cloud_.height = 1;\n+    cloud_.width  = j;\n+\n+    waiting_ = false;\n+  }\n+}\n+\n+bool GroundPlaneFinder::waitForCloud()\n+{\n+  ros::Duration(1/10.0).sleep();\n+\n+  waiting_ = true;\n+  int count = 250;\n+  while (--count)\n+  {\n+    if (!waiting_)\n+    {\n+      // success\n+      return true;\n+    }\n+    ros::Duration(0.01).sleep();\n+    ros::spinOnce();\n+  }\n+  ROS_ERROR(\"Failed to get cloud\");\n+  return !waiting_;\n+}\n+\n+\n+bool GroundPlaneFinder::find(robot_calibration_msgs::CalibrationData * msg)\n+{\n+  geometry_msgs::PointStamped rgbd;\n+  geometry_msgs::PointStamped world;\n+\n+  if (!waitForCloud())\n+  {\n+    ROS_ERROR(\"No point cloud data\");\n+    return false;\n+  }\n+\n+  int points_total = 80;\n+\n+  std::vector<cv::Point2f> points;\n+  points.resize(points_total);\n+\n+  // Create PointCloud2 to publish\n+  sensor_msgs::PointCloud2 cloud;\n+  cloud.width = 0;\n+  cloud.height = 0;\n+  cloud.header.stamp = ros::Time::now();\n+  cloud.header.frame_id = cloud_.header.frame_id;\n+  sensor_msgs::PointCloud2Modifier cloud_mod(cloud);\n+  cloud_mod.setPointCloud2FieldsByString(1, \"xyz\");\n+  cloud_mod.resize(points_total);\n+  sensor_msgs::PointCloud2Iterator<float> iter_cloud(cloud_, \"x\");\n+\n+  // Set msg size\n+  msg->observations.resize(2);\n+  msg->observations[0].sensor_name = \"camera\";\n+  msg->observations[0].features.resize(points_total);\n+  msg->observations[1].sensor_name = \"ground\";\n+  msg->observations[1].features.resize(points_total);\n+\n+  int step = cloud_.width/points_total;\n+\n+  size_t k = 0;\n+\n+  for (size_t i = step ; i < cloud_.width ; i = i+step)\n+  {\n+    points[k].x = i;\n+    k++;\n+  }\n+\n+  sensor_msgs::PointCloud2ConstIterator<float> xyz(cloud_, \"x\");\n+  for (size_t i = 0 ; i < points.size() ; i++)\n+  {\n+    // for ground plane world can just be zero as we are concerned only with z\n+    world.point.x = 0;\n+    world.point.y = 0;\n+    world.point.z = 0;\n+\n+    // Get 3d point\n+    int index = (int)points[i].x;\n+    rgbd.point.x = (xyz + index)[X];\n+    rgbd.point.y = (xyz + index)[Y];\n+    rgbd.point.z = (xyz + index)[Z];\n+    msg->observations[0].features[i] = rgbd;\n+    msg->observations[0].ext_camera_info = depth_camera_manager_.getDepthCameraInfo();\n+    msg->observations[1].features[i] = world;\n+\n+    iter_cloud[0] = rgbd.point.x;\n+    iter_cloud[1] = rgbd.point.y;\n+    iter_cloud[2] = rgbd.point.z;\n+    ++iter_cloud;\n+  }\n+\n+  publisher_.publish(cloud);\n+  return true;\n+}\n+}  // namespace robot_calibration"
+        },
+        {
+          "sha": "83ddc2025ae7ea7dfc5743c682455bad53e165a3",
+          "filename": "robot_calibration/src/models.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/mikeferguson/robot_calibration/blob/6a293337dd161d78334406c08fd5be05ae28301e/robot_calibration%2Fsrc%2Fmodels.cpp",
+          "raw_url": "https://github.com/mikeferguson/robot_calibration/raw/6a293337dd161d78334406c08fd5be05ae28301e/robot_calibration%2Fsrc%2Fmodels.cpp",
+          "contents_url": "https://api.github.com/repos/mikeferguson/robot_calibration/contents/robot_calibration%2Fsrc%2Fmodels.cpp?ref=6a293337dd161d78334406c08fd5be05ae28301e",
+          "patch": "@@ -264,4 +264,4 @@ void axis_magnitude_from_rotation(const KDL::Rotation& r, double& x, double& y,\n   z = (qz / k) * magnitude;\n }\n \n-}  // namespace robot_calibration\n\\ No newline at end of file\n+}  // namespace robot_calibration"
+        },
+        {
+          "sha": "dec7d28982f7e21df2b0bca6cd39b993d4da0e1c",
+          "filename": "robot_calibration/src/optimizer.cpp",
+          "status": "modified",
+          "additions": 38,
+          "deletions": 2,
+          "changes": 40,
+          "blob_url": "https://github.com/mikeferguson/robot_calibration/blob/6a293337dd161d78334406c08fd5be05ae28301e/robot_calibration%2Fsrc%2Foptimizer.cpp",
+          "raw_url": "https://github.com/mikeferguson/robot_calibration/raw/6a293337dd161d78334406c08fd5be05ae28301e/robot_calibration%2Fsrc%2Foptimizer.cpp",
+          "contents_url": "https://api.github.com/repos/mikeferguson/robot_calibration/contents/robot_calibration%2Fsrc%2Foptimizer.cpp?ref=6a293337dd161d78334406c08fd5be05ae28301e",
+          "patch": "@@ -27,11 +27,11 @@\n \n #include <robot_calibration/calibration_offset_parser.h>\n #include <robot_calibration/ceres/camera3d_to_arm_error.h>\n+#include <robot_calibration/ceres/ground_plane_error.h>\n #include <robot_calibration/ceres/data_functions.h>\n #include <robot_calibration/ceres/outrageous_error.h>\n #include <robot_calibration/models/camera3d.h>\n #include <robot_calibration/models/chain.h>\n-\n #include <boost/shared_ptr.hpp>\n #include <string>\n #include <map>\n@@ -120,6 +120,7 @@ int Optimizer::optimize(OptimizationParams& params,\n   for (int i = 0; i < offsets_->size(); ++i)\n     free_params[i] = 0.0;\n \n+  double z_ = 0;\n   // Houston, we have a problem...\n   ceres::Problem* problem = new ceres::Problem();\n \n@@ -134,6 +135,8 @@ int Optimizer::optimize(OptimizationParams& params,\n         // CheckboardFinder, or any other finder that can sample the pose\n         // of one or more data points that are connected at a constant offset\n         // from a link a kinematic chain (the \"arm\").\n+\n+    \n         std::string camera_name = static_cast<std::string>(params.error_blocks[j].params[\"camera\"]);\n         std::string arm_name = static_cast<std::string>(params.error_blocks[j].params[\"arm\"]);\n \n@@ -170,6 +173,39 @@ int Optimizer::optimize(OptimizationParams& params,\n                                    NULL /* squared loss */,\n                                    free_params);\n       }\n+      else if (params.error_blocks[j].type ==\"camera3d_to_ground\")\n+      {\n+        std::string camera_name = static_cast<std::string>(params.error_blocks[j].params[\"camera\"]);\n+        std::string ground_name = static_cast<std::string>(params.error_blocks[j].params[\"ground\"]);\n+\n+        // Check that this sample has the required features/observations\n+        if (!hasSensor(data[i], camera_name) || !hasSensor(data[i], ground_name))\n+          continue;\n+\n+        // Create the block\n+        ceres::CostFunction * cost = GroundPlaneError::Create(\n+          dynamic_cast<Camera3dModel*>(models_[camera_name]),\n+          z_,\n+          offsets_.get(), data[i]);\n+\n+         if (progress_to_stdout)\n+        {\n+          double ** params = new double*[1];\n+          params[0] = free_params;\n+          double * residuals = new double[data[i].observations[0].features.size()];\n+\n+          cost->Evaluate(params, residuals, NULL);\n+\n+          std::cout << std::endl << \"  z: \";\n+          for (size_t k = 0; k < data[i].observations[0].features.size(); ++k)\n+            std::cout << \"  \" << std::setw(10) << std::fixed << residuals[(k)];\n+          std::cout << std::endl << std::endl;\n+        }\n+\n+        problem->AddResidualBlock(cost,\n+                                   NULL /* squared loss */,\n+                                   free_params);\n+      }\n       else if (params.error_blocks[j].type == \"outrageous\")\n       {\n         // Outrageous error block requires no particular sensors, add to every sample\n@@ -196,7 +232,7 @@ int Optimizer::optimize(OptimizationParams& params,\n   options.linear_solver_type = ceres::DENSE_QR;\n   options.max_num_iterations = 1000;\n   options.minimizer_progress_to_stdout = progress_to_stdout;\n-  //options.use_nonmonotonic_steps = true;\n+  //  options.use_nonmonotonic_steps = true;\n \n   if (progress_to_stdout)\n     std::cout << \"\\nSolver output:\" << std::endl;"
+        }
+      ]
+    },
+    {
+      "author": "mintar",
+      "date": "2017-03-23T15:01:20Z",
+      "sha": "added19e00a8e3717551c7aa12f34421dffc4a09",
+      "message": "fix: don't append observations if finder has failed\n\nWithout this patch, the observations array size is increased by 2 even when\n`findInternal()` returns `false`.\n\nThe following patch would have solved the problem too, but it seemed\ncleaner to let `findInternal()` work on a temporary copy instead of\ntracking down and undoing all changes:\n\n    @@ -208,6 +208,9 @@ ROS_INFO_STREAM(\"looking for point \" << i);\n               isnan(rgbd.point.z))\n           {\n             ROS_ERROR_STREAM(\"checkerboard_finder: NAN point on geometrymsgs point \" << i);\n    +\n    +\t// undo the resize from above\n    +        msg->observations.resize(msg->observations.size() - 2);\n\n             return false;\n           }",
+      "files_changed": 1,
+      "additions": 6,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b837b12781eaa4c9407f6fb601634ec978951b2a",
+          "filename": "robot_calibration/src/checkerboard_finder.cpp",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 1,
+          "changes": 7,
+          "blob_url": "https://github.com/mikeferguson/robot_calibration/blob/added19e00a8e3717551c7aa12f34421dffc4a09/robot_calibration%2Fsrc%2Fcheckerboard_finder.cpp",
+          "raw_url": "https://github.com/mikeferguson/robot_calibration/raw/added19e00a8e3717551c7aa12f34421dffc4a09/robot_calibration%2Fsrc%2Fcheckerboard_finder.cpp",
+          "contents_url": "https://api.github.com/repos/mikeferguson/robot_calibration/contents/robot_calibration%2Fsrc%2Fcheckerboard_finder.cpp?ref=added19e00a8e3717551c7aa12f34421dffc4a09",
+          "patch": "@@ -99,8 +99,13 @@ bool CheckerboardFinder::find(robot_calibration_msgs::CalibrationData * msg)\n   // Try up to 50 frames\n   for (int i = 0; i < 50; ++i)\n   {\n-    if (findInternal(msg))\n+    // temporary copy of msg, so we throw away all changes if findInternal() returns false\n+    robot_calibration_msgs::CalibrationData tmp_msg(*msg);\n+    if (findInternal(&tmp_msg))\n+    {\n+      *msg = tmp_msg;\n       return true;\n+    }\n   }\n   return false;\n }"
+        }
+      ]
+    }
+  ]
+}

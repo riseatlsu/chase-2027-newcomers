@@ -1,0 +1,275 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T07:09:22Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "SteveMacenski",
+    "repo": "nonpersistent_voxel_layer"
+  },
+  "data": [
+    {
+      "author": "kaichie",
+      "date": "2025-07-14T17:22:26Z",
+      "sha": "b4fd1a86e5b135eb960431e1679751ae50c627d4",
+      "message": "link to nav2_costmap_2d::layers explicitly (#32)\n\nSigned-off-by: kaichie <kaichie.lee@gmail.com>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "0a3232e1ea6c930808cdc2ed65c50ba466451715",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/blob/b4fd1a86e5b135eb960431e1679751ae50c627d4/CMakeLists.txt",
+          "raw_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/raw/b4fd1a86e5b135eb960431e1679751ae50c627d4/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/SteveMacenski/nonpersistent_voxel_layer/contents/CMakeLists.txt?ref=b4fd1a86e5b135eb960431e1679751ae50c627d4",
+          "patch": "@@ -44,6 +44,7 @@ target_link_libraries(${library_name}\n   ${sensor_msgs_TARGETS}\n   laser_geometry::laser_geometry\n   nav2_costmap_2d::nav2_costmap_2d_core\n+  nav2_costmap_2d::layers\n   nav2_voxel_grid::voxel_grid\n   nav2_ros_common::nav2_ros_common\n )"
+        }
+      ]
+    },
+    {
+      "author": "SteveMacenski",
+      "date": "2017-12-10T21:34:10Z",
+      "sha": "927c72dff545a2c723e52532c974eb87c0de32b6",
+      "message": "Initial commit",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "4170a685fd29d485a9fac478a19e2ae4173bec4b",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/blob/927c72dff545a2c723e52532c974eb87c0de32b6/README.md",
+          "raw_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/raw/927c72dff545a2c723e52532c974eb87c0de32b6/README.md",
+          "contents_url": "https://api.github.com/repos/SteveMacenski/nonpersistent_voxel_layer/contents/README.md?ref=927c72dff545a2c723e52532c974eb87c0de32b6",
+          "patch": "@@ -0,0 +1,2 @@\n+# non-persistent-voxel-layer\n+ROS drop in replacement to the voxel layer which does not persist readings through iterations when ray tracing or map maintenance is undesirable"
+        }
+      ]
+    },
+    {
+      "author": "mini-1235",
+      "date": "2025-07-03T16:40:58Z",
+      "sha": "8049f4ae48e7fbb23bd9ba435b3f6b22b5fdd3b8",
+      "message": "Sync changes with nav2 (#31)\n\nSigned-off-by: mini-1235 <mauricepurnawan@gmail.com>",
+      "files_changed": 4,
+      "additions": 9,
+      "deletions": 38,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "920194b80d59de0e14cf40fca584fc16696512ee",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 26,
+          "changes": 33,
+          "blob_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/blob/8049f4ae48e7fbb23bd9ba435b3f6b22b5fdd3b8/CMakeLists.txt",
+          "raw_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/raw/8049f4ae48e7fbb23bd9ba435b3f6b22b5fdd3b8/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/SteveMacenski/nonpersistent_voxel_layer/contents/CMakeLists.txt?ref=8049f4ae48e7fbb23bd9ba435b3f6b22b5fdd3b8",
+          "patch": "@@ -10,47 +10,28 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n endif()\n \n find_package(ament_cmake REQUIRED)\n-find_package(geometry_msgs REQUIRED)\n find_package(laser_geometry REQUIRED)\n-find_package(map_msgs REQUIRED)\n-find_package(message_filters REQUIRED)\n-find_package(nav_msgs REQUIRED)\n find_package(nav2_msgs REQUIRED)\n find_package(pluginlib REQUIRED)\n find_package(sensor_msgs REQUIRED)\n find_package(rclcpp REQUIRED)\n-find_package(std_msgs REQUIRED)\n-find_package(tf2 REQUIRED)\n-find_package(tf2_ros REQUIRED)\n-find_package(visualization_msgs REQUIRED)\n find_package(nav2_voxel_grid REQUIRED)\n find_package(nav2_costmap_2d REQUIRED)\n-find_package(Eigen3 REQUIRED)\n+find_package(nav2_ros_common REQUIRED)\n \n set(dependencies\n-\tgeometry_msgs\n \tlaser_geometry\n-\tmap_msgs\n-\tmessage_filters\n-\tnav_msgs\n \tpluginlib\n \tsensor_msgs\n-  nav2_msgs\n+  \tnav2_msgs\n \trclcpp\n-\tstd_msgs\n-\ttf2\n-\ttf2_ros\n-\tvisualization_msgs\n \tnav2_voxel_grid\n \tnav2_costmap_2d)\n \n set(library_name nonpersistent_voxel_layer_core)\n \n-add_definitions(${EIGEN3_DEFINITIONS})\n-\n include_directories(\n     include\n-    ${EIGEN3_INCLUDE_DIRS}\n )\n \n add_library(${library_name} SHARED\n@@ -60,11 +41,11 @@ add_library(${library_name} SHARED\n target_compile_definitions(${library_name} PUBLIC \"PLUGINLIB__DISABLE_BOOST_FUNCTIONS\")\n \n target_link_libraries(${library_name}\n-  ${EIGEN3_LIBRARIES}\n-)\n-\n-ament_target_dependencies(${library_name}\n-  ${dependencies}\n+  ${sensor_msgs_TARGETS}\n+  laser_geometry::laser_geometry\n+  nav2_costmap_2d::nav2_costmap_2d_core\n+  nav2_voxel_grid::voxel_grid\n+  nav2_ros_common::nav2_ros_common\n )\n \n if(BUILD_TESTING)"
+        },
+        {
+          "sha": "30f72bd6dc28487e0ed0d6719cadac2d9d9e6b05",
+          "filename": "include/nonpersistent_voxel_layer/nonpersistent_voxel_layer.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 4,
+          "changes": 5,
+          "blob_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/blob/8049f4ae48e7fbb23bd9ba435b3f6b22b5fdd3b8/include%2Fnonpersistent_voxel_layer%2Fnonpersistent_voxel_layer.hpp",
+          "raw_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/raw/8049f4ae48e7fbb23bd9ba435b3f6b22b5fdd3b8/include%2Fnonpersistent_voxel_layer%2Fnonpersistent_voxel_layer.hpp",
+          "contents_url": "https://api.github.com/repos/SteveMacenski/nonpersistent_voxel_layer/contents/include%2Fnonpersistent_voxel_layer%2Fnonpersistent_voxel_layer.hpp?ref=8049f4ae48e7fbb23bd9ba435b3f6b22b5fdd3b8",
+          "patch": "@@ -45,13 +45,10 @@\n #include \"nav2_costmap_2d/layered_costmap.hpp\"\n #include \"nav2_costmap_2d/observation_buffer.hpp\"\n #include \"nav2_voxel_grid/voxel_grid.hpp\"\n-#include \"nav_msgs/msg/occupancy_grid.hpp\"\n #include \"sensor_msgs/msg/laser_scan.hpp\"\n #include \"laser_geometry/laser_geometry.hpp\"\n #include \"sensor_msgs/msg/point_cloud.hpp\"\n #include \"sensor_msgs/msg/point_cloud2.h\"\n-#include \"tf2_ros/message_filter.h\"\n-#include \"message_filters/subscriber.h\"\n #include \"nav2_costmap_2d/obstacle_layer.hpp\"\n #include \"nav2_msgs/msg/voxel_grid.hpp\"\n \n@@ -91,7 +88,7 @@ class NonPersistentVoxelLayer : public ObstacleLayer\n \n private:\n   bool publish_voxel_;\n-  rclcpp::Publisher<nav2_msgs::msg::VoxelGrid>::SharedPtr voxel_pub_;\n+  nav2::Publisher<nav2_msgs::msg::VoxelGrid>::SharedPtr voxel_pub_;\n   nav2_voxel_grid::VoxelGrid voxel_grid_;\n   double z_resolution_, origin_z_;\n   unsigned int unknown_threshold_, mark_threshold_, size_z_;"
+        },
+        {
+          "sha": "a79fc02233151488a91c27a7500c2766dc7fa332",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 7,
+          "changes": 7,
+          "blob_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/blob/8049f4ae48e7fbb23bd9ba435b3f6b22b5fdd3b8/package.xml",
+          "raw_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/raw/8049f4ae48e7fbb23bd9ba435b3f6b22b5fdd3b8/package.xml",
+          "contents_url": "https://api.github.com/repos/SteveMacenski/nonpersistent_voxel_layer/contents/package.xml?ref=8049f4ae48e7fbb23bd9ba435b3f6b22b5fdd3b8",
+          "patch": "@@ -15,18 +15,11 @@\n \n     <buildtool_depend>ament_cmake</buildtool_depend>\n \n-    <depend>geometry_msgs</depend>\n     <depend>laser_geometry</depend>\n-    <depend>map_msgs</depend>\n-    <depend>nav_msgs</depend>\n     <depend>nav2_msgs</depend>\n     <depend>pluginlib</depend>\n     <depend>rclcpp</depend>\n     <depend>sensor_msgs</depend>\n-    <depend>std_msgs</depend>\n-    <depend>tf2_ros</depend>\n-    <depend>tf2</depend>\n-    <depend>visualization_msgs</depend>\n     <depend>nav2_voxel_grid</depend>\n     <depend>nav2_costmap_2d</depend>\n "
+        },
+        {
+          "sha": "f989b774af96884015acffaa04646c4873ba49e4",
+          "filename": "plugins/nonpersistent_voxel_layer.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/blob/8049f4ae48e7fbb23bd9ba435b3f6b22b5fdd3b8/plugins%2Fnonpersistent_voxel_layer.cpp",
+          "raw_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/raw/8049f4ae48e7fbb23bd9ba435b3f6b22b5fdd3b8/plugins%2Fnonpersistent_voxel_layer.cpp",
+          "contents_url": "https://api.github.com/repos/SteveMacenski/nonpersistent_voxel_layer/contents/plugins%2Fnonpersistent_voxel_layer.cpp?ref=8049f4ae48e7fbb23bd9ba435b3f6b22b5fdd3b8",
+          "patch": "@@ -80,7 +80,7 @@ void NonPersistentVoxelLayer::onInitialize()\n   if (publish_voxel_) {\n     voxel_pub_ =\n       node->create_publisher<nav2_msgs::msg::VoxelGrid>(\n-      \"voxel_grid\", rclcpp::QoS(1));\n+      \"voxel_grid\", nav2::qos::StandardTopicQoS(1));\n   }\n \n   matchSize();"
+        }
+      ]
+    },
+    {
+      "author": "ruffsl",
+      "date": "2024-05-24T22:11:48Z",
+      "sha": "f791f75ff3fa6737b4d850e3c058333931c08273",
+      "message": "Use combination_method_from_int for type conversion (#29)\n\nto fix ggc error with Ubuntu 24.04 for ROS 2 Jazzy",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "43f7a85991ace9635b3f97712bd7a471774b7941",
+          "filename": "plugins/nonpersistent_voxel_layer.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/blob/f791f75ff3fa6737b4d850e3c058333931c08273/plugins%2Fnonpersistent_voxel_layer.cpp",
+          "raw_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/raw/f791f75ff3fa6737b4d850e3c058333931c08273/plugins%2Fnonpersistent_voxel_layer.cpp",
+          "contents_url": "https://api.github.com/repos/SteveMacenski/nonpersistent_voxel_layer/contents/plugins%2Fnonpersistent_voxel_layer.cpp?ref=f791f75ff3fa6737b4d850e3c058333931c08273",
+          "patch": "@@ -63,8 +63,8 @@ void NonPersistentVoxelLayer::onInitialize()\n   enabled_ = node->get_parameter(name_ + \".enabled\").as_bool();\n   max_obstacle_height_ = node->get_parameter(\n     name_ + \".max_obstacle_height\").as_double();\n-  combination_method_ = node->get_parameter(\n-    name_ + \".combination_method\").as_int();\n+  combination_method_ = combination_method_from_int(node->get_parameter(\n+    name_ + \".combination_method\").as_int());\n \n   size_z_ = node->declare_parameter(name_ + \".z_voxels\", 16);\n   origin_z_ = node->declare_parameter(name_ + \".origin_z\", 16.0);"
+        }
+      ]
+    },
+    {
+      "author": "cmraaron",
+      "date": "2023-05-24T21:37:58Z",
+      "sha": "4d302b190b98e78ccb39afc59952ebdabfc0db7f",
+      "message": "dont deadlock (#28)\n\napply same fix as \"fix for #1363\" on nav2_costmap_2d",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 4,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "d5d3ae4c3aff8e6e23f9375fb21235c8f13b23b2",
+          "filename": "plugins/nonpersistent_voxel_layer.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 4,
+          "changes": 6,
+          "blob_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/blob/4d302b190b98e78ccb39afc59952ebdabfc0db7f/plugins%2Fnonpersistent_voxel_layer.cpp",
+          "raw_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/raw/4d302b190b98e78ccb39afc59952ebdabfc0db7f/plugins%2Fnonpersistent_voxel_layer.cpp",
+          "contents_url": "https://api.github.com/repos/SteveMacenski/nonpersistent_voxel_layer/contents/plugins%2Fnonpersistent_voxel_layer.cpp?ref=4d302b190b98e78ccb39afc59952ebdabfc0db7f",
+          "patch": "@@ -118,15 +118,13 @@ void NonPersistentVoxelLayer::matchSize()\n \n void NonPersistentVoxelLayer::reset()\n {\n-  deactivate();\n+  ObstacleLayer::reset();\n   resetMaps();\n-  voxel_grid_.reset();\n-  activate();\n }\n \n void NonPersistentVoxelLayer::resetMaps()\n {\n-  Costmap2D::resetMaps();\n+  ObstacleLayer::resetMaps();\n   voxel_grid_.reset();\n }\n "
+        }
+      ]
+    },
+    {
+      "author": "TanmayDeshmukh",
+      "date": "2023-03-29T15:15:24Z",
+      "sha": "053c2bdec0e1f05c76cc25babf5e71eefcc68bf8",
+      "message": "Humble build (#27)\n\n* c++17\r\n\r\n* fix compilation error",
+      "files_changed": 2,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "c99a72012669ef0769044bf08ac88a8a4920229e",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/blob/053c2bdec0e1f05c76cc25babf5e71eefcc68bf8/CMakeLists.txt",
+          "raw_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/raw/053c2bdec0e1f05c76cc25babf5e71eefcc68bf8/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/SteveMacenski/nonpersistent_voxel_layer/contents/CMakeLists.txt?ref=053c2bdec0e1f05c76cc25babf5e71eefcc68bf8",
+          "patch": "@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)\n project(nonpersistent_voxel_layer)\n \n if(NOT WIN32)\n-  set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -std=c++14\")\n+  set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -std=c++17\")\n endif()\n \n if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")"
+        },
+        {
+          "sha": "449ac766a005e7eb19feaab1f29faead96074e46",
+          "filename": "plugins/nonpersistent_voxel_layer.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/blob/053c2bdec0e1f05c76cc25babf5e71eefcc68bf8/plugins%2Fnonpersistent_voxel_layer.cpp",
+          "raw_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/raw/053c2bdec0e1f05c76cc25babf5e71eefcc68bf8/plugins%2Fnonpersistent_voxel_layer.cpp",
+          "contents_url": "https://api.github.com/repos/SteveMacenski/nonpersistent_voxel_layer/contents/plugins%2Fnonpersistent_voxel_layer.cpp?ref=053c2bdec0e1f05c76cc25babf5e71eefcc68bf8",
+          "patch": "@@ -79,7 +79,7 @@ void NonPersistentVoxelLayer::onInitialize()\n \n   if (publish_voxel_) {\n     voxel_pub_ =\n-      rclcpp_node_->create_publisher<nav2_msgs::msg::VoxelGrid>(\n+      node->create_publisher<nav2_msgs::msg::VoxelGrid>(\n       \"voxel_grid\", rclcpp::QoS(1));\n   }\n "
+        }
+      ]
+    },
+    {
+      "author": "reinzor",
+      "date": "2019-04-18T14:04:24Z",
+      "sha": "361730086e259b6dbc3dc4509fcfc95f525f96cb",
+      "message": "fix: Melodic support + backwards compatibility\n\nChange of Observation class member 'cloud' type.",
+      "files_changed": 1,
+      "additions": 9,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "a44b8b331a538f8d26f846766a6f408593d2c0f0",
+          "filename": "plugins/nonpersistent_voxel_layer.cpp",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 2,
+          "changes": 11,
+          "blob_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/blob/361730086e259b6dbc3dc4509fcfc95f525f96cb/plugins%2Fnonpersistent_voxel_layer.cpp",
+          "raw_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/raw/361730086e259b6dbc3dc4509fcfc95f525f96cb/plugins%2Fnonpersistent_voxel_layer.cpp",
+          "contents_url": "https://api.github.com/repos/SteveMacenski/nonpersistent_voxel_layer/contents/plugins%2Fnonpersistent_voxel_layer.cpp?ref=361730086e259b6dbc3dc4509fcfc95f525f96cb",
+          "patch": "@@ -160,7 +160,14 @@ void NonPersistentVoxelLayer::updateBounds(double robot_x, double robot_y, doubl\n   {\n     const Observation& obs = *it;\n \n-    const pcl::PointCloud<pcl::PointXYZ>& cloud = *(obs.cloud_);\n+    #if ROS_VERSION_MINIMUM(1,14,0)\n+      // >= Melodic\n+      pcl::PointCloud<pcl::PointXYZ> cloud;\n+      pcl::fromROSMsg(*obs.cloud_, cloud);\n+    #else\n+      // < Melodic\n+      const pcl::PointCloud<pcl::PointXYZ>& cloud = *(obs.cloud_);\n+    #endif\n \n     double sq_obstacle_range = obs.obstacle_range_ * obs.obstacle_range_;\n \n@@ -239,4 +246,4 @@ void NonPersistentVoxelLayer::updateOrigin(double new_origin_x, double new_origi\n   origin_y_ = origin_y_ + cell_oy * resolution_;\n }\n \n-} // namespace costmap_2d\n\\ No newline at end of file\n+} // namespace costmap_2d"
+        }
+      ]
+    },
+    {
+      "author": "Jconn",
+      "date": "2020-01-31T21:44:03Z",
+      "sha": "2465a5c036c441a6e2f9f15ed0b290254e3b0461",
+      "message": "store shared files in share/{PROJECT_NAME} rather than share/ (#14)",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "34c6eeb869cac6498f52bb545980019b4e60267c",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/blob/2465a5c036c441a6e2f9f15ed0b290254e3b0461/CMakeLists.txt",
+          "raw_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/raw/2465a5c036c441a6e2f9f15ed0b290254e3b0461/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/SteveMacenski/nonpersistent_voxel_layer/contents/CMakeLists.txt?ref=2465a5c036c441a6e2f9f15ed0b290254e3b0461",
+          "patch": "@@ -100,11 +100,11 @@ install(TARGETS ${library_name}\n )\n \n install(DIRECTORY example\n-  DESTINATION share\n+  DESTINATION share/${PROJECT_NAME}\n )\n \n install(FILES costmap_plugins.xml\n-  DESTINATION share\n+  DESTINATION share/${PROJECT_NAME}\n )\n \n ament_export_include_directories(include)"
+        }
+      ]
+    },
+    {
+      "author": "Jrokisky",
+      "date": "2018-01-18T22:57:39Z",
+      "sha": "72cd3d368935a7de45577e284cc78b84cc659ce6",
+      "message": "Fix issue w/ missing headers during catkin_make\n\nSee: https://github.com/SteveMacenski/nonpersistent_voxel_layer/issues/1",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "45f1612a424e95b45de5a525972102e7eaa54b57",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/blob/72cd3d368935a7de45577e284cc78b84cc659ce6/CMakeLists.txt",
+          "raw_url": "https://github.com/SteveMacenski/nonpersistent_voxel_layer/raw/72cd3d368935a7de45577e284cc78b84cc659ce6/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/SteveMacenski/nonpersistent_voxel_layer/contents/CMakeLists.txt?ref=72cd3d368935a7de45577e284cc78b84cc659ce6",
+          "patch": "@@ -72,6 +72,7 @@ catkin_package(\n add_library(nonpersistent_voxel_layer\n   plugins/nonpersistent_voxel_layer.cpp\n )\n+add_dependencies(nonpersistent_voxel_layer ${PROJECT_NAME}_gencfg)\n target_link_libraries(nonpersistent_voxel_layer ${catkin_LIBRARIES})\n \n install(TARGETS\n@@ -87,4 +88,4 @@ install(FILES costmap_plugins.xml\n install(DIRECTORY include/nonpersistent_voxel_layer/\n   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}\n   PATTERN \".svn\" EXCLUDE\n-)\n\\ No newline at end of file\n+)"
+        }
+      ]
+    }
+  ]
+}

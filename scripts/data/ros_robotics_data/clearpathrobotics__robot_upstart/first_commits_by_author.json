@@ -1,0 +1,971 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T06:21:06Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "clearpathrobotics",
+    "repo": "robot_upstart"
+  },
+  "data": [
+    {
+      "author": "civerachb-cpr",
+      "date": "2020-05-22T17:41:44Z",
+      "sha": "c97bd5a10488e61ece1e3c066795c057679b98f1",
+      "message": "Update the python scripts to be python3-compatible",
+      "files_changed": 4,
+      "additions": 22,
+      "deletions": 22,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "92aade543c5a6e6c600a9db5aa8eb4a8e9fcf1f0",
+          "filename": "scripts/mutate_files",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 7,
+          "changes": 14,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/c97bd5a10488e61ece1e3c066795c057679b98f1/scripts%2Fmutate_files",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/c97bd5a10488e61ece1e3c066795c057679b98f1/scripts%2Fmutate_files",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/scripts%2Fmutate_files?ref=c97bd5a10488e61ece1e3c066795c057679b98f1",
+          "patch": "@@ -31,7 +31,7 @@ while the majority of the installation process occurs as the unprivileged user.\n import os, pickle, sys\n \n if len(sys.argv) != 2:\n-    print \"This script is not intended to be called manually.\"\n+    print (\"This script is not intended to be called manually.\")\n     exit(1)\n \n installation_files = pickle.loads(sys.argv[1])\n@@ -42,32 +42,32 @@ paths = set([os.path.dirname(filename) for filename in installation_files.keys()\n for path in paths:\n     if os.path.exists(path):\n         if not os.access(path, os.W_OK | os.X_OK):\n-            print \"Unable to write to path: %s\" % path\n+            print (\"Unable to write to path: %s\" % path)\n             exit(1)\n     else:\n         try:\n             os.makedirs(path)\n         except:\n-            print \"Unable to create path: %s\" % path\n+            print (\"Unable to create path: %s\" % path)\n \n # Mutate files according to the provided spec. We sort the list in reverse length\n # order so that when we are trying to remove a directory it is after everything in\n # it has already been removed.\n-paths = installation_files.keys()\n+paths = list(installation_files.keys())\n paths.sort(key=len, reverse=True)\n for path in paths:\n     recipe = installation_files[path]\n \n     if 'symlink' in recipe:\n         try:\n             os.symlink(recipe['symlink'], path)\n-        except OSError, e:\n+        except OSError as e:\n             # In case the symlink already exists, remove it before creating\n             if e.errno == 17:\n                 os.unlink(path)\n                 os.symlink(recipe['symlink'], path)\n             else:\n-                print \"Unable to create symlink: %s\" % path\n+                print (\"Unable to create symlink: %s\" % path)\n \n     if 'content' in recipe:\n         with open(path, 'w') as f:\n@@ -81,7 +81,7 @@ for path in paths:\n             try:\n                 os.rmdir(path)\n             except OSError:\n-                print \"WARNING: Unable to remove directory %s. Additional user-added files may be present.\" % path\n+                print (\"WARNING: Unable to remove directory %s. Additional user-added files may be present.\" % path)\n         else:\n             os.remove(path)\n "
+        },
+        {
+          "sha": "626e6339f8b504cddd0506e17cdd16ac6bf8eafd",
+          "filename": "src/robot_upstart/install_script.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/c97bd5a10488e61ece1e3c066795c057679b98f1/src%2Frobot_upstart%2Finstall_script.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/c97bd5a10488e61ece1e3c066795c057679b98f1/src%2Frobot_upstart%2Finstall_script.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/src%2Frobot_upstart%2Finstall_script.py?ref=c97bd5a10488e61ece1e3c066795c057679b98f1",
+          "patch": "@@ -28,7 +28,7 @@\n import robot_upstart\n from catkin.find_in_workspaces import find_in_workspaces\n \n-import providers\n+from . import providers\n \n DESC_PKGPATH = (\"Make sure the path starts with the package name\"\n                 \" (e.g. don't pass absolute path nor a path starting from\"\n@@ -97,7 +97,7 @@ def main():\n \n         found_path = find_in_workspaces(project=pkg, path=pkgpath, first_match_only=True)\n         if not found_path:\n-            print \"Unable to locate path %s in package %s. Installation aborted.\" % (pkgpath, pkg)\n+            print (\"Unable to locate path %s in package %s. Installation aborted.\" % (pkgpath, pkg))\n             return 1\n \n         if os.path.isfile(found_path[0]):"
+        },
+        {
+          "sha": "36a7d55332328d1e25810136914b12e84e6801b7",
+          "filename": "src/robot_upstart/job.py",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 7,
+          "changes": 14,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/c97bd5a10488e61ece1e3c066795c057679b98f1/src%2Frobot_upstart%2Fjob.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/c97bd5a10488e61ece1e3c066795c057679b98f1/src%2Frobot_upstart%2Fjob.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/src%2Frobot_upstart%2Fjob.py?ref=c97bd5a10488e61ece1e3c066795c057679b98f1",
+          "patch": "@@ -33,7 +33,7 @@\n \n from catkin.find_in_workspaces import find_in_workspaces\n \n-import providers\n+from . import providers\n \n \n class Job(object):\n@@ -163,7 +163,7 @@ def install(self, root=\"/\", sudo=\"/usr/bin/sudo\", Provider=None):\n \n         print \"Preparing to install files to the following paths:\"\n         for filename in sorted(installation_files.keys()):\n-            print \"  %s\" % filename\n+            print (\"  %s\" % filename)\n \n         self._call_mutate(sudo, installation_files)\n         p.post_install()\n@@ -186,11 +186,11 @@ def uninstall(self, root=\"/\", sudo=\"/usr/bin/sudo\", Provider=None):\n         installation_files = p.generate_uninstall()\n \n         if len(installation_files) == 0:\n-            print \"Job not found, nothing to remove.\"\n+            print (\"Job not found, nothing to remove.\")\n         else:\n             print \"Preparing to remove the following paths:\"\n             for filename in sorted(installation_files.keys()):\n-                print \"  %s\" % filename\n+                print (\"  %s\" % filename)\n \n             self._call_mutate(sudo, installation_files)\n \n@@ -208,13 +208,13 @@ def _call_mutate(self, sudo, installation_files):\n         cmd = [mutate_files_exec]\n         if sudo:\n             cmd.insert(0, sudo)\n-        print \"Now calling: %s\" % ' '.join(cmd)\n+        print (\"Now calling: %s\" % ' '.join(cmd))\n         p = subprocess.Popen(cmd + [pickle.dumps(installation_files)])\n         p.communicate()\n \n         if p.returncode == 0:\n-            print \"Filesystem operation succeeded.\"\n+            print (\"Filesystem operation succeeded.\")\n         else:\n-            print \"Error encountered; filesystem operation aborted.\"\n+            print (\"Error encountered; filesystem operation aborted.\")\n \n         return p.returncode"
+        },
+        {
+          "sha": "a64aca78686fdf43c3679fb6231eb346f4788394",
+          "filename": "src/robot_upstart/providers.py",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 6,
+          "changes": 12,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/c97bd5a10488e61ece1e3c066795c057679b98f1/src%2Frobot_upstart%2Fproviders.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/c97bd5a10488e61ece1e3c066795c057679b98f1/src%2Frobot_upstart%2Fproviders.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/src%2Frobot_upstart%2Fproviders.py?ref=c97bd5a10488e61ece1e3c066795c057679b98f1",
+          "patch": "@@ -30,14 +30,14 @@\n \n import em\n import os\n-import StringIO\n+import io\n \n from catkin.find_in_workspaces import find_in_workspaces\n \n \n def detect_provider():\n     cmd = open('/proc/1/cmdline', 'rb').read().split('\\x00')[0]\n-    print os.path.realpath(cmd)\n+    print (os.path.realpath(cmd))\n     if 'systemd' in os.path.realpath(cmd):\n         return Systemd\n     return Upstart\n@@ -116,7 +116,7 @@ def generate_install(self):\n         # all of it. A more sophisticated future implementation could track contents or hashes and\n         # thereby warn users when a new installation is stomping a change they have made.\n         self._load_installed_files_set()\n-        self.installed_files_set.update(self.installation_files.keys())\n+        self.installed_files_set.update(list(self.installation_files.keys()))\n \n         # Remove the job directory. This will fail if it is not empty, and notify the user.\n         self.installed_files_set.add(self.job.job_path)\n@@ -146,7 +146,7 @@ def _set_job_path(self):\n             self.root, \"etc/ros\", self.job.rosdistro, self.job.name + \".d\")\n \n     def _fill_template(self, template):\n-        self.interpreter.output = StringIO.StringIO()\n+        self.interpreter.output = io.StringIO()\n         self.interpreter.reset()\n         with open(find_in_workspaces(project=\"robot_upstart\", path=template)[0]) as f:\n             self.interpreter.file(f)\n@@ -191,7 +191,7 @@ def generate_install(self):\n         # all of it. A more sophisticated future implementation could track contents or hashes and\n         # thereby warn users when a new installation is stomping a change they have made.\n         self._load_installed_files_set()\n-        self.installed_files_set.update(self.installation_files.keys())\n+        self.installed_files_set.update(list(self.installation_files.keys()))\n \n         # Remove the job directory. This will fail if it is not empty, and notify the user.\n         self.installed_files_set.add(self.job.job_path)\n@@ -223,7 +223,7 @@ def _set_job_path(self):\n             self.root, \"etc/ros\", self.job.rosdistro, self.job.name + \".d\")\n \n     def _fill_template(self, template):\n-        self.interpreter.output = StringIO.StringIO()\n+        self.interpreter.output = io.StringIO()\n         self.interpreter.reset()\n         with open(find_in_workspaces(project=\"robot_upstart\", path=template)[0]) as f:\n             self.interpreter.file(f)"
+        }
+      ]
+    },
+    {
+      "author": "tonybaltovski",
+      "date": "2017-01-20T19:51:21Z",
+      "sha": "971fe6c4c6366b163dbe6f0dd46de480e9952655",
+      "message": "Moved detect_providers to providers.py (#46)\n\n* Moved detect_providers to providers.py\r\n\r\n* Made default args of install/uninstall to None in job.py.",
+      "files_changed": 3,
+      "additions": 18,
+      "deletions": 15,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "eb19cf4ed8731db0ac6e52c18045c75b36c2f284",
+          "filename": "src/robot_upstart/install_script.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 7,
+          "changes": 8,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/971fe6c4c6366b163dbe6f0dd46de480e9952655/src%2Frobot_upstart%2Finstall_script.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/971fe6c4c6366b163dbe6f0dd46de480e9952655/src%2Frobot_upstart%2Finstall_script.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/src%2Frobot_upstart%2Finstall_script.py?ref=971fe6c4c6366b163dbe6f0dd46de480e9952655",
+          "patch": "@@ -62,12 +62,6 @@ def get_argument_parser():\n                    help=\"Create symbolic link to job launch files instead of copying them.\")\n     return p\n \n-def detect_provider():\n-    cmd=open('/proc/1/cmdline', 'rb').read().split('\\x00')[0]\n-    if 'systemd' in os.path.realpath(cmd):\n-        return providers.Systemd\n-    return providers.Upstart\n-\n def main():\n     \"\"\" Implementation of the ``install`` script.\"\"\"\n \n@@ -101,7 +95,7 @@ def main():\n     if args.augment:\n         j.generate_system_files = False\n \n-    provider=detect_provider()\n+    provider=providers.detect_provider()\n     if args.provider == 'upstart':\n         provider=providers.Upstart\n     if args.provider == 'systemd':"
+        },
+        {
+          "sha": "fe633e6f56b896775b3508731bd7aabc5c100fdc",
+          "filename": "src/robot_upstart/job.py",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 3,
+          "changes": 9,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/971fe6c4c6366b163dbe6f0dd46de480e9952655/src%2Frobot_upstart%2Fjob.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/971fe6c4c6366b163dbe6f0dd46de480e9952655/src%2Frobot_upstart%2Fjob.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/src%2Frobot_upstart%2Fjob.py?ref=971fe6c4c6366b163dbe6f0dd46de480e9952655",
+          "patch": "@@ -141,7 +141,7 @@ def add(self, package=None, filename=None, glob=None):\n             for path in search_paths:\n                 self.files.extend(glob_files(os.path.join(path, glob)))\n \n-    def install(self, root=\"/\", sudo=\"/usr/bin/sudo\", Provider=providers.Upstart):\n+    def install(self, root=\"/\", sudo=\"/usr/bin/sudo\", Provider=None):\n         \"\"\" Install the job definition to the system.\n \n         :param root: Override the root to install to, useful for testing.\n@@ -156,6 +156,8 @@ def install(self, root=\"/\", sudo=\"/usr/bin/sudo\", Provider=providers.Upstart):\n         # This is a recipe of files and their contents which is pickled up and\n         # passed to a sudo process so that it can create the actual files,\n         # without needing a ROS workspace or any other environmental setup.\n+        if Provider is None:\n+           Provider=providers.detect_provider()\n         p = Provider(root, self)\n         installation_files = p.generate_install()\n \n@@ -166,7 +168,7 @@ def install(self, root=\"/\", sudo=\"/usr/bin/sudo\", Provider=providers.Upstart):\n         self._call_mutate(sudo, installation_files)\n         p.post_install()\n \n-    def uninstall(self, root=\"/\", sudo=\"/usr/bin/sudo\", Provider=providers.Upstart):\n+    def uninstall(self, root=\"/\", sudo=\"/usr/bin/sudo\", Provider=None):\n         \"\"\" Uninstall the job definition from the system.\n \n         :param root: Override the root to uninstall from, useful for testing.\n@@ -178,7 +180,8 @@ def uninstall(self, root=\"/\", sudo=\"/usr/bin/sudo\", Provider=providers.Upstart):\n             file preparation.\n         :type provider: Provider\n         \"\"\"\n-\n+        if Provider is None:\n+           Provider=providers.detect_provider()\n         p = Provider(root, self)\n         installation_files = p.generate_uninstall()\n "
+        },
+        {
+          "sha": "c79d05ba9670dca6b809a70e996dd08fbea25cd4",
+          "filename": "src/robot_upstart/providers.py",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 5,
+          "changes": 16,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/971fe6c4c6366b163dbe6f0dd46de480e9952655/src%2Frobot_upstart%2Fproviders.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/971fe6c4c6366b163dbe6f0dd46de480e9952655/src%2Frobot_upstart%2Fproviders.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/src%2Frobot_upstart%2Fproviders.py?ref=971fe6c4c6366b163dbe6f0dd46de480e9952655",
+          "patch": "@@ -34,6 +34,13 @@\n \n from catkin.find_in_workspaces import find_in_workspaces\n \n+def detect_provider():\n+    cmd=open('/proc/1/cmdline', 'rb').read().split('\\x00')[0]\n+    print os.path.realpath(cmd)\n+    if 'systemd' in os.path.realpath(cmd):\n+        return Systemd\n+    return Upstart\n+\n class Generic(object):\n     \"\"\" Provides only a common constructor for the moment, but as further\n         providers are implemented, may provide a place to store configuration\n@@ -119,10 +126,10 @@ def generate_install(self):\n             \"content\": \"\\n\".join(self.installed_files_set)}\n \n         return self.installation_files\n-    \n+\n     def post_install(self):\n         return\n-        \n+\n     def generate_uninstall(self):\n         self._set_job_path()\n         self._load_installed_files_set()\n@@ -144,7 +151,7 @@ def _fill_template(self, template):\n             return self.interpreter.output.getvalue()\n         self.set_job_path()\n \n-        \n+\n class Systemd(Generic):\n     \"\"\" The Systemd implementation places the user-specified files in ``/etc/ros/DISTRO/NAME.d``,\n     and creates an systemd job configuration in ``/lib/systemd/system/NAME.d``. Two additional\n@@ -193,7 +200,7 @@ def generate_install(self):\n             \"content\": \"\\n\".join(self.installed_files_set)}\n \n         return self.installation_files\n-    \n+\n     def post_install(self):\n         print(\"** To complete installation please run the following command:\")\n         print(\" sudo systemctl daemon-reload\" +\n@@ -219,4 +226,3 @@ def _fill_template(self, template):\n             self.interpreter.file(f)\n             return self.interpreter.output.getvalue()\n         self.set_job_path()\n-        "
+        }
+      ]
+    },
+    {
+      "author": "sragin",
+      "date": "2025-05-15T05:22:13Z",
+      "sha": "5e0ec3de50fb56a3bfdfd183d9ad046cd08eae94",
+      "message": "Support multiple launch file patterns (py, xml, yaml)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "93d6acefe35b3a74eb13e4c98171eb19ecb952f5",
+          "filename": "scripts/mklaunch",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/5e0ec3de50fb56a3bfdfd183d9ad046cd08eae94/scripts%2Fmklaunch",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/5e0ec3de50fb56a3bfdfd183d9ad046cd08eae94/scripts%2Fmklaunch",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/scripts%2Fmklaunch?ref=5e0ec3de50fb56a3bfdfd183d9ad046cd08eae94",
+          "patch": "@@ -28,7 +28,7 @@\n # Please send comments, questions, or patches to code@clearpathrobotics.com \n \n path=$1\n-files=$(ls $path/*.launch.py)\n+files=$(ls $path/*launch.[pxy][yma]*)\n if [[ \"$?\" != \"0\" ]]; then\n   echo \"<!-- No matching files found -->\"\n   exit 1"
+        }
+      ]
+    },
+    {
+      "author": "roni-kreinin",
+      "date": "2022-04-20T16:39:01Z",
+      "sha": "699815624d17bcebae1799dcf0020eb3da5e0231",
+      "message": "Removed master_uri, added rmw, cyclonedds_config, and fastrtps_config",
+      "files_changed": 3,
+      "additions": 36,
+      "deletions": 15,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "f6b7768b981a8faeac3db189ac292daacf0f48dc",
+          "filename": "robot_upstart/install_script.py",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 5,
+          "changes": 14,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/699815624d17bcebae1799dcf0020eb3da5e0231/robot_upstart%2Finstall_script.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/699815624d17bcebae1799dcf0020eb3da5e0231/robot_upstart%2Finstall_script.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/robot_upstart%2Finstall_script.py?ref=699815624d17bcebae1799dcf0020eb3da5e0231",
+          "patch": "@@ -50,6 +50,12 @@ def get_argument_parser():\n     p.add_argument(\"--job\", type=str,\n                    help=\"Specify job name. If unspecified, will be constructed from package name (first \" +\n                    \"element before underscore is taken, e.g. 'myrobot' if the package name is 'myrobot_bringup').\")\n+    p.add_argument(\"--rmw\", type=str, metavar=\"rmw_fastrtps_cpp\",\n+                   help=\"Specify RMW DDS being used. rmw_fastrtps_cpp or rmw_cyclonedds_cpp\")\n+    p.add_argument(\"--fastrtps_config\", type=str,\n+                   help=\"FastRTPS configuration URI\")\n+    p.add_argument(\"--cyclonedds_config\", type=str,\n+                   help=\"CycloneDDS configuration URI\")\n     p.add_argument(\"--interface\", type=str, metavar=\"ethN\",\n                    help=\"Specify network interface name to associate job with.\")\n     p.add_argument(\"--user\", type=str, metavar=\"NAME\",\n@@ -58,8 +64,6 @@ def get_argument_parser():\n                    help=\"Specify workspace setup file for the job launch context.\")\n     p.add_argument(\"--rosdistro\", type=str, metavar=\"DISTRO\",\n                    help=\"Specify ROS distro this is for.\")\n-    p.add_argument(\"--master\", type=str, metavar=\"http://MASTER:11311\",\n-                   help=\"Specify an alternative ROS_MASTER_URI for the job launch context.\")\n     p.add_argument(\"--logdir\", type=str, metavar=\"path/to/logs\",\n                    help=\"Specify an a value for ROS_LOG_DIR in the job launch context.\")\n     p.add_argument(\"--augment\", action='store_true',\n@@ -88,9 +92,9 @@ def main():\n     # Any unspecified arguments are on the args object as None. These are filled\n     # in by the Job constructor when passed as Nones.\n     j = robot_upstart.Job(\n-        name=job_name, interface=args.interface, user=args.user,\n-        workspace_setup=args.setup, rosdistro=args.rosdistro,\n-        master_uri=args.master, log_path=args.logdir,\n+        name=job_name, rmw=args.rmw, fastrtps_config=args.fastrtps_config,\n+        cyclonedds_config=args.cyclonedds_config, interface=args.interface, user=args.user,\n+        workspace_setup=args.setup, rosdistro=args.rosdistro, log_path=args.logdir,\n         systemd_after=args.systemd_after)\n \n     for this_pkgpath in args.pkgpath:"
+        },
+        {
+          "sha": "e1cdb7d38ea936df562bf5ddaada54a2ed7fc53d",
+          "filename": "robot_upstart/job.py",
+          "status": "modified",
+          "additions": 14,
+          "deletions": 6,
+          "changes": 20,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/699815624d17bcebae1799dcf0020eb3da5e0231/robot_upstart%2Fjob.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/699815624d17bcebae1799dcf0020eb3da5e0231/robot_upstart%2Fjob.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/robot_upstart%2Fjob.py?ref=699815624d17bcebae1799dcf0020eb3da5e0231",
+          "patch": "@@ -40,14 +40,21 @@\n class Job(object):\n     \"\"\" Represents a ROS configuration to launch on machine startup. \"\"\"\n \n-    def __init__(self, name=\"ros\", interface=None, user=None, workspace_setup=None,\n-                 rosdistro=None, master_uri=None, log_path=None,\n+    def __init__(self, name=\"ros\", rmw=None, fastrtps_config=None, cyclonedds_config=None,\n+                 interface=None, user=None, workspace_setup=None,\n+                 rosdistro=None, log_path=None,\n                  systemd_after=None):\n         \"\"\"Construct a new Job definition.\n \n         :param name: Name of job to create. Defaults to \"ros\", but you might\n             prefer to use the name of your platform.\n         :type name: str\n+        :param rmw: RMW DDS being used. rmw_fastrtps_cpp or rmw_cyclonedds_cpp.\n+        :type interface: str\n+        :param fastrtps_config: Path to FastRTPS xml profile.\n+        :type interface: str\n+        :param cyclonedds_config: Path to CycloneDDS xml profile.\n+        :type interface: str\n         :param interface: Network interface to bring ROS up with. If specified,\n             the job will come up with that network interface, and ROS_IP will be set\n             to that interface's IP address. If unspecified, the job will come up\n@@ -62,9 +69,6 @@ def __init__(self, name=\"ros\", interface=None, user=None, workspace_setup=None,\n         :param rosdistro: rosdistro to use for the /etc/ros/DISTRO path. Defaults\n             to $ROS_DISTRO from the current environment.\n         :type rosdistro: str\n-        :param master_uri: For systems with multiple computers, you may want this\n-            job to launch with ROS_MASTER_URI pointing to another machine.\n-        :type master_uri: str\n         :param log_path: The location to set ROS_LOG_DIR to. If changed from the\n             default of using /tmp, it is the user's responsibility to manage log\n             rotation.\n@@ -85,7 +89,11 @@ def __init__(self, name=\"ros\", interface=None, user=None, workspace_setup=None,\n         # Fall back on current distro if not otherwise specified.\n         self.rosdistro = rosdistro or os.environ['ROS_DISTRO']\n \n-        self.master_uri = master_uri or \"http://127.0.0.1:11311\"\n+        self.rmw = rmw or \"rmw_fastrtps_cpp\"\n+\n+        self.fastrtps_config = fastrtps_config or \"\"\n+\n+        self.cyclonedds_config = cyclonedds_config or \"\"\n \n         self.log_path = log_path or \"/tmp\"\n "
+        },
+        {
+          "sha": "becf0726196dbdd6d4d85d06e3404aade0ce8e1f",
+          "filename": "templates/job-start.em",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 4,
+          "changes": 17,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/699815624d17bcebae1799dcf0020eb3da5e0231/templates%2Fjob-start.em",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/699815624d17bcebae1799dcf0020eb3da5e0231/templates%2Fjob-start.em",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/templates%2Fjob-start.em?ref=699815624d17bcebae1799dcf0020eb3da5e0231",
+          "patch": "@@ -62,14 +62,23 @@ fi\n export ROS_HOSTNAME=$(hostname)\n @[end if]@\n \n-@[if master_uri]@\n-export ROS_MASTER_URI=@(master_uri)\n+@[if rmw]@\n+export RMW_IMPLEMENTATION=@(rmw)\n @[else]@\n-export ROS_MASTER_URI=http://127.0.0.1:11311\n+export RMW_IMPLEMENTATION=rmw_fastrtps_cpp\n @[end if]@\n+\n+@[if fastrtps_config]@\n+export FASTRTPS_DEFAULT_PROFILES_FILE=@(fastrtps_config)\n+@[end if]@\n+\n+@[if cyclonedds_config]@\n+export CYCLONEDDS_URI=@(cyclonedds_config)\n+@[end if]@\n+\n export ROS_HOME=${ROS_HOME:=$(echo ~@(user))/.ros}\n export ROS_LOG_DIR=$log_path\n-\n+ \n log info \"@(name): Launching ROS_HOSTNAME=$ROS_HOSTNAME, ROS_IP=$ROS_IP, ROS_MASTER_URI=$ROS_MASTER_URI, ROS_HOME=$ROS_HOME, ROS_LOG_DIR=$log_path\"\n \n # If xacro files are present in job folder, generate and expand an amalgamated urdf."
+        }
+      ]
+    },
+    {
+      "author": "zifengqi123",
+      "date": "2021-11-04T09:04:36Z",
+      "sha": "cad30d0fe93b37f0fd98e5b81da488052cb2b5b2",
+      "message": "ros2 foxy",
+      "files_changed": 5,
+      "additions": 42,
+      "deletions": 36,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "8a0cfd1d007e371996b8a866c172283bf3995d9e",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 19,
+          "changes": 26,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/cad30d0fe93b37f0fd98e5b81da488052cb2b5b2/package.xml",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/cad30d0fe93b37f0fd98e5b81da488052cb2b5b2/package.xml",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/package.xml?ref=cad30d0fe93b37f0fd98e5b81da488052cb2b5b2",
+          "patch": "@@ -1,31 +1,19 @@\n <?xml version=\"1.0\"?>\n-<package format=\"2\">\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n   <name>robot_upstart</name>\n   <version>0.4.2</version>\n   <description>\n     The robot_upstart package provides scripts which may be used to install\n     and uninstall Ubuntu Linux upstart jobs which launch groups of roslaunch files.\n   </description>\n \n-  <maintainer email=\"civerachb@clearpathrobotics.com\">Chris Iverach-Brereton</maintainer>\n-  <maintainer email=\"tbaltovski@clearpathrobotics.com\">Tony Baltovski</maintainer>\n-  <author email=\"mpurvis@clearpathrobotics.com\">Mike Purvis</author>\n-\n-  <license>BSD</license>\n-\n-  <buildtool_depend>catkin</buildtool_depend>\n-\n-  <exec_depend>daemontools</exec_depend>\n-  <exec_depend>net-tools</exec_depend>\n-  <exec_depend>roslaunch</exec_depend>\n-  <exec_depend>util-linux</exec_depend>\n-  <exec_depend>xacro</exec_depend>\n-\n-  <test_depend>roslint</test_depend>\n-  <test_depend>rosunit</test_depend>\n+  <test_depend>ament_copyright</test_depend>\n+  <test_depend>ament_flake8</test_depend>\n+  <test_depend>ament_pep257</test_depend>\n+  <test_depend>python3-pytest</test_depend>\n \n   <export>\n-    <architecture_independent/>\n-    <rosdoc config=\"rosdoc.yaml\"/>\n+    <build_type>ament_python</build_type>\n   </export>\n </package>"
+        },
+        {
+          "sha": "d1be78ddf98b72cd3c846ebe5c8a05765340e6d3",
+          "filename": "scripts/mklaunch",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/cad30d0fe93b37f0fd98e5b81da488052cb2b5b2/scripts%2Fmklaunch",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/cad30d0fe93b37f0fd98e5b81da488052cb2b5b2/scripts%2Fmklaunch",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/scripts%2Fmklaunch?ref=cad30d0fe93b37f0fd98e5b81da488052cb2b5b2",
+          "patch": "@@ -28,7 +28,7 @@\n # Please send comments, questions, or patches to code@clearpathrobotics.com \n \n path=$1\n-files=$(ls $path/*.launch)\n+files=$(ls $path/*.launch.py)\n if [[ \"$?\" != \"0\" ]]; then\n   echo \"<!-- No matching files found -->\"\n   exit 1"
+        },
+        {
+          "sha": "ad266616390e6adc0f956eb34d14ec4c34d16941",
+          "filename": "setup.py",
+          "status": "modified",
+          "additions": 24,
+          "deletions": 6,
+          "changes": 30,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/cad30d0fe93b37f0fd98e5b81da488052cb2b5b2/setup.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/cad30d0fe93b37f0fd98e5b81da488052cb2b5b2/setup.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/setup.py?ref=cad30d0fe93b37f0fd98e5b81da488052cb2b5b2",
+          "patch": "@@ -1,7 +1,25 @@\n-from distutils.core import setup\n-from catkin_pkg.python_setup import generate_distutils_setup\n+import os\n+from setuptools import setup\n+from glob import glob\n \n-setup(**generate_distutils_setup(\n-    packages=['robot_upstart'],\n-    package_dir={'': 'src'}\n-))\n+package_name = 'robot_upstart'\n+\n+setup(\n+    name=package_name,\n+    packages=[package_name],\n+    data_files=[\n+        ('share/ament_index/resource_index/packages',\n+            ['resource/' + package_name]),\n+        ('share/' + package_name, ['package.xml']),\n+        (os.path.join('lib', package_name, 'scripts'), glob('scripts/*')),\n+        (os.path.join('share', package_name, 'scripts'), glob('scripts/*')),\n+        (os.path.join('share', package_name, 'templates'), glob('templates/*')),\n+    ],\n+    install_requires=['setuptools'],\n+    zip_safe=True,\n+    tests_require=['pytest'],\n+    entry_points={\n+        'console_scripts': [\n+        ],\n+    },\n+)"
+        },
+        {
+          "sha": "84ec7c2c5369745e655e080008406ee6e6002cee",
+          "filename": "templates/job-start.em",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 9,
+          "changes": 18,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/cad30d0fe93b37f0fd98e5b81da488052cb2b5b2/templates%2Fjob-start.em",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/cad30d0fe93b37f0fd98e5b81da488052cb2b5b2/templates%2Fjob-start.em",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/templates%2Fjob-start.em?ref=cad30d0fe93b37f0fd98e5b81da488052cb2b5b2",
+          "patch": "@@ -53,9 +53,9 @@ if [[ ! -d $log_path ]]; then\n fi\n \n @[if interface]@\n-export ROS_IP=`rosrun robot_upstart getifip @(interface)`\n+export ROS_IP=`ros2 run robot_upstart getifip @(interface)`\n if [ \"$ROS_IP\" = \"\" ]; then\n-  log err \"@(name): No IP address on @(interface), cannot roslaunch.\"\n+  log err \"@(name): No IP address on @(interface), cannot ros2 launch.\"\n   exit 1\n fi\n @[else]@\n@@ -75,10 +75,10 @@ log info \"@(name): Launching ROS_HOSTNAME=$ROS_HOSTNAME, ROS_IP=$ROS_IP, ROS_MAS\n # If xacro files are present in job folder, generate and expand an amalgamated urdf.\n XACRO_FILENAME=$log_path/@(name).xacro\n XACRO_ROBOT_NAME=$(echo \"@(name)\" | cut -d- -f1)\n-rosrun robot_upstart mkxacro $JOB_FOLDER $XACRO_ROBOT_NAME > $XACRO_FILENAME\n+ros2 run robot_upstart mkxacro $JOB_FOLDER $XACRO_ROBOT_NAME > $XACRO_FILENAME\n if [[ \"$?\" == \"0\" ]]; then\n   URDF_FILENAME=$log_path/@(name).urdf\n-  rosrun xacro xacro $XACRO_FILENAME -o $URDF_FILENAME\n+  ros2 run xacro xacro $XACRO_FILENAME -o $URDF_FILENAME\n   if [[ \"$?\" == \"0\" ]]; then\n     log info \"@(name): Generated URDF: $URDF_FILENAME\"\n   else\n@@ -88,10 +88,10 @@ if [[ \"$?\" == \"0\" ]]; then\n fi\n \n # Assemble amalgamated launchfile.\n-LAUNCH_FILENAME=$log_path/@(name).launch\n-rosrun robot_upstart mklaunch $JOB_FOLDER > $LAUNCH_FILENAME\n+LAUNCH_FILENAME=$log_path/@(name).launch.py\n+ros2 run robot_upstart mklaunch $JOB_FOLDER > $LAUNCH_FILENAME\n if [[ \"$?\" != \"0\" ]]; then\n-  log err \"@(name): Unable to generate amalgamated launchfile.\"\n+  log err \"@(name): Unable to generate amalgamated launchfile. $JOB_FOLDER $LAUNCH_FILENAME\"\n   exit 1\n fi\n log info \"@(name): Generated launchfile: $LAUNCH_FILENAME\"\n@@ -104,10 +104,10 @@ if [ \"$?\" != \"0\" ]; then\n fi\n \n # Punch it.\n-setpriv --reuid @(user) --regid @(user) --init-groups roslaunch $LAUNCH_FILENAME @(roslaunch_wait?'--wait ')&\n+setpriv --reuid @(user) ros2 launch $LAUNCH_FILENAME @(roslaunch_wait?'--wait ')&\n PID=$!\n \n-log info \"@(name): Started roslaunch as background process, PID $PID, ROS_LOG_DIR=$ROS_LOG_DIR\"\n+log info \"@(name): Started ros2 launch as background process, PID $PID, ROS_LOG_DIR=$ROS_LOG_DIR\"\n echo \"$PID\" > $log_path/@(name).pid\n \n wait \"$PID\""
+        },
+        {
+          "sha": "b47c2578fc1b464b9e4fdd14632ea9c833f634e2",
+          "filename": "templates/job-stop.em",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/cad30d0fe93b37f0fd98e5b81da488052cb2b5b2/templates%2Fjob-stop.em",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/cad30d0fe93b37f0fd98e5b81da488052cb2b5b2/templates%2Fjob-stop.em",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/templates%2Fjob-stop.em?ref=cad30d0fe93b37f0fd98e5b81da488052cb2b5b2",
+          "patch": "@@ -31,5 +31,5 @@\n PID=$(cat @(log_path)/@(name).pid)\n logger -p user.info \"Attempting to stop @(name) (PID $PID)\"\n kill $PID\n-logger -s -p user.info \"Waiting for roslaunch process to end\"\n+logger -s -p user.info \"Waiting for ros2 launch process to end\"\n while kill -0 $PID 2>/dev/null; do sleep 0.2; done"
+        }
+      ]
+    },
+    {
+      "author": "mikaelarguedas",
+      "date": "2020-08-09T15:29:41Z",
+      "sha": "e6f20442cc93329df5291f3169871fb9a30f0707",
+      "message": "run ci on ROS noetic\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 2,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "b617a14786932f45249b242c51ac58e1a8104dab",
+          "filename": ".travis.yml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 2,
+          "changes": 3,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/e6f20442cc93329df5291f3169871fb9a30f0707/.travis.yml",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/e6f20442cc93329df5291f3169871fb9a30f0707/.travis.yml",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/.travis.yml?ref=e6f20442cc93329df5291f3169871fb9a30f0707",
+          "patch": "@@ -4,8 +4,7 @@ services:\n \n env:\n   matrix:\n-    - ROS_DISTRO=\"kinetic\"\n-    - ROS_DISTRO=\"melodic\"\n+    - ROS_DISTRO=\"noetic\"\n \n install:\n   - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci -b master"
+        }
+      ]
+    },
+    {
+      "author": "yotabits",
+      "date": "2021-05-12T16:36:51Z",
+      "sha": "54fa59f09186776d1ad948d8adf203970a641e85",
+      "message": " Enable customization of  After= in service (#104)\n\n* Cosmetic\r\n\r\nRemove unnecessary parenthesis.\r\n\r\n* Correct typo\r\n\r\n* FIX: Remove unreachable code\r\n\r\n* Enable customizable After= in service\r\n\r\nThis feature enables the user to define the services after which the\r\ngenerated service will. This is handy when hardware-related system\r\nservices have to start before the ROS software.",
+      "files_changed": 4,
+      "additions": 14,
+      "deletions": 6,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "29fbd7783e331d37227b4235f74eaa7795ad3237",
+          "filename": "src/robot_upstart/install_script.py",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 1,
+          "changes": 6,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/54fa59f09186776d1ad948d8adf203970a641e85/src%2Frobot_upstart%2Finstall_script.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/54fa59f09186776d1ad948d8adf203970a641e85/src%2Frobot_upstart%2Finstall_script.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/src%2Frobot_upstart%2Finstall_script.py?ref=54fa59f09186776d1ad948d8adf203970a641e85",
+          "patch": "@@ -68,6 +68,9 @@ def get_argument_parser():\n                    help=\"Create symbolic link to job launch files instead of copying them.\")\n     p.add_argument(\"--wait\", action='store_true',\n                    help=\"Pass a wait flag to roslaunch.\")\n+    p.add_argument(\"--systemd-after\", type=str, metavar=\"After=\",\n+                   help=\"Set the string of the After= section\"\n+                        \"of the generated Systemd service file\")\n \n     return p\n \n@@ -85,7 +88,8 @@ def main():\n     j = robot_upstart.Job(\n         name=job_name, interface=args.interface, user=args.user,\n         workspace_setup=args.setup, rosdistro=args.rosdistro,\n-        master_uri=args.master, log_path=args.logdir)\n+        master_uri=args.master, log_path=args.logdir,\n+        systemd_after=args.systemd_after)\n \n     for this_pkgpath in args.pkgpath:\n         pkg, pkgpath = this_pkgpath.split('/', 1)"
+        },
+        {
+          "sha": "895525cb86c6902cfe028abd3f8afdb64d90b6df",
+          "filename": "src/robot_upstart/job.py",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 1,
+          "changes": 7,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/54fa59f09186776d1ad948d8adf203970a641e85/src%2Frobot_upstart%2Fjob.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/54fa59f09186776d1ad948d8adf203970a641e85/src%2Frobot_upstart%2Fjob.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/src%2Frobot_upstart%2Fjob.py?ref=54fa59f09186776d1ad948d8adf203970a641e85",
+          "patch": "@@ -40,7 +40,8 @@ class Job(object):\n     \"\"\" Represents a ROS configuration to launch on machine startup. \"\"\"\n \n     def __init__(self, name=\"ros\", interface=None, user=None, workspace_setup=None,\n-                 rosdistro=None, master_uri=None, log_path=None):\n+                 rosdistro=None, master_uri=None, log_path=None,\n+                 systemd_after=None):\n         \"\"\"Construct a new Job definition.\n \n         :param name: Name of job to create. Defaults to \"ros\", but you might\n@@ -100,6 +101,10 @@ def __init__(self, name=\"ros\", interface=None, user=None, workspace_setup=None,\n         # connect to an existing master.\n         self.roslaunch_wait = False\n \n+        # Set the string of the \"After=\" section\n+        # of the generated Systemd service file\n+        self.systemd_after = systemd_after or \"network.target\"\n+\n         # Set of files to be installed for the job. This is only launchers\n         # and other user-specified configs--- nothing related to the system\n         # startup job itself. List of strs."
+        },
+        {
+          "sha": "d334cb8aab149f81e9129d1c96f957f806975c0f",
+          "filename": "src/robot_upstart/providers.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 3,
+          "changes": 5,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/54fa59f09186776d1ad948d8adf203970a641e85/src%2Frobot_upstart%2Fproviders.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/54fa59f09186776d1ad948d8adf203970a641e85/src%2Frobot_upstart%2Fproviders.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/src%2Frobot_upstart%2Fproviders.py?ref=54fa59f09186776d1ad948d8adf203970a641e85",
+          "patch": "@@ -151,7 +151,6 @@ def _fill_template(self, template):\n         with open(find_in_workspaces(project=\"robot_upstart\", path=template)[0]) as f:\n             self.interpreter.file(f)\n             return self.interpreter.output.getvalue()\n-        self.set_job_path()\n \n \n class Systemd(Generic):\n@@ -171,8 +170,8 @@ def generate_install(self):\n \n         # This is optional to support the old --augment flag where a \"job\" only adds\n         # launch files to an existing configuration.\n-        if (self.job.generate_system_files):\n-            # Share a single instance of the empy interpreter.\n+        if self.job.generate_system_files:\n+            # Share a single instance of the empty interpreter.\n             self.interpreter = em.Interpreter(globals=self.job.__dict__.copy())\n \n             self.installation_files[os.path.join(self.root, \"lib/systemd/system\", self.job.name + \".service\")] = {"
+        },
+        {
+          "sha": "c2d34afa58e4f22c432c36ad305054af0ae91875",
+          "filename": "templates/systemd_job.conf.em",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/54fa59f09186776d1ad948d8adf203970a641e85/templates%2Fsystemd_job.conf.em",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/54fa59f09186776d1ad948d8adf203970a641e85/templates%2Fsystemd_job.conf.em",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/templates%2Fsystemd_job.conf.em?ref=54fa59f09186776d1ad948d8adf203970a641e85",
+          "patch": "@@ -29,7 +29,7 @@\n \n [Unit]\n Description=\"bringup @(name)\"\n-After=network.target\n+After=@(systemd_after)\n \n [Service]\n Type=simple"
+        }
+      ]
+    },
+    {
+      "author": "Crowdedlight",
+      "date": "2020-06-16T12:11:16Z",
+      "sha": "b0efbd4703a8d0d809bd1f84ea57e7473b016beb",
+      "message": "updated to work with python3",
+      "files_changed": 8,
+      "additions": 18,
+      "deletions": 16,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "f6b996182467056c7cd5951a257965648f6f9d68",
+          "filename": "scripts/install",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/b0efbd4703a8d0d809bd1f84ea57e7473b016beb/scripts%2Finstall",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/b0efbd4703a8d0d809bd1f84ea57e7473b016beb/scripts%2Finstall",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/scripts%2Finstall?ref=b0efbd4703a8d0d809bd1f84ea57e7473b016beb",
+          "patch": "@@ -1,4 +1,4 @@\n-#!/usr/bin/env python\n+#!/usr/bin/env python3\n # Software License Agreement (BSD) \n #\n # @author    Mike Purvis <mpurvis@clearpathrobotics.com>"
+        },
+        {
+          "sha": "c65874c0749b3da4b2e7bb95d175c76f6d3ac2a0",
+          "filename": "scripts/mutate_files",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 4,
+          "changes": 7,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/b0efbd4703a8d0d809bd1f84ea57e7473b016beb/scripts%2Fmutate_files",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/b0efbd4703a8d0d809bd1f84ea57e7473b016beb/scripts%2Fmutate_files",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/scripts%2Fmutate_files?ref=b0efbd4703a8d0d809bd1f84ea57e7473b016beb",
+          "patch": "@@ -1,4 +1,4 @@\n-#!/usr/bin/env python\n+#!/usr/bin/env python3\n # Software License Agreement (BSD)\n #\n # @author    Mike Purvis <mpurvis@clearpathrobotics.com>\n@@ -28,14 +28,13 @@ small recipe of files to be created as the root user. So this script may be invo\n while the majority of the installation process occurs as the unprivileged user.\n \"\"\"\n \n-import os, pickle, sys\n+import os, sys, json\n \n if len(sys.argv) != 2:\n     print (\"This script is not intended to be called manually.\")\n     exit(1)\n \n-installation_files = pickle.loads(sys.argv[1])\n-\n+installation_files = json.loads(os.fsencode(sys.argv[1]))\n # Check first for writability, creating paths if necessary.\n paths = set([os.path.dirname(filename) for filename in installation_files.keys()])\n "
+        },
+        {
+          "sha": "0a5453db5e5b16b31162a5343d26f1fc280932a1",
+          "filename": "scripts/uninstall",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/b0efbd4703a8d0d809bd1f84ea57e7473b016beb/scripts%2Funinstall",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/b0efbd4703a8d0d809bd1f84ea57e7473b016beb/scripts%2Funinstall",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/scripts%2Funinstall?ref=b0efbd4703a8d0d809bd1f84ea57e7473b016beb",
+          "patch": "@@ -1,4 +1,4 @@\n-#!/usr/bin/env python\n+#!/usr/bin/env python3\n # Software License Agreement (BSD)\n #\n # @author    Mike Purvis <mpurvis@clearpathrobotics.com>"
+        },
+        {
+          "sha": "8de6c796c7888229f7a26e31956cb2dc398bd22a",
+          "filename": "src/robot_upstart/__init__.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/b0efbd4703a8d0d809bd1f84ea57e7473b016beb/src%2Frobot_upstart%2F__init__.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/b0efbd4703a8d0d809bd1f84ea57e7473b016beb/src%2Frobot_upstart%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/src%2Frobot_upstart%2F__init__.py?ref=b0efbd4703a8d0d809bd1f84ea57e7473b016beb",
+          "patch": "@@ -21,5 +21,5 @@\n # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n # POSSIBILITY OF SUCH DAMAGE.\n \n-from job import Job\n-import providers\n+from robot_upstart.job import Job\n+import robot_upstart.providers"
+        },
+        {
+          "sha": "0a9dd21127dcfef957acb4155406ec22b6c1704c",
+          "filename": "src/robot_upstart/install_script.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/b0efbd4703a8d0d809bd1f84ea57e7473b016beb/src%2Frobot_upstart%2Finstall_script.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/b0efbd4703a8d0d809bd1f84ea57e7473b016beb/src%2Frobot_upstart%2Finstall_script.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/src%2Frobot_upstart%2Finstall_script.py?ref=b0efbd4703a8d0d809bd1f84ea57e7473b016beb",
+          "patch": "@@ -1,4 +1,4 @@\n-#!/usr/bin/env python\n+#!/usr/bin/env python3\n # Software License Agreement (BSD)\n #\n # @author    Mike Purvis <mpurvis@clearpathrobotics.com>"
+        },
+        {
+          "sha": "f67b8d525db55894dc1a71867227130b060c0368",
+          "filename": "src/robot_upstart/job.py",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 4,
+          "changes": 11,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/b0efbd4703a8d0d809bd1f84ea57e7473b016beb/src%2Frobot_upstart%2Fjob.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/b0efbd4703a8d0d809bd1f84ea57e7473b016beb/src%2Frobot_upstart%2Fjob.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/src%2Frobot_upstart%2Fjob.py?ref=b0efbd4703a8d0d809bd1f84ea57e7473b016beb",
+          "patch": "@@ -27,7 +27,7 @@\n \n import getpass\n import os\n-import pickle\n+import json\n import subprocess\n from glob import glob as glob_files\n \n@@ -161,7 +161,7 @@ def install(self, root=\"/\", sudo=\"/usr/bin/sudo\", Provider=None):\n         p = Provider(root, self)\n         installation_files = p.generate_install()\n \n-        print \"Preparing to install files to the following paths:\"\n+        print (\"Preparing to install files to the following paths:\")\n         for filename in sorted(installation_files.keys()):\n             print (\"  %s\" % filename)\n \n@@ -188,7 +188,7 @@ def uninstall(self, root=\"/\", sudo=\"/usr/bin/sudo\", Provider=None):\n         if len(installation_files) == 0:\n             print (\"Job not found, nothing to remove.\")\n         else:\n-            print \"Preparing to remove the following paths:\"\n+            print (\"Preparing to remove the following paths:\")\n             for filename in sorted(installation_files.keys()):\n                 print (\"  %s\" % filename)\n \n@@ -209,7 +209,9 @@ def _call_mutate(self, sudo, installation_files):\n         if sudo:\n             cmd.insert(0, sudo)\n         print (\"Now calling: %s\" % ' '.join(cmd))\n-        p = subprocess.Popen(cmd + [pickle.dumps(installation_files)])\n+\n+        # changed to use json, as pickle gives 0-bytes error\n+        p = subprocess.Popen(cmd + [json.dumps(installation_files)])\n         p.communicate()\n \n         if p.returncode == 0:\n@@ -218,3 +220,4 @@ def _call_mutate(self, sudo, installation_files):\n             print (\"Error encountered; filesystem operation aborted.\")\n \n         return p.returncode\n+"
+        },
+        {
+          "sha": "f10176f3578657b8e53d666ee4de3e1c929e99b0",
+          "filename": "src/robot_upstart/providers.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/b0efbd4703a8d0d809bd1f84ea57e7473b016beb/src%2Frobot_upstart%2Fproviders.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/b0efbd4703a8d0d809bd1f84ea57e7473b016beb/src%2Frobot_upstart%2Fproviders.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/src%2Frobot_upstart%2Fproviders.py?ref=b0efbd4703a8d0d809bd1f84ea57e7473b016beb",
+          "patch": "@@ -36,9 +36,9 @@\n \n \n def detect_provider():\n-    cmd = open('/proc/1/cmdline', 'rb').read().split('\\x00')[0]\n+    cmd = open('/proc/1/cmdline', 'rb').read().split(b'\\x00')[0]\n     print (os.path.realpath(cmd))\n-    if 'systemd' in os.path.realpath(cmd):\n+    if b'systemd' in os.path.realpath(cmd):\n         return Systemd\n     return Upstart\n "
+        },
+        {
+          "sha": "3f28b09ddd5bcfd9ca5374157cf16fcce2c462dc",
+          "filename": "src/robot_upstart/uninstall_script.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/b0efbd4703a8d0d809bd1f84ea57e7473b016beb/src%2Frobot_upstart%2Funinstall_script.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/b0efbd4703a8d0d809bd1f84ea57e7473b016beb/src%2Frobot_upstart%2Funinstall_script.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/src%2Frobot_upstart%2Funinstall_script.py?ref=b0efbd4703a8d0d809bd1f84ea57e7473b016beb",
+          "patch": "@@ -1,4 +1,4 @@\n-#!/usr/bin/env python\n+#!/usr/bin/env python3\n # Software License Agreement (BSD)\n #\n # @author    Mike Purvis <mpurvis@clearpathrobotics.com>"
+        }
+      ]
+    },
+    {
+      "author": "130s",
+      "date": "2017-09-11T19:30:20Z",
+      "sha": "8ed6882c30609259cc0867eb8b620b3ce626b4b5",
+      "message": "Clarify the reason of the error due to wrong pkgpath passed. (#57)\n\n**Issue**\r\nWhen the path passed to pkgpath does NOT start from the path of the directory of the package your upstart launch is located at, the following error occurs, which does not provide enough info why failing.\r\n\r\n```\r\n$ rosrun robot_upstart install catkin_ws/src/foo/foo_support/launch/upstart.launch --user autoboot --setup /etc/ros/setup.bash\r\nUnable to locate path src/foo/foo_support/launch/upstart.launch in package catkin_ws. Installation aborted.\r\nTraceback (most recent call last):\r\n  File \"/opt/ros/indigo/lib/robot_upstart/install\", line 32, in <module>\r\n    exit(main())\r\n  File \"/opt/ros/indigo/lib/python2.7/dist-packages/robot_upstart/install_script.py\", line 80, in main\r\n    if os.path.isfile(found_path[0]):\r\n      IndexError: list index out of range\r\n```\r\n\r\n**Solution**\r\nIn the error message, clearly instruct what path should be passed.\r\nAlso add more description to the result of \"help\".",
+      "files_changed": 1,
+      "additions": 11,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "9aa541491c1c542922739d681231b4f20d3244ae",
+          "filename": "src/robot_upstart/install_script.py",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 1,
+          "changes": 12,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/8ed6882c30609259cc0867eb8b620b3ce626b4b5/src%2Frobot_upstart%2Finstall_script.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/8ed6882c30609259cc0867eb8b620b3ce626b4b5/src%2Frobot_upstart%2Finstall_script.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/src%2Frobot_upstart%2Finstall_script.py?ref=8ed6882c30609259cc0867eb8b620b3ce626b4b5",
+          "patch": "@@ -30,6 +30,10 @@\n \n import providers\n \n+DESC_PKGPATH = (\"Make sure the path starts with the package name\"\n+                \" (e.g. don't pass absolute path nor a path starting from\"\n+                \" workspace top folder etc.)\")\n+\n \n def get_argument_parser():\n     p = argparse.ArgumentParser(\n@@ -39,7 +43,8 @@ def get_argument_parser():\n         and a compatibility shim for previous versions of robot_upstart which were bash-based.\"\"\")\n \n     p.add_argument(\"pkgpath\", type=str, nargs='+', metavar=\"pkg/path\",\n-                   help=\"Package and path to install job launch files from.\")\n+                   help=\"Package and path to install job launch files from. \" +\n+                        DESC_PKGPATH)\n     p.add_argument(\"--job\", type=str,\n                    help=\"Specify job name. If unspecified, will be constructed from package name.\")\n     p.add_argument(\"--interface\", type=str, metavar=\"ethN\",\n@@ -80,6 +85,11 @@ def main():\n \n     for this_pkgpath in args.pkgpath:\n         pkg, pkgpath = this_pkgpath.split('/', 1)\n+        if not pkg:\n+            print(\"Unable to locate package your job launch is in.\"\n+                  \" Installation aborted. \" + DESC_PKGPATH +\n+                  \"\\npkgpath passed: {}.\".format(pkgpath))\n+            return 1\n \n         found_path = find_in_workspaces(project=pkg, path=pkgpath, first_match_only=True)\n         if not found_path:"
+        }
+      ]
+    },
+    {
+      "author": "Rayman",
+      "date": "2019-10-09T16:46:34Z",
+      "sha": "737bef8402a98acae580efb86e198bb660f1d0ec",
+      "message": "Melodic compatibility: modify getifip for bionic output (#88)\n\n* Add net-tools as dependency because ifconfig is used\r\n\r\n* Modify getifip to handle bionic ifconfig output",
+      "files_changed": 2,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "39b17d7ae252695eecdbc495821fa74366fe5bd2",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/737bef8402a98acae580efb86e198bb660f1d0ec/package.xml",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/737bef8402a98acae580efb86e198bb660f1d0ec/package.xml",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/package.xml?ref=737bef8402a98acae580efb86e198bb660f1d0ec",
+          "patch": "@@ -15,6 +15,7 @@\n   <buildtool_depend>catkin</buildtool_depend>\n \n   <exec_depend>daemontools</exec_depend>\n+  <exec_depend>net-tools</exec_depend>\n   <exec_depend>roslaunch</exec_depend>\n   <exec_depend>xacro</exec_depend>\n "
+        },
+        {
+          "sha": "15f582989570be1238240c9fd22cee6fd4477003",
+          "filename": "scripts/getifip",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/737bef8402a98acae580efb86e198bb660f1d0ec/scripts%2Fgetifip",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/737bef8402a98acae580efb86e198bb660f1d0ec/scripts%2Fgetifip",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/scripts%2Fgetifip?ref=737bef8402a98acae580efb86e198bb660f1d0ec",
+          "patch": "@@ -27,4 +27,4 @@\n # \n # Please send comments, questions, or patches to code@clearpathrobotics.com \n \n-echo `LANG=C ifconfig $1 | grep -o 'inet addr:[^ ]*' | cut -d: -f2`\n+echo `LANG=C ifconfig $1 | perl -lne '/inet (addr:)?(.[^ ]+)/ && print $2'`"
+        }
+      ]
+    },
+    {
+      "author": "mikepurvis",
+      "date": "2013-08-22T01:38:29Z",
+      "sha": "ae8ee92c8945a56ae11a14c35f312266d157b4a2",
+      "message": "Bare beginnings of a generalized ROS upstart package.",
+      "files_changed": 8,
+      "additions": 307,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "b9c6db15a1ebdf9d114cd82ce85906d43b9e8c02",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 128,
+          "deletions": 0,
+          "changes": 128,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/ae8ee92c8945a56ae11a14c35f312266d157b4a2/CMakeLists.txt",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/ae8ee92c8945a56ae11a14c35f312266d157b4a2/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/CMakeLists.txt?ref=ae8ee92c8945a56ae11a14c35f312266d157b4a2",
+          "patch": "@@ -0,0 +1,128 @@\n+cmake_minimum_required(VERSION 2.8.3)\n+project(upstart)\n+\n+## Find catkin macros and libraries\n+## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)\n+## is used, also find other catkin packages\n+find_package(catkin REQUIRED)\n+\n+## System dependencies are found with CMake's conventions\n+# find_package(Boost REQUIRED COMPONENTS system)\n+\n+\n+## Uncomment this if the package has a setup.py. This macro ensures\n+## modules and global scripts declared therein get installed\n+## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html\n+# catkin_python_setup()\n+\n+#######################################\n+## Declare ROS messages and services ##\n+#######################################\n+\n+## Generate messages in the 'msg' folder\n+# add_message_files(\n+#   FILES\n+#   Message1.msg\n+#   Message2.msg\n+# )\n+\n+## Generate services in the 'srv' folder\n+# add_service_files(\n+#   FILES\n+#   Service1.srv\n+#   Service2.srv\n+# )\n+\n+## Generate added messages and services with any dependencies listed here\n+# generate_messages(\n+#   DEPENDENCIES\n+#   std_msgs  # Or other packages containing msgs\n+# )\n+\n+###################################\n+## catkin specific configuration ##\n+###################################\n+## The catkin_package macro generates cmake config files for your package\n+## Declare things to be passed to dependent projects\n+## LIBRARIES: libraries you create in this project that dependent projects also need\n+## CATKIN_DEPENDS: catkin_packages dependent projects also need\n+## DEPENDS: system dependencies of this project that dependent projects also need\n+catkin_package(\n+#  INCLUDE_DIRS include\n+#  LIBRARIES upstart\n+#  CATKIN_DEPENDS other_catkin_pkg\n+#  DEPENDS system_lib\n+)\n+\n+###########\n+## Build ##\n+###########\n+\n+## Specify additional locations of header files\n+## Your package locations should be listed before other locations\n+# include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})\n+\n+## Declare a cpp library\n+# add_library(upstart\n+#   src/${PROJECT_NAME}/upstart.cpp\n+# )\n+\n+## Declare a cpp executable\n+# add_executable(upstart_node src/upstart_node.cpp)\n+\n+## Add cmake target dependencies of the executable/library\n+## as an example, message headers may need to be generated before nodes\n+# add_dependencies(upstart_node upstart_generate_messages_cpp)\n+\n+## Specify libraries to link a library or executable target against\n+# target_link_libraries(upstart_node\n+#   ${catkin_LIBRARIES}\n+# )\n+\n+#############\n+## Install ##\n+#############\n+\n+# all install targets should use catkin DESTINATION variables\n+# See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html\n+\n+## Mark executable scripts (Python etc.) for installation\n+## in contrast to setup.py, you can choose the destination\n+# install(PROGRAMS\n+#   scripts/my_python_script\n+#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n+# )\n+\n+## Mark executables and/or libraries for installation\n+# install(TARGETS upstart upstart_node\n+#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n+#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n+#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n+# )\n+\n+## Mark cpp header files for installation\n+# install(DIRECTORY include/${PROJECT_NAME}/\n+#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}\n+#   FILES_MATCHING PATTERN \"*.h\"\n+#   PATTERN \".svn\" EXCLUDE\n+# )\n+\n+## Mark other files for installation (e.g. launch and bag files, etc.)\n+# install(FILES\n+#   # myfile1\n+#   # myfile2\n+#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}\n+# )\n+\n+#############\n+## Testing ##\n+#############\n+\n+## Add gtest based cpp test target and link libraries\n+# catkin_add_gtest(${PROJECT_NAME}-test test/test_upstart.cpp)\n+# if(TARGET ${PROJECT_NAME}-test)\n+#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})\n+# endif()\n+\n+## Add folders to be run by python nosetests\n+# catkin_add_nosetests(test)"
+        },
+        {
+          "sha": "cfb200be55713b04ca469f3f23f7d2fad19464fb",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 53,
+          "deletions": 0,
+          "changes": 53,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/ae8ee92c8945a56ae11a14c35f312266d157b4a2/package.xml",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/ae8ee92c8945a56ae11a14c35f312266d157b4a2/package.xml",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/package.xml?ref=ae8ee92c8945a56ae11a14c35f312266d157b4a2",
+          "patch": "@@ -0,0 +1,53 @@\n+<?xml version=\"1.0\"?>\n+<package>\n+  <name>upstart</name>\n+  <version>0.0.0</version>\n+  <description>The upstart package</description>\n+\n+  <!-- One maintainer tag required, multiple allowed, one person per tag --> \n+  <!-- Example:  -->\n+  <!-- <maintainer email=\"jane.doe@example.com\">Jane Doe</maintainer> -->\n+  <maintainer email=\"mikepurvis@todo.todo\">mikepurvis</maintainer>\n+\n+\n+  <!-- One license tag required, multiple allowed, one license per tag -->\n+  <!-- Commonly used license strings: -->\n+  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->\n+  <license>TODO</license>\n+\n+\n+  <!-- Url tags are optional, but mutiple are allowed, one per tag -->\n+  <!-- Optional attribute type can be: website, bugtracker, or repository -->\n+  <!-- Example: -->\n+  <!-- <url type=\"website\">http://ros.org/wiki/upstart</url> -->\n+\n+\n+  <!-- Author tags are optional, mutiple are allowed, one per tag -->\n+  <!-- Authors do not have to be maintianers, but could be -->\n+  <!-- Example: -->\n+  <!-- <author email=\"jane.doe@example.com\">Jane Doe</author> -->\n+\n+\n+  <!-- The *_depend tags are used to specify dependencies -->\n+  <!-- Dependencies can be catkin packages or system dependencies -->\n+  <!-- Examples: -->\n+  <!-- Use build_depend for packages you need at compile time: -->\n+  <!--   <build_depend>message_generation</build_depend> -->\n+  <!-- Use buildtool_depend for build tool packages: -->\n+  <!--   <buildtool_depend>catkin</buildtool_depend> -->\n+  <!-- Use run_depend for packages you need at runtime: -->\n+  <!--   <run_depend>message_runtime</run_depend> -->\n+  <!-- Use test_depend for packages you need only for testing: -->\n+  <!--   <test_depend>gtest</test_depend> -->\n+  <buildtool_depend>catkin</buildtool_depend>\n+\n+\n+  <!-- The export tag contains other, unspecified, tags -->\n+  <export>\n+    <!-- You can specify that this package is a metapackage here: -->\n+    <!-- <metapackage/> -->\n+\n+    <!-- Other tools can request additional information be placed here -->\n+\n+  </export>\n+</package>\n\\ No newline at end of file"
+        },
+        {
+          "sha": "caa4a4974515260c788759761d0d2b2298635406",
+          "filename": "scripts/foo",
+          "status": "added",
+          "additions": 25,
+          "deletions": 0,
+          "changes": 25,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/ae8ee92c8945a56ae11a14c35f312266d157b4a2/scripts%2Ffoo",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/ae8ee92c8945a56ae11a14c35f312266d157b4a2/scripts%2Ffoo",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/scripts%2Ffoo?ref=ae8ee92c8945a56ae11a14c35f312266d157b4a2",
+          "patch": "@@ -0,0 +1,25 @@\n+#!/bin/bash\n+\n+log_file=/tmp/husky-upstart.log\n+DATE=`date`\n+\n+echo \"$DATE: robot job using setup file /etc/ros/setup.bash\" >> $log_file\n+source /etc/ros/setup.bash\n+\n+echo \"$DATE: robot job on interface eth0\" >> $log_file\n+\n+export ROS_IP=`ifconfig eth0 | grep -o 'inet addr:[^ ]*' | cut -d: -f2`\n+export ROS_MASTER_URI=http://$ROS_IP:portnum\n+export ROS_LOG_DIR=/tmp\n+\n+echo \"$DATE: robot job launching with ROS_MASTER_URI=$ROS_MASTER_URI\" >> $log_file\n+\n+if [ \"$ROS_IP\" = \"\" ]; then\n+    echo \"$DATE: robot job can't run with empty ROS_IP.\" >> $log_file\n+    exit 1\n+fi\n+\n+LAUNCH_FILENAME=/tmp/husky-job.launch\n+/usr/sbin/mklaunch /etc/ros/fuerte/husky/core.d > $LAUNCH_FILENAME\n+\n+setuidgid user roslaunch $LAUNCH_FILENAME"
+        },
+        {
+          "sha": "ba4e00c194a3c859119f96a51fc0e8c792f15563",
+          "filename": "scripts/mklaunch",
+          "status": "added",
+          "additions": 10,
+          "deletions": 0,
+          "changes": 10,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/ae8ee92c8945a56ae11a14c35f312266d157b4a2/scripts%2Fmklaunch",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/ae8ee92c8945a56ae11a14c35f312266d157b4a2/scripts%2Fmklaunch",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/scripts%2Fmklaunch?ref=ae8ee92c8945a56ae11a14c35f312266d157b4a2",
+          "patch": "@@ -0,0 +1,10 @@\n+#!/bin/bash\n+\n+path=$1\n+echo \"<launch>\"\n+echo \"    <!-- Generated from launch files in $path -->\"\n+for file in $path/*.launch\n+do\n+echo \"    <include file=\\\"$file\\\" />\"\n+done\n+echo \"</launch>\""
+        },
+        {
+          "sha": "49b9066b0206d730aa098cd64487f7da2edcac88",
+          "filename": "scripts/mktmpl",
+          "status": "added",
+          "additions": 41,
+          "deletions": 0,
+          "changes": 41,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/ae8ee92c8945a56ae11a14c35f312266d157b4a2/scripts%2Fmktmpl",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/ae8ee92c8945a56ae11a14c35f312266d157b4a2/scripts%2Fmktmpl",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/scripts%2Fmktmpl?ref=ae8ee92c8945a56ae11a14c35f312266d157b4a2",
+          "patch": "@@ -0,0 +1,41 @@\n+#!/usr/bin/env python\n+\n+import argparse, sys, string, os, stat\n+\n+parser = argparse.ArgumentParser(description=\"Create executable template from input template file.\")\n+parser.add_argument('infile', nargs='?', type=argparse.FileType('r'), \n+                    default=sys.stdin)\n+parser.add_argument('outfile', nargs='?', type=argparse.FileType('w'),\n+                    default=sys.stdout)\n+parser.add_argument('--executable', '-x', action='store_true',\n+                    help=\"Generate a template whose resulting output will be made executable.\")\n+args = parser.parse_args()\n+\n+template_text = args.infile.read()\n+subs = set()\n+for txt, sub, _, _ in string.Formatter().parse(template_text):\n+  if sub: subs.add(sub)\n+\n+out = \"\"\"#!/usr/bin/env python\n+import argparse, sys, string, os, stat\n+p = argparse.ArgumentParser(description='Executable template generated from {infile}.')\n+p.add_argument('outfile', nargs='?', type=argparse.FileType('w'),\n+               default=sys.stdout)\n+{template_args}\n+args = p.parse_args()\n+args.outfile.write({template_text}.format(**vars(args)))\n+if {make_executable} and not args.outfile.isatty():\n+  os.chmod(args.outfile.name, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)\n+\"\"\"\n+\n+argstrings = [ \"p.add_argument('--%s', type=str, required=True)\" % sub for sub in subs ]\n+\n+args.outfile.write(out.format(\n+    infile=args.infile.name,\n+    template_text=repr(template_text),\n+    template_args=\"\\n\".join(argstrings),\n+    make_executable=args.executable))\n+\n+# Make the template executable\n+if not args.outfile.isatty():\n+  os.chmod(args.outfile.name, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)"
+        },
+        {
+          "sha": "91a5c7276b94e37237e8001c3acbc31f7e369a23",
+          "filename": "upstart/job.conf.tmpl",
+          "status": "added",
+          "additions": 10,
+          "deletions": 0,
+          "changes": 10,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/ae8ee92c8945a56ae11a14c35f312266d157b4a2/upstart%2Fjob.conf.tmpl",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/ae8ee92c8945a56ae11a14c35f312266d157b4a2/upstart%2Fjob.conf.tmpl",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/upstart%2Fjob.conf.tmpl?ref=ae8ee92c8945a56ae11a14c35f312266d157b4a2",
+          "patch": "@@ -0,0 +1,10 @@\n+description \"bringup {robot}-{job}\"\n+\n+start on net-device-up IFACE={interface}\n+stop on net-device-down IFACE={interface}\n+\n+console output\n+respawn\n+\n+exec {robot}-{job}-start\n+pre-stop exec {robot}-{job}-stop"
+        },
+        {
+          "sha": "3ef737fc26766ed3be6cda0e90c04c0f4f9c70ec",
+          "filename": "upstart/start.tmpl",
+          "status": "added",
+          "additions": 35,
+          "deletions": 0,
+          "changes": 35,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/ae8ee92c8945a56ae11a14c35f312266d157b4a2/upstart%2Fstart.tmpl",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/ae8ee92c8945a56ae11a14c35f312266d157b4a2/upstart%2Fstart.tmpl",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/upstart%2Fstart.tmpl?ref=ae8ee92c8945a56ae11a14c35f312266d157b4a2",
+          "patch": "@@ -0,0 +1,35 @@\n+#!/bin/bash\n+\n+logger -p user.info \"{robot} {job} using setup file /etc/ros/setup.bash\"\n+source /etc/ros/setup.bash\n+\n+logger -p user.info \"{robot} {job} launching on interface {interface}\"\n+\n+export ROS_IP=`ifconfig {interface} | grep -o 'inet addr:[^ ]*' | cut -d: -f2`\n+export ROS_MASTER_URI=http://$ROS_IP:{port}\n+export ROS_LOG_DIR=/tmp\n+\n+logger -p user.info \"{robot} {job} launching with ROS_MASTER_URI=$ROS_MASTER_URI\"\n+\n+if [ \"$ROS_IP\" = \"\" ]; then\n+  logger -p user.err \"{robot} {job} can't run with empty ROS_IP.\"\n+  exit 1\n+fi\n+\n+# Make sure setuidgid is on this system.\n+which getuidgid\n+if [ \"$?\" != \"0\" ]; then\n+  logger -p user.err \"{robot} {job} can't launch as unprivileged user without setuidgid. Please install daemontools package.\"\n+  exit 1\n+fi\n+\n+# Assemble amalgamated launchfile.\n+LAUNCH_FILENAME=/tmp/{robot}-{job}.launch\n+rosrun upstart mklaunch /etc/ros/hydro/{robot}/{job}.d > $LAUNCH_FILENAME\n+\n+# Punch it.\n+setuidgid {administrator} roslaunch $LAUNCH_FILENAME &\n+PID=$!\n+\n+logger -p user.info \"roslaunch started as background process, PID $PID\"\n+echo \"$PID\" > /tmp/{robot}-{job}.pid"
+        },
+        {
+          "sha": "076ea59d781c0a0d88d684fef942f062c867f6c3",
+          "filename": "upstart/stop.tmpl",
+          "status": "added",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/ae8ee92c8945a56ae11a14c35f312266d157b4a2/upstart%2Fstop.tmpl",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/ae8ee92c8945a56ae11a14c35f312266d157b4a2/upstart%2Fstop.tmpl",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/upstart%2Fstop.tmpl?ref=ae8ee92c8945a56ae11a14c35f312266d157b4a2",
+          "patch": "@@ -0,0 +1,5 @@\n+#!/bin/bash\n+\n+PID=$(cat /tmp/{robot}-{job}.pid)\n+logger -p user.info \"Attempting to stop {robot} {job} (PID $PID)\"\n+kill $PID"
+        }
+      ]
+    },
+    {
+      "author": "msadowski",
+      "date": "2019-07-19T15:05:21Z",
+      "sha": "647bdeda706e6899accc15d9d5e72f8e719174f7",
+      "message": "Add support for wait flag in the install script (#73)",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "6df49dc452c64d4d8a02841c7526611785e07b13",
+          "filename": "src/robot_upstart/install_script.py",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/647bdeda706e6899accc15d9d5e72f8e719174f7/src%2Frobot_upstart%2Finstall_script.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/647bdeda706e6899accc15d9d5e72f8e719174f7/src%2Frobot_upstart%2Finstall_script.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/src%2Frobot_upstart%2Finstall_script.py?ref=647bdeda706e6899accc15d9d5e72f8e719174f7",
+          "patch": "@@ -65,6 +65,9 @@ def get_argument_parser():\n                    help=\"Specify provider if the autodetect fails to identify the correct provider\")\n     p.add_argument(\"--symlink\", action='store_true',\n                    help=\"Create symbolic link to job launch files instead of copying them.\")\n+    p.add_argument(\"--wait\", action='store_true',\n+                   help=\"Pass a wait flag to roslaunch.\")\n+\n     return p\n \n \n@@ -105,6 +108,8 @@ def main():\n \n     if args.augment:\n         j.generate_system_files = False\n+    if args.wait:\n+        j.roslaunch_wait = True\n \n     provider = providers.detect_provider()\n     if args.provider == 'upstart':"
+        }
+      ]
+    },
+    {
+      "author": "mikehosmar",
+      "date": "2018-05-23T13:57:40Z",
+      "sha": "a5d81ccee7685ecf12f3113eb37d300b5e73d3fc",
+      "message": "Add a dependency onto network-online.target (#67)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "3d14162a93a0cf6ba9ec08f0c8fbee0467495e49",
+          "filename": "templates/systemd_job.conf.em",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/a5d81ccee7685ecf12f3113eb37d300b5e73d3fc/templates%2Fsystemd_job.conf.em",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/a5d81ccee7685ecf12f3113eb37d300b5e73d3fc/templates%2Fsystemd_job.conf.em",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/templates%2Fsystemd_job.conf.em?ref=a5d81ccee7685ecf12f3113eb37d300b5e73d3fc",
+          "patch": "@@ -29,6 +29,7 @@\n \n [Unit]\n Description=\"bringup @(name)\"\n+After=network.target\n \n [Service]\n Type=simple"
+        }
+      ]
+    },
+    {
+      "author": "tfurf",
+      "date": "2017-03-14T20:47:56Z",
+      "sha": "ae14f47995fd7f50b5946888c1ecc9838471f156",
+      "message": "Allow ROS_HOME to be set previously by env file. (#54)",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 3,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "bdf9f1aa04cc20517c6bd7045c984577bfcb2adc",
+          "filename": "templates/job-start.em",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/ae14f47995fd7f50b5946888c1ecc9838471f156/templates%2Fjob-start.em",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/ae14f47995fd7f50b5946888c1ecc9838471f156/templates%2Fjob-start.em",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/templates%2Fjob-start.em?ref=ae14f47995fd7f50b5946888c1ecc9838471f156",
+          "patch": "@@ -67,8 +67,10 @@ export ROS_MASTER_URI=@(master_uri)\n @[else]@\n export ROS_MASTER_URI=http://127.0.0.1:11311\n @[end if]@\n+export ROS_HOME=${ROS_HOME:=$(echo ~@(user))/.ros}\n+export ROS_LOG_DIR=$log_path\n \n-log info \"@(name): Launching ROS_HOSTNAME=$ROS_HOSTNAME, ROS_IP=$ROS_IP, ROS_MASTER_URI=$ROS_MASTER_URI, ROS_LOG_DIR=$log_path\"\n+log info \"@(name): Launching ROS_HOSTNAME=$ROS_HOSTNAME, ROS_IP=$ROS_IP, ROS_MASTER_URI=$ROS_MASTER_URI, ROS_HOME=$ROS_HOME, ROS_LOG_DIR=$log_path\"\n \n # If xacro files are present in job folder, generate and expand an amalgamated urdf.\n XACRO_FILENAME=$log_path/@(name).xacro\n@@ -102,8 +104,6 @@ if [ \"$?\" != \"0\" ]; then\n fi\n \n # Punch it.\n-export ROS_HOME=$(echo ~@(user))/.ros\n-export ROS_LOG_DIR=$log_path\n setuidgid @(user) roslaunch $LAUNCH_FILENAME @(roslaunch_wait?'--wait ')&\n PID=$!\n "
+        }
+      ]
+    },
+    {
+      "author": "zacwitte",
+      "date": "2016-08-11T23:17:59Z",
+      "sha": "98c075fde5da3d8bc2434138594b92ac3cd7521c",
+      "message": "Added a spin wait until ros processes exit. (#40)",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "245250cf21a9bf50db59c062032fc8f44b65eaa0",
+          "filename": "templates/job-stop.em",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/98c075fde5da3d8bc2434138594b92ac3cd7521c/templates%2Fjob-stop.em",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/98c075fde5da3d8bc2434138594b92ac3cd7521c/templates%2Fjob-stop.em",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/templates%2Fjob-stop.em?ref=98c075fde5da3d8bc2434138594b92ac3cd7521c",
+          "patch": "@@ -31,3 +31,5 @@\n PID=$(cat @(log_path)/@(name).pid)\n logger -p user.info \"Attempting to stop @(name) (PID $PID)\"\n kill $PID\n+logger -s -p user.info \"Waiting for roslaunch process to end\"\n+while kill -0 $PID 2>/dev/null; do sleep 0.2; done"
+        }
+      ]
+    },
+    {
+      "author": "ncasaril",
+      "date": "2016-11-11T04:13:50Z",
+      "sha": "28e0097213edb4a1721865a0f8fc457b9b2f7f57",
+      "message": "Added option to install under systemd rather than upstart (#41)",
+      "files_changed": 5,
+      "additions": 142,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "00613008e539387b6eb49f0882deacb28f07281e",
+          "filename": "scripts/mutate_files",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 1,
+          "changes": 10,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/28e0097213edb4a1721865a0f8fc457b9b2f7f57/scripts%2Fmutate_files",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/28e0097213edb4a1721865a0f8fc457b9b2f7f57/scripts%2Fmutate_files",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/scripts%2Fmutate_files?ref=28e0097213edb4a1721865a0f8fc457b9b2f7f57",
+          "patch": "@@ -59,7 +59,15 @@ for path in paths:\n     recipe = installation_files[path]\n \n     if 'symlink' in recipe:\n-        os.symlink(recipe['symlink'], path)\n+        try:\n+            os.symlink(recipe['symlink'], path)\n+        except OSError, e:\n+            # In case the symlink already exists, remove it before creating\n+            if e.errno == 17:\n+                os.unlink(path)\n+                os.symlink(recipe['symlink'], path)\n+            else:\n+                print \"Unable to create symlink: %s\" % path\n \n     if 'content' in recipe:\n         with open(path, 'w') as f:"
+        },
+        {
+          "sha": "db09bf44a46a6a2d91b31240e10e787dafb7c9af",
+          "filename": "src/robot_upstart/install_script.py",
+          "status": "modified",
+          "additions": 14,
+          "deletions": 1,
+          "changes": 15,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/28e0097213edb4a1721865a0f8fc457b9b2f7f57/src%2Frobot_upstart%2Finstall_script.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/28e0097213edb4a1721865a0f8fc457b9b2f7f57/src%2Frobot_upstart%2Finstall_script.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/src%2Frobot_upstart%2Finstall_script.py?ref=28e0097213edb4a1721865a0f8fc457b9b2f7f57",
+          "patch": "@@ -29,6 +29,7 @@\n import robot_upstart\n from catkin.find_in_workspaces import find_in_workspaces\n \n+import providers\n \n def get_argument_parser():\n     p = argparse.ArgumentParser(\n@@ -55,10 +56,17 @@ def get_argument_parser():\n                    help=\"Specify an a value for ROS_LOG_DIR in the job launch context.\")\n     p.add_argument(\"--augment\", action='store_true',\n                    help=\"Bypass creating the job, and only copy user files. Assumes the job was previously created.\")\n+    p.add_argument(\"--provider\", type=str, metavar=\"[upstart|systemd]\",\n+                   help=\"Specify provider if the autodetect fails to identify the correct provider\")\n     p.add_argument(\"--symlink\", action='store_true',\n                    help=\"Create symbolic link to job launch files instead of copying them.\")\n     return p\n \n+def detect_provider():\n+    cmd=open('/proc/1/cmdline', 'rb').read().split('\\x00')[0]\n+    if 'systemd' in os.path.realpath(cmd):\n+        return providers.Systemd\n+    return providers.Upstart\n \n def main():\n     \"\"\" Implementation of the ``install`` script.\"\"\"\n@@ -93,9 +101,14 @@ def main():\n     if args.augment:\n         j.generate_system_files = False\n \n+    provider=detect_provider()\n+    if args.provider == 'upstart':\n+        provider=providers.Upstart\n+    if args.provider == 'systemd':\n+        provider=providers.Systemd\n     if args.symlink:\n         j.symlink = True\n \n-    j.install()\n+    j.install(Provider=provider)\n \n     return 0"
+        },
+        {
+          "sha": "574cb0050f6a73f5e59456b793ba1f6f071fef84",
+          "filename": "src/robot_upstart/job.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/28e0097213edb4a1721865a0f8fc457b9b2f7f57/src%2Frobot_upstart%2Fjob.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/28e0097213edb4a1721865a0f8fc457b9b2f7f57/src%2Frobot_upstart%2Fjob.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/src%2Frobot_upstart%2Fjob.py?ref=28e0097213edb4a1721865a0f8fc457b9b2f7f57",
+          "patch": "@@ -164,6 +164,7 @@ def install(self, root=\"/\", sudo=\"/usr/bin/sudo\", Provider=providers.Upstart):\n             print \"  %s\" % filename\n \n         self._call_mutate(sudo, installation_files)\n+        p.post_install()\n \n     def uninstall(self, root=\"/\", sudo=\"/usr/bin/sudo\", Provider=providers.Upstart):\n         \"\"\" Uninstall the job definition from the system."
+        },
+        {
+          "sha": "685f06fc598616fecec299adb3a52f72ac5513d8",
+          "filename": "src/robot_upstart/providers.py",
+          "status": "modified",
+          "additions": 80,
+          "deletions": 1,
+          "changes": 81,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/28e0097213edb4a1721865a0f8fc457b9b2f7f57/src%2Frobot_upstart%2Fproviders.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/28e0097213edb4a1721865a0f8fc457b9b2f7f57/src%2Frobot_upstart%2Fproviders.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/src%2Frobot_upstart%2Fproviders.py?ref=28e0097213edb4a1721865a0f8fc457b9b2f7f57",
+          "patch": "@@ -34,7 +34,6 @@\n \n from catkin.find_in_workspaces import find_in_workspaces\n \n-\n class Generic(object):\n     \"\"\" Provides only a common constructor for the moment, but as further\n         providers are implemented, may provide a place to store configuration\n@@ -120,6 +119,85 @@ def generate_install(self):\n             \"content\": \"\\n\".join(self.installed_files_set)}\n \n         return self.installation_files\n+    \n+    def post_install(self):\n+        return\n+        \n+    def generate_uninstall(self):\n+        self._set_job_path()\n+        self._load_installed_files_set()\n+\n+        for filename in self.installed_files_set:\n+            self.installation_files[filename] = {\"remove\": True}\n+\n+        return self.installation_files\n+\n+    def _set_job_path(self):\n+        self.job.job_path = os.path.join(\n+            self.root, \"etc/ros\", self.job.rosdistro, self.job.name + \".d\")\n+\n+    def _fill_template(self, template):\n+        self.interpreter.output = StringIO.StringIO()\n+        self.interpreter.reset()\n+        with open(find_in_workspaces(project=\"robot_upstart\", path=template)[0]) as f:\n+            self.interpreter.file(f)\n+            return self.interpreter.output.getvalue()\n+        self.set_job_path()\n+\n+        \n+class Systemd(Generic):\n+    \"\"\" The Systemd implementation places the user-specified files in ``/etc/ros/DISTRO/NAME.d``,\n+    and creates an systemd job configuration in ``/lib/systemd/system/NAME.d``. Two additional\n+    helper scripts are created for starting and stopping the job, places in\n+    ``/usr/sbin``.\n+    To detect which system you're using run: ps -p1 | grep systemd && echo systemd || echo upstart\n+    \"\"\"\n+\n+    def generate_install(self):\n+        # Default is /etc/ros/DISTRO/JOBNAME.d\n+        self._set_job_path()\n+\n+        # User-specified launch files.\n+        self._add_job_files()\n+\n+        # This is optional to support the old --augment flag where a \"job\" only adds\n+        # launch files to an existing configuration.\n+        if (self.job.generate_system_files):\n+            # Share a single instance of the empy interpreter.\n+            self.interpreter = em.Interpreter(globals=self.job.__dict__.copy())\n+\n+            self.installation_files[os.path.join(self.root, \"lib/systemd/system\", self.job.name + \".service\")] = {\n+                \"content\": self._fill_template(\"templates/systemd_job.conf.em\"), \"mode\": 0o644}\n+            self.installation_files[os.path.join(self.root, \"etc/systemd/system/multi-user.target.wants\", self.job.name + \".service\")] = {\n+                \"symlink\": os.path.join(self.root, \"lib/systemd/system/\", self.job.name + \".service\")}\n+            self.installation_files[os.path.join(self.root, \"usr/sbin\", self.job.name + \"-start\")] = {\n+                \"content\": self._fill_template(\"templates/job-start.em\"), \"mode\": 0o755}\n+            self.installation_files[os.path.join(self.root, \"usr/sbin\", self.job.name + \"-stop\")] = {\n+                \"content\": self._fill_template(\"templates/job-stop.em\"), \"mode\": 0o755}\n+            self.interpreter.shutdown()\n+\n+        # Add an annotation file listing what has been installed. This is a union of what's being\n+        # installed now with what has been installed previously, so that an uninstall should remove\n+        # all of it. A more sophisticated future implementation could track contents or hashes and\n+        # thereby warn users when a new installation is stomping a change they have made.\n+        self._load_installed_files_set()\n+        self.installed_files_set.update(self.installation_files.keys())\n+\n+        # Remove the job directory. This will fail if it is not empty, and notify the user.\n+        self.installed_files_set.add(self.job.job_path)\n+\n+        # Remove the annotation file itself.\n+        self.installed_files_set.add(self.installed_files_set_location)\n+\n+        self.installation_files[self.installed_files_set_location] = {\n+            \"content\": \"\\n\".join(self.installed_files_set)}\n+\n+        return self.installation_files\n+    \n+    def post_install(self):\n+        print(\"** To complete installation please run the following command:\")\n+        print(\" sudo systemctl daemon-reload\" +\n+              \" && sudo systemctl start \" + self.job.name)\n \n     def generate_uninstall(self):\n         self._set_job_path()\n@@ -141,3 +219,4 @@ def _fill_template(self, template):\n             self.interpreter.file(f)\n             return self.interpreter.output.getvalue()\n         self.set_job_path()\n+        "
+        },
+        {
+          "sha": "a8be15052a1e7f76d14e873657a5a7d697817f9a",
+          "filename": "templates/systemd_job.conf.em",
+          "status": "added",
+          "additions": 38,
+          "deletions": 0,
+          "changes": 38,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/28e0097213edb4a1721865a0f8fc457b9b2f7f57/templates%2Fsystemd_job.conf.em",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/28e0097213edb4a1721865a0f8fc457b9b2f7f57/templates%2Fsystemd_job.conf.em",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/templates%2Fsystemd_job.conf.em?ref=28e0097213edb4a1721865a0f8fc457b9b2f7f57",
+          "patch": "@@ -0,0 +1,38 @@\n+@#\n+@# Author: Mike Purvis <mpurvis@clearpathrobotics.com>\n+@#         Copyright (c) 2013-2014, Clearpath Robotics, Inc.\n+@#\n+@# Redistribution and use in source and binary forms, with or without\n+@# modification, are permitted provided that the following conditions are met:\n+@#    * Redistributions of source code must retain the above copyright\n+@#       notice, this list of conditions and the following disclaimer.\n+@#    * Redistributions in binary form must reproduce the above copyright\n+@#       notice, this list of conditions and the following disclaimer in the\n+@#       documentation and/or other materials provided with the distribution.\n+@#    * Neither the name of Clearpath Robotics, Inc. nor the\n+@#       names of its contributors may be used to endorse or promote products\n+@#       derived from this software without specific prior written permission.\n+@#\n+@# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND\n+@# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED\n+@# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\n+@# DISCLAIMED. IN NO EVENT SHALL CLEARPATH ROBOTICS, INC. BE LIABLE FOR ANY\n+@# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES\n+@# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+@# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND\n+@# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT\n+@# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS\n+@# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n+@#\n+@# Please send comments, questions, or patches to code@clearpathrobotics.com\n+# THIS IS A GENERATED FILE, NOT RECOMMENDED TO EDIT.\n+\n+[Unit]\n+Description=\"bringup @(name)\"\n+\n+[Service]\n+Type=simple\n+ExecStart=/usr/sbin/@(name)-start\n+\n+[Install]\n+WantedBy=multi-user.target"
+        }
+      ]
+    },
+    {
+      "author": "kmalhan",
+      "date": "2016-11-09T15:40:11Z",
+      "sha": "647b14922df974f84eac8adcac8a7e14a416dcb5",
+      "message": "Added option to add launch files as symbolic link (#43)",
+      "files_changed": 4,
+      "additions": 18,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "0d988bb6835fecf850b2f5ff927f2cd60dd9c281",
+          "filename": "scripts/mutate_files",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/647b14922df974f84eac8adcac8a7e14a416dcb5/scripts%2Fmutate_files",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/647b14922df974f84eac8adcac8a7e14a416dcb5/scripts%2Fmutate_files",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/scripts%2Fmutate_files?ref=647b14922df974f84eac8adcac8a7e14a416dcb5",
+          "patch": "@@ -58,6 +58,9 @@ paths.sort(key=len, reverse=True)\n for path in paths:\n     recipe = installation_files[path]\n \n+    if 'symlink' in recipe:\n+        os.symlink(recipe['symlink'], path)\n+\n     if 'content' in recipe:\n         with open(path, 'w') as f:\n             f.write(recipe['content'])"
+        },
+        {
+          "sha": "c47da1179147c9b1299adcd459e2203efbe72b1d",
+          "filename": "src/robot_upstart/install_script.py",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/647b14922df974f84eac8adcac8a7e14a416dcb5/src%2Frobot_upstart%2Finstall_script.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/647b14922df974f84eac8adcac8a7e14a416dcb5/src%2Frobot_upstart%2Finstall_script.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/src%2Frobot_upstart%2Finstall_script.py?ref=647b14922df974f84eac8adcac8a7e14a416dcb5",
+          "patch": "@@ -55,6 +55,8 @@ def get_argument_parser():\n                    help=\"Specify an a value for ROS_LOG_DIR in the job launch context.\")\n     p.add_argument(\"--augment\", action='store_true',\n                    help=\"Bypass creating the job, and only copy user files. Assumes the job was previously created.\")\n+    p.add_argument(\"--symlink\", action='store_true',\n+                   help=\"Create symbolic link to job launch files instead of copying them.\")\n     return p\n \n \n@@ -91,6 +93,9 @@ def main():\n     if args.augment:\n         j.generate_system_files = False\n \n+    if args.symlink:\n+        j.symlink = True\n+\n     j.install()\n \n     return 0"
+        },
+        {
+          "sha": "7eea9d9771b371b1297a9bd99a25b0a1d7b587b3",
+          "filename": "src/robot_upstart/job.py",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/647b14922df974f84eac8adcac8a7e14a416dcb5/src%2Frobot_upstart%2Fjob.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/647b14922df974f84eac8adcac8a7e14a416dcb5/src%2Frobot_upstart%2Fjob.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/src%2Frobot_upstart%2Fjob.py?ref=647b14922df974f84eac8adcac8a7e14a416dcb5",
+          "patch": "@@ -91,6 +91,10 @@ def __init__(self, name=\"ros\", interface=None, user=None, workspace_setup=None,\n         # upstart conf file.\n         self.generate_system_files = True\n \n+        # Override this to True if you want to create symbolic link for\n+        # job launch files instead of copying them.\n+        self.symlink = False\n+\n         # Override this to True is you want the --wait flag passed to roslaunch.\n         # This will be desired if the nodes spawned by this job are intended to\n         # connect to an existing master."
+        },
+        {
+          "sha": "60c86764edc99ccedc77dd71d787898a4a0e0c21",
+          "filename": "src/robot_upstart/providers.py",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 3,
+          "changes": 9,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/647b14922df974f84eac8adcac8a7e14a416dcb5/src%2Frobot_upstart%2Fproviders.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/647b14922df974f84eac8adcac8a7e14a416dcb5/src%2Frobot_upstart%2Fproviders.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/src%2Frobot_upstart%2Fproviders.py?ref=647b14922df974f84eac8adcac8a7e14a416dcb5",
+          "patch": "@@ -61,9 +61,12 @@ def __init__(self, root, job):\n     def _add_job_files(self):\n         # Make up list of files to copy to system locations.\n         for filename in self.job.files:\n-            with open(filename) as f:\n-                dest_filename = os.path.join(self.job.job_path, os.path.basename(filename))\n-                self.installation_files[dest_filename] = {\"content\": f.read()}\n+            dest_filename = os.path.join(self.job.job_path, os.path.basename(filename))\n+            if self.job.symlink:\n+                self.installation_files[dest_filename] = {\"symlink\": filename}\n+            else:\n+                with open(filename) as f:\n+                    self.installation_files[dest_filename] = {\"content\": f.read()}\n \n     def _load_installed_files_set(self):\n         self.installed_files_set_location = os.path.join(self.job.job_path, \".installed_files\")"
+        }
+      ]
+    },
+    {
+      "author": "jjekircp",
+      "date": "2015-09-30T20:05:52Z",
+      "sha": "4bd6ced22f1061cf66cb22043d581216ddee818f",
+      "message": "Updated install script to allow adding multiple launch files to a job at once",
+      "files_changed": 1,
+      "additions": 13,
+      "deletions": 10,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "9570b6a8d1833e08b1dc5ad592325f3df043e971",
+          "filename": "src/robot_upstart/install_script.py",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 10,
+          "changes": 23,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/4bd6ced22f1061cf66cb22043d581216ddee818f/src%2Frobot_upstart%2Finstall_script.py",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/4bd6ced22f1061cf66cb22043d581216ddee818f/src%2Frobot_upstart%2Finstall_script.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/src%2Frobot_upstart%2Finstall_script.py?ref=4bd6ced22f1061cf66cb22043d581216ddee818f",
+          "patch": "@@ -37,7 +37,7 @@ def get_argument_parser():\n         to access the Python API from their own setup scripts, but this exists as a simple helper, an example,\n         and a compatibility shim for previous versions of robot_upstart which were bash-based.\"\"\")\n \n-    p.add_argument(\"pkgpath\", type=str, nargs=1, metavar=(\"pkg/path\",),\n+    p.add_argument(\"pkgpath\", type=str, nargs='+', metavar=\"pkg/path\",\n                    help=\"Package and path to install job launch files from.\")\n     p.add_argument(\"--job\", type=str,\n                    help=\"Specify job name. If unspecified, will be constructed from package name.\")\n@@ -73,16 +73,19 @@ def main():\n         workspace_setup=args.setup, rosdistro=args.rosdistro,\n         master_uri=args.master, log_path=args.logdir)\n \n-    found_path = find_in_workspaces(project=pkg, path=pkgpath, first_match_only=True)\n-    if not found_path:\n-        print \"Unable to locate path %s in package %s. Installation aborted.\" % (pkgpath, pkg)\n+    for this_pkgpath in args.pkgpath:\n+        pkg, pkgpath = this_pkgpath.split('/', 1)\n \n-    if os.path.isfile(found_path[0]):\n-        # Single file, install just that.\n-        j.add(package=pkg, filename=pkgpath)\n-    else:\n-        # Directory found, install everything within.\n-        j.add(package=pkg, glob=os.path.join(pkgpath, \"*\"))\n+        found_path = find_in_workspaces(project=pkg, path=pkgpath, first_match_only=True)\n+        if not found_path:\n+            print \"Unable to locate path %s in package %s. Installation aborted.\" % (pkgpath, pkg)\n+\n+        if os.path.isfile(found_path[0]):\n+            # Single file, install just that.\n+            j.add(package=pkg, filename=pkgpath)\n+        else:\n+            # Directory found, install everything within.\n+            j.add(package=pkg, glob=os.path.join(pkgpath, \"*\"))\n \n     if args.augment:\n         j.generate_system_files = False"
+        }
+      ]
+    },
+    {
+      "author": "Gaël Ecorchard",
+      "date": "2015-02-13T13:30:26Z",
+      "sha": "e75c272fff30850ba95ec3d735ee23d66183aed0",
+      "message": "Add a documentation section about permissions",
+      "files_changed": 1,
+      "additions": 12,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "1d83f6daa0bfb6ba836178ad77602c4e88ffebc7",
+          "filename": "doc/install.rst",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 0,
+          "changes": 12,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/e75c272fff30850ba95ec3d735ee23d66183aed0/doc%2Finstall.rst",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/e75c272fff30850ba95ec3d735ee23d66183aed0/doc%2Finstall.rst",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/doc%2Finstall.rst?ref=e75c272fff30850ba95ec3d735ee23d66183aed0",
+          "patch": "@@ -6,6 +6,18 @@ The ``install`` script\n     :func: get_argument_parser\n     :prog: install\n \n+Permissions\n+-----------\n+\n+It's important to understand how permissions work robot_upstart:\n+\n+1. The upstart job invokes its `jobname-start` bash script as root.\n+\n+2. The script sets up environment variables, and then uses setuidgid_ to execute roslaunch as an unprivileged user. This is by default the user who ran the install script, but it can also be specified explicitly via a flag.\n+\n+3. The `roslaunch` which executes *does not have its user's group memberships*. This means that it will not have access to serial ports with the `dialout` group, or locations in `/var/log` owned by root, etc. Any filesystem resources needed by your ROS nodes should be chowned to the same unprivileged user which will run ROS, or should set to world readable/writeable, for example using udev. \n+\n+.. _setuidgid: http://manpages.ubuntu.com/manpages/trusty/man8/setuidgid.8.html \n \n Implementation\n --------------"
+        }
+      ]
+    },
+    {
+      "author": "eisoku9618",
+      "date": "2014-12-17T07:06:53Z",
+      "sha": "7e10d1aae60796232223be3336873ef438159e94",
+      "message": "fix invalid range error on grep\n\n`rosrun robot_upstart install turtlebot_bringup/launch/minimal.launch --interface wlan0` described in http://wiki.ros.org/robot_upstart did not work due to http://stackoverflow.com/questions/26754181/greps-invalid-range-end-bug-or-feature\r\n```\r\nIf you want to match the character -, among others, just add it in the edges of the expression: as the first or last item.\r\n```",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "6383e9e669d664a9ad41a4af6ad69e9b18afa02c",
+          "filename": "scripts/install",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/7e10d1aae60796232223be3336873ef438159e94/scripts%2Finstall",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/7e10d1aae60796232223be3336873ef438159e94/scripts%2Finstall",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/scripts%2Finstall?ref=7e10d1aae60796232223be3336873ef438159e94",
+          "patch": "@@ -100,7 +100,7 @@ positionals=()\n while (( \"$#\" )) ; do\n   arg_name=`echo \"$1\" | grep -o ^--[a-zA-Z0-9_]*$ | cut -d- -f3`\n   if [ \"$arg_name\" != \"\" ] ; then \n-    arg_val=`echo \"$2\" | grep -o ^[a-zA-Z0-9_-/.:]*$`\n+    arg_val=`echo \"$2\" | grep -o ^[a-zA-Z0-9_/.:-]*$`\n     #echo \"Parsed $arg_name $arg_val\"\n     if [[ \"$arg_val\" == --* ]] || [[ \"$arg_val\" == \"\" ]]; then\n       eval \"$arg_name=\\\"true\\\"\""
+        }
+      ]
+    },
+    {
+      "author": "mgruhler",
+      "date": "2014-09-02T13:01:13Z",
+      "sha": "575e905be4f45a8ce7c41aca9b8242ad279645af",
+      "message": "add argument to specify log directory",
+      "files_changed": 3,
+      "additions": 19,
+      "deletions": 9,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "630fd6299eeb61bbaf0a8482d3e88ff7c1a6567a",
+          "filename": "scripts/install",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 1,
+          "changes": 5,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/575e905be4f45a8ce7c41aca9b8242ad279645af/scripts%2Finstall",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/575e905be4f45a8ce7c41aca9b8242ad279645af/scripts%2Finstall",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/scripts%2Finstall?ref=575e905be4f45a8ce7c41aca9b8242ad279645af",
+          "patch": "@@ -51,6 +51,8 @@ Optional:\n   --master URI\n                Master to launch the job against, especially important for upstart\n                jobs on secondary machines. Defaults to http://$ROS_IP:11311\n+  --logdir DIRECTORY\n+               Path/to/directory where logfiles should be stored. Defaults to /tmp\n   --augment    Skip creating a job-- just copy the indicated launchfiles. Useful\n                adding more launchers to a single job, in the case of multiple\n                potential configurations.\n@@ -62,7 +64,7 @@ EOF\n )\n if [[ \"$@\" =~ \"--help\" || \"$#\" == \"0\" ]]; then echo \"$usage\"; exit 0; fi\n \n-tmpl_arg_names=(job interface user setup rosdistro master)\n+tmpl_arg_names=(job interface user setup rosdistro master logdir)\n \n ##############################################################################\n # Reinvocation as root\n@@ -128,6 +130,7 @@ pkgpath=`echo ${positionals[0]} | cut -d/ -f2-`\n job=${job-`echo \"$pkg\" | cut -d_ -f1`}\n interface=${interface-\"eth0\"}\n master=${master-\"http://\\$ROS_IP:11311\"}\n+logdir=${logdir-\"/tmp\"}\n \n ##############################################################################\n # Installation details"
+        },
+        {
+          "sha": "670e68bace416b5977d40237f0967157b040808e",
+          "filename": "tmpl/start",
+          "status": "modified",
+          "additions": 14,
+          "deletions": 7,
+          "changes": 21,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/575e905be4f45a8ce7c41aca9b8242ad279645af/tmpl%2Fstart",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/575e905be4f45a8ce7c41aca9b8242ad279645af/tmpl%2Fstart",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/tmpl%2Fstart?ref=575e905be4f45a8ce7c41aca9b8242ad279645af",
+          "patch": "@@ -35,20 +35,27 @@ log info \"{job}: Using workspace setup file {setup}\"\n source {setup}\n JOB_FOLDER=/etc/ros/{rosdistro}/{job}.d \n \n+logdir={logdir}\n export ROS_IP=`rosrun robot_upstart getifip {interface}`\n export ROS_MASTER_URI={master}\n if [ \"$ROS_IP\" = \"\" ]; then\n   log err \"{job}: No IP address on {interface}, cannot roslaunch.\"\n   exit 1\n fi\n-log info \"{job}: Launching on interface {interface}, ROS_IP=$ROS_IP, ROS_MASTER_URI=$ROS_MASTER_URI\"\n+\n+if [[ ! -d $logdir ]]; then\n+  log warn \"{job}: The log directory you specified ($logdir) does not exist. Defaulting to /tmp!\"\n+  logdir=\"/tmp\"\n+fi\n+\n+log info \"{job}: Launching on interface {interface}, ROS_IP=$ROS_IP, ROS_MASTER_URI=$ROS_MASTER_URI, ROS_LOG_DIR=$logdir\"\n \n # If xacro files are present in job folder, generate and expand an amalgamated urdf.\n-XACRO_FILENAME=/tmp/{job}.xacro\n+XACRO_FILENAME=$logdir/{job}.xacro\n XACRO_ROBOT_NAME=$(echo \"{job}\" | cut -d- -f1)\n rosrun robot_upstart mkxacro $JOB_FOLDER $XACRO_ROBOT_NAME > $XACRO_FILENAME\n if [[ \"$?\" == \"0\" ]]; then\n-  URDF_FILENAME=/tmp/{job}.urdf\n+  URDF_FILENAME=$logdir/{job}.urdf\n   rosrun xacro xacro $XACRO_FILENAME -o $URDF_FILENAME\n   if [[ \"$?\" == \"0\" ]]; then\n     log info \"{job}: Generated URDF: $URDF_FILENAME\"\n@@ -59,7 +66,7 @@ if [[ \"$?\" == \"0\" ]]; then\n fi\n \n # Assemble amalgamated launchfile.\n-LAUNCH_FILENAME=/tmp/{job}.launch\n+LAUNCH_FILENAME=$logdir/{job}.launch\n rosrun robot_upstart mklaunch $JOB_FOLDER > $LAUNCH_FILENAME\n if [[ \"$?\" != \"0\" ]]; then\n   log err \"{job}: Unable to generate amalgamated launchfile.\"\n@@ -76,11 +83,11 @@ fi\n \n # Punch it.\n export ROS_HOME=$(echo ~{user})/.ros\n-export ROS_LOG_DIR=/tmp\n+export ROS_LOG_DIR=$logdir\n setuidgid {user} roslaunch $LAUNCH_FILENAME &\n PID=$!\n \n-log info \"{job}: Started roslaunch as background process, PID $PID\"\n-echo \"$PID\" > /tmp/{job}.pid\n+log info \"{job}: Started roslaunch as background process, PID $PID, ROS_LOG_DIR=$ROS_LOG_DIR\"\n+echo \"$PID\" > $logdir/{job}.pid\n \n wait \"$PID\""
+        },
+        {
+          "sha": "f7ad4448b68e4d6a99b5cfd51da9cac1bd1a88d1",
+          "filename": "tmpl/stop",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/clearpathrobotics/robot_upstart/blob/575e905be4f45a8ce7c41aca9b8242ad279645af/tmpl%2Fstop",
+          "raw_url": "https://github.com/clearpathrobotics/robot_upstart/raw/575e905be4f45a8ce7c41aca9b8242ad279645af/tmpl%2Fstop",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/robot_upstart/contents/tmpl%2Fstop?ref=575e905be4f45a8ce7c41aca9b8242ad279645af",
+          "patch": "@@ -27,6 +27,6 @@\n # \n # Please send comments, questions, or patches to code@clearpathrobotics.com \n \n-PID=$(cat /tmp/{job}.pid)\n+PID=$(cat {logdir}/{job}.pid)\n logger -p user.info \"Attempting to stop {job} (PID $PID)\"\n kill $PID"
+        }
+      ]
+    }
+  ]
+}

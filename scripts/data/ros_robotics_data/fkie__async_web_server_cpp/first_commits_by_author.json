@@ -1,0 +1,649 @@
+{
+  "_meta": {
+    "fetched_at": "2026-09-24T14:51:55Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "fkie",
+    "repo": "async_web_server_cpp",
+    "refreshed_at": "2026-09-24T14:51:55Z",
+    "refresh_note": "incrementally added 1 author(s) missing from a prior stale cache"
+  },
+  "data": [
+    {
+      "author": "wentasah",
+      "date": "2026-01-12T16:02:47Z",
+      "sha": "3f40f9e6f9b8f8a50f6342197c0ed563f62b723f",
+      "message": "Fix compile errors with Boost >= 1.87 (#8)\n\nThat release removed many deprecated features. See\nhttps://www.boost.org/doc/libs/latest/doc/html/boost_asio/history.html#boost_asio.history.asio_1_33_0\n\nTypical error message looks like this:\n\n    In file included from /build/async_web_server_cpp-release-release-jazzy-async_web_server_cpp-2.0.1-1/include/async_web_server_cpp/websocket_connection.hpp:4,\n                     from /build/async_web_server_cpp-release-release-jazzy-async_web_server_cpp-2.0.1-1/src/websocket_connection.cpp:1:\n    /build/async_web_server_cpp-release-release-jazzy-async_web_server_cpp-2.0.1-1/include/async_web_server_cpp/http_connection.hpp:43:52: error: expected ')' before '&' token\n       43 |     explicit HttpConnection(boost::asio::io_service& io_service,\n          |                            ~                       ^\n          |                                                    )\n    /build/async_web_server_cpp-release-release-jazzy-async_web_server_cpp-2.0.1-1/include/async_web_server_cpp/http_connection.hpp:82:18: error: 'io_service' in namespace 'boost::asio' does not name a type; did you mean 'use_service'?\n       82 |     boost::asio::io_service::strand strand_;\n          |                  ^~~~~~~~~~\n          |                  use_service\n\nTest suite passes.",
+      "files_changed": 4,
+      "additions": 6,
+      "deletions": 8,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b1cbf6d33f8f73da54820199fbe592c857323846",
+          "filename": "include/async_web_server_cpp/http_connection.hpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/3f40f9e6f9b8f8a50f6342197c0ed563f62b723f/include%2Fasync_web_server_cpp%2Fhttp_connection.hpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/3f40f9e6f9b8f8a50f6342197c0ed563f62b723f/include%2Fasync_web_server_cpp%2Fhttp_connection.hpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/include%2Fasync_web_server_cpp%2Fhttp_connection.hpp?ref=3f40f9e6f9b8f8a50f6342197c0ed563f62b723f",
+          "patch": "@@ -40,7 +40,7 @@ class HttpConnection : public boost::enable_shared_from_this<HttpConnection>,\n         ReadHandler;\n     typedef std::shared_ptr<const void> ResourcePtr;\n \n-    explicit HttpConnection(boost::asio::io_service& io_service,\n+    explicit HttpConnection(boost::asio::io_context& io_service,\n                             HttpServerRequestHandler request_handler);\n \n     boost::asio::ip::tcp::socket& socket();\n@@ -79,7 +79,7 @@ class HttpConnection : public boost::enable_shared_from_this<HttpConnection>,\n     void handle_write(const boost::system::error_code& e,\n                       std::vector<ResourcePtr> resources);\n \n-    boost::asio::io_service::strand strand_;\n+    boost::asio::io_context::strand strand_;\n     boost::asio::ip::tcp::socket socket_;\n     HttpServerRequestHandler request_handler_;\n     boost::array<char, 8192> buffer_;"
+        },
+        {
+          "sha": "98103fbdd3fa7c99c57cef79a3652a45ea3b01cc",
+          "filename": "include/async_web_server_cpp/http_server.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/3f40f9e6f9b8f8a50f6342197c0ed563f62b723f/include%2Fasync_web_server_cpp%2Fhttp_server.hpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/3f40f9e6f9b8f8a50f6342197c0ed563f62b723f/include%2Fasync_web_server_cpp%2Fhttp_server.hpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/include%2Fasync_web_server_cpp%2Fhttp_server.hpp?ref=3f40f9e6f9b8f8a50f6342197c0ed563f62b723f",
+          "patch": "@@ -40,7 +40,7 @@ class HttpServer : private boost::noncopyable\n \n     void handle_accept(const boost::system::error_code& e);\n \n-    boost::asio::io_service io_service_;\n+    boost::asio::io_context io_service_;\n     boost::asio::ip::tcp::acceptor acceptor_;\n     std::size_t thread_pool_size_;\n     std::vector<boost::shared_ptr<boost::thread>> threads_;"
+        },
+        {
+          "sha": "fb5655c57e7024d127c43cbdddbf3fe6baa3aa8c",
+          "filename": "src/http_connection.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/3f40f9e6f9b8f8a50f6342197c0ed563f62b723f/src%2Fhttp_connection.cpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/3f40f9e6f9b8f8a50f6342197c0ed563f62b723f/src%2Fhttp_connection.cpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/src%2Fhttp_connection.cpp?ref=3f40f9e6f9b8f8a50f6342197c0ed563f62b723f",
+          "patch": "@@ -6,7 +6,7 @@\n namespace async_web_server_cpp\n {\n \n-HttpConnection::HttpConnection(boost::asio::io_service& io_service,\n+HttpConnection::HttpConnection(boost::asio::io_context& io_service,\n                                HttpServerRequestHandler handler)\n     : strand_(io_service), socket_(io_service), request_handler_(handler),\n       write_in_progress_(false)"
+        },
+        {
+          "sha": "d9f7df66f1320939a28f9caa98e629d9767e6368",
+          "filename": "src/http_server.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 4,
+          "changes": 6,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/3f40f9e6f9b8f8a50f6342197c0ed563f62b723f/src%2Fhttp_server.cpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/3f40f9e6f9b8f8a50f6342197c0ed563f62b723f/src%2Fhttp_server.cpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/src%2Fhttp_server.cpp?ref=3f40f9e6f9b8f8a50f6342197c0ed563f62b723f",
+          "patch": "@@ -13,9 +13,7 @@ HttpServer::HttpServer(const std::string& address, const std::string& port,\n {\n \n     boost::asio::ip::tcp::resolver resolver(io_service_);\n-    boost::asio::ip::tcp::resolver::query query(\n-        address, port, boost::asio::ip::resolver_query_base::flags());\n-    boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve(query);\n+    boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve(address, port).begin();\n     acceptor_.open(endpoint.protocol());\n     acceptor_.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));\n     acceptor_.bind(endpoint);\n@@ -33,7 +31,7 @@ void HttpServer::run()\n     for (std::size_t i = 0; i < thread_pool_size_; ++i)\n     {\n         boost::shared_ptr<boost::thread> thread(new boost::thread(\n-            boost::bind(&boost::asio::io_service::run, &io_service_)));\n+            boost::bind(&boost::asio::io_context::run, &io_service_)));\n         threads_.push_back(thread);\n     }\n }"
+        }
+      ]
+    },
+    {
+      "author": "roehling",
+      "date": "2018-11-15T17:14:29Z",
+      "sha": "492ea08328690b1413cdf3829da4419296bf5d1d",
+      "message": "Fix compatibility issue with Apache2 websocket proxy\n\nThe Apache2 proxy uses \"Upgrade: WebSocket\" headers when forwarding a\nWebSocket connection (note the camel case), breaking interoperability\nwith the web server.\n\nThe WebSocket RFC 6455 is somewhat inconclusive as it uses \"Upgrade:\nwebsocket\" in all its examples and requires the \"websocket\" keyword in\nsection 4.1, but states that \"WebSocket\" has been registered as HTTP\nUpgrade Token in section 11.2.\n\nIn any case, following the robustness principle to be as liberal as\npossible when accepting data and as conservative as possible when\nsending it, this commit makes the \"websocket\" keyword matching case\ninsensitive in the request handler.",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "373e906a124eefdae1a6b6d4dd917883ca531ffa",
+          "filename": "src/websocket_request_handler.cpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "changes": 4,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/492ea08328690b1413cdf3829da4419296bf5d1d/src%2Fwebsocket_request_handler.cpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/492ea08328690b1413cdf3829da4419296bf5d1d/src%2Fwebsocket_request_handler.cpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/src%2Fwebsocket_request_handler.cpp?ref=492ea08328690b1413cdf3829da4419296bf5d1d",
+          "patch": "@@ -1,4 +1,5 @@\n #include <boost/regex.hpp>\n+#include <boost/algorithm/string.hpp>\n #include <openssl/sha.h>\n #include <openssl/hmac.h>\n #include <openssl/evp.h>\n@@ -23,7 +24,8 @@ bool WebsocketHttpRequestHandler::operator()(const HttpRequest &request, boost::\n   std::string upgrade_header = request.get_header_value_or_default(\"Upgrade\", \"\");\n   std::string websocket_key = request.get_header_value_or_default(\"Sec-WebSocket-Key\", \"\");\n \n-  if (connection_header.find(\"Upgrade\") != std::string::npos && upgrade_header.compare(\"websocket\") == 0\n+  if (connection_header.find(\"Upgrade\") != std::string::npos\n+      && boost::iequals(upgrade_header, \"websocket\")\n       && websocket_key.size() > 0)\n   {\n     std::string concat_key = websocket_key + KEY_MAGIC_STRING;"
+        }
+      ]
+    },
+    {
+      "author": "jfrancis71",
+      "date": "2025-08-31T20:26:25Z",
+      "sha": "d1876da58215b853ac6fd66ef704442babc5f873",
+      "message": "Fix to build with current Boost libraries: (#7)\n\nAdding array include to include/async_web_server_cpp/http_connection.hpp\nBoost class path member leaf is now replaced with filename, see https://github.com/boostorg/filesystem/commit/5df060e95ca844fe91b29001b4ae22bdb65635c6",
+      "files_changed": 2,
+      "additions": 5,
+      "deletions": 4,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "62ccd893b999ad5e0e10fa8a4912bb005cc4d28f",
+          "filename": "include/async_web_server_cpp/http_connection.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/d1876da58215b853ac6fd66ef704442babc5f873/include%2Fasync_web_server_cpp%2Fhttp_connection.hpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/d1876da58215b853ac6fd66ef704442babc5f873/include%2Fasync_web_server_cpp%2Fhttp_connection.hpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/include%2Fasync_web_server_cpp%2Fhttp_connection.hpp?ref=d1876da58215b853ac6fd66ef704442babc5f873",
+          "patch": "@@ -10,6 +10,7 @@\n #include <boost/noncopyable.hpp>\n #include <boost/shared_ptr.hpp>\n #include <boost/thread/mutex.hpp>\n+#include <boost/array.hpp>\n \n namespace async_web_server_cpp\n {"
+        },
+        {
+          "sha": "c1eff6521c3365ad9a833a3ef568769cc5e3239b",
+          "filename": "src/http_reply.cpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 4,
+          "changes": 8,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/d1876da58215b853ac6fd66ef704442babc5f873/src%2Fhttp_reply.cpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/d1876da58215b853ac6fd66ef704442babc5f873/src%2Fhttp_reply.cpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/src%2Fhttp_reply.cpp?ref=d1876da58215b853ac6fd66ef704442babc5f873",
+          "patch": "@@ -360,19 +360,19 @@ bool FilesystemHttpRequestHandler::operator()(\n                         if (boost::filesystem::is_directory(itr->status()))\n                         {\n                             content << \"<a href=\\\"\"\n-                                    << itr->path().leaf().generic_string()\n+                                    << itr->path().filename().generic_string()\n                                     << \"/\\\">\";\n-                            content << itr->path().leaf().generic_string()\n+                            content << itr->path().filename().generic_string()\n                                     << \"/\";\n                             content << \"</a>\";\n                         }\n                         else if (boost::filesystem::is_regular_file(\n                                      itr->status()))\n                         {\n                             content << \"<a href=\\\"\"\n-                                    << itr->path().leaf().generic_string()\n+                                    << itr->path().filename().generic_string()\n                                     << \"\\\">\";\n-                            content << itr->path().leaf().generic_string();\n+                            content << itr->path().filename().generic_string();\n                             content << \"</a>\";\n                         }\n                         content << \"<br>\";"
+        }
+      ]
+    },
+    {
+      "author": "apiyap",
+      "date": "2021-09-08T02:32:50Z",
+      "sha": "0d853ae294bf51dcad4ef4fa701af9cb4abb05d3",
+      "message": "fix warning message",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "5e89a22b818999c3578bd958486e908333070a70",
+          "filename": "include/async_web_server_cpp/websocket_message.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/0d853ae294bf51dcad4ef4fa701af9cb4abb05d3/include%2Fasync_web_server_cpp%2Fwebsocket_message.hpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/0d853ae294bf51dcad4ef4fa701af9cb4abb05d3/include%2Fasync_web_server_cpp%2Fwebsocket_message.hpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/include%2Fasync_web_server_cpp%2Fwebsocket_message.hpp?ref=0d853ae294bf51dcad4ef4fa701af9cb4abb05d3",
+          "patch": "@@ -12,7 +12,7 @@\n #elif defined(__GNUC__)\n #    define PACKED_STRUCT(name) struct __attribute__((packed)) name\n #else\n-#    warning I don't know how to create a packed struct with your compiler\n+#    warning I don''t know how to create a packed struct with your compiler\n #    define PACKED_STRUCT(name) struct name\n #endif\n "
+        }
+      ]
+    },
+    {
+      "author": "sfalexrog",
+      "date": "2020-08-17T15:04:25Z",
+      "sha": "c04b7fd36c8d7be0f8eee6b82189f22b8941d6af",
+      "message": "Update package.xml and CMakeLists for Noetic\n\n* package.xml updated to version 3 to allow conditional dependencies\n\n* CMakeLists: cmake_minimum_required set to 3.0.2",
+      "files_changed": 2,
+      "additions": 4,
+      "deletions": 3,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "f433129659c558bceaed6d51505fdb3f8034780e",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/c04b7fd36c8d7be0f8eee6b82189f22b8941d6af/CMakeLists.txt",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/c04b7fd36c8d7be0f8eee6b82189f22b8941d6af/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/CMakeLists.txt?ref=c04b7fd36c8d7be0f8eee6b82189f22b8941d6af",
+          "patch": "@@ -1,4 +1,4 @@\n-cmake_minimum_required(VERSION 2.8.3)\n+cmake_minimum_required(VERSION 3.0.2)\n project(async_web_server_cpp)\n \n ## Find catkin macros and libraries"
+        },
+        {
+          "sha": "60c5640d375b255331acbd0ebf9f6419d3c7c6de",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 2,
+          "changes": 5,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/c04b7fd36c8d7be0f8eee6b82189f22b8941d6af/package.xml",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/c04b7fd36c8d7be0f8eee6b82189f22b8941d6af/package.xml",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/package.xml?ref=c04b7fd36c8d7be0f8eee6b82189f22b8941d6af",
+          "patch": "@@ -1,4 +1,4 @@\n-<package format=\"2\">\n+<package format=\"3\">\n   <name>async_web_server_cpp</name>\n   <version>0.0.3</version>\n   <description>Asynchronous Web/WebSocket Server in C++</description>\n@@ -23,5 +23,6 @@\n   <test_depend>rostest</test_depend>\n   <test_depend>rospy</test_depend>\n   <test_depend>roslib</test_depend>\n-  <test_depend>python-websocket</test_depend>\n+  <test_depend condition=\"$ROS_PYTHON_VERSION==2\">python-websocket</test_depend>\n+  <test_depend condition=\"$ROS_PYTHON_VERSION==3\">python3-websocket</test_depend>\n </package>"
+        }
+      ]
+    },
+    {
+      "author": "dirk-thomas",
+      "date": "2018-08-15T23:01:33Z",
+      "sha": "ea90d0e44229d9dc7162692e199a927b2e72010b",
+      "message": "use package format 2, change dependency type",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 4,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "882fbca3602f3aebcfccc87b22376b90fbe12ddf",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 4,
+          "changes": 8,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/ea90d0e44229d9dc7162692e199a927b2e72010b/package.xml",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/ea90d0e44229d9dc7162692e199a927b2e72010b/package.xml",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/package.xml?ref=ea90d0e44229d9dc7162692e199a927b2e72010b",
+          "patch": "@@ -1,4 +1,4 @@\n-<package>\n+<package format=\"2\">\n   <name>async_web_server_cpp</name>\n   <version>0.0.3</version>\n   <description>Asynchronous Web/WebSocket Server in C++</description>\n@@ -17,11 +17,11 @@\n   <build_depend>libssl-dev</build_depend>\n   <build_depend>boost</build_depend>\n \n-  <run_depend>libssl-dev</run_depend>\n-  <run_depend>boost</run_depend>\n+  <exec_depend>libssl-dev</exec_depend>\n+  <exec_depend>boost</exec_depend>\n \n   <test_depend>rostest</test_depend>\n   <test_depend>rospy</test_depend>\n   <test_depend>roslib</test_depend>\n-  <run_depend>python-websocket</run_depend>\n+  <test_depend>python-websocket</test_depend>\n </package>"
+        }
+      ]
+    },
+    {
+      "author": "russelhowe",
+      "date": "2019-05-23T17:41:13Z",
+      "sha": "f82abfba2ce1e73a15b6f24dbd5313bfa8ca9d58",
+      "message": "Fix unit tests\n\nWithout this include specification, the tests can't find `ros/package.h`",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "7b69cf9b6d7833e0a4e415f721b3b9409185235a",
+          "filename": "test/CMakeLists.txt",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/f82abfba2ce1e73a15b6f24dbd5313bfa8ca9d58/test%2FCMakeLists.txt",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/f82abfba2ce1e73a15b6f24dbd5313bfa8ca9d58/test%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/test%2FCMakeLists.txt?ref=f82abfba2ce1e73a15b6f24dbd5313bfa8ca9d58",
+          "patch": "@@ -1,5 +1,9 @@\n add_executable(test_web_server EXCLUDE_FROM_ALL test_web_server.cpp)\n target_link_libraries(test_web_server ${PROJECT_NAME} ${catkin_LIBRARIES})\n+include_directories(\n+  ${catkin_INCLUDE_DIRS}\n+)\n+\n \n if(TARGET tests)\n   add_dependencies(tests"
+        }
+      ]
+    },
+    {
+      "author": "rctoris",
+      "date": "2014-11-25T19:32:45Z",
+      "sha": "2d506b7edc89b0ab8d1a9372cf0d4c1847ff0c8a",
+      "message": "Initial commit",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "ac183edf9f9781d9275c31dbc3143a2791ff4c2f",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/2d506b7edc89b0ab8d1a9372cf0d4c1847ff0c8a/README.md",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/2d506b7edc89b0ab8d1a9372cf0d4c1847ff0c8a/README.md",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/README.md?ref=2d506b7edc89b0ab8d1a9372cf0d4c1847ff0c8a",
+          "patch": "@@ -0,0 +1,4 @@\n+async_web_server_cpp\n+====================\n+\n+Asynchronous Web Server in C++"
+        }
+      ]
+    },
+    {
+      "author": "mjcarroll",
+      "date": "2018-08-23T22:19:51Z",
+      "sha": "94e6f17d75fc796af185848fb3fa3918178ff659",
+      "message": "Fix function without return value.\n\nThis fixes a segfault on GCC8.",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "92b6840f082e6a2c47441b7fc84e15becf4d77eb",
+          "filename": "src/http_reply.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/94e6f17d75fc796af185848fb3fa3918178ff659/src%2Fhttp_reply.cpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/94e6f17d75fc796af185848fb3fa3918178ff659/src%2Fhttp_reply.cpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/src%2Fhttp_reply.cpp?ref=94e6f17d75fc796af185848fb3fa3918178ff659",
+          "patch": "@@ -275,11 +275,11 @@ static bool serveFromFile(HttpReply::status_type status, const std::string& file\n   reply_builder_.header(\"Content-Length\", boost::lexical_cast<std::string>(content.size()));\n   reply_builder_.write(connection);\n   connection->write(content);\n+  return true;\n }\n bool FileHttpRequestHandler::operator()(const HttpRequest &request, boost::shared_ptr<HttpConnection> connection, const char* begin, const char* end)\n {\n-  serveFromFile(status_, filename_, headers_, connection);\n-  return true;\n+  return serveFromFile(status_, filename_, headers_, connection);\n }\n \n "
+        }
+      ]
+    },
+    {
+      "author": "Russell Toris",
+      "date": "2014-12-02T13:41:35Z",
+      "sha": "14a4f53c7aa1fcf4850ce494ae8034cede32b697",
+      "message": "OCD clenup",
+      "files_changed": 3,
+      "additions": 14,
+      "deletions": 16,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "19fce855d614d494ef3b79c2710a35fa03df2005",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 7,
+          "changes": 17,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/14a4f53c7aa1fcf4850ce494ae8034cede32b697/CMakeLists.txt",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/14a4f53c7aa1fcf4850ce494ae8034cede32b697/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/CMakeLists.txt?ref=14a4f53c7aa1fcf4850ce494ae8034cede32b697",
+          "patch": "@@ -10,6 +10,13 @@ find_package(catkin REQUIRED)\n find_package(Boost REQUIRED COMPONENTS thread system regex)\n find_package(OpenSSL)\n \n+###################################################\n+## Declare things to be passed to other projects ##\n+###################################################\n+\n+## LIBRARIES: libraries you create in this project that dependent projects also need\n+## CATKIN_DEPENDS: catkin_packages dependent projects also need\n+## DEPENDS: system dependencies of this project that dependent projects also need\n catkin_package(\n  INCLUDE_DIRS include\n  LIBRARIES ${PROJECT_NAME}\n@@ -20,6 +27,7 @@ catkin_package(\n ## Build ##\n ###########\n \n+## Specify additional locations of header files\n include_directories(\n   include\n   ${Boost_INCLUDE_DIRS}\n@@ -31,6 +39,7 @@ add_library(${PROJECT_NAME} src/http_server.cpp\n   src/http_reply.cpp src/http_request_handler.cpp\n   src/websocket_connection.cpp src/websocket_request_handler.cpp\n   src/websocket_message.cpp src/http_request.cpp)\n+\n target_link_libraries(${PROJECT_NAME}\n   ${OPENSSL_LIBRARIES}\n   ${Boost_LIBRARIES}\n@@ -41,7 +50,6 @@ target_link_libraries(${PROJECT_NAME}\n ## Install ##\n #############\n \n-\n ## Mark executables and/or libraries for installation\n install(TARGETS ${PROJECT_NAME}\n   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n@@ -52,10 +60,5 @@ install(TARGETS ${PROJECT_NAME}\n ## Mark cpp header files for installation\n install(DIRECTORY include/${PROJECT_NAME}/\n   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}\n-  FILES_MATCHING PATTERN \"*.hpp\"\n+  FILES_MATCHING PATTERN \"*.hpp\" PATTERN \"*.h\"\n )\n-\n-#############\n-## Testing ##\n-#############\n-"
+        },
+        {
+          "sha": "67aeb75630f120a1dcc588cac26c8af7f8452a8f",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/14a4f53c7aa1fcf4850ce494ae8034cede32b697/README.md",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/14a4f53c7aa1fcf4850ce494ae8034cede32b697/README.md",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/README.md?ref=14a4f53c7aa1fcf4850ce494ae8034cede32b697",
+          "patch": "@@ -1,7 +1,7 @@\n async_web_server_cpp [![Build Status](https://api.travis-ci.org/WPI-RAIL/async_web_server_cpp.png)](https://travis-ci.org/WPI-RAIL/async_web_server_cpp)\n ====================\n \n-#### Asynchronous Web Server in C++\n+#### Asynchronous Web/WebSocket Server in C++\n An implementation of an HTTP web server in C++ built on top of the [Boost.Asio Library](http://www.boost.org/doc/libs/1_57_0/doc/html/boost_asio.html).\n It also provides the ability to handle websocket upgrade requests.\n "
+        },
+        {
+          "sha": "089ef849e21bec0ed93db7b9be5529973828ec13",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 8,
+          "changes": 11,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/14a4f53c7aa1fcf4850ce494ae8034cede32b697/package.xml",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/14a4f53c7aa1fcf4850ce494ae8034cede32b697/package.xml",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/package.xml?ref=14a4f53c7aa1fcf4850ce494ae8034cede32b697",
+          "patch": "@@ -1,27 +1,22 @@\n-<?xml version=\"1.0\"?>\n <package>\n   <name>async_web_server_cpp</name>\n   <version>0.0.0</version>\n-  <description>An asynchronous web server implementation in C++ that also supports websockets.</description>\n+  <description>Asynchronous Web/WebSocket Server in C++</description>\n \n   <maintainer email=\"rctoris@wpi.edu\">Russell Toris</maintainer>\n   <author email=\"mwills@wpi.edu\">Mitchell Wills</author>\n \n   <license>BSD</license>\n \n-\n   <url type=\"website\">http://ros.org/wiki/async_web_server_cpp</url>\n   <url type=\"bugtracker\">https://github.com/WPI-RAIL/async_web_server_cpp/issues</url>\n   <url type=\"repository\">https://github.com/WPI-RAIL/async_web_server_cpp</url>\n \n-\n   <buildtool_depend>catkin</buildtool_depend>\n+\n   <build_depend>libssl-dev</build_depend>\n   <build_depend>boost</build_depend>\n+\n   <run_depend>libssl-dev</run_depend>\n   <run_depend>boost</run_depend>\n-\n-  <export>\n-  </export>\n-\n </package>"
+        }
+      ]
+    },
+    {
+      "author": "dekent",
+      "date": "2016-02-18T15:54:33Z",
+      "sha": "540ca338b3553ac209ce805bf8f0c63909e59c21",
+      "message": "Update package.xml",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "706e2067f89827e18241ab3720bc289efd2dec05",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/540ca338b3553ac209ce805bf8f0c63909e59c21/package.xml",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/540ca338b3553ac209ce805bf8f0c63909e59c21/package.xml",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/package.xml?ref=540ca338b3553ac209ce805bf8f0c63909e59c21",
+          "patch": "@@ -9,8 +9,8 @@\n   <license>BSD</license>\n \n   <url type=\"website\">http://ros.org/wiki/async_web_server_cpp</url>\n-  <url type=\"bugtracker\">https://github.com/WPI-RAIL/async_web_server_cpp/issues</url>\n-  <url type=\"repository\">https://github.com/WPI-RAIL/async_web_server_cpp</url>\n+  <url type=\"bugtracker\">https://github.com/GT-RAIL/async_web_server_cpp/issues</url>\n+  <url type=\"repository\">https://github.com/GT-RAIL/async_web_server_cpp</url>\n \n   <buildtool_depend>catkin</buildtool_depend>\n "
+        }
+      ]
+    },
+    {
+      "author": "Mitchell Wills",
+      "date": "2014-11-25T19:57:24Z",
+      "sha": "b982d75fe24d7c9d6e7432c818018bfb50298844",
+      "message": "Initial import of cpp_web_server from webrtc_ros",
+      "files_changed": 21,
+      "additions": 2106,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "02ef281084fa82f56bc12423acc358709cc430ae",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 68,
+          "deletions": 0,
+          "changes": 68,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/b982d75fe24d7c9d6e7432c818018bfb50298844/CMakeLists.txt",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/b982d75fe24d7c9d6e7432c818018bfb50298844/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/CMakeLists.txt?ref=b982d75fe24d7c9d6e7432c818018bfb50298844",
+          "patch": "@@ -0,0 +1,68 @@\n+cmake_minimum_required(VERSION 2.8.3)\n+project(cpp_web_server)\n+\n+## Find catkin macros and libraries\n+## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)\n+## is used, also find other catkin packages\n+find_package(catkin REQUIRED)\n+\n+## System dependencies are found with CMake's conventions\n+find_package(Boost REQUIRED COMPONENTS thread)\n+find_package(OpenSSL)\n+\n+catkin_package(\n+ INCLUDE_DIRS include\n+ LIBRARIES cpp_web_server\n+ DEPENDS Boost\n+)\n+\n+###########\n+## Build ##\n+###########\n+\n+include_directories(\n+  include\n+  ${Boost_INCLUDE_DIRS}\n+  ${OPENSSL_INCLUDE_DIRS}\n+)\n+\n+add_library(cpp_web_server src/http_server.cpp\n+  src/http_connection.cpp src/http_request_parser.cpp\n+  src/http_reply.cpp src/http_request_handler.cpp\n+  src/websocket_connection.cpp src/websocket_request_handler.cpp\n+  src/websocket_message.cpp src/http_request.cpp)\n+target_link_libraries(cpp_web_server\n+  ${OPENSSL_LIBRARIES}\n+  ${Boost_LIBRARIES}\n+)\n+\n+#############\n+## Install ##\n+#############\n+\n+\n+## Mark executables and/or libraries for installation\n+install(TARGETS cpp_web_server\n+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n+)\n+\n+## Mark cpp header files for installation\n+install(DIRECTORY include/${PROJECT_NAME}/\n+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}\n+  FILES_MATCHING PATTERN \"*.h\"\n+)\n+\n+#############\n+## Testing ##\n+#############\n+\n+## Add gtest based cpp test target and link libraries\n+# catkin_add_gtest(${PROJECT_NAME}-test test/test_cpp_web_server.cpp)\n+# if(TARGET ${PROJECT_NAME}-test)\n+#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})\n+# endif()\n+\n+## Add folders to be run by python nosetests\n+# catkin_add_nosetests(test)"
+        },
+        {
+          "sha": "a429d45e88f8705240613eb4172aa612dc9cd382",
+          "filename": "include/cpp_web_server/http_connection.hpp",
+          "status": "added",
+          "additions": 78,
+          "deletions": 0,
+          "changes": 78,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/b982d75fe24d7c9d6e7432c818018bfb50298844/include%2Fcpp_web_server%2Fhttp_connection.hpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/b982d75fe24d7c9d6e7432c818018bfb50298844/include%2Fcpp_web_server%2Fhttp_connection.hpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/include%2Fcpp_web_server%2Fhttp_connection.hpp?ref=b982d75fe24d7c9d6e7432c818018bfb50298844",
+          "patch": "@@ -0,0 +1,78 @@\n+#ifndef CPP_WEB_SERVER_HTTP_CONNECTION_HPP\n+#define CPP_WEB_SERVER_HTTP_CONNECTION_HPP\n+\n+#include <boost/asio.hpp>\n+#include <boost/noncopyable.hpp>\n+#include <boost/shared_ptr.hpp>\n+#include <boost/enable_shared_from_this.hpp>\n+#include <boost/thread/mutex.hpp>\n+#include \"cpp_web_server/http_request_handler.hpp\"\n+#include \"cpp_web_server/http_request.hpp\"\n+#include \"cpp_web_server/http_request_parser.hpp\"\n+\n+namespace cpp_web_server\n+{\n+\n+class HttpConnection;\n+typedef boost::shared_ptr<HttpConnection> HttpConnectionPtr;\n+typedef boost::weak_ptr<HttpConnection> HttpConnectionWeakPtr;\n+\n+// Represents a connection to a client\n+// To keep the connection alive keep a shared pointer to this object\n+class HttpConnection : public boost::enable_shared_from_this<HttpConnection>,\n+                       private boost::noncopyable\n+{\n+public:\n+  typedef boost::function<void(const char* begin, const char* end)> ReadHandler;\n+  typedef boost::shared_ptr<void> ResourcePtr;\n+\n+  explicit HttpConnection(boost::asio::io_service &io_service,\n+\t\t\t  HttpServerRequestHandler request_handler);\n+\n+  boost::asio::ip::tcp::socket &socket();\n+\n+  // Start async operation to read request\n+  void start();\n+\n+  void async_read(ReadHandler callback);\n+\n+  void write_and_clear(std::vector<unsigned char> &data);\n+\n+  void write(const std::string &);\n+\n+  void write(const boost::asio::const_buffer &buffer,\n+      ResourcePtr resource);\n+\n+  void write(const std::vector<boost::asio::const_buffer> &buffer,\n+      ResourcePtr resource);\n+\n+private:\n+  void handle_read(const char* begin, const char* end);\n+  void handle_read_raw(ReadHandler callback,\n+\t\t       const boost::system::error_code &e,\n+\t\t       std::size_t bytes_transferred);\n+\n+  // Must be called while holding write lock\n+  void write_pending();\n+\n+  void handle_write(const boost::system::error_code &e,\n+      std::vector<boost::shared_ptr<void> > resources);\n+\n+  boost::asio::io_service::strand strand_;\n+  boost::asio::ip::tcp::socket socket_;\n+  HttpServerRequestHandler request_handler_;\n+  boost::array<char, 8192> buffer_;\n+  HttpRequest request_;\n+  HttpRequestParser request_parser_;\n+\n+  boost::mutex write_mutex_;\n+  bool write_in_progress_;\n+  std::vector<boost::asio::const_buffer> pending_write_buffers_;\n+  std::vector<ResourcePtr> pending_write_resources_;\n+  boost::system::error_code last_error_;\n+  ReadHandler read_handler_;\n+};\n+\n+}\n+\n+#endif"
+        },
+        {
+          "sha": "483f3d82b7db33b975f6cafcc90c93e9824c8332",
+          "filename": "include/cpp_web_server/http_header.hpp",
+          "status": "added",
+          "additions": 25,
+          "deletions": 0,
+          "changes": 25,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/b982d75fe24d7c9d6e7432c818018bfb50298844/include%2Fcpp_web_server%2Fhttp_header.hpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/b982d75fe24d7c9d6e7432c818018bfb50298844/include%2Fcpp_web_server%2Fhttp_header.hpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/include%2Fcpp_web_server%2Fhttp_header.hpp?ref=b982d75fe24d7c9d6e7432c818018bfb50298844",
+          "patch": "@@ -0,0 +1,25 @@\n+#ifndef CPP_WEB_SERVER_HTTP_HEADER_HPP\n+#define CPP_WEB_SERVER_HTTP_HEADER_HPP\n+\n+#include <string>\n+\n+namespace cpp_web_server\n+{\n+\n+struct HttpHeader\n+{\n+  HttpHeader()\n+  {\n+  }\n+\n+  HttpHeader(std::string name, std::string value) : name(name), value(value)\n+  {\n+  }\n+\n+  std::string name;\n+  std::string value;\n+};\n+\n+}\n+\n+#endif"
+        },
+        {
+          "sha": "0999fcc20d20e79fb554105257db5940e2ad363d",
+          "filename": "include/cpp_web_server/http_reply.hpp",
+          "status": "added",
+          "additions": 93,
+          "deletions": 0,
+          "changes": 93,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/b982d75fe24d7c9d6e7432c818018bfb50298844/include%2Fcpp_web_server%2Fhttp_reply.hpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/b982d75fe24d7c9d6e7432c818018bfb50298844/include%2Fcpp_web_server%2Fhttp_reply.hpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/include%2Fcpp_web_server%2Fhttp_reply.hpp?ref=b982d75fe24d7c9d6e7432c818018bfb50298844",
+          "patch": "@@ -0,0 +1,93 @@\n+#ifndef CPP_WEB_SERVER_HTTP_REPLY_HPP\n+#define CPP_WEB_SERVER_HTTP_REPLY_HPP\n+\n+#include <vector>\n+#include <string>\n+#include <boost/asio.hpp>\n+#include \"cpp_web_server/http_header.hpp\"\n+#include \"cpp_web_server/http_connection.hpp\"\n+#include \"cpp_web_server/http_request_handler.hpp\"\n+\n+namespace cpp_web_server\n+{\n+\n+class ReplyBuilder;\n+\n+// Utility methods for constructing replys\n+struct HttpReply\n+{\n+  enum status_type\n+  {\n+    switching_protocols = 101,\n+    ok = 200,\n+    created = 201,\n+    accepted = 202,\n+    no_content = 204,\n+    multiple_choices = 300,\n+    moved_permanently = 301,\n+    moved_temporarily = 302,\n+    not_modified = 304,\n+    bad_request = 400,\n+    unauthorized = 401,\n+    forbidden = 403,\n+    not_found = 404,\n+    internal_server_error = 500,\n+    not_implemented = 501,\n+    bad_gateway = 502,\n+    service_unavailable = 503\n+  } status;\n+\n+  static std::vector<boost::asio::const_buffer> to_buffers(const std::vector<HttpHeader> &headers);\n+\n+  static HttpServerRequestHandler stock_reply(status_type status);\n+\n+  static HttpServerRequestHandler from_file(HttpReply::status_type status,\n+\t\t\t\t\t    const std::string& content_type,\n+\t\t\t\t\t    const std::string& filename);\n+\n+  static HttpServerRequestHandler static_reply(status_type status,\n+\t\t\t\t\t       const std::string& content_type,\n+\t\t\t\t\t       const std::string& content);\n+\n+  static ReplyBuilder builder(status_type status);\n+};\n+\n+\n+// Object to build and send a reply\n+class ReplyBuilder\n+{\n+public:\n+  ReplyBuilder(HttpReply::status_type status);\n+\n+  ReplyBuilder &header(const std::string &name, const std::string &value);\n+\n+  ReplyBuilder &header(const HttpHeader &header);\n+\n+  ReplyBuilder &headers(const std::vector<HttpHeader> &headers);\n+\n+  void write(HttpConnectionPtr connection);\n+\n+private:\n+  HttpReply::status_type status_;\n+  boost::shared_ptr<std::vector<HttpHeader> > headers_;\n+};\n+\n+\n+// Request Handler that serves a a predefined response\n+class StaticHttpRequestHandler\n+{\n+public:\n+  StaticHttpRequestHandler(HttpReply::status_type status,\n+      const std::vector<HttpHeader> &headers,\n+      const std::string &content);\n+\n+  void operator()(const HttpRequest &, boost::shared_ptr<HttpConnection>, const char* begin, const char* end);\n+\n+private:\n+  ReplyBuilder reply_builder_;\n+  const std::string content_string_;\n+};\n+\n+}\n+\n+#endif"
+        },
+        {
+          "sha": "691f1cddb2662b6505f8fcf6c00b56c19e075481",
+          "filename": "include/cpp_web_server/http_request.hpp",
+          "status": "added",
+          "additions": 63,
+          "deletions": 0,
+          "changes": 63,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/b982d75fe24d7c9d6e7432c818018bfb50298844/include%2Fcpp_web_server%2Fhttp_request.hpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/b982d75fe24d7c9d6e7432c818018bfb50298844/include%2Fcpp_web_server%2Fhttp_request.hpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/include%2Fcpp_web_server%2Fhttp_request.hpp?ref=b982d75fe24d7c9d6e7432c818018bfb50298844",
+          "patch": "@@ -0,0 +1,63 @@\n+#ifndef CPP_WEB_SERVER_HTTP_REQUEST_HPP\n+#define CPP_WEB_SERVER_HTTP_REQUEST_HPP\n+\n+#include <string>\n+#include <vector>\n+#include <map>\n+#include <boost/lexical_cast.hpp>\n+#include \"cpp_web_server/http_header.hpp\"\n+\n+namespace cpp_web_server\n+{\n+\n+struct HttpRequest\n+{\n+  std::string method;\n+  std::string uri;\n+  int http_version_major;\n+  int http_version_minor;\n+  std::vector<HttpHeader> headers;\n+\n+  std::string path;\n+  std::string query;\n+  std::map<std::string, std::string> query_params;\n+\n+  bool has_header(const std::string &name) const;\n+\n+  std::string get_header_value_or_default(const std::string &name,\n+      const std::string &default_value) const;\n+\n+\n+  bool has_query_param(const std::string &name) const;\n+\n+  std::string get_query_param_value_or_default(const std::string &name,\n+      const std::string &default_value) const;\n+\n+  template<typename T>\n+  T get_query_param_value_or_default(const std::string &name,\n+      const T &default_value) const\n+  {\n+    std::map<std::string, std::string>::const_iterator itr = query_params.find(name);\n+    if (itr != query_params.end())\n+    {\n+      try\n+      {\n+        return boost::lexical_cast<T>(itr->second);\n+      }\n+      catch (const boost::bad_lexical_cast &)\n+      {\n+        return default_value;\n+      }\n+    }\n+    else\n+    {\n+      return default_value;\n+    }\n+  }\n+\n+  bool parse_uri();\n+};\n+\n+}\n+\n+#endif"
+        },
+        {
+          "sha": "04573421b7d92afed7d284faac986222b2d39b51",
+          "filename": "include/cpp_web_server/http_request_handler.hpp",
+          "status": "added",
+          "additions": 35,
+          "deletions": 0,
+          "changes": 35,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/b982d75fe24d7c9d6e7432c818018bfb50298844/include%2Fcpp_web_server%2Fhttp_request_handler.hpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/b982d75fe24d7c9d6e7432c818018bfb50298844/include%2Fcpp_web_server%2Fhttp_request_handler.hpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/include%2Fcpp_web_server%2Fhttp_request_handler.hpp?ref=b982d75fe24d7c9d6e7432c818018bfb50298844",
+          "patch": "@@ -0,0 +1,35 @@\n+#ifndef CPP_WEB_SERVER_HTTP_REQUEST_HANDLER_HPP\n+#define CPP_WEB_SERVER_HTTP_REQUEST_HANDLER_HPP\n+\n+#include <boost/function.hpp>\n+#include <boost/shared_ptr.hpp>\n+#include \"cpp_web_server/http_request.hpp\"\n+\n+namespace cpp_web_server\n+{\n+\n+class HttpConnection;\n+\n+typedef boost::function<void(const HttpRequest &, boost::shared_ptr<HttpConnection>, const char* begin, const char* end)> HttpServerRequestHandler;\n+\n+class HttpRequestHandlerGroup\n+{\n+public:\n+  typedef boost::function<bool(const HttpRequest &)> HandlerPredicate;\n+\n+  HttpRequestHandlerGroup(HttpServerRequestHandler default_handler);\n+\n+  void addHandlerForPath(const std::string &path_regex, HttpServerRequestHandler handler);\n+\n+  void addHandler(HandlerPredicate predicate, HttpServerRequestHandler handler);\n+\n+  void operator()(const HttpRequest &request, boost::shared_ptr<HttpConnection> connection, const char* begin, const char* end);\n+\n+private:\n+  HttpServerRequestHandler default_handler_;\n+  std::vector<std::pair<HandlerPredicate, HttpServerRequestHandler> > handlers_;\n+};\n+\n+}\n+\n+#endif"
+        },
+        {
+          "sha": "3eb9bd5f25c4a37c9b55dd9ca903b753cc284727",
+          "filename": "include/cpp_web_server/http_request_parser.hpp",
+          "status": "added",
+          "additions": 92,
+          "deletions": 0,
+          "changes": 92,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/b982d75fe24d7c9d6e7432c818018bfb50298844/include%2Fcpp_web_server%2Fhttp_request_parser.hpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/b982d75fe24d7c9d6e7432c818018bfb50298844/include%2Fcpp_web_server%2Fhttp_request_parser.hpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/include%2Fcpp_web_server%2Fhttp_request_parser.hpp?ref=b982d75fe24d7c9d6e7432c818018bfb50298844",
+          "patch": "@@ -0,0 +1,92 @@\n+//\n+// http_request_parser.hpp\n+// ~~~~~~~~~~~~~~~~~~\n+//\n+// Copyright (c) 2003-2011 Christopher M. Kohlhoff (chris at kohlhoff dot com)\n+//\n+// Distributed under the Boost Software License, Version 1.0. (See accompanying\n+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n+//\n+\n+#ifndef CPP_WEB_SERVER_HTTP_REQUEST_PARSER_HPP\n+#define CPP_WEB_SERVER_HTTP_REQUEST_PARSER_HPP\n+\n+#include <boost/logic/tribool.hpp>\n+#include <boost/tuple/tuple.hpp>\n+#include \"cpp_web_server/http_request.hpp\"\n+\n+namespace cpp_web_server\n+{\n+\n+class HttpRequestParser\n+{\n+public:\n+  /// Construct ready to parse the request method.\n+  HttpRequestParser();\n+\n+  /// Reset to initial parser state.\n+  void reset();\n+\n+  /// Parse some data. The tribool return value is true when a complete request\n+  /// has been parsed, false if the data is invalid, indeterminate when more\n+  /// data is required. The InputIterator return value indicates how much of the\n+  /// input has been consumed.\n+  template<typename InputIterator>\n+  boost::tuple<boost::tribool, InputIterator> parse(HttpRequest &req,\n+      InputIterator begin, InputIterator end)\n+  {\n+    while (begin != end)\n+    {\n+      boost::tribool result = consume(req, *begin++);\n+      if (result || !result)\n+        return boost::make_tuple(result, begin);\n+    }\n+    boost::tribool result = boost::indeterminate;\n+    return boost::make_tuple(result, begin);\n+  }\n+\n+private:\n+  /// Handle the next character of input.\n+  boost::tribool consume(HttpRequest &req, char input);\n+\n+  /// Check if a byte is an HTTP character.\n+  static bool is_char(int c);\n+\n+  /// Check if a byte is an HTTP control character.\n+  static bool is_ctl(int c);\n+\n+  /// Check if a byte is defined as an HTTP tspecial character.\n+  static bool is_tspecial(int c);\n+\n+  /// Check if a byte is a digit.\n+  static bool is_digit(int c);\n+\n+  /// The current state of the parser.\n+  enum state\n+  {\n+    method_start,\n+    method,\n+    uri,\n+    http_version_h,\n+    http_version_t_1,\n+    http_version_t_2,\n+    http_version_p,\n+    http_version_slash,\n+    http_version_major_start,\n+    http_version_major,\n+    http_version_minor_start,\n+    http_version_minor,\n+    expecting_newline_1,\n+    header_line_start,\n+    header_lws,\n+    header_name,\n+    space_before_header_value,\n+    header_value,\n+    expecting_newline_2,\n+    expecting_newline_3\n+  } state_;\n+};\n+\n+}\n+\n+#endif"
+        },
+        {
+          "sha": "90856ff39b2df476626f23d64c9f30d5e2733276",
+          "filename": "include/cpp_web_server/http_server.hpp",
+          "status": "added",
+          "additions": 43,
+          "deletions": 0,
+          "changes": 43,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/b982d75fe24d7c9d6e7432c818018bfb50298844/include%2Fcpp_web_server%2Fhttp_server.hpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/b982d75fe24d7c9d6e7432c818018bfb50298844/include%2Fcpp_web_server%2Fhttp_server.hpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/include%2Fcpp_web_server%2Fhttp_server.hpp?ref=b982d75fe24d7c9d6e7432c818018bfb50298844",
+          "patch": "@@ -0,0 +1,43 @@\n+#ifndef CPP_WEB_SERVER_HTTP_SERVER_HPP\n+#define CPP_WEB_SERVER_HTTP_SERVER_HPP\n+\n+#include <boost/asio.hpp>\n+#include <string>\n+#include <vector>\n+#include <boost/noncopyable.hpp>\n+#include <boost/function.hpp>\n+#include <boost/shared_ptr.hpp>\n+#include <boost/thread/thread.hpp>\n+\n+#include \"cpp_web_server/http_request_handler.hpp\"\n+#include \"cpp_web_server/http_connection.hpp\"\n+\n+namespace cpp_web_server\n+{\n+\n+class HttpServer : private boost::noncopyable\n+{\n+public:\n+  HttpServer(const std::string &address, const std::string &port,\n+      HttpServerRequestHandler request_handler, std::size_t thread_pool_size);\n+\n+  void run();\n+\n+  void stop();\n+\n+private:\n+  void start_accept();\n+\n+  void handle_accept(const boost::system::error_code &e);\n+\n+  boost::asio::io_service io_service_;\n+  boost::asio::ip::tcp::acceptor acceptor_;\n+  std::size_t thread_pool_size_;\n+  std::vector<boost::shared_ptr<boost::thread> > threads_;\n+  boost::shared_ptr<HttpConnection> new_connection_;\n+  HttpServerRequestHandler request_handler_;\n+};\n+\n+}\n+\n+#endif"
+        },
+        {
+          "sha": "901645b3c4251e0c91289c3aa4ec81a616d28d4b",
+          "filename": "include/cpp_web_server/websocket_connection.hpp",
+          "status": "added",
+          "additions": 55,
+          "deletions": 0,
+          "changes": 55,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/b982d75fe24d7c9d6e7432c818018bfb50298844/include%2Fcpp_web_server%2Fwebsocket_connection.hpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/b982d75fe24d7c9d6e7432c818018bfb50298844/include%2Fcpp_web_server%2Fwebsocket_connection.hpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/include%2Fcpp_web_server%2Fwebsocket_connection.hpp?ref=b982d75fe24d7c9d6e7432c818018bfb50298844",
+          "patch": "@@ -0,0 +1,55 @@\n+#ifndef CPP_WEB_SERVER_WEBSOCKET_CONNECTION_HPP\n+#define CPP_WEB_SERVER_WEBSOCKET_CONNECTION_HPP\n+\n+#include <boost/asio.hpp>\n+#include <boost/noncopyable.hpp>\n+#include <boost/shared_ptr.hpp>\n+#include <boost/enable_shared_from_this.hpp>\n+#include <boost/thread/mutex.hpp>\n+#include \"cpp_web_server/http_connection.hpp\"\n+#include \"cpp_web_server/websocket_message.hpp\"\n+\n+namespace cpp_web_server\n+{\n+\n+class WebsocketHttpRequestHandler;\n+\n+class WebsocketConnection;\n+typedef boost::shared_ptr<WebsocketConnection> WebsocketConnectionPtr;\n+typedef boost::weak_ptr<WebsocketConnection> WebsocketConnectionWeakPtr;\n+\n+// Represents a connection to a client\n+// To keep the connection alive keep a shared pointer to this object\n+class WebsocketConnection : public boost::enable_shared_from_this<WebsocketConnection>,\n+\t\t\t    private boost::noncopyable\n+{\n+public:\n+  explicit WebsocketConnection(HttpConnectionPtr connection);\n+\n+  typedef boost::function<void(const WebsocketMessage& message)> MessageHandler;\n+\n+  bool sendTextMessage(const std::string& content);\n+  bool sendPingMessage(const std::string& content = \"\");\n+\n+  bool sendMessage(const WebsocketMessage& message);\n+  bool sendFrame(WebsocketFrame& frame);\n+\n+private:\n+  static void static_handle_read(WebsocketConnectionWeakPtr weak_this, const char* begin, const char* end);\n+  void handle_read(const char* begin, const char* end);\n+  HttpConnectionPtr connection_;\n+\n+  void set_message_handler(MessageHandler& handler);\n+  MessageHandler handler_;\n+\n+  WebsocketFrame frame_;\n+  WebsocketMessage message_;\n+  WebsocketFrameParser frame_parser_;\n+  WebsocketFrameBuffer frame_buffer_;\n+\n+  friend WebsocketHttpRequestHandler;\n+};\n+\n+}\n+\n+#endif"
+        },
+        {
+          "sha": "3bdc3481708a0a07f70624c1bac3d9044f6d1905",
+          "filename": "include/cpp_web_server/websocket_message.hpp",
+          "status": "added",
+          "additions": 108,
+          "deletions": 0,
+          "changes": 108,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/b982d75fe24d7c9d6e7432c818018bfb50298844/include%2Fcpp_web_server%2Fwebsocket_message.hpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/b982d75fe24d7c9d6e7432c818018bfb50298844/include%2Fcpp_web_server%2Fwebsocket_message.hpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/include%2Fcpp_web_server%2Fwebsocket_message.hpp?ref=b982d75fe24d7c9d6e7432c818018bfb50298844",
+          "patch": "@@ -0,0 +1,108 @@\n+#ifndef CPP_WEB_SERVER_WEBSOCKET_MESSAGE_HPP\n+#define CPP_WEB_SERVER_WEBSOCKET_MESSAGE_HPP\n+\n+#include <boost/asio.hpp>\n+#include <boost/shared_ptr.hpp>\n+#include <boost/logic/tribool.hpp>\n+#include <boost/tuple/tuple.hpp>\n+\n+namespace cpp_web_server\n+{\n+\n+class WebsocketMessage;\n+\n+\n+class WebsocketFrame {\n+public:\n+  struct Header {\n+    enum opcode {\n+      opcode_continuation = 0,\n+      opcode_text = 1,\n+      opcode_binary = 2,\n+      opcode_close = 8,\n+      opcode_ping = 9,\n+      opcode_pong = 10,\n+    } opcode : 4;\n+    bool rsv3 : 1;\n+    bool rsv2 : 1;\n+    bool rsv1 : 1;\n+    bool fin : 1;\n+\n+    unsigned int len : 7;\n+    bool mask : 1;\n+  } __attribute__ ((__packed__));\n+  union {\n+    Header header;\n+    char header_bytes[2];\n+  };\n+  uint64_t length;\n+  unsigned char mask[4];\n+  std::string content;\n+\n+  bool fromMessage(const WebsocketMessage& message);\n+  bool serialize(std::vector<unsigned char>& buffer);\n+};\n+\n+class WebsocketFrameParser {\n+public:\n+  WebsocketFrameParser();\n+  void reset();\n+  boost::tribool consume(WebsocketFrame& frame, char input);\n+  template<typename InputIterator>\n+  boost::tuple<boost::tribool, InputIterator> parse(WebsocketFrame& frame,\n+      InputIterator begin, InputIterator end)\n+  {\n+    while (begin != end)\n+    {\n+      boost::tribool result = consume(frame, *begin++);\n+      if (result || !result)\n+        return boost::make_tuple(result, begin);\n+    }\n+    boost::tribool result = boost::indeterminate;\n+    return boost::make_tuple(result, begin);\n+  }\n+\n+private:\n+  enum state {\n+    header_byte1,\n+    header_byte2,\n+    length_8bytes_left,\n+    length_7bytes_left,\n+    length_6bytes_left,\n+    length_5bytes_left,\n+    length_4bytes_left,\n+    length_3bytes_left,\n+    length_2bytes_left,\n+    length_1bytes_left,\n+    mask_byte1,\n+    mask_byte2,\n+    mask_byte3,\n+    mask_byte4,\n+    body\n+  } state_;\n+\n+};\n+\n+class WebsocketMessage {\n+public:\n+  WebsocketMessage();\n+  enum type {\n+    type_unknown,\n+    type_text,\n+    type_binary,\n+    type_close,\n+    type_ping,\n+    type_pong,\n+  } type;\n+  std::string content;\n+};\n+\n+class WebsocketFrameBuffer {\n+public:\n+  boost::tribool consume(WebsocketMessage& message, WebsocketFrame& frame);\n+};\n+\n+\n+}\n+\n+#endif"
+        },
+        {
+          "sha": "13c8df46f8821df46a31dd83dcf338d99267b53d",
+          "filename": "include/cpp_web_server/websocket_request_handler.hpp",
+          "status": "added",
+          "additions": 29,
+          "deletions": 0,
+          "changes": 29,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/b982d75fe24d7c9d6e7432c818018bfb50298844/include%2Fcpp_web_server%2Fwebsocket_request_handler.hpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/b982d75fe24d7c9d6e7432c818018bfb50298844/include%2Fcpp_web_server%2Fwebsocket_request_handler.hpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/include%2Fcpp_web_server%2Fwebsocket_request_handler.hpp?ref=b982d75fe24d7c9d6e7432c818018bfb50298844",
+          "patch": "@@ -0,0 +1,29 @@\n+#ifndef CPP_WEB_SERVER_WEBSOCKET_REQUEST_HANDLER_HPP\n+#define CPP_WEB_SERVER_WEBSOCKET_REQUEST_HANDLER_HPP\n+\n+#include <boost/function.hpp>\n+#include <boost/shared_ptr.hpp>\n+#include \"cpp_web_server/http_request_handler.hpp\"\n+#include \"cpp_web_server/websocket_connection.hpp\"\n+\n+namespace cpp_web_server\n+{\n+\n+class WebsocketConnection;\n+\n+typedef boost::function<WebsocketConnection::MessageHandler (const HttpRequest &, boost::shared_ptr<WebsocketConnection>)> WebsocketRequestHandler;\n+\n+class WebsocketHttpRequestHandler\n+{\n+public:\n+  WebsocketHttpRequestHandler(WebsocketRequestHandler handler);\n+  void operator()(const HttpRequest &request, boost::shared_ptr<HttpConnection> connection, const char* begin, const char* end);\n+\n+  static const std::string KEY_MAGIC_STRING;\n+private:\n+  WebsocketRequestHandler handler_;\n+};\n+\n+}\n+\n+#endif"
+        },
+        {
+          "sha": "866f41c3304c3ac2c13976214a7da461a9ee02bd",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 54,
+          "deletions": 0,
+          "changes": 54,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/b982d75fe24d7c9d6e7432c818018bfb50298844/package.xml",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/b982d75fe24d7c9d6e7432c818018bfb50298844/package.xml",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/package.xml?ref=b982d75fe24d7c9d6e7432c818018bfb50298844",
+          "patch": "@@ -0,0 +1,54 @@\n+<?xml version=\"1.0\"?>\n+<package>\n+  <name>cpp_web_server</name>\n+  <version>0.0.0</version>\n+  <description>The cpp_web_server package</description>\n+\n+  <!-- One maintainer tag required, multiple allowed, one person per tag --> \n+  <!-- Example:  -->\n+  <!-- <maintainer email=\"jane.doe@example.com\">Jane Doe</maintainer> -->\n+  <maintainer email=\"mitchell@todo.todo\">mitchell</maintainer>\n+\n+\n+  <!-- One license tag required, multiple allowed, one license per tag -->\n+  <!-- Commonly used license strings: -->\n+  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->\n+  <license>TODO</license>\n+\n+\n+  <!-- Url tags are optional, but mutiple are allowed, one per tag -->\n+  <!-- Optional attribute type can be: website, bugtracker, or repository -->\n+  <!-- Example: -->\n+  <!-- <url type=\"website\">http://wiki.ros.org/cpp_web_server</url> -->\n+\n+\n+  <!-- Author tags are optional, mutiple are allowed, one per tag -->\n+  <!-- Authors do not have to be maintianers, but could be -->\n+  <!-- Example: -->\n+  <!-- <author email=\"jane.doe@example.com\">Jane Doe</author> -->\n+\n+\n+  <!-- The *_depend tags are used to specify dependencies -->\n+  <!-- Dependencies can be catkin packages or system dependencies -->\n+  <!-- Examples: -->\n+  <!-- Use build_depend for packages you need at compile time: -->\n+  <!--   <build_depend>message_generation</build_depend> -->\n+  <!-- Use buildtool_depend for build tool packages: -->\n+  <!--   <buildtool_depend>catkin</buildtool_depend> -->\n+  <!-- Use run_depend for packages you need at runtime: -->\n+  <!--   <run_depend>message_runtime</run_depend> -->\n+  <!-- Use test_depend for packages you need only for testing: -->\n+  <!--   <test_depend>gtest</test_depend> -->\n+  <buildtool_depend>catkin</buildtool_depend>\n+  <build_depend>libssl-dev</build_depend>\n+  <run_depend>libssl-dev</run_depend>\n+\n+  <!-- The export tag contains other, unspecified, tags -->\n+  <export>\n+    <!-- You can specify that this package is a metapackage here: -->\n+    <!-- <metapackage/> -->\n+\n+    <!-- Other tools can request additional information be placed here -->\n+\n+  </export>\n+</package>"
+        },
+        {
+          "sha": "5f8cedc86314faf2a04d98ef494e468fb12e77ff",
+          "filename": "src/http_connection.cpp",
+          "status": "added",
+          "additions": 148,
+          "deletions": 0,
+          "changes": 148,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/b982d75fe24d7c9d6e7432c818018bfb50298844/src%2Fhttp_connection.cpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/b982d75fe24d7c9d6e7432c818018bfb50298844/src%2Fhttp_connection.cpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/src%2Fhttp_connection.cpp?ref=b982d75fe24d7c9d6e7432c818018bfb50298844",
+          "patch": "@@ -0,0 +1,148 @@\n+#include <boost/bind.hpp>\n+#include <boost/make_shared.hpp>\n+#include \"cpp_web_server/http_reply.hpp\"\n+\n+namespace cpp_web_server\n+{\n+\n+HttpConnection::HttpConnection(boost::asio::io_service &io_service,\n+    HttpServerRequestHandler handler)\n+    : strand_(io_service),\n+      socket_(io_service),\n+      request_handler_(handler),\n+      write_in_progress_(false)\n+{\n+}\n+\n+boost::asio::ip::tcp::socket &HttpConnection::socket()\n+{\n+  return socket_;\n+}\n+\n+void HttpConnection::start()\n+{\n+  async_read(boost::bind(&HttpConnection::handle_read, shared_from_this(), _1, _2));\n+}\n+\n+void HttpConnection::handle_read(const char* begin, const char* end)\n+{\n+  boost::tribool result;\n+  const char* parse_end;\n+  boost::tie(result, parse_end) = request_parser_.parse(request_, begin, end);\n+\n+  if (result)\n+    {\n+      request_.parse_uri();\n+      try\n+\t{\n+\t  request_handler_(request_, shared_from_this(), parse_end, end);\n+\t} catch (...)\n+\t{\n+\t  // error constructing request\n+\t  // just kill the connection as the handler may have already started writing stuff out\n+\t}\n+    }\n+  else if (!result)\n+  {\n+    HttpReply::stock_reply(HttpReply::bad_request)(request_, shared_from_this(), begin, end);\n+  }\n+  else\n+  {\n+    async_read(boost::bind(&HttpConnection::handle_read, shared_from_this(), _1, _2));\n+  }\n+}\n+\n+void HttpConnection::handle_read_raw(ReadHandler callback,\n+\t\t\t\t     const boost::system::error_code &e,\n+\t\t\t\t     std::size_t bytes_transferred)\n+{\n+  if(!e){\n+    callback(buffer_.data(), buffer_.data() + bytes_transferred);\n+  }\n+  else {\n+    last_error_ = e;\n+  }\n+}\n+void HttpConnection::async_read(ReadHandler callback) {\n+  if (last_error_)\n+  {\n+    boost::throw_exception(boost::system::system_error(last_error_));\n+  }\n+  socket_.async_read_some(boost::asio::buffer(buffer_),\n+\t\t\t  strand_.wrap(boost::bind(&HttpConnection::handle_read_raw, shared_from_this(),\n+\t\t\t\t\t\t   callback,\n+\t\t\t\t\t\t   boost::asio::placeholders::error,\n+\t\t\t\t\t\t   boost::asio::placeholders::bytes_transferred)));\n+}\n+\n+void HttpConnection::write_and_clear(std::vector<unsigned char> &data)\n+{\n+  boost::shared_ptr<std::vector<unsigned char> > buffer(new std::vector<unsigned char>());\n+  buffer->swap(data);\n+  write(boost::asio::buffer(*buffer), buffer);\n+}\n+\n+void HttpConnection::write(const std::string &content)\n+{\n+  boost::shared_ptr<std::string> str(new std::string(content));\n+  write(boost::asio::buffer(*str), str);\n+}\n+\n+void HttpConnection::write(const boost::asio::const_buffer &buffer,\n+    ResourcePtr resource)\n+{\n+  boost::mutex::scoped_lock lock(write_mutex_);\n+  pending_write_buffers_.push_back(buffer);\n+  if (resource)\n+    pending_write_resources_.push_back(resource);\n+  if (!write_in_progress_)\n+    write_pending();\n+}\n+\n+void HttpConnection::write(const std::vector<boost::asio::const_buffer> &buffers,\n+    ResourcePtr resource)\n+{\n+  boost::mutex::scoped_lock lock(write_mutex_);\n+  pending_write_buffers_.insert(pending_write_buffers_.end(), buffers.begin(), buffers.end());\n+  if (resource)\n+    pending_write_resources_.push_back(resource);\n+  if (!write_in_progress_)\n+    write_pending();\n+}\n+\n+\n+// Must be called while holding write lock\n+void HttpConnection::write_pending()\n+{\n+  if (last_error_)\n+  {\n+    boost::throw_exception(boost::system::system_error(last_error_));\n+  }\n+  write_in_progress_ = true;\n+  boost::asio::async_write(socket_, pending_write_buffers_,\n+      boost::bind(&HttpConnection::handle_write, shared_from_this(),\n+          boost::asio::placeholders::error,\n+          pending_write_resources_));\n+  pending_write_buffers_.clear();\n+  pending_write_resources_.clear();\n+}\n+\n+void HttpConnection::handle_write(const boost::system::error_code &e,\n+    std::vector<ResourcePtr> resources)\n+{\n+  boost::mutex::scoped_lock lock(write_mutex_);\n+  write_in_progress_ = false;\n+  if (!e)\n+  {\n+    if (!pending_write_buffers_.empty())\n+    {\n+      write_pending();\n+    }\n+  }\n+  else\n+  {\n+    last_error_ = e;\n+  }\n+}\n+\n+}"
+        },
+        {
+          "sha": "1de902d9b890b660aa9159724654cd431797e615",
+          "filename": "src/http_reply.cpp",
+          "status": "added",
+          "additions": 322,
+          "deletions": 0,
+          "changes": 322,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/b982d75fe24d7c9d6e7432c818018bfb50298844/src%2Fhttp_reply.cpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/b982d75fe24d7c9d6e7432c818018bfb50298844/src%2Fhttp_reply.cpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/src%2Fhttp_reply.cpp?ref=b982d75fe24d7c9d6e7432c818018bfb50298844",
+          "patch": "@@ -0,0 +1,322 @@\n+//\n+// http_reply.hpp\n+// ~~~~~~~~~~~~~~~~~~\n+//\n+// Copyright (c) 2003-2011 Christopher M. Kohlhoff (chris at kohlhoff dot com)\n+//\n+// Distributed under the Boost Software License, Version 1.0. (See accompanying\n+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n+//\n+\n+\n+#include <boost/lexical_cast.hpp>\n+#include <fstream>\n+#include \"cpp_web_server/http_reply.hpp\"\n+\n+namespace cpp_web_server\n+{\n+\n+namespace status_strings\n+{\n+\n+const std::string switching_protocols =\n+    \"HTTP/1.0 101 Switching Protocols\\r\\n\";\n+const std::string ok =\n+    \"HTTP/1.0 200 OK\\r\\n\";\n+const std::string created =\n+    \"HTTP/1.0 201 Created\\r\\n\";\n+const std::string accepted =\n+    \"HTTP/1.0 202 Accepted\\r\\n\";\n+const std::string no_content =\n+    \"HTTP/1.0 204 No Content\\r\\n\";\n+const std::string multiple_choices =\n+    \"HTTP/1.0 300 Multiple Choices\\r\\n\";\n+const std::string moved_permanently =\n+    \"HTTP/1.0 301 Moved Permanently\\r\\n\";\n+const std::string moved_temporarily =\n+    \"HTTP/1.0 302 Moved Temporarily\\r\\n\";\n+const std::string not_modified =\n+    \"HTTP/1.0 304 Not Modified\\r\\n\";\n+const std::string bad_request =\n+    \"HTTP/1.0 400 Bad Request\\r\\n\";\n+const std::string unauthorized =\n+    \"HTTP/1.0 401 Unauthorized\\r\\n\";\n+const std::string forbidden =\n+    \"HTTP/1.0 403 Forbidden\\r\\n\";\n+const std::string not_found =\n+    \"HTTP/1.0 404 Not Found\\r\\n\";\n+const std::string internal_server_error =\n+    \"HTTP/1.0 500 Internal Server Error\\r\\n\";\n+const std::string not_implemented =\n+    \"HTTP/1.0 501 Not Implemented\\r\\n\";\n+const std::string bad_gateway =\n+    \"HTTP/1.0 502 Bad Gateway\\r\\n\";\n+const std::string service_unavailable =\n+    \"HTTP/1.0 503 Service Unavailable\\r\\n\";\n+\n+boost::asio::const_buffer to_buffer(HttpReply::status_type status)\n+{\n+  switch (status)\n+  {\n+    case HttpReply::switching_protocols:\n+      return boost::asio::buffer(switching_protocols);\n+    case HttpReply::ok:\n+      return boost::asio::buffer(ok);\n+    case HttpReply::created:\n+      return boost::asio::buffer(created);\n+    case HttpReply::accepted:\n+      return boost::asio::buffer(accepted);\n+    case HttpReply::no_content:\n+      return boost::asio::buffer(no_content);\n+    case HttpReply::multiple_choices:\n+      return boost::asio::buffer(multiple_choices);\n+    case HttpReply::moved_permanently:\n+      return boost::asio::buffer(moved_permanently);\n+    case HttpReply::moved_temporarily:\n+      return boost::asio::buffer(moved_temporarily);\n+    case HttpReply::not_modified:\n+      return boost::asio::buffer(not_modified);\n+    case HttpReply::bad_request:\n+      return boost::asio::buffer(bad_request);\n+    case HttpReply::unauthorized:\n+      return boost::asio::buffer(unauthorized);\n+    case HttpReply::forbidden:\n+      return boost::asio::buffer(forbidden);\n+    case HttpReply::not_found:\n+      return boost::asio::buffer(not_found);\n+    case HttpReply::internal_server_error:\n+      return boost::asio::buffer(internal_server_error);\n+    case HttpReply::not_implemented:\n+      return boost::asio::buffer(not_implemented);\n+    case HttpReply::bad_gateway:\n+      return boost::asio::buffer(bad_gateway);\n+    case HttpReply::service_unavailable:\n+      return boost::asio::buffer(service_unavailable);\n+    default:\n+      return boost::asio::buffer(internal_server_error);\n+  }\n+}\n+\n+} // namespace status_strings\n+\n+namespace misc_strings\n+{\n+\n+const char name_value_separator[] = {':', ' '};\n+const char crlf[] = {'\\r', '\\n'};\n+\n+} // namespace misc_strings\n+\n+namespace stock_replies\n+{\n+\n+const char ok[] = \"\";\n+const char created[] =\n+    \"<html>\"\n+        \"<head><title>Created</title></head>\"\n+        \"<body><h1>201 Created</h1></body>\"\n+        \"</html>\";\n+const char accepted[] =\n+    \"<html>\"\n+        \"<head><title>Accepted</title></head>\"\n+        \"<body><h1>202 Accepted</h1></body>\"\n+        \"</html>\";\n+const char no_content[] =\n+    \"<html>\"\n+        \"<head><title>No Content</title></head>\"\n+        \"<body><h1>204 Content</h1></body>\"\n+        \"</html>\";\n+const char multiple_choices[] =\n+    \"<html>\"\n+        \"<head><title>Multiple Choices</title></head>\"\n+        \"<body><h1>300 Multiple Choices</h1></body>\"\n+        \"</html>\";\n+const char moved_permanently[] =\n+    \"<html>\"\n+        \"<head><title>Moved Permanently</title></head>\"\n+        \"<body><h1>301 Moved Permanently</h1></body>\"\n+        \"</html>\";\n+const char moved_temporarily[] =\n+    \"<html>\"\n+        \"<head><title>Moved Temporarily</title></head>\"\n+        \"<body><h1>302 Moved Temporarily</h1></body>\"\n+        \"</html>\";\n+const char not_modified[] =\n+    \"<html>\"\n+        \"<head><title>Not Modified</title></head>\"\n+        \"<body><h1>304 Not Modified</h1></body>\"\n+        \"</html>\";\n+const char bad_request[] =\n+    \"<html>\"\n+        \"<head><title>Bad Request</title></head>\"\n+        \"<body><h1>400 Bad Request</h1></body>\"\n+        \"</html>\";\n+const char unauthorized[] =\n+    \"<html>\"\n+        \"<head><title>Unauthorized</title></head>\"\n+        \"<body><h1>401 Unauthorized</h1></body>\"\n+        \"</html>\";\n+const char forbidden[] =\n+    \"<html>\"\n+        \"<head><title>Forbidden</title></head>\"\n+        \"<body><h1>403 Forbidden</h1></body>\"\n+        \"</html>\";\n+const char not_found[] =\n+    \"<html>\"\n+        \"<head><title>Not Found</title></head>\"\n+        \"<body><h1>404 Not Found</h1></body>\"\n+        \"</html>\";\n+const char internal_server_error[] =\n+    \"<html>\"\n+        \"<head><title>Internal Server Error</title></head>\"\n+        \"<body><h1>500 Internal Server Error</h1></body>\"\n+        \"</html>\";\n+const char not_implemented[] =\n+    \"<html>\"\n+        \"<head><title>Not Implemented</title></head>\"\n+        \"<body><h1>501 Not Implemented</h1></body>\"\n+        \"</html>\";\n+const char bad_gateway[] =\n+    \"<html>\"\n+        \"<head><title>Bad Gateway</title></head>\"\n+        \"<body><h1>502 Bad Gateway</h1></body>\"\n+        \"</html>\";\n+const char service_unavailable[] =\n+    \"<html>\"\n+        \"<head><title>Service Unavailable</title></head>\"\n+        \"<body><h1>503 Service Unavailable</h1></body>\"\n+        \"</html>\";\n+\n+std::string to_string(HttpReply::status_type status)\n+{\n+  switch (status)\n+  {\n+    case HttpReply::ok:\n+      return ok;\n+    case HttpReply::created:\n+      return created;\n+    case HttpReply::accepted:\n+      return accepted;\n+    case HttpReply::no_content:\n+      return no_content;\n+    case HttpReply::multiple_choices:\n+      return multiple_choices;\n+    case HttpReply::moved_permanently:\n+      return moved_permanently;\n+    case HttpReply::moved_temporarily:\n+      return moved_temporarily;\n+    case HttpReply::not_modified:\n+      return not_modified;\n+    case HttpReply::bad_request:\n+      return bad_request;\n+    case HttpReply::unauthorized:\n+      return unauthorized;\n+    case HttpReply::forbidden:\n+      return forbidden;\n+    case HttpReply::not_found:\n+      return not_found;\n+    case HttpReply::internal_server_error:\n+      return internal_server_error;\n+    case HttpReply::not_implemented:\n+      return not_implemented;\n+    case HttpReply::bad_gateway:\n+      return bad_gateway;\n+    case HttpReply::service_unavailable:\n+      return service_unavailable;\n+    default:\n+      return internal_server_error;\n+  }\n+}\n+\n+} // namespace stock_replies\n+\n+std::vector<boost::asio::const_buffer> HttpReply::to_buffers(const std::vector<HttpHeader> &headers)\n+{\n+  std::vector<boost::asio::const_buffer> buffers;\n+  for (std::size_t i = 0; i < headers.size(); ++i)\n+  {\n+    const HttpHeader &h = headers[i];\n+    buffers.push_back(boost::asio::buffer(h.name));\n+    buffers.push_back(boost::asio::buffer(misc_strings::name_value_separator));\n+    buffers.push_back(boost::asio::buffer(h.value));\n+    buffers.push_back(boost::asio::buffer(misc_strings::crlf));\n+  }\n+  buffers.push_back(boost::asio::buffer(misc_strings::crlf));\n+  return buffers;\n+}\n+\n+\n+HttpServerRequestHandler HttpReply::stock_reply(HttpReply::status_type status)\n+{\n+  return static_reply(status, \"text/html\", stock_replies::to_string(status));\n+}\n+\n+HttpServerRequestHandler HttpReply::from_file(HttpReply::status_type status,\n+\t\t\t\t\t      const std::string& content_type,\n+\t\t\t\t\t      const std::string& filename)\n+{\n+  std::ifstream file_stream(filename.c_str());\n+  std::stringstream file_buffer;\n+  file_buffer << file_stream.rdbuf();\n+  return static_reply(status, content_type, file_buffer.str());\n+}\n+HttpServerRequestHandler HttpReply::static_reply(HttpReply::status_type status,\n+\t\t\t\t\t\t const std::string& content_type,\n+\t\t\t\t\t\t const std::string& content)\n+{\n+  std::vector<HttpHeader> headers;\n+  headers.push_back(HttpHeader(\"Content-Length\", boost::lexical_cast<std::string>(content.size())));\n+  headers.push_back(HttpHeader(\"Content-Type\", content_type));\n+  return StaticHttpRequestHandler(status, headers, content);\n+}\n+\n+\n+StaticHttpRequestHandler::StaticHttpRequestHandler(HttpReply::status_type status,\n+    const std::vector<HttpHeader> &headers,\n+    const std::string &content)\n+    : reply_builder_(status), content_string_(content)\n+{\n+  reply_builder_.headers(headers);\n+}\n+\n+void StaticHttpRequestHandler::operator()(const HttpRequest &request, boost::shared_ptr<HttpConnection> connection, const char* begin, const char* end)\n+{\n+  reply_builder_.write(connection);\n+  connection->write(content_string_);\n+}\n+\n+\n+ReplyBuilder HttpReply::builder(HttpReply::status_type status)\n+{\n+  return ReplyBuilder(status);\n+}\n+\n+ReplyBuilder::ReplyBuilder(HttpReply::status_type status)\n+    : status_(status), headers_(new std::vector<HttpHeader>())\n+{\n+}\n+\n+ReplyBuilder &ReplyBuilder::header(const std::string &name, const std::string &value)\n+{\n+  return header(HttpHeader(name, value));\n+}\n+\n+ReplyBuilder &ReplyBuilder::header(const HttpHeader &header)\n+{\n+  headers_->push_back(header);\n+  return *this;\n+}\n+\n+ReplyBuilder &ReplyBuilder::headers(const std::vector<HttpHeader> &headers)\n+{\n+  headers_->insert(headers_->end(), headers.begin(), headers.end());\n+  return *this;\n+}\n+\n+void ReplyBuilder::write(HttpConnectionPtr connection)\n+{\n+  connection->write(status_strings::to_buffer(status_), HttpConnection::ResourcePtr());\n+  connection->write(HttpReply::to_buffers(*headers_), headers_);\n+}\n+\n+}"
+        },
+        {
+          "sha": "ea7188a9c6d6d2bc7bc2c6e15d84a00852fab51a",
+          "filename": "src/http_request.cpp",
+          "status": "added",
+          "additions": 89,
+          "deletions": 0,
+          "changes": 89,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/b982d75fe24d7c9d6e7432c818018bfb50298844/src%2Fhttp_request.cpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/b982d75fe24d7c9d6e7432c818018bfb50298844/src%2Fhttp_request.cpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/src%2Fhttp_request.cpp?ref=b982d75fe24d7c9d6e7432c818018bfb50298844",
+          "patch": "@@ -0,0 +1,89 @@\n+#include <boost/regex.hpp>\n+#include <boost/foreach.hpp>\n+#include <boost/algorithm/string.hpp>\n+#include \"cpp_web_server/http_request.hpp\"\n+\n+namespace cpp_web_server\n+{\n+\n+static boost::regex uri_regex(\"(.*?)(?:\\\\?(.*?))?\");\n+\n+bool HttpRequest::parse_uri()\n+{\n+  boost::smatch match;\n+  if (regex_match(uri, match, uri_regex))\n+  {\n+    path.assign(match[1].first, match[1].second);\n+    if (match[2].matched)\n+    {\n+      query.assign(match[2].first, match[2].second);\n+\n+      std::vector<std::string> pair_strings;\n+      boost::split(pair_strings, query, boost::is_any_of(\"&\"));\n+      BOOST_FOREACH(const std::string &pair_string, pair_strings)\n+            {\n+              std::vector<std::string> pair_data;\n+              const int eq_index = pair_string.find_first_of('=');\n+              if (eq_index == std::string::npos)\n+              {\n+                if (pair_string.size() > 0)\n+                {\n+                  query_params[pair_string] = \"\";\n+                }\n+              }\n+              else\n+              {\n+                query_params[pair_string.substr(0, eq_index)] = pair_string.substr(eq_index + 1);\n+              }\n+            }\n+    }\n+    return true;\n+  }\n+  else\n+  {\n+    return false;\n+  }\n+\n+}\n+\n+bool HttpRequest::has_header(const std::string &name) const\n+{\n+  typedef std::vector<cpp_web_server::HttpHeader> HeaderList;\n+  for(HeaderList::const_iterator itr = headers.begin(); itr != headers.end(); ++itr) {\n+    if(itr->name.compare(name) == 0)\n+      return false;\n+  }\n+  return true;\n+}\n+std::string HttpRequest::get_header_value_or_default(const std::string &name,\n+    const std::string &default_value) const\n+{\n+  typedef std::vector<cpp_web_server::HttpHeader> HeaderList;\n+  for(HeaderList::const_iterator itr = headers.begin(); itr != headers.end(); ++itr) {\n+    if(itr->name.compare(name) == 0)\n+      return itr->value;\n+  }\n+  return default_value;\n+}\n+\n+bool HttpRequest::has_query_param(const std::string &name) const\n+{\n+  std::map<std::string, std::string>::const_iterator itr = query_params.find(name);\n+  return itr != query_params.end();\n+}\n+\n+std::string HttpRequest::get_query_param_value_or_default(const std::string &name,\n+    const std::string &default_value) const\n+{\n+  std::map<std::string, std::string>::const_iterator itr = query_params.find(name);\n+  if (itr != query_params.end())\n+  {\n+    return itr->second;\n+  }\n+  else\n+  {\n+    return default_value;\n+  }\n+}\n+\n+}"
+        },
+        {
+          "sha": "41c84c0f75f2fbec9c8ec2c76bd6ccccc9278627",
+          "filename": "src/http_request_handler.cpp",
+          "status": "added",
+          "additions": 54,
+          "deletions": 0,
+          "changes": 54,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/b982d75fe24d7c9d6e7432c818018bfb50298844/src%2Fhttp_request_handler.cpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/b982d75fe24d7c9d6e7432c818018bfb50298844/src%2Fhttp_request_handler.cpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/src%2Fhttp_request_handler.cpp?ref=b982d75fe24d7c9d6e7432c818018bfb50298844",
+          "patch": "@@ -0,0 +1,54 @@\n+#include <boost/regex.hpp>\n+#include \"cpp_web_server/http_request_handler.hpp\"\n+\n+namespace cpp_web_server\n+{\n+\n+HttpRequestHandlerGroup::HttpRequestHandlerGroup(HttpServerRequestHandler default_handler)\n+    : default_handler_(default_handler)\n+{\n+}\n+\n+class PathMatcher\n+{\n+public:\n+  explicit PathMatcher(const std::string &path_regex_string)\n+      : path_regex_(boost::regex(path_regex_string))\n+  {\n+  }\n+\n+  bool operator()(const HttpRequest &request)\n+  {\n+    return regex_match(request.path, path_regex_);\n+  }\n+\n+private:\n+  const boost::regex path_regex_;\n+};\n+\n+void HttpRequestHandlerGroup::addHandlerForPath(const std::string &path_regex, HttpServerRequestHandler handler)\n+{\n+  addHandler(PathMatcher(path_regex), handler);\n+}\n+\n+void HttpRequestHandlerGroup::addHandler(HandlerPredicate predicate, HttpServerRequestHandler handler)\n+{\n+  handlers_.push_back(std::make_pair(predicate, handler));\n+}\n+\n+\n+void HttpRequestHandlerGroup::operator()(const HttpRequest &request, boost::shared_ptr<HttpConnection> connection, const char* begin, const char* end)\n+{\n+  for (int i = 0; i < handlers_.size(); ++i)\n+  {\n+    std::pair<HandlerPredicate, HttpServerRequestHandler> &handler = handlers_[i];\n+    if (handler.first(request))\n+    {\n+      handler.second(request, connection, begin, end);\n+      return;\n+    }\n+  }\n+  default_handler_(request, connection, begin, end);\n+}\n+\n+}"
+        },
+        {
+          "sha": "d549c61ef843a7ffa6ad5544cb95cf88752794c5",
+          "filename": "src/http_request_parser.cpp",
+          "status": "added",
+          "additions": 327,
+          "deletions": 0,
+          "changes": 327,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/b982d75fe24d7c9d6e7432c818018bfb50298844/src%2Fhttp_request_parser.cpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/b982d75fe24d7c9d6e7432c818018bfb50298844/src%2Fhttp_request_parser.cpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/src%2Fhttp_request_parser.cpp?ref=b982d75fe24d7c9d6e7432c818018bfb50298844",
+          "patch": "@@ -0,0 +1,327 @@\n+//\n+// http_request_parser.cpp\n+// ~~~~~~~~~~~~~~~~~~\n+//\n+// Copyright (c) 2003-2011 Christopher M. Kohlhoff (chris at kohlhoff dot com)\n+//\n+// Distributed under the Boost Software License, Version 1.0. (See accompanying\n+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)\n+//\n+\n+#include \"cpp_web_server/http_request_parser.hpp\"\n+\n+namespace cpp_web_server\n+{\n+HttpRequestParser::HttpRequestParser()\n+    : state_(method_start)\n+{\n+}\n+\n+void HttpRequestParser::reset()\n+{\n+  state_ = method_start;\n+}\n+\n+boost::tribool HttpRequestParser::consume(HttpRequest &req, char input)\n+{\n+  switch (state_)\n+  {\n+    case method_start:\n+      if (!is_char(input) || is_ctl(input) || is_tspecial(input))\n+      {\n+        return false;\n+      }\n+      else\n+      {\n+        state_ = method;\n+        req.method.push_back(input);\n+        return boost::indeterminate;\n+      }\n+    case method:\n+      if (input == ' ')\n+      {\n+        state_ = uri;\n+        return boost::indeterminate;\n+      }\n+      else if (!is_char(input) || is_ctl(input) || is_tspecial(input))\n+      {\n+        return false;\n+      }\n+      else\n+      {\n+        req.method.push_back(input);\n+        return boost::indeterminate;\n+      }\n+    case uri:\n+      if (input == ' ')\n+      {\n+        state_ = http_version_h;\n+        return boost::indeterminate;\n+      }\n+      else if (is_ctl(input))\n+      {\n+        return false;\n+      }\n+      else\n+      {\n+        req.uri.push_back(input);\n+        return boost::indeterminate;\n+      }\n+    case http_version_h:\n+      if (input == 'H')\n+      {\n+        state_ = http_version_t_1;\n+        return boost::indeterminate;\n+      }\n+      else\n+      {\n+        return false;\n+      }\n+    case http_version_t_1:\n+      if (input == 'T')\n+      {\n+        state_ = http_version_t_2;\n+        return boost::indeterminate;\n+      }\n+      else\n+      {\n+        return false;\n+      }\n+    case http_version_t_2:\n+      if (input == 'T')\n+      {\n+        state_ = http_version_p;\n+        return boost::indeterminate;\n+      }\n+      else\n+      {\n+        return false;\n+      }\n+    case http_version_p:\n+      if (input == 'P')\n+      {\n+        state_ = http_version_slash;\n+        return boost::indeterminate;\n+      }\n+      else\n+      {\n+        return false;\n+      }\n+    case http_version_slash:\n+      if (input == '/')\n+      {\n+        req.http_version_major = 0;\n+        req.http_version_minor = 0;\n+        state_ = http_version_major_start;\n+        return boost::indeterminate;\n+      }\n+      else\n+      {\n+        return false;\n+      }\n+    case http_version_major_start:\n+      if (is_digit(input))\n+      {\n+        req.http_version_major = req.http_version_major * 10 + input - '0';\n+        state_ = http_version_major;\n+        return boost::indeterminate;\n+      }\n+      else\n+      {\n+        return false;\n+      }\n+    case http_version_major:\n+      if (input == '.')\n+      {\n+        state_ = http_version_minor_start;\n+        return boost::indeterminate;\n+      }\n+      else if (is_digit(input))\n+      {\n+        req.http_version_major = req.http_version_major * 10 + input - '0';\n+        return boost::indeterminate;\n+      }\n+      else\n+      {\n+        return false;\n+      }\n+    case http_version_minor_start:\n+      if (is_digit(input))\n+      {\n+        req.http_version_minor = req.http_version_minor * 10 + input - '0';\n+        state_ = http_version_minor;\n+        return boost::indeterminate;\n+      }\n+      else\n+      {\n+        return false;\n+      }\n+    case http_version_minor:\n+      if (input == '\\r')\n+      {\n+        state_ = expecting_newline_1;\n+        return boost::indeterminate;\n+      }\n+      else if (is_digit(input))\n+      {\n+        req.http_version_minor = req.http_version_minor * 10 + input - '0';\n+        return boost::indeterminate;\n+      }\n+      else\n+      {\n+        return false;\n+      }\n+    case expecting_newline_1:\n+      if (input == '\\n')\n+      {\n+        state_ = header_line_start;\n+        return boost::indeterminate;\n+      }\n+      else\n+      {\n+        return false;\n+      }\n+    case header_line_start:\n+      if (input == '\\r')\n+      {\n+        state_ = expecting_newline_3;\n+        return boost::indeterminate;\n+      }\n+      else if (!req.headers.empty() && (input == ' ' || input == '\\t'))\n+      {\n+        state_ = header_lws;\n+        return boost::indeterminate;\n+      }\n+      else if (!is_char(input) || is_ctl(input) || is_tspecial(input))\n+      {\n+        return false;\n+      }\n+      else\n+      {\n+        req.headers.push_back(HttpHeader());\n+        req.headers.back().name.push_back(input);\n+        state_ = header_name;\n+        return boost::indeterminate;\n+      }\n+    case header_lws:\n+      if (input == '\\r')\n+      {\n+        state_ = expecting_newline_2;\n+        return boost::indeterminate;\n+      }\n+      else if (input == ' ' || input == '\\t')\n+      {\n+        return boost::indeterminate;\n+      }\n+      else if (is_ctl(input))\n+      {\n+        return false;\n+      }\n+      else\n+      {\n+        state_ = header_value;\n+        req.headers.back().value.push_back(input);\n+        return boost::indeterminate;\n+      }\n+    case header_name:\n+      if (input == ':')\n+      {\n+        state_ = space_before_header_value;\n+        return boost::indeterminate;\n+      }\n+      else if (!is_char(input) || is_ctl(input) || is_tspecial(input))\n+      {\n+        return false;\n+      }\n+      else\n+      {\n+        req.headers.back().name.push_back(input);\n+        return boost::indeterminate;\n+      }\n+    case space_before_header_value:\n+      if (input == ' ')\n+      {\n+        state_ = header_value;\n+        return boost::indeterminate;\n+      }\n+      else\n+      {\n+        return false;\n+      }\n+    case header_value:\n+      if (input == '\\r')\n+      {\n+        state_ = expecting_newline_2;\n+        return boost::indeterminate;\n+      }\n+      else if (is_ctl(input))\n+      {\n+        return false;\n+      }\n+      else\n+      {\n+        req.headers.back().value.push_back(input);\n+        return boost::indeterminate;\n+      }\n+    case expecting_newline_2:\n+      if (input == '\\n')\n+      {\n+        state_ = header_line_start;\n+        return boost::indeterminate;\n+      }\n+      else\n+      {\n+        return false;\n+      }\n+    case expecting_newline_3:\n+      return (input == '\\n');\n+    default:\n+      return false;\n+  }\n+}\n+\n+bool HttpRequestParser::is_char(int c)\n+{\n+  return c >= 0 && c <= 127;\n+}\n+\n+bool HttpRequestParser::is_ctl(int c)\n+{\n+  return (c >= 0 && c <= 31) || (c == 127);\n+}\n+\n+bool HttpRequestParser::is_tspecial(int c)\n+{\n+  switch (c)\n+  {\n+    case '(':\n+    case ')':\n+    case '<':\n+    case '>':\n+    case '@':\n+    case ',':\n+    case ';':\n+    case ':':\n+    case '\\\\':\n+    case '\"':\n+    case '/':\n+    case '[':\n+    case ']':\n+    case '?':\n+    case '=':\n+    case '{':\n+    case '}':\n+    case ' ':\n+    case '\\t':\n+      return true;\n+    default:\n+      return false;\n+  }\n+}\n+\n+bool HttpRequestParser::is_digit(int c)\n+{\n+  return c >= '0' && c <= '9';\n+}\n+\n+}"
+        },
+        {
+          "sha": "b8215fd595c29fcfe69652270ba24dc3571438ec",
+          "filename": "src/http_server.cpp",
+          "status": "added",
+          "additions": 60,
+          "deletions": 0,
+          "changes": 60,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/b982d75fe24d7c9d6e7432c818018bfb50298844/src%2Fhttp_server.cpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/b982d75fe24d7c9d6e7432c818018bfb50298844/src%2Fhttp_server.cpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/src%2Fhttp_server.cpp?ref=b982d75fe24d7c9d6e7432c818018bfb50298844",
+          "patch": "@@ -0,0 +1,60 @@\n+#include \"cpp_web_server/http_server.hpp\"\n+#include \"cpp_web_server/http_reply.hpp\"\n+\n+namespace cpp_web_server\n+{\n+\n+HttpServer::HttpServer(const std::string &address, const std::string &port,\n+    HttpServerRequestHandler request_handler, std::size_t thread_pool_size)\n+    : acceptor_(io_service_), thread_pool_size_(thread_pool_size), request_handler_(request_handler)\n+{\n+\n+  boost::asio::ip::tcp::resolver resolver(io_service_);\n+  boost::asio::ip::tcp::resolver::query query(address, port);\n+  boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve(query);\n+  acceptor_.open(endpoint.protocol());\n+  acceptor_.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));\n+  acceptor_.bind(endpoint);\n+  acceptor_.listen();\n+}\n+\n+\n+void HttpServer::run()\n+{\n+  start_accept();\n+  for (std::size_t i = 0; i < thread_pool_size_; ++i)\n+  {\n+    boost::shared_ptr<boost::thread> thread(new boost::thread(\n+        boost::bind(&boost::asio::io_service::run, &io_service_)));\n+    threads_.push_back(thread);\n+  }\n+}\n+\n+void HttpServer::start_accept()\n+{\n+  new_connection_.reset(new HttpConnection(io_service_, request_handler_));\n+  acceptor_.async_accept(new_connection_->socket(),\n+      boost::bind(&HttpServer::handle_accept, this,\n+          boost::asio::placeholders::error));\n+}\n+\n+void HttpServer::handle_accept(const boost::system::error_code &e)\n+{\n+  if (!e)\n+  {\n+    new_connection_->start();\n+  }\n+  start_accept();\n+}\n+\n+void HttpServer::stop()\n+{\n+  acceptor_.cancel();\n+  acceptor_.close();\n+  io_service_.stop();\n+  // Wait for all threads in the pool to exit.\n+  for (std::size_t i = 0; i < threads_.size(); ++i)\n+    threads_[i]->join();\n+}\n+\n+}"
+        },
+        {
+          "sha": "28b9b95969b48cdb79fe42b1254945f5aa39c0c4",
+          "filename": "src/websocket_connection.cpp",
+          "status": "added",
+          "additions": 75,
+          "deletions": 0,
+          "changes": 75,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/b982d75fe24d7c9d6e7432c818018bfb50298844/src%2Fwebsocket_connection.cpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/b982d75fe24d7c9d6e7432c818018bfb50298844/src%2Fwebsocket_connection.cpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/src%2Fwebsocket_connection.cpp?ref=b982d75fe24d7c9d6e7432c818018bfb50298844",
+          "patch": "@@ -0,0 +1,75 @@\n+#include <boost/bind.hpp>\n+#include <boost/make_shared.hpp>\n+#include <limits>\n+#include \"cpp_web_server/websocket_connection.hpp\"\n+\n+namespace cpp_web_server\n+{\n+\n+WebsocketConnection::WebsocketConnection(HttpConnectionPtr connection)\n+  : connection_(connection) {}\n+\n+void WebsocketConnection::set_message_handler(MessageHandler& handler) {\n+  handler_ = handler;\n+}\n+\n+bool WebsocketConnection::sendTextMessage(const std::string& content) {\n+  cpp_web_server::WebsocketMessage m;\n+  m.type = cpp_web_server::WebsocketMessage::type_text;\n+  m.content = content;\n+  return sendMessage(m);\n+}\n+bool WebsocketConnection::sendPingMessage(const std::string& content) {\n+  cpp_web_server::WebsocketMessage m;\n+  m.type = cpp_web_server::WebsocketMessage::type_ping;\n+  m.content = content;\n+  return sendMessage(m);\n+}\n+\n+\n+bool WebsocketConnection::sendMessage(const WebsocketMessage& message){\n+  WebsocketFrame frame;\n+  if(frame.fromMessage(message)){\n+    return sendFrame(frame);\n+  }\n+  return false;\n+}\n+\n+bool WebsocketConnection::sendFrame(WebsocketFrame& frame){\n+  std::vector<unsigned char> buffer;\n+  if(frame.serialize(buffer)){\n+    connection_->write_and_clear(buffer);\n+    return true;\n+  }\n+  return false;\n+}\n+\n+\n+void WebsocketConnection::static_handle_read(WebsocketConnectionWeakPtr weak_this, const char* begin, const char* end) {\n+  WebsocketConnectionPtr _this = weak_this.lock();\n+  if(_this)\n+    _this->handle_read(begin, end);\n+}\n+void WebsocketConnection::handle_read(const char* begin, const char* end) {\n+  boost::tribool frame_result;\n+  const char* parse_end = begin;\n+  while(parse_end < end){\n+    boost::tie(frame_result, parse_end) = frame_parser_.parse(frame_, parse_end, end);\n+    if(frame_result){\n+      frame_parser_.reset();\n+      boost::tribool message_result = frame_buffer_.consume(message_, frame_);\n+\n+      if(message_result){\n+\tif(handler_)\n+\t  handler_(message_);\n+      }\n+    }\n+    else if(!frame_result){\n+      frame_parser_.reset();\n+      message_.type = WebsocketMessage::type_unknown;\n+    }\n+  }\n+  connection_->async_read(boost::bind(&WebsocketConnection::static_handle_read, WebsocketConnectionWeakPtr(shared_from_this()), _1, _2));\n+}\n+\n+}"
+        },
+        {
+          "sha": "90cfc9145f76540ce21aa439ab25f4d9003d9579",
+          "filename": "src/websocket_message.cpp",
+          "status": "added",
+          "additions": 225,
+          "deletions": 0,
+          "changes": 225,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/b982d75fe24d7c9d6e7432c818018bfb50298844/src%2Fwebsocket_message.cpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/b982d75fe24d7c9d6e7432c818018bfb50298844/src%2Fwebsocket_message.cpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/src%2Fwebsocket_message.cpp?ref=b982d75fe24d7c9d6e7432c818018bfb50298844",
+          "patch": "@@ -0,0 +1,225 @@\n+#include \"cpp_web_server/websocket_message.hpp\"\n+\n+namespace cpp_web_server\n+{\n+\n+bool WebsocketFrame::fromMessage(const WebsocketMessage& message){\n+  switch(message.type) {\n+  case WebsocketMessage::type_text:\n+    header.opcode =WebsocketFrame::Header::opcode_text;\n+    break;\n+  case WebsocketMessage::type_binary:\n+    header.opcode =WebsocketFrame::Header::opcode_binary;\n+    break;\n+  case WebsocketMessage::type_ping:\n+    header.opcode =WebsocketFrame::Header::opcode_ping;\n+    break;\n+  case WebsocketMessage::type_pong:\n+    header.opcode =WebsocketFrame::Header::opcode_pong;\n+    break;\n+  default:\n+    return false;\n+  }\n+  header.fin = true;\n+  header.rsv1 = false;\n+  header.rsv2 = false;\n+  header.rsv3 = false;\n+  content = message.content;\n+  length = message.content.size();\n+  return true;\n+}\n+\n+bool WebsocketFrame::serialize(std::vector<unsigned char>& buffer){\n+  int header_size = 2; // first two bytes of header\n+  if(length < 126){\n+    header.len = length;\n+  }\n+  else if(length <= std::numeric_limits<uint16_t>::max()){\n+    header.len = 126;\n+    header_size += 2;\n+  }\n+  else if(length <= std::numeric_limits<uint64_t>::max()){\n+    header.len = 127;\n+    header_size += 8;\n+  }\n+  else\n+    return false; // Message too big\n+  header.mask = false; // sending from server\n+\n+  buffer.resize(header_size + content.size());\n+  buffer[0] = header_bytes[0];\n+  buffer[1] = header_bytes[1];\n+\n+  if(length < 126){\n+    // already copied in header bytes\n+  }\n+  else if(length <= std::numeric_limits<uint16_t>::max()){\n+    buffer[2] = (length >> 8) & 0xFF;\n+    buffer[3] = (length >> 0) & 0xFF;\n+  }\n+  else if(length <= std::numeric_limits<uint64_t>::max()){\n+    buffer[2] = (length >> 56) & 0xFF;\n+    buffer[3] = (length >> 48) & 0xFF;\n+    buffer[4] = (length >> 40) & 0xFF;\n+    buffer[5] = (length >> 32) & 0xFF;\n+    buffer[6] = (length >> 24) & 0xFF;\n+    buffer[7] = (length >> 16) & 0xFF;\n+    buffer[8] = (length >> 8) & 0xFF;\n+    buffer[9] = (length >> 0) & 0xFF;\n+  }\n+  content.copy((char*)&buffer[header_size], content.size());\n+  return true;\n+}\n+\n+\n+WebsocketFrameParser::WebsocketFrameParser(){\n+  reset();\n+}\n+\n+void WebsocketFrameParser::reset(){\n+  state_ = header_byte1;\n+}\n+\n+boost::tribool WebsocketFrameParser::consume(WebsocketFrame& frame, char input)\n+{\n+  switch (state_)\n+  {\n+  case header_byte1:\n+    frame.header_bytes[0] = input;\n+    state_ = header_byte2;\n+    return boost::indeterminate;\n+  case header_byte2:\n+    frame.header_bytes[1] = input;\n+    if(frame.header.len < 126){\n+      frame.length = frame.header.len;\n+      frame.content.reserve(frame.length);\n+      frame.content.resize(0);\n+      if(frame.header.mask)\n+\tstate_ = mask_byte1;\n+      else if(frame.length > 0)\n+\tstate_ = body;\n+      else\n+\treturn true;\n+    }\n+    else if(frame.header.len == 126){\n+      frame.length = 0;\n+      state_ = length_2bytes_left;\n+    }\n+    else{\n+      frame.length = 0;\n+      state_ = length_8bytes_left;\n+    }\n+    return boost::indeterminate;\n+\n+  case length_8bytes_left:\n+    frame.length |= ((uint64_t)(input&0xFF) << 56);\n+    state_ = length_7bytes_left;\n+    return boost::indeterminate;\n+  case length_7bytes_left:\n+    frame.length |= ((uint64_t)(input&0xFF) << 48);\n+    state_ = length_6bytes_left;\n+    return boost::indeterminate;\n+  case length_6bytes_left:\n+    frame.length |= ((uint64_t)(input&0xFF) << 40);\n+    state_ = length_5bytes_left;\n+    return boost::indeterminate;\n+  case length_5bytes_left:\n+    frame.length |= ((uint64_t)(input&0xFF) << 32);\n+    state_ = length_4bytes_left;\n+    return boost::indeterminate;\n+  case length_4bytes_left:\n+    frame.length |= ((uint64_t)(input&0xFF) << 24);\n+    state_ = length_3bytes_left;\n+    return boost::indeterminate;\n+  case length_3bytes_left:\n+    frame.length |= ((uint64_t)(input&0xFF) << 16);\n+    state_ = length_2bytes_left;\n+    return boost::indeterminate;\n+  case length_2bytes_left:\n+    frame.length |= ((uint64_t)(input&0xFF) << 8);\n+    state_ = length_1bytes_left;\n+    return boost::indeterminate;\n+  case length_1bytes_left:\n+    frame.length |= ((uint64_t)(input&0xFF) << 0);\n+    frame.content.reserve(frame.length);\n+    frame.content.resize(0);\n+    if(frame.header.mask)\n+      state_ = mask_byte1;\n+    else\n+      state_ = body;\n+    return boost::indeterminate;\n+\n+\n+  case mask_byte1:\n+    frame.mask[0] = input;\n+    state_ = mask_byte2;\n+    return boost::indeterminate;\n+  case mask_byte2:\n+    frame.mask[1] = input;\n+    state_ = mask_byte3;\n+    return boost::indeterminate;\n+  case mask_byte3:\n+    frame.mask[2] = input;\n+    state_ = mask_byte4;\n+    return boost::indeterminate;\n+  case mask_byte4:\n+    frame.mask[3] = input;\n+    if(frame.length > 0)\n+      state_ = body;\n+    else\n+      return true;\n+    return boost::indeterminate;\n+\n+  case body:\n+    frame.content += input;\n+    if(frame.content.size() < frame.length)\n+      return boost::indeterminate;\n+    //unmask the frame\n+    if(frame.header.mask){\n+      for(int i = 0; i< frame.length; ++i){\n+\tframe.content[i] = frame.content[i] ^ frame.mask[i%4];\n+      }\n+    }\n+    return true;\n+  default:\n+    return false;\n+  }\n+}\n+\n+WebsocketMessage::WebsocketMessage() : type(type_unknown) {}\n+\n+boost::tribool WebsocketFrameBuffer::consume(WebsocketMessage& message, WebsocketFrame& frame) {\n+  if(frame.header.opcode == WebsocketFrame::Header::opcode_continuation){\n+    if(message.type == WebsocketMessage::type_unknown)\n+      return false;\n+    else\n+      message.content.append(frame.content);\n+  }\n+  else {\n+    switch(frame.header.opcode) {\n+    case WebsocketFrame::Header::opcode_text:\n+      message.type = WebsocketMessage::type_text;\n+      break;\n+    case WebsocketFrame::Header::opcode_binary:\n+      message.type = WebsocketMessage::type_binary;\n+      break;\n+    case WebsocketFrame::Header::opcode_ping:\n+      message.type = WebsocketMessage::type_ping;\n+      break;\n+    case WebsocketFrame::Header::opcode_pong:\n+      message.type = WebsocketMessage::type_pong;\n+      break;\n+    default:\n+      message.type = WebsocketMessage::type_unknown;\n+      return false;\n+    }\n+    message.content = frame.content;\n+  }\n+  if(frame.header.fin)\n+    return true;\n+  else\n+    return boost::indeterminate;\n+}\n+\n+\n+}"
+        },
+        {
+          "sha": "6ab63a9181b0d7697f15bd34194b57e6a1128115",
+          "filename": "src/websocket_request_handler.cpp",
+          "status": "added",
+          "additions": 63,
+          "deletions": 0,
+          "changes": 63,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/b982d75fe24d7c9d6e7432c818018bfb50298844/src%2Fwebsocket_request_handler.cpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/b982d75fe24d7c9d6e7432c818018bfb50298844/src%2Fwebsocket_request_handler.cpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/src%2Fwebsocket_request_handler.cpp?ref=b982d75fe24d7c9d6e7432c818018bfb50298844",
+          "patch": "@@ -0,0 +1,63 @@\n+#include <boost/regex.hpp>\n+#include <openssl/sha.h>\n+#include <openssl/hmac.h>\n+#include <openssl/evp.h>\n+#include <openssl/bio.h>\n+#include <openssl/buffer.h>\n+#include \"cpp_web_server/websocket_request_handler.hpp\"\n+#include \"cpp_web_server/websocket_connection.hpp\"\n+#include \"cpp_web_server/http_reply.hpp\"\n+\n+namespace cpp_web_server\n+{\n+\n+const std::string WebsocketHttpRequestHandler::KEY_MAGIC_STRING = \"258EAFA5-E914-47DA-95CA-C5AB0DC85B11\";\n+\n+WebsocketHttpRequestHandler::WebsocketHttpRequestHandler(WebsocketRequestHandler handler)\n+  : handler_(handler) {}\n+\n+\n+void WebsocketHttpRequestHandler::operator()(const HttpRequest &request, boost::shared_ptr<HttpConnection> connection, const char* begin, const char* end)\n+{\n+  std::string connection_header = request.get_header_value_or_default(\"Connection\", \"\");\n+  std::string upgrade_header = request.get_header_value_or_default(\"Upgrade\", \"\");\n+  std::string websocket_key = request.get_header_value_or_default(\"Sec-WebSocket-Key\", \"\");\n+\n+  if(connection_header.find(\"Upgrade\") != std::string::npos && upgrade_header.compare(\"websocket\") == 0\n+     && websocket_key.size() > 0) {\n+    std::string concat_key = websocket_key + KEY_MAGIC_STRING;\n+\n+    // compute the sha1 hash of the concatonated key\n+    unsigned char sha1_buf[20];\n+    SHA1((const unsigned char*)concat_key.data(), concat_key.size(), sha1_buf);\n+\n+    // base64 encode the hash\n+    BIO* b64 = BIO_new(BIO_f_base64());\n+    BIO* bmem = BIO_new(BIO_s_mem());\n+    b64 = BIO_push(b64, bmem);\n+    BIO_write(b64, sha1_buf, 20);\n+    BIO_flush(b64);\n+    BUF_MEM *bptr;\n+    BIO_get_mem_ptr(b64, &bptr);\n+    std::string base64_key(bptr->data, bptr->length-1);\n+    BIO_free_all(b64);\n+\n+\n+    cpp_web_server::HttpReply::builder(cpp_web_server::HttpReply::switching_protocols)\n+      .header(\"Upgrade\", \"websocket\")\n+      .header(\"Connection\", \"Upgrade\")\n+      .header(\"Sec-WebSocket-Version\", \"13\")\n+      .header(\"Sec-WebSocket-Accept\", base64_key)\n+      .write(connection);\n+\n+    WebsocketConnectionPtr websocket_connection(new WebsocketConnection(connection));\n+    WebsocketConnection::MessageHandler message_handler = handler_(request, websocket_connection);\n+    websocket_connection->set_message_handler(message_handler);\n+    websocket_connection->handle_read(begin, end);\n+  }\n+  else {\n+    cpp_web_server::HttpReply::stock_reply(cpp_web_server::HttpReply::bad_request)(request, connection, begin, end);\n+  }\n+}\n+\n+}"
+        }
+      ]
+    },
+    {
+      "author": "Michael Carroll",
+      "date": "2018-08-23T22:19:51Z",
+      "sha": "94e6f17d75fc796af185848fb3fa3918178ff659",
+      "message": "Fix function without return value.\n\nThis fixes a segfault on GCC8.",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "92b6840f082e6a2c47441b7fc84e15becf4d77eb",
+          "filename": "src/http_reply.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/fkie/async_web_server_cpp/blob/94e6f17d75fc796af185848fb3fa3918178ff659/src%2Fhttp_reply.cpp",
+          "raw_url": "https://github.com/fkie/async_web_server_cpp/raw/94e6f17d75fc796af185848fb3fa3918178ff659/src%2Fhttp_reply.cpp",
+          "contents_url": "https://api.github.com/repos/fkie/async_web_server_cpp/contents/src%2Fhttp_reply.cpp?ref=94e6f17d75fc796af185848fb3fa3918178ff659",
+          "patch": "@@ -275,11 +275,11 @@ static bool serveFromFile(HttpReply::status_type status, const std::string& file\n   reply_builder_.header(\"Content-Length\", boost::lexical_cast<std::string>(content.size()));\n   reply_builder_.write(connection);\n   connection->write(content);\n+  return true;\n }\n bool FileHttpRequestHandler::operator()(const HttpRequest &request, boost::shared_ptr<HttpConnection> connection, const char* begin, const char* end)\n {\n-  serveFromFile(status_, filename_, headers_, connection);\n-  return true;\n+  return serveFromFile(status_, filename_, headers_, connection);\n }\n \n "
+        }
+      ]
+    }
+  ]
+}

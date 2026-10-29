@@ -1,0 +1,1044 @@
+{
+  "_meta": {
+    "fetched_at": "2026-09-24T14:53:25Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ros2",
+    "repo": "rosidl_runtime_py",
+    "refreshed_at": "2026-09-24T14:53:25Z",
+    "refresh_note": "incrementally added 4 author(s) missing from a prior stale cache"
+  },
+  "data": [
+    {
+      "author": "VmirGerts",
+      "date": "2026-01-15T10:31:45Z",
+      "sha": "ed094a419d2b70554d0478c803c9521e473a8169",
+      "message": "Add py.typed to the package (#37)\n\nSigned-off-by: Vladimir Gerts <vladimir_gerts@outlook.de>",
+      "files_changed": 2,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "rosidl_runtime_py/py.typed",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/ed094a419d2b70554d0478c803c9521e473a8169/rosidl_runtime_py%2Fpy.typed",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/ed094a419d2b70554d0478c803c9521e473a8169/rosidl_runtime_py%2Fpy.typed",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/rosidl_runtime_py%2Fpy.typed?ref=ed094a419d2b70554d0478c803c9521e473a8169"
+        },
+        {
+          "sha": "143f8bf33f0f4d2d2dbc692a392da7223cab0f4d",
+          "filename": "setup.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/ed094a419d2b70554d0478c803c9521e473a8169/setup.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/ed094a419d2b70554d0478c803c9521e473a8169/setup.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/setup.py?ref=ed094a419d2b70554d0478c803c9521e473a8169",
+          "patch": "@@ -12,6 +12,7 @@\n         ('share/ament_index/resource_index/packages',\n             ['resource/' + package_name]),\n     ],\n+    package_data={'': ['py.typed']},\n     zip_safe=False,\n     author='Dirk Thomas',\n     author_email='dthomas@osrfoundation.org',"
+        }
+      ]
+    },
+    {
+      "author": "clalancette",
+      "date": "2019-05-30T21:13:54Z",
+      "sha": "ed383a73b60d3b8fcba7c3938b06c28918cc030b",
+      "message": "Fix the setting of array variables. (ros2/rosidl_python#59)\n\n* Fix the setting of array variables.\n\nIf the type of the field is array.array, then a simple\n\n  x = array.array(mylist)\n\ndoesn't work; the typecode *must* be specified.  Special-case\narrays here so that we do:\n\n  x = array.array(typecode, list)\n\nSigned-off-by: Chris Lalancette <clalancette@openrobotics.org>",
+      "files_changed": 1,
+      "additions": 12,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "1467931dcc1969b8b7e21e258d00fd741b2d852c",
+          "filename": "rosidl_runtime_py/set_message.py",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 3,
+          "changes": 15,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/ed383a73b60d3b8fcba7c3938b06c28918cc030b/rosidl_runtime_py%2Fset_message.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/ed383a73b60d3b8fcba7c3938b06c28918cc030b/rosidl_runtime_py%2Fset_message.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/rosidl_runtime_py%2Fset_message.py?ref=ed383a73b60d3b8fcba7c3938b06c28918cc030b",
+          "patch": "@@ -12,6 +12,8 @@\n # See the License for the specific language governing permissions and\n # limitations under the License.\n \n+import array\n+\n from typing import Any\n from typing import Dict\n \n@@ -32,11 +34,18 @@ def set_message_fields(msg: Any, values: Dict[str, str]) -> None:\n     :raises ValueError: If a message value does not match its field type.\n     \"\"\"\n     for field_name, field_value in values.items():\n-        field_type = type(getattr(msg, field_name))\n+        field = getattr(msg, field_name)\n+        field_type = type(field)\n         try:\n-            value = field_type(field_value)\n+            if field_type is array.array:\n+                value = field_type(field.typecode, field_value)\n+            else:\n+                value = field_type(field_value)\n         except TypeError:\n-            value = field_type()\n+            if field_type is array.array:\n+                value = field_type(field.typecode)\n+            else:\n+                value = field_type()\n             set_message_fields(value, field_value)\n         rosidl_type = get_message_slot_types(msg)[field_name]\n         # Check if field is an array of ROS messages"
+        }
+      ]
+    },
+    {
+      "author": "mosfet80",
+      "date": "2025-07-23T16:38:27Z",
+      "sha": "7c3df5c3ea352c3b6993a5e7f695ecdd67533bad",
+      "message": "fix setuptools deprecations (#35)\n\nSigned-off-by: mosfet80 <10235105+mosfet80@users.noreply.github.com>",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "261816ccfbdce8e758ff2452b263544fdd2bdae4",
+          "filename": "setup.py",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 2,
+          "changes": 7,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/7c3df5c3ea352c3b6993a5e7f695ecdd67533bad/setup.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/7c3df5c3ea352c3b6993a5e7f695ecdd67533bad/setup.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/setup.py?ref=7c3df5c3ea352c3b6993a5e7f695ecdd67533bad",
+          "patch": "@@ -23,13 +23,16 @@\n     classifiers=[\n         'Environment :: Console',\n         'Intended Audience :: Developers',\n-        'License :: OSI Approved :: Apache Software License',\n         'Programming Language :: Python',\n     ],\n     description='Runtime utilities for working with generated ROS interfaces in Python.',\n     long_description=(\n         'This package provides functions for operations such as populating ROS messages '\n         'and converting messages to different representations.'),\n     license='Apache License, Version 2.0',\n-    tests_require=['pytest'],\n+    extras_require={\n+        'test': [\n+            'pytest',\n+        ],\n+    },\n )"
+        }
+      ]
+    },
+    {
+      "author": "cottsay",
+      "date": "2025-04-18T21:32:33Z",
+      "sha": "cb4673d58a2054ccf6dc9b7c26bba736b8220a96",
+      "message": "0.14.1",
+      "files_changed": 3,
+      "additions": 8,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e2bd230b7b65e281c5580806af52f19370d0ceed",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/cb4673d58a2054ccf6dc9b7c26bba736b8220a96/CHANGELOG.rst",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/cb4673d58a2054ccf6dc9b7c26bba736b8220a96/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/CHANGELOG.rst?ref=cb4673d58a2054ccf6dc9b7c26bba736b8220a96",
+          "patch": "@@ -2,6 +2,12 @@\n Changelog for package rosidl_runtime_py\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+0.14.1 (2025-04-18)\n+-------------------\n+* Use deepcopy in set_message_fields for safety. (`#34 <https://github.com/ros2/rosidl_runtime_py/issues/34>`_)\n+* Remove CODEOWNERS and mirror-rolling-to-master. (`#31 <https://github.com/ros2/rosidl_runtime_py/issues/31>`_)\n+* Contributors: Chris Lalancette, Tomoya Fujita\n+\n 0.14.0 (2024-04-26)\n -------------------\n "
+        },
+        {
+          "sha": "2f9af67667854dbc966dc0c18349707018752fe8",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/cb4673d58a2054ccf6dc9b7c26bba736b8220a96/package.xml",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/cb4673d58a2054ccf6dc9b7c26bba736b8220a96/package.xml",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/package.xml?ref=cb4673d58a2054ccf6dc9b7c26bba736b8220a96",
+          "patch": "@@ -2,7 +2,7 @@\n <?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"2\">\n   <name>rosidl_runtime_py</name>\n-  <version>0.14.0</version>\n+  <version>0.14.1</version>\n   <description>Runtime utilities for working with generated ROS interfaces in Python.</description>\n \n   <maintainer email=\"sloretz@openrobotics.org\">Shane Loretz</maintainer>"
+        },
+        {
+          "sha": "9b34d76646135f9e16e03ea55b34ce93f917f1fe",
+          "filename": "setup.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/cb4673d58a2054ccf6dc9b7c26bba736b8220a96/setup.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/cb4673d58a2054ccf6dc9b7c26bba736b8220a96/setup.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/setup.py?ref=cb4673d58a2054ccf6dc9b7c26bba736b8220a96",
+          "patch": "@@ -5,7 +5,7 @@\n \n setup(\n     name=package_name,\n-    version='0.14.0',\n+    version='0.14.1',\n     packages=find_packages(exclude=['test']),\n     data_files=[\n         ('share/' + package_name, ['package.xml']),"
+        }
+      ]
+    },
+    {
+      "author": "fujitatomoya",
+      "date": "2022-03-16T17:30:05Z",
+      "sha": "730c461726165e8b58f8b25da908e0db81e188a4",
+      "message": "add yaml dump flow style. (#16)\n\nSigned-off-by: Tomoya Fujita <Tomoya.Fujita@sony.com>",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "eee4e37e6fe56f2cc771058d843d598faa0e7131",
+          "filename": "rosidl_runtime_py/convert.py",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 2,
+          "changes": 5,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/730c461726165e8b58f8b25da908e0db81e188a4/rosidl_runtime_py%2Fconvert.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/730c461726165e8b58f8b25da908e0db81e188a4/rosidl_runtime_py%2Fconvert.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/rosidl_runtime_py%2Fconvert.py?ref=730c461726165e8b58f8b25da908e0db81e188a4",
+          "patch": "@@ -68,7 +68,8 @@ def message_to_yaml(\n     *,\n     truncate_length: int = None,\n     no_arr: bool = False,\n-    no_str: bool = False\n+    no_str: bool = False,\n+    flow_style: bool = False\n ) -> str:\n     \"\"\"\n     Convert a ROS message to a YAML string.\n@@ -90,7 +91,7 @@ def message_to_yaml(\n     return yaml.dump(\n         message_to_ordereddict(\n             msg, truncate_length=truncate_length, no_arr=no_arr, no_str=no_str),\n-        allow_unicode=True, width=sys.maxsize,\n+        allow_unicode=True, width=sys.maxsize, default_flow_style=flow_style,\n     )\n \n "
+        }
+      ]
+    },
+    {
+      "author": "marcoag",
+      "date": "2024-03-27T12:40:13Z",
+      "sha": "0eb1eb5d458615881697909bb08be1ea9bebd154",
+      "message": "Changelog.\n\nSigned-off-by: Marco A. Gutierrez <marcogg@marcogg.com>",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "023e9fa9a50c626168066e74fb6b349f25f099f6",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/0eb1eb5d458615881697909bb08be1ea9bebd154/CHANGELOG.rst",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/0eb1eb5d458615881697909bb08be1ea9bebd154/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/CHANGELOG.rst?ref=0eb1eb5d458615881697909bb08be1ea9bebd154",
+          "patch": "@@ -2,6 +2,11 @@\n Changelog for package rosidl_runtime_py\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+Forthcoming\n+-----------\n+* Some fixes for modern flake8. (`#25 <https://github.com/ros2/rosidl_runtime_py/issues/25>`_)\n+* Contributors: Chris Lalancette\n+\n 0.13.0 (2023-04-28)\n -------------------\n "
+        }
+      ]
+    },
+    {
+      "author": "Yadunund",
+      "date": "2023-04-28T10:53:16Z",
+      "sha": "82af486e09d5463c2c4cc5135d2e122735d4f2be",
+      "message": "0.13.0",
+      "files_changed": 3,
+      "additions": 5,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "ace4b6079b70a4b9bb1e7ae42f3bbb326401f8fa",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/82af486e09d5463c2c4cc5135d2e122735d4f2be/CHANGELOG.rst",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/82af486e09d5463c2c4cc5135d2e122735d4f2be/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/CHANGELOG.rst?ref=82af486e09d5463c2c4cc5135d2e122735d4f2be",
+          "patch": "@@ -2,6 +2,9 @@\n Changelog for package rosidl_runtime_py\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+0.13.0 (2023-04-28)\n+-------------------\n+\n 0.12.0 (2023-04-11)\n -------------------\n * Replace the use __slots_\\_ for the appropiate API (`#23 <https://github.com/ros2/rosidl_runtime_py/issues/23>`_)"
+        },
+        {
+          "sha": "6340f45012e9cb8481e4e20cc24b42782a92622e",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/82af486e09d5463c2c4cc5135d2e122735d4f2be/package.xml",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/82af486e09d5463c2c4cc5135d2e122735d4f2be/package.xml",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/package.xml?ref=82af486e09d5463c2c4cc5135d2e122735d4f2be",
+          "patch": "@@ -2,7 +2,7 @@\n <?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"2\">\n   <name>rosidl_runtime_py</name>\n-  <version>0.12.0</version>\n+  <version>0.13.0</version>\n   <description>Runtime utilities for working with generated ROS interfaces in Python.</description>\n \n   <maintainer email=\"sloretz@openrobotics.org\">Shane Loretz</maintainer>"
+        },
+        {
+          "sha": "355a810827f5344403d16701f3a953b8642fedb7",
+          "filename": "setup.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/82af486e09d5463c2c4cc5135d2e122735d4f2be/setup.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/82af486e09d5463c2c4cc5135d2e122735d4f2be/setup.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/setup.py?ref=82af486e09d5463c2c4cc5135d2e122735d4f2be",
+          "patch": "@@ -5,7 +5,7 @@\n \n setup(\n     name=package_name,\n-    version='0.12.0',\n+    version='0.13.0',\n     packages=find_packages(exclude=['test']),\n     data_files=[\n         ('share/' + package_name, ['package.xml']),"
+        }
+      ]
+    },
+    {
+      "author": "Voldivh",
+      "date": "2023-04-03T11:58:54Z",
+      "sha": "e2b5b717305180e8263b6773e2bedc7acaa6d8e7",
+      "message": "Replace the use __slots__ for the appropiate API (#23)\n\n* Replace the use __slots__ for the appropiate API\r\n\r\nSigned-off-by: Voldivh <eloyabmfcv@gmail.com>",
+      "files_changed": 2,
+      "additions": 24,
+      "deletions": 12,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "ac8c5c18aba1589431684cbbd760ea4adb9e35b0",
+          "filename": "rosidl_runtime_py/convert.py",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 8,
+          "changes": 20,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/e2b5b717305180e8263b6773e2bedc7acaa6d8e7/rosidl_runtime_py%2Fconvert.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/e2b5b717305180e8263b6773e2bedc7acaa6d8e7/rosidl_runtime_py%2Fconvert.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/rosidl_runtime_py%2Fconvert.py?ref=e2b5b717305180e8263b6773e2bedc7acaa6d8e7",
+          "patch": "@@ -143,8 +143,11 @@ def to_string(val, field_type=None):\n         return r\n     result = ''\n \n-    # We rely on __slots__ retaining the order of the fields in the .msg file.\n-    for field_name, field_type in zip(msg.__slots__, msg.SLOT_TYPES):\n+    # The get_fields_and_field_types() method returns a map of field_names to stringified versions\n+    # of the field types. But here we want the \"rosidl_parser.definition\" types, so we zip the\n+    # field names together with SLOT_TYPES. The length of these two is guaranteed to be the same\n+    # length by the Python code generator.\n+    for field_name, field_type in zip(msg.get_fields_and_field_types().keys(), msg.SLOT_TYPES):\n         value = getattr(msg, field_name)\n \n         if result:\n@@ -176,15 +179,16 @@ def message_to_ordereddict(\n     \"\"\"\n     d = OrderedDict()\n \n-    # We rely on __slots__ retaining the order of the fields in the .msg file.\n-    for field_name, field_type in zip(msg.__slots__, msg.SLOT_TYPES):\n+    # The get_fields_and_field_types() method returns a map of field_names to stringified versions\n+    # of the field types. But here we want the \"rosidl_parser.definition\" types, so we zip the\n+    # field names together with SLOT_TYPES. The length of these two is guaranteed to be the same\n+    # length by the Python code generator.\n+    for field_name, field_type in zip(msg.get_fields_and_field_types().keys(), msg.SLOT_TYPES):\n         value = getattr(msg, field_name, None)\n-\n         value = _convert_value(\n             value, field_type=field_type,\n             truncate_length=truncate_length, no_arr=no_arr, no_str=no_str)\n-        # Remove leading underscore from field name\n-        d[field_name[1:]] = value\n+        d[field_name] = value\n     return d\n \n \n@@ -248,4 +252,4 @@ def get_message_slot_types(msg: Any) -> OrderedDict:\n     :param msg: The ROS message to get members types from.\n     :returns: An OrderedDict with message member names as keys and slot types as values.\n     \"\"\"\n-    return OrderedDict(zip([s[1:] for s in msg.__slots__], msg.SLOT_TYPES))\n+    return OrderedDict(zip(msg.get_fields_and_field_types().keys(), msg.SLOT_TYPES))"
+        },
+        {
+          "sha": "9c39f09cba0d375287684caf2e7820db1dd7b5e5",
+          "filename": "test/rosidl_runtime_py/test_set_message.py",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 4,
+          "changes": 16,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/e2b5b717305180e8263b6773e2bedc7acaa6d8e7/test%2Frosidl_runtime_py%2Ftest_set_message.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/e2b5b717305180e8263b6773e2bedc7acaa6d8e7/test%2Frosidl_runtime_py%2Ftest_set_message.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/test%2Frosidl_runtime_py%2Ftest_set_message.py?ref=e2b5b717305180e8263b6773e2bedc7acaa6d8e7",
+          "patch": "@@ -40,6 +40,11 @@ class MockMessageStamped:\n     def __init__(self):\n         self.header = Header()\n \n+    @classmethod\n+    def get_fields_and_field_types(cls):\n+        from copy import copy\n+        return copy(cls._fields_and_field_types)\n+\n     @builtins.property\n     def header(self):\n         return self._header\n@@ -70,6 +75,11 @@ def __init__(self):\n         self.timestamp1 = Time()\n         self.timestamp2 = Time()\n \n+    @classmethod\n+    def get_fields_and_field_types(cls):\n+        from copy import copy\n+        return copy(cls._fields_and_field_types)\n+\n     @builtins.property\n     def timestamp1(self):\n         return self._timestamp1\n@@ -122,9 +132,8 @@ def test_set_message_fields_partial():\n     values['int32_value'] = 24\n     set_message_fields(modified_msg, values)\n \n-    for _attr in original_msg.__slots__:\n+    for attr in original_msg.get_fields_and_field_types().keys():\n         # Remove underscore prefix\n-        attr = _attr[1:]\n         if attr in values:\n             assert getattr(modified_msg, attr) == values[attr]\n         else:\n@@ -138,9 +147,8 @@ def test_set_message_fields_full():\n \n     # Set msg0 values to the values of msg1\n     values = {}\n-    for _attr in msg1.__slots__:\n+    for attr in msg1.get_fields_and_field_types().keys():\n         # Remove underscore prefix\n-        attr = _attr[1:]\n         values[attr] = getattr(msg1, attr)\n     set_message_fields(msg0, values)\n "
+        }
+      ]
+    },
+    {
+      "author": "YXL76",
+      "date": "2023-03-14T18:28:03Z",
+      "sha": "a23f361fca010e042af5c38ce00e4f3e2516d806",
+      "message": "fix(typing): `get_interface_packages` returns a dict (#22)\n\nSigned-off-by: 兰陈昕 <43405544+YXL76@users.noreply.github.com>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "72db8290d5a56648f3c8794fc10c6e62e5a602ef",
+          "filename": "rosidl_runtime_py/get_interfaces.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/a23f361fca010e042af5c38ce00e4f3e2516d806/rosidl_runtime_py%2Fget_interfaces.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/a23f361fca010e042af5c38ce00e4f3e2516d806/rosidl_runtime_py%2Fget_interfaces.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/rosidl_runtime_py%2Fget_interfaces.py?ref=a23f361fca010e042af5c38ce00e4f3e2516d806",
+          "patch": "@@ -22,7 +22,7 @@\n from ament_index_python import has_resource\n \n \n-def get_interface_packages() -> List[str]:\n+def get_interface_packages() -> Dict[str, str]:\n     \"\"\"Get all packages that generate interfaces.\"\"\"\n     return get_resources('rosidl_interfaces')\n "
+        }
+      ]
+    },
+    {
+      "author": "audrow",
+      "date": "2021-11-24T23:39:23Z",
+      "sha": "f1bfe509c457e4693f8c1e85a5cecdd8483bd7d2",
+      "message": "Update maintainers (#15)\n\n* Update maintainers to Shane Loretz\r\n\r\nSigned-off-by: Audrow Nash <audrow@hey.com>\r\n\r\n* Update Shane's email\r\n\r\nCo-authored-by: Shane Loretz <sloretz@openrobotics.org>\r\n\r\nSigned-off-by: Audrow Nash <audrow@hey.com>",
+      "files_changed": 2,
+      "additions": 6,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "89ab98ea352f16b29c437520d2ed6a1e73a8fcfb",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 1,
+          "changes": 5,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/f1bfe509c457e4693f8c1e85a5cecdd8483bd7d2/package.xml",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/f1bfe509c457e4693f8c1e85a5cecdd8483bd7d2/package.xml",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/package.xml?ref=f1bfe509c457e4693f8c1e85a5cecdd8483bd7d2",
+          "patch": "@@ -4,10 +4,13 @@\n   <name>rosidl_runtime_py</name>\n   <version>0.9.1</version>\n   <description>Runtime utilities for working with generated ROS interfaces in Python.</description>\n-  <maintainer email=\"jacob@openrobotics.org\">Jacob Perron</maintainer>\n+\n+  <maintainer email=\"sloretz@openrobotics.org\">Shane Loretz</maintainer>\n+\n   <license>Apache License 2.0</license>\n \n   <author email=\"dthomas@osrfoundation.org\">Dirk Thomas</author>\n+  <author email=\"jacob@openrobotics.org\">Jacob Perron</author>\n \n   <exec_depend>python3-numpy</exec_depend>\n   <exec_depend>python3-yaml</exec_depend>"
+        },
+        {
+          "sha": "783fc25e456ae5b0febf4dbd55d09b87700eef6c",
+          "filename": "setup.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/f1bfe509c457e4693f8c1e85a5cecdd8483bd7d2/setup.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/f1bfe509c457e4693f8c1e85a5cecdd8483bd7d2/setup.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/setup.py?ref=f1bfe509c457e4693f8c1e85a5cecdd8483bd7d2",
+          "patch": "@@ -15,8 +15,8 @@\n     zip_safe=False,\n     author='Dirk Thomas',\n     author_email='dthomas@osrfoundation.org',\n-    maintainer='Jacob Perron',\n-    maintainer_email='jacob@openrobotics.org',\n+    maintainer='Shane Loretz',\n+    maintainer_email='sloretz@openrobotics.org',\n     url='https://github.com/ros2/rosidl_runtime_py',\n     download_url='https://github.com/ros2/rosidl_runtime_py/releases',\n     keywords=[],"
+        }
+      ]
+    },
+    {
+      "author": "esteve",
+      "date": "2022-09-13T17:43:39Z",
+      "sha": "0d7c227badc0fec281a55cd2bd1cf3f1b326963d",
+      "message": "Expand timestamps for std_msgs.msg.Header and builtin_interfaces.msg.Time if 'auto' and 'now' are passed as values (#19)\n\nSigned-off-by: Esteve Fernandez <esteve.fernandez@tier4.jp>",
+      "files_changed": 2,
+      "additions": 214,
+      "deletions": 33,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "5e7921e2f69f222294aa262dfb7ec622bdbd182c",
+          "filename": "rosidl_runtime_py/set_message.py",
+          "status": "modified",
+          "additions": 66,
+          "deletions": 32,
+          "changes": 98,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/0d7c227badc0fec281a55cd2bd1cf3f1b326963d/rosidl_runtime_py%2Fset_message.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/0d7c227badc0fec281a55cd2bd1cf3f1b326963d/rosidl_runtime_py%2Fset_message.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/rosidl_runtime_py%2Fset_message.py?ref=0d7c227badc0fec281a55cd2bd1cf3f1b326963d",
+          "patch": "@@ -13,9 +13,11 @@\n # limitations under the License.\n \n import array\n+from functools import partial\n \n from typing import Any\n from typing import Dict\n+from typing import List\n \n import numpy\n \n@@ -25,44 +27,76 @@\n from rosidl_runtime_py.import_message import import_message_from_namespaced_type\n \n \n-def set_message_fields(msg: Any, values: Dict[str, str]) -> None:\n+def set_message_fields(\n+        msg: Any, values: Dict[str, str], expand_header_auto: bool = False,\n+        expand_time_now: bool = False) -> List[Any]:\n     \"\"\"\n     Set the fields of a ROS message.\n \n     :param msg: The ROS message to populate.\n     :param values: The values to set in the ROS message. The keys of the dictionary represent\n         fields of the message.\n+    :param expand_header_auto: If enabled and 'auto' is passed as a value to a\n+        'std_msgs.msg.Header' field, an empty Header will be instantiated and a setter function\n+        will be returned so that its 'stamp' field can be set to the current time.\n+    :param expand_time_now: If enabled and 'now' is passed as a value to a\n+        'builtin_interfaces.msg.Time' field, a setter function will be returned so that\n+        its value can be set to the current time.\n+    :returns: A list of setter functions that can be used to update 'builtin_interfaces.msg.Time'\n+        fields, useful for setting them to the current time. The list will be empty if the message\n+        does not have any 'builtin_interfaces.msg.Time' fields, or if expand_header_auto and\n+        expand_time_now are false.\n     :raises AttributeError: If the message does not have a field provided in the input dictionary.\n     :raises TypeError: If a message value does not match its field type.\n     \"\"\"\n-    try:\n-        items = values.items()\n-    except AttributeError:\n-        raise TypeError(\n-            \"Value '%s' is expected to be a dictionary but is a %s\" %\n-            (values, type(values).__name__))\n-    for field_name, field_value in items:\n-        field = getattr(msg, field_name)\n-        field_type = type(field)\n-        if field_type is array.array:\n-            value = field_type(field.typecode, field_value)\n-        elif field_type is numpy.ndarray:\n-            value = numpy.array(field_value, dtype=field.dtype)\n-        elif type(field_value) is field_type:\n-            value = field_value\n-        else:\n-            try:\n-                value = field_type(field_value)\n-            except TypeError:\n-                value = field_type()\n-                set_message_fields(value, field_value)\n-        rosidl_type = get_message_slot_types(msg)[field_name]\n-        # Check if field is an array of ROS messages\n-        if isinstance(rosidl_type, AbstractNestedType):\n-            if isinstance(rosidl_type.value_type, NamespacedType):\n-                field_elem_type = import_message_from_namespaced_type(rosidl_type.value_type)\n-                for n in range(len(value)):\n-                    submsg = field_elem_type()\n-                    set_message_fields(submsg, value[n])\n-                    value[n] = submsg\n-        setattr(msg, field_name, value)\n+    timestamp_fields = []\n+\n+    def set_message_fields_internal(\n+            msg: Any, values: Dict[str, str],\n+            timestamp_fields: List[Any]) -> List[Any]:\n+        try:\n+            items = values.items()\n+        except AttributeError:\n+            raise TypeError(\n+                \"Value '%s' is expected to be a dictionary but is a %s\" %\n+                (values, type(values).__name__))\n+        for field_name, field_value in items:\n+            field = getattr(msg, field_name)\n+            field_type = type(field)\n+            qualified_class_name = '{}.{}'.format(field_type.__module__, field_type.__name__)\n+            if field_type is array.array:\n+                value = field_type(field.typecode, field_value)\n+            elif field_type is numpy.ndarray:\n+                value = numpy.array(field_value, dtype=field.dtype)\n+            elif type(field_value) is field_type:\n+                value = field_value\n+            # We can't import these types directly, so we use the qualified class name to\n+            # distinguish them from other fields\n+            elif qualified_class_name == 'std_msgs.msg._header.Header' and \\\n+                    field_value == 'auto' and expand_header_auto:\n+                timestamp_fields.append(partial(setattr, field, 'stamp'))\n+                continue\n+            elif qualified_class_name == 'builtin_interfaces.msg._time.Time' and \\\n+                    field_value == 'now' and expand_time_now:\n+                timestamp_fields.append(partial(setattr, msg, field_name))\n+                continue\n+            else:\n+                try:\n+                    value = field_type(field_value)\n+                except TypeError:\n+                    value = field_type()\n+                    set_message_fields_internal(\n+                        value, field_value, timestamp_fields)\n+            rosidl_type = get_message_slot_types(msg)[field_name]\n+            # Check if field is an array of ROS messages\n+            if isinstance(rosidl_type, AbstractNestedType):\n+                if isinstance(rosidl_type.value_type, NamespacedType):\n+                    field_elem_type = import_message_from_namespaced_type(rosidl_type.value_type)\n+                    for n in range(len(value)):\n+                        submsg = field_elem_type()\n+                        set_message_fields_internal(\n+                            submsg, value[n], timestamp_fields)\n+                        value[n] = submsg\n+            setattr(msg, field_name, value)\n+    set_message_fields_internal(msg, values, timestamp_fields)\n+    return timestamp_fields"
+        },
+        {
+          "sha": "1567c1566e2b05c60d1d41db217d72f081054c6d",
+          "filename": "test/rosidl_runtime_py/test_set_message.py",
+          "status": "modified",
+          "additions": 148,
+          "deletions": 1,
+          "changes": 149,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/0d7c227badc0fec281a55cd2bd1cf3f1b326963d/test%2Frosidl_runtime_py%2Ftest_set_message.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/0d7c227badc0fec281a55cd2bd1cf3f1b326963d/test%2Frosidl_runtime_py%2Ftest_set_message.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/test%2Frosidl_runtime_py%2Ftest_set_message.py?ref=0d7c227badc0fec281a55cd2bd1cf3f1b326963d",
+          "patch": "@@ -12,14 +12,81 @@\n # See the License for the specific language governing permissions and\n # limitations under the License.\n \n+import builtins\n import copy\n \n+from builtin_interfaces.msg import Time\n import pytest\n-\n+import rosidl_parser.definition\n from rosidl_runtime_py import set_message_fields\n+from std_msgs.msg import Header\n from test_msgs import message_fixtures\n \n \n+class MockMessageStamped:\n+\n+    __slots__ = [\n+        '_header',\n+    ]\n+\n+    _fields_and_field_types = {\n+        'header': 'std_msgs/Header',\n+    }\n+\n+    SLOT_TYPES = (\n+        rosidl_parser.definition.NamespacedType(['std_msgs', 'msg'], 'Header'),\n+    )\n+\n+    def __init__(self):\n+        self.header = Header()\n+\n+    @builtins.property\n+    def header(self):\n+        return self._header\n+\n+    @header.setter\n+    def header(self, value):\n+        self._header = value\n+\n+\n+class MockMessageWithStampFields:\n+\n+    __slots__ = [\n+        '_timestamp1',\n+        '_timestamp2',\n+    ]\n+\n+    _fields_and_field_types = {\n+        'timestamp1': 'builtin_interfaces/Time',\n+        'timestamp2': 'builtin_interfaces/Time',\n+    }\n+\n+    SLOT_TYPES = (\n+        rosidl_parser.definition.NamespacedType(['builtin_interfaces', 'msg'], 'Time'),\n+        rosidl_parser.definition.NamespacedType(['builtin_interfaces', 'msg'], 'Time'),\n+    )\n+\n+    def __init__(self):\n+        self.timestamp1 = Time()\n+        self.timestamp2 = Time()\n+\n+    @builtins.property\n+    def timestamp1(self):\n+        return self._timestamp1\n+\n+    @timestamp1.setter\n+    def timestamp1(self, value):\n+        self._timestamp1 = value\n+\n+    @builtins.property\n+    def timestamp2(self):\n+        return self._timestamp2\n+\n+    @timestamp2.setter\n+    def timestamp2(self, value):\n+        self._timestamp2 = value\n+\n+\n def test_set_message_fields_none():\n     # Smoke-test on a bunch of messages\n     msgs = []\n@@ -148,3 +215,83 @@ def test_set_message_fields_nested_type():\n     set_message_fields(msg0, test_values)\n \n     assert msg0.basic_types_value == msg_basic_types\n+\n+\n+def test_set_message_fields_header_auto():\n+    msg = MockMessageStamped()\n+    values = {'header': 'auto'}\n+    assert msg.header.stamp.sec == 0 and msg.header.stamp.nanosec == 0\n+    assert msg.header.frame_id == ''\n+    timestamp_fields = set_message_fields(\n+        msg, values, expand_header_auto=True, expand_time_now=True)\n+    assert timestamp_fields is not None\n+    for field_setter in timestamp_fields:\n+        stamp = Time(sec=1, nanosec=2)\n+        field_setter(stamp)\n+    assert msg.header.stamp.sec == 1 and msg.header.stamp.nanosec == 2\n+    assert msg.header.frame_id == ''\n+\n+\n+def test_set_message_fields_header_auto_not_parsed():\n+    msg = MockMessageStamped()\n+    values = {'header': 'auto'}\n+    assert msg.header.stamp.sec == 0 and msg.header.stamp.nanosec == 0\n+    assert msg.header.frame_id == ''\n+    with pytest.raises(\n+            TypeError, match=r\"^Value 'auto' is expected to be a dictionary but is a str$\"):\n+        set_message_fields(msg, values)\n+\n+\n+def test_set_message_fields_stamp_now():\n+    msg = MockMessageStamped()\n+    values = {'header': {'stamp': 'now'}}\n+    assert msg.header.stamp.sec == 0 and msg.header.stamp.nanosec == 0\n+    assert msg.header.frame_id == ''\n+    timestamp_fields = set_message_fields(\n+        msg, values, expand_header_auto=True, expand_time_now=True)\n+    assert timestamp_fields is not None\n+    for field_setter in timestamp_fields:\n+        stamp = Time(sec=1, nanosec=2)\n+        field_setter(stamp)\n+    assert msg.header.stamp.sec == 1 and msg.header.stamp.nanosec == 2\n+    assert msg.header.frame_id == ''\n+\n+\n+def test_set_message_fields_stamp_now_not_parsed():\n+    msg = MockMessageStamped()\n+    values = {'header': {'stamp': 'now'}}\n+    assert msg.header.stamp.sec == 0 and msg.header.stamp.nanosec == 0\n+    assert msg.header.frame_id == ''\n+    with pytest.raises(\n+            TypeError, match=r\"^Value 'now' is expected to be a dictionary but is a str$\"):\n+        set_message_fields(msg, values)\n+\n+\n+def test_set_message_fields_stamp_now_with_frame_id():\n+    msg = MockMessageStamped()\n+    values = {'header': {'stamp': 'now', 'frame_id': 'hello'}}\n+    assert msg.header.stamp.sec == 0 and msg.header.stamp.nanosec == 0\n+    assert msg.header.frame_id == ''\n+    timestamp_fields = set_message_fields(\n+        msg, values, expand_header_auto=True, expand_time_now=True)\n+    assert timestamp_fields is not None\n+    for field_setter in timestamp_fields:\n+        stamp = Time(sec=1, nanosec=2)\n+        field_setter(stamp)\n+    assert msg.header.stamp.sec == 1 and msg.header.stamp.nanosec == 2\n+    assert msg.header.frame_id == 'hello'\n+\n+\n+def test_set_message_fields_stamp_now_with_timestamp_fields():\n+    msg = MockMessageWithStampFields()\n+    values = {'timestamp1': 'now', 'timestamp2': 'now'}\n+    assert msg.timestamp1.sec == 0 and msg.timestamp1.nanosec == 0\n+    assert msg.timestamp2.sec == 0 and msg.timestamp2.nanosec == 0\n+    timestamp_fields = set_message_fields(\n+        msg, values, expand_header_auto=True, expand_time_now=True)\n+    assert timestamp_fields is not None\n+    for field_setter in timestamp_fields:\n+        stamp = Time(sec=1, nanosec=2)\n+        field_setter(stamp)\n+    assert msg.timestamp1.sec == 1 and msg.timestamp1.nanosec == 2\n+    assert msg.timestamp2.sec == 1 and msg.timestamp2.nanosec == 2"
+        }
+      ]
+    },
+    {
+      "author": "paudrow",
+      "date": "2022-03-28T22:35:53Z",
+      "sha": "9bb27db96e80ad743af56034f513f26190840e85",
+      "message": "0.9.2\n\nSigned-off-by: Audrow Nash <audrow@hey.com>",
+      "files_changed": 3,
+      "additions": 11,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "ecaa000ec220de493118348cb3f942b203a43a3f",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 0,
+          "changes": 9,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/9bb27db96e80ad743af56034f513f26190840e85/CHANGELOG.rst",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/9bb27db96e80ad743af56034f513f26190840e85/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/CHANGELOG.rst?ref=9bb27db96e80ad743af56034f513f26190840e85",
+          "patch": "@@ -2,6 +2,15 @@\n Changelog for package rosidl_runtime_py\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+0.9.2 (2022-03-28)\n+------------------\n+* add yaml dump flow style. (`#16 <https://github.com/ros2/rosidl_runtime_py/issues/16>`_)\n+* Update maintainers (`#15 <https://github.com/ros2/rosidl_runtime_py/issues/15>`_)\n+  * Update maintainers to Shane Loretz\n+  * Update Shane's email\n+  Co-authored-by: Shane Loretz <sloretz@openrobotics.org>\n+* Contributors: Audrow Nash, Tomoya Fujita\n+\n 0.9.1 (2021-03-18)\n ------------------\n * Add pytest.ini so local tests don't display warning (`#12 <https://github.com/ros2/rosidl_runtime_py/issues/12>`_)"
+        },
+        {
+          "sha": "9eea9ef74e4451cc51fc1b13481bf46565459b39",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/9bb27db96e80ad743af56034f513f26190840e85/package.xml",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/9bb27db96e80ad743af56034f513f26190840e85/package.xml",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/package.xml?ref=9bb27db96e80ad743af56034f513f26190840e85",
+          "patch": "@@ -2,7 +2,7 @@\n <?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"2\">\n   <name>rosidl_runtime_py</name>\n-  <version>0.9.1</version>\n+  <version>0.9.2</version>\n   <description>Runtime utilities for working with generated ROS interfaces in Python.</description>\n \n   <maintainer email=\"sloretz@openrobotics.org\">Shane Loretz</maintainer>"
+        },
+        {
+          "sha": "badf4a17a038439e3c2ace5bb882515072be479f",
+          "filename": "setup.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/9bb27db96e80ad743af56034f513f26190840e85/setup.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/9bb27db96e80ad743af56034f513f26190840e85/setup.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/setup.py?ref=9bb27db96e80ad743af56034f513f26190840e85",
+          "patch": "@@ -5,7 +5,7 @@\n \n setup(\n     name=package_name,\n-    version='0.9.1',\n+    version='0.9.2',\n     packages=find_packages(exclude=['test']),\n     data_files=[\n         ('share/' + package_name, ['package.xml']),"
+        }
+      ]
+    },
+    {
+      "author": "jacobperron",
+      "date": "2019-03-28T17:50:24Z",
+      "sha": "700137e13a1c0b3fb2c1c9984723a2d053c74136",
+      "message": "Add rosidl_runtime_py package\n\nMigrated utility functions for working with Python ROS messages from the package `ros2topic`.\n\nConversion implementation taken from:\n\nhttps://github.com/ros2/ros2cli/blob/978fc8807cb1f70b5f9c2b085e7b6fa74d191d0e/ros2topic/ros2topic/verb/echo.py\n\nSet message implementation taken from\n\nhttps://github.com/ros2/ros2cli/blob/978fc8807cb1f70b5f9c2b085e7b6fa74d191d0e/ros2topic/ros2topic/api/__init__.py#L93-L119\n\nSigned-off-by: Jacob Perron <jacob@openrobotics.org>",
+      "files_changed": 9,
+      "additions": 413,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "cb6bdbf5baa6caff3001e057eaa820df2671ac45",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 24,
+          "deletions": 0,
+          "changes": 24,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/700137e13a1c0b3fb2c1c9984723a2d053c74136/package.xml",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/700137e13a1c0b3fb2c1c9984723a2d053c74136/package.xml",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/package.xml?ref=700137e13a1c0b3fb2c1c9984723a2d053c74136",
+          "patch": "@@ -0,0 +1,24 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n+  <name>rosidl_runtime_py</name>\n+  <version>0.6.2</version>\n+  <description>Runtime utilities for working with generated ROS interfaces in Python.</description>\n+  <maintainer email=\"jacob@openrobotics.org\">Jacob Perron</maintainer>\n+  <license>Apache License 2.0</license>\n+\n+  <author email=\"dthomas@osrfoundation.org\">Dirk Thomas</author>\n+\n+  <exec_depend>python3-numpy</exec_depend>\n+  <exec_depend>python3-yaml</exec_depend>\n+\n+  <test_depend>ament_copyright</test_depend>\n+  <test_depend>ament_flake8</test_depend>\n+  <test_depend>ament_pep257</test_depend>\n+  <test_depend>python3-pytest</test_depend>\n+  <test_depend>test_msgs</test_depend>\n+\n+  <export>\n+    <build_type>ament_python</build_type>\n+  </export>\n+</package>"
+        },
+        {
+          "sha": "d7c7313e880bb26f7d2784a0e1154b8e0864dbfd",
+          "filename": "rosidl_runtime_py/__init__.py",
+          "status": "added",
+          "additions": 28,
+          "deletions": 0,
+          "changes": 28,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/700137e13a1c0b3fb2c1c9984723a2d053c74136/rosidl_runtime_py%2F__init__.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/700137e13a1c0b3fb2c1c9984723a2d053c74136/rosidl_runtime_py%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/rosidl_runtime_py%2F__init__.py?ref=700137e13a1c0b3fb2c1c9984723a2d053c74136",
+          "patch": "@@ -0,0 +1,28 @@\n+# Copyright 2019 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from .convert import msg_to_csv\n+from .convert import msg_to_ordereddict\n+from .convert import msg_to_yaml\n+from .set_message import set_msg_fields\n+from .set_message import SetFieldError\n+\n+\n+__all__ = [\n+    'msg_to_csv',\n+    'msg_to_ordereddict',\n+    'msg_to_yaml',\n+    'SetFieldError',\n+    'set_msg_fields',\n+]"
+        },
+        {
+          "sha": "4a4de9b53c7c333fc0a8f4f00eeb6ee39e3ca7d8",
+          "filename": "rosidl_runtime_py/convert.py",
+          "status": "added",
+          "additions": 138,
+          "deletions": 0,
+          "changes": 138,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/700137e13a1c0b3fb2c1c9984723a2d053c74136/rosidl_runtime_py%2Fconvert.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/700137e13a1c0b3fb2c1c9984723a2d053c74136/rosidl_runtime_py%2Fconvert.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/rosidl_runtime_py%2Fconvert.py?ref=700137e13a1c0b3fb2c1c9984723a2d053c74136",
+          "patch": "@@ -0,0 +1,138 @@\n+# Copyright 2016-2017 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+import array\n+from collections import OrderedDict\n+import sys\n+\n+import numpy\n+import yaml\n+\n+\n+def register_yaml_representer():\n+    # Register our custom representer for YAML output\n+    yaml.add_representer(OrderedDict, represent_ordereddict)\n+\n+\n+# Custom representer for getting clean YAML output that preserves the order in\n+# an OrderedDict.\n+# Inspired by:\n+# http://stackoverflow.com/a/16782282/7169408\n+def represent_ordereddict(dumper, data):\n+    items = []\n+    for k, v in data.items():\n+        items.append((dumper.represent_data(k), dumper.represent_data(v)))\n+    return yaml.nodes.MappingNode(u'tag:yaml.org,2002:map', items)\n+\n+\n+def msg_to_yaml(args, msg):\n+    return yaml.dump(\n+        msg_to_ordereddict(\n+            msg,\n+            truncate_length=args.truncate_length if not args.full_length else None\n+        ), width=sys.maxsize)\n+\n+\n+def msg_to_csv(args, msg):\n+    def to_string(val):\n+        nonlocal args\n+        r = ''\n+        if (any(\n+            isinstance(val, t)\n+            for t in [list, tuple, array.array, numpy.ndarray]\n+        )):\n+            for i, v in enumerate(val):\n+                if r:\n+                    r += ','\n+                if not args.full_length and i >= args.truncate_length:\n+                    r += '...'\n+                    break\n+                r += to_string(v)\n+        elif (any(\n+            isinstance(val, t)\n+            for t in [bool, bytes, float, int, str, numpy.number]\n+        )):\n+            if any(isinstance(val, t) for t in [bytes, str]):\n+                if not args.full_length and len(val) > args.truncate_length:\n+                    val = val[:args.truncate_length]\n+                    if isinstance(val, bytes):\n+                        val += b'...'\n+                    else:\n+                        val += '...'\n+            r = str(val)\n+        else:\n+            r = msg_to_csv(args, val)\n+        return r\n+    result = ''\n+    # We rely on __slots__ retaining the order of the fields in the .msg file.\n+    for field_name in msg.__slots__:\n+        value = getattr(msg, field_name, None)\n+        if result:\n+            result += ','\n+        result += to_string(value)\n+    return result\n+\n+\n+# Convert a msg to an OrderedDict. We do this instead of implementing a generic\n+# __dict__() method in the msg because we want to preserve order of fields from\n+# the .msg file(s).\n+def msg_to_ordereddict(msg, truncate_length=None):\n+    d = OrderedDict()\n+    # We rely on __slots__ retaining the order of the fields in the .msg file.\n+    for field_name in msg.__slots__:\n+        value = getattr(msg, field_name, None)\n+        value = _convert_value(value, truncate_length=truncate_length)\n+        # remove leading underscore from field name\n+        d[field_name[1:]] = value\n+    return d\n+\n+\n+def _convert_value(value, truncate_length=None):\n+    if isinstance(value, bytes):\n+        if truncate_length is not None and len(value) > truncate_length:\n+            value = ''.join([chr(c) for c in value[:truncate_length]]) + '...'\n+        else:\n+            value = ''.join([chr(c) for c in value])\n+    elif isinstance(value, str):\n+        if truncate_length is not None and len(value) > truncate_length:\n+            value = value[:truncate_length] + '...'\n+    elif (any(\n+        isinstance(value, t) for t in [list, tuple, array.array, numpy.ndarray]\n+    )):\n+        # since arrays and ndarrays can't contain mixed types convert to list\n+        typename = tuple if isinstance(value, tuple) else list\n+        if truncate_length is not None and len(value) > truncate_length:\n+            # Truncate the sequence\n+            value = value[:truncate_length]\n+            # Truncate every item in the sequence\n+            value = typename(\n+                [_convert_value(v, truncate_length) for v in value] + ['...'])\n+        else:\n+            # Truncate every item in the list\n+            value = typename(\n+                [_convert_value(v, truncate_length) for v in value])\n+    elif isinstance(value, dict) or isinstance(value, OrderedDict):\n+        # convert each key and value in the mapping\n+        new_value = {} if isinstance(value, dict) else OrderedDict()\n+        for k, v in value.items():\n+            # don't truncate keys because that could result in key collisions and data loss\n+            new_value[_convert_value(k)] = _convert_value(v, truncate_length=truncate_length)\n+        value = new_value\n+    elif (\n+        not any(isinstance(value, t) for t in (bool, float, int, numpy.number))\n+    ):\n+        # assuming value is a message\n+        # since it is neither a collection nor a primitive type\n+        value = msg_to_ordereddict(value, truncate_length=truncate_length)\n+    return value"
+        },
+        {
+          "sha": "9b36353f7a8b1090e1e91b3f2dec61699c95baf0",
+          "filename": "rosidl_runtime_py/set_message.py",
+          "status": "added",
+          "additions": 41,
+          "deletions": 0,
+          "changes": 41,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/700137e13a1c0b3fb2c1c9984723a2d053c74136/rosidl_runtime_py%2Fset_message.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/700137e13a1c0b3fb2c1c9984723a2d053c74136/rosidl_runtime_py%2Fset_message.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/rosidl_runtime_py%2Fset_message.py?ref=700137e13a1c0b3fb2c1c9984723a2d053c74136",
+          "patch": "@@ -0,0 +1,41 @@\n+# Copyright 2017-2019 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+class SetFieldError(Exception):\n+\n+    def __init__(self, field_name, exception):\n+        super(SetFieldError, self).__init__()\n+        self.field_name = field_name\n+        self.exception = exception\n+\n+\n+def set_msg_fields(msg, values):\n+    for field_name, field_value in values.items():\n+        field_type = type(getattr(msg, field_name))\n+        try:\n+            value = field_type(field_value)\n+        except TypeError:\n+            value = field_type()\n+            try:\n+                set_msg_fields(value, field_value)\n+            except SetFieldError as e:\n+                raise SetFieldError(\n+                    '{field_name}.{e.field_name}'.format_map(locals()),\n+                    e.exception)\n+        except ValueError as e:\n+            raise SetFieldError(field_name, e)\n+        try:\n+            setattr(msg, field_name, value)\n+        except Exception as e:\n+            raise SetFieldError(field_name, e)"
+        },
+        {
+          "sha": "ac476894e644fb45d0739e88290480e9b156ff68",
+          "filename": "setup.py",
+          "status": "added",
+          "additions": 28,
+          "deletions": 0,
+          "changes": 28,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/700137e13a1c0b3fb2c1c9984723a2d053c74136/setup.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/700137e13a1c0b3fb2c1c9984723a2d053c74136/setup.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/setup.py?ref=700137e13a1c0b3fb2c1c9984723a2d053c74136",
+          "patch": "@@ -0,0 +1,28 @@\n+from setuptools import find_packages\n+from setuptools import setup\n+\n+setup(\n+    name='rosidl_runtime_py',\n+    version='0.6.2',\n+    packages=find_packages(exclude=['test']),\n+    zip_safe=False,\n+    author='Dirk Thomas',\n+    author_email='dthomas@osrfoundation.org',\n+    maintainer='Jacob Perron',\n+    maintainer_email='jacob@openrobotics.org',\n+    url='https://github.com/ros2/rosidl_python/tree/master/rosidl_runtime_py',\n+    download_url='https://github.com/ros2/rosidl_python/releases',\n+    keywords=[],\n+    classifiers=[\n+        'Environment :: Console',\n+        'Intended Audience :: Developers',\n+        'License :: OSI Approved :: Apache Software License',\n+        'Programming Language :: Python',\n+    ],\n+    description='Runtime utilities for working with generated ROS interfaces in Python.',\n+    long_description=(\n+        'This package provides functions for operations such as populating ROS messages '\n+        'and converting messages to different representations.'),\n+    license='Apache License, Version 2.0',\n+    tests_require=['pytest'],\n+)"
+        },
+        {
+          "sha": "021aa6dea448ece1b9e1909b8a06fe33abc7ab96",
+          "filename": "test/rosidl_runtime_py/test_convert.py",
+          "status": "added",
+          "additions": 85,
+          "deletions": 0,
+          "changes": 85,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/700137e13a1c0b3fb2c1c9984723a2d053c74136/test%2Frosidl_runtime_py%2Ftest_convert.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/700137e13a1c0b3fb2c1c9984723a2d053c74136/test%2Frosidl_runtime_py%2Ftest_convert.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/test%2Frosidl_runtime_py%2Ftest_convert.py?ref=700137e13a1c0b3fb2c1c9984723a2d053c74136",
+          "patch": "@@ -0,0 +1,85 @@\n+# Copyright 2018 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from collections import OrderedDict\n+\n+from rosidl_runtime_py.convert import _convert_value\n+\n+\n+def test_convert_primitives():\n+    assert 5 == _convert_value(5)\n+    assert 5 == _convert_value(5, truncate_length=0)\n+    assert 5 == _convert_value(5, truncate_length=1)\n+    assert 5 == _convert_value(5, truncate_length=10000)\n+    assert 42.0 == _convert_value(42.0)\n+    assert 42.0 == _convert_value(42.0, truncate_length=0)\n+    assert 42.0 == _convert_value(42.0, truncate_length=1)\n+    assert 42.0 == _convert_value(42.0, truncate_length=10000)\n+    assert True is _convert_value(True)\n+    assert True is _convert_value(True, truncate_length=0)\n+    assert True is _convert_value(True, truncate_length=1)\n+    assert True is _convert_value(True, truncate_length=10000)\n+    assert False is _convert_value(False)\n+    assert False is _convert_value(False, truncate_length=0)\n+    assert False is _convert_value(False, truncate_length=1)\n+    assert False is _convert_value(False, truncate_length=10000)\n+\n+\n+def test_convert_tuple():\n+    assert (1, 2, 3) == _convert_value((1, 2, 3))\n+    assert ('...',) == _convert_value((1, 2, 3), truncate_length=0)\n+    assert (1, 2, '...') == _convert_value((1, 2, 3), truncate_length=2)\n+    assert ('123', '456', '789') == _convert_value(('123', '456', '789'))\n+    assert ('12...', '45...', '...') == _convert_value(('123', '456', '789'), truncate_length=2)\n+    assert ('123', '456', '789') == _convert_value(('123', '456', '789'), truncate_length=5)\n+\n+\n+def test_convert_list():\n+    assert [1, 2, 3] == _convert_value([1, 2, 3])\n+    assert ['...'] == _convert_value([1, 2, 3], truncate_length=0)\n+    assert [1, 2, '...'] == _convert_value([1, 2, 3], truncate_length=2)\n+    assert ['123', '456', '789'] == _convert_value(['123', '456', '789'])\n+    assert ['12...', '45...', '...'] == _convert_value(['123', '456', '789'], truncate_length=2)\n+    assert ['123', '456', '789'] == _convert_value(['123', '456', '789'], truncate_length=5)\n+\n+\n+def test_convert_str():\n+    assert 'hello world' == _convert_value('hello world')\n+    assert 'hello...' == _convert_value('hello world', truncate_length=5)\n+    assert 'hello world' == _convert_value('hello world', truncate_length=1000)\n+\n+\n+def test_convert_bytes():\n+    assert 'hello world' == _convert_value(b'hello world')\n+    assert 'hello...' == _convert_value(b'hello world', truncate_length=5)\n+    assert 'hello world' == _convert_value(b'hello world', truncate_length=1000)\n+\n+\n+def test_convert_ordered_dict():\n+    assert OrderedDict([(1, 'a'), ('2', 'b')]) == _convert_value(\n+        OrderedDict([(1, 'a'), ('2', 'b')]))\n+    assert OrderedDict([(1, 'a'), ('2', 'b')]) == _convert_value(\n+        OrderedDict([(1, 'a'), ('2', 'b')]), truncate_length=1)\n+    assert OrderedDict([(1, 'a'), ('2', 'b')]) == _convert_value(\n+        OrderedDict([(1, 'a'), ('2', 'b')]), truncate_length=1000)\n+    assert OrderedDict([(1, 'a...'), ('234', 'b...')]) == _convert_value(\n+        OrderedDict([(1, 'abc'), ('234', 'bcd')]), truncate_length=1)\n+\n+\n+def test_convert_dict():\n+    assert {1: 'a', '2': 'b'} == _convert_value({1: 'a', '2': 'b'})\n+    assert {1: 'a', '2': 'b'} == _convert_value({1: 'a', '2': 'b'}, truncate_length=1)\n+    assert {1: 'a', '2': 'b'} == _convert_value({1: 'a', '2': 'b'}, truncate_length=1000)\n+    assert {1: 'a...', '234': 'b...'} == _convert_value(\n+        {1: 'abc', '234': 'bcd'}, truncate_length=1)"
+        },
+        {
+          "sha": "cf0fae31fde37f67f8bb744bc30512da4369370d",
+          "filename": "test/test_copyright.py",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/700137e13a1c0b3fb2c1c9984723a2d053c74136/test%2Ftest_copyright.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/700137e13a1c0b3fb2c1c9984723a2d053c74136/test%2Ftest_copyright.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/test%2Ftest_copyright.py?ref=700137e13a1c0b3fb2c1c9984723a2d053c74136",
+          "patch": "@@ -0,0 +1,23 @@\n+# Copyright 2017 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_copyright.main import main\n+import pytest\n+\n+\n+@pytest.mark.copyright\n+@pytest.mark.linter\n+def test_copyright():\n+    rc = main(argv=['.', 'test'])\n+    assert rc == 0, 'Found errors'"
+        },
+        {
+          "sha": "eff829969534949bd9d5512146a7b0029b4cec84",
+          "filename": "test/test_flake8.py",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/700137e13a1c0b3fb2c1c9984723a2d053c74136/test%2Ftest_flake8.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/700137e13a1c0b3fb2c1c9984723a2d053c74136/test%2Ftest_flake8.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/test%2Ftest_flake8.py?ref=700137e13a1c0b3fb2c1c9984723a2d053c74136",
+          "patch": "@@ -0,0 +1,23 @@\n+# Copyright 2017 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_flake8.main import main\n+import pytest\n+\n+\n+@pytest.mark.flake8\n+@pytest.mark.linter\n+def test_flake8():\n+    rc = main(argv=[])\n+    assert rc == 0, 'Found errors'"
+        },
+        {
+          "sha": "0e38a6c6056f03486caeeaef5adf7fae6854a9d3",
+          "filename": "test/test_pep257.py",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/700137e13a1c0b3fb2c1c9984723a2d053c74136/test%2Ftest_pep257.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/700137e13a1c0b3fb2c1c9984723a2d053c74136/test%2Ftest_pep257.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/test%2Ftest_pep257.py?ref=700137e13a1c0b3fb2c1c9984723a2d053c74136",
+          "patch": "@@ -0,0 +1,23 @@\n+# Copyright 2017 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_pep257.main import main\n+import pytest\n+\n+\n+@pytest.mark.linter\n+@pytest.mark.pep257\n+def test_pep257():\n+    rc = main(argv=[])\n+    assert rc == 0, 'Found code style errors / warnings'"
+        }
+      ]
+    },
+    {
+      "author": "dirk-thomas",
+      "date": "2019-04-04T16:32:17Z",
+      "sha": "ca965b3697c97d695613c985dce43c0cad4b335c",
+      "message": "fix echo of numpy.number values (ros2/rosidl_python#37)\n\nSigned-off-by: Dirk Thomas <dirk-thomas@users.noreply.github.com>",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "663384dbfa1df9b5c9cb1615a3c0fe5c9da57d67",
+          "filename": "rosidl_runtime_py/convert.py",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/ca965b3697c97d695613c985dce43c0cad4b335c/rosidl_runtime_py%2Fconvert.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/ca965b3697c97d695613c985dce43c0cad4b335c/rosidl_runtime_py%2Fconvert.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/rosidl_runtime_py%2Fconvert.py?ref=ca965b3697c97d695613c985dce43c0cad4b335c",
+          "patch": "@@ -150,9 +150,9 @@ def _convert_value(value, truncate_length=None):\n             # Don't truncate keys because that could result in key collisions and data loss\n             new_value[_convert_value(k)] = _convert_value(v, truncate_length=truncate_length)\n         value = new_value\n-    elif (\n-        not any(isinstance(value, t) for t in (bool, float, int, numpy.number))\n-    ):\n+    elif isinstance(value, numpy.number):\n+        value = value.item()\n+    elif not any(isinstance(value, t) for t in (bool, float, int)):\n         # Assuming value is a message since it is neither a collection nor a primitive type\n         value = message_to_ordereddict(value, truncate_length=truncate_length)\n     return value"
+        }
+      ]
+    },
+    {
+      "author": "evshary",
+      "date": "2019-12-05T20:50:28Z",
+      "sha": "61a67b454c1b7bbf0508482d7de9bee12000a662",
+      "message": "Limit the interface path to prevent security issues. (#7)\n\n* Limit the interface path to prevent security issues.\r\n\r\nSigned-off-by: evshary <evshary@gmail.com>\r\n\r\n* Remove namespace checking since constant, param may be added in the\r\nfuture.\r\n\r\nSigned-off-by: evshary <evshary@gmail.com>\r\n\r\n* Add interface to the error message.\r\n\r\nSigned-off-by: evshary <evshary@gmail.com>",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "73c204dfce34eef4ec56092f62a403e5ea4a5129",
+          "filename": "rosidl_runtime_py/get_interfaces.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/61a67b454c1b7bbf0508482d7de9bee12000a662/rosidl_runtime_py%2Fget_interfaces.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/61a67b454c1b7bbf0508482d7de9bee12000a662/rosidl_runtime_py%2Fget_interfaces.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/rosidl_runtime_py%2Fget_interfaces.py?ref=61a67b454c1b7bbf0508482d7de9bee12000a662",
+          "patch": "@@ -171,6 +171,8 @@ def get_interface_path(interface_name: str) -> str:\n             f\"Invalid name '{interface_name}'. Expected at least two parts separated by '/'\")\n     if not all(parts):\n         raise ValueError(f\"Invalid name '{interface_name}'. Must not contain empty parts\")\n+    if '..' in parts:\n+        raise ValueError(f\"Invalid name '{interface_name}'. Must not contain '..'\")\n     # By convention we expect the first part to be the package name\n     prefix_path = has_resource('packages', parts[0])\n     if not prefix_path:"
+        }
+      ]
+    },
+    {
+      "author": "mjcarroll",
+      "date": "2019-09-26T17:11:11Z",
+      "sha": "614bad797ad84b55655463810d153c113af261bb",
+      "message": "0.8.0\n\nSigned-off-by: Michael Carroll <michael@openrobotics.org>",
+      "files_changed": 3,
+      "additions": 56,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "d729cbd65546a0be2dd205cca38879c4528895ea",
+          "filename": "CHANGELOG.rst",
+          "status": "added",
+          "additions": 54,
+          "deletions": 0,
+          "changes": 54,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/614bad797ad84b55655463810d153c113af261bb/CHANGELOG.rst",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/614bad797ad84b55655463810d153c113af261bb/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/CHANGELOG.rst?ref=614bad797ad84b55655463810d153c113af261bb",
+          "patch": "@@ -0,0 +1,54 @@\n+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n+Changelog for package rosidl_runtime_py\n+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n+\n+0.8.0 (2019-09-26)\n+------------------\n+* install resource marker file for package (`#2 <https://github.com/ros2/rosidl_runtime_py/issues/2>`_)\n+* Update setup.py URLs\n+* Add contributing and license files\n+* install package manifest (`ros2/rosidl_python#86 <https://github.com/ros2/rosidl_python/issues/86>`_)\n+* Rename TestConfig class to Config to avoid pytest warning (`ros2/rosidl_python#82 <https://github.com/ros2/rosidl_python/issues/82>`_)\n+* fix set_message_fields for numpy array (`ros2/rosidl_python#81 <https://github.com/ros2/rosidl_python/issues/81>`_)\n+* Fix type name queries for string types. (`ros2/rosidl_python#77 <https://github.com/ros2/rosidl_python/issues/77>`_)\n+* Require keyword arguments be passed by name (`ros2/rosidl_python#80 <https://github.com/ros2/rosidl_python/issues/80>`_)\n+* Add utility functions to get interface from identifier\n+* Make import_message_from_namespaced_type operate on NamespacedType (`ros2/rosidl_python#74 <https://github.com/ros2/rosidl_python/issues/74>`_)\n+* handle set_message_fields given some non-basic type (`ros2/rosidl_python#68 <https://github.com/ros2/rosidl_python/issues/68>`_)\n+* Add no_arr and no_str parameters (`ros2/rosidl_python#38 <https://github.com/ros2/rosidl_python/issues/38>`_)\n+* Contributors: Dirk Thomas, Jacob Perron, Jeremie Deray, Michel Hidalgo, Mikael Arguedas, Vinnam Kim, ivanpauno\n+\n+0.7.6 (2019-05-30)\n+------------------\n+* fix logic around populating arrays (`ros2/rosidl_python#62 <https://github.com/ros2/rosidl_python/issues/62>`_)\n+* Fix the setting of array variables. (`ros2/rosidl_python#59 <https://github.com/ros2/rosidl_python/issues/59>`_)\n+* Contributors: Chris Lalancette, Dirk Thomas\n+\n+0.7.5 (2019-05-29)\n+------------------\n+\n+0.7.4 (2019-05-20)\n+------------------\n+\n+0.7.3 (2019-05-08 17:57)\n+------------------------\n+\n+0.7.2 (2019-05-08 16:58)\n+------------------------\n+* allow unicode chars in yaml output (`ros2/rosidl_python#50 <https://github.com/ros2/rosidl_python/issues/50>`_)\n+* add xmllint linter test (`ros2/rosidl_python#53 <https://github.com/ros2/rosidl_python/issues/53>`_)\n+* store types as tuple of abstract types (`ros2/rosidl_python#33 <https://github.com/ros2/rosidl_python/issues/33>`_)\n+* Update tests that were missed during switch to use new interfaces (`ros2/rosidl_python#51 <https://github.com/ros2/rosidl_python/issues/51>`_)\n+* [rosidl_runtime_py] Use new test interface definitions\n+* simplify code using updated definition API (`ros2/rosidl_python#45 <https://github.com/ros2/rosidl_python/issues/45>`_)\n+* Contributors: Dirk Thomas, Jacob Perron, Mikael Arguedas\n+\n+0.7.1 (2019-04-14 12:48)\n+------------------------\n+\n+0.7.0 (2019-04-14 05:05)\n+------------------------\n+* fix echo of numpy.number values (`ros2/rosidl_python#37 <https://github.com/ros2/rosidl_python/issues/37>`_)\n+* Refactor rosidl_runtime_py functions\n+* Add rosidl_runtime_py package\n+* Contributors: Dirk Thomas, Jacob Perron"
+        },
+        {
+          "sha": "0914d2f28a460083837383fdbe954977967878d4",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/614bad797ad84b55655463810d153c113af261bb/package.xml",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/614bad797ad84b55655463810d153c113af261bb/package.xml",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/package.xml?ref=614bad797ad84b55655463810d153c113af261bb",
+          "patch": "@@ -2,7 +2,7 @@\n <?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"2\">\n   <name>rosidl_runtime_py</name>\n-  <version>0.7.6</version>\n+  <version>0.8.0</version>\n   <description>Runtime utilities for working with generated ROS interfaces in Python.</description>\n   <maintainer email=\"jacob@openrobotics.org\">Jacob Perron</maintainer>\n   <license>Apache License 2.0</license>"
+        },
+        {
+          "sha": "a8e6a5165c7c1da414c322c18260576f263723db",
+          "filename": "setup.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/614bad797ad84b55655463810d153c113af261bb/setup.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/614bad797ad84b55655463810d153c113af261bb/setup.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/setup.py?ref=614bad797ad84b55655463810d153c113af261bb",
+          "patch": "@@ -5,7 +5,7 @@\n \n setup(\n     name=package_name,\n-    version='0.7.6',\n+    version='0.8.0',\n     packages=find_packages(exclude=['test']),\n     data_files=[\n         ('share/' + package_name, ['package.xml']),"
+        }
+      ]
+    },
+    {
+      "author": "galou",
+      "date": "2019-11-02T05:13:24Z",
+      "sha": "694c2b49effb8fe71b82bfecd12c0b6611e00ed6",
+      "message": "Add .gitignore (#5)\n\nSigned-off-by: Gaël Écorchard <gael.ecorchard@cvut.cz>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "bee8a64b79a99590d5303307144172cfe824fbf7",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/694c2b49effb8fe71b82bfecd12c0b6611e00ed6/.gitignore",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/694c2b49effb8fe71b82bfecd12c0b6611e00ed6/.gitignore",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/.gitignore?ref=694c2b49effb8fe71b82bfecd12c0b6611e00ed6",
+          "patch": "@@ -0,0 +1 @@\n+__pycache__"
+        }
+      ]
+    },
+    {
+      "author": "hidmic",
+      "date": "2019-08-22T18:12:03Z",
+      "sha": "6ebce88a040330774443dce59ac97d5f0f6910ee",
+      "message": "Fix type name queries for string types. (ros2/rosidl_python#77)\n\nSigned-off-by: Michel Hidalgo <michel@ekumenlabs.com>",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "c054dc49e14bb3dc910a0ce284469392b01aefd1",
+          "filename": "rosidl_runtime_py/convert.py",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/6ebce88a040330774443dce59ac97d5f0f6910ee/rosidl_runtime_py%2Fconvert.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/6ebce88a040330774443dce59ac97d5f0f6910ee/rosidl_runtime_py%2Fconvert.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/rosidl_runtime_py%2Fconvert.py?ref=6ebce88a040330774443dce59ac97d5f0f6910ee",
+          "patch": "@@ -28,6 +28,10 @@\n def __get_type_name(value_type):\n     if isinstance(value_type, rosidl_parser.definition.BasicType):\n         return value_type.typename\n+    elif isinstance(value_type, rosidl_parser.definition.AbstractString):\n+        return 'string'\n+    elif isinstance(value_type, rosidl_parser.definition.AbstractWString):\n+        return 'wstring'\n     elif isinstance(value_type, rosidl_parser.definition.NamedType):\n         return value_type.name\n     elif isinstance(value_type, rosidl_parser.definition.NamespacedType):"
+        }
+      ]
+    },
+    {
+      "author": "ivanpauno",
+      "date": "2019-08-06T19:32:51Z",
+      "sha": "73a40442fcc5f49f0fdf28309d0c1967c19dd0be",
+      "message": "Add utility functions to get interface from identifier\n\n* Add get_namespaced_type, get_message_namespaced_type, get_service_namespaced_type and get_action_namespaced_type functions.\n\nSigned-off-by: ivanpauno <ivanpauno@ekumenlabs.com>\n\n* Add is_message, is_service and is_action functions.\n\nSigned-off-by: ivanpauno <ivanpauno@ekumenlabs.com>\n\n* Add get_interface, get_message, get_service and get_action functions\n\nSigned-off-by: ivanpauno <ivanpauno@ekumenlabs.com>",
+      "files_changed": 2,
+      "additions": 218,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "1563dbafae83ddb8b923f51711ee6a19bcbb9c71",
+          "filename": "rosidl_runtime_py/utilities.py",
+          "status": "added",
+          "additions": 95,
+          "deletions": 0,
+          "changes": 95,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/73a40442fcc5f49f0fdf28309d0c1967c19dd0be/rosidl_runtime_py%2Futilities.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/73a40442fcc5f49f0fdf28309d0c1967c19dd0be/rosidl_runtime_py%2Futilities.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/rosidl_runtime_py%2Futilities.py?ref=73a40442fcc5f49f0fdf28309d0c1967c19dd0be",
+          "patch": "@@ -0,0 +1,95 @@\n+# Copyright 2019 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from typing import Text\n+\n+from rosidl_parser.definition import NamespacedType\n+from rosidl_runtime_py.import_message import import_message_from_namespaced_type\n+\n+\n+def get_interface(identifier: Text):\n+    \"\"\"Get an interface from its full name.\"\"\"\n+    return import_message_from_namespaced_type(get_namespaced_type(identifier))\n+\n+\n+def get_message(identifier: Text):\n+    \"\"\"Get a message from its full name.\"\"\"\n+    interface = import_message_from_namespaced_type(get_message_namespaced_type(identifier))\n+    if not is_message(interface):\n+        raise ValueError(\"Expected the full name of a message, got '{}'\".format(identifier))\n+    return interface\n+\n+\n+def get_service(identifier: Text):\n+    \"\"\"Get a service from its full name.\"\"\"\n+    interface = import_message_from_namespaced_type(get_service_namespaced_type(identifier))\n+    if not is_service(interface):\n+        raise ValueError(\"Expected the full name of a service, got '{}'\".format(identifier))\n+    return interface\n+\n+\n+def get_action(identifier: Text):\n+    \"\"\"Get a message from its full name.\"\"\"\n+    interface = import_message_from_namespaced_type(get_action_namespaced_type(identifier))\n+    if not is_action(interface):\n+        raise ValueError(\"Expected the full name of an action, got '{}'\".format(identifier))\n+    return interface\n+\n+\n+def get_namespaced_type(identifier: Text):\n+    \"\"\"Create a `NamespacedType` object from the full name of an interface.\"\"\"\n+    return _get_namespaced_type(identifier)\n+\n+\n+def get_message_namespaced_type(identifier: Text):\n+    \"\"\"Create a `NamespacedType` object from the full name of a message.\"\"\"\n+    return _get_namespaced_type(identifier, default_namespace='msg')\n+\n+\n+def get_service_namespaced_type(identifier: Text):\n+    \"\"\"Create a `NamespacedType` object from the full name of a service.\"\"\"\n+    return _get_namespaced_type(identifier, default_namespace='srv')\n+\n+\n+def get_action_namespaced_type(identifier: Text):\n+    \"\"\"Create a `NamespacedType` object from the full name of an action.\"\"\"\n+    return _get_namespaced_type(identifier, default_namespace='action')\n+\n+\n+def is_message(interface):\n+    \"\"\"Return `True` if `interface` is a message.\"\"\"\n+    return hasattr(interface, 'SLOT_TYPES')\n+\n+\n+def is_service(interface):\n+    \"\"\"Return `True` if `interface` is a service.\"\"\"\n+    return hasattr(interface, 'Request') and hasattr(interface, 'Response')\n+\n+\n+def is_action(interface):\n+    \"\"\"Return `True` if `interface` is an action.\"\"\"\n+    return (\n+        hasattr(interface, 'Goal') and\n+        hasattr(interface, 'Result') and\n+        hasattr(interface, 'Feedback')\n+    )\n+\n+\n+def _get_namespaced_type(identifier: Text, *, default_namespace=None):\n+    namespace = identifier.split(sep='/')\n+    name = namespace[-1]\n+    namespace = namespace[0:-1]\n+    if len(namespace) == 1 and default_namespace is not None:\n+        namespace.append(default_namespace)\n+    return NamespacedType(namespace, name)"
+        },
+        {
+          "sha": "18cdeec2d379b760135249bfa86514097945c165",
+          "filename": "test/rosidl_runtime_py/test_utilities.py",
+          "status": "added",
+          "additions": 123,
+          "deletions": 0,
+          "changes": 123,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/73a40442fcc5f49f0fdf28309d0c1967c19dd0be/test%2Frosidl_runtime_py%2Ftest_utilities.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/73a40442fcc5f49f0fdf28309d0c1967c19dd0be/test%2Frosidl_runtime_py%2Ftest_utilities.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/test%2Frosidl_runtime_py%2Ftest_utilities.py?ref=73a40442fcc5f49f0fdf28309d0c1967c19dd0be",
+          "patch": "@@ -0,0 +1,123 @@\n+# Copyright 2019 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+import pytest\n+\n+from rosidl_runtime_py import utilities\n+from rosidl_runtime_py.import_message import import_message_from_namespaced_type\n+\n+import test_msgs.action\n+import test_msgs.msg\n+import test_msgs.srv\n+\n+\n+class TestConfig:\n+\n+    def __init__(\n+        self,\n+        *,\n+        path,\n+        object_type=None,\n+        to_namespaced_type_function=None,\n+        is_function=None\n+    ):\n+        self.path = path\n+        self.object_type = object_type\n+        self.to_namespaced_type_function = to_namespaced_type_function\n+        self.is_function = is_function\n+\n+\n+@pytest.mark.parametrize('config', (\n+    TestConfig(\n+        path='test_msgs/msg/Empty',\n+        object_type=test_msgs.msg.Empty,\n+        to_namespaced_type_function=utilities.get_message_namespaced_type,\n+        is_function=utilities.is_message\n+    ),\n+    TestConfig(\n+        path='test_msgs/Empty',\n+        object_type=test_msgs.msg.Empty,\n+        to_namespaced_type_function=utilities.get_message_namespaced_type,\n+        is_function=utilities.is_message\n+    ),\n+    TestConfig(\n+        path='test_msgs/srv/Empty',\n+        object_type=test_msgs.srv.Empty,\n+        to_namespaced_type_function=utilities.get_service_namespaced_type,\n+        is_function=utilities.is_service\n+    ),\n+    TestConfig(\n+        path='test_msgs/Empty',\n+        object_type=test_msgs.srv.Empty,\n+        to_namespaced_type_function=utilities.get_service_namespaced_type,\n+        is_function=utilities.is_service\n+    ),\n+    TestConfig(\n+        path='test_msgs/action/Fibonacci',\n+        object_type=test_msgs.action.Fibonacci,\n+        to_namespaced_type_function=utilities.get_action_namespaced_type,\n+        is_function=utilities.is_action\n+    ),\n+    TestConfig(\n+        path='test_msgs/Fibonacci',\n+        object_type=test_msgs.action.Fibonacci,\n+        to_namespaced_type_function=utilities.get_action_namespaced_type,\n+        is_function=utilities.is_action\n+    ),\n+))\n+def test_get_namespaced_type_functions(config):\n+    message = import_message_from_namespaced_type(config.to_namespaced_type_function(config.path))\n+    assert message is config.object_type\n+    assert config.is_function(message)\n+\n+\n+def test_is_interface_functions():\n+    assert utilities.is_message(test_msgs.msg.Empty)\n+    assert not utilities.is_message(test_msgs.srv.Empty)\n+    assert not utilities.is_message(test_msgs.action.Fibonacci)\n+    assert not utilities.is_service(test_msgs.msg.Empty)\n+    assert utilities.is_service(test_msgs.srv.Empty)\n+    assert not utilities.is_service(test_msgs.action.Fibonacci)\n+    assert not utilities.is_action(test_msgs.msg.Empty)\n+    assert not utilities.is_action(test_msgs.srv.Empty)\n+    assert utilities.is_action(test_msgs.action.Fibonacci)\n+\n+\n+@pytest.mark.parametrize('function,identifier,result', (\n+    (utilities.get_interface, 'test_msgs/msg/Empty', test_msgs.msg.Empty),\n+    (utilities.get_interface, 'test_msgs/srv/Empty', test_msgs.srv.Empty),\n+    (utilities.get_interface, 'test_msgs/action/Fibonacci', test_msgs.action.Fibonacci),\n+    (utilities.get_message, 'test_msgs/msg/Empty', test_msgs.msg.Empty),\n+    (utilities.get_message, 'test_msgs/Empty', test_msgs.msg.Empty),\n+    (utilities.get_service, 'test_msgs/srv/Empty', test_msgs.srv.Empty),\n+    (utilities.get_service, 'test_msgs/Empty', test_msgs.srv.Empty),\n+    (utilities.get_action, 'test_msgs/action/Fibonacci', test_msgs.action.Fibonacci),\n+    (utilities.get_action, 'test_msgs/Fibonacci', test_msgs.action.Fibonacci),\n+))\n+def test_get_interface_functions(function, identifier, result):\n+    assert function(identifier) is result\n+\n+\n+@pytest.mark.parametrize('function,identifier,interface_type', (\n+    (utilities.get_message, 'test_msgs/srv/Empty', 'a message'),\n+    (utilities.get_message, 'test_msgs/action/Fibonacci', 'a message'),\n+    (utilities.get_service, 'test_msgs/msg/Empty', 'a service'),\n+    (utilities.get_service, 'test_msgs/action/Fibonacci', 'a service'),\n+    (utilities.get_action, 'test_msgs/msg/Empty', 'an action'),\n+    (utilities.get_action, 'test_msgs/srv/Empty', 'an action'),\n+))\n+def test_get_interface_raises(function, identifier, interface_type):\n+    with pytest.raises(ValueError) as ex:\n+        function(identifier)\n+    ex.match(\"Expected the full name of {}, got '{}'\".format(interface_type, identifier))"
+        }
+      ]
+    },
+    {
+      "author": "mikaelarguedas",
+      "date": "2019-05-03T03:26:09Z",
+      "sha": "ad2d2858a4374812fb3396160cfee66145ad15c8",
+      "message": "store types as tuple of abstract types (ros2/rosidl_python#33)\n\n* store types as constant and return ordered dict\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\nupdate tests\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\nsimplify logic by printing member type directly\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\nmove dict construction to rosidl_runtime_py\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\nadd utility to import complex message and add support for nested array in set_message\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\nupdate tests and remove coverage for dict to avoid circular dependency\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\nmore descriptive variable name\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\nrefactor import logic according to ros2/rosidl_python#35\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\nmove imports to top of file\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\nstring maximum size doesn't need quoting or str conversion\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\nupdate docblock\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\nslot_types_dict_from_message -> get_message_slot_types\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\ncheck Abstrct type instead of 'list'\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\nuse NestedType\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\nadd conditional is namespaces is an empty list\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\none liner\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\nextend test suite to cover NesteTypes of NamespacedTypes\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\nsingle message fixture to use\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\nuse NestedType\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\nadd coverage for static array of nested messages\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\nrestore old API\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\nSLOT_TYPES improvement from dirk-thomas\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\nresolve conflicts\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\n* add back I100 ignore\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\n* use new rosidl_parser.definition types and new test interfaces\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>\n\n* restore original test, add test for SLOT_TYPES\n\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>",
+      "files_changed": 6,
+      "additions": 89,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "2de8eb66addefa69937fddcf0baba2db5bf6fefd",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/ad2d2858a4374812fb3396160cfee66145ad15c8/package.xml",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/ad2d2858a4374812fb3396160cfee66145ad15c8/package.xml",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/package.xml?ref=ad2d2858a4374812fb3396160cfee66145ad15c8",
+          "patch": "@@ -11,6 +11,7 @@\n \n   <exec_depend>python3-numpy</exec_depend>\n   <exec_depend>python3-yaml</exec_depend>\n+  <exec_depend>rosidl_parser</exec_depend>\n \n   <test_depend>ament_copyright</test_depend>\n   <test_depend>ament_flake8</test_depend>"
+        },
+        {
+          "sha": "7a71aa92f9f0fa0c70c89756cfb377cfdd98861e",
+          "filename": "rosidl_runtime_py/__init__.py",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/ad2d2858a4374812fb3396160cfee66145ad15c8/rosidl_runtime_py%2F__init__.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/ad2d2858a4374812fb3396160cfee66145ad15c8/rosidl_runtime_py%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/rosidl_runtime_py%2F__init__.py?ref=ad2d2858a4374812fb3396160cfee66145ad15c8",
+          "patch": "@@ -12,13 +12,17 @@\n # See the License for the specific language governing permissions and\n # limitations under the License.\n \n+from .convert import get_message_slot_types\n from .convert import message_to_csv\n from .convert import message_to_ordereddict\n from .convert import message_to_yaml\n+from .import_message import import_message_from_namespaced_type\n from .set_message import set_message_fields\n \n \n __all__ = [\n+    'get_message_slot_types',\n+    'import_message_from_namespaced_type',\n     'message_to_csv',\n     'message_to_ordereddict',\n     'message_to_yaml',"
+        },
+        {
+          "sha": "1babe73c592888def0e5916e3ee743045eeb8b5f",
+          "filename": "rosidl_runtime_py/convert.py",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 0,
+          "changes": 10,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/ad2d2858a4374812fb3396160cfee66145ad15c8/rosidl_runtime_py%2Fconvert.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/ad2d2858a4374812fb3396160cfee66145ad15c8/rosidl_runtime_py%2Fconvert.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/rosidl_runtime_py%2Fconvert.py?ref=ad2d2858a4374812fb3396160cfee66145ad15c8",
+          "patch": "@@ -154,3 +154,13 @@ def _convert_value(value, truncate_length=None):\n         # Assuming value is a message since it is neither a collection nor a primitive type\n         value = message_to_ordereddict(value, truncate_length=truncate_length)\n     return value\n+\n+\n+def get_message_slot_types(msg: Any) -> OrderedDict:\n+    \"\"\"\n+    Return an OrderedDict of the slot types of a message.\n+\n+    :param msg: The ROS message to get members types from.\n+    :returns: An OrderedDict with message member names as keys and slot types as values.\n+    \"\"\"\n+    return OrderedDict(zip([s[1:] for s in msg.__slots__], msg.SLOT_TYPES))"
+        },
+        {
+          "sha": "ceb11ad8df06f467709ebe1ec711b4194eef8cb5",
+          "filename": "rosidl_runtime_py/import_message.py",
+          "status": "added",
+          "additions": 24,
+          "deletions": 0,
+          "changes": 24,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/ad2d2858a4374812fb3396160cfee66145ad15c8/rosidl_runtime_py%2Fimport_message.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/ad2d2858a4374812fb3396160cfee66145ad15c8/rosidl_runtime_py%2Fimport_message.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/rosidl_runtime_py%2Fimport_message.py?ref=ad2d2858a4374812fb3396160cfee66145ad15c8",
+          "patch": "@@ -0,0 +1,24 @@\n+# Copyright 2019 Mikael Arguedas.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+import importlib\n+from typing import Any\n+\n+from rosidl_parser.definition import NamespacedType\n+\n+\n+def import_message_from_namespaced_type(message_type: NamespacedType) -> Any:\n+    module = importlib.import_module(\n+        '.'.join(message_type.value_type.namespaces))\n+    return getattr(module, message_type.value_type.name)"
+        },
+        {
+          "sha": "d84a7a4d35ad93a7b0c1d10a2deaacc6bf91be5e",
+          "filename": "rosidl_runtime_py/set_message.py",
+          "status": "modified",
+          "additions": 14,
+          "deletions": 0,
+          "changes": 14,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/ad2d2858a4374812fb3396160cfee66145ad15c8/rosidl_runtime_py%2Fset_message.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/ad2d2858a4374812fb3396160cfee66145ad15c8/rosidl_runtime_py%2Fset_message.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/rosidl_runtime_py%2Fset_message.py?ref=ad2d2858a4374812fb3396160cfee66145ad15c8",
+          "patch": "@@ -15,6 +15,11 @@\n from typing import Any\n from typing import Dict\n \n+from rosidl_parser.definition import AbstractNestedType\n+from rosidl_parser.definition import NamespacedType\n+from rosidl_runtime_py.convert import get_message_slot_types\n+from rosidl_runtime_py.import_message import import_message_from_namespaced_type\n+\n \n def set_message_fields(msg: Any, values: Dict[str, str]) -> None:\n     \"\"\"\n@@ -33,4 +38,13 @@ def set_message_fields(msg: Any, values: Dict[str, str]) -> None:\n         except TypeError:\n             value = field_type()\n             set_message_fields(value, field_value)\n+        rosidl_type = get_message_slot_types(msg)[field_name]\n+        # Check if field is an array of ROS messages\n+        if isinstance(rosidl_type, AbstractNestedType):\n+            if isinstance(rosidl_type.value_type, NamespacedType):\n+                field_elem_type = import_message_from_namespaced_type(rosidl_type)\n+                for n in range(len(value)):\n+                    submsg = field_elem_type()\n+                    set_message_fields(submsg, value[n])\n+                    value[n] = submsg\n         setattr(msg, field_name, value)"
+        },
+        {
+          "sha": "4f178d65750a94dde751b58dacaea55b2a279290",
+          "filename": "test/rosidl_runtime_py/test_set_message.py",
+          "status": "modified",
+          "additions": 36,
+          "deletions": 0,
+          "changes": 36,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/ad2d2858a4374812fb3396160cfee66145ad15c8/test%2Frosidl_runtime_py%2Ftest_set_message.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/ad2d2858a4374812fb3396160cfee66145ad15c8/test%2Frosidl_runtime_py%2Ftest_set_message.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/test%2Frosidl_runtime_py%2Ftest_set_message.py?ref=ad2d2858a4374812fb3396160cfee66145ad15c8",
+          "patch": "@@ -91,3 +91,39 @@ def test_set_message_fields_invalid():\n     invalid_type['int32_value'] = 'this is not an integer'\n     with pytest.raises(ValueError):\n         set_message_fields(msg, invalid_type)\n+\n+\n+def test_set_nested_namespaced_fields():\n+    unbounded_sequence_msg = message_fixtures.get_msg_unbounded_sequences()[1]\n+    test_values = {\n+        'basic_types_values': [\n+            {'float64_value': 42.42, 'int8_value': 42},\n+            {'float64_value': 11.11, 'int8_value': 11}\n+        ]\n+    }\n+    set_message_fields(unbounded_sequence_msg, test_values)\n+    assert unbounded_sequence_msg.basic_types_values[0].float64_value == 42.42\n+    assert unbounded_sequence_msg.basic_types_values[0].int8_value == 42\n+    assert unbounded_sequence_msg.basic_types_values[0].uint8_value == 0\n+    assert unbounded_sequence_msg.basic_types_values[1].float64_value == 11.11\n+    assert unbounded_sequence_msg.basic_types_values[1].int8_value == 11\n+    assert unbounded_sequence_msg.basic_types_values[1].uint8_value == 0\n+\n+    arrays_msg = message_fixtures.get_msg_arrays()[0]\n+    test_values = {\n+        'basic_types_values': [\n+            {'float64_value': 42.42, 'int8_value': 42},\n+            {'float64_value': 11.11, 'int8_value': 11},\n+            {'float64_value': 22.22, 'int8_value': 22},\n+        ]\n+    }\n+    set_message_fields(arrays_msg, test_values)\n+    assert arrays_msg.basic_types_values[0].float64_value == 42.42\n+    assert arrays_msg.basic_types_values[0].int8_value == 42\n+    assert arrays_msg.basic_types_values[0].uint8_value == 0\n+    assert arrays_msg.basic_types_values[1].float64_value == 11.11\n+    assert arrays_msg.basic_types_values[1].int8_value == 11\n+    assert arrays_msg.basic_types_values[1].uint8_value == 0\n+    assert arrays_msg.basic_types_values[2].float64_value == 22.22\n+    assert arrays_msg.basic_types_values[2].int8_value == 22\n+    assert arrays_msg.basic_types_values[2].uint8_value == 0"
+        }
+      ]
+    },
+    {
+      "author": "artivis",
+      "date": "2019-07-12T01:46:42Z",
+      "sha": "85be413a7bcff2160c77e0ad2f698bb56902dde0",
+      "message": "handle set_message_fields given some non-basic type (ros2/rosidl_python#68)\n\nFix ros2/rosidl_python#67\n\nSigned-off-by: artivis <jeremie.deray@canonical.com>",
+      "files_changed": 2,
+      "additions": 19,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "dd18004f357b8c4081cf8e825d6e2ae527ef18e2",
+          "filename": "rosidl_runtime_py/set_message.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/85be413a7bcff2160c77e0ad2f698bb56902dde0/rosidl_runtime_py%2Fset_message.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/85be413a7bcff2160c77e0ad2f698bb56902dde0/rosidl_runtime_py%2Fset_message.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/rosidl_runtime_py%2Fset_message.py?ref=85be413a7bcff2160c77e0ad2f698bb56902dde0",
+          "patch": "@@ -38,6 +38,8 @@ def set_message_fields(msg: Any, values: Dict[str, str]) -> None:\n         field_type = type(field)\n         if field_type is array.array:\n             value = field_type(field.typecode, field_value)\n+        elif type(field_value) is field_type:\n+            value = field_value\n         else:\n             try:\n                 value = field_type(field_value)"
+        },
+        {
+          "sha": "59db4df5346b9af282683be67a6056e1950e7f4d",
+          "filename": "test/rosidl_runtime_py/test_set_message.py",
+          "status": "modified",
+          "additions": 17,
+          "deletions": 0,
+          "changes": 17,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/85be413a7bcff2160c77e0ad2f698bb56902dde0/test%2Frosidl_runtime_py%2Ftest_set_message.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/85be413a7bcff2160c77e0ad2f698bb56902dde0/test%2Frosidl_runtime_py%2Ftest_set_message.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/test%2Frosidl_runtime_py%2Ftest_set_message.py?ref=85be413a7bcff2160c77e0ad2f698bb56902dde0",
+          "patch": "@@ -127,3 +127,20 @@ def test_set_nested_namespaced_fields():\n     assert arrays_msg.basic_types_values[2].float64_value == 22.22\n     assert arrays_msg.basic_types_values[2].int8_value == 22\n     assert arrays_msg.basic_types_values[2].uint8_value == 0\n+\n+\n+def test_set_message_fields_nested_type():\n+    msg_basic_types = message_fixtures.get_msg_basic_types()[0]\n+    msg0 = message_fixtures.get_msg_nested()[0]\n+\n+    msg0.basic_types_value.bool_value = False\n+    msg0.basic_types_value.char_value = 3\n+    msg0.basic_types_value.int32_value = 42\n+\n+    assert msg0.basic_types_value != msg_basic_types\n+\n+    test_values = {}\n+    test_values['basic_types_value'] = msg_basic_types\n+    set_message_fields(msg0, test_values)\n+\n+    assert msg0.basic_types_value == msg_basic_types"
+        }
+      ]
+    },
+    {
+      "author": "vinnamkim",
+      "date": "2019-07-09T16:28:46Z",
+      "sha": "9fb725dccfcba32b2faca45401b905869e10e53d",
+      "message": "Add no_arr and no_str parameters (ros2/rosidl_python#38)\n\n* Add no_arr and no_str params\n - For the issue : https://github.com/ros2/ros2cli/issues/136\n\nSigned-off-by: vinnamkim <vinnam.kim@gmail.com>\n\n* Fix formats on --noarr and --nostr\n\nSigned-off-by: vinnamkim <vinnam.kim@gmail.com>\n\n* Fix review\n\nSigned-off-by: vinnamkim <vinnam.kim@gmail.com>\n\n* Fix comments and remove outer parenthesis\n\nSigned-off-by: vinnamkim <vinnam.kim@gmail.com>\n\n* Distinguish between array, sequence and unbounded sequence\n\nSigned-off-by: vinnamkim <vinnam.kim@gmail.com>\n\n* Fix test failure\n\nSigned-off-by: vinnamkim <vinnam.kim@gmail.com>",
+      "files_changed": 1,
+      "additions": 88,
+      "deletions": 27,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b72484230c0a8b8e9f92a3091d84503a3a2fef85",
+          "filename": "rosidl_runtime_py/convert.py",
+          "status": "modified",
+          "additions": 88,
+          "deletions": 27,
+          "changes": 115,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/9fb725dccfcba32b2faca45401b905869e10e53d/rosidl_runtime_py%2Fconvert.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/9fb725dccfcba32b2faca45401b905869e10e53d/rosidl_runtime_py%2Fconvert.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/rosidl_runtime_py%2Fconvert.py?ref=9fb725dccfcba32b2faca45401b905869e10e53d",
+          "patch": "@@ -18,12 +18,38 @@\n from typing import Any\n \n import numpy\n+import rosidl_parser.definition\n import yaml\n \n \n __yaml_representer_registered = False\n \n \n+def __get_type_name(value_type):\n+    if isinstance(value_type, rosidl_parser.definition.BasicType):\n+        return value_type.typename\n+    elif isinstance(value_type, rosidl_parser.definition.NamedType):\n+        return value_type.name\n+    elif isinstance(value_type, rosidl_parser.definition.NamespacedType):\n+        return '/'.join(value_type.namespaced_name())\n+    else:\n+        return 'unknown'\n+\n+\n+def __abbreviate_array_info(value, field_type):\n+    value_type_name = __get_type_name(field_type.value_type)\n+    if isinstance(field_type, rosidl_parser.definition.Array):\n+        return '<array type: {0}[{1}]>'.format(\n+            value_type_name, field_type.size)\n+    elif isinstance(field_type, rosidl_parser.definition.BoundedSequence):\n+        return '<sequence type: {0}[{1}], length: {2}>'.format(\n+            value_type_name, field_type.maximum_size, len(value))\n+    elif isinstance(field_type, rosidl_parser.definition.UnboundedSequence):\n+        return '<sequence type: {0}, length: {1}>'.format(\n+            value_type_name, len(value))\n+    return 'unknown'\n+\n+\n # Custom representer for getting clean YAML output that preserves the order in an OrderedDict.\n # Inspired by: http://stackoverflow.com/a/16782282/7169408\n def __represent_ordereddict(dumper, data):\n@@ -33,13 +59,16 @@ def __represent_ordereddict(dumper, data):\n     return yaml.nodes.MappingNode(u'tag:yaml.org,2002:map', items)\n \n \n-def message_to_yaml(msg: Any, truncate_length: int = None) -> str:\n+def message_to_yaml(msg: Any, truncate_length: int = None,\n+                    no_arr: bool = False, no_str: bool = False) -> str:\n     \"\"\"\n     Convert a ROS message to a YAML string.\n \n     :param msg: The ROS message to convert.\n     :param truncate_length: Truncate values for all message fields to this length.\n         This does not truncate the list of message fields.\n+    :param no_arr: Exclude array fields of the message.\n+    :param no_str: Exclude string fields of the message.\n     :returns: A YAML string representation of the input ROS message.\n     \"\"\"\n     global __yaml_representer_registered\n@@ -50,33 +79,42 @@ def message_to_yaml(msg: Any, truncate_length: int = None) -> str:\n         __yaml_representer_registered = True\n \n     return yaml.dump(\n-        message_to_ordereddict(msg, truncate_length=truncate_length),\n+        message_to_ordereddict(\n+            msg, truncate_length=truncate_length, no_arr=no_arr, no_str=no_str),\n         allow_unicode=True, width=sys.maxsize,\n     )\n \n \n-def message_to_csv(msg: Any, truncate_length: int = None) -> str:\n+def message_to_csv(msg: Any, truncate_length: int = None,\n+                   no_arr: bool = False, no_str: bool = False) -> str:\n     \"\"\"\n     Convert a ROS message to string of comma-separated values.\n \n     :param msg: The ROS message to convert.\n     :param truncate_length: Truncate values for all message fields to this length.\n         This does not truncate the list of message fields.\n+    :param no_arr: Exclude array fields of the message.\n+    :param no_str: Exclude string fields of the message.\n     :returns: A string of comma-separated values representing the input message.\n     \"\"\"\n-    def to_string(val):\n-        nonlocal truncate_length\n+    def to_string(val, field_type=None):\n+        nonlocal truncate_length, no_arr, no_str\n         r = ''\n         if any(isinstance(val, t) for t in [list, tuple, array.array, numpy.ndarray]):\n-            for i, v in enumerate(val):\n-                if r:\n-                    r += ','\n-                if truncate_length is not None and i >= truncate_length:\n-                    r += '...'\n-                    break\n-                r += to_string(v)\n+            if no_arr is True and field_type is not None:\n+                r = __abbreviate_array_info(val, field_type)\n+            else:\n+                for i, v in enumerate(val):\n+                    if r:\n+                        r += ','\n+                    if truncate_length is not None and i >= truncate_length:\n+                        r += '...'\n+                        break\n+                    r += to_string(v)\n         elif any(isinstance(val, t) for t in [bool, bytes, float, int, str, numpy.number]):\n-            if any(isinstance(val, t) for t in [bytes, str]):\n+            if no_str is True and isinstance(val, str):\n+                val = '<string length: <{0}>>'.format(len(val))\n+            elif any(isinstance(val, t) for t in [bytes, str]):\n                 if truncate_length is not None and len(val) > truncate_length:\n                     val = val[:truncate_length]\n                     if isinstance(val, bytes):\n@@ -85,74 +123,97 @@ def to_string(val):\n                         val += '...'\n             r = str(val)\n         else:\n-            r = message_to_csv(val, truncate_length)\n+            r = message_to_csv(val, truncate_length, no_arr, no_str)\n         return r\n     result = ''\n+\n     # We rely on __slots__ retaining the order of the fields in the .msg file.\n-    for field_name in msg.__slots__:\n+    for field_name, field_type in zip(msg.__slots__, msg.SLOT_TYPES):\n         value = getattr(msg, field_name)\n+\n         if result:\n             result += ','\n-        result += to_string(value)\n+\n+        result += to_string(value, field_type)\n     return result\n \n \n # Convert a msg to an OrderedDict. We do this instead of implementing a generic __dict__() method\n # in the msg because we want to preserve order of fields from the .msg file(s).\n-def message_to_ordereddict(msg: Any, truncate_length: int = None) -> OrderedDict:\n+def message_to_ordereddict(\n+        msg: Any,\n+        truncate_length: int = None,\n+        no_arr: bool = False,\n+        no_str: bool = False) -> OrderedDict:\n     \"\"\"\n     Convert a ROS message to an OrderedDict.\n \n     :param msg: The ROS message to convert.\n     :param truncate_length: Truncate values for all message fields to this length.\n         This does not truncate the list of fields (ie. the dictionary keys).\n+    :param no_arr: Exclude array fields of the message.\n+    :param no_str: Exclude string fields of the message.\n     :returns: An OrderedDict where the keys are the ROS message fields and the values are\n         set to the values of the input message.\n     \"\"\"\n     d = OrderedDict()\n+\n     # We rely on __slots__ retaining the order of the fields in the .msg file.\n-    for field_name in msg.__slots__:\n+    for field_name, field_type in zip(msg.__slots__, msg.SLOT_TYPES):\n         value = getattr(msg, field_name, None)\n-        value = _convert_value(value, truncate_length=truncate_length)\n+\n+        value = _convert_value(\n+            value, field_type,\n+            truncate_length=truncate_length, no_arr=no_arr, no_str=no_str)\n         # Remove leading underscore from field name\n         d[field_name[1:]] = value\n     return d\n \n \n-def _convert_value(value, truncate_length=None):\n+def _convert_value(value, field_type=None,\n+                   truncate_length=None, no_arr=False, no_str=False):\n+\n     if isinstance(value, bytes):\n         if truncate_length is not None and len(value) > truncate_length:\n             value = ''.join([chr(c) for c in value[:truncate_length]]) + '...'\n         else:\n             value = ''.join([chr(c) for c in value])\n     elif isinstance(value, str):\n-        if truncate_length is not None and len(value) > truncate_length:\n+        if no_str is True:\n+            value = '<string length: <{0}>>'.format(len(value))\n+        elif truncate_length is not None and len(value) > truncate_length:\n             value = value[:truncate_length] + '...'\n     elif isinstance(value, (list, tuple, array.array, numpy.ndarray)):\n         # Since arrays and ndarrays can't contain mixed types convert to list\n         typename = tuple if isinstance(value, tuple) else list\n-        if truncate_length is not None and len(value) > truncate_length:\n+        if no_arr is True and field_type is not None:\n+            value = __abbreviate_array_info(value, field_type)\n+        elif truncate_length is not None and len(value) > truncate_length:\n             # Truncate the sequence\n             value = value[:truncate_length]\n             # Truncate every item in the sequence\n             value = typename(\n-                [_convert_value(v, truncate_length) for v in value] + ['...'])\n+                [_convert_value(v, truncate_length=truncate_length,\n+                                no_arr=no_arr, no_str=no_str) for v in value] + ['...'])\n         else:\n             # Truncate every item in the list\n             value = typename(\n-                [_convert_value(v, truncate_length) for v in value])\n-    elif isinstance(value, (dict, OrderedDict)):\n+                [_convert_value(v, truncate_length=truncate_length,\n+                                no_arr=no_arr, no_str=no_str) for v in value])\n+    elif isinstance(value, dict) or isinstance(value, OrderedDict):\n         # Convert each key and value in the mapping\n         new_value = {} if isinstance(value, dict) else OrderedDict()\n         for k, v in value.items():\n             # Don't truncate keys because that could result in key collisions and data loss\n-            new_value[_convert_value(k)] = _convert_value(v, truncate_length=truncate_length)\n+            new_value[_convert_value(k)] = _convert_value(\n+                v, truncate_length=truncate_length, no_arr=no_arr, no_str=no_str)\n         value = new_value\n     elif isinstance(value, numpy.number):\n         value = value.item()\n     elif not isinstance(value, (bool, float, int)):\n         # Assuming value is a message since it is neither a collection nor a primitive type\n-        value = message_to_ordereddict(value, truncate_length=truncate_length)\n+        value = message_to_ordereddict(\n+            value, truncate_length=truncate_length, no_arr=no_arr, no_str=no_str)\n     return value\n \n "
+        }
+      ]
+    },
+    {
+      "author": "nuclearsandwich",
+      "date": "2019-04-14T12:05:04Z",
+      "sha": "45f85f2497beff0f25943f0d719c2e28184f17f9",
+      "message": "0.7.0",
+      "files_changed": 2,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "536a8e555c1b5f669f0e4c6b35768a45e72e5fec",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/45f85f2497beff0f25943f0d719c2e28184f17f9/package.xml",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/45f85f2497beff0f25943f0d719c2e28184f17f9/package.xml",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/package.xml?ref=45f85f2497beff0f25943f0d719c2e28184f17f9",
+          "patch": "@@ -2,7 +2,7 @@\n <?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"3\">\n   <name>rosidl_runtime_py</name>\n-  <version>0.6.2</version>\n+  <version>0.7.0</version>\n   <description>Runtime utilities for working with generated ROS interfaces in Python.</description>\n   <maintainer email=\"jacob@openrobotics.org\">Jacob Perron</maintainer>\n   <license>Apache License 2.0</license>"
+        },
+        {
+          "sha": "6cd82759037299cdccdecd35521f903009badcb6",
+          "filename": "setup.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/45f85f2497beff0f25943f0d719c2e28184f17f9/setup.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/45f85f2497beff0f25943f0d719c2e28184f17f9/setup.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/setup.py?ref=45f85f2497beff0f25943f0d719c2e28184f17f9",
+          "patch": "@@ -3,7 +3,7 @@\n \n setup(\n     name='rosidl_runtime_py',\n-    version='0.6.2',\n+    version='0.7.0',\n     packages=find_packages(exclude=['test']),\n     zip_safe=False,\n     author='Dirk Thomas',"
+        }
+      ]
+    },
+    {
+      "author": "ahcorde",
+      "date": "2026-04-09T13:30:21Z",
+      "sha": "f1c9c28ba259bea7b397397cf031735ba11b4321",
+      "message": "Changelog\n\nSigned-off-by: Alejandro Hernandez Cordero <ahcorde@gmail.com>",
+      "files_changed": 1,
+      "additions": 7,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "b9aa89ba8456076ed4882b15164aceb5bb7e2b55",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/f1c9c28ba259bea7b397397cf031735ba11b4321/CHANGELOG.rst",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/f1c9c28ba259bea7b397397cf031735ba11b4321/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/CHANGELOG.rst?ref=f1c9c28ba259bea7b397397cf031735ba11b4321",
+          "patch": "@@ -2,6 +2,13 @@\n Changelog for package rosidl_runtime_py\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+0.15.2 (2026-04-09)\n+-------------------\n+* Add support for rosidl::Buffer in rosidl Python path for rclpy (`#39 <https://github.com/ros2/rosidl_runtime_py/issues/39>`_)\n+* Fix flake8 (`#40 <https://github.com/ros2/rosidl_runtime_py/issues/40>`_)\n+* Add py.typed to the package (`#37 <https://github.com/ros2/rosidl_runtime_py/issues/37>`_)\n+* Contributors: CY Chen, Michael Carlstrom, Vladimir Gerts\n+\n 0.15.1 (2025-07-29)\n -------------------\n * fix setuptools deprecations (`#35 <https://github.com/ros2/rosidl_runtime_py/issues/35>`_)"
+        }
+      ]
+    },
+    {
+      "author": "nvcyc",
+      "date": "2026-04-06T23:01:21Z",
+      "sha": "647f2607150b85ed1b17ba418800e60bb976e500",
+      "message": "Add support for rosidl::Buffer in rosidl Python path for rclpy (#39)\n\n* Add support for rosidl::Buffer in rosidl Python path for rclpy\n\nSigned-off-by: CY Chen <cyc@nvidia.com>\n\n* Use itertools for Buffer display in convert.py\n\nSigned-off-by: CY Chen <cyc@nvidia.com>\n\n* Simplify logic of truncating output for the buffer type\n\nSigned-off-by: CY Chen <cyc@nvidia.com>\n\n---------\n\nSigned-off-by: CY Chen <cyc@nvidia.com>",
+      "files_changed": 3,
+      "additions": 23,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "3ad092d0ac770e913c26ab7d7659a226f1359e9a",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/647f2607150b85ed1b17ba418800e60bb976e500/package.xml",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/647f2607150b85ed1b17ba418800e60bb976e500/package.xml",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/package.xml?ref=647f2607150b85ed1b17ba418800e60bb976e500",
+          "patch": "@@ -14,6 +14,7 @@\n \n   <exec_depend>python3-numpy</exec_depend>\n   <exec_depend>python3-yaml</exec_depend>\n+  <exec_depend>rosidl_buffer_py</exec_depend>\n   <exec_depend>rosidl_parser</exec_depend>\n \n   <test_depend>ament_copyright</test_depend>"
+        },
+        {
+          "sha": "ae7f110cedd50a27a03a03655265820f962af369",
+          "filename": "rosidl_runtime_py/convert.py",
+          "status": "modified",
+          "additions": 18,
+          "deletions": 1,
+          "changes": 19,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/647f2607150b85ed1b17ba418800e60bb976e500/rosidl_runtime_py%2Fconvert.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/647f2607150b85ed1b17ba418800e60bb976e500/rosidl_runtime_py%2Fconvert.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/rosidl_runtime_py%2Fconvert.py?ref=647f2607150b85ed1b17ba418800e60bb976e500",
+          "patch": "@@ -18,6 +18,7 @@\n from typing import Any\n \n import numpy\n+from rosidl_buffer import Buffer as _RosidlBuffer\n import rosidl_parser.definition\n import yaml\n \n@@ -115,7 +116,15 @@ def message_to_csv(\n     \"\"\"\n     def to_string(val, field_type=None):\n         r = ''\n-        if any(isinstance(val, t) for t in [list, tuple, array.array, numpy.ndarray]):\n+        if isinstance(val, _RosidlBuffer):\n+            if no_arr and field_type is not None:\n+                r = __abbreviate_array_info(val, field_type)\n+            else:\n+                values = val.to_bytes()\n+                r = ','.join(str(v) for v in values[:truncate_length])\n+                if truncate_length is not None and len(values) > truncate_length:\n+                    r += ',...'\n+        elif any(isinstance(val, t) for t in [list, tuple, array.array, numpy.ndarray]):\n             if no_arr is True and field_type is not None:\n                 r = __abbreviate_array_info(val, field_type)\n             else:\n@@ -210,6 +219,14 @@ def _convert_value(\n             value = '<string length: <{0}>>'.format(len(value))\n         elif truncate_length is not None and len(value) > truncate_length:\n             value = value[:truncate_length] + '...'\n+    elif isinstance(value, _RosidlBuffer):\n+        if no_arr and field_type is not None:\n+            value = __abbreviate_array_info(value, field_type)\n+        else:\n+            bytestring = value.to_bytes()\n+            value = [int(v) for v in bytestring[:truncate_length]]\n+            if truncate_length is not None and len(bytestring) > truncate_length:\n+                value += ['...']\n     elif isinstance(value, (list, tuple, array.array, numpy.ndarray)):\n         # Since arrays and ndarrays can't contain mixed types convert to list\n         typename = tuple if isinstance(value, tuple) else list"
+        },
+        {
+          "sha": "8ab98cdea4f3f15a471eecd8949137fbef668c02",
+          "filename": "rosidl_runtime_py/set_message.py",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/647f2607150b85ed1b17ba418800e60bb976e500/rosidl_runtime_py%2Fset_message.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/647f2607150b85ed1b17ba418800e60bb976e500/rosidl_runtime_py%2Fset_message.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/rosidl_runtime_py%2Fset_message.py?ref=647f2607150b85ed1b17ba418800e60bb976e500",
+          "patch": "@@ -22,6 +22,8 @@\n \n import numpy\n \n+from rosidl_buffer import Buffer as _RosidlBuffer\n+\n from rosidl_parser.definition import AbstractNestedType\n from rosidl_parser.definition import NamespacedType\n from rosidl_runtime_py.convert import get_message_slot_types\n@@ -69,6 +71,8 @@ def set_message_fields_internal(\n             qualified_class_name = '{}.{}'.format(field_type.__module__, field_type.__name__)\n             if field_type is array.array:\n                 value = field_type(field.typecode, field_value)\n+            elif field_type is _RosidlBuffer:\n+                value = array.array('B', field_value)\n             elif field_type is numpy.ndarray:\n                 value = numpy.array(field_value, dtype=field.dtype)\n             elif type(field_value) is field_type:"
+        }
+      ]
+    },
+    {
+      "author": "InvincibleRMC",
+      "date": "2026-03-24T10:58:37Z",
+      "sha": "fd0e28ef5d11e973ebcbdd76e7f8ccdd708c3f07",
+      "message": "Fix flake8 (#40)\n\nSigned-off-by: Michael Carlstrom <rmc@carlstrom.com>",
+      "files_changed": 1,
+      "additions": 0,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "f21295e4b9cea8711ae21a06333fc403e6ddaae2",
+          "filename": "rosidl_runtime_py/convert.py",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 1,
+          "changes": 1,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/fd0e28ef5d11e973ebcbdd76e7f8ccdd708c3f07/rosidl_runtime_py%2Fconvert.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/fd0e28ef5d11e973ebcbdd76e7f8ccdd708c3f07/rosidl_runtime_py%2Fconvert.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/rosidl_runtime_py%2Fconvert.py?ref=fd0e28ef5d11e973ebcbdd76e7f8ccdd708c3f07",
+          "patch": "@@ -114,7 +114,6 @@ def message_to_csv(\n     :returns: A string of comma-separated values representing the input message.\n     \"\"\"\n     def to_string(val, field_type=None):\n-        nonlocal truncate_length, no_arr, no_str\n         r = ''\n         if any(isinstance(val, t) for t in [list, tuple, array.array, numpy.ndarray]):\n             if no_arr is True and field_type is not None:"
+        }
+      ]
+    },
+    {
+      "author": "Michael Carroll",
+      "date": "2019-09-26T17:11:11Z",
+      "sha": "614bad797ad84b55655463810d153c113af261bb",
+      "message": "0.8.0\n\nSigned-off-by: Michael Carroll <michael@openrobotics.org>",
+      "files_changed": 3,
+      "additions": 56,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "d729cbd65546a0be2dd205cca38879c4528895ea",
+          "filename": "CHANGELOG.rst",
+          "status": "added",
+          "additions": 54,
+          "deletions": 0,
+          "changes": 54,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/614bad797ad84b55655463810d153c113af261bb/CHANGELOG.rst",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/614bad797ad84b55655463810d153c113af261bb/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/CHANGELOG.rst?ref=614bad797ad84b55655463810d153c113af261bb",
+          "patch": "@@ -0,0 +1,54 @@\n+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n+Changelog for package rosidl_runtime_py\n+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n+\n+0.8.0 (2019-09-26)\n+------------------\n+* install resource marker file for package (`#2 <https://github.com/ros2/rosidl_runtime_py/issues/2>`_)\n+* Update setup.py URLs\n+* Add contributing and license files\n+* install package manifest (`ros2/rosidl_python#86 <https://github.com/ros2/rosidl_python/issues/86>`_)\n+* Rename TestConfig class to Config to avoid pytest warning (`ros2/rosidl_python#82 <https://github.com/ros2/rosidl_python/issues/82>`_)\n+* fix set_message_fields for numpy array (`ros2/rosidl_python#81 <https://github.com/ros2/rosidl_python/issues/81>`_)\n+* Fix type name queries for string types. (`ros2/rosidl_python#77 <https://github.com/ros2/rosidl_python/issues/77>`_)\n+* Require keyword arguments be passed by name (`ros2/rosidl_python#80 <https://github.com/ros2/rosidl_python/issues/80>`_)\n+* Add utility functions to get interface from identifier\n+* Make import_message_from_namespaced_type operate on NamespacedType (`ros2/rosidl_python#74 <https://github.com/ros2/rosidl_python/issues/74>`_)\n+* handle set_message_fields given some non-basic type (`ros2/rosidl_python#68 <https://github.com/ros2/rosidl_python/issues/68>`_)\n+* Add no_arr and no_str parameters (`ros2/rosidl_python#38 <https://github.com/ros2/rosidl_python/issues/38>`_)\n+* Contributors: Dirk Thomas, Jacob Perron, Jeremie Deray, Michel Hidalgo, Mikael Arguedas, Vinnam Kim, ivanpauno\n+\n+0.7.6 (2019-05-30)\n+------------------\n+* fix logic around populating arrays (`ros2/rosidl_python#62 <https://github.com/ros2/rosidl_python/issues/62>`_)\n+* Fix the setting of array variables. (`ros2/rosidl_python#59 <https://github.com/ros2/rosidl_python/issues/59>`_)\n+* Contributors: Chris Lalancette, Dirk Thomas\n+\n+0.7.5 (2019-05-29)\n+------------------\n+\n+0.7.4 (2019-05-20)\n+------------------\n+\n+0.7.3 (2019-05-08 17:57)\n+------------------------\n+\n+0.7.2 (2019-05-08 16:58)\n+------------------------\n+* allow unicode chars in yaml output (`ros2/rosidl_python#50 <https://github.com/ros2/rosidl_python/issues/50>`_)\n+* add xmllint linter test (`ros2/rosidl_python#53 <https://github.com/ros2/rosidl_python/issues/53>`_)\n+* store types as tuple of abstract types (`ros2/rosidl_python#33 <https://github.com/ros2/rosidl_python/issues/33>`_)\n+* Update tests that were missed during switch to use new interfaces (`ros2/rosidl_python#51 <https://github.com/ros2/rosidl_python/issues/51>`_)\n+* [rosidl_runtime_py] Use new test interface definitions\n+* simplify code using updated definition API (`ros2/rosidl_python#45 <https://github.com/ros2/rosidl_python/issues/45>`_)\n+* Contributors: Dirk Thomas, Jacob Perron, Mikael Arguedas\n+\n+0.7.1 (2019-04-14 12:48)\n+------------------------\n+\n+0.7.0 (2019-04-14 05:05)\n+------------------------\n+* fix echo of numpy.number values (`ros2/rosidl_python#37 <https://github.com/ros2/rosidl_python/issues/37>`_)\n+* Refactor rosidl_runtime_py functions\n+* Add rosidl_runtime_py package\n+* Contributors: Dirk Thomas, Jacob Perron"
+        },
+        {
+          "sha": "0914d2f28a460083837383fdbe954977967878d4",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/614bad797ad84b55655463810d153c113af261bb/package.xml",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/614bad797ad84b55655463810d153c113af261bb/package.xml",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/package.xml?ref=614bad797ad84b55655463810d153c113af261bb",
+          "patch": "@@ -2,7 +2,7 @@\n <?xml-model href=\"http://download.ros.org/schema/package_format2.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"2\">\n   <name>rosidl_runtime_py</name>\n-  <version>0.7.6</version>\n+  <version>0.8.0</version>\n   <description>Runtime utilities for working with generated ROS interfaces in Python.</description>\n   <maintainer email=\"jacob@openrobotics.org\">Jacob Perron</maintainer>\n   <license>Apache License 2.0</license>"
+        },
+        {
+          "sha": "a8e6a5165c7c1da414c322c18260576f263723db",
+          "filename": "setup.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/rosidl_runtime_py/blob/614bad797ad84b55655463810d153c113af261bb/setup.py",
+          "raw_url": "https://github.com/ros2/rosidl_runtime_py/raw/614bad797ad84b55655463810d153c113af261bb/setup.py",
+          "contents_url": "https://api.github.com/repos/ros2/rosidl_runtime_py/contents/setup.py?ref=614bad797ad84b55655463810d153c113af261bb",
+          "patch": "@@ -5,7 +5,7 @@\n \n setup(\n     name=package_name,\n-    version='0.7.6',\n+    version='0.8.0',\n     packages=find_packages(exclude=['test']),\n     data_files=[\n         ('share/' + package_name, ['package.xml']),"
+        }
+      ]
+    }
+  ]
+}

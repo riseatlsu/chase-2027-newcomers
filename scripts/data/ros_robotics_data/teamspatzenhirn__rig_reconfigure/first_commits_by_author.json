@@ -1,0 +1,131 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T06:14:24Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "teamspatzenhirn",
+    "repo": "rig_reconfigure"
+  },
+  "data": [
+    {
+      "author": "ottojo",
+      "date": "2023-02-13T19:54:28Z",
+      "sha": "0af8e5c71e4e7cb4f5e86f87ffa33b3bf0ce6c85",
+      "message": "only call listbox end if it is visible",
+      "files_changed": 1,
+      "additions": 7,
+      "deletions": 6,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "25b6b7ea62f0ba1370ab0cd7a9dd0cb87fcc21d5",
+          "filename": "src/rig_reconfigure.cpp",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 6,
+          "changes": 13,
+          "blob_url": "https://github.com/teamspatzenhirn/rig_reconfigure/blob/0af8e5c71e4e7cb4f5e86f87ffa33b3bf0ce6c85/src%2Frig_reconfigure.cpp",
+          "raw_url": "https://github.com/teamspatzenhirn/rig_reconfigure/raw/0af8e5c71e4e7cb4f5e86f87ffa33b3bf0ce6c85/src%2Frig_reconfigure.cpp",
+          "contents_url": "https://api.github.com/repos/teamspatzenhirn/rig_reconfigure/contents/src%2Frig_reconfigure.cpp?ref=0af8e5c71e4e7cb4f5e86f87ffa33b3bf0ce6c85",
+          "patch": "@@ -228,14 +228,15 @@ int main(int argc, char *argv[]) {\n         } else {\n             ImGui::Text(\"Available nodes:\");\n \n-            ImGui::ListBoxHeader(\"##Nodes\", ImVec2(0, 500));\n-            for (auto i = 0U; i < nodeNames.size(); ++i) {\n-                const bool isSelected = (selectedIndex == i);\n-                if (ImGui::Selectable(nodeNames[i].c_str(), isSelected)) {\n-                    selectedIndex = i;\n+            if (ImGui::BeginListBox(\"##Nodes\", ImVec2(0, 500))) {\n+                for (auto i = 0U; i < nodeNames.size(); ++i) {\n+                    const bool isSelected = (selectedIndex == i);\n+                    if (ImGui::Selectable(nodeNames[i].c_str(), isSelected)) {\n+                        selectedIndex = i;\n+                    }\n                 }\n+                ImGui::EndListBox();\n             }\n-            ImGui::ListBoxFooter();\n         }\n \n         if (ImGui::Button(\"Refresh\")) {"
+        }
+      ]
+    },
+    {
+      "author": "authaldo",
+      "date": "2022-12-05T20:44:50Z",
+      "sha": "a731a46bf12bde1a2882f01af367d123a55c14bc",
+      "message": "added minimalistic README",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "d106a1935c57c786fb25f3a56c49fd13af47ba47",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/teamspatzenhirn/rig_reconfigure/blob/a731a46bf12bde1a2882f01af367d123a55c14bc/README.md",
+          "raw_url": "https://github.com/teamspatzenhirn/rig_reconfigure/raw/a731a46bf12bde1a2882f01af367d123a55c14bc/README.md",
+          "contents_url": "https://api.github.com/repos/teamspatzenhirn/rig_reconfigure/contents/README.md?ref=a731a46bf12bde1a2882f01af367d123a55c14bc",
+          "patch": "@@ -0,0 +1,5 @@\n+# rig-reconfigure\n+\n+RQT reconfigure alternative based on [Dear ImGui](https://github.com/ocornut/imgui) and the corresponding python bindings\n+provided by [imviz](https://github.com/joruof/imviz).\n+"
+        }
+      ]
+    },
+    {
+      "author": "malban",
+      "date": "2025-04-07T18:30:21Z",
+      "sha": "379cc5b79177c5e12f2b0b5dbdea924cb4e095a2",
+      "message": "Fix parameter input widget widths by removing explicit calculation.",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 8,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "63b2156f11500ff4147c6497456db787d51ecff6",
+          "filename": "src/parameter_window.cpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 8,
+          "changes": 12,
+          "blob_url": "https://github.com/teamspatzenhirn/rig_reconfigure/blob/379cc5b79177c5e12f2b0b5dbdea924cb4e095a2/src%2Fparameter_window.cpp",
+          "raw_url": "https://github.com/teamspatzenhirn/rig_reconfigure/raw/379cc5b79177c5e12f2b0b5dbdea924cb4e095a2/src%2Fparameter_window.cpp",
+          "contents_url": "https://api.github.com/repos/teamspatzenhirn/rig_reconfigure/contents/src%2Fparameter_window.cpp?ref=379cc5b79177c5e12f2b0b5dbdea924cb4e095a2",
+          "patch": "@@ -28,7 +28,7 @@ constexpr auto TEXT_INPUT_EDITING_END_CHARACTERS = \"\\n\";\n \n static std::set<ImGuiID> visualizeParameters(ServiceWrapper &serviceWrapper,\n                                              const std::shared_ptr<ParameterGroup> &parameterNode,\n-                                             std::size_t maxParamLength, std::size_t textfieldWidth,\n+                                             std::size_t maxParamLength,\n                                              const std::string &filterString, bool expandAll = false);\n \n void renderParameterWindow(const char *windowName, const std::string &curSelectedNode,\n@@ -90,10 +90,8 @@ void renderParameterWindow(const char *windowName, const std::string &curSelecte\n         ImGui::Dummy(ImVec2(0.0F, 10.0F));\n \n         const auto maxParamLength = filteredParameterTree.getMaxParamNameLength();\n-        const auto textfieldWidth = std::max(MIN_INPUT_TEXT_FIELD_WIDTH, curWindowWidth - static_cast<int>(maxParamLength) - TEXT_INPUT_FIELD_PADDING);\n-\n         const auto ids = visualizeParameters(serviceWrapper, filteredParameterTree.getRoot(),\n-                                             maxParamLength, textfieldWidth, filteredParameterTree.getAppliedFilter(),\n+                                             maxParamLength, filteredParameterTree.getAppliedFilter(),\n                                              expandAllParameters);\n         treeNodeIDs.insert(ids.begin(), ids.end());\n \n@@ -111,7 +109,6 @@ void renderParameterWindow(const char *windowName, const std::string &curSelecte\n std::set<ImGuiID> visualizeParameters(ServiceWrapper &serviceWrapper,\n                                       const std::shared_ptr<ParameterGroup> &parameterNode,\n                                       const std::size_t maxParamLength,\n-                                      const std::size_t textfieldWidth,\n                                       const std::string &filterString,\n                                       const bool expandAll) {\n     // required to store which of the text input fields is 'dirty' (has changes which have not yet been propagated to\n@@ -154,7 +151,7 @@ std::set<ImGuiID> visualizeParameters(ServiceWrapper &serviceWrapper,\n         ImGui::Text(\"%s\", padding.c_str());\n \n         ImGui::SameLine();\n-        ImGui::PushItemWidth(static_cast<float>(textfieldWidth));\n+        ImGui::PushItemWidth(-FLT_MIN);\n \n         if (std::holds_alternative<double>(value)) {\n             ImGui::DragScalar(identifier.c_str(), ImGuiDataType_Double, &std::get<double>(value), 1.0F, nullptr,\n@@ -232,8 +229,7 @@ std::set<ImGuiID> visualizeParameters(ServiceWrapper &serviceWrapper,\n             }\n \n             if (open) {\n-                const auto newWidth = textfieldWidth - TEXT_FIELD_WIDTH_REDUCTION_PER_LEVEL;\n-                auto subIDs = visualizeParameters(serviceWrapper, subgroup, maxParamLength, newWidth,\n+                auto subIDs = visualizeParameters(serviceWrapper, subgroup, maxParamLength,\n                                                   filterString, expandAll);\n                 nodeIDs.insert(subIDs.begin(), subIDs.end());\n                 ImGui::TreePop();"
+        }
+      ]
+    },
+    {
+      "author": "clalancette",
+      "date": "2023-12-27T15:09:27Z",
+      "sha": "365582a1b38848b0593b237f451319cb7cc82667",
+      "message": "Add dependency on ament_index_cpp (#29)\n\nThis is required to compile on the latest Rolling.",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 2,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "bc902fb160d0189990d05622b6502a296526884a",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 2,
+          "changes": 3,
+          "blob_url": "https://github.com/teamspatzenhirn/rig_reconfigure/blob/365582a1b38848b0593b237f451319cb7cc82667/CMakeLists.txt",
+          "raw_url": "https://github.com/teamspatzenhirn/rig_reconfigure/raw/365582a1b38848b0593b237f451319cb7cc82667/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/teamspatzenhirn/rig_reconfigure/contents/CMakeLists.txt?ref=365582a1b38848b0593b237f451319cb7cc82667",
+          "patch": "@@ -40,8 +40,7 @@ add_executable(${PROJECT_NAME} src/rig_reconfigure.cpp src/service_wrapper.cpp s\n #target_link_options(${PROJECT_NAME} PRIVATE -fsanitize=thread)\n \n target_include_directories(${PROJECT_NAME} PRIVATE include external/imspinner external/lodepng)\n-target_link_libraries(${PROJECT_NAME} imgui)\n-ament_target_dependencies(${PROJECT_NAME} rclcpp)\n+target_link_libraries(${PROJECT_NAME} imgui rclcpp::rclcpp ament_index_cpp::ament_index_cpp)\n \n install(TARGETS ${PROJECT_NAME}\n         DESTINATION lib/${PROJECT_NAME}"
+        }
+      ]
+    },
+    {
+      "author": "cottsay",
+      "date": "2023-04-10T22:07:36Z",
+      "sha": "2fa00bf27f6b9b5705faeedb1b110dba6794d233",
+      "message": "Add missing buildtool_depends on git\n\nThis dependency is needed for a call to FetchContent_Declare.",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "e588c2bccfe0a55d5c4186eb38c3398bc0dde579",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/teamspatzenhirn/rig_reconfigure/blob/2fa00bf27f6b9b5705faeedb1b110dba6794d233/package.xml",
+          "raw_url": "https://github.com/teamspatzenhirn/rig_reconfigure/raw/2fa00bf27f6b9b5705faeedb1b110dba6794d233/package.xml",
+          "contents_url": "https://api.github.com/repos/teamspatzenhirn/rig_reconfigure/contents/package.xml?ref=2fa00bf27f6b9b5705faeedb1b110dba6794d233",
+          "patch": "@@ -9,6 +9,7 @@\n     <license>MIT</license>\n \n     <buildtool_depend>ament_cmake</buildtool_depend>\n+    <buildtool_depend>git</buildtool_depend>\n     <depend>libglfw3-dev</depend>\n     <depend>rclcpp</depend>\n "
+        }
+      ]
+    }
+  ]
+}

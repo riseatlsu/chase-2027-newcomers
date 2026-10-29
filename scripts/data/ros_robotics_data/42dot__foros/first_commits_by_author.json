@@ -1,0 +1,217 @@
+{
+  "_meta": {
+    "fetched_at": "2026-09-24T14:50:14Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "42dot",
+    "repo": "foros",
+    "refreshed_at": "2026-09-24T14:50:14Z",
+    "refresh_note": "incrementally added 3 author(s) missing from a prior stale cache"
+  },
+  "data": [
+    {
+      "author": "huchijwk",
+      "date": "2021-10-13T08:06:28Z",
+      "sha": "1c9da49325f1e0bf7727359c68957db83e2cb229",
+      "message": "Initial commit",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "c3f457b5fe0d9e28a6aded7f44429a23ebb7d7dd",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/42dot/foros/blob/1c9da49325f1e0bf7727359c68957db83e2cb229/README.md",
+          "raw_url": "https://github.com/42dot/foros/raw/1c9da49325f1e0bf7727359c68957db83e2cb229/README.md",
+          "contents_url": "https://api.github.com/repos/42dot/foros/contents/README.md?ref=1c9da49325f1e0bf7727359c68957db83e2cb229",
+          "patch": "@@ -0,0 +1,3 @@\n+# fsros\n+\n+Failsafe ROS framework prototype\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "Taehun Lim",
+      "date": "2022-10-17T15:50:06Z",
+      "sha": "fb76bfcf5428be4d05597f9909764c0c101a0972",
+      "message": "Added humble branch (#1)\n\nforos: migration to humble hawksbill\r\n\r\n- asnyc_send_request() returns a std::future instead of a std::shared_future\r\n- get_callback_group() is replaced with for_each_callback_group()\r\n- publish() is not a virtual function anymore\r\n\r\nSigned-off-by: Taehun Lim <thlim@robotis.com>",
+      "files_changed": 4,
+      "additions": 16,
+      "deletions": 10,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "0fbc6ee37080bf2c2646af64830eaf9e4e556aaf",
+          "filename": "foros/include/akit/failover/foros/cluster_node.hpp",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 4,
+          "changes": 13,
+          "blob_url": "https://github.com/42dot/foros/blob/fb76bfcf5428be4d05597f9909764c0c101a0972/foros%2Finclude%2Fakit%2Ffailover%2Fforos%2Fcluster_node.hpp",
+          "raw_url": "https://github.com/42dot/foros/raw/fb76bfcf5428be4d05597f9909764c0c101a0972/foros%2Finclude%2Fakit%2Ffailover%2Fforos%2Fcluster_node.hpp",
+          "contents_url": "https://api.github.com/repos/42dot/foros/contents/foros%2Finclude%2Fakit%2Ffailover%2Fforos%2Fcluster_node.hpp?ref=fb76bfcf5428be4d05597f9909764c0c101a0972",
+          "patch": "@@ -135,13 +135,18 @@ class ClusterNode : public std::enable_shared_from_this<ClusterNode>,\n       rclcpp::CallbackGroupType group_type,\n       bool automatically_add_to_executor_with_node = true);\n \n-  /// Return the list of callback groups in the node.\n+  /// Iterate over the callback groups in the node, calling func on each valid\n+  /// one.\n   /**\n-   * \\return List of callback groups in the node.\n+   * From Humble, get_callback_groups() is replaced with this method.\n+   * https://github.com/ros2/rclcpp/pull/1723\n+   *\n+   * \\param[in] func The callback function to call on each valid callback group.\n    */\n   CLUSTER_NODE_PUBLIC\n-  const std::vector<rclcpp::CallbackGroup::WeakPtr> &get_callback_groups()\n-      const;\n+  void for_each_callback_group(\n+      const rclcpp::node_interfaces::NodeBaseInterface::CallbackGroupFunction\n+          &func);\n \n   /// Create a Publisher.\n   /**"
+        },
+        {
+          "sha": "fd0aee6b974d89e9ed7702ad8499406b165a1896",
+          "filename": "foros/include/akit/failover/foros/cluster_node_publisher.hpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/42dot/foros/blob/fb76bfcf5428be4d05597f9909764c0c101a0972/foros%2Finclude%2Fakit%2Ffailover%2Fforos%2Fcluster_node_publisher.hpp",
+          "raw_url": "https://github.com/42dot/foros/raw/fb76bfcf5428be4d05597f9909764c0c101a0972/foros%2Finclude%2Fakit%2Ffailover%2Fforos%2Fcluster_node_publisher.hpp",
+          "contents_url": "https://api.github.com/repos/42dot/foros/contents/foros%2Finclude%2Fakit%2Ffailover%2Fforos%2Fcluster_node_publisher.hpp?ref=fb76bfcf5428be4d05597f9909764c0c101a0972",
+          "patch": "@@ -72,7 +72,7 @@ class ClusterNodePublisher : public rclcpp::Publisher<MessageT, Alloc> {\n    *\n    * \\param[in] msg a message to publish.\n    */\n-  void publish(std::unique_ptr<MessageT, MessageDeleter> msg) override {\n+  void publish(std::unique_ptr<MessageT, MessageDeleter> msg) {\n     if (node_lifecycle_interface_ != nullptr &&\n         !node_lifecycle_interface_->is_activated()) {\n       // ignore publish request when publisher is not activated\n@@ -88,7 +88,7 @@ class ClusterNodePublisher : public rclcpp::Publisher<MessageT, Alloc> {\n    *\n    * \\param[in] msg a message to publish.\n    */\n-  void publish(const MessageT& msg) override {\n+  void publish(const MessageT& msg) {\n     if (node_lifecycle_interface_ != nullptr &&\n         !node_lifecycle_interface_->is_activated()) {\n       // ignore publish request when publisher is not activated"
+        },
+        {
+          "sha": "ce4ba8dfb1a47bbb83670f7b647c634781e0141f",
+          "filename": "foros/src/cluster_node.cpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 3,
+          "changes": 7,
+          "blob_url": "https://github.com/42dot/foros/blob/fb76bfcf5428be4d05597f9909764c0c101a0972/foros%2Fsrc%2Fcluster_node.cpp",
+          "raw_url": "https://github.com/42dot/foros/raw/fb76bfcf5428be4d05597f9909764c0c101a0972/foros%2Fsrc%2Fcluster_node.cpp",
+          "contents_url": "https://api.github.com/repos/42dot/foros/contents/foros%2Fsrc%2Fcluster_node.cpp?ref=fb76bfcf5428be4d05597f9909764c0c101a0972",
+          "patch": "@@ -119,9 +119,10 @@ rclcpp::CallbackGroup::SharedPtr ClusterNode::create_callback_group(\n       group_type, automatically_add_to_executor_with_node);\n }\n \n-const std::vector<rclcpp::CallbackGroup::WeakPtr>\n-    &ClusterNode::get_callback_groups() const {\n-  return node_base_->get_callback_groups();\n+void ClusterNode::for_each_callback_group(\n+    const rclcpp::node_interfaces::NodeBaseInterface::CallbackGroupFunction\n+        &func) {\n+  node_base_->for_each_callback_group(func);\n }\n \n const rclcpp::ParameterValue &ClusterNode::declare_parameter("
+        },
+        {
+          "sha": "0c9540dca05ff54fa9c932db9e34755961d844b9",
+          "filename": "foros/test/test_raft.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/42dot/foros/blob/fb76bfcf5428be4d05597f9909764c0c101a0972/foros%2Ftest%2Ftest_raft.hpp",
+          "raw_url": "https://github.com/42dot/foros/raw/fb76bfcf5428be4d05597f9909764c0c101a0972/foros%2Ftest%2Ftest_raft.hpp",
+          "contents_url": "https://api.github.com/repos/42dot/foros/contents/foros%2Ftest%2Ftest_raft.hpp?ref=fb76bfcf5428be4d05597f9909764c0c101a0972",
+          "patch": "@@ -112,7 +112,7 @@ class TestContext : public akit::failover::foros::raft::Context {\n     request->prev_log_index = prev_log_index;\n     request->prev_log_term = prev_log_term;\n     request->entries = entries;\n-    return append_entries_->async_send_request(request);\n+    return append_entries_->async_send_request(request).future.share();\n   }\n \n  private:"
+        }
+      ]
+    },
+    {
+      "author": "Wonguk Jeong",
+      "date": "2021-10-13T08:08:25Z",
+      "sha": "846ecfe915d162bb63d3a1b3cbb257b88dd4dad5",
+      "message": "cluster node class initial commit\n\nSigned-off-by: Wonguk Jeong <wonguk.jeong@42dot.ai>",
+      "files_changed": 4,
+      "additions": 111,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "faed24c37f2087b24a14bd75ce47a3a12703eacd",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/42dot/foros/blob/846ecfe915d162bb63d3a1b3cbb257b88dd4dad5/CMakeLists.txt",
+          "raw_url": "https://github.com/42dot/foros/raw/846ecfe915d162bb63d3a1b3cbb257b88dd4dad5/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/42dot/foros/contents/CMakeLists.txt?ref=846ecfe915d162bb63d3a1b3cbb257b88dd4dad5",
+          "patch": "@@ -0,0 +1,23 @@\n+cmake_minimum_required(VERSION 3.8)\n+project(fsros)\n+\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  add_compile_options(-Wall -Wextra -Wpedantic)\n+endif()\n+\n+# find dependencies\n+find_package(ament_cmake REQUIRED)\n+find_package(rclcpp REQUIRED)\n+\n+if(BUILD_TESTING)\n+  find_package(ament_lint_auto REQUIRED)\n+  # the following line skips the linter which checks for copyrights\n+  # uncomment the line when a copyright and license is not present in all source files\n+  #set(ament_cmake_copyright_FOUND TRUE)\n+  # the following line skips cpplint (only works in a git repo)\n+  # uncomment the line when this package is not in a git repo\n+  #set(ament_cmake_cpplint_FOUND TRUE)\n+  ament_lint_auto_find_test_dependencies()\n+endif()\n+\n+ament_package()"
+        },
+        {
+          "sha": "9be80c3fb344026d88bd16bfb994bb03404cf701",
+          "filename": "include/common.hpp",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/42dot/foros/blob/846ecfe915d162bb63d3a1b3cbb257b88dd4dad5/include%2Fcommon.hpp",
+          "raw_url": "https://github.com/42dot/foros/raw/846ecfe915d162bb63d3a1b3cbb257b88dd4dad5/include%2Fcommon.hpp",
+          "contents_url": "https://api.github.com/repos/42dot/foros/contents/include%2Fcommon.hpp?ref=846ecfe915d162bb63d3a1b3cbb257b88dd4dad5",
+          "patch": "@@ -0,0 +1,23 @@\n+/*\n+ * Copyright (c) 2021 42dot All rights reserved.\n+ *\n+ * Licensed under the Apache License, Version 2.0 (the \"License\");\n+ * you may not use this file except in compliance with the License.\n+ * You may obtain a copy of the License at\n+ *\n+ * http://www.apache.org/licenses/LICENSE-2.0\n+ *\n+ * Unless required by applicable law or agreed to in writing, software\n+ * distributed under the License is distributed on an \"AS IS\" BASIS,\n+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+ * See the License for the specific language governing permissions and\n+ * limitations under the License.\n+ */\n+\n+#ifndef AKIT_FAILSAFE_COMMON_HPP_\n+#define AKIT_FAILSAFE_COMMON_HPP_\n+\n+// Support Linux and GCC version 4.0 or later\n+#define EXPORT_API __attribute__((visibility(\"default\")))\n+\n+#endif  // AKIT_FAILSAFE_COMMON_HPP_\n\\ No newline at end of file"
+        },
+        {
+          "sha": "41dc09b5edb91dbb2198ede0045ddd020a5b73db",
+          "filename": "include/node_cluster.hpp",
+          "status": "added",
+          "additions": 44,
+          "deletions": 0,
+          "changes": 44,
+          "blob_url": "https://github.com/42dot/foros/blob/846ecfe915d162bb63d3a1b3cbb257b88dd4dad5/include%2Fnode_cluster.hpp",
+          "raw_url": "https://github.com/42dot/foros/raw/846ecfe915d162bb63d3a1b3cbb257b88dd4dad5/include%2Fnode_cluster.hpp",
+          "contents_url": "https://api.github.com/repos/42dot/foros/contents/include%2Fnode_cluster.hpp?ref=846ecfe915d162bb63d3a1b3cbb257b88dd4dad5",
+          "patch": "@@ -0,0 +1,44 @@\n+/*\n+ * Copyright (c) 2021 42dot All rights reserved.\n+ *\n+ * Licensed under the Apache License, Version 2.0 (the \"License\");\n+ * you may not use this file except in compliance with the License.\n+ * You may obtain a copy of the License at\n+ *\n+ * http://www.apache.org/licenses/LICENSE-2.0\n+ *\n+ * Unless required by applicable law or agreed to in writing, software\n+ * distributed under the License is distributed on an \"AS IS\" BASIS,\n+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+ * See the License for the specific language governing permissions and\n+ * limitations under the License.\n+ */\n+\n+#ifndef AKIT_FAILSAFE_NODE_CLUSTER_HPP_\n+#define AKIT_FAILSAFE_NODE_CLUSTER_HPP_\n+\n+#include <memory>\n+#include <rclcpp/node_options.hpp>\n+\n+#include \"common.hpp\"\n+\n+namespace akit {\n+namespace failsafe {\n+\n+class NodeCluster {\n+ public:\n+  EXPORT_API\n+  explicit NodeCluster(\n+      const std::string &node_name,\n+      const rclcpp::NodeOptions &options = rclcpp::NodeOptions());\n+\n+ private:\n+  class NodeClusterImpl;\n+\n+  std::unique_ptr<NodeClusterImpl> impl_;\n+};\n+\n+}  // namespace failsafe\n+}  // namespace akit\n+\n+#endif  // AKIT_FAILSAFE_NODE_CLUSTER_HPP_\n\\ No newline at end of file"
+        },
+        {
+          "sha": "cee8581abb82ae36cb8a25b80ffae17316850f67",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 21,
+          "deletions": 0,
+          "changes": 21,
+          "blob_url": "https://github.com/42dot/foros/blob/846ecfe915d162bb63d3a1b3cbb257b88dd4dad5/package.xml",
+          "raw_url": "https://github.com/42dot/foros/raw/846ecfe915d162bb63d3a1b3cbb257b88dd4dad5/package.xml",
+          "contents_url": "https://api.github.com/repos/42dot/foros/contents/package.xml?ref=846ecfe915d162bb63d3a1b3cbb257b88dd4dad5",
+          "patch": "@@ -0,0 +1,21 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n+  <name>fsros</name>\n+  <version>0.0.0</version>\n+  <description>Fail safe ROS</description>\n+  <maintainer email=\"wonguk.jeong@42dot.ai\">Wonguk Jeong</maintainer>\n+  <license>TODO: License declaration</license>\n+\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+\n+  <depend>rclcpp</depend>\n+\n+  <test_depend>ament_lint_auto</test_depend>\n+  <test_depend>ament_lint_common</test_depend>\n+\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n+</package>\n+"
+        }
+      ]
+    },
+    {
+      "author": "정원국",
+      "date": "2021-10-13T08:06:28Z",
+      "sha": "1c9da49325f1e0bf7727359c68957db83e2cb229",
+      "message": "Initial commit",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "c3f457b5fe0d9e28a6aded7f44429a23ebb7d7dd",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/42dot/foros/blob/1c9da49325f1e0bf7727359c68957db83e2cb229/README.md",
+          "raw_url": "https://github.com/42dot/foros/raw/1c9da49325f1e0bf7727359c68957db83e2cb229/README.md",
+          "contents_url": "https://api.github.com/repos/42dot/foros/contents/README.md?ref=1c9da49325f1e0bf7727359c68957db83e2cb229",
+          "patch": "@@ -0,0 +1,3 @@\n+# fsros\n+\n+Failsafe ROS framework prototype\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "wonguk.jeong",
+      "date": "2021-10-23T15:38:56Z",
+      "sha": "a189ed67d7834353eabec6ca4c94b95a73bad682",
+      "message": "fsros: observer generic implemented\n\nSigned-off-by: Wonguk Jeong <wonguk.jeong@42dot.ai>",
+      "files_changed": 2,
+      "additions": 81,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "79bfd9686546ba89d8f3bb44103fe236ef9ee12d",
+          "filename": "fsros/src/common/observable.hpp",
+          "status": "added",
+          "additions": 47,
+          "deletions": 0,
+          "changes": 47,
+          "blob_url": "https://github.com/42dot/foros/blob/a189ed67d7834353eabec6ca4c94b95a73bad682/fsros%2Fsrc%2Fcommon%2Fobservable.hpp",
+          "raw_url": "https://github.com/42dot/foros/raw/a189ed67d7834353eabec6ca4c94b95a73bad682/fsros%2Fsrc%2Fcommon%2Fobservable.hpp",
+          "contents_url": "https://api.github.com/repos/42dot/foros/contents/fsros%2Fsrc%2Fcommon%2Fobservable.hpp?ref=a189ed67d7834353eabec6ca4c94b95a73bad682",
+          "patch": "@@ -0,0 +1,47 @@\n+/*\n+ * Copyright (c) 2021 42dot All rights reserved.\n+ *\n+ * Licensed under the Apache License, Version 2.0 (the \"License\");\n+ * you may not use this file except in compliance with the License.\n+ * You may obtain a copy of the License at\n+ *\n+ * http://www.apache.org/licenses/LICENSE-2.0\n+ *\n+ * Unless required by applicable law or agreed to in writing, software\n+ * distributed under the License is distributed on an \"AS IS\" BASIS,\n+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+ * See the License for the specific language governing permissions and\n+ * limitations under the License.\n+ */\n+\n+#ifndef AKIT_FAILSAFE_FSROS_COMMON_OBSERVABLE_HPP_\n+#define AKIT_FAILSAFE_FSROS_COMMON_OBSERVABLE_HPP_\n+\n+#include <list>\n+\n+#include \"common/observer.hpp\"\n+\n+namespace akit {\n+namespace failsafe {\n+namespace fsros {\n+\n+template <typename T>\n+class Observable {\n+ public:\n+  void AddObserver(Observer<T> *observer) { observers_.push_back(observer); }\n+  void RemoveObserver(Observer<T> *observer) { observers_.remove(observer); }\n+  void Notify(const T &event) {\n+    for (auto observer : observers_) {\n+      observer->Update(event);\n+    }\n+  }\n+\n+ private:\n+  std::list<Observer<T> *> observers_;\n+};\n+\n+}  // namespace fsros\n+}  // namespace failsafe\n+}  // namespace akit\n+\n+#endif  // AKIT_FAILSAFE_FSROS_COMMON_OBSERVABLE_HPP_"
+        },
+        {
+          "sha": "8e3ae75cfeb647573966bcd68b2efed41555e384",
+          "filename": "fsros/src/common/observer.hpp",
+          "status": "added",
+          "additions": 34,
+          "deletions": 0,
+          "changes": 34,
+          "blob_url": "https://github.com/42dot/foros/blob/a189ed67d7834353eabec6ca4c94b95a73bad682/fsros%2Fsrc%2Fcommon%2Fobserver.hpp",
+          "raw_url": "https://github.com/42dot/foros/raw/a189ed67d7834353eabec6ca4c94b95a73bad682/fsros%2Fsrc%2Fcommon%2Fobserver.hpp",
+          "contents_url": "https://api.github.com/repos/42dot/foros/contents/fsros%2Fsrc%2Fcommon%2Fobserver.hpp?ref=a189ed67d7834353eabec6ca4c94b95a73bad682",
+          "patch": "@@ -0,0 +1,34 @@\n+/*\n+ * Copyright (c) 2021 42dot All rights reserved.\n+ *\n+ * Licensed under the Apache License, Version 2.0 (the \"License\");\n+ * you may not use this file except in compliance with the License.\n+ * You may obtain a copy of the License at\n+ *\n+ * http://www.apache.org/licenses/LICENSE-2.0\n+ *\n+ * Unless required by applicable law or agreed to in writing, software\n+ * distributed under the License is distributed on an \"AS IS\" BASIS,\n+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+ * See the License for the specific language governing permissions and\n+ * limitations under the License.\n+ */\n+\n+#ifndef AKIT_FAILSAFE_FSROS_COMMON_OBSERVER_HPP_\n+#define AKIT_FAILSAFE_FSROS_COMMON_OBSERVER_HPP_\n+\n+namespace akit {\n+namespace failsafe {\n+namespace fsros {\n+\n+template <typename T>\n+class Observer {\n+ public:\n+  virtual void Update(const T &event) = 0;\n+};\n+\n+}  // namespace fsros\n+}  // namespace failsafe\n+}  // namespace akit\n+\n+#endif  // AKIT_FAILSAFE_FSROS_COMMON_OBSERVER_HPP_"
+        }
+      ]
+    }
+  ]
+}

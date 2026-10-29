@@ -1,0 +1,253 @@
+{
+  "_meta": {
+    "fetched_at": "2026-09-24T14:54:17Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "reductstore",
+    "repo": "reductstore_agent",
+    "refreshed_at": "2026-09-24T14:54:17Z",
+    "refresh_note": "incrementally added 1 author(s) missing from a prior stale cache"
+  },
+  "data": [
+    {
+      "author": "tuanhungngyn",
+      "date": "2025-10-10T09:36:03Z",
+      "sha": "e7058773ee81f7f9b9f85524fd7ae791a52274dd",
+      "message": "Added downsampling option UNTESTED",
+      "files_changed": 2,
+      "additions": 39,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "306efbfa0712e29b38f56bbdb7e836ea00d14b1c",
+          "filename": "reductstore_agent/config_models.py",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 0,
+          "changes": 13,
+          "blob_url": "https://github.com/reductstore/reductstore_agent/blob/e7058773ee81f7f9b9f85524fd7ae791a52274dd/reductstore_agent%2Fconfig_models.py",
+          "raw_url": "https://github.com/reductstore/reductstore_agent/raw/e7058773ee81f7f9b9f85524fd7ae791a52274dd/reductstore_agent%2Fconfig_models.py",
+          "contents_url": "https://api.github.com/repos/reductstore/reductstore_agent/contents/reductstore_agent%2Fconfig_models.py?ref=e7058773ee81f7f9b9f85524fd7ae791a52274dd",
+          "patch": "@@ -107,6 +107,17 @@ class PipelineConfig(BaseModel):\n     static_labels: dict[str, str] = Field(default_factory=dict)\n     filename_mode: FilenameMode = FilenameMode.TIMESTAMP\n \n+    downsampling_mode: str = Field(\n+        \"none\",\n+        pattern=r\"^(none|max_rate|stride)$\"\n+    )\n+    max_rate_hz: float | None = Field(\n+        None, ge=0.0\n+    )\n+    stride_n: int | None = Field(\n+        None, ge=2\n+    )\n+\n     @field_validator(\"include_topics\", \"exclude_topics\")\n     @classmethod\n     def validate_topics_list(cls, value):\n@@ -184,3 +195,5 @@ class PipelineState(BaseModel):\n     timer: Timer | None = None\n     current_size: int = 0\n     is_uploading: bool = False\n+    msg_counter: int = 0\n+    last_recorded_timestamp: int | None = None\n\\ No newline at end of file"
+        },
+        {
+          "sha": "db2e94ebb05252d83096f4fdb23c20833753794f",
+          "filename": "reductstore_agent/recorder.py",
+          "status": "modified",
+          "additions": 26,
+          "deletions": 0,
+          "changes": 26,
+          "blob_url": "https://github.com/reductstore/reductstore_agent/blob/e7058773ee81f7f9b9f85524fd7ae791a52274dd/reductstore_agent%2Frecorder.py",
+          "raw_url": "https://github.com/reductstore/reductstore_agent/raw/e7058773ee81f7f9b9f85524fd7ae791a52274dd/reductstore_agent%2Frecorder.py",
+          "contents_url": "https://api.github.com/repos/reductstore/reductstore_agent/contents/reductstore_agent%2Frecorder.py?ref=e7058773ee81f7f9b9f85524fd7ae791a52274dd",
+          "patch": "@@ -388,6 +388,7 @@ def get_publish_time(self, message: Any, topic_name: str) -> int:\n     def process_message(self, topic_name: str, message: Any, publish_time: int):\n         \"\"\"Process message for all pipelines that include the topic.\"\"\"\n         for pipeline_name, state in self.pipeline_states.items():\n+            cfg = self.pipeline_configs[pipeline_name] # get pipeconfig to access msg_counter and stride_n\n             if topic_name not in state.topics:\n                 self.log_debug(\n                     lambda: f\"Skipping message for pipeline '{pipeline_name}' \"\n@@ -397,6 +398,31 @@ def process_message(self, topic_name: str, message: Any, publish_time: int):\n \n             if state.first_timestamp is None:\n                 state.first_timestamp = publish_time\n+            \n+                if cfg.downsampling_mode == \"stride\":\n+                    state.msg_counter += 1\n+                if cfg.stride_n is None or cfg.stride_n < 2:\n+                    self.get_logger().error(\n+                        f\"Pipeline '{pipeline_name}' in 'stride' mode has invalid or missing stride_n: {cfg.stride_n}. Skipping messages.\"\n+                )\n+                    continue\n+\n+                if state.msg_counter % cfg.stride_n != 0:\n+                    continue # skipping message \n+            \n+            elif cfg.downsampling_mode == \"max_rate\":\n+                if cfg.max_rate_hz is None or cfg.max_rate_hz <= 0.0:\n+                    self.get_logger().error(\n+                    f\"Pipeline '{pipeline_name}' in 'max_rate' mode has invalid or missing max_rate_hz: {cfg.max_rate_hz}. Skipping messages.\"\n+                )\n+                    continue\n+\n+                max_rate_period = 1e9/cfg.max_rate_hz\n+                if state.last_recorded_timestamp is None or (publish_time - state.last_recorded_timestamp) >= max_rate_period:\n+                    state.last_recorded_timestamp = publish_time\n+                else:\n+                    continue # skip message if message is in waiting period\n+\n \n             self.log_debug(\n                 lambda: f\"Writing message to pipeline '{pipeline_name}' [{topic_name}]\""
+        }
+      ]
+    },
+    {
+      "author": "atimin",
+      "date": "2025-04-25T12:08:38Z",
+      "sha": "7797fd078f5eb8de7ed4c9c2787d84ec35ec012b",
+      "message": "Initial commit",
+      "files_changed": 1,
+      "additions": 21,
+      "deletions": 0,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "05cc2aaa7b6e542965354e036eb1d0a8fda5b3a9",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 21,
+          "deletions": 0,
+          "changes": 21,
+          "blob_url": "https://github.com/reductstore/reductstore_agent/blob/7797fd078f5eb8de7ed4c9c2787d84ec35ec012b/LICENSE",
+          "raw_url": "https://github.com/reductstore/reductstore_agent/raw/7797fd078f5eb8de7ed4c9c2787d84ec35ec012b/LICENSE",
+          "contents_url": "https://api.github.com/repos/reductstore/reductstore_agent/contents/LICENSE?ref=7797fd078f5eb8de7ed4c9c2787d84ec35ec012b",
+          "patch": "@@ -0,0 +1,21 @@\n+MIT License\n+\n+Copyright (c) 2025 ReductStore\n+\n+Permission is hereby granted, free of charge, to any person obtaining a copy\n+of this software and associated documentation files (the \"Software\"), to deal\n+in the Software without restriction, including without limitation the rights\n+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n+copies of the Software, and to permit persons to whom the Software is\n+furnished to do so, subject to the following conditions:\n+\n+The above copyright notice and this permission notice shall be included in all\n+copies or substantial portions of the Software.\n+\n+THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n+SOFTWARE."
+        }
+      ]
+    },
+    {
+      "author": "hungngyenn",
+      "date": "2025-10-24T13:56:57Z",
+      "sha": "67289475f574ceb8d6658d7db9d0b824851b2e02",
+      "message": "added downsampler.py",
+      "files_changed": 5,
+      "additions": 78,
+      "deletions": 54,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "c253eb85e203c40e7975093dcfcc3f0dbb3f7642",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/reductstore/reductstore_agent/blob/67289475f574ceb8d6658d7db9d0b824851b2e02/CHANGELOG.rst",
+          "raw_url": "https://github.com/reductstore/reductstore_agent/raw/67289475f574ceb8d6658d7db9d0b824851b2e02/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/reductstore/reductstore_agent/contents/CHANGELOG.rst?ref=67289475f574ceb8d6658d7db9d0b824851b2e02",
+          "patch": "@@ -19,3 +19,5 @@ Changelog for package reductstore_agent\n   Add code linting with flake8, pep257, and copyright checks\n * Merge pull request `#6 <https://github.com/reductstore/ros2_reduct_agent/issues/6>`_ from reductstore/3-minimum-recording-implementation\n   Implement minimum recorder agent for ROS 2 MCAP files\n+* Merge pull request `#10 <https://github.com/reductstore/reductstore_agent/issues/10>`_ from reductstore/10-add-downsampling-option\n+  Implement downsampling option per pipeline\n\\ No newline at end of file"
+        },
+        {
+          "sha": "c5963d9186b00f06f5ca56c8423d122298ee666d",
+          "filename": "reductstore_agent/config_models.py",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 52,
+          "changes": 54,
+          "blob_url": "https://github.com/reductstore/reductstore_agent/blob/67289475f574ceb8d6658d7db9d0b824851b2e02/reductstore_agent%2Fconfig_models.py",
+          "raw_url": "https://github.com/reductstore/reductstore_agent/raw/67289475f574ceb8d6658d7db9d0b824851b2e02/reductstore_agent%2Fconfig_models.py",
+          "contents_url": "https://api.github.com/repos/reductstore/reductstore_agent/contents/reductstore_agent%2Fconfig_models.py?ref=67289475f574ceb8d6658d7db9d0b824851b2e02",
+          "patch": "@@ -23,7 +23,6 @@\n import re\n from enum import Enum\n from tempfile import SpooledTemporaryFile\n-from typing import Optional\n \n from mcap.records import Schema\n from mcap_ros2.writer import Writer as McapWriter\n@@ -116,7 +115,7 @@ class PipelineConfig(BaseModel):\n     static_labels: dict[str, str] = Field(default_factory=dict)\n     filename_mode: FilenameMode = FilenameMode.TIMESTAMP\n \n-    downsampling_mode: str = Field(\"none\", pattern=r\"^(none|max_rate|stride)$\")\n+    downsampling_mode: DownsamplingMode = Field(default=DownsamplingMode.NONE)\n     max_rate_hz: float | None = Field(None, ge=0.0)\n     stride_n: int | None = Field(None, ge=2)\n \n@@ -182,55 +181,6 @@ def format_for_log(self) -> str:\n         return \"\\n\".join(lines)\n \n \n-class Downsampler:\n-    \"\"\"Downsampler class for logic and state of a pipeline.\"\"\"\n-\n-    def __init__(self, cfg: PipelineConfig):\n-        \"\"\"Initialize Downsampler Instance.\"\"\"\n-        self.mode = cfg.downsampling_mode\n-\n-        if self.mode == DownsamplingMode.STRIDE:\n-            self.stride_n = cfg.stride_n\n-            self.msg_counter: int = 0\n-            self.downsampling = self.downsampler_stride\n-\n-        elif self.mode == DownsamplingMode.MAX_RATE:\n-            self.max_rate_hz = cfg.max_rate_hz\n-            self.last_recorded_timestamp: int | None = None\n-            self.period_ns = 1e9 / self.max_rate_hz\n-            self.downsampling = self.downsampler_max_rate\n-\n-        else:\n-            self.downsampling = self.stub_function\n-\n-    def downsampler_stride(self, timestamp):\n-        \"\"\"Downsample logic for 'stride' mode.\"\"\"\n-        if self.stride_n == 0:\n-            return False\n-\n-        skip = self.msg_counter % self.stride_n != 0\n-        self.msg_counter += 1\n-\n-        return skip\n-\n-    def downsampler_max_rate(self, timestamp):\n-        \"\"\"Downsample logic for 'max_rate' mode.\"\"\"\n-        if self.last_recorded_timestamp is None:\n-            self.last_recorded_timestamp = timestamp\n-            return False\n-\n-        skip = (timestamp - self.last_recorded_timestamp) < self.period_ns\n-\n-        if not skip:\n-            self.last_recorded_timestamp = timestamp\n-            return False\n-        return skip\n-\n-    def stub_function(self, timestamp):\n-        \"\"\"Set downsampling to do nothing.\"\"\"\n-        return False\n-\n-\n class PipelineState(BaseModel):\n     \"\"\"State for a recording pipeline.\"\"\"\n \n@@ -246,4 +196,4 @@ class PipelineState(BaseModel):\n     timer: Timer | None = None\n     current_size: int = 0\n     is_uploading: bool = False\n-    downsampler: Optional[Downsampler] = Field(default=None)\n+    downsampler: None = None"
+        },
+        {
+          "sha": "a6f34ba369b8663bcb44fb181a2d237db8ebee51",
+          "filename": "reductstore_agent/downsampler.py",
+          "status": "added",
+          "additions": 72,
+          "deletions": 0,
+          "changes": 72,
+          "blob_url": "https://github.com/reductstore/reductstore_agent/blob/67289475f574ceb8d6658d7db9d0b824851b2e02/reductstore_agent%2Fdownsampler.py",
+          "raw_url": "https://github.com/reductstore/reductstore_agent/raw/67289475f574ceb8d6658d7db9d0b824851b2e02/reductstore_agent%2Fdownsampler.py",
+          "contents_url": "https://api.github.com/repos/reductstore/reductstore_agent/contents/reductstore_agent%2Fdownsampler.py?ref=67289475f574ceb8d6658d7db9d0b824851b2e02",
+          "patch": "@@ -0,0 +1,72 @@\n+# Copyright 2025 ReductSoftware UG\n+#\n+# Permission is hereby granted, free of charge, to any person obtaining a copy\n+# of this software and associated documentation files (the \"Software\"), to deal\n+# in the Software without restriction, including without limitation the rights\n+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n+# copies of the Software, and to permit persons to whom the Software is\n+# furnished to do so, subject to the following conditions:\n+#\n+# The above copyright notice and this permission notice shall be included in\n+# all copies or substantial portions of the Software.\n+#\n+# THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL\n+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n+# THE SOFTWARE.\n+\n+\"\"\"Downsampler class for the Recorder node.\"\"\"\n+\n+from .config_models import DownsamplingMode, PipelineConfig\n+\n+\n+class Downsampler:\n+    \"\"\"Downsampler class for logic and state of a pipeline.\"\"\"\n+\n+    def __init__(self, cfg: PipelineConfig):\n+        \"\"\"Initialize Downsampler Instance.\"\"\"\n+        self.mode = cfg.downsampling_mode\n+\n+        if self.mode == DownsamplingMode.STRIDE:\n+            self.stride_n = cfg.stride_n\n+            self.msg_counter: int = 0\n+            self.downsampling = self.downsampler_stride\n+\n+        elif self.mode == DownsamplingMode.MAX_RATE:\n+            self.max_rate_hz = cfg.max_rate_hz\n+            self.last_recorded_timestamp: int | None = None\n+            self.period_ns = 1e9 / self.max_rate_hz\n+            self.downsampling = self.downsampler_max_rate\n+\n+        else:\n+            self.downsampling = self.stub_function\n+\n+    def downsampler_stride(self, timestamp):\n+        \"\"\"Downsample logic for 'stride' mode.\"\"\"\n+        if self.stride_n == 0:\n+            return False\n+\n+        skip = self.msg_counter % self.stride_n != 0\n+        self.msg_counter += 1\n+\n+        return skip\n+\n+    def downsampler_max_rate(self, timestamp):\n+        \"\"\"Downsample logic for 'max_rate' mode.\"\"\"\n+        if self.last_recorded_timestamp is None:\n+            self.last_recorded_timestamp = timestamp\n+            return False\n+\n+        skip = (timestamp - self.last_recorded_timestamp) < self.period_ns\n+\n+        if not skip:\n+            self.last_recorded_timestamp = timestamp\n+            return False\n+        return skip\n+\n+    def stub_function(self, timestamp):\n+        \"\"\"Set downsampling to do nothing.\"\"\"\n+        return False"
+        },
+        {
+          "sha": "3535d0bfd8b791a982c9f9bf5eddaaa93f5c5e00",
+          "filename": "reductstore_agent/recorder.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/reductstore/reductstore_agent/blob/67289475f574ceb8d6658d7db9d0b824851b2e02/reductstore_agent%2Frecorder.py",
+          "raw_url": "https://github.com/reductstore/reductstore_agent/raw/67289475f574ceb8d6658d7db9d0b824851b2e02/reductstore_agent%2Frecorder.py",
+          "contents_url": "https://api.github.com/repos/reductstore/reductstore_agent/contents/reductstore_agent%2Frecorder.py?ref=67289475f574ceb8d6658d7db9d0b824851b2e02",
+          "patch": "@@ -37,12 +37,12 @@\n from rosbag2_py import LocalMessageDefinitionSource\n \n from .config_models import (\n-    Downsampler,\n     FilenameMode,\n     PipelineConfig,\n     PipelineState,\n     StorageConfig,\n )\n+from .downsampler import Downsampler\n from .utils import get_or_create_event_loop\n \n "
+        },
+        {
+          "sha": "c4b587f21d70b586e9229a540e8adc649b751e4c",
+          "filename": "test/test_downsampling.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/reductstore/reductstore_agent/blob/67289475f574ceb8d6658d7db9d0b824851b2e02/test%2Ftest_downsampling.py",
+          "raw_url": "https://github.com/reductstore/reductstore_agent/raw/67289475f574ceb8d6658d7db9d0b824851b2e02/test%2Ftest_downsampling.py",
+          "contents_url": "https://api.github.com/repos/reductstore/reductstore_agent/contents/test%2Ftest_downsampling.py?ref=67289475f574ceb8d6658d7db9d0b824851b2e02",
+          "patch": "@@ -21,10 +21,10 @@\n \"\"\"Test Recorder node downsampling logic.\"\"\"\n \n from reductstore_agent.config_models import (\n-    Downsampler,\n     DownsamplingMode,\n     PipelineConfig,\n )\n+from reductstore_agent.downsampler import Downsampler\n \n \n def test_downsampling_stride_logic():"
+        }
+      ]
+    },
+    {
+      "author": "AnthonyCvn",
+      "date": "2025-05-02T11:52:26Z",
+      "sha": "b7ad3a082d6f7cec07363268681c381eb6384022",
+      "message": "initial readme file",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "f57adedfe70f62eaf0cd72a823ab5f58d5ec6ba5",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/reductstore/reductstore_agent/blob/b7ad3a082d6f7cec07363268681c381eb6384022/README.md",
+          "raw_url": "https://github.com/reductstore/reductstore_agent/raw/b7ad3a082d6f7cec07363268681c381eb6384022/README.md",
+          "contents_url": "https://api.github.com/repos/reductstore/reductstore_agent/contents/README.md?ref=b7ad3a082d6f7cec07363268681c381eb6384022",
+          "patch": "@@ -0,0 +1 @@\n+# ros2-reduct-agent\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "Hung Nguyen",
+      "date": "2025-10-23T12:52:49Z",
+      "sha": "77aa9446be23a3be6c01b28da5568c02e6364305",
+      "message": "Removed integration test, added downsampling class",
+      "files_changed": 4,
+      "additions": 87,
+      "deletions": 179,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "0965b356324c6103abf41f7cc79f8f7f8ded7cf2",
+          "filename": "reductstore_agent/config_models.py",
+          "status": "modified",
+          "additions": 49,
+          "deletions": 9,
+          "changes": 58,
+          "blob_url": "https://github.com/reductstore/reductstore_agent/blob/77aa9446be23a3be6c01b28da5568c02e6364305/reductstore_agent%2Fconfig_models.py",
+          "raw_url": "https://github.com/reductstore/reductstore_agent/raw/77aa9446be23a3be6c01b28da5568c02e6364305/reductstore_agent%2Fconfig_models.py",
+          "contents_url": "https://api.github.com/repos/reductstore/reductstore_agent/contents/reductstore_agent%2Fconfig_models.py?ref=77aa9446be23a3be6c01b28da5568c02e6364305",
+          "patch": "@@ -23,7 +23,7 @@\n import re\n from enum import Enum\n from tempfile import SpooledTemporaryFile\n-from typing import Callable, Any\n+from typing import Optional\n \n from mcap.records import Schema\n from mcap_ros2.writer import Writer as McapWriter\n@@ -182,9 +182,53 @@ def format_for_log(self) -> str:\n         return \"\\n\".join(lines)\n \n \n-DownsamplerFunc = Callable[[Any, Any, int], bool]\n-UpdateFunc = Callable[[Any, int], None]\n-UpdateStampFunc = Callable[[Any, int], None]\n+class Downsampler:\n+    \"\"\"Downsampler class for logic and state of a pipeline.\"\"\"\n+\n+    def __init__(self, cfg: PipelineConfig):\n+        \"\"\"Initialize Downsampler Instance.\"\"\"\n+        self.mode = cfg.downsampling_mode\n+\n+        if self.mode == DownsamplingMode.STRIDE:\n+            self.stride_n = cfg.stride_n\n+            self.msg_counter: int = 0\n+            self.downsampling = self.downsampler_stride\n+\n+        elif self.mode == DownsamplingMode.MAX_RATE:\n+            self.max_rate_hz = cfg.max_rate_hz\n+            self.last_recorded_timestamp: int | None = None\n+            self.period_ns = 1e9 / self.max_rate_hz\n+            self.downsampling = self.downsampler_max_rate\n+\n+        else:\n+            self.downsampling = self.stub_function\n+            \n+    def downsampler_stride(self, timestamp):\n+        \"\"\"Downsample logic for 'stride' mode.\"\"\"\n+        if self.stride_n == 0:\n+            return False\n+        \n+        skip = self.msg_counter % self.stride_n != 0\n+        self.msg_counter += 1\n+\n+        return skip\n+    \n+    def downsampler_max_rate(self, timestamp):\n+        \"\"\"Downsample logic for 'max_rate' mode.\"\"\"\n+        if self.last_recorded_timestamp is None:\n+            self.last_recorded_timestamp = timestamp\n+            return False\n+        \n+        skip = (timestamp - self.last_recorded_timestamp) < self.period_ns\n+\n+        if not skip:\n+            self.last_recorded_timestamp = timestamp\n+            return False\n+        return skip\n+    \n+    def stub_function(self, timestamp):\n+        \"\"\"Set downsampling to do nothing.\"\"\"\n+        return False\n \n \n class PipelineState(BaseModel):\n@@ -202,8 +246,4 @@ class PipelineState(BaseModel):\n     timer: Timer | None = None\n     current_size: int = 0\n     is_uploading: bool = False\n-    msg_counter: int = 0\n-    last_recorded_timestamp: int | None = None\n-    down_sample: DownsamplerFunc = Field(default=lambda state, timestamp: False)\n-    update_state: UpdateFunc | None = Field(default=None)\n-    update_stamp: UpdateStampFunc | None = Field(default=None)\n+    downsampler: Optional[Downsampler] = Field(default=None)"
+        },
+        {
+          "sha": "97d19b659bff85c1538ac9bbf882e864e01b7651",
+          "filename": "reductstore_agent/recorder.py",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 60,
+          "changes": 64,
+          "blob_url": "https://github.com/reductstore/reductstore_agent/blob/77aa9446be23a3be6c01b28da5568c02e6364305/reductstore_agent%2Frecorder.py",
+          "raw_url": "https://github.com/reductstore/reductstore_agent/raw/77aa9446be23a3be6c01b28da5568c02e6364305/reductstore_agent%2Frecorder.py",
+          "contents_url": "https://api.github.com/repos/reductstore/reductstore_agent/contents/reductstore_agent%2Frecorder.py?ref=77aa9446be23a3be6c01b28da5568c02e6364305",
+          "patch": "@@ -41,49 +41,11 @@\n     PipelineConfig,\n     PipelineState,\n     StorageConfig,\n-    DownsamplingMode\n+    Downsampler\n )\n from .utils import get_or_create_event_loop\n \n \n-def create_stride_downsampler(cfg):\n-    \"\"\"Create stride_downsampler.\"\"\"\n-    stride_n = cfg.stride_n\n-\n-    def stride_downsampler(state, timestamp):\n-        return (state.msg_counter % stride_n) != 0\n-    \n-    return stride_downsampler\n-\n-\n-def create_max_rate_downsampler(cfg):\n-    \"\"\"Create max_rate_downsampler.\"\"\"\n-    max_rate_period_ns = 1e9 / cfg.max_rate_hz\n-\n-    def max_rate_downsampler(state, timestamp):\n-        if state.last_recorded_timestamp is None:\n-            state.last_recorded_timestamp = timestamp\n-            return False\n-        return (timestamp - state.last_recorded_timestamp) < max_rate_period_ns\n-    \n-    return max_rate_downsampler\n-\n-\n-def update_stride(state, timestamp):\n-    \"\"\"Update state.msg_counter for 'stride'.\"\"\"\n-    state.msg_counter += 1\n-\n-\n-def update_max_rate(state, timestamp):\n-    \"\"\"Update last_recorded_timestamp for 'max_rate'.\"\"\"\n-    state.last_recorded_timestamp = timestamp\n-\n-\n-def no_update(state, timestmap):\n-    \"\"\"Stub function in case for 'None' mode.\"\"\"\n-    pass\n-\n-\n class Recorder(Node):\n     \"\"\"ROS2 node that records selected topics to ReductStore.\"\"\"\n \n@@ -233,27 +195,13 @@ def init_mcap_writers(self):\n             max_size = cfg.spool_max_size_bytes\n             buffer = SpooledTemporaryFile(max_size=max_size, mode=\"w+b\")\n             writer = self.create_mcap_writer(buffer, pipeline_name)\n-            if cfg.downsampling_mode == DownsamplingMode.STRIDE:\n-                down_sample_func = create_stride_downsampler(cfg)\n-                update_func = update_stride\n-                update_stamp_func = no_update\n-            elif cfg.downsampling_mode == DownsamplingMode.MAX_RATE:\n-                down_sample_func = create_max_rate_downsampler(cfg)\n-                update_func = no_update\n-                update_stamp_func = update_max_rate\n-            else:\n-                down_sample_func = no_update\n-                update_func = no_update\n-                update_stamp_func = no_update\n+            downsampler_instance = Downsampler(cfg)\n \n             state = PipelineState(\n                 topics=topics,\n                 buffer=buffer,\n                 writer=writer,\n-                down_sample=down_sample_func,\n-                update_state=update_func,\n-                update_stamp=update_stamp_func\n-\n+                downsampler=downsampler_instance\n             )\n             self.pipeline_states[pipeline_name] = state\n \n@@ -459,12 +407,8 @@ def process_message(self, topic_name: str, message: Any, publish_time: int):\n             if state.first_timestamp is None:\n                 state.first_timestamp = publish_time\n \n-            state.update_state(state, publish_time)\n-\n-            if state.down_sample(state, publish_time):\n+            if state.downsampler and state.downsampler.downsampling(publish_time):\n                 continue\n-\n-            state.update_stamp(state, publish_time)\n             \n             self.log_debug(\n                 lambda: f\"Writing message to pipeline '{pipeline_name}' [{topic_name}]\""
+        },
+        {
+          "sha": "346a4bb2fcfc5a63204e8e5ddcace3796c37bdb6",
+          "filename": "test/conftest.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/reductstore/reductstore_agent/blob/77aa9446be23a3be6c01b28da5568c02e6364305/test%2Fconftest.py",
+          "raw_url": "https://github.com/reductstore/reductstore_agent/raw/77aa9446be23a3be6c01b28da5568c02e6364305/test%2Fconftest.py",
+          "contents_url": "https://api.github.com/repos/reductstore/reductstore_agent/contents/test%2Fconftest.py?ref=77aa9446be23a3be6c01b28da5568c02e6364305",
+          "patch": "@@ -70,7 +70,7 @@ def publisher_node() -> Generator[Node, None, None]:\n @pytest.fixture\n def publisher(publisher_node: Node) -> Publisher:\n     \"\"\"Create a publisher for the test topic.\"\"\"\n-    pub = publisher_node.create_publisher(String, \"/test/topic\", 50)\n+    pub = publisher_node.create_publisher(String, \"/test/topic\", 10)\n     return pub\n \n "
+        },
+        {
+          "sha": "ad9b94646b85f4df2b7d03e5822c85674327ea26",
+          "filename": "test/test_downsampling.py",
+          "status": "modified",
+          "additions": 33,
+          "deletions": 109,
+          "changes": 142,
+          "blob_url": "https://github.com/reductstore/reductstore_agent/blob/77aa9446be23a3be6c01b28da5568c02e6364305/test%2Ftest_downsampling.py",
+          "raw_url": "https://github.com/reductstore/reductstore_agent/raw/77aa9446be23a3be6c01b28da5568c02e6364305/test%2Ftest_downsampling.py",
+          "contents_url": "https://api.github.com/repos/reductstore/reductstore_agent/contents/test%2Ftest_downsampling.py?ref=77aa9446be23a3be6c01b28da5568c02e6364305",
+          "patch": "@@ -20,135 +20,59 @@\n \n \"\"\"Test Recorder node downsampling logic.\"\"\"\n \n-import pytest\n-import io\n-\n-from reduct.client import Client\n-\n-import rclpy\n-from rclpy.node import Node\n-from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy\n-from types import SimpleNamespace\n-from mcap.reader import make_reader\n-from mcap_ros2.decoder import DecoderFactory\n-from rclpy.publisher import Publisher\n-from std_msgs.msg import String\n-import time\n-\n-from reductstore_agent.recorder import (\n-    Recorder,\n-    create_stride_downsampler,\n-    create_max_rate_downsampler\n+from reductstore_agent.config_models import (\n+    Downsampler,\n+    DownsamplingMode,\n+    PipelineConfig\n )\n-from test_recorder_params import (\n-    as_overrides,\n-    storage_params,\n-    pipeline_params,\n-    downsampling_params_max_rate,\n-    downsampling_params_stride\n-)\n-from test_storage import get_or_create_event_loop\n-\n-@pytest.fixture\n-def downsampling_func_accessor():\n-    \"\"\"Get the callable static down_sampling method.\"\"\"\n-    return Recorder.down_sampling\n \n \n def test_downsampling_stride_logic():\n-    \"\"\"Test that 'stride' logic works.\"\"\"\n-    cfg = SimpleNamespace(stride_n=5)\n-    state = SimpleNamespace(msg_counter=0)\n-    stride_downsampler = create_stride_downsampler(cfg)\n+    \"\"\"Test the Downsampler class configured for 'stride' mode.\"\"\"\n+    cfg = PipelineConfig(\n+        downsampling_mode=DownsamplingMode.STRIDE,\n+        stride_n=5,\n+        **{\"split.max_duration_s\": 1},\n+    )\n+    downsampler = Downsampler(cfg)\n \n-    assert stride_downsampler(state, timestamp=0) is False, \"Msg 0 should be kept\"\n-    state.msg_counter += 1\n-    assert stride_downsampler(state, timestamp=0) is True, \"Msg 1 should be skipped\"\n-    state.msg_counter += 1\n-    assert stride_downsampler(state, timestamp=0) is True, \"Msg 2 should be skipped\"\n-    state.msg_counter += 1\n-    assert stride_downsampler(state, timestamp=0) is True, \"Msg 3 should be skipped\"\n-    state.msg_counter += 1\n-    assert stride_downsampler(state, timestamp=0) is True, \"Msg 4 should be skipped\"\n-    state.msg_counter += 1\n-    assert stride_downsampler(state, timestamp=0) is False, \"Msg 5 should be kept\"\n+    assert downsampler.downsampling(timestamp=0) is False, \"Msg 0 should be kept\"\n+    assert downsampler.downsampling(timestamp=0) is True, \"Msg 1 should be skipped\"\n+    assert downsampler.downsampling(timestamp=0) is True, \"Msg 2 should be skipped\"\n+    assert downsampler.downsampling(timestamp=0) is True, \"Msg 3 should be skipped\"\n+    assert downsampler.downsampling(timestamp=0) is True, \"Msg 4 should be skipped\"\n+    assert downsampler.downsampling(timestamp=0) is False, \"Msg 5 should be kept\"\n+    assert downsampler.downsampling(timestamp=0) is True, \"Msg 6 should be skipped\"\n \n \n def test_downsampling_max_hz_logic():\n-    \"\"\"Test that 'max_rate' logic is working.\"\"\"\n+    \"\"\"Test the Downsampler class configured for 'max_rate' mode.\"\"\"\n     PERIOD_NS = 100_000_000\n     START_TIME = 1_000_000_000\n \n-    cfg = SimpleNamespace(max_rate_hz=10.0)\n-    state = SimpleNamespace(last_recorded_timestamp=None)\n-    max_rate_downsampler = create_max_rate_downsampler(cfg)\n+    cfg = PipelineConfig(\n+        downsampling_mode=DownsamplingMode.MAX_RATE,\n+        max_rate_hz=10.0,\n+        **{\"split.max_duration_s\": 1},\n+    )\n \n-    assert (\n-        max_rate_downsampler(state, timestamp=START_TIME) is False\n-    ), \"Msg 1 should be kept.\"\n+    downsampler = Downsampler(cfg)\n \n-    state.last_recorded_timestamp = START_TIME\n+    assert (\n+        downsampler.downsampling(timestamp=START_TIME) is False\n+    ), \"Msg 1 (first) should be kept.\"\n \n     timestamp_too_soon = START_TIME + 50_000_000\n     assert (\n-        max_rate_downsampler(state, timestamp=timestamp_too_soon) is True\n+        downsampler.downsampling(timestamp=timestamp_too_soon) is True\n     ), \"Msg 2 (too soon) should be skipped.\"\n+\n     timestamp_exact = START_TIME + PERIOD_NS\n     assert (\n-        max_rate_downsampler(state, timestamp=timestamp_exact) is False\n+        downsampler.downsampling(timestamp=timestamp_exact) is False\n     ), \"Msg 3 (exact interval) should be kept.\"\n-    state.last_recorded_timestamp = timestamp_exact\n \n-    timestamp_again_too_soon = timestamp_exact + 5_000_000\n+    timestamp_too_soon = timestamp_exact + 5_000_000\n     assert (\n-        max_rate_downsampler(state, timestamp=timestamp_again_too_soon) is True\n+        downsampler.downsampling(timestamp=timestamp_too_soon) is True\n     ), \"Msg 4 (too soon from Msg 3) should be skipped.\"\n-\n-\n-\n-\n-@pytest.fixture\n-def stride_recorder():\n-    \"\"\"Create a Recorder instance with 'stride' mode.\"\"\"\n-    node = Recorder(\n-        parameter_overrides=as_overrides(\n-            storage_params(),\n-            pipeline_params(),\n-            # downsampling_params_stride()\n-        )\n-    )\n-    yield node\n-    node.destroy_node()\n-\n-def test_downsampling_integration_stride(\n-    reduct_client: Client, publisher_node: rclpy.node, publisher: Publisher, stride_recorder: Recorder\n-):\n-    TOTAL_MESSAGES = 50\n-    EXPECTED_RECORDED_MESSAGES = 10\n-\n-    publish_and_spin(\n-        publisher_node,\n-        publisher,\n-        stride_recorder,\n-        n_msgs=TOTAL_MESSAGES,\n-    )\n-    async def fetch():\n-        bucket = await reduct_client.get_bucket(\"test_bucket\")\n-        count = 0\n-        async for record in bucket.query(\"test\"):\n-            reader = make_reader(\n-                io.BytesIO(await record.read_all()),\n-                decoder_factories=[DecoderFactory()]\n-            )\n-            for _ in reader.iter_decoded_messages():\n-                count += 1\n-        return count\n-\n-    recorded_count = get_or_create_event_loop().run_until_complete(fetch())\n-\n-    assert recorded_count == EXPECTED_RECORDED_MESSAGES, (\n-        f\"Expected {EXPECTED_RECORDED_MESSAGES} messages after downsampling, \"\n-        f\"found {recorded_count}.\"\n-\n-\n-    )"
+        }
+      ]
+    },
+    {
+      "author": "mother-6000",
+      "date": "2026-03-25T22:17:04Z",
+      "sha": "da79553e1fc0a2b8a8c931cea7eccd9761c94ff2",
+      "message": "Mark reductstore_agent as maintenance mode and point to reduct-bridge (#59)",
+      "files_changed": 1,
+      "additions": 7,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "0722c9323c9658af2afecff52fcbdefdf5db96a8",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/reductstore/reductstore_agent/blob/da79553e1fc0a2b8a8c931cea7eccd9761c94ff2/README.md",
+          "raw_url": "https://github.com/reductstore/reductstore_agent/raw/da79553e1fc0a2b8a8c931cea7eccd9761c94ff2/README.md",
+          "contents_url": "https://api.github.com/repos/reductstore/reductstore_agent/contents/README.md?ref=da79553e1fc0a2b8a8c931cea7eccd9761c94ff2",
+          "patch": "@@ -2,6 +2,13 @@\n \n [![ROS 2 Jazzy & Rolling](https://img.shields.io/github/actions/workflow/status/reductstore/reductstore_agent/ci.yml?branch=main&label=ROS%202%20CI%20(Jazzy%20%26%20Rolling))](https://github.com/reductstore/reductstore_agent/actions/workflows/ci.yml)\n \n+> **Status:** This project is in **maintenance mode**.\n+>\n+> We are no longer actively developing `reductstore_agent`. Only maintenance updates (bug fixes, security/dependency updates, and minor documentation updates) are planned.\n+>\n+> **Looking for the actively developed solution?** Use **Reduct Bridge**:\n+> https://github.com/reductstore/reduct-bridge\n+\n **reductstore_agent** is a ROS 2 node that records selected topics into [ReductStore](https://www.reduct.store/), a high-performance storage and streaming solution. ReductStore is an ELT-based system for robotics and industrial IoT data acquisition. It ingests and streams time-series data of any size—images, sensor readings, logs, files, MCAP, ROS bags—and stores it with time indexing and labels for ultra-fast retrieval and management.\n \n This agent is fully configurable via YAML and designed to solve storage, bandwidth, and workflow limitations commonly found in field robotics. It streams data to ReductStore in near real-time with optional compression, splitting, dynamic labeling, and per-pipeline controls."
+        }
+      ]
+    }
+  ]
+}

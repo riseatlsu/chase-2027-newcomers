@@ -1,0 +1,131 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T05:57:09Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ForteFibre",
+    "repo": "parameter_expression"
+  },
+  "data": [
+    {
+      "author": "f0reachARR",
+      "date": "2025-03-13T15:52:30Z",
+      "sha": "8f5d9b3ab8574840d97dac4ffff7ddceddfa456b",
+      "message": "initial commit",
+      "files_changed": 9,
+      "additions": 451,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "543f37c123b41c9ee447936bd1a396e689e5a35f",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/ForteFibre/parameter_expression/blob/8f5d9b3ab8574840d97dac4ffff7ddceddfa456b/.gitignore",
+          "raw_url": "https://github.com/ForteFibre/parameter_expression/raw/8f5d9b3ab8574840d97dac4ffff7ddceddfa456b/.gitignore",
+          "contents_url": "https://api.github.com/repos/ForteFibre/parameter_expression/contents/.gitignore?ref=8f5d9b3ab8574840d97dac4ffff7ddceddfa456b",
+          "patch": "@@ -0,0 +1,7 @@\n+.cache\n+.vscode/*\n+!.vscode/cspell.json\n+build\n+install\n+log\n+__pycache__/"
+        },
+        {
+          "sha": "012687f41bc5b8bef3c658fc52aae5465f759ad3",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 64,
+          "deletions": 0,
+          "changes": 64,
+          "blob_url": "https://github.com/ForteFibre/parameter_expression/blob/8f5d9b3ab8574840d97dac4ffff7ddceddfa456b/CMakeLists.txt",
+          "raw_url": "https://github.com/ForteFibre/parameter_expression/raw/8f5d9b3ab8574840d97dac4ffff7ddceddfa456b/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ForteFibre/parameter_expression/contents/CMakeLists.txt?ref=8f5d9b3ab8574840d97dac4ffff7ddceddfa456b",
+          "patch": "@@ -0,0 +1,64 @@\n+cmake_minimum_required(VERSION 3.5)\n+project(parameter_expression)\n+\n+# Default to C99\n+if(NOT CMAKE_C_STANDARD)\n+  set(CMAKE_C_STANDARD 99)\n+endif()\n+\n+# Default to C++17\n+if(NOT CMAKE_CXX_STANDARD)\n+  set(CMAKE_CXX_STANDARD 17)\n+endif()\n+\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  add_compile_options(-Wall -Wextra -Wpedantic -Wshadow -Wfloat-equal)\n+endif()\n+\n+find_package(ament_cmake_auto REQUIRED)\n+\n+ament_auto_find_build_dependencies()\n+\n+# muParser\n+include(parameter_expression-extras.cmake)\n+\n+include_directories(SYSTEM ${muparser_INCLUDE_DIRS})\n+\n+# Lib\n+file(\n+  GLOB_RECURSE sources\n+  \"./src/**/*.cpp\"\n+  \"./src/**/*.c\"\n+  \"./src/*.cpp\"\n+  \"./src/*.c\"\n+)\n+\n+ament_auto_add_library(${PROJECT_NAME} SHARED ${sources})\n+\n+target_link_libraries(${PROJECT_NAME} muparser::muparser)\n+\n+ament_export_libraries(${PROJECT_NAME})\n+ament_export_dependencies(muparser)\n+\n+if(BUILD_TESTING)\n+  find_package(ament_lint_auto REQUIRED)\n+  set(ament_cmake_copyright_FOUND TRUE)\n+  set(ament_cmake_cpplint_FOUND TRUE)\n+  set(ament_cmake_uncrustify_FOUND TRUE)\n+  set(ament_cmake_lint_cmake_FOUND TRUE)\n+  ament_lint_auto_find_test_dependencies()\n+\n+  file(\n+    GLOB_RECURSE test_sources\n+    \"./test/*.cpp\"\n+  )\n+  ament_add_gmock(${PROJECT_NAME}_test ${test_sources})\n+\n+  target_include_directories(${PROJECT_NAME}_test PUBLIC include)\n+  target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})\n+endif()\n+\n+ament_auto_package(\n+  CONFIG_EXTRAS \"parameter_expression-extras.cmake\"\n+  INSTALL_TO_SHARE cmake\n+)\n\\ No newline at end of file"
+        },
+        {
+          "sha": "b9827f00f7805b50739dfe44aef57ae74089334b",
+          "filename": "cmake/Findmuparser.cmake",
+          "status": "added",
+          "additions": 39,
+          "deletions": 0,
+          "changes": 39,
+          "blob_url": "https://github.com/ForteFibre/parameter_expression/blob/8f5d9b3ab8574840d97dac4ffff7ddceddfa456b/cmake%2FFindmuparser.cmake",
+          "raw_url": "https://github.com/ForteFibre/parameter_expression/raw/8f5d9b3ab8574840d97dac4ffff7ddceddfa456b/cmake%2FFindmuparser.cmake",
+          "contents_url": "https://api.github.com/repos/ForteFibre/parameter_expression/contents/cmake%2FFindmuparser.cmake?ref=8f5d9b3ab8574840d97dac4ffff7ddceddfa456b",
+          "patch": "@@ -0,0 +1,39 @@\n+# Find the muparser library\n+#\n+# Usage:\n+# find_package(muparser [REQUIRED] [QUIET] )\n+#\n+# Hints may be given by the (environment) variables\n+# muparser_ROOT                ... Path to the installation library\n+#\n+# It sets the following variables:\n+# muparser_FOUND               ... true if muparser is found on the system\n+# muparser_LIBRARIES           ... full path to muparser library\n+# muparser_INCLUDES            ... muparser include directory\n+#\n+#\n+\n+find_package(PkgConfig)\n+\n+pkg_check_modules(PC_MUPARSER QUIET muparser)\n+set(MUPARSER_DEFINITIONS ${PC_MUPARSER_CFLAGS_OTHER})\n+\n+find_path(muparser_INCLUDES muParser.h\n+    HINTS ${PC_MUPARSER_INCLUDEDIR} ${PC_MUPARSER_INCLUDE_DIRS})\n+\n+find_library(muparser_LIBRARIES NAMES muparser libmuparser\n+    HINTS ${PC_MUPARSER_LIBDIR} ${PC_MUPARSER_LIBRARY_DIRS})\n+\n+set(MUPARSER_LIBRARIES ${muparser_LIBRARIES})\n+set(MUPARSER_INCLUDE_DIRS ${muparser_INCLUDES})\n+\n+set(muparser_FOUND FALSE)\n+\n+if(muparser_INCLUDES AND muparser_LIBRARIES)\n+    set(muparser_FOUND TRUE)\n+    MESSAGE(STATUS \"Found muParser: ${muparser_LIBRARIES}\")\n+else()\n+    MESSAGE(STATUS \"Not found muParser\")\n+endif()\n+\n+mark_as_advanced(muparser_INCLUDES muparser_LIBRARIES)\n\\ No newline at end of file"
+        },
+        {
+          "sha": "cf0e555cb7fc2a87b2c9c6eff39930e68cde012a",
+          "filename": "include/parameter_expression/parameter_expression.hpp",
+          "status": "added",
+          "additions": 49,
+          "deletions": 0,
+          "changes": 49,
+          "blob_url": "https://github.com/ForteFibre/parameter_expression/blob/8f5d9b3ab8574840d97dac4ffff7ddceddfa456b/include%2Fparameter_expression%2Fparameter_expression.hpp",
+          "raw_url": "https://github.com/ForteFibre/parameter_expression/raw/8f5d9b3ab8574840d97dac4ffff7ddceddfa456b/include%2Fparameter_expression%2Fparameter_expression.hpp",
+          "contents_url": "https://api.github.com/repos/ForteFibre/parameter_expression/contents/include%2Fparameter_expression%2Fparameter_expression.hpp?ref=8f5d9b3ab8574840d97dac4ffff7ddceddfa456b",
+          "patch": "@@ -0,0 +1,49 @@\n+#pragma once\n+\n+#include <muParser.h>\n+\n+#include <rclcpp/node_interfaces/get_node_parameters_interface.hpp>\n+#include <rclcpp/node_interfaces/node_parameters_interface.hpp>\n+#include <rclcpp/parameter_event_handler.hpp>\n+\n+namespace parameter_expression {\n+// ROS 2 dynamic typed parameter with mathematical expression\n+class ParameterExpression {\n+public:\n+  ParameterExpression(\n+      rclcpp::node_interfaces::NodeParametersInterface::SharedPtr\n+          node_parameters_interface,\n+      const std::string &name, const double default_value,\n+      rcl_interfaces::msg::ParameterDescriptor descriptor);\n+\n+  template <typename Node>\n+  ParameterExpression(Node &node, const std::string &name,\n+                      const double default_value = 0.0,\n+                      rcl_interfaces::msg::ParameterDescriptor descriptor =\n+                          rcl_interfaces::msg::ParameterDescriptor())\n+      : ParameterExpression(\n+            rclcpp::node_interfaces::get_node_parameters_interface(node), name,\n+            default_value, descriptor) {}\n+\n+  double get() const;\n+\n+  RCLCPP_SMART_PTR_DEFINITIONS(ParameterExpression)\n+\n+private:\n+  rcl_interfaces::msg::SetParametersResult\n+  on_parameter(const std::vector<rclcpp::Parameter> &);\n+  void eval(const rclcpp::Parameter parameter_value);\n+\n+  void eval_first();\n+\n+  rclcpp::node_interfaces::NodeParametersInterface::SharedPtr\n+      node_parameters_interface_;\n+  rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr\n+      callback_handle_;\n+  rclcpp::Parameter parameter_;\n+  const std::string name_;\n+  mu::Parser parser_;\n+  double value_;\n+  const double default_value_;\n+};\n+} // namespace parameter_expression\n\\ No newline at end of file"
+        },
+        {
+          "sha": "138c90dbddf9834c6d3ce19ba2174f2689476e16",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 26,
+          "deletions": 0,
+          "changes": 26,
+          "blob_url": "https://github.com/ForteFibre/parameter_expression/blob/8f5d9b3ab8574840d97dac4ffff7ddceddfa456b/package.xml",
+          "raw_url": "https://github.com/ForteFibre/parameter_expression/raw/8f5d9b3ab8574840d97dac4ffff7ddceddfa456b/package.xml",
+          "contents_url": "https://api.github.com/repos/ForteFibre/parameter_expression/contents/package.xml?ref=8f5d9b3ab8574840d97dac4ffff7ddceddfa456b",
+          "patch": "@@ -0,0 +1,26 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n+  <name>parameter_expression</name>\n+  <version>0.0.1</version>\n+  <description>Using mathematical expression in ROS 2 parameter</description>\n+  <maintainer email=\"f0reach@f0reach.me\">f0reachARR</maintainer>\n+  <license>MIT</license>\n+\n+  <depend>rclcpp</depend>\n+  <depend>muparser</depend>\n+  <depend>std_msgs</depend>\n+\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+  <buildtool_depend>ament_cmake_auto</buildtool_depend>\n+\n+  <test_depend>ament_lint_auto</test_depend>\n+  <test_depend>ament_lint_common</test_depend>\n+  <test_depend>ament_cmake_clang_format</test_depend>\n+  <test_depend>ament_cmake_gtest</test_depend>\n+  <test_depend>ament_cmake_gmock</test_depend>\n+\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n+</package>\n\\ No newline at end of file"
+        },
+        {
+          "sha": "8c1b8ada5cba29e2b2654ec8dace64cfe2f9156b",
+          "filename": "parameter_expression-extras.cmake",
+          "status": "added",
+          "additions": 20,
+          "deletions": 0,
+          "changes": 20,
+          "blob_url": "https://github.com/ForteFibre/parameter_expression/blob/8f5d9b3ab8574840d97dac4ffff7ddceddfa456b/parameter_expression-extras.cmake",
+          "raw_url": "https://github.com/ForteFibre/parameter_expression/raw/8f5d9b3ab8574840d97dac4ffff7ddceddfa456b/parameter_expression-extras.cmake",
+          "contents_url": "https://api.github.com/repos/ForteFibre/parameter_expression/contents/parameter_expression-extras.cmake?ref=8f5d9b3ab8574840d97dac4ffff7ddceddfa456b",
+          "patch": "@@ -0,0 +1,20 @@\n+find_package(ament_cmake QUIET REQUIRED)\n+find_package(muparser QUIET)\n+\n+if(muparser_FOUND)\n+    message(STATUS \"Using system MuParser\")\n+else()\n+    if(DEFINED fibril_ros_utils_DIR)\n+        list(APPEND CMAKE_MODULE_PATH \"${fibril_ros_utils_DIR}/Modules\")\n+    else()\n+        list(APPEND CMAKE_MODULE_PATH \"${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules\")\n+    endif()\n+\n+    find_package(muparser QUIET)\n+\n+    if(muparser_FOUND)\n+        message(STATUS \"Using bundled MuParser\")\n+    else()\n+        message(FATAL_ERROR \"MuParser not found. Please install it or set the path to it.\")\n+    endif()\n+endif()\n\\ No newline at end of file"
+        },
+        {
+          "sha": "519b14074f7b1b9c43d3dc98061b7edc204b1d5a",
+          "filename": "src/parameter_expression.cpp",
+          "status": "added",
+          "additions": 82,
+          "deletions": 0,
+          "changes": 82,
+          "blob_url": "https://github.com/ForteFibre/parameter_expression/blob/8f5d9b3ab8574840d97dac4ffff7ddceddfa456b/src%2Fparameter_expression.cpp",
+          "raw_url": "https://github.com/ForteFibre/parameter_expression/raw/8f5d9b3ab8574840d97dac4ffff7ddceddfa456b/src%2Fparameter_expression.cpp",
+          "contents_url": "https://api.github.com/repos/ForteFibre/parameter_expression/contents/src%2Fparameter_expression.cpp?ref=8f5d9b3ab8574840d97dac4ffff7ddceddfa456b",
+          "patch": "@@ -0,0 +1,82 @@\n+#include \"parameter_expression/parameter_expression.hpp\"\n+\n+#include <muParser.h>\n+\n+namespace parameter_expression {\n+ParameterExpression::ParameterExpression(\n+    rclcpp::node_interfaces::NodeParametersInterface::SharedPtr\n+        node_parameters_interface,\n+    const std::string &name, const double default_value,\n+    rcl_interfaces::msg::ParameterDescriptor descriptor)\n+    : node_parameters_interface_(node_parameters_interface), name_(name),\n+      parser_(), value_(), default_value_(default_value) {\n+  using namespace std::placeholders;\n+  const auto parameter_descriptor =\n+      rcl_interfaces::msg::ParameterDescriptor(descriptor)\n+          .set__dynamic_typing(true);\n+  const auto empty_value = rclcpp::ParameterValue();\n+  node_parameters_interface_->declare_parameter(name, empty_value,\n+                                                parameter_descriptor);\n+  callback_handle_ = node_parameters_interface_->add_on_set_parameters_callback(\n+      std::bind(&ParameterExpression::on_parameter, this, _1));\n+  eval_first();\n+}\n+\n+ParameterExpression::~ParameterExpression() {}\n+\n+void ParameterExpression::eval_first() {\n+  const auto parameter = node_parameters_interface_->get_parameter(name_);\n+  eval(parameter);\n+}\n+\n+rcl_interfaces::msg::SetParametersResult ParameterExpression::on_parameter(\n+    const std::vector<rclcpp::Parameter> &parameters) {\n+  for (const auto &parameter : parameters) {\n+    if (parameter.get_name() == name_) {\n+      try {\n+        eval(parameter);\n+      } catch (const std::exception &e) {\n+        return rcl_interfaces::msg::SetParametersResult()\n+            .set__reason(std::string(\"Failed to evaluate expression: \") +\n+                         e.what())\n+            .set__successful(false);\n+      } catch (const mu::Parser::exception_type &e) {\n+        return rcl_interfaces::msg::SetParametersResult()\n+            .set__reason(std::string(\"Failed to evaluate expression: \") +\n+                         e.GetMsg())\n+            .set__successful(false);\n+      }\n+    }\n+  }\n+  return rcl_interfaces::msg::SetParametersResult().set__successful(true);\n+}\n+\n+void ParameterExpression::eval(const rclcpp::Parameter parameter_value) {\n+  using ParameterType = rcl_interfaces::msg::ParameterType;\n+  const auto ty = parameter_value.get_type();\n+  if (ty == ParameterType::PARAMETER_NOT_SET) {\n+    value_ = default_value_;\n+    return;\n+  }\n+  // If the parameter is double or integer, return the value directly\n+  if (ty == ParameterType::PARAMETER_INTEGER) {\n+    value_ = static_cast<double>(parameter_value.as_int());\n+    return;\n+  }\n+  if (ty == ParameterType::PARAMETER_DOUBLE) {\n+    value_ = parameter_value.as_double();\n+    return;\n+  }\n+\n+  // If the parameter is string, parse the expression\n+  if (ty != ParameterType::PARAMETER_STRING) {\n+    throw std::runtime_error(\"Parameter type is not string\");\n+  }\n+  const auto expression = parameter_value.as_string();\n+\n+  parser_.SetExpr(expression);\n+  value_ = parser_.Eval();\n+}\n+\n+double ParameterExpression::get() const { return value_; }\n+} // namespace parameter_expression\n\\ No newline at end of file"
+        },
+        {
+          "sha": "f64340b637c84b4b8813e8092531730fe7b96c17",
+          "filename": "test/runner.cpp",
+          "status": "added",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/ForteFibre/parameter_expression/blob/8f5d9b3ab8574840d97dac4ffff7ddceddfa456b/test%2Frunner.cpp",
+          "raw_url": "https://github.com/ForteFibre/parameter_expression/raw/8f5d9b3ab8574840d97dac4ffff7ddceddfa456b/test%2Frunner.cpp",
+          "contents_url": "https://api.github.com/repos/ForteFibre/parameter_expression/contents/test%2Frunner.cpp?ref=8f5d9b3ab8574840d97dac4ffff7ddceddfa456b",
+          "patch": "@@ -0,0 +1,7 @@\n+#include <gtest/gtest.h>\n+\n+int main(int argc, char ** argv)\n+{\n+  testing::InitGoogleTest(&argc, argv);\n+  return RUN_ALL_TESTS();\n+}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "d3e572faec533f8576ee00a4078cb503395c0bc9",
+          "filename": "test/test_parameter_expression.cpp",
+          "status": "added",
+          "additions": 157,
+          "deletions": 0,
+          "changes": 157,
+          "blob_url": "https://github.com/ForteFibre/parameter_expression/blob/8f5d9b3ab8574840d97dac4ffff7ddceddfa456b/test%2Ftest_parameter_expression.cpp",
+          "raw_url": "https://github.com/ForteFibre/parameter_expression/raw/8f5d9b3ab8574840d97dac4ffff7ddceddfa456b/test%2Ftest_parameter_expression.cpp",
+          "contents_url": "https://api.github.com/repos/ForteFibre/parameter_expression/contents/test%2Ftest_parameter_expression.cpp?ref=8f5d9b3ab8574840d97dac4ffff7ddceddfa456b",
+          "patch": "@@ -0,0 +1,157 @@\n+#include <gtest/gtest.h>\n+\n+#include <rclcpp/rclcpp.hpp>\n+#include <std_msgs/msg/float32.hpp>\n+\n+#include \"parameter_expression/parameter_expression.hpp\"\n+\n+class ParameterExpressionTest : public ::testing::Test {\n+protected:\n+  void SetUp() override {\n+    using namespace std::chrono_literals;\n+\n+    if (!rclcpp::ok())\n+      rclcpp::init(0, nullptr);\n+\n+    executor_ = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();\n+\n+    receiver_ = std::make_shared<rclcpp::Node>(\"parameter_expression_receiver\");\n+    expression_ = std::make_shared<parameter_expression::ParameterExpression>(\n+        receiver_, \"expression\", 123.4);\n+\n+    sender_ = std::make_shared<rclcpp::Node>(\"parameter_expression_sender\");\n+    parameters_client_ = std::make_shared<rclcpp::AsyncParametersClient>(\n+        sender_, \"parameter_expression_receiver\");\n+\n+    executor_->add_node(sender_);\n+    executor_->add_node(receiver_);\n+  }\n+\n+  void TearDown() override {\n+    executor_->remove_node(sender_);\n+    executor_->remove_node(receiver_);\n+    sender_.reset();\n+    receiver_.reset();\n+  }\n+\n+  template <typename TInput>\n+  void testExpression(const TInput expression, double expected) {\n+    using namespace std::chrono_literals;\n+    std::vector<rclcpp::Parameter> parameters = {\n+        rclcpp::Parameter(\"expression\", expression)};\n+    auto future = parameters_client_->set_parameters(parameters);\n+    executor_->spin_until_future_complete(future, 500ms);\n+    EXPECT_DOUBLE_EQ(expression_->get(), expected)\n+        << \"Expression: \" << expression << \" should be evaluated as \"\n+        << expected;\n+  }\n+\n+  template <typename TInput> void testError(const TInput expression) {\n+    using namespace std::chrono_literals;\n+    std::vector<rclcpp::Parameter> parameters = {\n+        rclcpp::Parameter(\"expression\", expression)};\n+    auto future = parameters_client_->set_parameters(parameters);\n+    executor_->spin_until_future_complete(future, 500ms);\n+    EXPECT_FALSE(future.get().at(0).successful)\n+        << \"Expression: \" << expression << \" should be evaluated as error\";\n+  }\n+\n+  rclcpp::Node::SharedPtr sender_, receiver_;\n+  rclcpp::executors::SingleThreadedExecutor::SharedPtr executor_;\n+\n+  // Sender\n+  rclcpp::AsyncParametersClient::SharedPtr parameters_client_;\n+\n+  // Receiver\n+  ros2_parameter_expression::ParameterExpression::SharedPtr expression_;\n+  double value_;\n+};\n+\n+TEST_F(ParameterExpressionTest, testDefault) {\n+  EXPECT_DOUBLE_EQ(expression_->get(), 123.4);\n+}\n+\n+TEST_F(ParameterExpressionTest, testConstant) { testExpression(1.0, 1.0); }\n+\n+TEST_F(ParameterExpressionTest, testInteger) {\n+  testExpression(\"1\", 1);\n+  testExpression(\"1+2\", 3);\n+  testExpression(\"1-2\", -1);\n+  testExpression(\"1*2\", 2);\n+  testExpression(\"1/2\", 0.5);\n+  testExpression(\"1+2*3\", 7);\n+  testExpression(\"(1+2)*3\", 9);\n+}\n+\n+TEST_F(ParameterExpressionTest, testDouble) {\n+  testExpression(\"1.0\", 1.0);\n+  testExpression(\"1.0+2.0\", 3.0);\n+  testExpression(\"1.0-2.0\", -1.0);\n+  testExpression(\"1.0*2.0\", 2.0);\n+  testExpression(\"1.0/2.0\", 0.5);\n+  testExpression(\"1.0+2.0*3.0\", 7.0);\n+  testExpression(\"(1.0+2.0)*3.0\", 9.0);\n+}\n+\n+// function\n+TEST_F(ParameterExpressionTest, testFunction) {\n+  testExpression(\"sin(0)\", 0);\n+  testExpression(\"cos(0)\", 1);\n+  testExpression(\"tan(0)\", 0);\n+  testExpression(\"atan2(0, 1)\", 0);\n+}\n+\n+// change type\n+TEST_F(ParameterExpressionTest, testChangeType) {\n+  testExpression(123, 123);\n+  testExpression(123.0, 123.0);\n+  testExpression(\"123\", 123);\n+  testExpression(\"121+2\", 123);\n+}\n+\n+// error\n+TEST_F(ParameterExpressionTest, testError) {\n+  testError(\"1+\");\n+  testError(\"1+*2\");\n+  testError(\"1+2)\");\n+  testError(\"1+2(\");\n+}\n+\n+class OptionsPassedParameterTest : public ::testing::Test {\n+protected:\n+  void SetUp() override {\n+    if (!rclcpp::ok())\n+      rclcpp::init(0, nullptr);\n+  }\n+\n+  void TearDown() override { receiver_.reset(); }\n+\n+  template <typename T> void test(const T value, const double expected) {\n+    const auto node_options =\n+        rclcpp::NodeOptions().append_parameter_override(\"expression\", value);\n+    receiver_ = std::make_shared<rclcpp::Node>(\"parameter_expression_receiver\",\n+                                               node_options);\n+    expression_ = std::make_shared<parameter_expression::ParameterExpression>(\n+        receiver_, \"expression\", 0.0);\n+\n+    rclcpp::spin_some(receiver_);\n+\n+    EXPECT_DOUBLE_EQ(expression_->get(), expected)\n+        << \"Expression: \" << value << \" should be evaluated as \" << expected;\n+  }\n+\n+  rclcpp::Node::SharedPtr receiver_;\n+\n+  // Receiver\n+  fibril::ParameterExpression::SharedPtr expression_;\n+};\n+\n+TEST_F(OptionsPassedParameterTest, testConstant) { test(1.0, 1.0); }\n+\n+TEST_F(OptionsPassedParameterTest, testExpression) { test(\"1+2\", 3); }\n+\n+TEST_F(OptionsPassedParameterTest, testError) {\n+  // In case of passing invalid value in initialize, it should throw an\n+  // exception\n+  EXPECT_THROW(test(\"1+\", 0), mu::Parser::exception_type);\n+}"
+        }
+      ]
+    }
+  ]
+}

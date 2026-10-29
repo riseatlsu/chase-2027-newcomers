@@ -1,0 +1,287 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T03:37:35Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "clearpathrobotics",
+    "repo": "puma_motor_driver"
+  },
+  "data": [
+    {
+      "author": "tonybaltovski",
+      "date": "2015-04-28T21:07:30Z",
+      "sha": "a344f6799e9582237747348078b7d0e2ac9471fe",
+      "message": "Fixed dependenecy issue and added initial SocketCAN gateway.",
+      "files_changed": 8,
+      "additions": 280,
+      "deletions": 20,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b017347c9c60454730a8e5235c6616e8e937fb17",
+          "filename": "puma_motor_driver/CMakeLists.txt",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 2,
+          "changes": 9,
+          "blob_url": "https://github.com/clearpathrobotics/puma_motor_driver/blob/a344f6799e9582237747348078b7d0e2ac9471fe/puma_motor_driver%2FCMakeLists.txt",
+          "raw_url": "https://github.com/clearpathrobotics/puma_motor_driver/raw/a344f6799e9582237747348078b7d0e2ac9471fe/puma_motor_driver%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/puma_motor_driver/contents/puma_motor_driver%2FCMakeLists.txt?ref=a344f6799e9582237747348078b7d0e2ac9471fe",
+          "patch": "@@ -5,6 +5,7 @@ find_package(catkin REQUIRED COMPONENTS\n   roscpp\n   sensor_msgs\n   serial\n+  puma_motor_msgs\n )\n \n ## Generate messages in the 'msg' folder\n@@ -30,7 +31,7 @@ find_package(catkin REQUIRED COMPONENTS\n catkin_package(\n   INCLUDE_DIRS include\n   LIBRARIES puma_motor_driver\n-  CATKIN_DEPENDS roscpp sensor_msgs serial\n+  CATKIN_DEPENDS roscpp sensor_msgs serial puma_motor_msgs\n #  DEPENDS system_lib\n )\n \n@@ -42,19 +43,23 @@ include_directories(\n add_library(puma_motor_driver\n   src/driver.cpp\n   src/serial_gateway.cpp\n-  #src/socketcan_gateway.cpp\n+  src/socketcan_gateway.cpp\n )\n target_link_libraries(puma_motor_driver\n   ${catkin_LIBRARIES}\n )\n \n+add_dependencies(puma_motor_driver puma_motor_msgs_gencpp)\n add_executable(puma_multi_controller_node src/multi_controller_node.cpp)\n \n+\n target_link_libraries(puma_multi_controller_node\n   puma_motor_driver\n   ${catkin_LIBRARIES}\n )\n \n+\n+\n # Mark executables and/or libraries for installation\n install(TARGETS puma_motor_driver puma_multi_controller_node\n   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}"
+        },
+        {
+          "sha": "c513ce5c4423bd9e4a7b7e3822a40cb6a631a094",
+          "filename": "puma_motor_driver/include/puma_motor_driver/driver.h",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 1,
+          "changes": 7,
+          "blob_url": "https://github.com/clearpathrobotics/puma_motor_driver/blob/a344f6799e9582237747348078b7d0e2ac9471fe/puma_motor_driver%2Finclude%2Fpuma_motor_driver%2Fdriver.h",
+          "raw_url": "https://github.com/clearpathrobotics/puma_motor_driver/raw/a344f6799e9582237747348078b7d0e2ac9471fe/puma_motor_driver%2Finclude%2Fpuma_motor_driver%2Fdriver.h",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/puma_motor_driver/contents/puma_motor_driver%2Finclude%2Fpuma_motor_driver%2Fdriver.h?ref=a344f6799e9582237747348078b7d0e2ac9471fe",
+          "patch": "@@ -71,7 +71,12 @@ class Driver\n   float lastBusVoltage();\n   float lastCurrent();\n   float lastTemperature();\n-\n+  float lastPosition();\n+  float lastSpeed();\n+  float lastFault();\n+  float lastPower();\n+  float lastMode();\n+  float lastOutVoltage();\n \n   /**\n    * Return the current duty cycle of the motor driver's h-bridge from the status cache."
+        },
+        {
+          "sha": "00e3e1d6a91e34e0f5aff000065e9151a90b3343",
+          "filename": "puma_motor_driver/include/puma_motor_driver/socketcan_gateway.h",
+          "status": "modified",
+          "additions": 43,
+          "deletions": 1,
+          "changes": 44,
+          "blob_url": "https://github.com/clearpathrobotics/puma_motor_driver/blob/a344f6799e9582237747348078b7d0e2ac9471fe/puma_motor_driver%2Finclude%2Fpuma_motor_driver%2Fsocketcan_gateway.h",
+          "raw_url": "https://github.com/clearpathrobotics/puma_motor_driver/raw/a344f6799e9582237747348078b7d0e2ac9471fe/puma_motor_driver%2Finclude%2Fpuma_motor_driver%2Fsocketcan_gateway.h",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/puma_motor_driver/contents/puma_motor_driver%2Finclude%2Fpuma_motor_driver%2Fsocketcan_gateway.h?ref=a344f6799e9582237747348078b7d0e2ac9471fe",
+          "patch": "@@ -22,12 +22,54 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCL\n ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n */\n \n+#include <string>\n+#include <stdio.h>\n+#include <unistd.h>\n+#include <fcntl.h>\n+#include <poll.h>\n+#include <sys/types.h>\n+#include <sys/socket.h>\n+#include <sys/ioctl.h>\n+#include <sys/select.h>\n+#include <net/if.h>\n+\n+#include <linux/can.h>\n+#include <linux/can/raw.h>\n+\n+#include \"puma_motor_driver/gateway.h\"\n+#include \"puma_motor_driver/message.h\"\n+\n namespace puma_motor_driver\n {\n \n class SocketCANGateway : public Gateway\n {\n+public:\n+  SocketCANGateway(std::string canbus_dev):\n+    canbus_dev_(canbus_dev),\n+    isConnected_(false),\n+    write_frames_index_(0)\n+  {\n+  }\n+\n+  virtual bool connect();\n+  virtual bool isConnected();\n+\n+  virtual bool recv(Message* msg);\n+  virtual void queue(const Message& msg);\n+  virtual bool sendAllQueued();\n+  void msgToFrame(Message* msg, can_frame* frame);\n+\n+private:\n+\n+  int socket_;\n+  std::string canbus_dev_;  // CAN interface ID\n+  bool isConnected_;\n+\n+  can_frame write_frames_[1024];\n+  int write_frames_index_;\n+  can_frame read_frame_;\n \n-}\n+};\n \n }  // puma_motor_driver"
+        },
+        {
+          "sha": "665f0e70f53a3ae2708ab2d4ca43077dba1dac66",
+          "filename": "puma_motor_driver/mecanum.launch",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/clearpathrobotics/puma_motor_driver/blob/a344f6799e9582237747348078b7d0e2ac9471fe/puma_motor_driver%2Fmecanum.launch",
+          "raw_url": "https://github.com/clearpathrobotics/puma_motor_driver/raw/a344f6799e9582237747348078b7d0e2ac9471fe/puma_motor_driver%2Fmecanum.launch",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/puma_motor_driver/contents/puma_motor_driver%2Fmecanum.launch?ref=a344f6799e9582237747348078b7d0e2ac9471fe",
+          "patch": "@@ -6,6 +6,7 @@\n   <node pkg=\"puma_motor_driver\" name=\"joy_mecanum\" type=\"joy_mecanum\" />\n \n   <node pkg=\"puma_motor_driver\" name=\"puma_multi_controller_node\" type=\"puma_multi_controller_node\">\n-    <param name=\"port\" value=\"/dev/ttyUSB0\" />\n+    <param name=\"canbus_dev\" value=\"can0\" />\n   </node>\n+\n </launch>"
+        },
+        {
+          "sha": "97605a8e941e640f85c3b65a23ed34ee28ca2dfd",
+          "filename": "puma_motor_driver/package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/clearpathrobotics/puma_motor_driver/blob/a344f6799e9582237747348078b7d0e2ac9471fe/puma_motor_driver%2Fpackage.xml",
+          "raw_url": "https://github.com/clearpathrobotics/puma_motor_driver/raw/a344f6799e9582237747348078b7d0e2ac9471fe/puma_motor_driver%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/puma_motor_driver/contents/puma_motor_driver%2Fpackage.xml?ref=a344f6799e9582237747348078b7d0e2ac9471fe",
+          "patch": "@@ -11,9 +11,11 @@\n   <build_depend>roscpp</build_depend>\n   <build_depend>sensor_msgs</build_depend>\n   <build_depend>serial</build_depend>\n+  <build_depend>puma_motor_msgs</build_depend>\n   <run_depend>roscpp</run_depend>\n   <run_depend>sensor_msgs</run_depend>\n   <run_depend>serial</run_depend>\n+  <run_depend>puma_motor_msgs</run_depend>\n \n   <export>\n   </export>"
+        },
+        {
+          "sha": "39f66768357def3585521a1a8afd2a89ad7b2d9a",
+          "filename": "puma_motor_driver/src/driver.cpp",
+          "status": "modified",
+          "additions": 44,
+          "deletions": 7,
+          "changes": 51,
+          "blob_url": "https://github.com/clearpathrobotics/puma_motor_driver/blob/a344f6799e9582237747348078b7d0e2ac9471fe/puma_motor_driver%2Fsrc%2Fdriver.cpp",
+          "raw_url": "https://github.com/clearpathrobotics/puma_motor_driver/raw/a344f6799e9582237747348078b7d0e2ac9471fe/puma_motor_driver%2Fsrc%2Fdriver.cpp",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/puma_motor_driver/contents/puma_motor_driver%2Fsrc%2Fdriver.cpp?ref=a344f6799e9582237747348078b7d0e2ac9471fe",
+          "patch": "@@ -34,6 +34,7 @@ namespace puma_motor_driver\n \n void Driver::processMessage(const Message& received_msg)\n {\n+\n   // If it's not our message, jump out.\n   if (received_msg.getDeviceNumber() != device_number_) return;\n \n@@ -74,13 +75,13 @@ bool Driver::requestStatusMessages()\n   gateway_.queue(Message(LM_API_STATUS_VOLTOUT | device_number_));\n   gateway_.queue(Message(LM_API_STATUS_VOLTBUS | device_number_));\n   gateway_.queue(Message(LM_API_STATUS_CURRENT | device_number_));\n-  gateway_.queue(Message(LM_API_STATUS_TEMP | device_number_));\n-  gateway_.queue(Message(LM_API_STATUS_POS | device_number_));\n-  gateway_.queue(Message(LM_API_STATUS_SPD | device_number_));\n-  //gateway_.queue(Message(LM_API_STATUS_FAULT | device_number_));\n-  //gateway_.queue(Message(LM_API_STATUS_POWER | device_number_));\n-  //gateway_.queue(Message(LM_API_STATUS_CMODE | device_number_));\n-  //gateway_.queue(Message(LM_API_STATUS_VOUT | device_number_));\n+  gateway_.queue(Message(LM_API_STATUS_TEMP    | device_number_));\n+  gateway_.queue(Message(LM_API_STATUS_POS     | device_number_));\n+  gateway_.queue(Message(LM_API_STATUS_SPD     | device_number_));\n+  gateway_.queue(Message(LM_API_STATUS_FAULT   | device_number_));\n+  gateway_.queue(Message(LM_API_STATUS_POWER   | device_number_));\n+  gateway_.queue(Message(LM_API_STATUS_CMODE   | device_number_));\n+  gateway_.queue(Message(LM_API_STATUS_VOUT    | device_number_));\n   return true;\n }\n \n@@ -102,6 +103,42 @@ float Driver::lastCurrent()\n   return field->interpretFixed8x8();\n }\n \n+float Driver::lastPosition()\n+{\n+  StatusField* field = statusFieldForMessage(Message(LM_API_STATUS_POS));\n+  return field->interpretFixed8x8();\n+}\n+\n+float Driver::lastSpeed()\n+{\n+  StatusField* field = statusFieldForMessage(Message(LM_API_STATUS_SPD));\n+  return field->interpretFixed8x8();\n+}\n+\n+float Driver::lastFault()\n+{\n+  StatusField* field = statusFieldForMessage(Message(LM_API_STATUS_FAULT));\n+  return field->interpretFixed8x8();\n+}\n+\n+float Driver::lastPower()\n+{\n+  StatusField* field = statusFieldForMessage(Message(LM_API_STATUS_POWER));\n+  return field->interpretFixed8x8();\n+}\n+\n+float Driver::lastMode()\n+{\n+  StatusField* field = statusFieldForMessage(Message(LM_API_STATUS_CMODE));\n+  return field->interpretFixed8x8();\n+}\n+\n+float Driver::lastOutVoltage()\n+{\n+  StatusField* field = statusFieldForMessage(Message(LM_API_STATUS_VOUT));\n+  return field->interpretFixed8x8();\n+}\n+\n Driver::StatusField* Driver::statusFieldForMessage(const Message& msg)\n {\n   // If it's not a STATUS message, there is no status field box to return."
+        },
+        {
+          "sha": "34fa89e02bbd66ff62a6e02b0b2773fa5911a9da",
+          "filename": "puma_motor_driver/src/multi_controller_node.cpp",
+          "status": "modified",
+          "additions": 28,
+          "deletions": 8,
+          "changes": 36,
+          "blob_url": "https://github.com/clearpathrobotics/puma_motor_driver/blob/a344f6799e9582237747348078b7d0e2ac9471fe/puma_motor_driver%2Fsrc%2Fmulti_controller_node.cpp",
+          "raw_url": "https://github.com/clearpathrobotics/puma_motor_driver/raw/a344f6799e9582237747348078b7d0e2ac9471fe/puma_motor_driver%2Fsrc%2Fmulti_controller_node.cpp",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/puma_motor_driver/contents/puma_motor_driver%2Fsrc%2Fmulti_controller_node.cpp?ref=a344f6799e9582237747348078b7d0e2ac9471fe",
+          "patch": "@@ -26,6 +26,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI\n #include \"boost/scoped_ptr.hpp\"\n #include \"puma_motor_driver/driver.h\"\n #include \"puma_motor_driver/serial_gateway.h\"\n+#include \"puma_motor_driver/socketcan_gateway.h\"\n #include \"puma_motor_msgs/MultiStatus.h\"\n #include \"puma_motor_msgs/Status.h\"\n #include \"ros/ros.h\"\n@@ -80,7 +81,7 @@ class MultiControllerNode\n \n   void run()\n   {\n-    ros::Rate rate(10);\n+    ros::Rate rate(25);\n \n     while (ros::ok())\n     {\n@@ -93,15 +94,15 @@ class MultiControllerNode\n       // Process ROS callbacks, which will queue command messages to the drivers.\n       ros::spinOnce();\n       gateway_.sendAllQueued();\n-      ros::Duration(0.01).sleep();\n+      ros::Duration(0.005).sleep();\n \n       // Queue data requests for the drivers in order to assemble an amalgamated status message.\n       BOOST_FOREACH(puma_motor_driver::Driver& driver, drivers_)\n       {\n         driver.clearStatusCache();\n         driver.requestStatusMessages();\n         gateway_.sendAllQueued();\n-        ros::Duration(0.012).sleep();\n+        ros::Duration(0.006).sleep();\n       }\n \n       // Send all queued messages.\n@@ -126,6 +127,10 @@ class MultiControllerNode\n         s->duty_cycle = driver.lastDutyCycle();\n         s->bus_voltage = driver.lastBusVoltage();\n         s->current = driver.lastCurrent();\n+        s->travel = driver.lastPosition();\n+        s->fault = driver.lastFault();\n+        s->mode = driver.lastMode();\n+        s->output_voltage = driver.lastOutVoltage();\n \n         status_index++;\n       }\n@@ -157,12 +162,27 @@ int main(int argc, char *argv[])\n   ros::NodeHandle nh_private(\"~\");\n \n   std::string serial_port;\n-  nh_private.param<std::string>(\"port\", serial_port, \"/dev/ttyUSB0\");\n+  std::string canbus_dev;\n \n-  serial::Serial serial;\n-  serial.setPort(serial_port);\n-  puma_motor_driver::SerialGateway gateway(serial);\n+  boost::scoped_ptr<puma_motor_driver::Gateway> gateway;\n \n-  MultiControllerNode n(nh, nh_private, gateway);\n+  if (nh_private.getParam(\"canbus_dev\", canbus_dev))\n+  {\n+    gateway.reset(new puma_motor_driver::SocketCANGateway (canbus_dev));\n+  }\n+  else if (nh_private.getParam(\"port\", serial_port))\n+  {\n+    serial::Serial serial;\n+    serial.setPort(serial_port);\n+    gateway.reset(new puma_motor_driver::SerialGateway (serial));\n+  }\n+  else\n+  {\n+    ROS_FATAL(\"No communication method given.\");\n+    return 1;\n+  }\n+\n+  MultiControllerNode n(nh, nh_private, *gateway);\n   n.run();\n+\n }"
+        },
+        {
+          "sha": "d763bade2c7b4b60bc7a69e5fa80939571eca52e",
+          "filename": "puma_motor_driver/src/socketcan_gateway.cpp",
+          "status": "added",
+          "additions": 148,
+          "deletions": 0,
+          "changes": 148,
+          "blob_url": "https://github.com/clearpathrobotics/puma_motor_driver/blob/a344f6799e9582237747348078b7d0e2ac9471fe/puma_motor_driver%2Fsrc%2Fsocketcan_gateway.cpp",
+          "raw_url": "https://github.com/clearpathrobotics/puma_motor_driver/raw/a344f6799e9582237747348078b7d0e2ac9471fe/puma_motor_driver%2Fsrc%2Fsocketcan_gateway.cpp",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/puma_motor_driver/contents/puma_motor_driver%2Fsrc%2Fsocketcan_gateway.cpp?ref=a344f6799e9582237747348078b7d0e2ac9471fe",
+          "patch": "@@ -0,0 +1,148 @@\n+/**\n+Software License Agreement (BSD)\n+\n+\\authors   Mike Purvis <mpurvis@clearpathrobotics.com>\n+\\copyright Copyright (c) 2015, Clearpath Robotics, Inc., All rights reserved.\n+\n+Redistribution and use in source and binary forms, with or without modification, are permitted provided that\n+the following conditions are met:\n+ * Redistributions of source code must retain the above copyright notice, this list of conditions and the\n+   following disclaimer.\n+ * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the\n+   following disclaimer in the documentation and/or other materials provided with the distribution.\n+ * Neither the name of Clearpath Robotics nor the names of its contributors may be used to endorse or promote\n+   products derived from this software without specific prior written permission.\n+\n+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED WAR-\n+RANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR\n+PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, IN-\n+DIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT\n+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND\n+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n+*/\n+\n+#include <string>\n+#include <stdio.h>\n+#include <unistd.h>\n+#include <fcntl.h>\n+#include <poll.h>\n+#include <sys/types.h>\n+#include <sys/socket.h>\n+#include <sys/ioctl.h>\n+#include <net/if.h>\n+\n+#include <linux/can.h>\n+#include <linux/can/raw.h>\n+\n+#include \"puma_motor_driver/socketcan_gateway.h\"\n+#include \"ros/ros.h\"\n+\n+namespace puma_motor_driver\n+{\n+\n+bool SocketCANGateway::connect()\n+{\n+\n+  if((socket_ = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0)\n+  {\n+    ROS_ERROR(\"Error while opening socket\");\n+    return false;\n+  }\n+\n+  struct ifreq ifr;\n+\n+  strcpy(ifr.ifr_name, canbus_dev_.c_str());\n+\n+  if (ioctl(socket_, SIOCGIFINDEX, &ifr) < 0)\n+  {\n+    close(socket_);\n+    ROS_ERROR(\"Error while trying to control device\");\n+    return false;\n+  }\n+\n+  struct sockaddr_can addr;\n+  addr.can_family  = AF_CAN;\n+  addr.can_ifindex = ifr.ifr_ifindex; \n+\n+  ROS_DEBUG(\"%s at index %d\", canbus_dev_.c_str(), ifr.ifr_ifindex);\n+\n+  if(bind(socket_, (struct sockaddr *)&addr, sizeof(addr)) < 0)\n+  {\n+    ROS_ERROR(\"Error in socket bind\");\n+    return false;\n+  }\n+\n+  struct timeval tv;\n+  tv.tv_sec = 0;\n+  tv.tv_usec = 1; // microseconds\n+\n+  setsockopt(socket_, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));\n+\n+  ROS_INFO(\"Opened Socket CAN on %s\", canbus_dev_.c_str());\n+  isConnected_ = true;\n+\n+  return isConnected_;\n+}\n+\n+\n+bool SocketCANGateway::isConnected()\n+{\n+  return isConnected_;\n+}\n+\n+\n+bool SocketCANGateway::recv(Message* msg)\n+{\n+\n+  int bytes = read(socket_, &read_frame_, sizeof(struct can_frame));\n+  ROS_DEBUG(\"Recieved ID 0x%08x, data (%d)\", (read_frame_.can_id& CAN_EFF_MASK), read_frame_.can_dlc);\n+  if (bytes <= 0)\n+  {\n+    ROS_DEBUG(\"No more frames\");\n+    return false;\n+  }\n+  else\n+  {\n+    msgToFrame(msg, &read_frame_);\n+    return true;\n+  }\n+\n+}\n+\n+void SocketCANGateway::queue(const Message& msg)\n+{\n+  ROS_DEBUG(\"Queuing ID 0x%08x, data (%d)\", msg.id, msg.len);\n+  write_frames_[write_frames_index_].can_id = msg.id | CAN_EFF_FLAG;\n+  write_frames_[write_frames_index_].can_dlc = msg.len;\n+  \n+\n+  for (int i = 0; i < msg.len; i++)\n+  {\n+    write_frames_[write_frames_index_].data[i] = msg.data[i];\n+  }\n+  write_frames_index_++;\n+}\n+\n+bool SocketCANGateway::sendAllQueued()\n+{\n+  for (int i = 0; i <= write_frames_index_; i++)\n+  {\n+    ROS_DEBUG(\"Writing ID 0x%08x, data (%d)\", write_frames_[i].can_id, write_frames_[i].can_dlc);\n+    int bytes = write(socket_, &write_frames_[i], sizeof(struct can_frame));\n+  }\n+  write_frames_index_ = 0;\n+  return true;\n+}\n+\n+void SocketCANGateway::msgToFrame(Message* msg, can_frame* frame)\n+{\n+  msg->id = frame->can_id & CAN_EFF_MASK;\n+  msg->len = frame->can_dlc;\n+  for(int i = 0; i < msg->len; i++)\n+  {\n+    msg->data[i] = frame->data[i];\n+  }\n+}\n+\n+}"
+        }
+      ]
+    },
+    {
+      "author": "luis-camero",
+      "date": "2024-06-10T17:34:28Z",
+      "sha": "bcc6efb7ac531842462536001629248be4b074f3",
+      "message": "Add retrieval functions with received checks",
+      "files_changed": 1,
+      "additions": 133,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "a327db9d4143e104c35c38f198b196e1ba66e16a",
+          "filename": "puma_motor_driver/src/driver.cpp",
+          "status": "modified",
+          "additions": 133,
+          "deletions": 2,
+          "changes": 135,
+          "blob_url": "https://github.com/clearpathrobotics/puma_motor_driver/blob/bcc6efb7ac531842462536001629248be4b074f3/puma_motor_driver%2Fsrc%2Fdriver.cpp",
+          "raw_url": "https://github.com/clearpathrobotics/puma_motor_driver/raw/bcc6efb7ac531842462536001629248be4b074f3/puma_motor_driver%2Fsrc%2Fdriver.cpp",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/puma_motor_driver/contents/puma_motor_driver%2Fsrc%2Fdriver.cpp?ref=bcc6efb7ac531842462536001629248be4b074f3",
+          "patch": "@@ -201,7 +201,10 @@ void Driver::commandDutyCycle(const float cmd)\n void Driver::commandSpeed(const double cmd)\n {\n   // Converting from rad/s to RPM through the gearbox.\n-  sendFixed16x16((LM_API_SPD_SET | device_number_), (cmd * radPerSecToRpm()));\n+  double rpm = cmd * radPerSecToRpm();\n+  //sendFixed16x16((LM_API_SPD_SET | device_number_), (cmd * radPerSecToRpm()));\n+  RCLCPP_INFO(rclcpp::get_logger(\"rclcpp\"), \"Driver::commandSpeed %f\", rpm);\n+  sendFixed16x16((LM_API_SPD_SET | device_number_), (rpm));\n }\n \n void Driver::verifyParams()\n@@ -509,7 +512,7 @@ void Driver::setMode(const uint8_t mode, const double p, const double i, const d\n       resetConfiguration();\n     }\n     setGains(p, i, d);\n-    RCLCPP_INFO(rclcpp::get_logger(\"rclcpp\"), \n+    RCLCPP_INFO(rclcpp::get_logger(\"rclcpp\"),\n         \"Puma Motor Controller on %s (%i): mode set to a closed-loop control with PID gains of P:%f, I:%f and D:%f.\",\n         device_name_.c_str(), device_number_, gain_p_, gain_i_, gain_d_);\n   }\n@@ -597,69 +600,192 @@ void Driver::updateGains()\n   state_ = ConfigurationState::PGain;\n }\n \n+bool Driver::receivedDutyCycle()\n+{\n+  Field* field = statusFieldForMessage(Message(LM_API_STATUS_VOLTOUT));\n+  return field->received;\n+}\n+\n+bool Driver::receivedBusVoltage()\n+{\n+  Field* field = statusFieldForMessage(Message(LM_API_STATUS_VOLTBUS));\n+  return field->received;\n+}\n+\n+bool Driver::receivedCurrent()\n+{\n+  Field* field = statusFieldForMessage(Message(LM_API_STATUS_CURRENT));\n+  return field->received;\n+}\n+\n+bool Driver::receivedPosition()\n+{\n+  Field* field = statusFieldForMessage(Message(LM_API_STATUS_POS));\n+  return field->received;\n+}\n+\n+bool Driver::receivedSpeed()\n+{\n+  Field* field = statusFieldForMessage(Message(LM_API_STATUS_SPD));\n+  return field->received;\n+}\n+\n+bool Driver::receivedFault()\n+{\n+  Field* field = statusFieldForMessage(Message(LM_API_STATUS_FAULT));\n+  return field->received;\n+}\n+\n+bool Driver::receivedPower()\n+{\n+  Field* field = statusFieldForMessage(Message(LM_API_STATUS_POWER));\n+  return field->received;\n+}\n+\n+bool Driver::receivedMode()\n+{\n+  Field* field = statusFieldForMessage(Message(LM_API_STATUS_CMODE));\n+  return field->received;\n+}\n+\n+bool Driver::receivedOutVoltage()\n+{\n+  Field* field = statusFieldForMessage(Message(LM_API_STATUS_VOUT));\n+  return field->received;\n+}\n+\n+bool Driver::receivedTemperature()\n+{\n+  Field* field = statusFieldForMessage(Message(LM_API_STATUS_TEMP));\n+  return field->received;\n+}\n+\n+bool Driver::receivedAnalogInput()\n+{\n+  Field* field = statusFieldForMessage(Message(CPR_API_STATUS_ANALOG));\n+  return field->received;\n+}\n+\n+bool Driver::receivedSetpoint()\n+{\n+  switch (control_mode_)\n+  {\n+    case puma_motor_msgs::msg::Status::MODE_CURRENT:\n+      return receivedCurrentSetpoint();\n+      break;\n+    case puma_motor_msgs::msg::Status::MODE_POSITION:\n+      return receivedPositionSetpoint();\n+      break;\n+    case puma_motor_msgs::msg::Status::MODE_SPEED:\n+      return receivedSpeedSetpoint();\n+      break;\n+    case puma_motor_msgs::msg::Status::MODE_VOLTAGE:\n+      return receivedDutyCycleSetpoint();\n+      break;\n+    default:\n+      return 0;\n+      break;\n+  }\n+}\n+\n+bool Driver::receivedSpeedSetpoint()\n+{\n+  Field* field = spdFieldForMessage(Message(LM_API_SPD_SET));\n+  return field->received;\n+}\n+\n+bool Driver::receivedDutyCycleSetpoint()\n+{\n+  Field* field = voltageFieldForMessage(Message(LM_API_VOLT_SET));\n+  return field->received;\n+}\n+\n+bool Driver::receivedCurrentSetpoint()\n+{\n+  Field* field = ictrlFieldForMessage(Message(LM_API_ICTRL_SET));\n+  return field->received;\n+}\n+\n+bool Driver::receivedPositionSetpoint()\n+{\n+  Field* field = posFieldForMessage(Message(LM_API_POS_SET));\n+  return field->received;\n+}\n+\n float Driver::lastDutyCycle()\n {\n   Field* field = statusFieldForMessage(Message(LM_API_STATUS_VOLTOUT));\n+  field->received = false;\n   return (field->interpretFixed8x8() / 128.0);\n }\n \n float Driver::lastBusVoltage()\n {\n   Field* field = statusFieldForMessage(Message(LM_API_STATUS_VOLTBUS));\n+  field->received = false;\n   return field->interpretFixed8x8();\n }\n \n float Driver::lastCurrent()\n {\n   Field* field = statusFieldForMessage(Message(LM_API_STATUS_CURRENT));\n+  field->received = false;\n   return field->interpretFixed8x8();\n }\n \n double Driver::lastPosition()\n {\n   Field* field = statusFieldForMessage(Message(LM_API_STATUS_POS));\n+  field->received = false;\n   return (field->interpretFixed16x16() * ((2 * M_PI) / gear_ratio_));  // Convert rev to rad\n }\n \n double Driver::lastSpeed()\n {\n   Field* field = statusFieldForMessage(Message(LM_API_STATUS_SPD));\n+  field->received = false;\n   return (field->interpretFixed16x16() * ((2 * M_PI) / (gear_ratio_ * 60)));  // Convert RPM to rad/s\n }\n \n uint8_t Driver::lastFault()\n {\n   Field* field = statusFieldForMessage(Message(LM_API_STATUS_FAULT));\n+  field->received = false;\n   return field->data[0];\n }\n \n uint8_t Driver::lastPower()\n {\n   Field* field = statusFieldForMessage(Message(LM_API_STATUS_POWER));\n+  field->received = false;\n   return field->data[0];\n }\n \n uint8_t Driver::lastMode()\n {\n   Field* field = statusFieldForMessage(Message(LM_API_STATUS_CMODE));\n+  field->received = false;\n   return field->data[0];\n }\n \n float Driver::lastOutVoltage()\n {\n   Field* field = statusFieldForMessage(Message(LM_API_STATUS_VOUT));\n+  field->received = false;\n   return field->interpretFixed8x8();\n }\n \n float Driver::lastTemperature()\n {\n   Field* field = statusFieldForMessage(Message(LM_API_STATUS_TEMP));\n+  field->received = false;\n   return field->interpretFixed8x8();\n }\n \n float Driver::lastAnalogInput()\n {\n   Field* field = statusFieldForMessage(Message(CPR_API_STATUS_ANALOG));\n+  field->received = false;\n   return field->interpretFixed8x8();\n }\n \n@@ -687,23 +813,28 @@ double Driver::lastSetpoint()\n double Driver::statusSpeedGet()\n {\n   Field* field = spdFieldForMessage(Message(LM_API_SPD_SET));\n+  field->received = false;\n   return (field->interpretFixed16x16() * ((2 * M_PI) / (gear_ratio_ * 60)));  // Convert RPM to rad/s\n }\n \n float Driver::statusDutyCycleGet()\n {\n   Field* field = voltageFieldForMessage(Message(LM_API_VOLT_SET));\n+  field->received = false;\n   return (field->interpretFixed8x8() / 128.0);\n }\n \n float Driver::statusCurrentGet()\n {\n   Field* field = ictrlFieldForMessage(Message(LM_API_ICTRL_SET));\n+  field->received = false;\n   return field->interpretFixed8x8();\n }\n+\n double Driver::statusPositionGet()\n {\n   Field* field = posFieldForMessage(Message(LM_API_POS_SET));\n+  field->received = false;\n   return (field->interpretFixed16x16() * (( 2 * M_PI) / gear_ratio_));  // Convert rev to rad\n }\n "
+        }
+      ]
+    },
+    {
+      "author": "joe28965",
+      "date": "2021-07-12T10:45:57Z",
+      "sha": "0051eb5f2e6aac441fd3b4e919998247e8d2860b",
+      "message": "updated msgs to foxy",
+      "files_changed": 4,
+      "additions": 47,
+      "deletions": 23,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "ee6f38798d57c689e2f0f50d296c7a93ae3d0d29",
+          "filename": "puma_motor_msgs/CMakeLists.txt",
+          "status": "modified",
+          "additions": 31,
+          "deletions": 16,
+          "changes": 47,
+          "blob_url": "https://github.com/clearpathrobotics/puma_motor_driver/blob/0051eb5f2e6aac441fd3b4e919998247e8d2860b/puma_motor_msgs%2FCMakeLists.txt",
+          "raw_url": "https://github.com/clearpathrobotics/puma_motor_driver/raw/0051eb5f2e6aac441fd3b4e919998247e8d2860b/puma_motor_msgs%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/puma_motor_driver/contents/puma_motor_msgs%2FCMakeLists.txt?ref=0051eb5f2e6aac441fd3b4e919998247e8d2860b",
+          "patch": "@@ -1,22 +1,37 @@\n-cmake_minimum_required(VERSION 2.8.3)\n+################################################################################\n+# Set minimum required version of cmake, project name and compile options\n+################################################################################\n+cmake_minimum_required(VERSION 3.5)\n project(puma_motor_msgs)\n \n-find_package(catkin REQUIRED COMPONENTS\n-  message_generation\n-  std_msgs\n-)\n+if(NOT CMAKE_CXX_STANDARD)\n+  set(CMAKE_CXX_STANDARD 14)\n+endif()\n \n-add_message_files(\n-  FILES\n-  MultiStatus.msg\n-  Status.msg\n-  MultiFeedback.msg\n-  Feedback.msg\n-)\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  add_compile_options(-Wall -Wextra -Wpedantic)\n+endif()\n+\n+################################################################################\n+# Find ament packages and libraries for ament and system dependencies\n+################################################################################\n+find_package(action_msgs REQUIRED)\n+find_package(ament_cmake REQUIRED)\n+find_package(rosidl_default_generators REQUIRED)\n+find_package(std_msgs REQUIRED)\n+\n+\n+################################################################################\n+# Declare ROS messages, services and actions\n+################################################################################\n \n-generate_messages(\n-  DEPENDENCIES\n-  std_msgs\n+rosidl_generate_interfaces(${PROJECT_NAME}\n+\t\"msg/Feedback.msg\"\n+\t\"msg/Status.msg\"\n+\t\"msg/MultiFeedback.msg\"\n+\t\"msg/MultiStatus.msg\"\n+\tDEPENDENCIES action_msgs std_msgs\n )\n \n-catkin_package(CATKIN_DEPENDS std_msgs message_runtime)\n+ament_export_dependencies(rosidl_default_runtime)\n+ament_package()"
+        },
+        {
+          "sha": "87facc8c005c4807c047909f10a3dc7ba361f5ec",
+          "filename": "puma_motor_msgs/msg/MultiFeedback.msg",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/clearpathrobotics/puma_motor_driver/blob/0051eb5f2e6aac441fd3b4e919998247e8d2860b/puma_motor_msgs%2Fmsg%2FMultiFeedback.msg",
+          "raw_url": "https://github.com/clearpathrobotics/puma_motor_driver/raw/0051eb5f2e6aac441fd3b4e919998247e8d2860b/puma_motor_msgs%2Fmsg%2FMultiFeedback.msg",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/puma_motor_driver/contents/puma_motor_msgs%2Fmsg%2FMultiFeedback.msg?ref=0051eb5f2e6aac441fd3b4e919998247e8d2860b",
+          "patch": "@@ -1,3 +1,3 @@\n-Header header\n+std_msgs/Header header\n \n puma_motor_msgs/Feedback[] drivers_feedback"
+        },
+        {
+          "sha": "8de1abde4b188b56e6b3b3c1199c95da43c7145a",
+          "filename": "puma_motor_msgs/msg/MultiStatus.msg",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/clearpathrobotics/puma_motor_driver/blob/0051eb5f2e6aac441fd3b4e919998247e8d2860b/puma_motor_msgs%2Fmsg%2FMultiStatus.msg",
+          "raw_url": "https://github.com/clearpathrobotics/puma_motor_driver/raw/0051eb5f2e6aac441fd3b4e919998247e8d2860b/puma_motor_msgs%2Fmsg%2FMultiStatus.msg",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/puma_motor_driver/contents/puma_motor_msgs%2Fmsg%2FMultiStatus.msg?ref=0051eb5f2e6aac441fd3b4e919998247e8d2860b",
+          "patch": "@@ -1,3 +1,3 @@\n-Header header\n+std_msgs/Header header\n \n puma_motor_msgs/Status[] drivers"
+        },
+        {
+          "sha": "5096526c4b27ccbdb5a9624e0bf45f406e622e5f",
+          "filename": "puma_motor_msgs/package.xml",
+          "status": "modified",
+          "additions": 14,
+          "deletions": 5,
+          "changes": 19,
+          "blob_url": "https://github.com/clearpathrobotics/puma_motor_driver/blob/0051eb5f2e6aac441fd3b4e919998247e8d2860b/puma_motor_msgs%2Fpackage.xml",
+          "raw_url": "https://github.com/clearpathrobotics/puma_motor_driver/raw/0051eb5f2e6aac441fd3b4e919998247e8d2860b/puma_motor_msgs%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/puma_motor_driver/contents/puma_motor_msgs%2Fpackage.xml?ref=0051eb5f2e6aac441fd3b4e919998247e8d2860b",
+          "patch": "@@ -1,14 +1,23 @@\n <?xml version=\"1.0\"?>\n-<package format=\"2\">\n+<package format=\"3\">\n   <name>puma_motor_msgs</name>\n   <version>0.3.1</version>\n   <description>Messages specific to Puma.</description>\n \n   <maintainer email=\"mpurvis@clearpathrobotics.com\">Mike Purvis</maintainer>\n   <license>BSD</license>\n \n-  <buildtool_depend>catkin</buildtool_depend>\n-  <build_depend>message_generation</build_depend>\n-  <exec_depend>message_runtime</exec_depend>\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+\n+  <depend>action_msgs</depend>\n+  <depend>builtin_interfaces</depend>\n   <depend>std_msgs</depend>\n-</package>\n+\n+  <build_depend>rosidl_default_generators</build_depend>\n+  <exec_depend>rosidl_default_runtime</exec_depend>\n+  <member_of_group>rosidl_interface_packages</member_of_group>\n+\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n+</package>\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "UltronDestroyer",
+      "date": "2017-06-20T23:06:09Z",
+      "sha": "c2921061bd6b94b48fbe3d8f9885bbd2af1c47e3",
+      "message": "Merge pull request #7 from clearpathrobotics/fix-point\n\nUpdated fixed-point conversion.",
+      "files_changed": 3,
+      "additions": 44,
+      "deletions": 16,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "46d652dcae96f84fd70c9cd90bb80d13317d541d",
+          "filename": "puma_motor_driver/include/puma_motor_driver/driver.h",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 5,
+          "changes": 17,
+          "blob_url": "https://github.com/clearpathrobotics/puma_motor_driver/blob/c2921061bd6b94b48fbe3d8f9885bbd2af1c47e3/puma_motor_driver%2Finclude%2Fpuma_motor_driver%2Fdriver.h",
+          "raw_url": "https://github.com/clearpathrobotics/puma_motor_driver/raw/c2921061bd6b94b48fbe3d8f9885bbd2af1c47e3/puma_motor_driver%2Finclude%2Fpuma_motor_driver%2Fdriver.h",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/puma_motor_driver/contents/puma_motor_driver%2Finclude%2Fpuma_motor_driver%2Fdriver.h?ref=c2921061bd6b94b48fbe3d8f9885bbd2af1c47e3",
+          "patch": "@@ -351,13 +351,12 @@ class Driver\n \n     float interpretFixed8x8()\n     {\n-      return static_cast<int8_t>(data[1]) + static_cast<float>(data[0]) / static_cast<float>(1<<8);\n+      return *(reinterpret_cast<int16_t*>(data)) / static_cast<float>(1<<8);\n     }\n \n     double interpretFixed16x16()\n     {\n-      return ((data[0] | static_cast<int32_t>(data[1]) << 8 |\n-        static_cast<int32_t>(data[2]) << 16 | static_cast<int32_t>(data[3]) << 24)) / static_cast<double>(1<<16);\n+      return *(reinterpret_cast<int32_t*>(data)) / static_cast<double>(1<<16);\n     }\n   };\n \n@@ -386,12 +385,20 @@ class Driver\n   void sendFixed16x16(uint32_t id, double value);\n \n   /**\n-   * Comparing the raw bytes of the fixed-point numbers\n+   * Comparing the raw bytes of the 16x16 fixed-point numbers\n     * to avoid comparing the floating point values.\n    *\n    * @return boolean if received is equal to expected.\n    */\n-  bool verifyRawData(uint8_t* received, double expected);\n+  bool verifyRaw16x16(uint8_t* received, double expected);\n+\n+  /**\n+   * Comparing the raw bytes of the 8x8 fixed-point numbers\n+    * to avoid comparing the floating point values.\n+   *\n+   * @return boolean if received is equal to expected.\n+   */\n+  bool verifyRaw8x8(uint8_t* received, float expected);\n \n   StatusField status_fields_[12];\n "
+        },
+        {
+          "sha": "20c0a2bd01e4584cb71f021fd14868cd788921f0",
+          "filename": "puma_motor_driver/src/driver.cpp",
+          "status": "modified",
+          "additions": 28,
+          "deletions": 9,
+          "changes": 37,
+          "blob_url": "https://github.com/clearpathrobotics/puma_motor_driver/blob/c2921061bd6b94b48fbe3d8f9885bbd2af1c47e3/puma_motor_driver%2Fsrc%2Fdriver.cpp",
+          "raw_url": "https://github.com/clearpathrobotics/puma_motor_driver/raw/c2921061bd6b94b48fbe3d8f9885bbd2af1c47e3/puma_motor_driver%2Fsrc%2Fdriver.cpp",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/puma_motor_driver/contents/puma_motor_driver%2Fsrc%2Fdriver.cpp?ref=c2921061bd6b94b48fbe3d8f9885bbd2af1c47e3",
+          "patch": "@@ -99,7 +99,7 @@ void Driver::sendFixed16x16(uint32_t id, double value)\n   gateway_.queue(msg);\n }\n \n-bool Driver::verifyRawData(uint8_t* received, double expected)\n+bool Driver::verifyRaw16x16(uint8_t* received, double expected)\n {\n   uint8_t data[4];\n   int32_t output_value = static_cast<int32_t>(static_cast<double>((1<<16) * expected));\n@@ -115,6 +115,22 @@ bool Driver::verifyRawData(uint8_t* received, double expected)\n   return true;\n }\n \n+bool Driver::verifyRaw8x8(uint8_t* received, float expected)\n+{\n+  uint8_t data[2];\n+  int32_t output_value = static_cast<int32_t>(static_cast<float>((1<<8) * expected));\n+  memcpy(data, &output_value, 2);\n+  for (uint8_t i = 0; i < 2; i++)\n+  {\n+    if (*received != data[i])\n+    {\n+      return false;\n+    }\n+    received++;\n+  }\n+  return true;\n+}\n+\n void Driver::setEncoderCPR(uint16_t encoder_cpr)\n {\n   encoder_cpr_ = encoder_cpr;\n@@ -215,7 +231,7 @@ void Driver::verifyParams()\n       }\n       break;\n     case 7:\n-      if (verifyRawData(getRawP(), gain_p_))\n+      if (verifyRaw16x16(getRawP(), gain_p_))\n       {\n         state_++;\n         ROS_DEBUG(\"Dev: %i P gain constant was set to %f and %f was requested.\", device_number_, getP(), gain_p_);\n@@ -237,7 +253,7 @@ void Driver::verifyParams()\n       }\n       break;\n     case 8:\n-      if (verifyRawData(getRawI(), gain_i_))\n+      if (verifyRaw16x16(getRawI(), gain_i_))\n       {\n         state_++;\n         ROS_DEBUG(\"Dev: %i I gain constant was set to %f and %f was requested.\", device_number_, getI(), gain_i_);\n@@ -259,7 +275,7 @@ void Driver::verifyParams()\n       }\n       break;\n     case 9:\n-      if (verifyRawData(getRawD(), gain_d_))\n+      if (verifyRaw16x16(getRawD(), gain_d_))\n       {\n         state_ = 200;\n         ROS_DEBUG(\"Dev: %i D gain constant was set to %f and %f was requested.\", device_number_, getD(), gain_d_);\n@@ -511,7 +527,7 @@ void Driver::updateGains()\n float Driver::lastDutyCycle()\n {\n   StatusField* field = statusFieldForMessage(Message(LM_API_STATUS_VOLTOUT));\n-  return field->interpretFixed8x8() / 128.0;\n+  return (field->interpretFixed8x8() / 128.0);\n }\n \n float Driver::lastBusVoltage()\n@@ -535,7 +551,7 @@ double Driver::lastPosition()\n double Driver::lastSpeed()\n {\n   StatusField* field = statusFieldForMessage(Message(LM_API_STATUS_SPD));\n-  return field->interpretFixed16x16() * ((2 * M_PI) / (gear_ratio_ * 60));  // Convert RPM to rad/s\n+  return (field->interpretFixed16x16() * ((2 * M_PI) / (gear_ratio_ * 60)));  // Convert RPM to rad/s\n }\n \n uint8_t Driver::lastFault()\n@@ -590,6 +606,9 @@ double Driver::lastSetpoint()\n     case puma_motor_msgs::Status::MODE_VOLTAGE:\n       return statusDutyCycleGet();\n       break;\n+    default:\n+      return 0;\n+      break;\n   }\n }\n double Driver::statusSpeedGet()\n@@ -601,7 +620,7 @@ double Driver::statusSpeedGet()\n float Driver::statusDutyCycleGet()\n {\n   StatusField* field = statusFieldForMessage(Message(LM_API_VOLT_SET));\n-  return field->interpretFixed8x8() / 128.0;\n+  return (field->interpretFixed8x8() / 128.0);\n }\n \n float Driver::statusCurrentGet()\n@@ -630,7 +649,7 @@ uint8_t Driver::spdEncoderRef()\n uint16_t Driver::encoderCounts()\n {\n   StatusField* field = statusFieldForMessage(Message(LM_API_CFG_ENC_LINES));\n-  return (uint16_t)field->data[0] | (uint16_t)field->data[1] << 8;\n+  return (static_cast<uint16_t>(field->data[0]) | static_cast<uint16_t>(field->data[1] << 8));\n }\n \n double Driver::getP()\n@@ -743,7 +762,7 @@ uint8_t* Driver::getRawD()\n Driver::StatusField* Driver::statusFieldForMessage(const Message& msg)\n {\n   // If it's not a STATUS message, there is no status field box to return.\n-  if (msg.getApi() & CAN_MSGID_API_M != CAN_API_MC_STATUS)\n+  if ((msg.getApi() & CAN_MSGID_API_M) != CAN_API_MC_STATUS)\n   {\n     return NULL;\n   }"
+        },
+        {
+          "sha": "627227709e9684696d0863030feeb66854d87ea5",
+          "filename": "puma_motor_driver/test/fixed_point_test.cpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 2,
+          "changes": 6,
+          "blob_url": "https://github.com/clearpathrobotics/puma_motor_driver/blob/c2921061bd6b94b48fbe3d8f9885bbd2af1c47e3/puma_motor_driver%2Ftest%2Ffixed_point_test.cpp",
+          "raw_url": "https://github.com/clearpathrobotics/puma_motor_driver/raw/c2921061bd6b94b48fbe3d8f9885bbd2af1c47e3/puma_motor_driver%2Ftest%2Ffixed_point_test.cpp",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/puma_motor_driver/contents/puma_motor_driver%2Ftest%2Ffixed_point_test.cpp?ref=c2921061bd6b94b48fbe3d8f9885bbd2af1c47e3",
+          "patch": "@@ -29,7 +29,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI\n \n TEST(TestFixedPoint16x16, test16x16interpret)\n {\n-  double cases[7] = {\n+  double cases[7] =\n+  {\n     0.0,\n     1.0,\n     -1.0,\n@@ -50,7 +51,8 @@ TEST(TestFixedPoint16x16, test16x16interpret)\n \n TEST(TestFixedPoint8x8, test8x8interpret)\n {\n-  float cases[7] = {\n+  float cases[7] =\n+  {\n     0.0,\n     1.0,\n     -1.0,"
+        }
+      ]
+    },
+    {
+      "author": "mikepurvis",
+      "date": "2015-02-12T12:14:54Z",
+      "sha": "5c584546b3b3f649d8524b5df4d84fe8adc88f26",
+      "message": "Skeleton package.",
+      "files_changed": 2,
+      "additions": 124,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "9fb8ab7b3f6d1a112fc421c753200f9a323638ee",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 104,
+          "deletions": 0,
+          "changes": 104,
+          "blob_url": "https://github.com/clearpathrobotics/puma_motor_driver/blob/5c584546b3b3f649d8524b5df4d84fe8adc88f26/CMakeLists.txt",
+          "raw_url": "https://github.com/clearpathrobotics/puma_motor_driver/raw/5c584546b3b3f649d8524b5df4d84fe8adc88f26/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/puma_motor_driver/contents/CMakeLists.txt?ref=5c584546b3b3f649d8524b5df4d84fe8adc88f26",
+          "patch": "@@ -0,0 +1,104 @@\n+cmake_minimum_required(VERSION 2.8.3)\n+project(puma_motor_driver)\n+\n+find_package(catkin REQUIRED COMPONENTS\n+  roscpp\n+  sensor_msgs\n+  serial\n+)\n+\n+## Generate messages in the 'msg' folder\n+# add_message_files(\n+#   FILES\n+#   Message1.msg\n+#   Message2.msg\n+# )\n+\n+## Generate actions in the 'action' folder\n+# add_action_files(\n+#   FILES\n+#   Action1.action\n+#   Action2.action\n+# )\n+\n+## Generate added messages and services with any dependencies listed here\n+# generate_messages(\n+#   DEPENDENCIES\n+#   sensor_msgs\n+# )\n+\n+catkin_package(\n+#  INCLUDE_DIRS include\n+#  LIBRARIES puma_motor_driver\n+#  CATKIN_DEPENDS roscpp sensor_msgs serial\n+#  DEPENDS system_lib\n+)\n+\n+include_directories(\n+  ${catkin_INCLUDE_DIRS}\n+)\n+\n+## Declare a cpp library\n+# add_library(puma_motor_driver\n+#   src/${PROJECT_NAME}/puma_motor_driver.cpp\n+# )\n+\n+## Declare a cpp executable\n+# add_executable(puma_motor_driver_node src/puma_motor_driver_node.cpp)\n+\n+## Add cmake target dependencies of the executable/library\n+## as an example, message headers may need to be generated before nodes\n+# add_dependencies(puma_motor_driver_node puma_motor_driver_generate_messages_cpp)\n+\n+## Specify libraries to link a library or executable target against\n+# target_link_libraries(puma_motor_driver_node\n+#   ${catkin_LIBRARIES}\n+# )\n+\n+#############\n+## Install ##\n+#############\n+\n+# all install targets should use catkin DESTINATION variables\n+# See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html\n+\n+## Mark executable scripts (Python etc.) for installation\n+## in contrast to setup.py, you can choose the destination\n+# install(PROGRAMS\n+#   scripts/my_python_script\n+#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n+# )\n+\n+## Mark executables and/or libraries for installation\n+# install(TARGETS puma_motor_driver puma_motor_driver_node\n+#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n+#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n+#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n+# )\n+\n+## Mark cpp header files for installation\n+# install(DIRECTORY include/${PROJECT_NAME}/\n+#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}\n+#   FILES_MATCHING PATTERN \"*.h\"\n+#   PATTERN \".svn\" EXCLUDE\n+# )\n+\n+## Mark other files for installation (e.g. launch and bag files, etc.)\n+# install(FILES\n+#   # myfile1\n+#   # myfile2\n+#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}\n+# )\n+\n+#############\n+## Testing ##\n+#############\n+\n+## Add gtest based cpp test target and link libraries\n+# catkin_add_gtest(${PROJECT_NAME}-test test/test_puma_motor_driver.cpp)\n+# if(TARGET ${PROJECT_NAME}-test)\n+#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})\n+# endif()\n+\n+## Add folders to be run by python nosetests\n+# catkin_add_nosetests(test)"
+        },
+        {
+          "sha": "40d782fb626ee846ba04b2be4e1b3682b4a57214",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 20,
+          "deletions": 0,
+          "changes": 20,
+          "blob_url": "https://github.com/clearpathrobotics/puma_motor_driver/blob/5c584546b3b3f649d8524b5df4d84fe8adc88f26/package.xml",
+          "raw_url": "https://github.com/clearpathrobotics/puma_motor_driver/raw/5c584546b3b3f649d8524b5df4d84fe8adc88f26/package.xml",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/puma_motor_driver/contents/package.xml?ref=5c584546b3b3f649d8524b5df4d84fe8adc88f26",
+          "patch": "@@ -0,0 +1,20 @@\n+<?xml version=\"1.0\"?>\n+<package>\n+  <name>puma_motor_driver</name>\n+  <version>0.0.0</version>\n+  <description>A ROS driver for Puma single-channel motor control board.</description>\n+\n+  <maintainer email=\"mpurvis@clearpathrobotics.com\">Mike Purvis</maintainer>\n+  <license>BSD</license>\n+\n+  <buildtool_depend>catkin</buildtool_depend>\n+  <build_depend>roscpp</build_depend>\n+  <build_depend>sensor_msgs</build_depend>\n+  <build_depend>serial</build_depend>\n+  <run_depend>roscpp</run_depend>\n+  <run_depend>sensor_msgs</run_depend>\n+  <run_depend>serial</run_depend>\n+\n+  <export>\n+  </export>\n+</package>"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,179 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T04:48:22Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "clearpathrobotics",
+    "repo": "clearpath_ros2_socketcan_interface"
+  },
+  "data": [
+    {
+      "author": "tonybaltovski",
+      "date": "2024-11-15T03:12:50Z",
+      "sha": "b8899837090e3e5f9cc5f644830e29741c2922c4",
+      "message": "Merge pull request #2 from clearpathrobotics/rkreinin/callback\n\nConstructor with callback",
+      "files_changed": 2,
+      "additions": 168,
+      "deletions": 9,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "dfcb6ec413569830018c562cb5a184fb76aabb7c",
+          "filename": "include/clearpath_ros2_socketcan_interface/socketcan_interface.hpp",
+          "status": "modified",
+          "additions": 39,
+          "deletions": 3,
+          "changes": 42,
+          "blob_url": "https://github.com/clearpathrobotics/clearpath_ros2_socketcan_interface/blob/b8899837090e3e5f9cc5f644830e29741c2922c4/include%2Fclearpath_ros2_socketcan_interface%2Fsocketcan_interface.hpp",
+          "raw_url": "https://github.com/clearpathrobotics/clearpath_ros2_socketcan_interface/raw/b8899837090e3e5f9cc5f644830e29741c2922c4/include%2Fclearpath_ros2_socketcan_interface%2Fsocketcan_interface.hpp",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/clearpath_ros2_socketcan_interface/contents/include%2Fclearpath_ros2_socketcan_interface%2Fsocketcan_interface.hpp?ref=b8899837090e3e5f9cc5f644830e29741c2922c4",
+          "patch": "@@ -1,3 +1,28 @@\n+/**\n+Software License Agreement (BSD)\n+\n+\\authors   Roni Kreinin <rkreinin@clearpathrobotics.com>\n+\\authors   Luis Camero <lcamero@clearpathrobotics.com>\n+\\copyright Copyright (c) 2024, Clearpath Robotics, Inc., All rights reserved.\n+\n+Redistribution and use in source and binary forms, with or without modification, are permitted provided that\n+the following conditions are met:\n+ * Redistributions of source code must retain the above copyright notice, this list of conditions and the\n+   following disclaimer.\n+ * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the\n+   following disclaimer in the documentation and/or other materials provided with the distribution.\n+ * Neither the name of Clearpath Robotics nor the names of its contributors may be used to endorse or promote\n+   products derived from this software without specific prior written permission.\n+\n+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED WAR-\n+RANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR\n+PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, IN-\n+DIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT\n+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND\n+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n+*/\n+\n #ifndef CLEARPATH_ROS2_SOCKETCAN_INTERFACE__SOCKETCAN_INTERFACE_HPP_\n #define CLEARPATH_ROS2_SOCKETCAN_INTERFACE__SOCKETCAN_INTERFACE_HPP_\n \n@@ -16,26 +41,37 @@ class SocketCANInterface\n {\n public:\n   SocketCANInterface(const std::string & canbus, std::shared_ptr<rclcpp::Node> & nh);\n+  SocketCANInterface(\n+    const std::string& canbus,\n+    std::shared_ptr<rclcpp::Node> & nh, \n+    std::function<void(const can_msgs::msg::Frame::SharedPtr msg)> cb);\n \n   bool recv(can_msgs::msg::Frame::SharedPtr msg);\n   void send(can_msgs::msg::Frame msg);\n+  void queue(can_msgs::msg::Frame msg);\n+\n+  void startSendTimer(uint16_t period_ms);\n+  void stopSendTimer();\n \n private:\n   std::string canbus_;  // CANBUS interface\n   std::shared_ptr<rclcpp::Node> nh_;\n+  rclcpp::TimerBase::SharedPtr send_timer_;\n \n   std::queue<can_msgs::msg::Frame> can_rx_message_queue_;\n-  std::mutex receive_queue_mutex_;\n+  std::queue<can_msgs::msg::Frame> can_tx_message_queue_;\n+  std::mutex rx_queue_mutex_;\n+  std::mutex tx_queue_mutex_;\n \n   can_msgs::msg::Frame frame_msg_;\n \n   rclcpp::Publisher<can_msgs::msg::Frame>::SharedPtr can_tx_pub_;\n   rclcpp::Subscription<can_msgs::msg::Frame>::SharedPtr can_rx_sub_;\n \n   void rxCallback(const can_msgs::msg::Frame::SharedPtr msg);\n+  void sendFromQueue();\n };\n \n-}\n-  // namespace clearpath_ros2_socketcan_interface\n+}  // namespace clearpath_ros2_socketcan_interface\n \n #endif  // CLEARPATH_ROS2_SOCKETCAN_INTERFACE__SOCKETCAN_INTERFACE_HPP_"
+        },
+        {
+          "sha": "7dca595448c8ac1aec05c5c8538c40c29209d8cb",
+          "filename": "src/socketcan_interface.cpp",
+          "status": "modified",
+          "additions": 129,
+          "deletions": 6,
+          "changes": 135,
+          "blob_url": "https://github.com/clearpathrobotics/clearpath_ros2_socketcan_interface/blob/b8899837090e3e5f9cc5f644830e29741c2922c4/src%2Fsocketcan_interface.cpp",
+          "raw_url": "https://github.com/clearpathrobotics/clearpath_ros2_socketcan_interface/raw/b8899837090e3e5f9cc5f644830e29741c2922c4/src%2Fsocketcan_interface.cpp",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/clearpath_ros2_socketcan_interface/contents/src%2Fsocketcan_interface.cpp?ref=b8899837090e3e5f9cc5f644830e29741c2922c4",
+          "patch": "@@ -1,8 +1,40 @@\n+/**\n+Software License Agreement (BSD)\n+\n+\\authors   Roni Kreinin <rkreinin@clearpathrobotics.com>\n+\\authors   Luis Camero <lcamero@clearpathrobotics.com>\n+\\copyright Copyright (c) 2024, Clearpath Robotics, Inc., All rights reserved.\n+\n+Redistribution and use in source and binary forms, with or without modification, are permitted provided that\n+the following conditions are met:\n+ * Redistributions of source code must retain the above copyright notice, this list of conditions and the\n+   following disclaimer.\n+ * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the\n+   following disclaimer in the documentation and/or other materials provided with the distribution.\n+ * Neither the name of Clearpath Robotics nor the names of its contributors may be used to endorse or promote\n+   products derived from this software without specific prior written permission.\n+\n+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED WAR-\n+RANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR\n+PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, IN-\n+DIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT\n+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND\n+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n+*/\n+\n #include \"clearpath_ros2_socketcan_interface/socketcan_interface.hpp\"\n \n namespace clearpath_ros2_socketcan_interface\n {\n \n+/**\n+ * @brief Construct a new SocketCANInterface object\n+ * Uses default Rx callback to queue up received messages\n+ * \n+ * @param canbus Name of CAN bus\n+ * @param nh Pointer to node handle\n+ */\n SocketCANInterface::SocketCANInterface(\n   const std::string & canbus,\n   std::shared_ptr<rclcpp::Node> & nh\n@@ -21,17 +53,56 @@ SocketCANInterface::SocketCANInterface(\n     rclcpp::SystemDefaultsQoS());\n }\n \n+/**\n+ * @brief Construct a new SocketCANInterface object\n+ * Uses custom callback function to handle received messages\n+ * \n+ * @param canbus Name of CAN bus\n+ * @param nh Pointer to node handle\n+ * @param cb Rx subscriber callback\n+ */\n+SocketCANInterface::SocketCANInterface(\n+    const std::string& canbus,\n+    std::shared_ptr<rclcpp::Node> & nh, \n+    std::function<void(const can_msgs::msg::Frame::SharedPtr msg)> cb\n+)\n+: canbus_(canbus), nh_(nh)\n+{\n+  // Rx Subscriber\n+  can_rx_sub_ = nh->create_subscription<can_msgs::msg::Frame>(\n+    canbus_ + \"/rx\",\n+    rclcpp::SensorDataQoS(),\n+    cb);\n+\n+  // Tx Publisher\n+  can_tx_pub_ = nh->create_publisher<can_msgs::msg::Frame>(\n+    canbus_ + \"/tx\",\n+    rclcpp::SystemDefaultsQoS());\n+}\n+\n+/**\n+ * @brief Default Rx subscription callback\n+ * Queues messages\n+ * @param msg Pointer to received message\n+ */\n void SocketCANInterface::rxCallback(const can_msgs::msg::Frame::SharedPtr msg)\n {\n   if (msg) {\n-    std::lock_guard<std::mutex> lock(receive_queue_mutex_);\n+    std::lock_guard<std::mutex> lock(rx_queue_mutex_);\n     can_rx_message_queue_.push(*msg);\n   }\n }\n \n+/**\n+ * @brief Receive a CAN message frame from the Rx queue\n+ * Only works when interface is created with default constructor\n+ * @param msg Message pointer to fill with new message\n+ * @return true on success\n+ * @return false if queue is empty\n+ */\n bool SocketCANInterface::recv(can_msgs::msg::Frame::SharedPtr msg)\n {\n-  std::lock_guard<std::mutex> lock(receive_queue_mutex_);\n+  std::lock_guard<std::mutex> lock(rx_queue_mutex_);\n   if (can_rx_message_queue_.empty()) {\n     return false;\n   }\n@@ -40,13 +111,65 @@ bool SocketCANInterface::recv(can_msgs::msg::Frame::SharedPtr msg)\n   return true;\n }\n \n+/**\n+ * @brief Queue up a message to be sent at a later time by the wall timer.\n+ *\n+ * @param msg CAN message frame to send\n+ */\n+void SocketCANInterface::queue(can_msgs::msg::Frame msg)\n+{\n+  std::lock_guard<std::mutex> lock(tx_queue_mutex_);\n+  can_tx_message_queue_.push(msg);\n+}\n+\n+/**\n+ * @brief Stamp and publish a CAN frame message\n+ * \n+ * @param msg Message to publish\n+ */\n void SocketCANInterface::send(can_msgs::msg::Frame msg)\n {\n-  // frame_msg_ = msg.getFrame();\n-  // frame_msg_.header.stamp = nh_->get_clock()->now();\n-  // frame_msg_.header.frame_id = \"base_link\";\n-  sleep(0.001);\n+  msg.header.stamp = nh_->get_clock()->now();\n   can_tx_pub_->publish(msg);\n }\n \n+/**\n+ * @brief Start a wall timer to periodically check for queued Tx messages and send them.\n+ * \n+ * @param period_ms Wall timer period\n+ */\n+void SocketCANInterface::startSendTimer(uint16_t period_ms)\n+{\n+  if (period_ms == 0)\n+  {\n+    RCLCPP_WARN(nh_->get_logger(), \"Period must be a non-zero value\");\n+    return;\n+  }\n+\n+  send_timer_ = nh_->create_wall_timer(\n+    std::chrono::milliseconds(period_ms), std::bind(&SocketCANInterface::sendFromQueue, this));\n+}\n+\n+/**\n+ * @brief Stop the Tx wall timer\n+ * \n+ */\n+void SocketCANInterface::stopSendTimer()\n+{\n+  send_timer_->cancel();\n+}\n+\n+/**\n+ * @brief Callback for Tx wall timer\n+ * \n+ */\n+void SocketCANInterface::sendFromQueue()\n+{\n+  std::lock_guard<std::mutex> lock(tx_queue_mutex_);\n+  if (!can_tx_message_queue_.empty()) {\n+    send(can_tx_message_queue_.front());\n+    can_tx_message_queue_.pop();\n+  }\n+}\n+\n }  // namespace clearpath_ros2_socketcan_interface"
+        }
+      ]
+    },
+    {
+      "author": "hilary-luo",
+      "date": "2025-05-25T02:26:48Z",
+      "sha": "359c1b126d386701b5dae65acafac5d4f51eff2d",
+      "message": "Fix typos in issue templates",
+      "files_changed": 2,
+      "additions": 3,
+      "deletions": 3,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "3972d09007ab41cff8d64a46e1ead9248076859c",
+          "filename": ".github/ISSUE_TEMPLATE/bug.md",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/clearpathrobotics/clearpath_ros2_socketcan_interface/blob/359c1b126d386701b5dae65acafac5d4f51eff2d/.github%2FISSUE_TEMPLATE%2Fbug.md",
+          "raw_url": "https://github.com/clearpathrobotics/clearpath_ros2_socketcan_interface/raw/359c1b126d386701b5dae65acafac5d4f51eff2d/.github%2FISSUE_TEMPLATE%2Fbug.md",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/clearpath_ros2_socketcan_interface/contents/.github%2FISSUE_TEMPLATE%2Fbug.md?ref=359c1b126d386701b5dae65acafac5d4f51eff2d",
+          "patch": "@@ -11,7 +11,7 @@ assignees: clearpathrobotics/clearpath-platform-team\n  - OS: (e.g. Ubuntu 22.04, Ubuntu 24.04)\n  - ROS 2 Distro: (e.g. Humble, Jazzy)\n  - Built from source or installed:\n- - Package version: (if from repository, give version from `sudo dpkg -s ros-$ROS_VERSION-clearpath_ros2_socketcan_interface`, if from source, give commit hash)\n+ - Package version: (if from repository, give version from `sudo dpkg -s ros-$ROS_DISTRO-clearpath_ros2_socketcan_interface`, if from source, give commit hash)\n \n \n  **Expected behaviour**\n@@ -28,4 +28,4 @@ Provide the steps to reproduce:\n \n \n **Other notes**\n-Add anything else you thing is important.\n+Add anything else you think is important."
+        },
+        {
+          "sha": "4faa2dbfaa230b1bea27a7add7cff7b5913f820d",
+          "filename": ".github/ISSUE_TEMPLATE/feature.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/clearpathrobotics/clearpath_ros2_socketcan_interface/blob/359c1b126d386701b5dae65acafac5d4f51eff2d/.github%2FISSUE_TEMPLATE%2Ffeature.md",
+          "raw_url": "https://github.com/clearpathrobotics/clearpath_ros2_socketcan_interface/raw/359c1b126d386701b5dae65acafac5d4f51eff2d/.github%2FISSUE_TEMPLATE%2Ffeature.md",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/clearpath_ros2_socketcan_interface/contents/.github%2FISSUE_TEMPLATE%2Ffeature.md?ref=359c1b126d386701b5dae65acafac5d4f51eff2d",
+          "patch": "@@ -11,4 +11,4 @@ assignees: clearpathrobotics/clearpath-platform-team\n A clear and concise description of what you want to happen.\n \n **Other notes**\n-Add anything else you thing is important.\n+Add anything else you think is important."
+        }
+      ]
+    },
+    {
+      "author": "luis-camero",
+      "date": "2024-09-23T15:20:35Z",
+      "sha": "ada3ad951f80315b139644f26fd54ccbbfa75ad7",
+      "message": "Initial commit",
+      "files_changed": 1,
+      "additions": 28,
+      "deletions": 0,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "62bd137d6a7b06b9b6dd0c025c52bbcd8a6d9077",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 28,
+          "deletions": 0,
+          "changes": 28,
+          "blob_url": "https://github.com/clearpathrobotics/clearpath_ros2_socketcan_interface/blob/ada3ad951f80315b139644f26fd54ccbbfa75ad7/LICENSE",
+          "raw_url": "https://github.com/clearpathrobotics/clearpath_ros2_socketcan_interface/raw/ada3ad951f80315b139644f26fd54ccbbfa75ad7/LICENSE",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/clearpath_ros2_socketcan_interface/contents/LICENSE?ref=ada3ad951f80315b139644f26fd54ccbbfa75ad7",
+          "patch": "@@ -0,0 +1,28 @@\n+BSD 3-Clause License\n+\n+Copyright (c) 2024, clearpathrobotics\n+\n+Redistribution and use in source and binary forms, with or without\n+modification, are permitted provided that the following conditions are met:\n+\n+1. Redistributions of source code must retain the above copyright notice, this\n+   list of conditions and the following disclaimer.\n+\n+2. Redistributions in binary form must reproduce the above copyright notice,\n+   this list of conditions and the following disclaimer in the documentation\n+   and/or other materials provided with the distribution.\n+\n+3. Neither the name of the copyright holder nor the names of its\n+   contributors may be used to endorse or promote products derived from\n+   this software without specific prior written permission.\n+\n+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\n+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE\n+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL\n+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR\n+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\n+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+        }
+      ]
+    },
+    {
+      "author": "roni-kreinin",
+      "date": "2024-11-08T14:45:05Z",
+      "sha": "32bb3a9124059f745a2125410a82cf0a5613a857",
+      "message": "Merge pull request #1 from clearpathrobotics/cib/jazzy-fixes\n\nSmall code styling to make default tests pass",
+      "files_changed": 2,
+      "additions": 8,
+      "deletions": 8,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "4ef482bd252f20ddc250251542c47a15923eb8ec",
+          "filename": "include/clearpath_ros2_socketcan_interface/socketcan_interface.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/clearpathrobotics/clearpath_ros2_socketcan_interface/blob/32bb3a9124059f745a2125410a82cf0a5613a857/include%2Fclearpath_ros2_socketcan_interface%2Fsocketcan_interface.hpp",
+          "raw_url": "https://github.com/clearpathrobotics/clearpath_ros2_socketcan_interface/raw/32bb3a9124059f745a2125410a82cf0a5613a857/include%2Fclearpath_ros2_socketcan_interface%2Fsocketcan_interface.hpp",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/clearpath_ros2_socketcan_interface/contents/include%2Fclearpath_ros2_socketcan_interface%2Fsocketcan_interface.hpp?ref=32bb3a9124059f745a2125410a82cf0a5613a857",
+          "patch": "@@ -15,7 +15,7 @@ namespace clearpath_ros2_socketcan_interface\n class SocketCANInterface\n {\n public:\n-  SocketCANInterface(const std::string& canbus, std::shared_ptr<rclcpp::Node> & nh);\n+  SocketCANInterface(const std::string & canbus, std::shared_ptr<rclcpp::Node> & nh);\n \n   bool recv(can_msgs::msg::Frame::SharedPtr msg);\n   void send(can_msgs::msg::Frame msg);"
+        },
+        {
+          "sha": "76c18a49f9bed4c32a1616e4264ba7dd9619a8fd",
+          "filename": "src/socketcan_interface.cpp",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 7,
+          "changes": 14,
+          "blob_url": "https://github.com/clearpathrobotics/clearpath_ros2_socketcan_interface/blob/32bb3a9124059f745a2125410a82cf0a5613a857/src%2Fsocketcan_interface.cpp",
+          "raw_url": "https://github.com/clearpathrobotics/clearpath_ros2_socketcan_interface/raw/32bb3a9124059f745a2125410a82cf0a5613a857/src%2Fsocketcan_interface.cpp",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/clearpath_ros2_socketcan_interface/contents/src%2Fsocketcan_interface.cpp?ref=32bb3a9124059f745a2125410a82cf0a5613a857",
+          "patch": "@@ -3,9 +3,11 @@\n namespace clearpath_ros2_socketcan_interface\n {\n \n-SocketCANInterface::SocketCANInterface(const std::string& canbus,\n-                                   std::shared_ptr<rclcpp::Node> & nh):\n-  canbus_(canbus), nh_(nh)\n+SocketCANInterface::SocketCANInterface(\n+  const std::string & canbus,\n+  std::shared_ptr<rclcpp::Node> & nh\n+)\n+: canbus_(canbus), nh_(nh)\n {\n   // Rx Subscriber\n   can_rx_sub_ = nh->create_subscription<can_msgs::msg::Frame>(\n@@ -21,8 +23,7 @@ SocketCANInterface::SocketCANInterface(const std::string& canbus,\n \n void SocketCANInterface::rxCallback(const can_msgs::msg::Frame::SharedPtr msg)\n {\n-  if (msg)\n-  {\n+  if (msg) {\n     std::lock_guard<std::mutex> lock(receive_queue_mutex_);\n     can_rx_message_queue_.push(*msg);\n   }\n@@ -31,8 +32,7 @@ void SocketCANInterface::rxCallback(const can_msgs::msg::Frame::SharedPtr msg)\n bool SocketCANInterface::recv(can_msgs::msg::Frame::SharedPtr msg)\n {\n   std::lock_guard<std::mutex> lock(receive_queue_mutex_);\n-  if (can_rx_message_queue_.empty())\n-  {\n+  if (can_rx_message_queue_.empty()) {\n     return false;\n   }\n   *msg = can_rx_message_queue_.front();"
+        }
+      ]
+    },
+    {
+      "author": "civerachb-cpr",
+      "date": "2024-11-06T19:29:29Z",
+      "sha": "b42188907497f3cdd2051185ef2297025282207d",
+      "message": "Small code styling to make default tests pass",
+      "files_changed": 2,
+      "additions": 8,
+      "deletions": 8,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "4ef482bd252f20ddc250251542c47a15923eb8ec",
+          "filename": "include/clearpath_ros2_socketcan_interface/socketcan_interface.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/clearpathrobotics/clearpath_ros2_socketcan_interface/blob/b42188907497f3cdd2051185ef2297025282207d/include%2Fclearpath_ros2_socketcan_interface%2Fsocketcan_interface.hpp",
+          "raw_url": "https://github.com/clearpathrobotics/clearpath_ros2_socketcan_interface/raw/b42188907497f3cdd2051185ef2297025282207d/include%2Fclearpath_ros2_socketcan_interface%2Fsocketcan_interface.hpp",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/clearpath_ros2_socketcan_interface/contents/include%2Fclearpath_ros2_socketcan_interface%2Fsocketcan_interface.hpp?ref=b42188907497f3cdd2051185ef2297025282207d",
+          "patch": "@@ -15,7 +15,7 @@ namespace clearpath_ros2_socketcan_interface\n class SocketCANInterface\n {\n public:\n-  SocketCANInterface(const std::string& canbus, std::shared_ptr<rclcpp::Node> & nh);\n+  SocketCANInterface(const std::string & canbus, std::shared_ptr<rclcpp::Node> & nh);\n \n   bool recv(can_msgs::msg::Frame::SharedPtr msg);\n   void send(can_msgs::msg::Frame msg);"
+        },
+        {
+          "sha": "76c18a49f9bed4c32a1616e4264ba7dd9619a8fd",
+          "filename": "src/socketcan_interface.cpp",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 7,
+          "changes": 14,
+          "blob_url": "https://github.com/clearpathrobotics/clearpath_ros2_socketcan_interface/blob/b42188907497f3cdd2051185ef2297025282207d/src%2Fsocketcan_interface.cpp",
+          "raw_url": "https://github.com/clearpathrobotics/clearpath_ros2_socketcan_interface/raw/b42188907497f3cdd2051185ef2297025282207d/src%2Fsocketcan_interface.cpp",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/clearpath_ros2_socketcan_interface/contents/src%2Fsocketcan_interface.cpp?ref=b42188907497f3cdd2051185ef2297025282207d",
+          "patch": "@@ -3,9 +3,11 @@\n namespace clearpath_ros2_socketcan_interface\n {\n \n-SocketCANInterface::SocketCANInterface(const std::string& canbus,\n-                                   std::shared_ptr<rclcpp::Node> & nh):\n-  canbus_(canbus), nh_(nh)\n+SocketCANInterface::SocketCANInterface(\n+  const std::string & canbus,\n+  std::shared_ptr<rclcpp::Node> & nh\n+)\n+: canbus_(canbus), nh_(nh)\n {\n   // Rx Subscriber\n   can_rx_sub_ = nh->create_subscription<can_msgs::msg::Frame>(\n@@ -21,8 +23,7 @@ SocketCANInterface::SocketCANInterface(const std::string& canbus,\n \n void SocketCANInterface::rxCallback(const can_msgs::msg::Frame::SharedPtr msg)\n {\n-  if (msg)\n-  {\n+  if (msg) {\n     std::lock_guard<std::mutex> lock(receive_queue_mutex_);\n     can_rx_message_queue_.push(*msg);\n   }\n@@ -31,8 +32,7 @@ void SocketCANInterface::rxCallback(const can_msgs::msg::Frame::SharedPtr msg)\n bool SocketCANInterface::recv(can_msgs::msg::Frame::SharedPtr msg)\n {\n   std::lock_guard<std::mutex> lock(receive_queue_mutex_);\n-  if (can_rx_message_queue_.empty())\n-  {\n+  if (can_rx_message_queue_.empty()) {\n     return false;\n   }\n   *msg = can_rx_message_queue_.front();"
+        }
+      ]
+    }
+  ]
+}

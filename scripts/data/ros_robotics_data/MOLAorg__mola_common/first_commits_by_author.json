@@ -1,0 +1,35 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T05:42:11Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "MOLAorg",
+    "repo": "mola_common"
+  },
+  "data": [
+    {
+      "author": "jlblancoc",
+      "date": "2018-11-05T23:31:54Z",
+      "sha": "c466ee3f36d11dd217059982a86e1633c900b2bb",
+      "message": "Basic cmake structure",
+      "files_changed": 1,
+      "additions": 46,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "daa3a6486fb7283c86c073f8dd9ebcf8540ca22e",
+          "filename": "molaBuildFlags.cmake",
+          "status": "added",
+          "additions": 46,
+          "deletions": 0,
+          "changes": 46,
+          "blob_url": "https://github.com/MOLAorg/mola_common/blob/c466ee3f36d11dd217059982a86e1633c900b2bb/molaBuildFlags.cmake",
+          "raw_url": "https://github.com/MOLAorg/mola_common/raw/c466ee3f36d11dd217059982a86e1633c900b2bb/molaBuildFlags.cmake",
+          "contents_url": "https://api.github.com/repos/MOLAorg/mola_common/contents/molaBuildFlags.cmake?ref=c466ee3f36d11dd217059982a86e1633c900b2bb",
+          "patch": "@@ -0,0 +1,46 @@\n+\n+\n+# We want libraries to be named \"libXXX\" in all compilers, \"libXXX-dbg\" in MSVC\n+set(CMAKE_SHARED_LIBRARY_PREFIX \"lib\")\n+set(CMAKE_STATIC_LIBRARY_PREFIX \"lib\")\n+if(MSVC)\n+  set(CMAKE_DEBUG_POSTFIX \"-dbg\")\n+else()\n+  set(CMAKE_DEBUG_POSTFIX \"\")\n+endif()\n+\n+# Set defaults for each project CMake target:\n+function(mola_set_target_build_options TARGETNAME)\n+  # Build for C++17\n+  # -------------------------\n+  target_compile_features(${TARGETNAME} INTERFACE cxx_std_17)\n+  if (MSVC)\n+    # this seems to be required in addition to the cxx_std_17 above (?)\n+    add_compile_options(${TARGETNAME} INTERFACE /std:c++latest)\n+  endif()\n+\n+  # Warning level:\n+  # -------------------------\n+  if (MSVC)\n+    # msvc:\n+    add_compile_options(${TARGETNAME} PRIVATE /W3)\n+    target_compile_definitions(${TARGETNAME} PRIVATE\n+      _CRT_SECURE_NO_DEPRECATE\n+      _CRT_NONSTDC_NO_DEPRECATE\n+      _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS\n+    )\n+  else()\n+    # gcc & clang:\n+    target_compile_options(${TARGETNAME} PRIVATE\n+      -Wall -Wextra -Wshadow -Wreturn-type -Wabi\n+      -Wtype-limits -Wcast-align -Wparentheses\n+      -fPIC\n+    )\n+  endif()\n+\n+  # Optimization:\n+  # -------------------------\n+  if((NOT MSVC) AND ((NOT CMAKE_CROSSCOMPILING) AND (NOT CMAKE_BUILD_TYPE STREQUAL \"Debug\")))\n+    add_compile_options(${TARGETNAME} PRIVATE -O3 -mtune=native)\n+  endif()\n+endfunction()"
+        }
+      ]
+    }
+  ]
+}

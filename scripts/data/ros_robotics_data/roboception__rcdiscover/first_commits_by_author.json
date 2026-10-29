@@ -1,0 +1,453 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T06:08:39Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "roboception",
+    "repo": "rcdiscover"
+  },
+  "data": [
+    {
+      "author": "heikohimu",
+      "date": "2017-05-04T13:50:32Z",
+      "sha": "9e3c667c693d12a7c21559a4dd8c59bcc69197b4",
+      "message": "Initial release",
+      "files_changed": 20,
+      "additions": 3667,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "67d51a62e74f0c48cba1403bbedb51978a64a459",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 11,
+          "deletions": 0,
+          "changes": 11,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/.gitignore",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/.gitignore",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/.gitignore?ref=9e3c667c693d12a7c21559a4dd8c59bcc69197b4",
+          "patch": "@@ -0,0 +1,11 @@\n+build\n+\n+*~\n+*.swp\n+\n+.idea\n+*.cproject\n+*.project\n+*.externalToolBuilders\n+.settings\n+.metadata"
+        },
+        {
+          "sha": "08fe02460f9e82611582b1866c21d75dff285b57",
+          "filename": ".gitlab-ci.yml",
+          "status": "added",
+          "additions": 206,
+          "deletions": 0,
+          "changes": 206,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/.gitlab-ci.yml",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/.gitlab-ci.yml",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/.gitlab-ci.yml?ref=9e3c667c693d12a7c21559a4dd8c59bcc69197b4",
+          "patch": "@@ -0,0 +1,206 @@\n+before_script:\n+  - export DISTRO_CODENAME=`lsb_release -cs` && echo Using distro $DISTRO_CODENAME\n+  - echo \"deb http://apt.roboception.de/stable $DISTRO_CODENAME main\" > /etc/apt/sources.list.d/roboception-stable.list\n+  - if [ \"$TESTING_DEBS\" = \"true\" ]; then echo \"deb http://apt.roboception.de/testing $DISTRO_CODENAME main\" > /etc/apt/sources.list.d/roboception-testing.list ; fi\n+  - curl http://apt.roboception.de/archive.key | apt-key add -\n+  - apt-get update -yq && apt-get install -y lintian # append packages required for your build here, e.g. cvkit\n+\n+#############\n+# Templates\n+#############\n+.amd64_template: &amd64_job   # Hidden job that defines an anchor named 'amd64_job'\n+  image: registry.roboception.de/tools/docker_images:buildimage\n+  tags:\n+    - amd64\n+    - docker\n+\n+.armhf_template: &armhf_job   # Hidden job that defines an anchor named 'armhf_job'\n+  image: registry.roboception.de/tools/docker_images:armhf-buildimage\n+  tags:\n+    - armhf\n+    - docker\n+\n+.amd64_xenial_template: &amd64_xenial_job\n+  image: registry.roboception.de/tools/docker_images:xenial-buildimage\n+  tags:\n+    - amd64\n+    - docker\n+\n+.armhf_xenial_template: &armhf_xenial_job\n+  image: registry.roboception.de/tools/docker_images:armhf-xenial-buildimage\n+  tags:\n+    - armhf\n+    - docker\n+\n+.test_t: &test\n+  stage: test\n+  script:\n+    - mkdir build\n+    - cd build\n+    - cmake ..\n+    - make -j 4\n+    - CTEST_OUTPUT_ON_FAILURE=1 make test\n+\n+# run test script with latest debs from testing installed\n+.test_latest_t: &test_latest\n+  <<: *test\n+  variables:\n+    TESTING_DEBS: \"true\"\n+\n+# run test script with released debs from stable installed (allowed to fail)\n+.test_stable_t: &test_stable\n+  <<: *test\n+  allow_failure: true\n+  except:\n+    - /^v[0-9]+\\.[0-9]+\\.[0-9]+/\n+\n+# run test script with released debs from stable (only for releases, mustn't fail)\n+.test_release_t: &test_release\n+  <<: *test\n+  only:\n+    - /^v[0-9]+\\.[0-9]+\\.[0-9]+/\n+  except:\n+    - branches\n+\n+.package_testing_t: &package_testing\n+  stage: deploy\n+  environment:\n+    name: testing/$DISTRO_CODENAME\n+  variables:\n+    TESTING_DEBS: \"true\"\n+  script:\n+    - mkdir build\n+    - cd build\n+    - cmake ..\n+    - make -j 4\n+    - make package\n+    - upload_deb.sh $DISTRO_CODENAME-testing *.deb\n+  only:\n+    - master\n+\n+.package_stable_t: &package_stable\n+  stage: deploy\n+  environment:\n+    name: stable/$DISTRO_CODENAME\n+  script:\n+    - mkdir build\n+    - cd build\n+    - cmake ..\n+    - make -j 4\n+    - make package\n+    - upload_deb.sh $DISTRO_CODENAME-stable *.deb\n+  only:\n+    - /^v[0-9]+\\.[0-9]+\\.[0-9]+/\n+  except:\n+    - branches\n+\n+##############\n+#### Jobs ####\n+##############\n+gen_dox:\n+  <<: *amd64_job\n+  variables:\n+    TESTING_DEBS: \"true\"\n+  stage: deploy\n+  script:\n+    - apt-get install -y doxygen ncftp\n+    - mkdir build\n+    - cd build\n+    - cmake ..\n+    - make doc\n+    - upload_dox.sh doc/html\n+  only:\n+    - master\n+    - tags\n+  tags:\n+    - docs\n+\n+# Test against latest (on every commit)\n+#######################################\n+test_amd64:\n+  <<: *amd64_job\n+  <<: *test_latest\n+\n+test_armhf:\n+  <<: *armhf_job\n+  <<: *test_latest\n+\n+test_xenial_amd64:\n+  <<: *amd64_xenial_job\n+  <<: *test_latest\n+\n+test_xenial_armhf:\n+  <<: *armhf_xenial_job\n+  <<: *test_latest\n+\n+# Test against stable (is allowed to fail)\n+##########################################\n+test_stable_amd64:\n+  <<: *amd64_job\n+  <<: *test_stable\n+\n+test_stable_armhf:\n+  <<: *armhf_job\n+  <<: *test_stable\n+\n+test_stable_xenial_amd64:\n+  <<: *amd64_xenial_job\n+  <<: *test_stable\n+\n+test_stable_xenial_armhf:\n+  <<: *armhf_xenial_job\n+  <<: *test_stable\n+\n+# Deploy testing (only on master)\n+#################################\n+package_testing_amd64:\n+  <<: *amd64_job\n+  <<: *package_testing\n+\n+package_testing_armhf:\n+  <<: *armhf_job\n+  <<: *package_testing\n+\n+package_testing_xenial_amd64:\n+  <<: *amd64_xenial_job\n+  <<: *package_testing\n+\n+package_testing_xenial_armhf:\n+  <<: *armhf_xenial_job\n+  <<: *package_testing\n+\n+# Test against stable if it is a release\n+########################################\n+test_release_amd64:\n+  <<: *amd64_job\n+  <<: *test_release\n+\n+test_release_armhf:\n+  <<: *armhf_job\n+  <<: *test_release\n+\n+test_release_xenial_amd64:\n+  <<: *amd64_xenial_job\n+  <<: *test_release\n+\n+test_release_xenial_armhf:\n+  <<: *armhf_xenial_job\n+  <<: *test_release\n+\n+# Deploy stable (only for releases, version tags)\n+#################################################\n+package_stable_amd64:\n+  <<: *amd64_job\n+  <<: *package_stable\n+\n+package_stable_armhf:\n+  <<: *armhf_job\n+  <<: *package_stable\n+\n+package_stable_xenial_amd64:\n+  <<: *amd64_xenial_job\n+  <<: *package_stable\n+\n+package_stable_xenial_armhf:\n+  <<: *armhf_xenial_job\n+  <<: *package_stable"
+        },
+        {
+          "sha": "d2a7e2c0dfccdac903284d6f18a3fbca94df1907",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 66,
+          "deletions": 0,
+          "changes": 66,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/CMakeLists.txt",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/CMakeLists.txt?ref=9e3c667c693d12a7c21559a4dd8c59bcc69197b4",
+          "patch": "@@ -0,0 +1,66 @@\n+cmake_minimum_required (VERSION 2.8.12)\n+\n+# Don't set PROJECT_VERSION to empty string when no VERSION is given to project() command.\n+if(POLICY CMP0048)\n+  cmake_policy(SET CMP0048 OLD)\n+endif()\n+\n+project(rcdiscover)\n+include(cmake/project_version.cmake)\n+\n+enable_testing()\n+\n+include_directories(${CMAKE_SOURCE_DIR})\n+\n+# - Find manditory packages -\n+\n+# - Configuration for code optimization -\n+\n+if (NOT CMAKE_BUILD_TYPE)\n+  set(CMAKE_BUILD_TYPE RELEASE CACHE STRING \"Build type: DEBUG or RELEASE\" FORCE)\n+endif ()\n+\n+include(cmake/optimization_flags.cmake)\n+\n+# - Standard definitions -\n+\n+add_definitions(-Wall)\n+\n+# - Build individual parts -\n+\n+add_subdirectory(rcdiscover)\n+add_subdirectory(tools)\n+\n+# export project targets\n+\n+# Declare (shared) libraries that are created by your project. For all\n+# libraries that appear here, the following line should exist in a cmake\n+# file in a sub directory:\n+# install(TARGETS rcXXX EXPORT PROJECTTargets COMPONENT bin DESTINATION lib)\n+#set(PROJECT_LIBRARIES rcXXX)\n+\n+# Declare static libraries that are created by your project. For all\n+# libraries that appear here, the following line should exist in a cmake\n+# file in a sub directory:\n+# install(TARGETS rcXXX_static EXPORT PROJECTTargets COMPONENT dev DESTINATION lib)\n+#set(PROJECT_STATIC_LIBRARIES rcdiscover_static)\n+\n+# comment the following line if your project does not provide any library\n+#include(cmake/configure_link_libs.cmake)\n+\n+# add a target to generate API documentation with Doxygen\n+\n+add_subdirectory(doc)\n+\n+# - Define information for packaging -\n+\n+# optionally set description and maintainer (if not set will use defaults from package_debian.cmake)\n+#set(CPACK_DEBIAN_PACKAGE_DESCRIPTION \"Roboception package description\")\n+\n+# optionally set package maintainer (otherwise defaults to Roboception <info@roboception.de>)\n+#set(CPACK_DEBIAN_PACKAGE_MAINTAINER \"Your Name <your.name@roboception.de>\")\n+\n+# optionally specify dependencies of the debian package here (comma separated!)\n+#set(CPACK_DEBIAN_PACKAGE_DEPENDS \"cvkit (>= 1.7.0)\")\n+\n+include(cmake/package_debian.cmake)"
+        },
+        {
+          "sha": "1d235e5789cd26447a4614a6de7a2cd4c8c4e39b",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/README.md",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/README.md",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/README.md?ref=9e3c667c693d12a7c21559a4dd8c59bcc69197b4",
+          "patch": "@@ -0,0 +1,5 @@\n+Discovery of roboception sensors\n+================================\n+\n+This package contains tools for the discovery of rc_visard sensors via\n+GigE Vision."
+        },
+        {
+          "sha": "111a6454cac28bba46fd71d074269b4a1aa3fec6",
+          "filename": "cmake/PROJECTConfig.cmake.in",
+          "status": "added",
+          "additions": 30,
+          "deletions": 0,
+          "changes": 30,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/cmake%2FPROJECTConfig.cmake.in",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/cmake%2FPROJECTConfig.cmake.in",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/cmake%2FPROJECTConfig.cmake.in?ref=9e3c667c693d12a7c21559a4dd8c59bcc69197b4",
+          "patch": "@@ -0,0 +1,30 @@\n+# Config file for @PROJECT_NAME_LOWER@\n+#\n+# It defines the following variables:\n+#\n+# @PROJECT_NAME_UPPER@_INCLUDE_DIRS     - include directory\n+# @PROJECT_NAME_UPPER@_LIBRARIES        - all dynamic libraries\n+# @PROJECT_NAME_UPPER@_STATIC_LIBRARIES - all static libraries\n+\n+get_filename_component(PROJECT_CMAKE_DIR \"${CMAKE_CURRENT_LIST_FILE}\" PATH)\n+\n+set(@PROJECT_NAME_UPPER@_INCLUDE_DIRS \"${PROJECT_CMAKE_DIR}/../../include\")\n+\n+include(\"${PROJECT_CMAKE_DIR}/@PROJECT_NAME_UPPER@Targets.cmake\")\n+\n+set(@PROJECT_NAME_UPPER@_STATIC_LIBRARIES @PROJECT_STATIC_LIBRARIES@)\n+set(@PROJECT_NAME_UPPER@_LIBRARIES @PROJECT_LIBRARIES@)\n+\n+# If this library's header files include header files of your dependencies\n+# (e.g. Eigen) then you need to include them here as well (the same way you\n+# included them in your main CMakeLists.txt) and add them to this library's\n+# include dirs:\n+#\n+# find_package(Eigen3 REQUIRED)\n+# list(APPEND @PROJECT_NAME_UPPER@_INCLUDE_DIRS\t${EIGEN3_INCLUDE_DIR})\n+#\n+# find_package(rcXXX REQUIRED)\n+# list(APPEND @PROJECT_NAME_UPPER@_INCLUDE_DIRS\t${RCXXX_INCLUDE_DIRS})\n+\n+\n+"
+        },
+        {
+          "sha": "aefbbf8322997795ea383d59c576941562b97158",
+          "filename": "cmake/PROJECTConfigVersion.cmake.in",
+          "status": "added",
+          "additions": 13,
+          "deletions": 0,
+          "changes": 13,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/cmake%2FPROJECTConfigVersion.cmake.in",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/cmake%2FPROJECTConfigVersion.cmake.in",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/cmake%2FPROJECTConfigVersion.cmake.in?ref=9e3c667c693d12a7c21559a4dd8c59bcc69197b4",
+          "patch": "@@ -0,0 +1,13 @@\n+\n+set(PACKAGE_VERSION \"@PROJECT_VERSION@\")\n+\n+# Check whether the requested PACKAGE_FIND_VERSION is compatible\n+\n+if(\"${PACKAGE_VERSION}\" VERSION_LESS \"${PACKAGE_FIND_VERSION}\")\n+  set(PACKAGE_VERSION_COMPATIBLE FALSE)\n+else()\n+  set(PACKAGE_VERSION_COMPATIBLE TRUE)\n+  if (\"${PACKAGE_VERSION}\" VERSION_EQUAL \"${PACKAGE_FIND_VERSION}\")\n+    set(PACKAGE_VERSION_EXACT TRUE)\n+  endif()\n+endif()"
+        },
+        {
+          "sha": "88ac33b8f48947a62b2bf3d896edff583aa5a062",
+          "filename": "cmake/configure_link_libs.cmake",
+          "status": "added",
+          "additions": 58,
+          "deletions": 0,
+          "changes": 58,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/cmake%2Fconfigure_link_libs.cmake",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/cmake%2Fconfigure_link_libs.cmake",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/cmake%2Fconfigure_link_libs.cmake?ref=9e3c667c693d12a7c21559a4dd8c59bcc69197b4",
+          "patch": "@@ -0,0 +1,58 @@\n+# This cmake code creates the configuration that is found and used by\n+# find_package() of another cmake project\n+\n+# Do not Error on non-existent target in get_target_property.\n+if(POLICY CMP0045)\n+  cmake_policy(SET CMP0045 OLD)\n+endif()\n+\n+# Go through all static libraries and add the INTERFACE_LINK_LIBRARIES of all\n+# dependencies also to the INTERFACE_LINK_LIBRARIES of the static libraries\n+\n+foreach (LIB ${PROJECT_STATIC_LIBRARIES})\n+  get_target_property(LIB_DEPS ${LIB} INTERFACE_LINK_LIBRARIES)\n+\n+  if (LIB_DEPS)\n+    set(ADD_LIB_DEBS)\n+    foreach (DEP ${LIB_DEPS})\n+      get_target_property(DEP_DEP ${DEP} INTERFACE_LINK_LIBRARIES)\n+\n+      if (NOT DEP_DEP)\n+        get_target_property(DEP_DEP ${DEP} IMPORTED_LINK_INTERFACE_LIBRARIES_RELEASE)\n+      endif ()\n+\n+      if (DEP_DEP)\n+        set(ADD_LIB_DEPS ${ADD_LIB_DEPS} ${DEP_DEP})\n+      endif ()\n+    endforeach ()\n+\n+    set(LIB_DEPS ${LIB_DEPS} ${ADD_LIB_DEPS})\n+    set_target_properties(${LIB} PROPERTIES INTERFACE_LINK_LIBRARIES \"${LIB_DEPS}\")\n+  endif ()\n+endforeach ()\n+\n+# get lower and upper case project name for the configuration files\n+\n+string(TOUPPER \"${PROJECT_NAME}\" PROJECT_NAME_UPPER)\n+string(TOLOWER \"${PROJECT_NAME}\" PROJECT_NAME_LOWER)\n+\n+# configure and install the configuration files\n+\n+#export(TARGETS ${PROJECT_LIBRARIES} ${PROJECT_STATIC_LIBRARIES}\n+#  FILE \"${PROJECT_BINARY_DIR}/${PROJECT_NAME_UPPER}Targets.cmake\")\n+\n+configure_file(cmake/PROJECTConfig.cmake.in\n+  \"${PROJECT_BINARY_DIR}/${PROJECT_NAME_UPPER}Config.cmake\" @ONLY)\n+\n+configure_file(cmake/PROJECTConfigVersion.cmake.in\n+  \"${PROJECT_BINARY_DIR}/${PROJECT_NAME_UPPER}ConfigVersion.cmake\" @ONLY)\n+\n+install(FILES\n+  \"${PROJECT_BINARY_DIR}/${PROJECT_NAME_UPPER}Config.cmake\"\n+  \"${PROJECT_BINARY_DIR}/${PROJECT_NAME_UPPER}ConfigVersion.cmake\"\n+  COMPONENT dev\n+  DESTINATION lib/${PROJECT_NAME_LOWER})\n+\n+install(EXPORT PROJECTTargets\n+        FILE ${PROJECT_NAME_UPPER}Targets.cmake\n+        DESTINATION lib/${PROJECT_NAME_LOWER})"
+        },
+        {
+          "sha": "c67a294eaf50153f9b426628ddeb0c92b66563aa",
+          "filename": "cmake/optimization_flags.cmake",
+          "status": "added",
+          "additions": 84,
+          "deletions": 0,
+          "changes": 84,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/cmake%2Foptimization_flags.cmake",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/cmake%2Foptimization_flags.cmake",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/cmake%2Foptimization_flags.cmake?ref=9e3c667c693d12a7c21559a4dd8c59bcc69197b4",
+          "patch": "@@ -0,0 +1,84 @@\n+# set common optimization flags\n+\n+find_package(CUDA 6.5)\n+\n+if (CUDA_FOUND)\n+  set(USE_CUDA 1 CACHE BOOL \"Use CUDA to speed up some functions\")\n+else ()\n+  set(USE_CUDA 0 CACHE BOOL \"Use CUDA to speed up some functions\" FORCE)\n+endif ()\n+\n+EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\\n' OUTPUT_VARIABLE ARCHITECTURE)\n+message(STATUS \"Detected architecture ${ARCHITECTURE}\")\n+\n+if (${ARCHITECTURE} STREQUAL \"armv7l\") # Preselect settings for Odroid or Tegra K1\n+    set(USE_SSE2 0 CACHE BOOL \"Compile for SSE2 (x86) using -msse2\")\n+    set(USE_SSE4.2 0 CACHE BOOL \"Compile for SSE4.2 (x86) using -mpopcnt -msse4.2\")\n+    set(USE_AVX 0 CACHE BOOL \"Compile for AVX (x86) using -mavx\")\n+    set(USE_AVX2 0 CACHE BOOL \"Compile for AVX2 (x86) using -mavx2\")\n+    set(USE_ARMV7_CA15 1 CACHE BOOL \"Compile for ARM V7 Cortex-A15 using -mcpu=cortex-a15 -mfpu=neon\")\n+    set(USE_ARMV8_AARCH64 0 CACHE BOOL \"Compile for ARM V8 64 bit using -mcpu=armv8-a -mtune=cortex-a57\")\n+elseif (${ARCHITECTURE} STREQUAL \"aarch64\") # Preselect settings for Tegra X1\n+    set(USE_SSE2 0 CACHE BOOL \"Compile for SSE2 (x86) using -msse2\")\n+    set(USE_SSE4.2 0 CACHE BOOL \"Compile for SSE4.2 (x86) using -mpopcnt -msse4.2\")\n+    set(USE_AVX 0 CACHE BOOL \"Compile for AVX (x86) using -mavx\")\n+    set(USE_AVX2 0 CACHE BOOL \"Compile for AVX2 (x86) using -mavx2\")\n+    set(USE_ARMV7_CA15 0 CACHE BOOL \"Compile for ARM V7 Cortex-A15 using -mcpu=cortex-a15 -mfpu=neon\")\n+    set(USE_ARMV8_AARCH64 1 CACHE BOOL \"Compile for ARM V8 64 bit using -mcpu=armv8-a -mtune=cortex-a57\")\n+else () # Preselect settings for intel architecture\n+    set(USE_SSE2 1 CACHE BOOL \"Compile for SSE2 (x86) using -msse2\")\n+    set(USE_SSE4.2 1 CACHE BOOL \"Compile for SSE4.2 (x86) using -mpopcnt -msse4.2\")\n+    set(USE_AVX 1 CACHE BOOL \"Compile for AVX (x86) using -mavx\")\n+    set(USE_AVX2 1 CACHE BOOL \"Compile for AVX2 (x86) using -mavx2\")\n+    set(USE_ARMV7_CA15 0 CACHE BOOL \"Compile for ARM V7 Cortex-A15 using -mcpu=cortex-a15 -mfpu=neon\")\n+    set(USE_ARMV8_AARCH64 0 CACHE BOOL \"Compile for ARM V8 64 bit using -mcpu=armv8-a -mtune=cortex-a57\")\n+endif ()\n+\n+set(UNROLL_LOOPS 1 CACHE BOOL \"Compile using -funroll-loops\")\n+\n+if (USE_CUDA)\n+    include_directories(${CUDA_INCLUDE_DIRS})\n+\n+    if (${ARCHITECTURE} STREQUAL \"armv7l\")\n+        set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -gencode=arch=compute_32,code=sm_32 -O3)\n+    elseif (${ARCHITECTURE} STREQUAL \"aarch64\")\n+        set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -gencode=arch=compute_53,code=sm_53 -O3)\n+    else ()\n+        set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -gencode=arch=compute_30,code=sm_30 -gencode=arch=compute_35,code=sm_35 -gencode=arch=compute_50,code=sm_50 -gencode=arch=compute_52,code=sm_52 -gencode=arch=compute_52,code=compute_52 -O3)\n+    endif ()\n+\n+    add_definitions(-DINCLUDE_CUDA)\n+\n+    get_filename_component(CUDA_LIB_FOLDER ${CUDA_LIBRARIES} DIRECTORY)\n+    set(CUDA_STATIC_LIBRARIES \"${CUDA_LIB_FOLDER}/libcudart_static.a\" -ldl -lrt)\n+endif ()\n+\n+if (USE_SSE2)\n+    add_definitions(-msse2)\n+endif ()\n+\n+if (USE_SSE4.2)\n+    add_definitions(-mpopcnt)\n+    add_definitions(-msse4.2)\n+endif ()\n+\n+if (USE_AVX)\n+    add_definitions(-mavx)\n+endif ()\n+\n+if (USE_AVX2)\n+    add_definitions(-mavx2)\n+endif ()\n+\n+if (USE_ARMV7_CA15)\n+    add_definitions(-mcpu=cortex-a15 -mfpu=neon)\n+endif ()\n+\n+if (USE_ARMV8_AARCH64)\n+#    add_definitions(-march=armv8-a -mtune=cortex-a57 -mfpu=neon)\n+    add_definitions(-march=armv8-a -mfpu=neon)\n+endif ()\n+\n+if (UNROLL_LOOPS)\n+    add_definitions(-funroll-loops)\n+endif ()"
+        },
+        {
+          "sha": "3a7c63bb6386753f41cf0847a69b4f7123530fae",
+          "filename": "cmake/package_debian.cmake",
+          "status": "added",
+          "additions": 144,
+          "deletions": 0,
+          "changes": 144,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/cmake%2Fpackage_debian.cmake",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/cmake%2Fpackage_debian.cmake",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/cmake%2Fpackage_debian.cmake?ref=9e3c667c693d12a7c21559a4dd8c59bcc69197b4",
+          "patch": "@@ -0,0 +1,144 @@\n+# general cpack variables\n+set(CPACK_PACKAGE_CONTACT \"Roboception <info@roboception.de>\")\n+set(CPACK_PACKAGE_VENDOR \"Roboception GmbH, Munich, Germany\")\n+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY \"Roboception ${PROJECT_NAME} package\")\n+\n+# CPACK_PACKAGE_VERSION\n+if (PACKAGE_VERSION)\n+    set(CPACK_PACKAGE_VERSION ${PACKAGE_VERSION})\n+else ()\n+    message(WARNING \"PACKAGE_VERSION not set! Did you include project_version.cmake? Falling back to (${PROJECT_VERSION})\")\n+    set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})\n+endif ()\n+\n+\n+###############################\n+# debian package specific stuff\n+###############################\n+set(CPACK_GENERATOR \"DEB\")\n+#set(CPACK_DEBIAN_PACKAGE_DEBUG ON)\n+\n+if (NOT CPACK_DEBIAN_PACKAGE_ARCHITECTURE)\n+# if architecture is already set (e.g. to \"all\"), this is not needed\n+# add -1~distribution-codename (e.g. -1~trusty or -1~xenial) to end of package version\n+# if lsb_release is available, take it from there or fall back to DISTRO_CODENAME env variable\n+    set(DISTRO_CODENAME $ENV{DISTRO_CODENAME})\n+    find_program(LSB_RELEASE_CMD lsb_release)\n+    mark_as_advanced(LSB_RELEASE_CMD)\n+    if (LSB_RELEASE_CMD)\n+        execute_process(COMMAND \"${LSB_RELEASE_CMD}\" --codename --short\n+                OUTPUT_VARIABLE DISTRO_CODENAME\n+                OUTPUT_STRIP_TRAILING_WHITESPACE)\n+    endif ()\n+    if (DISTRO_CODENAME)\n+        set(CPACK_PACKAGE_VERSION ${CPACK_PACKAGE_VERSION}-1~${DISTRO_CODENAME})\n+    else ()\n+        message(STATUS \"Could not find lsb_release nor is DISTRO_CODENAME set.\")\n+    endif ()\n+\n+    find_program(DPKG_CMD dpkg)\n+    mark_as_advanced(DPKG_CMD)\n+    if (NOT DPKG_CMD)\n+        message(STATUS \"Can not find dpkg in your path, default to i386.\")\n+        set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE i386)\n+    else ()\n+        execute_process(COMMAND \"${DPKG_CMD}\" --print-architecture\n+                OUTPUT_VARIABLE CPACK_DEBIAN_PACKAGE_ARCHITECTURE\n+                OUTPUT_STRIP_TRAILING_WHITESPACE)\n+    endif ()\n+endif ()\n+\n+# package name is lower case of project name with _ replaced by -\n+string(TOLOWER \"${PROJECT_NAME}\" PROJECT_NAME_LOWER)\n+string(REPLACE \"_\" \"-\" CPACK_PACKAGE_NAME \"${PROJECT_NAME_LOWER}\")\n+\n+# check if it is a ROS/catkin package\n+if (EXISTS \"${PROJECT_SOURCE_DIR}/package.xml\")\n+    file(STRINGS \"${PROJECT_SOURCE_DIR}/package.xml\" PACKAGE_XML_VERSION REGEX <version>[0-9.]*</version>)\n+    string(REGEX REPLACE .*<version>\\([0-9.]*\\)</version>.* \\\\1 ROS_PACKAGE_VERSION \"${PACKAGE_XML_VERSION}\")\n+    if (NOT ROS_PACKAGE_VERSION MATCHES ${PROJECT_VERSION})\n+        message(WARNING \"Version in package.xml (${ROS_PACKAGE_VERSION}) doesn't match project version (${PROJECT_VERSION})\")\n+    endif ()\n+    set(ROS_DISTRO $ENV{ROS_DISTRO})\n+    if (NOT ROS_DISTRO)\n+        message(WARNING \"ROS_DISTRO not set! falling back to indigo\")\n+        set(ROS_DISTRO \"indigo\")\n+    endif ()\n+    set(CPACK_PACKAGE_NAME \"ros-${ROS_DISTRO}-${CPACK_PACKAGE_NAME}\")\n+\n+    # tell CPack to use CMAKE_INSTALL_PREFIX\n+    # cmake -DCATKIN_BUILD_BINARY_PACKAGE=\"1\" -DCMAKE_INSTALL_PREFIX=\"/opt/ros/indigo\" -DCMAKE_PREFIX_PATH=\"/opt/ros/indigo\" -DCMAKE_BUILD_TYPE=Release ..\n+    set(CPACK_SET_DESTDIR true)\n+endif ()\n+\n+if(EXCLUSIVE_CUSTOMER)\n+#use original name (without customer suffix) to declare the conflict\n+  set(CPACK_DEBIAN_PACKAGE_CONFLICTS ${CPACK_PACKAGE_NAME})\n+  set(CPACK_DEBIAN_PACKAGE_PROVIDES  ${CPACK_PACKAGE_NAME})\n+  set(CPACK_DEBIAN_PACKAGE_REPLACES  ${CPACK_PACKAGE_NAME})\n+#use a name with the name of the customer suffixed to build the package\n+  string(TOLOWER \"${EXCLUSIVE_CUSTOMER}\" CUSTOMER_NAME_LOWER)\n+  string(REPLACE \"_\" \"-\" CUSTOMER_SUFFIX \"${CUSTOMER_NAME_LOWER}\")\n+  set(CPACK_PACKAGE_NAME \"${CPACK_PACKAGE_NAME}-${CUSTOMER_SUFFIX}\")\n+endif()\n+\n+set(CPACK_PACKAGE_FILE_NAME \"${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}\")\n+\n+#########################################\n+## things you might need to change ??? ##\n+#########################################\n+# if this package doesn't provide any libs or binaries, add set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS OFF) in your main CMakeLists.txt\n+if (NOT DEFINED CPACK_DEBIAN_PACKAGE_SHLIBDEPS)\n+    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)\n+endif ()\n+\n+# ??? this defaults to PROJECT_LIBRARIES which should be defined in main CMakeLists.txt before including this file\n+# list of shared library this package provides (; separated, comment or empty list if there are none)\n+# IMPORTANT: also the lib needs to set SOVERSION via set_target_properties, e.g.:\n+# set_target_properties(rcimage PROPERTIES SOVERSION ${abiversion})\n+if (PROJECT_LIBRARIES)\n+    set(sharedlibs ${PROJECT_LIBRARIES})\n+endif ()\n+\n+# if there are shared libs exported by this package:\n+# generate debian shlibs file and call ldconf in postinst and postrm scripts\n+if (sharedlibs)\n+    set(SHLIBS_FILE \"${CMAKE_CURRENT_BINARY_DIR}/shlibs\")\n+    set(POSTINST_SCRIPT \"${CMAKE_CURRENT_BINARY_DIR}/postinst\")\n+    set(POSTRM_SCRIPT \"${CMAKE_CURRENT_BINARY_DIR}/postrm\")\n+\n+    # Generate postinst, prerm and postrm hooks\n+    file(WRITE \"${POSTINST_SCRIPT}\" \"#!/bin/sh\\n\\nset -e\\n\")\n+    file(WRITE \"${POSTRM_SCRIPT}\" \"#!/bin/sh\\n\\nset -e\\n\")\n+    file(APPEND \"${POSTINST_SCRIPT}\" \"if [ \\\"$1\\\" = \\\"configure\\\" ]; then\\n        ldconfig\\nfi\\n\")\n+    file(APPEND \"${POSTRM_SCRIPT}\" \"if [ \\\"$1\\\" = \\\"remove\\\" ]; then\\n        ldconfig\\nfi\\n\")\n+\n+    # Generate shlibs file\n+    # also the lib needs to set SOVERSION via set_target_properties:\n+    # set_target_properties(rcimage PROPERTIES SOVERSION ${abiversion})\n+    file(WRITE \"${SHLIBS_FILE}\" \"\")\n+    foreach (libname ${sharedlibs})\n+        get_target_property(so_abiversion ${libname} SOVERSION)\n+        if(NOT ${so_abiversion})\n+          set(so_abiversion ${abiversion})\n+          message(STATUS \"SOVERSION of shared lib \\\"${libname}\\\" not set explicitly. Using <Major.Minor> of latest tag: ${so_abiversion}\")\n+          set_target_properties(${libname} PROPERTIES SOVERSION ${so_abiversion})\n+        endif()\n+        file(APPEND \"${SHLIBS_FILE}\" \"lib${libname} ${so_abiversion} ${CPACK_PACKAGE_NAME}\\n\")\n+    endforeach (libname)\n+\n+    execute_process(COMMAND chmod 644 \"${SHLIBS_FILE}\")\n+    execute_process(COMMAND chmod 755 \"${POSTINST_SCRIPT}\" \"${POSTRM_SCRIPT}\")\n+    set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA \"${SHLIBS_FILE};${POSTINST_SCRIPT};${POSTRM_SCRIPT}\")\n+endif ()\n+\n+if (conffiles)\n+  set(CONFFILES_FILE \"${CMAKE_CURRENT_BINARY_DIR}/conffiles\")\n+  file(WRITE \"${CONFFILES_FILE}\" \"\")\n+  foreach (conffile ${conffiles})\n+    file(APPEND \"${CONFFILES_FILE}\" \"${conffile}\\n\")\n+  endforeach (conffile)\n+  set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA \"${CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA};${CONFFILES_FILE}\")\n+endif ()\n+\n+include(CPack)"
+        },
+        {
+          "sha": "c885e4965296b26229dcc4a79da8c6b7b1db66c1",
+          "filename": "cmake/project_version.cmake",
+          "status": "added",
+          "additions": 119,
+          "deletions": 0,
+          "changes": 119,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/cmake%2Fproject_version.cmake",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/cmake%2Fproject_version.cmake",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/cmake%2Fproject_version.cmake?ref=9e3c667c693d12a7c21559a4dd8c59bcc69197b4",
+          "patch": "@@ -0,0 +1,119 @@\n+#\n+# Sets PROJECT_VERSION and PACKAGE_VERSION\n+#\n+\n+# Don't set PROJECT_VERSION to empty string when no VERSION is given to project() command.\n+if(POLICY CMP0048)\n+  cmake_policy(SET CMP0048 OLD)\n+endif()\n+\n+# Split a version number into separate components\n+# version the version number to split\n+# major variable name to store the major version in\n+# minor variable name to store the minor version in\n+# patch variable name to store the patch version in\n+# extra variable name to store a version suffix in\n+function(version_split version major minor patch extra)\n+    string(REGEX MATCH \"([0-9]+)\\\\.([0-9]+)\\\\.([0-9]+)(.*)?\" version_valid ${version})\n+    if(version_valid)\n+        string(REGEX REPLACE \"([0-9]+)\\\\.([0-9]+)\\\\.([0-9]+)(.*)?\" \"\\\\1;\\\\2;\\\\3;\\\\4\" VERSION_MATCHES ${version})\n+        list(GET VERSION_MATCHES 0 version_major)\n+        set(${major} ${version_major} PARENT_SCOPE)\n+        list(GET VERSION_MATCHES 1 version_minor)\n+        set(${minor} ${version_minor} PARENT_SCOPE)\n+        list(GET VERSION_MATCHES 2 version_patch)\n+        set(${patch} ${version_patch} PARENT_SCOPE)\n+        list(GET VERSION_MATCHES 3 version_extra)\n+        set(${extra} ${version_extra} PARENT_SCOPE)\n+    else(version_valid)\n+        message(AUTHOR_WARNING \"Bad version ${version}; falling back to 0 (have you made an initial release?)\")\n+        set(${major} \"0\" PARENT_SCOPE)\n+        set(${minor} \"\" PARENT_SCOPE)\n+        set(${patch} \"\" PARENT_SCOPE)\n+        set(${extra} \"\" PARENT_SCOPE)\n+    endif(version_valid)\n+endfunction(version_split)\n+\n+##############################\n+# get PROJECT_VERSION from git\n+##############################\n+find_program(GIT_CMD git)\n+mark_as_advanced(GIT_CMD)\n+if (GIT_CMD)\n+    execute_process(COMMAND ${GIT_CMD} rev-parse --show-toplevel\n+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}\n+            OUTPUT_VARIABLE GIT_TOPLEVEL\n+            ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)\n+endif()\n+if (GIT_CMD AND EXISTS \"${GIT_TOPLEVEL}\")\n+    execute_process(COMMAND ${GIT_CMD} rev-parse --short HEAD\n+            WORKING_DIRECTORY ${GIT_TOPLEVEL}\n+            OUTPUT_VARIABLE GIT_SHA1\n+            OUTPUT_STRIP_TRAILING_WHITESPACE)\n+    #message(STATUS \"GIT_SHA1: \" ${GIT_SHA1})\n+    execute_process(COMMAND ${GIT_CMD} describe --match \"*[0-9].[0-9]*\" HEAD\n+            WORKING_DIRECTORY ${GIT_TOPLEVEL}\n+            OUTPUT_VARIABLE GIT_DESCRIBE\n+            ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)\n+    #message(STATUS \"GIT_DESCRIBE: \" ${GIT_DESCRIBE})\n+\n+    if (GIT_DESCRIBE)\n+        string(REGEX REPLACE \"v?([0-9.]+).*\" \"\\\\1\" GIT_VERSION ${GIT_DESCRIBE})\n+        #message(STATUS \"GIT_VERSION: \" ${GIT_VERSION})\n+        if(PROJECT_VERSION)\n+            if(NOT GIT_DESCRIBE MATCHES ${PROJECT_VERSION})\n+                message(WARNING \"Version from git (${GIT_VERSION}) doesn't match already specified PROJECT_VERSION (${PROJECT_VERSION})\")\n+            endif()\n+        endif()\n+\n+        # project version is MAJOR.MINOR.PATCH\n+        set(PROJECT_VERSION ${GIT_VERSION})\n+\n+        # as package version we use the full version from git describe: 1.7.1+7+ge324c81\n+        if (GIT_DESCRIBE MATCHES \".*-g.*\")\n+            # convert a git describe string to usable debian version, e.g. v1.7.1-7-ge324c81 to 1.7.1+7+ge324c81\n+            string(REGEX REPLACE \"v?([0-9]*.[0-9.]*).*-([0-9]*)-([a-g0-9]*)\" \"\\\\1+\\\\2+\\\\3\" DEB_GIT_VERSION ${GIT_DESCRIBE})\n+            set(PACKAGE_VERSION ${DEB_GIT_VERSION})\n+        else()\n+            # current HEAD is git tag (i.e. releaase), directly use the version\n+            set(PACKAGE_VERSION ${GIT_VERSION})\n+        endif()\n+    else ()\n+        # no (suitable) tag found\n+        if (PROJECT_VERSION)\n+            message(WARNING \"Could not extract version from git! Using manually specified PROJECT_VERSION.\")\n+        else ()\n+            message(WARNING \"Could not extract version from git and PROJECT_VERSION not set. Defaulting to 0.0.0\")\n+            set(PROJECT_VERSION \"0.0.0\")\n+        endif ()\n+        # get number of commits in repo\n+        execute_process(COMMAND ${GIT_CMD} rev-list --count HEAD\n+                WORKING_DIRECTORY ${GIT_TOPLEVEL}\n+                OUTPUT_VARIABLE GIT_COMMIT_COUNT\n+                OUTPUT_STRIP_TRAILING_WHITESPACE)\n+        set(PACKAGE_VERSION ${PROJECT_VERSION}+${GIT_COMMIT_COUNT}+g${GIT_SHA1})\n+    endif ()\n+endif ()\n+\n+# check that project version is now set\n+if (NOT PROJECT_VERSION)\n+    message(WARNING \"PROJECT_VERSION not set. Defaulting to 0.0.0\")\n+    set(PROJECT_VERSION \"0.0.0\")\n+endif ()\n+if (NOT PACKAGE_VERSION)\n+    message(WARNING \"PACKAGE_VERSION not set! Falling back to (${PROJECT_VERSION})\")\n+    set(PACKAGE_VERSION ${PROJECT_VERSION})\n+endif ()\n+\n+version_split(${PROJECT_VERSION} PACKAGE_VERSION_MAJOR PACKAGE_VERSION_MINOR PACKAGE_VERSION_PATCH extra)\n+#message(STATUS \"PACKAGE_VERSION_MAJOR: \" ${PACKAGE_VERSION_MAJOR})\n+#message(STATUS \"PACKAGE_VERSION_MINOR: \" ${PACKAGE_VERSION_MINOR})\n+#message(STATUS \"PACKAGE_VERSION_PATCH: \" ${PACKAGE_VERSION_PATCH})\n+\n+message(STATUS \"PROJECT_VERSION: \" ${PROJECT_VERSION})\n+message(STATUS \"PACKAGE_VERSION: \" ${PACKAGE_VERSION})\n+\n+# make PROJECT_VERSION available as define in the project source\n+add_definitions(-DPROJECT_VERSION=\"${PROJECT_VERSION}\")\n+add_definitions(-DPACKAGE_VERSION=\"${PACKAGE_VERSION}\")\n+set(abiversion \"${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR}\")"
+        },
+        {
+          "sha": "b050827b27da2e993331f87b86a7ef0804a87f86",
+          "filename": "doc/CMakeLists.txt",
+          "status": "added",
+          "additions": 16,
+          "deletions": 0,
+          "changes": 16,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/doc%2FCMakeLists.txt",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/doc%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/doc%2FCMakeLists.txt?ref=9e3c667c693d12a7c21559a4dd8c59bcc69197b4",
+          "patch": "@@ -0,0 +1,16 @@\n+# add a target to generate API documentation with Doxygen\n+find_package(Doxygen)\n+if(DOXYGEN_FOUND)\n+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)\n+  add_custom_target(doc\n+      ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile\n+      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}\n+      COMMENT \"Generating API documentation with Doxygen\" VERBATIM\n+  )\n+else(DOXYGEN_FOUND)\n+  add_custom_target(doc\n+      echo \"Can't build docs without doxygen installed.\" && exit 1\n+      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}\n+      COMMENT \"Generating API documentation with Doxygen\" VERBATIM\n+  )\n+endif(DOXYGEN_FOUND)"
+        },
+        {
+          "sha": "a1e65445bd474ccc8d8c4e5e8f15a2752d0cd984",
+          "filename": "doc/Doxyfile.in",
+          "status": "added",
+          "additions": 2305,
+          "deletions": 0,
+          "changes": 2305,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/doc%2FDoxyfile.in",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/doc%2FDoxyfile.in",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/doc%2FDoxyfile.in?ref=9e3c667c693d12a7c21559a4dd8c59bcc69197b4"
+        },
+        {
+          "sha": "3bf63d6648eca29d6ee315cfbb3be524144f6f62",
+          "filename": "rcdiscover/CMakeLists.txt",
+          "status": "added",
+          "additions": 11,
+          "deletions": 0,
+          "changes": 11,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/rcdiscover%2FCMakeLists.txt",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/rcdiscover%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/rcdiscover%2FCMakeLists.txt?ref=9e3c667c693d12a7c21559a4dd8c59bcc69197b4",
+          "patch": "@@ -0,0 +1,11 @@\n+\n+# Author: Heiko Hirschmueller\n+\n+project(rcdiscover CXX)\n+\n+set(rcdiscover_src\n+  deviceinfo.cc\n+  discover.cc\n+)\n+\n+add_library(rcdiscover_static STATIC ${rcdiscover_src})\n\\ No newline at end of file"
+        },
+        {
+          "sha": "3c532c666c398aa8dca70c363fc270b487168c36",
+          "filename": "rcdiscover/deviceinfo.cc",
+          "status": "added",
+          "additions": 116,
+          "deletions": 0,
+          "changes": 116,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/rcdiscover%2Fdeviceinfo.cc",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/rcdiscover%2Fdeviceinfo.cc",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/rcdiscover%2Fdeviceinfo.cc?ref=9e3c667c693d12a7c21559a4dd8c59bcc69197b4",
+          "patch": "@@ -0,0 +1,116 @@\n+/*\n+ * Roboception GmbH\n+ * Munich, Germany\n+ * www.roboception.com\n+ *\n+ * Copyright (c) 2017 Roboception GmbH\n+ * All rights reserved\n+ *\n+ * Author: Heiko Hirschmueller\n+ */\n+\n+#include \"deviceinfo.h\"\n+\n+#include <sstream>\n+\n+namespace rcdiscover\n+{\n+\n+namespace\n+{\n+\n+/*\n+  Extract at most len bytes from p as characters and returns them as string.\n+  Extraction ends if a null byte is encountered or if len bytes have been\n+  extracted.\n+\n+  @param p   Pointer to byte array.\n+  @param len Maximum number of bytes to extract.\n+  @return    Extracted string.\n+*/\n+\n+std::string extract(const uint8_t *p, size_t len)\n+{\n+  std::ostringstream out;\n+\n+  while (*p != 0 && len > 0)\n+  {\n+    out << static_cast<char>(*p);\n+\n+    p++;\n+    len--;\n+  }\n+\n+  return out.str();\n+}\n+\n+}\n+\n+DeviceInfo::DeviceInfo()\n+{\n+  clear();\n+}\n+\n+void DeviceInfo::set(const uint8_t *raw, size_t len)\n+{\n+  // clear stored information\n+\n+  clear();\n+\n+  // extract information\n+\n+  if (len >= 4)\n+  {\n+    major=(static_cast<int>(raw[0])<<8)|raw[1];\n+    minor=(static_cast<int>(raw[2])<<8)|raw[3];\n+  }\n+\n+  if (len >= 16)\n+  {\n+    mac=0;\n+    for (int i=0; i<6; i++) mac=(mac<<8)|raw[10+i];\n+  }\n+\n+  if (len >= 40)\n+  {\n+    ip=0;\n+    for (int i=0; i<4; i++) ip=(ip<<8)|raw[36+i];\n+  }\n+\n+  if (len >= 56)\n+  {\n+    subnet=0;\n+    for (int i=0; i<4; i++) subnet=(subnet<<8)|raw[52+i];\n+  }\n+\n+  if (len >= 72)\n+  {\n+    gateway=0;\n+    for (int i=0; i<4; i++) gateway=(gateway<<8)|raw[68+i];\n+  }\n+\n+  if (len >= 104) manufacturer_name=extract(raw+72, 32);\n+  if (len >= 136) model_name=extract(raw+104, 32);\n+  if (len >= 168) device_version=extract(raw+136, 32);\n+  if (len >= 216) manufacturer_info=extract(raw+168, 48);\n+  if (len >= 232) serial_number=extract(raw+216, 16);\n+  if (len >= 248) user_name=extract(raw+232, 16);\n+}\n+\n+void DeviceInfo::clear()\n+{\n+  major=minor=0;\n+  mac=0;\n+  ip=0;\n+  subnet=0;\n+  gateway=0;\n+\n+  manufacturer_name.erase();\n+  model_name.erase();\n+  device_version.erase();\n+  manufacturer_info.erase();\n+  serial_number.erase();\n+  user_name.erase();\n+}\n+\n+}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "bc2d634e95b09e7c50b4997e57ac26d473f8a4eb",
+          "filename": "rcdiscover/deviceinfo.h",
+          "status": "added",
+          "additions": 171,
+          "deletions": 0,
+          "changes": 171,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/rcdiscover%2Fdeviceinfo.h",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/rcdiscover%2Fdeviceinfo.h",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/rcdiscover%2Fdeviceinfo.h?ref=9e3c667c693d12a7c21559a4dd8c59bcc69197b4",
+          "patch": "@@ -0,0 +1,171 @@\n+/*\n+ * Roboception GmbH\n+ * Munich, Germany\n+ * www.roboception.com\n+ *\n+ * Copyright (c) 2017 Roboception GmbH\n+ * All rights reserved\n+ *\n+ * Author: Heiko Hirschmueller\n+ */\n+\n+#ifndef RCDISCOVER_DEVICEINFO\n+#define RCDISCOVER_DEVICEINFO\n+\n+#include <string>\n+#include <stdint.h>\n+\n+namespace rcdiscover\n+{\n+\n+class DeviceInfo\n+{\n+  public:\n+\n+    DeviceInfo();\n+\n+    /**\n+      Extracts the RAW GigE Vision information according to the given\n+      DISCOVERY_ACK package.\n+\n+      @param raw Pointer to raw message body, excluding header.\n+      @param len Length of body as specified in the header.\n+    */\n+\n+    void set(const uint8_t *raw, size_t len);\n+\n+    /**\n+      Clears all information.\n+    */\n+\n+    void clear();\n+\n+    /**\n+      Checks if the object contains useful information.\n+    */\n+\n+    bool isValid() const { return mac != 0; }\n+\n+    /**\n+      Return major version of device.\n+\n+      @return Major version.\n+    */\n+\n+    int getMajorVersion() const { return major; }\n+\n+    /**\n+      Return minor version of device.\n+\n+      @return Minor version.\n+    */\n+\n+    int getMinorVersion() const { return minor; }\n+\n+    /**\n+      Returns 6 bytes with the MAC address of the device.\n+\n+      @return Pointer to 6 bytes with the MAC address.\n+    */\n+\n+    const uint64_t getMAC() const { return mac; }\n+\n+    /**\n+      Returns the current IP address of the device.\n+\n+      @return Pointer to 4 bytes with an IPv4 address.\n+    */\n+\n+    const uint32_t getIP() const { return ip; }\n+\n+    /**\n+      Returns the current subnet mask of the device.\n+\n+      @return Pointer to 4 bytes with an IPv4 subnet mask.\n+    */\n+\n+    const uint32_t getSubnetMask() const { return subnet; }\n+\n+    /**\n+      Returns the current IP address of the devices gateway.\n+\n+      @return Pointer to 4 bytes with an IPv4 address.\n+    */\n+\n+    const uint32_t getGateway() const { return gateway; }\n+\n+    /**\n+      Returns the manufacturer name.\n+\n+      @return Manufacturer name.\n+    */\n+\n+    std::string getManufacturerName() const { return manufacturer_name; }\n+\n+    /**\n+      Returns the model name.\n+\n+      @return Model name.\n+    */\n+\n+    std::string getModelName() const { return model_name; }\n+\n+    /**\n+      Returns the device version.\n+\n+      @return Device version.\n+    */\n+\n+    std::string getDeviceVersion() const { return device_version; }\n+\n+    /**\n+      Returns manufacturer specific information.\n+\n+      @return Manufacturer info.\n+    */\n+\n+    std::string getManufacturerInfo() const { return manufacturer_info; }\n+\n+    /**\n+      Returns the serial number.\n+\n+      @return Serial number.\n+    */\n+\n+    std::string getSerialNumber() const { return serial_number; }\n+\n+    /**\n+      Returns the user name.\n+\n+      @return User name.\n+    */\n+\n+    std::string getUserName() const { return user_name; }\n+\n+    /**\n+      Returns true if the MAC addresses conicide.\n+    */\n+\n+    bool operator == (const DeviceInfo &info) const { return mac == info.mac; }\n+\n+  private:\n+\n+    int major;\n+    int minor;\n+\n+    uint64_t mac;\n+    uint32_t ip;\n+    uint32_t subnet;\n+    uint32_t gateway;\n+\n+    std::string manufacturer_name;\n+    std::string model_name;\n+    std::string device_version;\n+    std::string manufacturer_info;\n+    std::string serial_number;\n+    std::string user_name;\n+};\n+\n+}\n+\n+#endif\n\\ No newline at end of file"
+        },
+        {
+          "sha": "5fd2bf199812bd6e84a3f664d9e1fe601f6f75ce",
+          "filename": "rcdiscover/discover.cc",
+          "status": "added",
+          "additions": 161,
+          "deletions": 0,
+          "changes": 161,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/rcdiscover%2Fdiscover.cc",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/rcdiscover%2Fdiscover.cc",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/rcdiscover%2Fdiscover.cc?ref=9e3c667c693d12a7c21559a4dd8c59bcc69197b4",
+          "patch": "@@ -0,0 +1,161 @@\n+/*\n+ * Roboception GmbH\n+ * Munich, Germany\n+ * www.roboception.com\n+ *\n+ * Copyright (c) 2017 Roboception GmbH\n+ * All rights reserved\n+ *\n+ * Author: Heiko Hirschmueller\n+ */\n+\n+#include \"discover.h\"\n+\n+#include <exception>\n+#include <ios>\n+#include <iostream>\n+\n+#ifdef WIN32\n+#include <winsock2.h>\n+#else\n+#include <sys/socket.h>\n+#include <arpa/inet.h>\n+#include <unistd.h>\n+#include <fcntl.h>\n+#endif\n+\n+#include <string.h>\n+#include <errno.h>\n+\n+namespace rcdiscover\n+{\n+\n+Discover::Discover()\n+{\n+  // create socket\n+\n+  sock=socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);\n+\n+  if (sock == -1)\n+  {\n+    throw std::ios_base::failure(std::string(strerror(errno)));\n+  }\n+\n+  // bind an arbitrary port to it\n+\n+  struct sockaddr_in addr;\n+  memset(&addr, 0, sizeof(addr));\n+\n+  addr.sin_addr.s_addr=htonl(INADDR_ANY);\n+  addr.sin_port=htons(0);\n+  addr.sin_family=AF_INET;\n+\n+  if (bind(sock, reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr)) != 0)\n+  {\n+    close(sock);\n+    throw std::ios_base::failure(std::string(strerror(errno)));\n+  }\n+\n+  // configure for broadcasting\n+\n+  int yes=1;\n+  if (setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &yes, sizeof(yes)) != 0)\n+  {\n+    close(sock);\n+    throw std::ios_base::failure(std::string(strerror(errno)));\n+  }\n+\n+  // configure socket as non blocking\n+\n+  if (fcntl(sock, F_SETFL, O_RDWR|O_NONBLOCK) == -1)\n+  {\n+    close(sock);\n+    throw std::ios_base::failure(std::string(strerror(errno)));\n+  }\n+}\n+\n+Discover::~Discover()\n+{\n+  close(sock);\n+}\n+\n+void Discover::broadcastRequest()\n+{\n+  // send discover cmd message as broadcast\n+\n+  uint8_t discovery_cmd[8]={0x42, 0x11, 0, 0x02, 0, 0, 0, 1};\n+\n+  struct sockaddr_in addr;\n+  memset(&addr, 0, sizeof(addr));\n+  addr.sin_addr.s_addr=htonl(-1); // broadcast to local network\n+  addr.sin_port=htons(3956); // GigE Vision control port\n+  addr.sin_family=PF_INET;\n+\n+  if (sendto(sock, discovery_cmd, 8, 0, reinterpret_cast<struct sockaddr *>(&addr),\n+             sizeof(addr)) != 8)\n+  {\n+    close(sock);\n+    throw std::ios_base::failure(std::string(strerror(errno)));\n+  }\n+}\n+\n+bool Discover::getResponse(DeviceInfo &info, int timeout)\n+{\n+  // setup waiting for data to arrive\n+\n+  fd_set fds;\n+  FD_ZERO(&fds);\n+  FD_SET(sock, &fds);\n+\n+  struct timeval tv;\n+  tv.tv_sec=timeout/1000;\n+  tv.tv_usec=(timeout%1000)*1000;\n+\n+  int count=10;\n+  info.clear();\n+\n+  // try to get a valid package (repeat if an invalid package is received)\n+\n+  while (!info.isValid() && count > 0)\n+  {\n+    count--;\n+\n+    if (select(sock+1, &fds, NULL, NULL, &tv) > 0)\n+    {\n+      // get package\n+\n+      uint8_t p[600];\n+\n+      struct sockaddr_in addr;\n+      socklen_t naddr=sizeof(addr);\n+      memset(&addr, 0, naddr);\n+\n+      int n=recvfrom(sock, p, sizeof(p), 0, reinterpret_cast<struct sockaddr *>(&addr), &naddr);\n+\n+      // check if received package is a valid discovery acknowledge\n+\n+      if (n >= 8)\n+      {\n+        if (p[0] == 0 && p[1] == 0 && p[2] == 0 && p[3] == 0x03 && p[6] == 0 && p[7] == 1)\n+        {\n+          size_t len=(static_cast<size_t>(p[4])<<8)|p[5];\n+\n+          if (static_cast<size_t>(n) >= len+8)\n+          {\n+            // extract information and store in list\n+\n+            info.set(p+8, len);\n+          }\n+        }\n+      }\n+    }\n+    else\n+    {\n+      count=0;\n+    }\n+  }\n+\n+  return info.isValid();\n+}\n+\n+}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "e9d311bc14a245598a3e1bb3a50ef418adf2b5fc",
+          "filename": "rcdiscover/discover.h",
+          "status": "added",
+          "additions": 60,
+          "deletions": 0,
+          "changes": 60,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/rcdiscover%2Fdiscover.h",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/rcdiscover%2Fdiscover.h",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/rcdiscover%2Fdiscover.h?ref=9e3c667c693d12a7c21559a4dd8c59bcc69197b4",
+          "patch": "@@ -0,0 +1,60 @@\n+/*\n+ * Roboception GmbH\n+ * Munich, Germany\n+ * www.roboception.com\n+ *\n+ * Copyright (c) 2017 Roboception GmbH\n+ * All rights reserved\n+ *\n+ * Author: Heiko Hirschmueller\n+ */\n+\n+#ifndef RCDISCOVER_DISCOVER\n+#define RCDISCOVER_DISCOVER\n+\n+#include \"deviceinfo.h\"\n+\n+namespace rcdiscover\n+{\n+\n+class Discover\n+{\n+  public:\n+\n+    /**\n+      Initializes a socket ready for broadcasting requests.\n+\n+      NOTE: Exceptions are thrown in case of severe network errors.\n+    */\n+\n+    Discover();\n+    ~Discover();\n+\n+    /**\n+      Broadcasts a discovery command request.\n+    */\n+\n+    void broadcastRequest();\n+\n+    /**\n+      Returns a discovery response. This method should be called until there is\n+      no further response.\n+\n+      @param info    Info object that will be filled if there is an available\n+                     response.\n+      @param timeout Timeout in Milliseconds.\n+      @return        True if there was a valid response. In this case, the info\n+                     object contains valid information. False in case of a\n+                     timeout.\n+    */\n+\n+    bool getResponse(DeviceInfo &info, int timeout=1000);\n+\n+  private:\n+\n+    int sock;\n+};\n+\n+}\n+\n+#endif\n\\ No newline at end of file"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "third_party_packages.txt",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/third_party_packages.txt",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/third_party_packages.txt",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/third_party_packages.txt?ref=9e3c667c693d12a7c21559a4dd8c59bcc69197b4"
+        },
+        {
+          "sha": "ce68e2f3897f11239a1d7bb67c4647d4746c1233",
+          "filename": "tools/CMakeLists.txt",
+          "status": "added",
+          "additions": 13,
+          "deletions": 0,
+          "changes": 13,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/tools%2FCMakeLists.txt",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/tools%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/tools%2FCMakeLists.txt?ref=9e3c667c693d12a7c21559a4dd8c59bcc69197b4",
+          "patch": "@@ -0,0 +1,13 @@\n+\n+# Author: Heiko Hirschmueller\n+\n+project(tools CXX)\n+\n+# build programs\n+\n+add_executable(rcdiscover rcdiscover.cc)\n+target_link_libraries(rcdiscover rcdiscover_static)\n+\n+# install tools\n+\n+install(TARGETS rcdiscover COMPONENT bin DESTINATION bin)\n\\ No newline at end of file"
+        },
+        {
+          "sha": "d131b242ef981c36ceb80daca154d8432877af7b",
+          "filename": "tools/rcdiscover.cc",
+          "status": "added",
+          "additions": 78,
+          "deletions": 0,
+          "changes": 78,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/tools%2Frcdiscover.cc",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/9e3c667c693d12a7c21559a4dd8c59bcc69197b4/tools%2Frcdiscover.cc",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/tools%2Frcdiscover.cc?ref=9e3c667c693d12a7c21559a4dd8c59bcc69197b4",
+          "patch": "@@ -0,0 +1,78 @@\n+/*\n+ * Roboception GmbH\n+ * Munich, Germany\n+ * www.roboception.com\n+ *\n+ * Copyright (c) 2017 Roboception GmbH\n+ * All rights reserved\n+ *\n+ * Author: Heiko Hirschmueller\n+ */\n+\n+#include \"rcdiscover/discover.h\"\n+#include \"rcdiscover/deviceinfo.h\"\n+\n+#include <string>\n+#include <sstream>\n+#include <iostream>\n+#include <iomanip>\n+\n+namespace\n+{\n+\n+std::string mac2string(const uint64_t mac)\n+{\n+  std::ostringstream out;\n+\n+  out << std::hex << std::setfill('0');\n+  out << std::setw(2) << ((mac>>40)&0xff) << ':' << std::setw(2) << ((mac>>32)&0xff) << ':'\n+      << std::setw(2) << ((mac>>24)&0xff) << ':' << std::setw(2) << ((mac>>16)&0xff) << ':'\n+      << std::setw(2) << ((mac>>8)&0xff) << ':' << std::setw(2) << (mac&0xff);\n+\n+  return out.str();\n+}\n+\n+std::string ip2string(const uint32_t ip)\n+{\n+  std::ostringstream out;\n+\n+  out << ((ip>>24)&0xff) << '.' << ((ip>>16)&0xff) << '.'\n+      << ((ip>>8)&0xff) << '.' << (ip&0xff);\n+\n+  return out.str();\n+}\n+\n+}\n+\n+int main(int argc, char *argv[])\n+{\n+  std::cout << \"User name\\tSerial number\\tIP\\t\\tMAC\" << std::endl;\n+\n+  rcdiscover::Discover discover;\n+  discover.broadcastRequest();\n+\n+  rcdiscover::DeviceInfo info;\n+  while (discover.getResponse(info))\n+  {\n+    std::string name=info.getUserName();\n+\n+    if (name.size() == 0)\n+    {\n+      name=\"rc_visard\";\n+    }\n+\n+    std::cout << name << \"\\t\";\n+    std::cout << info.getSerialNumber() << \"\\t\";\n+    std::cout << ip2string(info.getIP()) << \"\\t\";\n+    std::cout << mac2string(info.getMAC());\n+\n+    if (info.getModelName() != \"rc_visard\")\n+    {\n+      std::cout << \"\\t[other GEV device]\";\n+    }\n+\n+    std::cout << std::endl;\n+  }\n+\n+  return 0;\n+}\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "flixr",
+      "date": "2018-01-05T14:09:21Z",
+      "sha": "03270d6a44040537d13123d9ae7a744c5af12165",
+      "message": "cleanup .gitlab-ci.yml",
+      "files_changed": 1,
+      "additions": 7,
+      "deletions": 73,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "fcc168b63c7e2b3ade34bb58d3f6ea5afdc227c2",
+          "filename": ".gitlab-ci.yml",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 73,
+          "changes": 80,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/03270d6a44040537d13123d9ae7a744c5af12165/.gitlab-ci.yml",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/03270d6a44040537d13123d9ae7a744c5af12165/.gitlab-ci.yml",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/.gitlab-ci.yml?ref=03270d6a44040537d13123d9ae7a744c5af12165",
+          "patch": "@@ -1,9 +1,6 @@\n before_script:\n   - export DISTRO_CODENAME=`lsb_release -cs` && echo Using distro $DISTRO_CODENAME\n-  - echo \"deb http://apt.roboception.de/stable $DISTRO_CODENAME main\" > /etc/apt/sources.list.d/roboception-stable.list\n-  - if [ \"$TESTING_DEBS\" = \"true\" ]; then echo \"deb http://apt.roboception.de/testing $DISTRO_CODENAME main\" > /etc/apt/sources.list.d/roboception-testing.list ; fi\n-  - curl http://apt.roboception.de/archive.key | apt-key add -\n-  - apt-get update -yq && apt-get install -y lintian libwxgtk3.0-dev # append packages required for your build here, e.g. cvkit\n+  - apt-get update -yq && apt-get install -y lintian libwxgtk3.0-dev\n \n #############\n # Templates\n@@ -41,33 +38,8 @@ before_script:\n     - make -j 4\n     - CTEST_OUTPUT_ON_FAILURE=1 make test\n \n-# run test script with latest debs from testing installed\n-.test_latest_t: &test_latest\n-  <<: *test\n-  variables:\n-    TESTING_DEBS: \"true\"\n-\n-# run test script with released debs from stable installed (allowed to fail)\n-.test_stable_t: &test_stable\n-  <<: *test\n-  allow_failure: true\n-  except:\n-    - /^v[0-9]+\\.[0-9]+\\.[0-9]+/\n-\n-# run test script with released debs from stable (only for releases, mustn't fail)\n-.test_release_t: &test_release\n-  <<: *test\n-  only:\n-    - /^v[0-9]+\\.[0-9]+\\.[0-9]+/\n-  except:\n-    - branches\n-\n .package_testing_t: &package_testing\n   stage: deploy\n-  environment:\n-    name: testing/$DISTRO_CODENAME\n-  variables:\n-    TESTING_DEBS: \"true\"\n   script:\n     - mkdir build\n     - cd build\n@@ -80,8 +52,6 @@ before_script:\n \n .package_stable_t: &package_stable\n   stage: deploy\n-  environment:\n-    name: stable/$DISTRO_CODENAME\n   script:\n     - mkdir build\n     - cd build\n@@ -115,41 +85,23 @@ gen_dox:\n   tags:\n     - docs\n \n-# Test against latest (on every commit)\n-#######################################\n+# Test (on every commit)\n+########################\n test_amd64:\n   <<: *amd64_job\n-  <<: *test_latest\n+  <<: *test\n \n test_armhf:\n   <<: *armhf_job\n-  <<: *test_latest\n+  <<: *test\n \n test_xenial_amd64:\n   <<: *amd64_xenial_job\n-  <<: *test_latest\n+  <<: *test\n \n test_xenial_armhf:\n   <<: *armhf_xenial_job\n-  <<: *test_latest\n-\n-# Test against stable (is allowed to fail)\n-##########################################\n-test_stable_amd64:\n-  <<: *amd64_job\n-  <<: *test_stable\n-\n-test_stable_armhf:\n-  <<: *armhf_job\n-  <<: *test_stable\n-\n-test_stable_xenial_amd64:\n-  <<: *amd64_xenial_job\n-  <<: *test_stable\n-\n-test_stable_xenial_armhf:\n-  <<: *armhf_xenial_job\n-  <<: *test_stable\n+  <<: *test\n \n # Deploy testing (only on master)\n #################################\n@@ -169,24 +121,6 @@ package_testing_xenial_armhf:\n   <<: *armhf_xenial_job\n   <<: *package_testing\n \n-# Test against stable if it is a release\n-########################################\n-test_release_amd64:\n-  <<: *amd64_job\n-  <<: *test_release\n-\n-test_release_armhf:\n-  <<: *armhf_job\n-  <<: *test_release\n-\n-test_release_xenial_amd64:\n-  <<: *amd64_xenial_job\n-  <<: *test_release\n-\n-test_release_xenial_armhf:\n-  <<: *armhf_xenial_job\n-  <<: *test_release\n-\n # Deploy stable (only for releases, version tags)\n #################################################\n package_stable_amd64:"
+        }
+      ]
+    },
+    {
+      "author": "DanBmh",
+      "date": "2021-09-08T08:26:24Z",
+      "sha": "1aa77987dc7495c2cc74f0540ba4a5ab3f481064",
+      "message": "Update README.md",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "3f22d82c338594f9d9e5976301fcd128ddb2de8e",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/1aa77987dc7495c2cc74f0540ba4a5ab3f481064/README.md",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/1aa77987dc7495c2cc74f0540ba4a5ab3f481064/README.md",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/README.md?ref=1aa77987dc7495c2cc74f0540ba4a5ab3f481064",
+          "patch": "@@ -8,6 +8,7 @@ This package contains tools for the discovery of Roboception devices\n - `rcdiscover-gui`: graphical application for discovering Roboception devices and\n   sending magic packets for resetting of parameters\n \n+**Installation:** You can find some prebuilt packages for Linux or Windows on the [releases](https://github.com/roboception/rcdiscover/releases) page. Alternatively follow the compilation steps in the next sections.\n \n Compiling on Linux\n ------------------"
+        }
+      ]
+    },
+    {
+      "author": "schallerr",
+      "date": "2017-05-12T12:40:15Z",
+      "sha": "55ec32405de30c73fb37805b08742b2990aba430",
+      "message": "gui for rcdiscover using wxWidgets",
+      "files_changed": 5,
+      "additions": 324,
+      "deletions": 29,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "32de0a805391c046dec26521b82403120e2da682",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 1,
+          "changes": 9,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/55ec32405de30c73fb37805b08742b2990aba430/CMakeLists.txt",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/55ec32405de30c73fb37805b08742b2990aba430/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/CMakeLists.txt?ref=55ec32405de30c73fb37805b08742b2990aba430",
+          "patch": "@@ -11,9 +11,14 @@ include(cmake/project_version.cmake)\n enable_testing()\n \n include_directories(${CMAKE_SOURCE_DIR})\n-\n # - Find manditory packages -\n \n+SET(wxWidgets_USE_STATIC ON)\n+find_package(wxWidgets COMPONENTS core base adv)\n+if(wxWidgets_FOUND)\n+    include(${wxWidgets_USE_FILE})\n+endif(wxWidgets_FOUND)\n+\n # - Configuration for code optimization -\n \n if (NOT CMAKE_BUILD_TYPE)\n@@ -28,6 +33,8 @@ if (CMAKE_COMPILER_IS_GNUCC)\n   add_definitions(-Wall)\n endif ()\n \n+add_definitions(-std=c++11)\n+\n # - Build individual parts -\n \n add_subdirectory(rcdiscover)"
+        },
+        {
+          "sha": "320023a904e181433ca3eaa1d44844ebbeeaf202",
+          "filename": "tools/CMakeLists.txt",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 1,
+          "changes": 16,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/55ec32405de30c73fb37805b08742b2990aba430/tools%2FCMakeLists.txt",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/55ec32405de30c73fb37805b08742b2990aba430/tools%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/tools%2FCMakeLists.txt?ref=55ec32405de30c73fb37805b08742b2990aba430",
+          "patch": "@@ -9,7 +9,21 @@ target_link_libraries(rcdiscover rcdiscover_static)\n \n if (WIN32)\n   target_link_libraries(rcdiscover iphlpapi.lib ws2_32.lib)\n-endif ()\n+endif (WIN32)\n+\n+if(wxWidgets_FOUND)\n+    include_directories(${wxWidgets_INCLUDE_DIRS})\n+    add_executable(rcdiscover-gui rcdiscover-gui.cc)\n+    target_link_libraries(rcdiscover-gui rcdiscover_static ${wxWidgets_LIBRARIES})\n+\n+    if (WIN32)\n+        target_link_libraries(rcdiscover-gui iphlpapi.lib ws2_32.lib)\n+    endif (WIN32)\n+else(wxWidgets_FOUND)\n+    MESSAGE(WARN \"wxWidgets not found! Not building GUI application\")\n+endif(wxWidgets_FOUND)\n+\n+\n \n # install tools\n "
+        },
+        {
+          "sha": "7b180bc25cd01c8781246b9ebd111561621cb6fb",
+          "filename": "tools/rcdiscover-gui.cc",
+          "status": "added",
+          "additions": 260,
+          "deletions": 0,
+          "changes": 260,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/55ec32405de30c73fb37805b08742b2990aba430/tools%2Frcdiscover-gui.cc",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/55ec32405de30c73fb37805b08742b2990aba430/tools%2Frcdiscover-gui.cc",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/tools%2Frcdiscover-gui.cc?ref=55ec32405de30c73fb37805b08742b2990aba430",
+          "patch": "@@ -0,0 +1,260 @@\n+/*\n+* Roboception GmbH\n+* Munich, Germany\n+* www.roboception.com\n+*\n+* Copyright (c) 2017 Roboception GmbH\n+* All rights reserved\n+*\n+* Author: Raphael Schaller\n+*/\n+\n+#include \"rcdiscover/discover.h\"\n+#include \"rcdiscover/deviceinfo.h\"\n+#include \"utils.h\"\n+\n+#include <future>\n+#include <vector>\n+#include <algorithm>\n+\n+#include <wx/wx.h> // wxWidgets core\n+#include <wx/dataview.h> // wxDataViewListCtrl\n+\n+wxDEFINE_EVENT(wxEVT_COMMAND_DISCOVERY_COMPLETED, wxThreadEvent);\n+\n+enum\n+{\n+  ID_DiscoverButton = wxID_HIGHEST + 1,\n+  ID_DataViewListCtrl\n+};\n+\n+class DiscoverThread : public wxThread\n+{\n+  public:\n+    DiscoverThread(wxFrame *parent) :\n+      parent_(parent)\n+    { }\n+\n+  protected:\n+    virtual ExitCode Entry() override\n+    {\n+      ExitCode exit_code = (ExitCode)0;\n+\n+      std::vector<wxVector<wxVariant>> device_list;\n+\n+      try\n+      {\n+#ifdef WIN32\n+        WSADATA wsaData;\n+        WSAStartup(MAKEWORD(2, 2), &wsaData);\n+#endif\n+\n+        rcdiscover::Discover discover;\n+        discover.broadcastRequest();\n+\n+        rcdiscover::DeviceInfo info;\n+\n+        while (discover.getResponse(info))\n+        {\n+          std::string name=info.getUserName();\n+\n+          if (name.size() == 0)\n+          {\n+            name=\"rc_visard\";\n+          }\n+\n+          wxVector<wxVariant> data;\n+          data.push_back(wxVariant(name));\n+          data.push_back(wxVariant(info.getSerialNumber()));\n+          data.push_back(wxVariant(ip2string(info.getIP())));\n+          data.push_back(wxVariant(mac2string(info.getMAC())));\n+\n+          device_list.push_back(std::move(data));\n+        }\n+\n+        std::sort(device_list.begin(), device_list.end(),\n+                  [](const wxVector<wxVariant>& lhs, const wxVector<wxVariant>& rhs) {\n+          return lhs[0].GetString() < rhs[0].GetString();\n+        });\n+\n+        auto it = std::unique(device_list.begin(), device_list.end(),\n+                              [](const wxVector<wxVariant>& lhs, const wxVector<wxVariant>& rhs){\n+          for (size_t i = 0; i < lhs.size(); ++i)\n+          {\n+            if (lhs[i] != rhs[i])\n+            {\n+              return false;\n+            }\n+          }\n+          return true;\n+        });\n+        device_list.erase(it, device_list.end());\n+\n+#ifdef WIN32\n+        ::WSACleanup();\n+#endif\n+      }\n+      catch(const std::exception& ex)\n+      {\n+        std::cerr << ex.what() << std::endl;\n+        device_list.clear();\n+        exit_code = (ExitCode)1;\n+      }\n+\n+      wxThreadEvent event(wxEVT_COMMAND_DISCOVERY_COMPLETED);\n+      event.SetPayload(device_list);\n+      parent_->GetEventHandler()->AddPendingEvent(event);\n+\n+      return exit_code;\n+    }\n+\n+  private:\n+    wxFrame *parent_;\n+};\n+\n+class RcDiscoverFrame : public wxFrame\n+{\n+  public:\n+    RcDiscoverFrame(const wxString& title,\n+                    const wxPoint& pos) :\n+      wxFrame(NULL, wxID_ANY, title, pos, wxSize(510,300)),\n+      device_list_(nullptr),\n+      discover_button_(nullptr)\n+    {\n+      wxMenu *menuFile = new wxMenu();\n+      menuFile->Append(wxID_EXIT);\n+\n+      wxMenu *menuHelp = new wxMenu();\n+      menuHelp->Append(wxID_ABOUT);\n+\n+      wxMenuBar *menuBar = new wxMenuBar();\n+      menuBar->Append(menuFile, \"&File\");\n+      menuBar->Append(menuHelp, \"&Help\");\n+\n+      SetMenuBar(menuBar);\n+      CreateStatusBar();\n+\n+      auto *panel = new wxPanel(this, -1);\n+\n+      auto *vbox = new wxBoxSizer(wxVERTICAL);\n+\n+      auto *button_box = new wxBoxSizer(wxHORIZONTAL);\n+      discover_button_ = new wxButton(panel, ID_DiscoverButton, \"Start Discovery\");\n+      button_box->Add(discover_button_, 1, wxEXPAND);\n+      vbox->Add(button_box, 0, wxLEFT | wxTOP, 10);\n+\n+      auto *data_box = new wxBoxSizer(wxHORIZONTAL);\n+\n+      device_list_ = new wxDataViewListCtrl(panel,\n+                                            ID_DataViewListCtrl,\n+                                            wxPoint(-1,-1),\n+                                            wxSize(-1,-1));\n+      device_list_->AppendTextColumn(\"Hostname\",\n+                                     wxDATAVIEW_CELL_INERT,\n+                                     100, wxALIGN_LEFT,\n+                                     wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE);\n+      device_list_->AppendTextColumn(\"Serial Number\",\n+                                     wxDATAVIEW_CELL_INERT,\n+                                     150, wxALIGN_LEFT,\n+                                     wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE);\n+      device_list_->AppendTextColumn(\"IP Address\",\n+                                     wxDATAVIEW_CELL_INERT,\n+                                     100, wxALIGN_LEFT,\n+                                     wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE);\n+      device_list_->AppendTextColumn(\"MAC Address\",\n+                                     wxDATAVIEW_CELL_INERT,\n+                                     130, wxALIGN_LEFT,\n+                                     wxDATAVIEW_COL_RESIZABLE | wxDATAVIEW_COL_SORTABLE);\n+\n+      device_list_->SetToolTip(\"Double-click row to open WebGUI in browser.\");\n+\n+      data_box->Add(device_list_, 1, wxEXPAND);\n+      vbox->Add(data_box, 1, wxLEFT | wxRIGHT | wxEXPAND, 10);\n+\n+      panel->SetSizer(vbox);\n+      Centre();\n+\n+      Connect(ID_DiscoverButton,\n+              wxEVT_COMMAND_BUTTON_CLICKED,\n+              wxCommandEventHandler(RcDiscoverFrame::onDiscoverButton));\n+      Connect(wxID_ANY,\n+              wxEVT_COMMAND_DISCOVERY_COMPLETED,\n+              wxThreadEventHandler(RcDiscoverFrame::onDiscoveryCompleted));\n+      Connect(ID_DataViewListCtrl,\n+              wxEVT_DATAVIEW_ITEM_ACTIVATED,\n+              wxDataViewEventHandler(RcDiscoverFrame::onDeviceDoubleClick));\n+    }\n+\n+  private:\n+    void onDiscoverButton(wxCommandEvent&)\n+    {\n+      discover_button_->Disable();\n+\n+      auto *thread = new DiscoverThread(this);\n+      if (thread->Run() != wxTHREAD_NO_ERROR)\n+      {\n+        std::cerr << \"Could not spawn thread\" << std::endl;\n+        delete thread;\n+        thread = nullptr;\n+        discover_button_->Enable();\n+      }\n+    }\n+\n+    void onDiscoveryCompleted(wxThreadEvent& event)\n+    {\n+      device_list_->DeleteAllItems();\n+\n+      std::vector<wxVector<wxVariant>> data =\n+          event.GetPayload<std::vector<wxVector<wxVariant>>>();\n+      for(const auto& d : data)\n+      {\n+        device_list_->AppendItem(d);\n+      }\n+\n+      discover_button_->Enable();\n+    }\n+\n+    void onDeviceDoubleClick(wxDataViewEvent& event)\n+    {\n+      const auto item = event.GetItem();\n+      const auto row = device_list_->ItemToRow(item);\n+      const auto ip = device_list_->GetTextValue(row, 2);\n+      wxLaunchDefaultBrowser(\"http://\" + ip + \"/\");\n+    }\n+\n+    void onExit(wxCommandEvent& event)\n+    {\n+      Close(true);\n+    }\n+\n+    void onAbout(wxCommandEvent&)\n+    {\n+      wxMessageBox(\"This is rc_discover\", \"About rc_discover\",\n+                   wxOK | wxICON_INFORMATION);\n+    }\n+\n+    wxDECLARE_EVENT_TABLE();\n+\n+  private:\n+    wxDataViewListCtrl *device_list_;\n+    wxButton *discover_button_;\n+    std::future<void> discover_future_;\n+};\n+\n+wxBEGIN_EVENT_TABLE(RcDiscoverFrame, wxFrame)\n+  EVT_MENU(wxID_EXIT, RcDiscoverFrame::onExit)\n+  EVT_MENU(wxID_ABOUT, RcDiscoverFrame::onAbout)\n+wxEND_EVENT_TABLE()\n+\n+class RcDiscoverApp : public wxApp\n+{\n+  public:\n+    virtual bool OnInit() override\n+    {\n+      auto *frame = new RcDiscoverFrame(\"rc_discover\", wxPoint(50,50));\n+      frame->Show(true);\n+      return true;\n+    }\n+};\n+\n+wxIMPLEMENT_APP(RcDiscoverApp);"
+        },
+        {
+          "sha": "33f3938770b1a9b8bb6dbc46720fd167e0520ef6",
+          "filename": "tools/rcdiscover.cc",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 27,
+          "changes": 28,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/55ec32405de30c73fb37805b08742b2990aba430/tools%2Frcdiscover.cc",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/55ec32405de30c73fb37805b08742b2990aba430/tools%2Frcdiscover.cc",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/tools%2Frcdiscover.cc?ref=55ec32405de30c73fb37805b08742b2990aba430",
+          "patch": "@@ -11,6 +11,7 @@\n \n #include \"rcdiscover/discover.h\"\n #include \"rcdiscover/deviceinfo.h\"\n+#include \"utils.h\"\n \n #include <string>\n #include <sstream>\n@@ -21,33 +22,6 @@\n #include <winsock2.h>\n #endif\n \n-namespace\n-{\n-\n-std::string mac2string(const uint64_t mac)\n-{\n-  std::ostringstream out;\n-\n-  out << std::hex << std::setfill('0');\n-  out << std::setw(2) << ((mac>>40)&0xff) << ':' << std::setw(2) << ((mac>>32)&0xff) << ':'\n-      << std::setw(2) << ((mac>>24)&0xff) << ':' << std::setw(2) << ((mac>>16)&0xff) << ':'\n-      << std::setw(2) << ((mac>>8)&0xff) << ':' << std::setw(2) << (mac&0xff);\n-\n-  return out.str();\n-}\n-\n-std::string ip2string(const uint32_t ip)\n-{\n-  std::ostringstream out;\n-\n-  out << ((ip>>24)&0xff) << '.' << ((ip>>16)&0xff) << '.'\n-      << ((ip>>8)&0xff) << '.' << (ip&0xff);\n-\n-  return out.str();\n-}\n-\n-}\n-\n int main(int argc, char *argv[])\n {\n #ifdef WIN32"
+        },
+        {
+          "sha": "7a1227136dcbf568dbff08a609aeb966cab57b10",
+          "filename": "utils.h",
+          "status": "added",
+          "additions": 40,
+          "deletions": 0,
+          "changes": 40,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/55ec32405de30c73fb37805b08742b2990aba430/utils.h",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/55ec32405de30c73fb37805b08742b2990aba430/utils.h",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/utils.h?ref=55ec32405de30c73fb37805b08742b2990aba430",
+          "patch": "@@ -0,0 +1,40 @@\n+/*\n+* Roboception GmbH\n+* Munich, Germany\n+* www.roboception.com\n+*\n+* Copyright (c) 2017 Roboception GmbH\n+* All rights reserved\n+*\n+* Author: Raphael Schaller\n+*/\n+\n+#ifndef UTILS_H\n+#define UTILS_H\n+\n+#include <iomanip>\n+#include <sstream>\n+\n+std::string mac2string(const uint64_t mac)\n+{\n+  std::ostringstream out;\n+\n+  out << std::hex << std::setfill('0');\n+  out << std::setw(2) << ((mac>>40)&0xff) << ':' << std::setw(2) << ((mac>>32)&0xff) << ':'\n+      << std::setw(2) << ((mac>>24)&0xff) << ':' << std::setw(2) << ((mac>>16)&0xff) << ':'\n+      << std::setw(2) << ((mac>>8)&0xff) << ':' << std::setw(2) << (mac&0xff);\n+\n+  return out.str();\n+}\n+\n+std::string ip2string(const uint32_t ip)\n+{\n+  std::ostringstream out;\n+\n+  out << ((ip>>24)&0xff) << '.' << ((ip>>16)&0xff) << '.'\n+      << ((ip>>8)&0xff) << '.' << (ip&0xff);\n+\n+  return out.str();\n+}\n+\n+#endif // UTILS_H"
+        }
+      ]
+    },
+    {
+      "author": "Carlos Garcia",
+      "date": "2019-07-02T12:15:10Z",
+      "sha": "4e2df1a2e368516ddfda339dbf5731612b77966e",
+      "message": "also build shared lib\n\nand add package.xml for releasing as ROS package",
+      "files_changed": 5,
+      "additions": 106,
+      "deletions": 26,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "e3556d59f6d2740950c85ea746f6ed19d313f29a",
+          "filename": ".gitlab-ci.yml",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 5,
+          "changes": 17,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/4e2df1a2e368516ddfda339dbf5731612b77966e/.gitlab-ci.yml",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/4e2df1a2e368516ddfda339dbf5731612b77966e/.gitlab-ci.yml",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/.gitlab-ci.yml?ref=4e2df1a2e368516ddfda339dbf5731612b77966e",
+          "patch": "@@ -45,7 +45,7 @@ variables:\n   stage: test\n   script:\n     - mkdir build && cd build\n-    - cmake ..\n+    - cmake -DCMAKE_INSTALL_PREFIX=\"/usr\" ..\n     - make -j 4\n     - CTEST_OUTPUT_ON_FAILURE=1 make test\n \n@@ -54,10 +54,17 @@ variables:\n   stage: deploy\n   script:\n     - mkdir build && cd build\n-    - cmake -DRCDISCOVER_CLI_ONLY_DEB=ON -DRCDISCOVER_GUI_ONLY_DEB=OFF ..\n-    - make -j4 package\n-    - cmake -DRCDISCOVER_CLI_ONLY_DEB=OFF -DRCDISCOVER_GUI_ONLY_DEB=ON ..\n-    - make -j4 package\n+    - if [ -n \"$ROS_DISTRO\" ]; then\n+        cmake -DRCDISCOVER_CLI_ONLY_DEB=ON -DRCDISCOVER_GUI_ONLY_DEB=OFF -DCMAKE_INSTALL_PREFIX=\"/opt/ros/$ROS_DISTRO\" -DCMAKE_PREFIX_PATH=\"/opt/ros/$ROS_DISTRO\" -DCMAKE_BUILD_TYPE=Release .. ;\n+        make -j4 package\n+        cmake -DRCDISCOVER_CLI_ONLY_DEB=OFF -DRCDISCOVER_GUI_ONLY_DEB=ON -DCMAKE_INSTALL_PREFIX=\"/opt/ros/$ROS_DISTRO\" -DCMAKE_PREFIX_PATH=\"/opt/ros/$ROS_DISTRO\" -DCMAKE_BUILD_TYPE=Release ..\n+        make -j4 package\n+      else\n+        cmake -DRCDISCOVER_CLI_ONLY_DEB=ON -DRCDISCOVER_GUI_ONLY_DEB=OFF -DCMAKE_INSTALL_PREFIX=\"/usr\" .. ;\n+        make -j4 package\n+        cmake -DRCDISCOVER_CLI_ONLY_DEB=OFF -DRCDISCOVER_GUI_ONLY_DEB=ON -DCMAKE_INSTALL_PREFIX=\"/usr\" ..\n+        make -j4 package\n+      fi\n     - if [ -z \"$APT_REPO\" ]; then export APT_REPO=testing; fi\n     - upload_deb.sh $DISTRO_CODENAME-$APT_REPO *.deb\n "
+        },
+        {
+          "sha": "f553a1ecc14e21c96118adb73725b2234a32b52e",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/4e2df1a2e368516ddfda339dbf5731612b77966e/CMakeLists.txt",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/4e2df1a2e368516ddfda339dbf5731612b77966e/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/CMakeLists.txt?ref=4e2df1a2e368516ddfda339dbf5731612b77966e",
+          "patch": "@@ -83,6 +83,7 @@ endif ()\n # - Build individual parts -\n \n add_subdirectory(rcdiscover)\n+set(PROJECT_LIBRARIES rc_discover)\n \n # by default install commandline and gui tools\n option(INSTALL_RCDISCOVER_CLI \"install rcdiscover commandline tool\" ON)\n@@ -123,6 +124,9 @@ add_subdirectory(doc)\n \n # - Define information for packaging -\n \n+install(FILES package.xml COMPONENT dev DESTINATION share/${PROJECT_NAME_LOWER})\n+\n+\n if (RCDISCOVER_GUI_ONLY_DEB)\n   set(CPACK_PACKAGE_NAME \"rcdiscover-gui\")\n   set(CPACK_DEBIAN_PACKAGE_RECOMMENDS \"rcdiscover-cli\")"
+        },
+        {
+          "sha": "1d122af5024d83ec03188b5cce253f41a04d861b",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 26,
+          "deletions": 0,
+          "changes": 26,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/4e2df1a2e368516ddfda339dbf5731612b77966e/package.xml",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/4e2df1a2e368516ddfda339dbf5731612b77966e/package.xml",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/package.xml?ref=4e2df1a2e368516ddfda339dbf5731612b77966e",
+          "patch": "@@ -0,0 +1,26 @@\n+<?xml version=\"1.0\"?>\n+<package format=\"2\">\n+    <name>rcdiscover</name>\n+    <version>0.9.2</version>\n+    <description>\n+        This package contains tools for the discovery of rc_visard sensors via GigE Vision.\n+    </description>\n+\n+    <maintainer email=\"felix.ruess@roboception.de\">Felix Ruess</maintainer>\n+\n+    <author email=\"heiko.hirschmueller@roboception.de\">Heiko Hirschmueller</author>\n+    <author email=\"raphael.schaller@roboception.de\">Raphael Schaller</author>\n+\n+    <license>BSD</license>\n+\n+    <url type=\"repository\">https://github.com/roboception/rcdiscover</url>\n+    <url type=\"bugtracker\">https://github.com/roboception/rcdiscover/issues</url>\n+\n+    <buildtool_depend>cmake</buildtool_depend>\n+    <build_export_depend>catkin</build_export_depend>\n+\n+    <doc_depend>doxygen</doc_depend>\n+    <export>\n+        <build_type>cmake</build_type>\n+    </export>\n+</package>"
+        },
+        {
+          "sha": "5377a6ed93bb9dcc2b75acd7abff4d25ecfd694c",
+          "filename": "rcdiscover/CMakeLists.txt",
+          "status": "modified",
+          "additions": 62,
+          "deletions": 19,
+          "changes": 81,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/4e2df1a2e368516ddfda339dbf5731612b77966e/rcdiscover%2FCMakeLists.txt",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/4e2df1a2e368516ddfda339dbf5731612b77966e/rcdiscover%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/rcdiscover%2FCMakeLists.txt?ref=4e2df1a2e368516ddfda339dbf5731612b77966e",
+          "patch": "@@ -32,33 +32,76 @@\n # POSSIBILITY OF SUCH DAMAGE.\n \n project(rcdiscover CXX)\n+include(GNUInstallDirs)\n+\n+if (UNIX)\n+  find_package( Threads REQUIRED)\n+endif ()\n \n add_definitions(-DHAVE_PCAP)\n \n set(rcdiscover_src\n-  deviceinfo.cc\n-  discover.cc\n-  force_ip.cc\n-  operation_not_permitted.cc\n-  wol_exception.cc\n-  socket_exception.cc\n-  ping.cc\n-  wol.cc\n-  gige_request_counter.cc\n-)\n+        deviceinfo.cc\n+        discover.cc\n+        force_ip.cc\n+        operation_not_permitted.cc\n+        wol_exception.cc\n+        socket_exception.cc\n+        ping.cc\n+        wol.cc\n+        gige_request_counter.cc\n+        )\n+set(rcdiscover_hh\n+        deviceinfo.h\n+        discover.h\n+        force_ip.h\n+        operation_not_permitted.h\n+        wol_exception.h\n+        socket_exception.h\n+        socket.h\n+        ping.h\n+        wol.h\n+        gige_request_counter.h\n+        utils.h)\n \n if (WIN32)\n   set(rcdiscover_src ${rcdiscover_src} socket_windows.cc)\n+  set(rcdiscover_hh ${rcdiscover_hh} socket_windows.h)\n else (WIN32)\n   set(rcdiscover_src ${rcdiscover_src} socket_linux.cc)\n+  set(rcdiscover_hh ${rcdiscover_hh} socket_linux.h)\n endif (WIN32)\n \n-add_library(rcdiscover_static STATIC ${rcdiscover_src})\n-target_include_directories(rcdiscover_static\n-  PUBLIC\n-    $<INSTALL_INTERFACE:include>\n-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>\n-)\n-target_link_libraries(rcdiscover_static\n-  PRIVATE\n-    ${CMAKE_THREAD_LIBS_INIT})\n+# Static library\n+add_library(rc_discover_static STATIC ${rcdiscover_src})\n+add_library(${PROJECT_NAMESPACE}::rcdiscover_static ALIAS rc_discover_static)\n+\n+target_include_directories(rc_discover_static\n+        PUBLIC\n+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>\n+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>\n+        $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>)\n+\n+# Install shared library\n+add_library(rc_discover SHARED ${rcdiscover_src})\n+add_library(${PROJECT_NAMESPACE}::rc_discover_shared ALIAS rc_discover)\n+target_include_directories(rc_discover\n+    PUBLIC\n+      $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>\n+      $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>\n+      $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>)\n+\n+set_target_properties(rc_discover PROPERTIES SOVERSION ${abiversion})\n+target_compile_options(rc_discover PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall>)\n+if (UNIX)\n+  target_link_libraries (rc_discover ${CMAKE_THREAD_LIBS_INIT})\n+endif(UNIX)\n+\n+\n+install(TARGETS rc_discover\n+        EXPORT PROJECTTargets\n+        COMPONENT bin\n+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}\n+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}\n+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})\n+install(FILES ${rcdiscover_hh} COMPONENT dev DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rc_discover)"
+        },
+        {
+          "sha": "8c9cb5cafc5f6d71110de0d380a483f233ce6630",
+          "filename": "tools/CMakeLists.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/roboception/rcdiscover/blob/4e2df1a2e368516ddfda339dbf5731612b77966e/tools%2FCMakeLists.txt",
+          "raw_url": "https://github.com/roboception/rcdiscover/raw/4e2df1a2e368516ddfda339dbf5731612b77966e/tools%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/roboception/rcdiscover/contents/tools%2FCMakeLists.txt?ref=4e2df1a2e368516ddfda339dbf5731612b77966e",
+          "patch": "@@ -45,7 +45,7 @@ add_executable(rcdiscover\n   rcdiscover-cli/rcdiscover_force_ip.cc\n   rcdiscover-cli/rcdiscover_reset.cc\n   rcdiscover-cli/cli_utils.cc)\n-target_link_libraries(rcdiscover rcdiscover_static)\n+target_link_libraries(rcdiscover rc_discover_static)\n \n if (WIN32)\n   target_link_libraries(rcdiscover iphlpapi.lib ws2_32.lib)\n@@ -94,7 +94,7 @@ if(wxWidgets_FOUND)\n     PRIVATE\n       ${wxWidgets_INCLUDE_DIRS}\n   )\n-  target_link_libraries(rcdiscover-gui rcdiscover_static ${wxWidgets_LIBRARIES})\n+  target_link_libraries(rcdiscover-gui rc_discover_static ${wxWidgets_LIBRARIES})\n \n   if (WIN32)\n     target_link_libraries(rcdiscover-gui iphlpapi.lib ws2_32.lib uxtheme)"
+        }
+      ]
+    }
+  ]
+}

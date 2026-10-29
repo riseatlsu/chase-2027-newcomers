@@ -1,0 +1,347 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T06:36:02Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "rt-net",
+    "repo": "rt_usb_9axisimu_driver"
+  },
+  "data": [
+    {
+      "author": "YusukeKato",
+      "date": "2024-04-05T08:58:25Z",
+      "sha": "faf39b0a5a923be09ab25fede1b6d531eee9a866",
+      "message": "Add unit tests (#52)\n\n* Use pointer for SerialPort instance instead of inheritance\n\n* Add test using fakeit\n\n* Install git comand in indsutrial_ci\n\n* Refactoring\n\n* Update CI\n\n* Use AFTER_SETUP_TARGET_WORKSPACE\n\n* driverインスタンスのメンバ変数のテストを追加\n\n* バイナリデータが読み込まれたことを確認するテストを追加\n\n* ASCIIデータが読み込まれたことを確認するテストを追加\n\n* バイナリでもASCIIでもないデータが読み込まれたことを確認するテストを追加\n\n* テストが通る状態に修正\n\n---------\n\nCo-authored-by: ShotaAk <s.aoki@rt-net.jp>",
+      "files_changed": 6,
+      "additions": 224,
+      "deletions": 23,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "168e6a6319570e1d92f4fc5ce167af37dad38cf1",
+          "filename": ".github/workflows/industrial_ci.yml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/blob/faf39b0a5a923be09ab25fede1b6d531eee9a866/.github%2Fworkflows%2Findustrial_ci.yml",
+          "raw_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/raw/faf39b0a5a923be09ab25fede1b6d531eee9a866/.github%2Fworkflows%2Findustrial_ci.yml",
+          "contents_url": "https://api.github.com/repos/rt-net/rt_usb_9axisimu_driver/contents/.github%2Fworkflows%2Findustrial_ci.yml?ref=faf39b0a5a923be09ab25fede1b6d531eee9a866",
+          "patch": "@@ -15,7 +15,7 @@ jobs:\n     strategy:\n       matrix:\n         env:\n-          - { ROS_DISTRO: humble, ROS_REPO: ros }\n+          - { ROS_DISTRO: humble, ROS_REPO: ros, AFTER_SETUP_TARGET_WORKSPACE: 'apt update && apt install -y git' }\n \n     runs-on: ubuntu-latest\n     steps:"
+        },
+        {
+          "sha": "2db44401ecd5bc94a04210366f6845d652f92334",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 18,
+          "deletions": 2,
+          "changes": 20,
+          "blob_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/blob/faf39b0a5a923be09ab25fede1b6d531eee9a866/CMakeLists.txt",
+          "raw_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/raw/faf39b0a5a923be09ab25fede1b6d531eee9a866/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/rt-net/rt_usb_9axisimu_driver/contents/CMakeLists.txt?ref=faf39b0a5a923be09ab25fede1b6d531eee9a866",
+          "patch": "@@ -82,9 +82,25 @@ install(DIRECTORY\n   DESTINATION share/${PROJECT_NAME}/\n )\n \n-#if(BUILD_TESTING)\n+if(BUILD_TESTING)\n #  find_package(ament_lint_auto REQUIRED)\n #  ament_lint_auto_find_test_dependencies()\n-#endif()\n+  Set(FETCHCONTENT_QUIET FALSE)\n+  include(FetchContent)\n+  FetchContent_Declare(\n+    fakeit\n+    GIT_REPOSITORY https://github.com/eranpeer/FakeIt\n+    GIT_TAG 2.4.0\n+    GIT_PROGRESS TRUE)\n+  FetchContent_MakeAvailable(fakeit)\n+\n+  find_package(ament_cmake_gtest)\n+  ament_add_gtest(test_driver test/test_driver.cpp src/rt_usb_9axisimu_driver.cpp)\n+  target_include_directories(test_driver PRIVATE ${fakeit_SOURCE_DIR}/single_header/gtest)\n+  ament_target_dependencies(test_driver\n+    rclcpp\n+    sensor_msgs\n+  )\n+endif()\n \n ament_package()\n\\ No newline at end of file"
+        },
+        {
+          "sha": "e0bbad8af2a12202036fc5c1536c0e89922aedeb",
+          "filename": "include/rt_usb_9axisimu_driver/rt_usb_9axisimu.hpp",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 7,
+          "changes": 14,
+          "blob_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/blob/faf39b0a5a923be09ab25fede1b6d531eee9a866/include%2Frt_usb_9axisimu_driver%2Frt_usb_9axisimu.hpp",
+          "raw_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/raw/faf39b0a5a923be09ab25fede1b6d531eee9a866/include%2Frt_usb_9axisimu_driver%2Frt_usb_9axisimu.hpp",
+          "contents_url": "https://api.github.com/repos/rt-net/rt_usb_9axisimu_driver/contents/include%2Frt_usb_9axisimu_driver%2Frt_usb_9axisimu.hpp?ref=faf39b0a5a923be09ab25fede1b6d531eee9a866",
+          "patch": "@@ -178,23 +178,23 @@ class SerialPort\n   {\n   }\n \n-  ~SerialPort()\n+  virtual ~SerialPort()\n   {\n     closeSerialPort();\n   }\n \n-  void setPort(const char * port)\n+  virtual void setPort(const char * port)\n   {\n     port_name_ = port;\n   }\n \n-  bool openPort(const char * port)\n+  virtual bool openPort(const char * port)\n   {\n     port_name_ = port;\n     return openSerialPort();\n   }\n \n-  bool openSerialPort()\n+  virtual bool openSerialPort()\n   {\n     int fd = 0;\n \n@@ -221,7 +221,7 @@ class SerialPort\n     return fd > 0;\n   }\n \n-  void closeSerialPort()\n+  virtual void closeSerialPort()\n   {\n     if (port_fd_ > 0) {\n       tcsetattr(port_fd_, TCSANOW, &old_settings_);\n@@ -230,7 +230,7 @@ class SerialPort\n     }\n   }\n \n-  int readFromDevice(unsigned char * buf, unsigned int buf_len)\n+  virtual int readFromDevice(unsigned char * buf, unsigned int buf_len)\n   {\n     if (port_fd_ < 0) {\n       return -1;\n@@ -239,7 +239,7 @@ class SerialPort\n     return read(port_fd_, buf, buf_len);\n   }\n \n-  int writeToDevice(unsigned char * data, unsigned int data_len)\n+  virtual int writeToDevice(unsigned char * data, unsigned int data_len)\n   {\n     if (port_fd_ < 0) {\n       return -1;"
+        },
+        {
+          "sha": "07f8ed353662bbc93e36209cd25c76c5909d8a4d",
+          "filename": "include/rt_usb_9axisimu_driver/rt_usb_9axisimu_driver.hpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 6,
+          "changes": 9,
+          "blob_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/blob/faf39b0a5a923be09ab25fede1b6d531eee9a866/include%2Frt_usb_9axisimu_driver%2Frt_usb_9axisimu_driver.hpp",
+          "raw_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/raw/faf39b0a5a923be09ab25fede1b6d531eee9a866/include%2Frt_usb_9axisimu_driver%2Frt_usb_9axisimu_driver.hpp",
+          "contents_url": "https://api.github.com/repos/rt-net/rt_usb_9axisimu_driver/contents/include%2Frt_usb_9axisimu_driver%2Frt_usb_9axisimu_driver.hpp?ref=faf39b0a5a923be09ab25fede1b6d531eee9a866",
+          "patch": "@@ -44,14 +44,10 @@\n #include \"sensor_msgs/msg/magnetic_field.hpp\"\n #include \"std_msgs/msg/float64.hpp\"\n \n-class RtUsb9axisimuRosDriver : public rt_usb_9axisimu::SerialPort\n+class RtUsb9axisimuRosDriver\n {\n private:\n-  // ros::NodeHandle nh_;\n-\n-  // ros::Publisher imu_data_raw_pub_;\n-  // ros::Publisher imu_mag_pub_;\n-  // ros::Publisher imu_temperature_pub_;\n+  std::unique_ptr<rt_usb_9axisimu::SerialPort> serial_port_;\n \n   rt_usb_9axisimu::SensorData sensor_data_;\n \n@@ -85,6 +81,7 @@ class RtUsb9axisimuRosDriver : public rt_usb_9axisimu::SerialPort\n \n public:\n   explicit RtUsb9axisimuRosDriver(std::string serialport);\n+  RtUsb9axisimuRosDriver(std::unique_ptr<rt_usb_9axisimu::SerialPort> serial_port);\n   ~RtUsb9axisimuRosDriver();\n \n   void setImuFrameIdName(std::string frame_id);"
+        },
+        {
+          "sha": "cbb6bd26a4299ad2353eff2860ca9586fb1690b6",
+          "filename": "src/rt_usb_9axisimu_driver.cpp",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 7,
+          "changes": 22,
+          "blob_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/blob/faf39b0a5a923be09ab25fede1b6d531eee9a866/src%2Frt_usb_9axisimu_driver.cpp",
+          "raw_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/raw/faf39b0a5a923be09ab25fede1b6d531eee9a866/src%2Frt_usb_9axisimu_driver.cpp",
+          "contents_url": "https://api.github.com/repos/rt-net/rt_usb_9axisimu_driver/contents/src%2Frt_usb_9axisimu_driver.cpp?ref=faf39b0a5a923be09ab25fede1b6d531eee9a866",
+          "patch": "@@ -99,7 +99,7 @@ bool RtUsb9axisimuRosDriver::readBinaryData(void)\n   unsigned char read_data_buf[256];\n \n   has_refreshed_imu_data_ = false;\n-  int read_data_size = readFromDevice(read_data_buf,\n+  int read_data_size = serial_port_->readFromDevice(read_data_buf,\n     consts.IMU_BIN_DATA_SIZE - imu_binary_data_buffer.size());\n \n   if(read_data_size == 0){  // The device was unplugged.\n@@ -158,7 +158,7 @@ bool RtUsb9axisimuRosDriver::readAsciiData(void)\n   has_refreshed_imu_data_ = false;\n   imu_data_oneline_buf.clear();\n \n-  int data_size_of_buf = readFromDevice(imu_data_buf, sizeof(imu_data_buf));\n+  int data_size_of_buf = serial_port_->readFromDevice(imu_data_buf, sizeof(imu_data_buf));\n \n   if (data_size_of_buf <= 0) {\n     return false;  // Raise communication error\n@@ -205,8 +205,16 @@ bool RtUsb9axisimuRosDriver::readAsciiData(void)\n }\n \n RtUsb9axisimuRosDriver::RtUsb9axisimuRosDriver(std::string port = \"\")\n-: rt_usb_9axisimu::SerialPort(port.c_str())\n {\n+  serial_port_ = std::make_unique<rt_usb_9axisimu::SerialPort>(port.c_str());\n+  has_completed_format_check_ = false;\n+  data_format_ = DataFormat::NONE;\n+  has_refreshed_imu_data_ = false;\n+}\n+\n+RtUsb9axisimuRosDriver::RtUsb9axisimuRosDriver(std::unique_ptr<rt_usb_9axisimu::SerialPort> serial_port)\n+{\n+  serial_port_ = std::move(serial_port);\n   has_completed_format_check_ = false;\n   data_format_ = DataFormat::NONE;\n   has_refreshed_imu_data_ = false;\n@@ -223,7 +231,7 @@ void RtUsb9axisimuRosDriver::setImuFrameIdName(std::string frame_id)\n \n void RtUsb9axisimuRosDriver::setImuPortName(std::string port)\n {\n-  setPort(port.c_str());\n+  serial_port_->setPort(port.c_str());\n }\n \n void RtUsb9axisimuRosDriver::setImuStdDev(\n@@ -238,12 +246,12 @@ void RtUsb9axisimuRosDriver::setImuStdDev(\n bool RtUsb9axisimuRosDriver::startCommunication()\n {\n   // returns serial port open status\n-  return openSerialPort();\n+  return serial_port_->openSerialPort();\n }\n \n void RtUsb9axisimuRosDriver::stopCommunication(void)\n {\n-  closeSerialPort();\n+  serial_port_->closeSerialPort();\n   has_completed_format_check_ = false;\n   data_format_ = DataFormat::NONE;\n   has_refreshed_imu_data_ = false;\n@@ -253,7 +261,7 @@ void RtUsb9axisimuRosDriver::checkDataFormat(void)\n {\n   if (data_format_ == DataFormat::NONE) {\n     unsigned char data_buf[256];\n-    int data_size_of_buf = readFromDevice(data_buf, consts.IMU_BIN_DATA_SIZE);\n+    int data_size_of_buf = serial_port_->readFromDevice(data_buf, consts.IMU_BIN_DATA_SIZE);\n     if (data_size_of_buf == consts.IMU_BIN_DATA_SIZE) {\n       if (isBinarySensorData(data_buf)) {\n         data_format_ = DataFormat::BINARY;"
+        },
+        {
+          "sha": "68ff4d26af1f77e852b5d61f3bfe8e4c790e439e",
+          "filename": "test/test_driver.cpp",
+          "status": "added",
+          "additions": 180,
+          "deletions": 0,
+          "changes": 180,
+          "blob_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/blob/faf39b0a5a923be09ab25fede1b6d531eee9a866/test%2Ftest_driver.cpp",
+          "raw_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/raw/faf39b0a5a923be09ab25fede1b6d531eee9a866/test%2Ftest_driver.cpp",
+          "contents_url": "https://api.github.com/repos/rt-net/rt_usb_9axisimu_driver/contents/test%2Ftest_driver.cpp?ref=faf39b0a5a923be09ab25fede1b6d531eee9a866",
+          "patch": "@@ -0,0 +1,180 @@\n+/*\n+ * test_driver.cpp\n+ *\n+ * License: BSD-3-Clause\n+ *\n+ * Copyright (c) 2015-2023 RT Corporation <support@rt-net.jp>\n+ * All rights reserved.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ *\n+ * 1. Redistributions of source code must retain the above copyright notice,\n+ *    this list of conditions and the following disclaimer.\n+ * 2. Redistributions in binary form must reproduce the above copyright\n+ *    notice, this list of conditions and the following disclaimer in the\n+ *    documentation and/or other materials provided with the distribution.\n+ * 3. Neither the name of RT Corporation nor the names of its\n+ *    contributors may be used to endorse or promote products derived from\n+ *    this software without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE\n+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+ * POSSIBILITY OF SUCH DAMAGE.\n+ */\n+\n+#include <array>\n+#include <string>\n+#include <gtest/gtest.h>\n+#include \"fakeit.hpp\"\n+#include \"rt_usb_9axisimu_driver/rt_usb_9axisimu_driver.hpp\"\n+#include \"rt_usb_9axisimu_driver/rt_usb_9axisimu.hpp\"\n+\n+using fakeit::Mock;\n+using fakeit::When;\n+using rt_usb_9axisimu::SerialPort;\n+\n+Mock<SerialPort> create_serial_port_mock(void) {\n+  Mock<SerialPort> mock;\n+  When(Method(mock, setPort)).AlwaysReturn();\n+  When(Method(mock, openPort)).AlwaysReturn(true);\n+  When(Method(mock, openSerialPort)).AlwaysReturn(true);\n+  When(Method(mock, closeSerialPort)).AlwaysReturn();\n+  When(Method(mock, readFromDevice)).AlwaysReturn(0);\n+  When(Method(mock, writeToDevice)).AlwaysReturn(0);\n+  return mock;\n+}\n+\n+TEST(TestDriver, startCommunication)\n+{\n+  // Expect the startCommunication method to be called twice and return true then false\n+  auto mock = create_serial_port_mock();\n+  When(Method(mock, openSerialPort)).Return(true, false);  // Return true then false\n+\n+  RtUsb9axisimuRosDriver driver(\n+    std::unique_ptr<SerialPort>(&mock.get()));\n+\n+  EXPECT_TRUE(driver.startCommunication());\n+  EXPECT_FALSE(driver.startCommunication());\n+}\n+\n+TEST(TestDriver, initialize_member_variables)\n+{\n+  // Expect member variables of the driver instance to be initialised\n+  auto mock = create_serial_port_mock();\n+\n+  RtUsb9axisimuRosDriver driver(\n+    std::unique_ptr<SerialPort>(&mock.get()));\n+\n+  EXPECT_FALSE(driver.hasCompletedFormatCheck());\n+  EXPECT_FALSE(driver.hasBinaryDataFormat());\n+  EXPECT_FALSE(driver.hasAsciiDataFormat());\n+  EXPECT_FALSE(driver.hasRefreshedImuData());\n+}\n+\n+TEST(TestDriver, checkDataFormat_Binary)\n+{\n+  // Expect to check correctly when read data in binary format\n+  auto mock = create_serial_port_mock();\n+\n+  When(Method(mock, readFromDevice)).Do([](\n+    unsigned char* buf, unsigned int buf_size) {\n+    rt_usb_9axisimu::Consts consts;\n+    unsigned char dummy_bin_imu_data[consts.IMU_BIN_DATA_SIZE] = {0};\n+    dummy_bin_imu_data[consts.IMU_BIN_HEADER_R] = 0x52; // R\n+    dummy_bin_imu_data[consts.IMU_BIN_HEADER_T] = 0x54; // T\n+    for(int i = 0; i < consts.IMU_BIN_DATA_SIZE; i++) {\n+      buf[i] = dummy_bin_imu_data[i];\n+    }\n+    buf_size = consts.IMU_BIN_DATA_SIZE;\n+    return buf_size;\n+  });\n+\n+  RtUsb9axisimuRosDriver driver(\n+    std::unique_ptr<SerialPort>(&mock.get()));\n+\n+  driver.checkDataFormat();\n+\n+  EXPECT_TRUE(driver.hasCompletedFormatCheck());\n+  EXPECT_TRUE(driver.hasBinaryDataFormat());\n+  EXPECT_FALSE(driver.hasAsciiDataFormat());\n+}\n+\n+TEST(TestDriver, checkDataFormat_ASCII)\n+{\n+  // Expect to check correctly when read data in ASCII format\n+  auto mock = create_serial_port_mock();\n+\n+  When(Method(mock, readFromDevice)).Do([](\n+    unsigned char* buf, unsigned int buf_size) {\n+    rt_usb_9axisimu::Consts consts;\n+    std::array<std::string, consts.IMU_ASCII_DATA_SIZE> dummy_ascii_imu_data; \n+    dummy_ascii_imu_data[consts.IMU_ASCII_TIMESTAMP] = \"0\";\n+    dummy_ascii_imu_data[consts.IMU_ASCII_GYRO_X] = \"0.000000\";\n+    dummy_ascii_imu_data[consts.IMU_ASCII_GYRO_Y] = \"0.000000\";\n+    dummy_ascii_imu_data[consts.IMU_ASCII_GYRO_Z] = \"0.000000\";\n+    dummy_ascii_imu_data[consts.IMU_ASCII_ACC_X] = \"0.000000\";\n+    dummy_ascii_imu_data[consts.IMU_ASCII_ACC_Y] = \"0.000000\";\n+    dummy_ascii_imu_data[consts.IMU_ASCII_ACC_Z] = \"0.000000\";\n+    dummy_ascii_imu_data[consts.IMU_ASCII_MAG_X] = \"0.000000\";\n+    dummy_ascii_imu_data[consts.IMU_ASCII_MAG_Y] = \"0.000000\";\n+    dummy_ascii_imu_data[consts.IMU_ASCII_MAG_Z] = \"0.000000\";\n+    dummy_ascii_imu_data[consts.IMU_ASCII_TEMP] = \"0.000000\";\n+    std::string str = \"\";\n+    std::string split_char = \",\";\n+    for(int i = 0; i < consts.IMU_ASCII_DATA_SIZE; i++) {\n+      str += dummy_ascii_imu_data[i];\n+      if(i != consts.IMU_ASCII_DATA_SIZE - 1) str += split_char;\n+    }\n+    for(int i = 0; i < int(str.length()); i++) {\n+      buf[i] = str[i];\n+    }\n+    buf_size = consts.IMU_BIN_DATA_SIZE;\n+    return buf_size;\n+  });\n+\n+  RtUsb9axisimuRosDriver driver(\n+    std::unique_ptr<SerialPort>(&mock.get()));\n+\n+  driver.checkDataFormat();\n+  driver.checkDataFormat();\n+\n+  EXPECT_TRUE(driver.hasCompletedFormatCheck());\n+  EXPECT_TRUE(driver.hasAsciiDataFormat());\n+  EXPECT_FALSE(driver.hasBinaryDataFormat());\n+}\n+\n+TEST(TestDriver, checkDataFormat_not_Binary_or_ASCII)\n+{\n+  // Expect to check correctly when read data in not Binary or ASCII format\n+  auto mock = create_serial_port_mock();\n+\n+  When(Method(mock, readFromDevice)).Do([](\n+    unsigned char* buf, unsigned int buf_size) {\n+    rt_usb_9axisimu::Consts consts;\n+    unsigned char dummy_data_not_binary_or_ascii[] =\n+      \"dummy_data_not_binary_or_ascii\";\n+    for(int i = 0; i < int(sizeof(dummy_data_not_binary_or_ascii)); i++) {\n+      buf[i] = dummy_data_not_binary_or_ascii[i];\n+    }\n+    buf_size = consts.IMU_BIN_DATA_SIZE;\n+    return buf_size;\n+  });\n+\n+  RtUsb9axisimuRosDriver driver(\n+    std::unique_ptr<SerialPort>(&mock.get()));\n+\n+  driver.checkDataFormat();\n+\n+  EXPECT_FALSE(driver.hasCompletedFormatCheck());\n+  EXPECT_FALSE(driver.hasBinaryDataFormat());\n+  EXPECT_FALSE(driver.hasAsciiDataFormat());\n+}"
+        }
+      ]
+    },
+    {
+      "author": "KuraZuzu",
+      "date": "2024-10-31T02:12:38Z",
+      "sha": "9138e0dd21ba007d2d00eb1ea7cac7545f3b2e1e",
+      "message": "ROS 2 Jazzyへの対応 (#61)\n\n* fix \"ROS_DISTRO\"  of CI for Jazzy\r\n\r\n* Add authors\r\n\r\n* Update README for Jazzy\r\n\r\n* Modify CI to ensure compatibility with the act tool\r\n\r\n* Add messages of compiler version message for debug\r\n\r\n* add ccache setting\r\n\r\n* Set log level \"debug\" for CI\r\n\r\n* comment out env for debug\r\n\r\n* Replace  \"ROS_REPO: [ros]\" with \"ROS_REPO: [main]\" for CI of \"ROS 2\"\r\n\r\n* Fix undefined behavior by storing `std::string` objects instead of `const char*` pointers\r\nPreviously, the test code for the 9-axis IMU was storing `const char*` pointers obtained from temporary `std::string` objects into a vector. Since these temporary `std::string` objects are destroyed immediately after the expression, the stored pointers became invalid (dangling pointers), leading to undefined behavior and causing tests to fail.\r\nThis commit fixes the issue by changing the vector to store *std::string* objects directly instead of `const char*` pointers. By maintaining the `std::string` objects, we ensure that the data remains valid throughout its usage, and any `c_str()` calls on these strings return valid pointers.\r\n\r\nThis change resolves the test failures and prevents potential crashes or incorrect data processing due to invalid memory access.\r\n\r\n* Update copyright year",
+      "files_changed": 5,
+      "additions": 50,
+      "deletions": 46,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "3355069605b683a3d85d2c39bc060a4f91f1c6b1",
+          "filename": ".github/workflows/industrial_ci.yml",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 3,
+          "changes": 15,
+          "blob_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/blob/9138e0dd21ba007d2d00eb1ea7cac7545f3b2e1e/.github%2Fworkflows%2Findustrial_ci.yml",
+          "raw_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/raw/9138e0dd21ba007d2d00eb1ea7cac7545f3b2e1e/.github%2Fworkflows%2Findustrial_ci.yml",
+          "contents_url": "https://api.github.com/repos/rt-net/rt_usb_9axisimu_driver/contents/.github%2Fworkflows%2Findustrial_ci.yml?ref=9138e0dd21ba007d2d00eb1ea7cac7545f3b2e1e",
+          "patch": "@@ -14,11 +14,20 @@ jobs:\n   industrial_ci:\n     strategy:\n       matrix:\n-        env:\n-          - { ROS_DISTRO: humble, ROS_REPO: ros, AFTER_SETUP_TARGET_WORKSPACE: 'apt update && apt install -y git' }\n+        ROS_DISTRO: [jazzy]\n+        ROS_REPO: [main]\n+        AFTER_SETUP_TARGET_WORKSPACE: [apt update && apt install -y git gcc-11 g++-11]\n+    # env:\n+    #   CCACHE_DIR: \"${{ github.workspace }}/.ccache\" # ccache directory for debug\n \n     runs-on: ubuntu-latest\n     steps:\n       - uses: actions/checkout@v4\n       - uses: \"ros-industrial/industrial_ci@master\"\n-        env: ${{ matrix.env }}\n+        env:\n+          ROS_DISTRO: ${{matrix.ROS_DISTRO}}\n+          ROS_REPO: ${{matrix.ROS_REPO}}\n+          AFTER_SETUP_TARGET_WORKSPACE: ${{matrix.AFTER_SETUP_TARGET_WORKSPACE}}\n+          BUILD_TOOL_ARGS: \"--event-handlers console_direct+\"\n+          COLCON_LOG_LEVEL: debug\n+          VERBOSE_OUTPUT: true"
+        },
+        {
+          "sha": "4ac47346869fb2bb5e7886c01350ec6fb3b4ccf8",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/blob/9138e0dd21ba007d2d00eb1ea7cac7545f3b2e1e/CMakeLists.txt",
+          "raw_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/raw/9138e0dd21ba007d2d00eb1ea7cac7545f3b2e1e/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/rt-net/rt_usb_9axisimu_driver/contents/CMakeLists.txt?ref=9138e0dd21ba007d2d00eb1ea7cac7545f3b2e1e",
+          "patch": "@@ -15,6 +15,10 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n   add_compile_options(-Wall -Wextra -Wpedantic)\n endif()\n \n+message(STATUS \"CMake Version: ${CMAKE_VERSION}\")\n+message(STATUS \"C++ Compiler: ${CMAKE_CXX_COMPILER}\")\n+message(STATUS \"C++ Compiler Version: ${CMAKE_CXX_COMPILER_VERSION}\")\n+message(STATUS \"C++ Standard: ${CMAKE_CXX_STANDARD}\")\n \n # find dependencies\n find_package(ament_cmake REQUIRED)"
+        },
+        {
+          "sha": "0e165757a79885937de744f379a04a5fba1397d3",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 17,
+          "deletions": 28,
+          "changes": 45,
+          "blob_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/blob/9138e0dd21ba007d2d00eb1ea7cac7545f3b2e1e/README.md",
+          "raw_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/raw/9138e0dd21ba007d2d00eb1ea7cac7545f3b2e1e/README.md",
+          "contents_url": "https://api.github.com/repos/rt-net/rt_usb_9axisimu_driver/contents/README.md?ref=9138e0dd21ba007d2d00eb1ea7cac7545f3b2e1e",
+          "patch": "@@ -2,53 +2,45 @@\n \n # rt_usb_9axisimu_driver\n \n-株式会社アールティが販売しているUSB出力9軸IMUセンサモジュール用のROS 2パッケージです。  \n+[![industrial_ci](https://github.com/rt-net/rt_usb_9axisimu_driver/workflows/industrial_ci/badge.svg?branch=ros2-devel)](https://github.com/rt-net/rt_usb_9axisimu_driver/actions?query=workflow%3Aindustrial_ci+branch%3Aros2-devel)\n+\n+株式会社アールティが販売しているUSB出力9軸IMUセンサモジュール用のROS 2パッケージです。\n \n ![usb-9axisimu](https://rt-net.github.io/images/usb-9axisimu/usb-9axisimu.png)\n \n 現在、以下のROSのディストリビューションに対応しております。\n-- Melodic ([`melodic-devel`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/melodic-devel))\n-- Noetic ([`noetic-devel`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/noetic-devel))\n-- Foxy ([`foxy-devel`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/foxy-devel))\n-- Humble ([`humble-devel`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/humble-devel))\n-\n-| | industrial_ci | source build | amd64 binary | arm64 binary |\n-|:---:|:---:|:---:|:---:|:---:|\n-| main develop<br>([`master`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/master)) |  [![industrial_ci](https://github.com/rt-net/rt_usb_9axisimu_driver/workflows/industrial_ci/badge.svg?branch=master)](https://github.com/rt-net/rt_usb_9axisimu_driver/actions?query=workflow%3Aindustrial_ci+branch%3Amaster) | - | - | - | - |\n-| ROS 2 develop<br>([`ros2-devel`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/ros2-devel)) |  [![industrial_ci](https://github.com/rt-net/rt_usb_9axisimu_driver/workflows/industrial_ci/badge.svg?branch=ros2-devel)](https://github.com/rt-net/rt_usb_9axisimu_driver/actions?query=workflow%3Aindustrial_ci+branch%3Aros2-devel) | - | - | - | - |\n-| Bionic + Melodic<br>([`melodic-devel`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/melodic-devel)) | [![industrial_ci](https://github.com/rt-net/rt_usb_9axisimu_driver/workflows/industrial_ci/badge.svg?branch=melodic-devel)](https://github.com/rt-net/rt_usb_9axisimu_driver/actions?query=workflow%3Aindustrial_ci+branch%3Amelodic-devel) | [![Build Status](http://build.ros.org/job/Msrc_uB__rt_usb_9axisimu_driver__ubuntu_bionic__source/badge/icon)](http://build.ros.org/job/Msrc_uB__rt_usb_9axisimu_driver__ubuntu_bionic__source/) | [![Build Status](http://build.ros.org/view/Mbin_uB64/job/Mbin_uB64__rt_usb_9axisimu_driver__ubuntu_bionic_amd64__binary/badge/icon)](http://build.ros.org/view/Mbin_uB64/job/Mbin_uB64__rt_usb_9axisimu_driver__ubuntu_bionic_amd64__binary/) | [![Build Status](http://build.ros.org/job/Mbin_ubv8_uBv8__rt_usb_9axisimu_driver__ubuntu_bionic_arm64__binary/badge/icon)](http://build.ros.org/job/Mbin_ubv8_uBv8__rt_usb_9axisimu_driver__ubuntu_bionic_arm64__binary/) |\n-| Focal + Noetic<br>([`noetic-devel`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/noetic-devel)) |  [![industrial_ci](https://github.com/rt-net/rt_usb_9axisimu_driver/workflows/industrial_ci/badge.svg?branch=noetic-devel)](https://github.com/rt-net/rt_usb_9axisimu_driver/actions?query=workflow%3Aindustrial_ci+branch%3Anoetic-devel) | - | - | - | - |\n-| Focal + Foxy<br>([`foxy-devel`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/foxy-devel)) | [![industrial_ci](https://github.com/rt-net/rt_usb_9axisimu_driver/workflows/industrial_ci/badge.svg?branch=foxy-devel)](https://github.com/rt-net/rt_usb_9axisimu_driver/actions?query=workflow%3Aindustrial_ci+branch%3Afoxy-devel) | [![Build Status](https://build.ros2.org/view/Fsrc_uF/job/Fsrc_uF__rt_usb_9axisimu_driver__ubuntu_focal__source/badge/icon)](https://build.ros2.org/view/Fsrc_uF/job/Fsrc_uF__rt_usb_9axisimu_driver__ubuntu_focal__source/) |[![Build Status](https://build.ros2.org/view/Fsrc_uF/job/Fbin_uF64__rt_usb_9axisimu_driver__ubuntu_focal_amd64__binary/badge/icon)](https://build.ros2.org/view/Fsrc_uF/job/Fbin_uF64__rt_usb_9axisimu_driver__ubuntu_focal_amd64__binary/) | [![Build Status](https://build.ros2.org/view/Fbin_ubv8_uFv8/job/Fbin_ubv8_uFv8__rt_usb_9axisimu_driver__ubuntu_focal_arm64__binary/badge/icon)](https://build.ros2.org/view/Fbin_ubv8_uFv8/job/Fbin_ubv8_uFv8__rt_usb_9axisimu_driver__ubuntu_focal_arm64__binary/) |\n-**TODO: Add Jammy + Humble**\n+\n+- ROS 2 Humble ([`humble`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/humble))\n+- ROS 2 Jazzy ([`jazzy`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/jazzy))\n \n ## 1. 概要\n \n rt_usb_9axisimu_driverは株式会社アールティが販売している\n [USB出力9軸IMUセンサモジュール](https://www.rt-net.jp/products/9axisimu2/)\n-のROS 2パッケージです。  \n+のROS 2パッケージです。\n \n 株式会社アールティによって開発、メンテナンスがなされています。\n \n - License: [The 3-Clause BSD License](https://github.com/rt-net/rt_usb_9axisimu_driver/blob/master/LICENSE)\n \n ### 1.1 座標軸について\n \n-USB出力9軸IMUセンサモジュールは、センサとしてInvenSense社のMPU9250を使用しております。  \n+USB出力9軸IMUセンサモジュールは、センサとしてInvenSense社のMPU9250を使用しております。\n このセンサの磁気センサの座標系はNED座標系(x-north, y-east, z-down)ですが、\n モジュール内のマイコン(LPC1343)においてENU座標系(x-east, y-north, z-up)に変換され、\n-ジャイロセンサおよび加速度センサの座標系と揃えられております。  \n+ジャイロセンサおよび加速度センサの座標系と揃えられております。\n これはROSで使われる座標系のルールにも適合しています。詳しくは、[REP-0103](http://www.ros.org/reps/rep-0103.html#axis-orientation)をご覧ください。\n \n ### 1.2 ファームウェア開発について\n \n-USB出力9軸IMUセンサモジュールはオープンハード・オープンソースのため、モジュール内のマイコンのファームウェアの変更が可能です。  \n+USB出力9軸IMUセンサモジュールはオープンハード・オープンソースのため、モジュール内のマイコンのファームウェアの変更が可能です。\n このROSパッケージはデフォルトのファームウェアにのみ対応しております。ファームウェアを変更された場合、正常な動作ができなくなる恐れがございますので、ご了承ください。\n \n ### 1.3 ver2.0でのご利用について\n \n-2020年8月現在、販売されているUSB出力9軸IMUセンサモジュールはver2.0となります。  \n-このバージョンのデフォルトのファームウェアには、ASCII出力とBinary出力の２つのデータ出力形式があります。  \n-センサ出荷時点ではASCII出力に設定されています。出力形式の切り替え方法は、以下のリポジトリにあるマニュアルをご参照ください。  \n+2020年8月現在、販売されているUSB出力9軸IMUセンサモジュールはver2.0となります。\n+このバージョンのデフォルトのファームウェアには、ASCII出力とBinary出力の２つのデータ出力形式があります。\n+センサ出荷時点ではASCII出力に設定されています。出力形式の切り替え方法は、以下のリポジトリにあるマニュアルをご参照ください。\n https://github.com/rt-net/RT-USB-9AXIS-00\n \n ### [ERROR] Error opening sensor device, please re-check your devices. が発生する場合\n@@ -61,24 +53,21 @@ $ sudo chmod 666 /dev/ttyACM0\n \n ## 2. インストール\n \n-\n-ROS Melodic等ROS 1のパッケージについては[`master`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/master)ブランチのREADMEをご覧ください。\n-\n ### 2.1 バイナリをインストールする場合\n \n ```sh\n-# ROS 2 Foxy\n-$ sudo apt install ros-foxy-rt-usb-9axisimu-driver\n-# ROS 2 Humble \n+# ROS 2 Humble\n $ sudo apt install ros-humble-rt-usb-9axisimu-driver\n+# ROS 2 Jazzy (ToDo)\n+$\n ```\n \n ### 2.2 ソースからインストールする場合\n \n ```sh\n $ cd ~/ros2_ws/src\n # Clone package & checkout ROS 2 branch\n-$ git clone -b $ROS_DISTRO-devel https://github.com/rt-net/rt_usb_9axisimu_driver\n+$ git clone -b $ROS_DISTRO https://github.com/rt-net/rt_usb_9axisimu_driver\n \n # Install dependencies\n $ rosdep install -r -y -i --from-paths ."
+        },
+        {
+          "sha": "bf29b380a4845b7939fe1259ab2fe85e97679496",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/blob/9138e0dd21ba007d2d00eb1ea7cac7545f3b2e1e/package.xml",
+          "raw_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/raw/9138e0dd21ba007d2d00eb1ea7cac7545f3b2e1e/package.xml",
+          "contents_url": "https://api.github.com/repos/rt-net/rt_usb_9axisimu_driver/contents/package.xml?ref=9138e0dd21ba007d2d00eb1ea7cac7545f3b2e1e",
+          "patch": "@@ -7,6 +7,8 @@\n \n   <maintainer email=\"shop@rt-net.jp\">RT Corporation</maintainer>\n   <author email=\"shop@rt-net.jp\">RT Corporation</author>\n+  <author email=\"yusuke.kato@rt-net.jp\">Yusuke Kato</author>\n+  <author email=\"kurasawa@rt-net.jp\">Kazushi Kurasawa</author>\n \n   <license>BSD</license>\n \n@@ -29,4 +31,3 @@\n     <build_type>ament_cmake</build_type>\n   </export>\n </package>\n-"
+        },
+        {
+          "sha": "b0fe3050227a83a83ea8bbc377a514bf79746196",
+          "filename": "test/test_driver.cpp",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 14,
+          "changes": 29,
+          "blob_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/blob/9138e0dd21ba007d2d00eb1ea7cac7545f3b2e1e/test%2Ftest_driver.cpp",
+          "raw_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/raw/9138e0dd21ba007d2d00eb1ea7cac7545f3b2e1e/test%2Ftest_driver.cpp",
+          "contents_url": "https://api.github.com/repos/rt-net/rt_usb_9axisimu_driver/contents/test%2Ftest_driver.cpp?ref=9138e0dd21ba007d2d00eb1ea7cac7545f3b2e1e",
+          "patch": "@@ -3,7 +3,7 @@\n  *\n  * License: BSD-3-Clause\n  *\n- * Copyright (c) 2015-2023 RT Corporation <support@rt-net.jp>\n+ * Copyright (c) 2015-2024 RT Corporation <support@rt-net.jp>\n  * All rights reserved.\n  *\n  * Redistribution and use in source and binary forms, with or without\n@@ -198,29 +198,30 @@ unsigned int create_dummy_ascii_imu_data(unsigned char *buf, bool is_invalid) {\n unsigned int create_dummy_ascii_imu_data(unsigned char *buf, bool is_invalid,\n                                          double *gyro, double *acc, double *mag, double temp) {\n   rt_usb_9axisimu::Consts consts;\n-  std::vector<const char*> dummy_ascii_imu_data(consts.IMU_ASCII_DATA_SIZE); \n+  std::vector<std::string> dummy_ascii_imu_data(consts.IMU_ASCII_DATA_SIZE);\n   if (is_invalid) {\n     dummy_ascii_imu_data[consts.IMU_ASCII_TIMESTAMP] = \"0.0\";\n   } else {\n     dummy_ascii_imu_data[consts.IMU_ASCII_TIMESTAMP] = \"0\";\n   }\n-  dummy_ascii_imu_data[consts.IMU_ASCII_GYRO_X] = double_to_string(gyro[0]).c_str();\n-  dummy_ascii_imu_data[consts.IMU_ASCII_GYRO_Y] = double_to_string(gyro[1]).c_str();\n-  dummy_ascii_imu_data[consts.IMU_ASCII_GYRO_Z] = double_to_string(gyro[2]).c_str();\n-  dummy_ascii_imu_data[consts.IMU_ASCII_ACC_X] = double_to_string(acc[0]).c_str();\n-  dummy_ascii_imu_data[consts.IMU_ASCII_ACC_Y] = double_to_string(acc[1]).c_str();\n-  dummy_ascii_imu_data[consts.IMU_ASCII_ACC_Z] = double_to_string(acc[2]).c_str();\n-  dummy_ascii_imu_data[consts.IMU_ASCII_MAG_X] = double_to_string(mag[0]).c_str();\n-  dummy_ascii_imu_data[consts.IMU_ASCII_MAG_Y] = double_to_string(mag[1]).c_str();\n-  dummy_ascii_imu_data[consts.IMU_ASCII_MAG_Z] = double_to_string(mag[2]).c_str();\n-  dummy_ascii_imu_data[consts.IMU_ASCII_TEMP] = double_to_string(temp).c_str();\n+  dummy_ascii_imu_data[consts.IMU_ASCII_GYRO_X] = double_to_string(gyro[0]);\n+  dummy_ascii_imu_data[consts.IMU_ASCII_GYRO_Y] = double_to_string(gyro[1]);\n+  dummy_ascii_imu_data[consts.IMU_ASCII_GYRO_Z] = double_to_string(gyro[2]);\n+  dummy_ascii_imu_data[consts.IMU_ASCII_ACC_X] = double_to_string(acc[0]);\n+  dummy_ascii_imu_data[consts.IMU_ASCII_ACC_Y] = double_to_string(acc[1]);\n+  dummy_ascii_imu_data[consts.IMU_ASCII_ACC_Z] = double_to_string(acc[2]);\n+  dummy_ascii_imu_data[consts.IMU_ASCII_MAG_X] = double_to_string(mag[0]);\n+  dummy_ascii_imu_data[consts.IMU_ASCII_MAG_Y] = double_to_string(mag[1]);\n+  dummy_ascii_imu_data[consts.IMU_ASCII_MAG_Z] = double_to_string(mag[2]);\n+  dummy_ascii_imu_data[consts.IMU_ASCII_TEMP] = double_to_string(temp);\n   const char split_char = ',';\n   const char newline_char = '\\n';\n   buf[0] = (unsigned char)newline_char;\n   unsigned int char_count = 1;\n   for(int i = 0; i < consts.IMU_ASCII_DATA_SIZE; i++) {\n-    for(int j = 0; j < (int)strlen(dummy_ascii_imu_data.at(i)); j++) {\n-      buf[char_count] = (unsigned char)dummy_ascii_imu_data.at(i)[j];\n+    const char* data_str = dummy_ascii_imu_data.at(i).c_str();\n+    for(int j = 0; j < (int)strlen(data_str); j++) {\n+      buf[char_count] = (unsigned char)data_str[j];\n       char_count++;\n     }\n     if(i != consts.IMU_ASCII_DATA_SIZE - 1) buf[char_count] = (unsigned char)split_char;"
+        }
+      ]
+    },
+    {
+      "author": "Shuhei Kozasa",
+      "date": "2023-01-25T02:11:14Z",
+      "sha": "1bced85b61335fd47539bcbec6565241b4c9c174",
+      "message": "Support Humble (#42)\n\n* Updates CI to Humble\r\n\r\n* Updates README\r\n\r\n* Update GitHub Actions setting\r\n\r\n* Removes unsupported distributions\r\n\r\n* Adds Noetic information",
+      "files_changed": 2,
+      "additions": 10,
+      "deletions": 10,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "984d3d5bff38d649ad610e5c9798fccd0c0731a6",
+          "filename": ".github/workflows/industrial_ci.yml",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/blob/1bced85b61335fd47539bcbec6565241b4c9c174/.github%2Fworkflows%2Findustrial_ci.yml",
+          "raw_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/raw/1bced85b61335fd47539bcbec6565241b4c9c174/.github%2Fworkflows%2Findustrial_ci.yml",
+          "contents_url": "https://api.github.com/repos/rt-net/rt_usb_9axisimu_driver/contents/.github%2Fworkflows%2Findustrial_ci.yml?ref=1bced85b61335fd47539bcbec6565241b4c9c174",
+          "patch": "@@ -15,10 +15,10 @@ jobs:\n     strategy:\n       matrix:\n         env:\n-          - { ROS_DISTRO: foxy, ROS_REPO: ros }\n+          - { ROS_DISTRO: humble, ROS_REPO: ros }\n \n     runs-on: ubuntu-latest\n     steps:\n-      - uses: actions/checkout@v2\n+      - uses: actions/checkout@v3\n       - uses: \"ros-industrial/industrial_ci@master\"\n-        env: ${{ matrix.env }}\n\\ No newline at end of file\n+        env: ${{ matrix.env }}"
+        },
+        {
+          "sha": "137adde3ab9126ae8bb87d637d141a118081a522",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 7,
+          "changes": 14,
+          "blob_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/blob/1bced85b61335fd47539bcbec6565241b4c9c174/README.md",
+          "raw_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/raw/1bced85b61335fd47539bcbec6565241b4c9c174/README.md",
+          "contents_url": "https://api.github.com/repos/rt-net/rt_usb_9axisimu_driver/contents/README.md?ref=1bced85b61335fd47539bcbec6565241b4c9c174",
+          "patch": "@@ -7,19 +7,19 @@\n ![usb-9axisimu](https://rt-net.github.io/images/usb-9axisimu/usb-9axisimu.png)\n \n 現在、以下のROSのディストリビューションに対応しております。\n-- Kinetic ([`kinetic-devel`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/kinetic-devel))\n - Melodic ([`melodic-devel`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/melodic-devel))\n-- Dashing ([`dashing-devel`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/dashing-devel))\n+- Noetic ([`noetic-devel`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/noetic-devel))\n - Foxy ([`foxy-devel`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/foxy-devel))\n+- Humble ([`humble-devel`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/humble-devel))\n \n | | industrial_ci | source build | amd64 binary | arm64 binary |\n |:---:|:---:|:---:|:---:|:---:|\n | main develop<br>([`master`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/master)) |  [![industrial_ci](https://github.com/rt-net/rt_usb_9axisimu_driver/workflows/industrial_ci/badge.svg?branch=master)](https://github.com/rt-net/rt_usb_9axisimu_driver/actions?query=workflow%3Aindustrial_ci+branch%3Amaster) | - | - | - | - |\n | ROS 2 develop<br>([`ros2-devel`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/ros2-devel)) |  [![industrial_ci](https://github.com/rt-net/rt_usb_9axisimu_driver/workflows/industrial_ci/badge.svg?branch=ros2-devel)](https://github.com/rt-net/rt_usb_9axisimu_driver/actions?query=workflow%3Aindustrial_ci+branch%3Aros2-devel) | - | - | - | - |\n-| Xenial + Kinetic<br>([`kinetic-devel`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/kinetic-devel)) | [![industrial_ci](https://github.com/rt-net/rt_usb_9axisimu_driver/workflows/industrial_ci/badge.svg?branch=kinetic-devel)](https://github.com/rt-net/rt_usb_9axisimu_driver/actions?query=workflow%3Aindustrial_ci+branch%3Akinetic-devel) | [![Build Status](http://build.ros.org/job/Ksrc_uX__rt_usb_9axisimu_driver__ubuntu_xenial__source/badge/icon)](http://build.ros.org/job/Ksrc_uX__rt_usb_9axisimu_driver__ubuntu_xenial__source/) | [![Build Status](http://build.ros.org/view/Kbin_uX64/job/Kbin_uX64__rt_usb_9axisimu_driver__ubuntu_xenial_amd64__binary/badge/icon)](http://build.ros.org/view/Kbin_uX64/job/Kbin_uX64__rt_usb_9axisimu_driver__ubuntu_xenial_amd64__binary/) | [![Build Status](http://build.ros.org/view/Kbin_uxv8_uXv8/job/Kbin_uxv8_uXv8__rt_usb_9axisimu_driver__ubuntu_xenial_arm64__binary/badge/icon)](http://build.ros.org/view/Kbin_uxv8_uXv8/job/Kbin_uxv8_uXv8__rt_usb_9axisimu_driver__ubuntu_xenial_arm64__binary/) |\n | Bionic + Melodic<br>([`melodic-devel`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/melodic-devel)) | [![industrial_ci](https://github.com/rt-net/rt_usb_9axisimu_driver/workflows/industrial_ci/badge.svg?branch=melodic-devel)](https://github.com/rt-net/rt_usb_9axisimu_driver/actions?query=workflow%3Aindustrial_ci+branch%3Amelodic-devel) | [![Build Status](http://build.ros.org/job/Msrc_uB__rt_usb_9axisimu_driver__ubuntu_bionic__source/badge/icon)](http://build.ros.org/job/Msrc_uB__rt_usb_9axisimu_driver__ubuntu_bionic__source/) | [![Build Status](http://build.ros.org/view/Mbin_uB64/job/Mbin_uB64__rt_usb_9axisimu_driver__ubuntu_bionic_amd64__binary/badge/icon)](http://build.ros.org/view/Mbin_uB64/job/Mbin_uB64__rt_usb_9axisimu_driver__ubuntu_bionic_amd64__binary/) | [![Build Status](http://build.ros.org/job/Mbin_ubv8_uBv8__rt_usb_9axisimu_driver__ubuntu_bionic_arm64__binary/badge/icon)](http://build.ros.org/job/Mbin_ubv8_uBv8__rt_usb_9axisimu_driver__ubuntu_bionic_arm64__binary/) |\n-| Bionic + Dashing<br>([`dashing-devel`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/dashing-devel)) | [![industrial_ci](https://github.com/rt-net/rt_usb_9axisimu_driver/workflows/industrial_ci/badge.svg?branch=dashing-devel)](https://github.com/rt-net/rt_usb_9axisimu_driver/actions?query=workflow%3Aindustrial_ci+branch%3Adashing-devel) |[![Build Status](https://build.ros2.org/view/Dsrc_uB/job/Dsrc_uB__rt_usb_9axisimu_driver__ubuntu_bionic__source/badge/icon)](https://build.ros2.org/view/Dsrc_uB/job/Dsrc_uB__rt_usb_9axisimu_driver__ubuntu_bionic__source/) | [![Build Status](https://build.ros2.org/view/Dsrc_uB/job/Dbin_uB64__rt_usb_9axisimu_driver__ubuntu_bionic_amd64__binary/badge/icon)](https://build.ros2.org/view/Dsrc_uB/job/Dbin_uB64__rt_usb_9axisimu_driver__ubuntu_bionic_amd64__binary/) | [![Build Status](https://build.ros2.org/view/Dsrc_uB/job/Dbin_ubv8_uBv8__rt_usb_9axisimu_driver__ubuntu_bionic_arm64__binary/badge/icon)](https://build.ros2.org/view/Dsrc_uB/job/Dbin_ubv8_uBv8__rt_usb_9axisimu_driver__ubuntu_bionic_arm64__binary/) |\n+| Focal + Noetic<br>([`noetic-devel`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/noetic-devel)) |  [![industrial_ci](https://github.com/rt-net/rt_usb_9axisimu_driver/workflows/industrial_ci/badge.svg?branch=noetic-devel)](https://github.com/rt-net/rt_usb_9axisimu_driver/actions?query=workflow%3Aindustrial_ci+branch%3Anoetic-devel) | - | - | - | - |\n | Focal + Foxy<br>([`foxy-devel`](https://github.com/rt-net/rt_usb_9axisimu_driver/tree/foxy-devel)) | [![industrial_ci](https://github.com/rt-net/rt_usb_9axisimu_driver/workflows/industrial_ci/badge.svg?branch=foxy-devel)](https://github.com/rt-net/rt_usb_9axisimu_driver/actions?query=workflow%3Aindustrial_ci+branch%3Afoxy-devel) | [![Build Status](https://build.ros2.org/view/Fsrc_uF/job/Fsrc_uF__rt_usb_9axisimu_driver__ubuntu_focal__source/badge/icon)](https://build.ros2.org/view/Fsrc_uF/job/Fsrc_uF__rt_usb_9axisimu_driver__ubuntu_focal__source/) |[![Build Status](https://build.ros2.org/view/Fsrc_uF/job/Fbin_uF64__rt_usb_9axisimu_driver__ubuntu_focal_amd64__binary/badge/icon)](https://build.ros2.org/view/Fsrc_uF/job/Fbin_uF64__rt_usb_9axisimu_driver__ubuntu_focal_amd64__binary/) | [![Build Status](https://build.ros2.org/view/Fbin_ubv8_uFv8/job/Fbin_ubv8_uFv8__rt_usb_9axisimu_driver__ubuntu_focal_arm64__binary/badge/icon)](https://build.ros2.org/view/Fbin_ubv8_uFv8/job/Fbin_ubv8_uFv8__rt_usb_9axisimu_driver__ubuntu_focal_arm64__binary/) |\n+**TODO: Add Jammy + Humble**\n \n ## 1. 概要\n \n@@ -67,18 +67,18 @@ ROS Melodic等ROS 1のパッケージについては[`master`](https://github.co\n ### 2.1 バイナリをインストールする場合\n \n ```sh\n-# ROS 2 Dashing\n-$ sudo apt install ros-dashing-rt-usb-9axisimu-driver\n # ROS 2 Foxy\n $ sudo apt install ros-foxy-rt-usb-9axisimu-driver\n+# ROS 2 Humble \n+$ sudo apt install ros-humble-rt-usb-9axisimu-driver\n ```\n \n ### 2.2 ソースからインストールする場合\n \n ```sh\n $ cd ~/ros2_ws/src\n # Clone package & checkout ROS 2 branch\n-$ git clone -b ros2-devel https://github.com/rt-net/rt_usb_9axisimu_driver\n+$ git clone -b $ROS_DISTRO-devel https://github.com/rt-net/rt_usb_9axisimu_driver\n \n # Install dependencies\n $ rosdep install -r -y -i --from-paths ."
+        }
+      ]
+    },
+    {
+      "author": "Tiryoh",
+      "date": "2019-12-21T10:36:46Z",
+      "sha": "1b574b65d90ed0b7dd5dc83d3505ad6bb487cf17",
+      "message": "Update CHANGELOG",
+      "files_changed": 1,
+      "additions": 20,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "597d5dc84d666794769e0452dfd69813b7b1ace2",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 20,
+          "deletions": 0,
+          "changes": 20,
+          "blob_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/blob/1b574b65d90ed0b7dd5dc83d3505ad6bb487cf17/CHANGELOG.rst",
+          "raw_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/raw/1b574b65d90ed0b7dd5dc83d3505ad6bb487cf17/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/rt-net/rt_usb_9axisimu_driver/contents/CHANGELOG.rst?ref=1b574b65d90ed0b7dd5dc83d3505ad6bb487cf17",
+          "patch": "@@ -2,6 +2,26 @@\n Changelog for package rt_usb_9axisimu_driver\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+Forthcoming\n+-----------\n+* Close node & port at device plugout\n+* Fix wrong data output\n+* Fix serial port attributes\n+* Add serial port settings after port open()\n+* Add required attribute to launch file\n+* Fix CMake Warnings\n+* Add a port argument to launch file\n+* Merge pull request `#5 <https://github.com/Tiryoh/rt_usb_9axisimu_driver/issues/5>`_ from pazeshun/secure-read-bytes\n+  Continue reading until all data comes\n+* Continue reading until all data comes\n+* Don't use travis-python\n+* Fix typo in stddev\n+* Merge pull request `#2 <https://github.com/Tiryoh/rt_usb_9axisimu_driver/issues/2>`_ from pazeshun/add-travis-test\n+  Add travis test\n+* Add build status to README.md\n+* Add .travis.yml\n+* Contributors: RT Corp, Shota Aoki, ShotaAk, Shun Hasegawa, pazeshun\n+\n 0.1.2 (2016-03-10)\n -----------\n "
+        }
+      ]
+    },
+    {
+      "author": "Shota Aoki",
+      "date": "2019-12-25T04:36:02Z",
+      "sha": "59fa297bf179da6fd33ef6b733a3f7b4c7a1ba91",
+      "message": "Merge pull request #9 from rt-net/#8_fix_travis\n\nFix TravisCI settings",
+      "files_changed": 2,
+      "additions": 23,
+      "deletions": 45,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "6507fd0e1b9f6c70a0d621ab1a525e3442da4661",
+          "filename": ".travis.yml",
+          "status": "modified",
+          "additions": 22,
+          "deletions": 44,
+          "changes": 66,
+          "blob_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/blob/59fa297bf179da6fd33ef6b733a3f7b4c7a1ba91/.travis.yml",
+          "raw_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/raw/59fa297bf179da6fd33ef6b733a3f7b4c7a1ba91/.travis.yml",
+          "contents_url": "https://api.github.com/repos/rt-net/rt_usb_9axisimu_driver/contents/.travis.yml?ref=59fa297bf179da6fd33ef6b733a3f7b4c7a1ba91",
+          "patch": "@@ -1,52 +1,30 @@\n-# Based on https://github.com/felixduvallet/ros-travis-integration\n-# and https://github.com/mavlink/mavros\n+# This config uses industrial_ci (https://github.com/ros-industrial/industrial_ci.git).\n+# For troubleshooting, see readme (https://github.com/ros-industrial/industrial_ci/blob/master/README.rst)\n \n-dist: trusty\n-sudo: required\n-language: c++ # to avoid using /opt/python from travis\n-cache:\n-  - apt\n+language: generic\n+services:\n+  - docker\n+git:\n+  quiet: true\n \n+# configure the build environment(s)\n+# https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#variables-you-can-configure\n env:\n-  global:\n-    - ROS_CI_DESKTOP=\"`lsb_release -cs`\"\n-    - CI_SOURCE_PATH=$(pwd)\n-    - ROSINSTALL_FILE=$CI_SOURCE_PATH/.travis.rosinstall\n-    - ROS_PARALLEL_JOBS='-j8 -l6'\n-\n   matrix:\n-    - ROS_DISTRO=indigo\n+    - ROS_DISTRO=kinetic ROS_REPO=ros UPSTREAM_WORKSPACE=debian OS_NAME=ubuntu OS_CODE_NAME=xenial\n+    - ROS_DISTRO=kinetic ROS_REPO=ros-shadow-fixed UPSTREAM_WORKSPACE=debian OS_NAME=ubuntu OS_CODE_NAME=xenial\n+    - ROS_DISTRO=melodic ROS_REPO=ros UPSTREAM_WORKSPACE=debian OS_NAME=ubuntu OS_CODE_NAME=bionic\n+    - ROS_DISTRO=melodic ROS_REPO=ros-shadow-fixed UPSTREAM_WORKSPACE=debian OS_NAME=ubuntu OS_CODE_NAME=bionic\n \n-before_install:\n-  - sudo sh -c \"echo \\\"deb http://packages.ros.org/ros/ubuntu $ROS_CI_DESKTOP main\\\" > /etc/apt/sources.list.d/ros-latest.list\"\n-  - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -\n-  - sudo apt-get update -qq\n-  - sudo apt-get install -y python-catkin-pkg python-rosdep python-wstool ros-$ROS_DISTRO-catkin\n-  - source /opt/ros/$ROS_DISTRO/setup.bash\n-  - sudo rosdep init\n-  - rosdep update\n+# allow failures, e.g. for unsupported distros\n+matrix:\n+  allow_failures:\n+    - env: ROS_DISTRO=kinetic ROS_REPO=ros-shadow-fixed UPSTREAM_WORKSPACE=debian OS_NAME=ubuntu OS_CODE_NAME=xenial\n+    - env: ROS_DISTRO=melodic ROS_REPO=ros UPSTREAM_WORKSPACE=debian OS_NAME=ubuntu OS_CODE_NAME=bionic\n+    - env: ROS_DISTRO=melodic ROS_REPO=ros-shadow-fixed UPSTREAM_WORKSPACE=debian OS_NAME=ubuntu OS_CODE_NAME=bionic\n \n+# clone and run industrial_ci\n install:\n-  - mkdir -p ~/catkin_ws/src\n-  - cd ~/catkin_ws/src\n-  - catkin_init_workspace\n-  - cd ~/catkin_ws\n-  - catkin_make\n-  - source devel/setup.bash\n-  - cd ~/catkin_ws/src\n-  - ln -s $CI_SOURCE_PATH .\n-\n-before_script:\n-  - cd ~/catkin_ws/src\n-  - wstool init\n-  - if [[ -f $ROSINSTALL_FILE ]] ; then wstool merge $ROSINSTALL_FILE ; fi\n-  - wstool up\n-  - cd ~/catkin_ws\n-  - rosdep install -y --from-paths src --ignore-src --rosdistro $ROS_DISTRO\n-\n+  - git clone --quiet --depth 1 https://github.com/ros-industrial/industrial_ci.git .industrial_ci -b master\n script:\n-  - source /opt/ros/$ROS_DISTRO/setup.bash\n-  - cd ~/catkin_ws\n-  - catkin_make\n-  - source devel/setup.bash\n-  - catkin_make run_tests && catkin_make test\n+  - .industrial_ci/travis.sh"
+        },
+        {
+          "sha": "9062fdc018b6e5f685e85b7fed152eb864023cc6",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/blob/59fa297bf179da6fd33ef6b733a3f7b4c7a1ba91/README.md",
+          "raw_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/raw/59fa297bf179da6fd33ef6b733a3f7b4c7a1ba91/README.md",
+          "contents_url": "https://api.github.com/repos/rt-net/rt_usb_9axisimu_driver/contents/README.md?ref=59fa297bf179da6fd33ef6b733a3f7b4c7a1ba91",
+          "patch": "@@ -1,6 +1,6 @@\n # rt_usb_9axisimu_driver\n \n-[![Build Status](https://travis-ci.org/rt-net/rt_usb_9axisimu_driver.svg)](https://travis-ci.org/rt-net/rt_usb_9axisimu_driver)\n+[![Build Status](https://travis-ci.org/rt-net/rt_usb_9axisimu_driver.svg?branch=master)](https://travis-ci.org/rt-net/rt_usb_9axisimu_driver)\n \n Package which provides a ROS driver for RT-USB-9axisIMU  \n Details of this package is on [Wiki page](https://github.com/rt-net/rt_usb_9axisimu_driver/wiki)(Japanese only for now)."
+        }
+      ]
+    },
+    {
+      "author": "ShotaAk",
+      "date": "2018-10-16T08:03:07Z",
+      "sha": "9338d188286754b58a3f07012942cbfffd11cdf8",
+      "message": "Merge pull request #5 from pazeshun/secure-read-bytes\n\nContinue reading until all data comes",
+      "files_changed": 1,
+      "additions": 13,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "11bfa67da3d568b2bf4bcbb89dd41ec7a203f380",
+          "filename": "include/rt_usb_9axisimu_driver/rt_usb_9axisimu.hpp",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 2,
+          "changes": 15,
+          "blob_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/blob/9338d188286754b58a3f07012942cbfffd11cdf8/include%2Frt_usb_9axisimu_driver%2Frt_usb_9axisimu.hpp",
+          "raw_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/raw/9338d188286754b58a3f07012942cbfffd11cdf8/include%2Frt_usb_9axisimu_driver%2Frt_usb_9axisimu.hpp",
+          "contents_url": "https://api.github.com/repos/rt-net/rt_usb_9axisimu_driver/contents/include%2Frt_usb_9axisimu_driver%2Frt_usb_9axisimu.hpp?ref=9338d188286754b58a3f07012942cbfffd11cdf8",
+          "patch": "@@ -174,8 +174,19 @@ namespace RtUsbImu\n           return -1;\n         }\n \n-        return read(port_fd, buf, buf_len);  //Read device file and put the data into buf (max size is (buf_len) bytes)\n-                                             //Process stops here until data comes\n+        unsigned int left_len = buf_len;\n+        unsigned char* p = buf;\n+        while(left_len > 0) {\n+          //Read device file and put the data into buf (max size is (buf_len) bytes)\n+          int size = read(port_fd, p, left_len);\n+          if(size < 0) {\n+            return -1;\n+          }\n+          p += size;\n+          left_len -= size;\n+        }\n+\n+        return (buf_len - left_len);\n       }\n \n       int Write(unsigned char* data, unsigned int data_len) {"
+        }
+      ]
+    },
+    {
+      "author": "pazeshun",
+      "date": "2015-10-28T07:39:26Z",
+      "sha": "27400d45a4b72c5188f34f142e5bafaab11ec98b",
+      "message": "update README.md",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 25,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "2016fc4d1d29cd46ce0fe86024f1eacd912fb884",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 25,
+          "changes": 26,
+          "blob_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/blob/27400d45a4b72c5188f34f142e5bafaab11ec98b/README.md",
+          "raw_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/raw/27400d45a4b72c5188f34f142e5bafaab11ec98b/README.md",
+          "contents_url": "https://api.github.com/repos/rt-net/rt_usb_9axisimu_driver/contents/README.md?ref=27400d45a4b72c5188f34f142e5bafaab11ec98b",
+          "patch": "@@ -1,27 +1,3 @@\n # rt_usb_9axisimu_driver\n Package which provides a ROS driver for RT-USB-9axisIMU\n-\n-## Installation\n-\n-Install the package:\n-\n-```sh\n-$ cd ~/catkin_ws/src\n-$ git clone https://github.com/rt-net/rt_usb_9axisimu_driver.git\n-$ cd ~/catkin_ws\n-$ catkin_make\n-```\n-\n-## How to Run\n-\n-Run the driver:\n-\n-```sh\n-$ rosrun rt_usb_9axisimu_driver rt_usb_9axisimu_driver\n-```\n-\n-or\n-\n-```sh\n-$ roslaunch rt_usb_9axisimu_driver rt_usb_9axisimu_driver.launch\n-```\n+Details of this package is on [Wiki page](https://github.com/rt-net/rt_usb_9axisimu_driver/wiki)(Japanese only for now)."
+        }
+      ]
+    },
+    {
+      "author": "rt-corp",
+      "date": "2015-09-26T04:19:52Z",
+      "sha": "0d5f0c34e6b02ce33572815bf7ae38de4fceb4dd",
+      "message": "Initial commit",
+      "files_changed": 2,
+      "additions": 30,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "123d103d87bb9640be07c769f8e36439f1fdcc2d",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 28,
+          "deletions": 0,
+          "changes": 28,
+          "blob_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/blob/0d5f0c34e6b02ce33572815bf7ae38de4fceb4dd/LICENSE",
+          "raw_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/raw/0d5f0c34e6b02ce33572815bf7ae38de4fceb4dd/LICENSE",
+          "contents_url": "https://api.github.com/repos/rt-net/rt_usb_9axisimu_driver/contents/LICENSE?ref=0d5f0c34e6b02ce33572815bf7ae38de4fceb4dd",
+          "patch": "@@ -0,0 +1,28 @@\n+Copyright (c) 2015, RT Corp.\n+All rights reserved.\n+\n+Redistribution and use in source and binary forms, with or without\n+modification, are permitted provided that the following conditions are met:\n+\n+* Redistributions of source code must retain the above copyright notice, this\n+  list of conditions and the following disclaimer.\n+\n+* Redistributions in binary form must reproduce the above copyright notice,\n+  this list of conditions and the following disclaimer in the documentation\n+  and/or other materials provided with the distribution.\n+\n+* Neither the name of rt_usb_9axisimu_driver nor the names of its\n+  contributors may be used to endorse or promote products derived from\n+  this software without specific prior written permission.\n+\n+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\n+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE\n+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL\n+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR\n+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\n+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n+"
+        },
+        {
+          "sha": "0569a3c1bb335409f21319828a3dd607a611975f",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/blob/0d5f0c34e6b02ce33572815bf7ae38de4fceb4dd/README.md",
+          "raw_url": "https://github.com/rt-net/rt_usb_9axisimu_driver/raw/0d5f0c34e6b02ce33572815bf7ae38de4fceb4dd/README.md",
+          "contents_url": "https://api.github.com/repos/rt-net/rt_usb_9axisimu_driver/contents/README.md?ref=0d5f0c34e6b02ce33572815bf7ae38de4fceb4dd",
+          "patch": "@@ -0,0 +1,2 @@\n+# rt_usb_9axisimu_driver\n+Package which provides a ROS driver for RT-USB-9axisIMU"
+        }
+      ]
+    }
+  ]
+}

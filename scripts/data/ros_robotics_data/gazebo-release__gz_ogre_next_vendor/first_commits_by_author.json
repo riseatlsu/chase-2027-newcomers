@@ -1,0 +1,313 @@
+{
+  "_meta": {
+    "fetched_at": "2026-09-24T14:54:06Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "gazebo-release",
+    "repo": "gz_ogre_next_vendor",
+    "refreshed_at": "2026-09-24T14:54:06Z",
+    "refresh_note": "incrementally added 2 author(s) missing from a prior stale cache"
+  },
+  "data": [
+    {
+      "author": "j-rivero",
+      "date": "2025-11-20T18:46:55Z",
+      "sha": "5183fa136be83cfbcce0ce383f172d4a6c1cbdf2",
+      "message": "Kilted: missing atomic depends. 0.2.0\n\nSigned-off-by: Jose Luis Rivero <jrivero@honurobotics.com>",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "d76b6083d98ee6823b260da05766e5738970a2e1",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/blob/5183fa136be83cfbcce0ce383f172d4a6c1cbdf2/package.xml",
+          "raw_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/raw/5183fa136be83cfbcce0ce383f172d4a6c1cbdf2/package.xml",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_ogre_next_vendor/contents/package.xml?ref=5183fa136be83cfbcce0ce383f172d4a6c1cbdf2",
+          "patch": "@@ -11,7 +11,7 @@\n     To avoid any confusion with the version of the vendor package, the major\n     version here will always be 0.\n   -->\n-  <version>0.1.0</version>\n+  <version>0.2.0</version>\n   <description>\n     Vendor package for Ogre-next v2.3.3\n   </description>\n@@ -32,6 +32,7 @@\n   <depend>gz_cmake_vendor</depend>\n   <depend>glslang-dev</depend>\n   <depend>glslc</depend>\n+  <depend>libatomic</depend>\n   <depend>libboost-date-time-dev</depend>\n   <depend>libboost-dev</depend>\n   <depend>libboost-thread-dev</depend>"
+        }
+      ]
+    },
+    {
+      "author": "azeey",
+      "date": "2024-03-13T22:10:54Z",
+      "sha": "204c7e5de9e8d4f5bcf1249c2390f0574d8a64e3",
+      "message": "Aligned with  build flags from our fork\n\nSigned-off-by: Addisu Z. Taddese <addisu@openrobotics.org>",
+      "files_changed": 4,
+      "additions": 39,
+      "deletions": 44,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "130ca9ff2b113c0487b358eb3c8c4c1b130063aa",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 21,
+          "deletions": 16,
+          "changes": 37,
+          "blob_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/blob/204c7e5de9e8d4f5bcf1249c2390f0574d8a64e3/CMakeLists.txt",
+          "raw_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/raw/204c7e5de9e8d4f5bcf1249c2390f0574d8a64e3/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_ogre_next_vendor/contents/CMakeLists.txt?ref=204c7e5de9e8d4f5bcf1249c2390f0574d8a64e3",
+          "patch": "@@ -1,28 +1,33 @@\n cmake_minimum_required(VERSION 3.10)\n-project(ogre_next_vendor)\n+project(gazebo_ogre_next_vendor)\n \n find_package(ament_cmake REQUIRED)\n find_package(ament_cmake_vendor_package REQUIRED)\n \n-ament_vendor(ogre_next_vendor\n+ament_vendor(${PROJECT_NAME}\n   VCS_URL https://github.com/OGRECave/ogre-next.git\n-  VCS_VERSION master\n+  VCS_VERSION v2.3.3\n   CMAKE_ARGS\n-    -DOGRE_STATIC:BOOL=OFF\n+    -DOGRE_BUILD_COMPONENT_HLMS:BOOL=TRUE\n     -DOGRE_BUILD_COMPONENT_OVERLAY:BOOL=ON\n-    -DOGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS:BOOL=ON\n+    -DOGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS:BOOL=TRUE\n     -DOGRE_BUILD_PLUGIN_PFX:BOOL=ON\n-    -DOGRE_BUILD_RENDERSYSTEM_GL3PLUS:BOOL=ON\n-    -DOGRE_BUILD_RENDERSYSTEM_VULKAN:BOOL=ON\n-    -DOGRE_BUILD_SAMPLES2:BOOL=OFF\n-    -DOGRE_BUILD_TESTS:BOOL=OFF\n-    -DOGRE_BUILD_TOOLS:BOOL=OFF\n-    -DOGRE_GLSUPPORT_USE_EGL_HEADLESS:BOOL=ON\n-    -DOGRE_GLSUPPORT_USE_GLX:BOOL=ON\n-    -DOGRE_VULKAN_WINDOW_NULL:BOOL=ON\n-    -DOGRE_VULKAN_WINDOW_XCB:BOOL=ON\n+    -DOGRE_BUILD_RENDERSYSTEM_GL3PLUS:BOOL=TRUE\n+    -DOGRE_BUILD_RENDERSYSTEM_GLES2:BOOL=FALSE\n+    -DOGRE_BUILD_RENDERSYSTEM_VULKAN:BOOL=TRUE\n+    -DOGRE_BUILD_SAMPLES2:BOOL=FALSE\n+    -DOGRE_CONFIG_UNIX_NO_X11:BOOL=FALSE\n+    -DOGRE_FULL_RPATH:BOOL=FALSE\n+    -DOGRE_GLSUPPORT_USE_EGL_HEADLESS:BOOL=TRUE\n+    -DOGRE_GLSUPPORT_USE_GLX:BOOL=TRUE\n+    -DOGRE_INSTALL_DOCS:BOOL=FALSE\n+    -DOGRE_INSTALL_SAMPLES:BOOL=FALSE\n     -DOGRE_USE_NEW_PROJECT_NAME:BOOL=ON\n-  PATCHES patches\n+    -DOGRE_VULKAN_WINDOW_NULL:BOOL=TRUE\n+    -DOGRE_VULKAN_WINDOW_XCB:BOOL=ON\n+  GLOBAL_HOOK\n+  PATCHES\n+    patches/0001-Fix-incomplete-vulkan-linkage.patch\n )\n \n if(BUILD_TESTING)\n@@ -31,5 +36,5 @@ if(BUILD_TESTING)\n endif()\n \n ament_package(\n-  CONFIG_EXTRAS_POST \"ogre_next_vendor-extras.cmake.in\"\n+  CONFIG_EXTRAS_POST \"gazebo_ogre_next_vendor-extras.cmake.in\"\n )"
+        },
+        {
+          "sha": "36d6f37f6a0777d5bc7438ec7943015dc4572036",
+          "filename": "gazebo_ogre_next_vendor-extras.cmake.in",
+          "status": "added",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/blob/204c7e5de9e8d4f5bcf1249c2390f0574d8a64e3/gazebo_ogre_next_vendor-extras.cmake.in",
+          "raw_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/raw/204c7e5de9e8d4f5bcf1249c2390f0574d8a64e3/gazebo_ogre_next_vendor-extras.cmake.in",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_ogre_next_vendor/contents/gazebo_ogre_next_vendor-extras.cmake.in?ref=204c7e5de9e8d4f5bcf1249c2390f0574d8a64e3",
+          "patch": "@@ -0,0 +1,3 @@\n+\n+set(ENV{PKG_CONFIG_PATH} \"$ENV{PKG_CONFIG_PATH}:@CMAKE_INSTALL_PREFIX@/opt/@PROJECT_NAME@/lib/pkgconfig\")\n+"
+        },
+        {
+          "sha": "7579b10434c61461f7f1a070494da7e102a9bb6c",
+          "filename": "ogre_next_vendor-extras.cmake.in",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 25,
+          "changes": 25,
+          "blob_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/blob/0e73c5e3cbb3098e9cef1c900bc79e918371c133/ogre_next_vendor-extras.cmake.in",
+          "raw_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/raw/0e73c5e3cbb3098e9cef1c900bc79e918371c133/ogre_next_vendor-extras.cmake.in",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_ogre_next_vendor/contents/ogre_next_vendor-extras.cmake.in?ref=0e73c5e3cbb3098e9cef1c900bc79e918371c133",
+          "patch": "@@ -1,25 +0,0 @@\n-\n-set(OGRE_DIR \"${@PROJECT_NAME@_DIR}/../../../opt/ogre_next_vendor\")\n-\n-set(OGRE_LIBRARY_REL \"${OGRE_DIR}/lib/libOgreNextMain.so\")\n-set(OGRE_INCLUDE_DIR \"${OGRE_DIR}/include/OGRE-Next\")\n-set(OGRE_MEDIA_DIR \"${OGRE_DIR}/share/OGRE-Next/Media\")\n-\n-add_library(ogre_next_vendor::OgreMain UNKNOWN IMPORTED)\n-set_target_properties(ogre_next_vendor::OgreMain PROPERTIES IMPORTED_LOCATION_RELEASE ${OGRE_LIBRARY_REL})\n-set_property(TARGET ogre_next_vendor::OgreMain PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${OGRE_INCLUDE_DIR})\n-set_property(TARGET ogre_next_vendor::OgreMain APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)\n-\n-set(OGRE_VK_LIBRARY_REL \"${OGRE_DIR}/lib/libOgreNextMain.so\")\n-set(OGRE_VK_INCLUDE_DIR \"${OGRE_DIR}/include/OGRE-Next/RenderSystems/Vulkan/\")\n-\n-add_library(ogre_next_vendor::RenderSystemVulkan UNKNOWN IMPORTED)\n-set_target_properties(ogre_next_vendor::RenderSystemVulkan PROPERTIES IMPORTED_LOCATION_RELEASE ${OGRE_VK_LIBRARY_REL})\n-set_property(TARGET ogre_next_vendor::RenderSystemVulkan PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${OGRE_VK_INCLUDE_DIR})\n-set_property(TARGET ogre_next_vendor::RenderSystemVulkan APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)\n-\n-get_cmake_property(_variableNames VARIABLES)\n-list (SORT _variableNames)\n-foreach (_variableName ${_variableNames})\n-    message(STATUS \"${_variableName}=${${_variableName}}\")\n-endforeach()"
+        },
+        {
+          "sha": "58442bef82ee53a7f34235422af40220937ac50f",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 3,
+          "changes": 18,
+          "blob_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/blob/204c7e5de9e8d4f5bcf1249c2390f0574d8a64e3/package.xml",
+          "raw_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/raw/204c7e5de9e8d4f5bcf1249c2390f0574d8a64e3/package.xml",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_ogre_next_vendor/contents/package.xml?ref=204c7e5de9e8d4f5bcf1249c2390f0574d8a64e3",
+          "patch": "@@ -3,8 +3,8 @@\n   href=\"http://download.ros.org/schema/package_format2.xsd\"\n   schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"2\">\n-  <name>ogre_next_vendor</name>\n-  <version>3.0.0</version>\n+  <name>gazebo_ogre_next_vendor</name>\n+  <version>2.3.3</version>\n   <description>\n     Wrapper around ogre3d, it provides a fixed CMake module and an ExternalProject build of ogre.\n   </description>\n@@ -25,10 +25,22 @@\n   <depend>libxaw</depend>\n   <depend>libxrandr</depend>\n   <depend>opengl</depend>\n+  <depend>libpoco-dev</depend>\n+  <depend>libfreetype-dev</depend>\n+  <depend>rapidjson</depend>\n+  <depend>libzzip-dev</depend>\n+  <depend>libx11-xcb-dev</depend>\n+  <depend>libxcb-randr0-dev</depend>\n+  <depend>libvulkan-dev</depend>\n+  <depend>libsdl2-dev</depend>\n+  <depend>libtbb-dev</depend>\n+  <depend>libtinyxml-dev</depend>\n+  <depend>glslang-dev</depend>\n+  <depend>glslc</depend>\n+  <depend>libshaderc-dev</depend>\n \n   <test_depend>ament_cmake_xmllint</test_depend>\n   <test_depend>ament_lint_auto</test_depend>\n-\n   <export>\n     <build_type>ament_cmake</build_type>\n   </export>"
+        }
+      ]
+    },
+    {
+      "author": "oysstu",
+      "date": "2024-08-29T15:48:44Z",
+      "sha": "c1596a8c8ab5f33da37e41b0de1e794ec5e0fd1b",
+      "message": "Add check for system installed ogre-next (#5)\n\n* Check for system installed ogre-next first.\r\n\r\nSigned-off-by: Rhys Mainwaring <rhys.mainwaring@me.com>\r\n\r\n* Add exact/relaxed version matching\r\n\r\nSigned-off-by: Øystein Sture <os@skarvtech.com>\r\n\r\n* Revert change to github url\r\n\r\nSigned-off-by: Øystein Sture <os@skarvtech.com>\r\n\r\n---------\r\n\r\nSigned-off-by: Rhys Mainwaring <rhys.mainwaring@me.com>\r\nSigned-off-by: Øystein Sture <os@skarvtech.com>\r\nCo-authored-by: Rhys Mainwaring <rhys.mainwaring@me.com>",
+      "files_changed": 2,
+      "additions": 46,
+      "deletions": 2,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "7c6ec8e142952f9f6d53c5e0a8786f7fe61fdc14",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 45,
+          "deletions": 2,
+          "changes": 47,
+          "blob_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/blob/c1596a8c8ab5f33da37e41b0de1e794ec5e0fd1b/CMakeLists.txt",
+          "raw_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/raw/c1596a8c8ab5f33da37e41b0de1e794ec5e0fd1b/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_ogre_next_vendor/contents/CMakeLists.txt?ref=c1596a8c8ab5f33da37e41b0de1e794ec5e0fd1b",
+          "patch": "@@ -1,9 +1,46 @@\n cmake_minimum_required(VERSION 3.10)\n project(gz_ogre_next_vendor)\n \n+# Project-specific settings\n+set(LIB_VER_MAJOR 2)\n+set(LIB_VER_MINOR 3)\n+set(LIB_VER_PATCH 3)\n+\n+# Derived variables\n+set(LIB_VER ${LIB_VER_MAJOR}.${LIB_VER_MINOR}.${LIB_VER_PATCH})\n+\n find_package(ament_cmake REQUIRED)\n find_package(ament_cmake_vendor_package REQUIRED)\n \n+# Required for FindGzOGRE2.cmake and gz_find_package\n+find_package(gz_cmake_vendor REQUIRED)\n+find_package(gz-cmake3 REQUIRED)\n+\n+# Set the VERSION_MATCH to \"EXACT\" by default, but relax the requirement\n+# if we are users are building from source (determined by the\n+# GZ_BUILD_FROM_SOURCE environment variable) or if explicitly told to do so\n+# by the GZ_RELAX_VERSION_MATCH environment variable.\n+set(VERSION_MATCH \"EXACT\")\n+if(NOT $ENV{GZ_BUILD_FROM_SOURCE} STREQUAL \"\")\n+  set(VERSION_MATCH \"\")\n+endif()\n+\n+if(NOT $ENV{GZ_RELAX_VERSION_MATCH} STREQUAL \"\")\n+  set(VERSION_MATCH \"\")\n+endif()\n+\n+gz_find_package(GzOGRE2\n+  EXACT ${VERSION_MATCH}\n+  VERSION ${LIB_VER}\n+  COMPONENTS\n+  HlmsPbs\n+  HlmsUnlit\n+  Overlay\n+  PlanarReflections\n+  PRIVATE_FOR ogre2\n+  QUIET\n+)\n+\n set(EXTRA_CMAKE_FLAGS)\n if(CMAKE_SYSTEM_PROCESSOR MATCHES \"^(aarch64.*|AARCH64.*|arm64.*|ARM64.*|arm.*|ARM.*)\")\n   # Flags for non SIMD architectures\n@@ -12,8 +49,9 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES \"^(aarch64.*|AARCH64.*|arm64.*|ARM64.*|arm.*|A\n endif()\n \n ament_vendor(${PROJECT_NAME}\n-  VCS_URL https://github.com/OGRECave/ogre-next.git\n-  VCS_VERSION v2.3.3\n+SATISFIED ${OGRE2_FOUND}\n+VCS_URL https://github.com/OGRECave/ogre-next.git\n+  VCS_VERSION v${LIB_VER}\n   CMAKE_ARGS\n     -DOGRE_STATIC:BOOL=OFF\n     -DOGRE_BUILD_COMPONENT_OVERLAY:BOOL=ON\n@@ -37,6 +75,11 @@ ament_vendor(${PROJECT_NAME}\n     patches/0001-Fix-incomplete-vulkan-linkage.patch\n )\n \n+message(\"OGRE2_FOUND: ${OGRE2_FOUND}\")\n+message(\"OGRE2_VERSION: ${OGRE2_VERSION}\")\n+message(\"OGRE2_INCLUDE_DIRS: ${OGRE2_INCLUDE_DIRS}\")\n+message(\"OGRE2_LIBRARIES: ${OGRE2_LIBRARIES}\")\n+\n if(BUILD_TESTING)\n   find_package(ament_lint_auto REQUIRED)\n   ament_lint_auto_find_test_dependencies()"
+        },
+        {
+          "sha": "c6cc2da42b64ff13481df2a5848e32244bf892e9",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/blob/c1596a8c8ab5f33da37e41b0de1e794ec5e0fd1b/package.xml",
+          "raw_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/raw/c1596a8c8ab5f33da37e41b0de1e794ec5e0fd1b/package.xml",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_ogre_next_vendor/contents/package.xml?ref=c1596a8c8ab5f33da37e41b0de1e794ec5e0fd1b",
+          "patch": "@@ -28,6 +28,7 @@\n \n   <buildtool_depend>ament_cmake</buildtool_depend>\n   <buildtool_depend>ament_cmake_vendor_package</buildtool_depend>\n+  <buildtool_depend>gz_cmake_vendor</buildtool_depend>\n \n   <depend>glslang-dev</depend>\n   <depend>glslc</depend>"
+        }
+      ]
+    },
+    {
+      "author": "mjcarroll",
+      "date": "2023-11-16T22:10:28Z",
+      "sha": "0e73c5e3cbb3098e9cef1c900bc79e918371c133",
+      "message": "Ogre Next Vendor package\n\nSigned-off-by: Michael Carroll <mjcarroll@intrinsic.ai>",
+      "files_changed": 4,
+      "additions": 321,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "6f96cb77b726c7ccefed85ef86ef1c675e82e187",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 35,
+          "deletions": 0,
+          "changes": 35,
+          "blob_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/blob/0e73c5e3cbb3098e9cef1c900bc79e918371c133/CMakeLists.txt",
+          "raw_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/raw/0e73c5e3cbb3098e9cef1c900bc79e918371c133/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_ogre_next_vendor/contents/CMakeLists.txt?ref=0e73c5e3cbb3098e9cef1c900bc79e918371c133",
+          "patch": "@@ -0,0 +1,35 @@\n+cmake_minimum_required(VERSION 3.10)\n+project(ogre_next_vendor)\n+\n+find_package(ament_cmake REQUIRED)\n+find_package(ament_cmake_vendor_package REQUIRED)\n+\n+ament_vendor(ogre_next_vendor\n+  VCS_URL https://github.com/OGRECave/ogre-next.git\n+  VCS_VERSION master\n+  CMAKE_ARGS\n+    -DOGRE_STATIC:BOOL=OFF\n+    -DOGRE_BUILD_COMPONENT_OVERLAY:BOOL=ON\n+    -DOGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS:BOOL=ON\n+    -DOGRE_BUILD_PLUGIN_PFX:BOOL=ON\n+    -DOGRE_BUILD_RENDERSYSTEM_GL3PLUS:BOOL=ON\n+    -DOGRE_BUILD_RENDERSYSTEM_VULKAN:BOOL=ON\n+    -DOGRE_BUILD_SAMPLES2:BOOL=OFF\n+    -DOGRE_BUILD_TESTS:BOOL=OFF\n+    -DOGRE_BUILD_TOOLS:BOOL=OFF\n+    -DOGRE_GLSUPPORT_USE_EGL_HEADLESS:BOOL=ON\n+    -DOGRE_GLSUPPORT_USE_GLX:BOOL=ON\n+    -DOGRE_VULKAN_WINDOW_NULL:BOOL=ON\n+    -DOGRE_VULKAN_WINDOW_XCB:BOOL=ON\n+    -DOGRE_USE_NEW_PROJECT_NAME:BOOL=ON\n+  PATCHES patches\n+)\n+\n+if(BUILD_TESTING)\n+  find_package(ament_lint_auto REQUIRED)\n+  ament_lint_auto_find_test_dependencies()\n+endif()\n+\n+ament_package(\n+  CONFIG_EXTRAS_POST \"ogre_next_vendor-extras.cmake.in\"\n+)"
+        },
+        {
+          "sha": "7579b10434c61461f7f1a070494da7e102a9bb6c",
+          "filename": "ogre_next_vendor-extras.cmake.in",
+          "status": "added",
+          "additions": 25,
+          "deletions": 0,
+          "changes": 25,
+          "blob_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/blob/0e73c5e3cbb3098e9cef1c900bc79e918371c133/ogre_next_vendor-extras.cmake.in",
+          "raw_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/raw/0e73c5e3cbb3098e9cef1c900bc79e918371c133/ogre_next_vendor-extras.cmake.in",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_ogre_next_vendor/contents/ogre_next_vendor-extras.cmake.in?ref=0e73c5e3cbb3098e9cef1c900bc79e918371c133",
+          "patch": "@@ -0,0 +1,25 @@\n+\n+set(OGRE_DIR \"${@PROJECT_NAME@_DIR}/../../../opt/ogre_next_vendor\")\n+\n+set(OGRE_LIBRARY_REL \"${OGRE_DIR}/lib/libOgreNextMain.so\")\n+set(OGRE_INCLUDE_DIR \"${OGRE_DIR}/include/OGRE-Next\")\n+set(OGRE_MEDIA_DIR \"${OGRE_DIR}/share/OGRE-Next/Media\")\n+\n+add_library(ogre_next_vendor::OgreMain UNKNOWN IMPORTED)\n+set_target_properties(ogre_next_vendor::OgreMain PROPERTIES IMPORTED_LOCATION_RELEASE ${OGRE_LIBRARY_REL})\n+set_property(TARGET ogre_next_vendor::OgreMain PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${OGRE_INCLUDE_DIR})\n+set_property(TARGET ogre_next_vendor::OgreMain APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)\n+\n+set(OGRE_VK_LIBRARY_REL \"${OGRE_DIR}/lib/libOgreNextMain.so\")\n+set(OGRE_VK_INCLUDE_DIR \"${OGRE_DIR}/include/OGRE-Next/RenderSystems/Vulkan/\")\n+\n+add_library(ogre_next_vendor::RenderSystemVulkan UNKNOWN IMPORTED)\n+set_target_properties(ogre_next_vendor::RenderSystemVulkan PROPERTIES IMPORTED_LOCATION_RELEASE ${OGRE_VK_LIBRARY_REL})\n+set_property(TARGET ogre_next_vendor::RenderSystemVulkan PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${OGRE_VK_INCLUDE_DIR})\n+set_property(TARGET ogre_next_vendor::RenderSystemVulkan APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)\n+\n+get_cmake_property(_variableNames VARIABLES)\n+list (SORT _variableNames)\n+foreach (_variableName ${_variableNames})\n+    message(STATUS \"${_variableName}=${${_variableName}}\")\n+endforeach()"
+        },
+        {
+          "sha": "4fac6ea366c9cf84b3164eb3b56c090c4ab394e6",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 35,
+          "deletions": 0,
+          "changes": 35,
+          "blob_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/blob/0e73c5e3cbb3098e9cef1c900bc79e918371c133/package.xml",
+          "raw_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/raw/0e73c5e3cbb3098e9cef1c900bc79e918371c133/package.xml",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_ogre_next_vendor/contents/package.xml?ref=0e73c5e3cbb3098e9cef1c900bc79e918371c133",
+          "patch": "@@ -0,0 +1,35 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model\n+  href=\"http://download.ros.org/schema/package_format2.xsd\"\n+  schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"2\">\n+  <name>ogre_next_vendor</name>\n+  <version>3.0.0</version>\n+  <description>\n+    Wrapper around ogre3d, it provides a fixed CMake module and an ExternalProject build of ogre.\n+  </description>\n+\n+  <maintainer email=\"mjcarroll@intrinsic.ai\">Michael Carroll</maintainer>\n+\n+  <license>Apache License 2.0</license>  <!-- the contents of this package are Apache 2.0 -->\n+  <license>MIT</license>  <!-- ogre is MIT (https://www.ogre3d.org/licensing) -->\n+\n+  <url type=\"website\">https://www.ogre3d.org/</url>\n+\n+  <author email=\"mjcarroll@intrinsic.ai\">Michael Carroll</author>\n+\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+  <buildtool_depend>ament_cmake_vendor_package</buildtool_depend>\n+\n+  <depend>libx11-dev</depend>\n+  <depend>libxaw</depend>\n+  <depend>libxrandr</depend>\n+  <depend>opengl</depend>\n+\n+  <test_depend>ament_cmake_xmllint</test_depend>\n+  <test_depend>ament_lint_auto</test_depend>\n+\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n+</package>"
+        },
+        {
+          "sha": "0da6aaa9acaf7434f0af3197f455106a53d016d4",
+          "filename": "patches/0001-Fix-incomplete-vulkan-linkage.patch",
+          "status": "added",
+          "additions": 226,
+          "deletions": 0,
+          "changes": 226,
+          "blob_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/blob/0e73c5e3cbb3098e9cef1c900bc79e918371c133/patches%2F0001-Fix-incomplete-vulkan-linkage.patch",
+          "raw_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/raw/0e73c5e3cbb3098e9cef1c900bc79e918371c133/patches%2F0001-Fix-incomplete-vulkan-linkage.patch",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_ogre_next_vendor/contents/patches%2F0001-Fix-incomplete-vulkan-linkage.patch?ref=0e73c5e3cbb3098e9cef1c900bc79e918371c133",
+          "patch": "@@ -0,0 +1,226 @@\n+From 012b7a30db3d8c9b85e4f4b940dcc37e93268c29 Mon Sep 17 00:00:00 2001\n+From: Michael Carroll <mjcarroll@intrinsic.ai>\n+Date: Thu, 16 Nov 2023 21:27:04 +0000\n+Subject: [PATCH] Fix incomplete vulkan linkage\n+\n+Signed-off-by: Michael Carroll <mjcarroll@intrinsic.ai>\n+---\n+ CMake/Dependencies.cmake            |   2 +-\n+ CMake/Packages/FindVulkan.cmake     | 175 ----------------------------\n+ RenderSystems/Vulkan/CMakeLists.txt |   4 +-\n+ 3 files changed, 4 insertions(+), 177 deletions(-)\n+ delete mode 100644 CMake/Packages/FindVulkan.cmake\n+\n+diff --git a/CMake/Dependencies.cmake b/CMake/Dependencies.cmake\n+index 7dd36f2..208c87c 100644\n+--- a/CMake/Dependencies.cmake\n++++ b/CMake/Dependencies.cmake\n+@@ -91,7 +91,7 @@ macro_log_feature(FreeImage_FOUND \"freeimage\" \"Support for commonly used graphic\n+ find_package(Freetype)\n+ macro_log_feature(FREETYPE_FOUND \"freetype\" \"Portable font engine\" \"http://www.freetype.org\" FALSE \"\" \"\")\n+ \n+-find_package(Vulkan)\n++find_package(Vulkan COMPONENTS glslang glslc shaderc_combined SPIRV-Tools)\n+ macro_log_feature(Vulkan_FOUND \"vulkan-sdk\" \"Vulkan SDK\" \"https://vulkan.lunarg.com/\" FALSE \"\" \"\")\n+ \n+ # Find X11\n+diff --git a/CMake/Packages/FindVulkan.cmake b/CMake/Packages/FindVulkan.cmake\n+deleted file mode 100644\n+index ce28772..0000000\n+--- a/CMake/Packages/FindVulkan.cmake\n++++ /dev/null\n+@@ -1,175 +0,0 @@\n+-# Distributed under the OSI-approved BSD 3-Clause License.  See accompanying\n+-# file Copyright.txt or https://cmake.org/licensing for details.\n+-\n+-#[=======================================================================[.rst:\n+-FindVulkan\n+-----------\n+-\n+-.. versionadded:: 3.7\n+-\n+-Find Vulkan, which is a low-overhead, cross-platform 3D graphics\n+-and computing API.\n+-\n+-IMPORTED Targets\n+-^^^^^^^^^^^^^^^^\n+-\n+-This module defines :prop_tgt:`IMPORTED` target ``Vulkan::Vulkan``, if\n+-Vulkan has been found.\n+-\n+-This module defines :prop_tgt:`IMPORTED` target ``Vulkan::glslc``, if\n+-Vulkan and the GLSLC SPIR-V compiler has been found.\n+-\n+-Result Variables\n+-^^^^^^^^^^^^^^^^\n+-\n+-This module defines the following variables::\n+-\n+-  Vulkan_FOUND          - \"True\" if Vulkan was found\n+-  Vulkan_INCLUDE_DIRS   - include directories for Vulkan\n+-  Vulkan_LIBRARIES      - link against this library to use Vulkan\n+-\n+-The module will also define three cache variables::\n+-\n+-  Vulkan_INCLUDE_DIR        - the Vulkan include directory\n+-  Vulkan_LIBRARY            - the path to the Vulkan library\n+-  Vulkan_GLSLC_EXECUTABLE   - the path to the GLSL SPIR-V compiler\n+-\n+-Hints\n+-^^^^^\n+-\n+-The ``VULKAN_SDK`` environment variable optionally specifies the\n+-location of the Vulkan SDK root directory for the given\n+-architecture. It is typically set by sourcing the toplevel\n+-``setup-env.sh`` script of the Vulkan SDK directory into the shell\n+-environment.\n+-\n+-#]=======================================================================]\n+-\n+-set( OGRE_VULKAN_SDK \"\" CACHE STRING \"Path to Vulkan SDK e.g. C:\\\\VulkanSDK\\\\1.2.148.1 or /home/user/vulkansdk\" )\n+-\n+-if(WIN32)\n+-\tfind_path(Vulkan_INCLUDE_DIR\n+-\t\tNAMES vulkan/vulkan.h\n+-\t\tHINTS\n+-\t\t\t\"${OGRE_DEPENDENCIES_DIR}/include\" \"${ENV_OGRE_DEPENDENCIES_DIR}/include\"\n+-\t\t\t\"${OGRE_SOURCE}/Dependencies/include\"\n+-\t\t\t\"${OGRE_VULKAN_SDK}/Include\"\n+-\t\t\t\"$ENV{VULKAN_SDK}/Include\"\n+-\t\t)\n+-\n+-\tfind_path(Vulkan_SHADERC_INCLUDE_DIR\n+-\t\tNAMES shaderc/shaderc.h\n+-\t\tHINTS\n+-\t\t\t\"${OGRE_DEPENDENCIES_DIR}/include\" \"${ENV_OGRE_DEPENDENCIES_DIR}/include\"\n+-\t\t\t\"${OGRE_SOURCE}/Dependencies/include\"\n+-\t\t\t\"${OGRE_VULKAN_SDK}/Include\"\n+-\t\t\t\"$ENV{VULKAN_SDK}/Include\"\n+-\t\t)\n+-\n+-\tif(CMAKE_SIZEOF_VOID_P EQUAL 8)\n+-\t\tset( VK_BIN \"Bin\" )\n+-\t\tset( VK_LIB \"Lib\" )\n+-\telseif(CMAKE_SIZEOF_VOID_P EQUAL 4)\n+-\t\tset( VK_BIN \"Bin32\" )\n+-\t\tset( VK_LIB \"Lib32\" )\n+-\tendif()\n+-\n+-\tfind_library(Vulkan_LIBRARY\n+-\t\tNAMES vulkan-1\n+-\t\tHINTS\n+-\t\t\t\"${OGRE_DEPENDENCIES_DIR}/lib\" \"${ENV_OGRE_DEPENDENCIES_DIR}/lib\"\n+-\t\t\t\"${OGRE_SOURCE}/Dependencies/lib\"\n+-\t\t\t\"${OGRE_VULKAN_SDK}/${VK_LIB}\"\n+-\t\t\t\"${OGRE_VULKAN_SDK}/${VK_BIN}\"\n+-\t\t\t\"$ENV{VULKAN_SDK}/${VK_LIB}\"\n+-\t\t\t\"$ENV{VULKAN_SDK}/${VK_BIN}\"\n+-\t\tPATH_SUFFIXES \"\" Release RelWithDebInfo MinSizeRel Debug\n+-\t\t)\n+-\tfind_library(Vulkan_SHADERC_LIB_REL\n+-\t\tNAMES shaderc_combined\n+-\t\tHINTS\n+-\t\t\t\"${OGRE_DEPENDENCIES_DIR}/lib\" \"${ENV_OGRE_DEPENDENCIES_DIR}/lib\"\n+-\t\t\t\"${OGRE_SOURCE}/Dependencies/lib\"\n+-\t\t\t\"${OGRE_VULKAN_SDK}/${VK_LIB}\"\n+-\t\t\t\"${OGRE_VULKAN_SDK}/${VK_BIN}\"\n+-\t\t\t\"$ENV{VULKAN_SDK}/${VK_LIB}\"\n+-\t\t\t\"$ENV{VULKAN_SDK}/${VK_BIN}\"\n+-\t\tPATH_SUFFIXES \"\" Release RelWithDebInfo MinSizeRel\n+-\t\t)\n+-\tfind_library(Vulkan_SHADERC_LIB_DBG\n+-\t\tNAMES shaderc_combined\n+-\t\tHINTS\n+-\t\t\t\"${OGRE_DEPENDENCIES_DIR}/lib\" \"${ENV_OGRE_DEPENDENCIES_DIR}/lib\"\n+-\t\t\t\"${OGRE_SOURCE}/Dependencies/lib\"\n+-\t\tPATH_SUFFIXES \"\" Debug\n+-\t\t)\n+-\tfind_program(Vulkan_GLSLC_EXECUTABLE\n+-\t\tNAMES glslc\n+-\t\tHINTS\n+-\t\t\t\"${OGRE_VULKAN_SDK}/${VK_BIN}\"\n+-\t\t\t\"$ENV{VULKAN_SDK}/${VK_BIN}\"\n+-\t\t)\n+-else()\n+-\tset( VK_ARCH \"x86_64\" )\n+-\tfind_path(Vulkan_INCLUDE_DIR\n+-\t\tNAMES vulkan/vulkan.h\n+-\t\tHINTS\n+-\t\t\t\"${OGRE_DEPENDENCIES_DIR}/lib\" \"${ENV_OGRE_DEPENDENCIES_DIR}/lib\"\n+-\t\t\t\"${OGRE_SOURCE}/Dependencies/lib\"\n+-\t\t\t\"${OGRE_VULKAN_SDK}/${VK_ARCH}/include\"\n+-\t\t\t\"$ENV{VULKAN_SDK}/include\"\n+-\t\t)\n+-\tfind_path(Vulkan_SHADERC_INCLUDE_DIR\n+-\t\tNAMES shaderc/shaderc.h\n+-\t\tHINTS\n+-\t\t\t\"${OGRE_DEPENDENCIES_DIR}/lib\" \"${ENV_OGRE_DEPENDENCIES_DIR}/lib\"\n+-\t\t\t\"${OGRE_SOURCE}/Dependencies/lib\"\n+-\t\t\t\"${OGRE_VULKAN_SDK}/${VK_ARCH}/include\"\n+-\t\t\t\"$ENV{VULKAN_SDK}/include\"\n+-\t\t)\n+-\tfind_library(Vulkan_LIBRARY\n+-\t\tNAMES vulkan\n+-\t\tHINTS\n+-\t\t\t\"${OGRE_DEPENDENCIES_DIR}/lib\" \"${ENV_OGRE_DEPENDENCIES_DIR}/lib\"\n+-\t\t\t\"${OGRE_SOURCE}/Dependencies/lib\"\n+-\t\t\t\"${OGRE_VULKAN_SDK}/${VK_ARCH}/lib\"\n+-\t\t\t\"$ENV{VULKAN_SDK}/lib\"\n+-\t\t)\n+-\tfind_library(Vulkan_SHADERC_LIB_REL\n+-\t\tNAMES shaderc_combined\n+-\t\tHINTS\n+-\t\t\t\"${OGRE_DEPENDENCIES_DIR}/lib\" \"${ENV_OGRE_DEPENDENCIES_DIR}/lib\"\n+-\t\t\t\"${OGRE_SOURCE}/Dependencies/lib\"\n+-\t\t\t\"${OGRE_VULKAN_SDK}/${VK_ARCH}/lib\"\n+-\t\t\t\"$ENV{VULKAN_SDK}/lib\"\n+-\t\t)\n+-\tset( Vulkan_SHADERC_LIB_DBG ${Vulkan_SHADERC_LIB_REL} )\n+-\tfind_program(Vulkan_GLSLC_EXECUTABLE\n+-\t\tNAMES glslc\n+-\t\tHINTS\n+-\t\t\t\"${OGRE_VULKAN_SDK}/${VK_ARCH}/bin\"\n+-\t\t\t\"$ENV{VULKAN_SDK}/bin\"\n+-\t\t)\n+-endif()\n+-\n+-set(Vulkan_LIBRARIES ${Vulkan_LIBRARY} optimized ${Vulkan_SHADERC_LIB_REL} debug ${Vulkan_SHADERC_LIB_DBG})\n+-set(Vulkan_INCLUDE_DIRS ${Vulkan_INCLUDE_DIR} ${Vulkan_SHADERC_INCLUDE_DIR})\n+-\n+-include(FindPackageHandleStandardArgs)\n+-find_package_handle_standard_args(Vulkan\n+-  DEFAULT_MSG\n+-  Vulkan_LIBRARY Vulkan_SHADERC_LIB_REL Vulkan_SHADERC_LIB_DBG Vulkan_INCLUDE_DIR)\n+-\n+-mark_as_advanced(Vulkan_INCLUDE_DIR Vulkan_LIBRARY Vulkan_SHADERC_INCLUDE_DIR Vulkan_SHADERC_LIB_REL Vulkan_SHADERC_LIB_DBG Vulkan_GLSLC_EXECUTABLE)\n+-\n+-if(Vulkan_FOUND AND NOT TARGET Vulkan::Vulkan)\n+-  add_library(Vulkan::Vulkan UNKNOWN IMPORTED)\n+-  set_target_properties(Vulkan::Vulkan PROPERTIES\n+-    IMPORTED_LOCATION \"${Vulkan_LIBRARIES}\"\n+-    INTERFACE_INCLUDE_DIRECTORIES \"${Vulkan_INCLUDE_DIRS}\")\n+-endif()\n+-\n+-if(Vulkan_FOUND AND Vulkan_GLSLC_EXECUTABLE AND NOT TARGET Vulkan::glslc)\n+-  add_executable(Vulkan::glslc IMPORTED)\n+-  set_property(TARGET Vulkan::glslc PROPERTY IMPORTED_LOCATION \"${Vulkan_GLSLC_EXECUTABLE}\")\n+-endif()\n+diff --git a/RenderSystems/Vulkan/CMakeLists.txt b/RenderSystems/Vulkan/CMakeLists.txt\n+index 2fc1859..45fd7a8 100644\n+--- a/RenderSystems/Vulkan/CMakeLists.txt\n++++ b/RenderSystems/Vulkan/CMakeLists.txt\n+@@ -34,8 +34,10 @@ include_directories(\n+ \n+ include_directories( ${Vulkan_INCLUDE_DIRS} )\n+ \n++message(STATUS \"========\" ${Vulkan_LIBRARIES})\n+ ogre_add_library(RenderSystem_Vulkan ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})\n+-target_link_libraries(RenderSystem_Vulkan ${OGRE_NEXT}Main ${Vulkan_LIBRARIES})\n++target_link_libraries(RenderSystem_Vulkan ${OGRE_NEXT}Main\n++  Vulkan::Vulkan MachineIndependent OSDependent GenericCodeGen OGLCompiler SPIRV SPIRV-Tools-opt SPIRV-Tools SPIRV-Tools-link shaderc_combined)\n+ \n+ if( OGRE_VULKAN_WINDOW_XCB )\n+ \ttarget_link_libraries(RenderSystem_Vulkan xcb-randr X11-xcb)\n+-- \n+2.43.0.rc1.413.gea7ed67945-goog\n+"
+        }
+      ]
+    },
+    {
+      "author": "Addisu Z. Taddese",
+      "date": "2024-03-13T22:10:54Z",
+      "sha": "204c7e5de9e8d4f5bcf1249c2390f0574d8a64e3",
+      "message": "Aligned with  build flags from our fork\n\nSigned-off-by: Addisu Z. Taddese <addisu@openrobotics.org>",
+      "files_changed": 4,
+      "additions": 39,
+      "deletions": 44,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "130ca9ff2b113c0487b358eb3c8c4c1b130063aa",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 21,
+          "deletions": 16,
+          "changes": 37,
+          "blob_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/blob/204c7e5de9e8d4f5bcf1249c2390f0574d8a64e3/CMakeLists.txt",
+          "raw_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/raw/204c7e5de9e8d4f5bcf1249c2390f0574d8a64e3/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_ogre_next_vendor/contents/CMakeLists.txt?ref=204c7e5de9e8d4f5bcf1249c2390f0574d8a64e3",
+          "patch": "@@ -1,28 +1,33 @@\n cmake_minimum_required(VERSION 3.10)\n-project(ogre_next_vendor)\n+project(gazebo_ogre_next_vendor)\n \n find_package(ament_cmake REQUIRED)\n find_package(ament_cmake_vendor_package REQUIRED)\n \n-ament_vendor(ogre_next_vendor\n+ament_vendor(${PROJECT_NAME}\n   VCS_URL https://github.com/OGRECave/ogre-next.git\n-  VCS_VERSION master\n+  VCS_VERSION v2.3.3\n   CMAKE_ARGS\n-    -DOGRE_STATIC:BOOL=OFF\n+    -DOGRE_BUILD_COMPONENT_HLMS:BOOL=TRUE\n     -DOGRE_BUILD_COMPONENT_OVERLAY:BOOL=ON\n-    -DOGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS:BOOL=ON\n+    -DOGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS:BOOL=TRUE\n     -DOGRE_BUILD_PLUGIN_PFX:BOOL=ON\n-    -DOGRE_BUILD_RENDERSYSTEM_GL3PLUS:BOOL=ON\n-    -DOGRE_BUILD_RENDERSYSTEM_VULKAN:BOOL=ON\n-    -DOGRE_BUILD_SAMPLES2:BOOL=OFF\n-    -DOGRE_BUILD_TESTS:BOOL=OFF\n-    -DOGRE_BUILD_TOOLS:BOOL=OFF\n-    -DOGRE_GLSUPPORT_USE_EGL_HEADLESS:BOOL=ON\n-    -DOGRE_GLSUPPORT_USE_GLX:BOOL=ON\n-    -DOGRE_VULKAN_WINDOW_NULL:BOOL=ON\n-    -DOGRE_VULKAN_WINDOW_XCB:BOOL=ON\n+    -DOGRE_BUILD_RENDERSYSTEM_GL3PLUS:BOOL=TRUE\n+    -DOGRE_BUILD_RENDERSYSTEM_GLES2:BOOL=FALSE\n+    -DOGRE_BUILD_RENDERSYSTEM_VULKAN:BOOL=TRUE\n+    -DOGRE_BUILD_SAMPLES2:BOOL=FALSE\n+    -DOGRE_CONFIG_UNIX_NO_X11:BOOL=FALSE\n+    -DOGRE_FULL_RPATH:BOOL=FALSE\n+    -DOGRE_GLSUPPORT_USE_EGL_HEADLESS:BOOL=TRUE\n+    -DOGRE_GLSUPPORT_USE_GLX:BOOL=TRUE\n+    -DOGRE_INSTALL_DOCS:BOOL=FALSE\n+    -DOGRE_INSTALL_SAMPLES:BOOL=FALSE\n     -DOGRE_USE_NEW_PROJECT_NAME:BOOL=ON\n-  PATCHES patches\n+    -DOGRE_VULKAN_WINDOW_NULL:BOOL=TRUE\n+    -DOGRE_VULKAN_WINDOW_XCB:BOOL=ON\n+  GLOBAL_HOOK\n+  PATCHES\n+    patches/0001-Fix-incomplete-vulkan-linkage.patch\n )\n \n if(BUILD_TESTING)\n@@ -31,5 +36,5 @@ if(BUILD_TESTING)\n endif()\n \n ament_package(\n-  CONFIG_EXTRAS_POST \"ogre_next_vendor-extras.cmake.in\"\n+  CONFIG_EXTRAS_POST \"gazebo_ogre_next_vendor-extras.cmake.in\"\n )"
+        },
+        {
+          "sha": "36d6f37f6a0777d5bc7438ec7943015dc4572036",
+          "filename": "gazebo_ogre_next_vendor-extras.cmake.in",
+          "status": "added",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/blob/204c7e5de9e8d4f5bcf1249c2390f0574d8a64e3/gazebo_ogre_next_vendor-extras.cmake.in",
+          "raw_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/raw/204c7e5de9e8d4f5bcf1249c2390f0574d8a64e3/gazebo_ogre_next_vendor-extras.cmake.in",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_ogre_next_vendor/contents/gazebo_ogre_next_vendor-extras.cmake.in?ref=204c7e5de9e8d4f5bcf1249c2390f0574d8a64e3",
+          "patch": "@@ -0,0 +1,3 @@\n+\n+set(ENV{PKG_CONFIG_PATH} \"$ENV{PKG_CONFIG_PATH}:@CMAKE_INSTALL_PREFIX@/opt/@PROJECT_NAME@/lib/pkgconfig\")\n+"
+        },
+        {
+          "sha": "7579b10434c61461f7f1a070494da7e102a9bb6c",
+          "filename": "ogre_next_vendor-extras.cmake.in",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 25,
+          "changes": 25,
+          "blob_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/blob/0e73c5e3cbb3098e9cef1c900bc79e918371c133/ogre_next_vendor-extras.cmake.in",
+          "raw_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/raw/0e73c5e3cbb3098e9cef1c900bc79e918371c133/ogre_next_vendor-extras.cmake.in",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_ogre_next_vendor/contents/ogre_next_vendor-extras.cmake.in?ref=0e73c5e3cbb3098e9cef1c900bc79e918371c133",
+          "patch": "@@ -1,25 +0,0 @@\n-\n-set(OGRE_DIR \"${@PROJECT_NAME@_DIR}/../../../opt/ogre_next_vendor\")\n-\n-set(OGRE_LIBRARY_REL \"${OGRE_DIR}/lib/libOgreNextMain.so\")\n-set(OGRE_INCLUDE_DIR \"${OGRE_DIR}/include/OGRE-Next\")\n-set(OGRE_MEDIA_DIR \"${OGRE_DIR}/share/OGRE-Next/Media\")\n-\n-add_library(ogre_next_vendor::OgreMain UNKNOWN IMPORTED)\n-set_target_properties(ogre_next_vendor::OgreMain PROPERTIES IMPORTED_LOCATION_RELEASE ${OGRE_LIBRARY_REL})\n-set_property(TARGET ogre_next_vendor::OgreMain PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${OGRE_INCLUDE_DIR})\n-set_property(TARGET ogre_next_vendor::OgreMain APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)\n-\n-set(OGRE_VK_LIBRARY_REL \"${OGRE_DIR}/lib/libOgreNextMain.so\")\n-set(OGRE_VK_INCLUDE_DIR \"${OGRE_DIR}/include/OGRE-Next/RenderSystems/Vulkan/\")\n-\n-add_library(ogre_next_vendor::RenderSystemVulkan UNKNOWN IMPORTED)\n-set_target_properties(ogre_next_vendor::RenderSystemVulkan PROPERTIES IMPORTED_LOCATION_RELEASE ${OGRE_VK_LIBRARY_REL})\n-set_property(TARGET ogre_next_vendor::RenderSystemVulkan PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${OGRE_VK_INCLUDE_DIR})\n-set_property(TARGET ogre_next_vendor::RenderSystemVulkan APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)\n-\n-get_cmake_property(_variableNames VARIABLES)\n-list (SORT _variableNames)\n-foreach (_variableName ${_variableNames})\n-    message(STATUS \"${_variableName}=${${_variableName}}\")\n-endforeach()"
+        },
+        {
+          "sha": "58442bef82ee53a7f34235422af40220937ac50f",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 3,
+          "changes": 18,
+          "blob_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/blob/204c7e5de9e8d4f5bcf1249c2390f0574d8a64e3/package.xml",
+          "raw_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/raw/204c7e5de9e8d4f5bcf1249c2390f0574d8a64e3/package.xml",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_ogre_next_vendor/contents/package.xml?ref=204c7e5de9e8d4f5bcf1249c2390f0574d8a64e3",
+          "patch": "@@ -3,8 +3,8 @@\n   href=\"http://download.ros.org/schema/package_format2.xsd\"\n   schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"2\">\n-  <name>ogre_next_vendor</name>\n-  <version>3.0.0</version>\n+  <name>gazebo_ogre_next_vendor</name>\n+  <version>2.3.3</version>\n   <description>\n     Wrapper around ogre3d, it provides a fixed CMake module and an ExternalProject build of ogre.\n   </description>\n@@ -25,10 +25,22 @@\n   <depend>libxaw</depend>\n   <depend>libxrandr</depend>\n   <depend>opengl</depend>\n+  <depend>libpoco-dev</depend>\n+  <depend>libfreetype-dev</depend>\n+  <depend>rapidjson</depend>\n+  <depend>libzzip-dev</depend>\n+  <depend>libx11-xcb-dev</depend>\n+  <depend>libxcb-randr0-dev</depend>\n+  <depend>libvulkan-dev</depend>\n+  <depend>libsdl2-dev</depend>\n+  <depend>libtbb-dev</depend>\n+  <depend>libtinyxml-dev</depend>\n+  <depend>glslang-dev</depend>\n+  <depend>glslc</depend>\n+  <depend>libshaderc-dev</depend>\n \n   <test_depend>ament_cmake_xmllint</test_depend>\n   <test_depend>ament_lint_auto</test_depend>\n-\n   <export>\n     <build_type>ament_cmake</build_type>\n   </export>"
+        }
+      ]
+    },
+    {
+      "author": "Michael Carroll",
+      "date": "2023-11-16T22:10:28Z",
+      "sha": "0e73c5e3cbb3098e9cef1c900bc79e918371c133",
+      "message": "Ogre Next Vendor package\n\nSigned-off-by: Michael Carroll <mjcarroll@intrinsic.ai>",
+      "files_changed": 4,
+      "additions": 321,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "6f96cb77b726c7ccefed85ef86ef1c675e82e187",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 35,
+          "deletions": 0,
+          "changes": 35,
+          "blob_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/blob/0e73c5e3cbb3098e9cef1c900bc79e918371c133/CMakeLists.txt",
+          "raw_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/raw/0e73c5e3cbb3098e9cef1c900bc79e918371c133/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_ogre_next_vendor/contents/CMakeLists.txt?ref=0e73c5e3cbb3098e9cef1c900bc79e918371c133",
+          "patch": "@@ -0,0 +1,35 @@\n+cmake_minimum_required(VERSION 3.10)\n+project(ogre_next_vendor)\n+\n+find_package(ament_cmake REQUIRED)\n+find_package(ament_cmake_vendor_package REQUIRED)\n+\n+ament_vendor(ogre_next_vendor\n+  VCS_URL https://github.com/OGRECave/ogre-next.git\n+  VCS_VERSION master\n+  CMAKE_ARGS\n+    -DOGRE_STATIC:BOOL=OFF\n+    -DOGRE_BUILD_COMPONENT_OVERLAY:BOOL=ON\n+    -DOGRE_BUILD_COMPONENT_PLANAR_REFLECTIONS:BOOL=ON\n+    -DOGRE_BUILD_PLUGIN_PFX:BOOL=ON\n+    -DOGRE_BUILD_RENDERSYSTEM_GL3PLUS:BOOL=ON\n+    -DOGRE_BUILD_RENDERSYSTEM_VULKAN:BOOL=ON\n+    -DOGRE_BUILD_SAMPLES2:BOOL=OFF\n+    -DOGRE_BUILD_TESTS:BOOL=OFF\n+    -DOGRE_BUILD_TOOLS:BOOL=OFF\n+    -DOGRE_GLSUPPORT_USE_EGL_HEADLESS:BOOL=ON\n+    -DOGRE_GLSUPPORT_USE_GLX:BOOL=ON\n+    -DOGRE_VULKAN_WINDOW_NULL:BOOL=ON\n+    -DOGRE_VULKAN_WINDOW_XCB:BOOL=ON\n+    -DOGRE_USE_NEW_PROJECT_NAME:BOOL=ON\n+  PATCHES patches\n+)\n+\n+if(BUILD_TESTING)\n+  find_package(ament_lint_auto REQUIRED)\n+  ament_lint_auto_find_test_dependencies()\n+endif()\n+\n+ament_package(\n+  CONFIG_EXTRAS_POST \"ogre_next_vendor-extras.cmake.in\"\n+)"
+        },
+        {
+          "sha": "7579b10434c61461f7f1a070494da7e102a9bb6c",
+          "filename": "ogre_next_vendor-extras.cmake.in",
+          "status": "added",
+          "additions": 25,
+          "deletions": 0,
+          "changes": 25,
+          "blob_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/blob/0e73c5e3cbb3098e9cef1c900bc79e918371c133/ogre_next_vendor-extras.cmake.in",
+          "raw_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/raw/0e73c5e3cbb3098e9cef1c900bc79e918371c133/ogre_next_vendor-extras.cmake.in",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_ogre_next_vendor/contents/ogre_next_vendor-extras.cmake.in?ref=0e73c5e3cbb3098e9cef1c900bc79e918371c133",
+          "patch": "@@ -0,0 +1,25 @@\n+\n+set(OGRE_DIR \"${@PROJECT_NAME@_DIR}/../../../opt/ogre_next_vendor\")\n+\n+set(OGRE_LIBRARY_REL \"${OGRE_DIR}/lib/libOgreNextMain.so\")\n+set(OGRE_INCLUDE_DIR \"${OGRE_DIR}/include/OGRE-Next\")\n+set(OGRE_MEDIA_DIR \"${OGRE_DIR}/share/OGRE-Next/Media\")\n+\n+add_library(ogre_next_vendor::OgreMain UNKNOWN IMPORTED)\n+set_target_properties(ogre_next_vendor::OgreMain PROPERTIES IMPORTED_LOCATION_RELEASE ${OGRE_LIBRARY_REL})\n+set_property(TARGET ogre_next_vendor::OgreMain PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${OGRE_INCLUDE_DIR})\n+set_property(TARGET ogre_next_vendor::OgreMain APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)\n+\n+set(OGRE_VK_LIBRARY_REL \"${OGRE_DIR}/lib/libOgreNextMain.so\")\n+set(OGRE_VK_INCLUDE_DIR \"${OGRE_DIR}/include/OGRE-Next/RenderSystems/Vulkan/\")\n+\n+add_library(ogre_next_vendor::RenderSystemVulkan UNKNOWN IMPORTED)\n+set_target_properties(ogre_next_vendor::RenderSystemVulkan PROPERTIES IMPORTED_LOCATION_RELEASE ${OGRE_VK_LIBRARY_REL})\n+set_property(TARGET ogre_next_vendor::RenderSystemVulkan PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${OGRE_VK_INCLUDE_DIR})\n+set_property(TARGET ogre_next_vendor::RenderSystemVulkan APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)\n+\n+get_cmake_property(_variableNames VARIABLES)\n+list (SORT _variableNames)\n+foreach (_variableName ${_variableNames})\n+    message(STATUS \"${_variableName}=${${_variableName}}\")\n+endforeach()"
+        },
+        {
+          "sha": "4fac6ea366c9cf84b3164eb3b56c090c4ab394e6",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 35,
+          "deletions": 0,
+          "changes": 35,
+          "blob_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/blob/0e73c5e3cbb3098e9cef1c900bc79e918371c133/package.xml",
+          "raw_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/raw/0e73c5e3cbb3098e9cef1c900bc79e918371c133/package.xml",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_ogre_next_vendor/contents/package.xml?ref=0e73c5e3cbb3098e9cef1c900bc79e918371c133",
+          "patch": "@@ -0,0 +1,35 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model\n+  href=\"http://download.ros.org/schema/package_format2.xsd\"\n+  schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"2\">\n+  <name>ogre_next_vendor</name>\n+  <version>3.0.0</version>\n+  <description>\n+    Wrapper around ogre3d, it provides a fixed CMake module and an ExternalProject build of ogre.\n+  </description>\n+\n+  <maintainer email=\"mjcarroll@intrinsic.ai\">Michael Carroll</maintainer>\n+\n+  <license>Apache License 2.0</license>  <!-- the contents of this package are Apache 2.0 -->\n+  <license>MIT</license>  <!-- ogre is MIT (https://www.ogre3d.org/licensing) -->\n+\n+  <url type=\"website\">https://www.ogre3d.org/</url>\n+\n+  <author email=\"mjcarroll@intrinsic.ai\">Michael Carroll</author>\n+\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+  <buildtool_depend>ament_cmake_vendor_package</buildtool_depend>\n+\n+  <depend>libx11-dev</depend>\n+  <depend>libxaw</depend>\n+  <depend>libxrandr</depend>\n+  <depend>opengl</depend>\n+\n+  <test_depend>ament_cmake_xmllint</test_depend>\n+  <test_depend>ament_lint_auto</test_depend>\n+\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n+</package>"
+        },
+        {
+          "sha": "0da6aaa9acaf7434f0af3197f455106a53d016d4",
+          "filename": "patches/0001-Fix-incomplete-vulkan-linkage.patch",
+          "status": "added",
+          "additions": 226,
+          "deletions": 0,
+          "changes": 226,
+          "blob_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/blob/0e73c5e3cbb3098e9cef1c900bc79e918371c133/patches%2F0001-Fix-incomplete-vulkan-linkage.patch",
+          "raw_url": "https://github.com/gazebo-release/gz_ogre_next_vendor/raw/0e73c5e3cbb3098e9cef1c900bc79e918371c133/patches%2F0001-Fix-incomplete-vulkan-linkage.patch",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_ogre_next_vendor/contents/patches%2F0001-Fix-incomplete-vulkan-linkage.patch?ref=0e73c5e3cbb3098e9cef1c900bc79e918371c133",
+          "patch": "@@ -0,0 +1,226 @@\n+From 012b7a30db3d8c9b85e4f4b940dcc37e93268c29 Mon Sep 17 00:00:00 2001\n+From: Michael Carroll <mjcarroll@intrinsic.ai>\n+Date: Thu, 16 Nov 2023 21:27:04 +0000\n+Subject: [PATCH] Fix incomplete vulkan linkage\n+\n+Signed-off-by: Michael Carroll <mjcarroll@intrinsic.ai>\n+---\n+ CMake/Dependencies.cmake            |   2 +-\n+ CMake/Packages/FindVulkan.cmake     | 175 ----------------------------\n+ RenderSystems/Vulkan/CMakeLists.txt |   4 +-\n+ 3 files changed, 4 insertions(+), 177 deletions(-)\n+ delete mode 100644 CMake/Packages/FindVulkan.cmake\n+\n+diff --git a/CMake/Dependencies.cmake b/CMake/Dependencies.cmake\n+index 7dd36f2..208c87c 100644\n+--- a/CMake/Dependencies.cmake\n++++ b/CMake/Dependencies.cmake\n+@@ -91,7 +91,7 @@ macro_log_feature(FreeImage_FOUND \"freeimage\" \"Support for commonly used graphic\n+ find_package(Freetype)\n+ macro_log_feature(FREETYPE_FOUND \"freetype\" \"Portable font engine\" \"http://www.freetype.org\" FALSE \"\" \"\")\n+ \n+-find_package(Vulkan)\n++find_package(Vulkan COMPONENTS glslang glslc shaderc_combined SPIRV-Tools)\n+ macro_log_feature(Vulkan_FOUND \"vulkan-sdk\" \"Vulkan SDK\" \"https://vulkan.lunarg.com/\" FALSE \"\" \"\")\n+ \n+ # Find X11\n+diff --git a/CMake/Packages/FindVulkan.cmake b/CMake/Packages/FindVulkan.cmake\n+deleted file mode 100644\n+index ce28772..0000000\n+--- a/CMake/Packages/FindVulkan.cmake\n++++ /dev/null\n+@@ -1,175 +0,0 @@\n+-# Distributed under the OSI-approved BSD 3-Clause License.  See accompanying\n+-# file Copyright.txt or https://cmake.org/licensing for details.\n+-\n+-#[=======================================================================[.rst:\n+-FindVulkan\n+-----------\n+-\n+-.. versionadded:: 3.7\n+-\n+-Find Vulkan, which is a low-overhead, cross-platform 3D graphics\n+-and computing API.\n+-\n+-IMPORTED Targets\n+-^^^^^^^^^^^^^^^^\n+-\n+-This module defines :prop_tgt:`IMPORTED` target ``Vulkan::Vulkan``, if\n+-Vulkan has been found.\n+-\n+-This module defines :prop_tgt:`IMPORTED` target ``Vulkan::glslc``, if\n+-Vulkan and the GLSLC SPIR-V compiler has been found.\n+-\n+-Result Variables\n+-^^^^^^^^^^^^^^^^\n+-\n+-This module defines the following variables::\n+-\n+-  Vulkan_FOUND          - \"True\" if Vulkan was found\n+-  Vulkan_INCLUDE_DIRS   - include directories for Vulkan\n+-  Vulkan_LIBRARIES      - link against this library to use Vulkan\n+-\n+-The module will also define three cache variables::\n+-\n+-  Vulkan_INCLUDE_DIR        - the Vulkan include directory\n+-  Vulkan_LIBRARY            - the path to the Vulkan library\n+-  Vulkan_GLSLC_EXECUTABLE   - the path to the GLSL SPIR-V compiler\n+-\n+-Hints\n+-^^^^^\n+-\n+-The ``VULKAN_SDK`` environment variable optionally specifies the\n+-location of the Vulkan SDK root directory for the given\n+-architecture. It is typically set by sourcing the toplevel\n+-``setup-env.sh`` script of the Vulkan SDK directory into the shell\n+-environment.\n+-\n+-#]=======================================================================]\n+-\n+-set( OGRE_VULKAN_SDK \"\" CACHE STRING \"Path to Vulkan SDK e.g. C:\\\\VulkanSDK\\\\1.2.148.1 or /home/user/vulkansdk\" )\n+-\n+-if(WIN32)\n+-\tfind_path(Vulkan_INCLUDE_DIR\n+-\t\tNAMES vulkan/vulkan.h\n+-\t\tHINTS\n+-\t\t\t\"${OGRE_DEPENDENCIES_DIR}/include\" \"${ENV_OGRE_DEPENDENCIES_DIR}/include\"\n+-\t\t\t\"${OGRE_SOURCE}/Dependencies/include\"\n+-\t\t\t\"${OGRE_VULKAN_SDK}/Include\"\n+-\t\t\t\"$ENV{VULKAN_SDK}/Include\"\n+-\t\t)\n+-\n+-\tfind_path(Vulkan_SHADERC_INCLUDE_DIR\n+-\t\tNAMES shaderc/shaderc.h\n+-\t\tHINTS\n+-\t\t\t\"${OGRE_DEPENDENCIES_DIR}/include\" \"${ENV_OGRE_DEPENDENCIES_DIR}/include\"\n+-\t\t\t\"${OGRE_SOURCE}/Dependencies/include\"\n+-\t\t\t\"${OGRE_VULKAN_SDK}/Include\"\n+-\t\t\t\"$ENV{VULKAN_SDK}/Include\"\n+-\t\t)\n+-\n+-\tif(CMAKE_SIZEOF_VOID_P EQUAL 8)\n+-\t\tset( VK_BIN \"Bin\" )\n+-\t\tset( VK_LIB \"Lib\" )\n+-\telseif(CMAKE_SIZEOF_VOID_P EQUAL 4)\n+-\t\tset( VK_BIN \"Bin32\" )\n+-\t\tset( VK_LIB \"Lib32\" )\n+-\tendif()\n+-\n+-\tfind_library(Vulkan_LIBRARY\n+-\t\tNAMES vulkan-1\n+-\t\tHINTS\n+-\t\t\t\"${OGRE_DEPENDENCIES_DIR}/lib\" \"${ENV_OGRE_DEPENDENCIES_DIR}/lib\"\n+-\t\t\t\"${OGRE_SOURCE}/Dependencies/lib\"\n+-\t\t\t\"${OGRE_VULKAN_SDK}/${VK_LIB}\"\n+-\t\t\t\"${OGRE_VULKAN_SDK}/${VK_BIN}\"\n+-\t\t\t\"$ENV{VULKAN_SDK}/${VK_LIB}\"\n+-\t\t\t\"$ENV{VULKAN_SDK}/${VK_BIN}\"\n+-\t\tPATH_SUFFIXES \"\" Release RelWithDebInfo MinSizeRel Debug\n+-\t\t)\n+-\tfind_library(Vulkan_SHADERC_LIB_REL\n+-\t\tNAMES shaderc_combined\n+-\t\tHINTS\n+-\t\t\t\"${OGRE_DEPENDENCIES_DIR}/lib\" \"${ENV_OGRE_DEPENDENCIES_DIR}/lib\"\n+-\t\t\t\"${OGRE_SOURCE}/Dependencies/lib\"\n+-\t\t\t\"${OGRE_VULKAN_SDK}/${VK_LIB}\"\n+-\t\t\t\"${OGRE_VULKAN_SDK}/${VK_BIN}\"\n+-\t\t\t\"$ENV{VULKAN_SDK}/${VK_LIB}\"\n+-\t\t\t\"$ENV{VULKAN_SDK}/${VK_BIN}\"\n+-\t\tPATH_SUFFIXES \"\" Release RelWithDebInfo MinSizeRel\n+-\t\t)\n+-\tfind_library(Vulkan_SHADERC_LIB_DBG\n+-\t\tNAMES shaderc_combined\n+-\t\tHINTS\n+-\t\t\t\"${OGRE_DEPENDENCIES_DIR}/lib\" \"${ENV_OGRE_DEPENDENCIES_DIR}/lib\"\n+-\t\t\t\"${OGRE_SOURCE}/Dependencies/lib\"\n+-\t\tPATH_SUFFIXES \"\" Debug\n+-\t\t)\n+-\tfind_program(Vulkan_GLSLC_EXECUTABLE\n+-\t\tNAMES glslc\n+-\t\tHINTS\n+-\t\t\t\"${OGRE_VULKAN_SDK}/${VK_BIN}\"\n+-\t\t\t\"$ENV{VULKAN_SDK}/${VK_BIN}\"\n+-\t\t)\n+-else()\n+-\tset( VK_ARCH \"x86_64\" )\n+-\tfind_path(Vulkan_INCLUDE_DIR\n+-\t\tNAMES vulkan/vulkan.h\n+-\t\tHINTS\n+-\t\t\t\"${OGRE_DEPENDENCIES_DIR}/lib\" \"${ENV_OGRE_DEPENDENCIES_DIR}/lib\"\n+-\t\t\t\"${OGRE_SOURCE}/Dependencies/lib\"\n+-\t\t\t\"${OGRE_VULKAN_SDK}/${VK_ARCH}/include\"\n+-\t\t\t\"$ENV{VULKAN_SDK}/include\"\n+-\t\t)\n+-\tfind_path(Vulkan_SHADERC_INCLUDE_DIR\n+-\t\tNAMES shaderc/shaderc.h\n+-\t\tHINTS\n+-\t\t\t\"${OGRE_DEPENDENCIES_DIR}/lib\" \"${ENV_OGRE_DEPENDENCIES_DIR}/lib\"\n+-\t\t\t\"${OGRE_SOURCE}/Dependencies/lib\"\n+-\t\t\t\"${OGRE_VULKAN_SDK}/${VK_ARCH}/include\"\n+-\t\t\t\"$ENV{VULKAN_SDK}/include\"\n+-\t\t)\n+-\tfind_library(Vulkan_LIBRARY\n+-\t\tNAMES vulkan\n+-\t\tHINTS\n+-\t\t\t\"${OGRE_DEPENDENCIES_DIR}/lib\" \"${ENV_OGRE_DEPENDENCIES_DIR}/lib\"\n+-\t\t\t\"${OGRE_SOURCE}/Dependencies/lib\"\n+-\t\t\t\"${OGRE_VULKAN_SDK}/${VK_ARCH}/lib\"\n+-\t\t\t\"$ENV{VULKAN_SDK}/lib\"\n+-\t\t)\n+-\tfind_library(Vulkan_SHADERC_LIB_REL\n+-\t\tNAMES shaderc_combined\n+-\t\tHINTS\n+-\t\t\t\"${OGRE_DEPENDENCIES_DIR}/lib\" \"${ENV_OGRE_DEPENDENCIES_DIR}/lib\"\n+-\t\t\t\"${OGRE_SOURCE}/Dependencies/lib\"\n+-\t\t\t\"${OGRE_VULKAN_SDK}/${VK_ARCH}/lib\"\n+-\t\t\t\"$ENV{VULKAN_SDK}/lib\"\n+-\t\t)\n+-\tset( Vulkan_SHADERC_LIB_DBG ${Vulkan_SHADERC_LIB_REL} )\n+-\tfind_program(Vulkan_GLSLC_EXECUTABLE\n+-\t\tNAMES glslc\n+-\t\tHINTS\n+-\t\t\t\"${OGRE_VULKAN_SDK}/${VK_ARCH}/bin\"\n+-\t\t\t\"$ENV{VULKAN_SDK}/bin\"\n+-\t\t)\n+-endif()\n+-\n+-set(Vulkan_LIBRARIES ${Vulkan_LIBRARY} optimized ${Vulkan_SHADERC_LIB_REL} debug ${Vulkan_SHADERC_LIB_DBG})\n+-set(Vulkan_INCLUDE_DIRS ${Vulkan_INCLUDE_DIR} ${Vulkan_SHADERC_INCLUDE_DIR})\n+-\n+-include(FindPackageHandleStandardArgs)\n+-find_package_handle_standard_args(Vulkan\n+-  DEFAULT_MSG\n+-  Vulkan_LIBRARY Vulkan_SHADERC_LIB_REL Vulkan_SHADERC_LIB_DBG Vulkan_INCLUDE_DIR)\n+-\n+-mark_as_advanced(Vulkan_INCLUDE_DIR Vulkan_LIBRARY Vulkan_SHADERC_INCLUDE_DIR Vulkan_SHADERC_LIB_REL Vulkan_SHADERC_LIB_DBG Vulkan_GLSLC_EXECUTABLE)\n+-\n+-if(Vulkan_FOUND AND NOT TARGET Vulkan::Vulkan)\n+-  add_library(Vulkan::Vulkan UNKNOWN IMPORTED)\n+-  set_target_properties(Vulkan::Vulkan PROPERTIES\n+-    IMPORTED_LOCATION \"${Vulkan_LIBRARIES}\"\n+-    INTERFACE_INCLUDE_DIRECTORIES \"${Vulkan_INCLUDE_DIRS}\")\n+-endif()\n+-\n+-if(Vulkan_FOUND AND Vulkan_GLSLC_EXECUTABLE AND NOT TARGET Vulkan::glslc)\n+-  add_executable(Vulkan::glslc IMPORTED)\n+-  set_property(TARGET Vulkan::glslc PROPERTY IMPORTED_LOCATION \"${Vulkan_GLSLC_EXECUTABLE}\")\n+-endif()\n+diff --git a/RenderSystems/Vulkan/CMakeLists.txt b/RenderSystems/Vulkan/CMakeLists.txt\n+index 2fc1859..45fd7a8 100644\n+--- a/RenderSystems/Vulkan/CMakeLists.txt\n++++ b/RenderSystems/Vulkan/CMakeLists.txt\n+@@ -34,8 +34,10 @@ include_directories(\n+ \n+ include_directories( ${Vulkan_INCLUDE_DIRS} )\n+ \n++message(STATUS \"========\" ${Vulkan_LIBRARIES})\n+ ogre_add_library(RenderSystem_Vulkan ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})\n+-target_link_libraries(RenderSystem_Vulkan ${OGRE_NEXT}Main ${Vulkan_LIBRARIES})\n++target_link_libraries(RenderSystem_Vulkan ${OGRE_NEXT}Main\n++  Vulkan::Vulkan MachineIndependent OSDependent GenericCodeGen OGLCompiler SPIRV SPIRV-Tools-opt SPIRV-Tools SPIRV-Tools-link shaderc_combined)\n+ \n+ if( OGRE_VULKAN_WINDOW_XCB )\n+ \ttarget_link_libraries(RenderSystem_Vulkan xcb-randr X11-xcb)\n+-- \n+2.43.0.rc1.413.gea7ed67945-goog\n+"
+        }
+      ]
+    }
+  ]
+}

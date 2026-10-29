@@ -1,0 +1,359 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T03:59:39Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "PickNikRobotics",
+    "repo": "data_tamer"
+  },
+  "data": [
+    {
+      "author": "henrygerardmoore",
+      "date": "2023-11-10T20:57:40Z",
+      "sha": "e89895148a1b2f0e6e3211129ca96edae8a02171",
+      "message": "typo fixes",
+      "files_changed": 3,
+      "additions": 14,
+      "deletions": 11,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "409d346930f6297f9a461a1bbc304195e9aaaff8",
+          "filename": "data_tamer/examples/custom_types.cpp",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 5,
+          "changes": 10,
+          "blob_url": "https://github.com/PickNikRobotics/data_tamer/blob/e89895148a1b2f0e6e3211129ca96edae8a02171/data_tamer%2Fexamples%2Fcustom_types.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/data_tamer/raw/e89895148a1b2f0e6e3211129ca96edae8a02171/data_tamer%2Fexamples%2Fcustom_types.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/data_tamer/contents/data_tamer%2Fexamples%2Fcustom_types.cpp?ref=e89895148a1b2f0e6e3211129ca96edae8a02171",
+          "patch": "@@ -69,19 +69,19 @@ int main()\n   Point3D pointB;\n   channel->registerValue<Point3D>(\"pointB\", &pointB);\n \n-  // complex types like Pose are also supported\n+  // Non-trivial types like Pose are also supported\n   Pose pose;\n   channel->registerValue(\"my_pose\", &pose);\n \n-  // Vector can be registered as long as their size will NEVER change\n-  // Tour responsivibily to guaranty that!\n+  // std::vectors can be registered as long as their size will NEVER change\n+  // It is your responsibility to guarantee that!\n   std::vector<Point3D> points_vect(5);\n   channel->registerValue(\"points\", &points_vect);\n \n-  // std::array is also supported (safer than std::vector)\n+  // std::array is also supported (safer than std::vector due to constant size)\n   std::array<int, 3> value_array;\n   channel->registerValue(\"value_array\", &value_array);\n \n-  // Print the schema to understand ho they are serialized\n+  // Print the schema to understand how they are serialized\n   std::cout << channel->getSchema() << std::endl;\n }"
+        },
+        {
+          "sha": "5930ade40ae46827ca6aa1c7a6b571450a7ec4ee",
+          "filename": "data_tamer/examples/example.cpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 1,
+          "changes": 5,
+          "blob_url": "https://github.com/PickNikRobotics/data_tamer/blob/e89895148a1b2f0e6e3211129ca96edae8a02171/data_tamer%2Fexamples%2Fexample.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/data_tamer/raw/e89895148a1b2f0e6e3211129ca96edae8a02171/data_tamer%2Fexamples%2Fexample.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/data_tamer/contents/data_tamer%2Fexamples%2Fexample.cpp?ref=e89895148a1b2f0e6e3211129ca96edae8a02171",
+          "patch": "@@ -27,12 +27,15 @@ int main()\n   [[maybe_unused]] auto id2 = channel->registerValue(\"value_int\", &value_int);\n \n   // If you prefer to use RAII, use this method instead\n-  // logged_real will disable itself when it goes out of scope.\n+  // logged_float will disable itself when it goes out of scope.\n   auto logged_float = channel->createLoggedValue<float>(\"real\");\n \n   // this is the way you store the current snapshot of the values\n   channel->takeSnapshot();\n \n+  // you can modify logged_float like this\n+  logged_float->set(6.28);\n+\n   // You can disable a value like this\n   channel->setEnabled(id1, false);\n   // or"
+        },
+        {
+          "sha": "75d9b3e765f6df2e51414b13aee61283c4bf892f",
+          "filename": "data_tamer/examples/mcap_1m_per_sec.cpp",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 5,
+          "changes": 10,
+          "blob_url": "https://github.com/PickNikRobotics/data_tamer/blob/e89895148a1b2f0e6e3211129ca96edae8a02171/data_tamer%2Fexamples%2Fmcap_1m_per_sec.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/data_tamer/raw/e89895148a1b2f0e6e3211129ca96edae8a02171/data_tamer%2Fexamples%2Fmcap_1m_per_sec.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/data_tamer/contents/data_tamer%2Fexamples%2Fmcap_1m_per_sec.cpp?ref=e89895148a1b2f0e6e3211129ca96edae8a02171",
+          "patch": "@@ -53,17 +53,17 @@ void WritingThread(const std::string& channel_name)\n \n int main()\n {\n-  // start defining one or more Sinks that must be added by default.\n-  // Dp ot BEFORE creating a channel.\n+  // Start defining one or more Sinks that must be added by default.\n+  // Do this BEFORE creating a channel.\n   auto mcap_sink = std::make_shared<MCAPSink>(\"test_1M.mcap\");\n   ChannelsRegistry::Global().addDefaultSink(mcap_sink);\n \n   // Create (or get) a channel using the global registry (singleton)\n   auto channel = ChannelsRegistry::Global().getChannel(\"chan\");\n \n-  // each WritingThread has 300 traced values\n-  // in total, we will collect 300*4 = 1200 traced values at 1 KHz\n-  // for 10 seconds (12 millions data points)\n+  // Each WritingThread has 300 traced values.\n+  // In total, we will collect 300*4 = 1200 traced values at 1 KHz\n+  // for 10 seconds (12 million data points)\n   const int N = 4;\n   std::thread writers[N];\n   for(int i=0; i<N; i++)"
+        }
+      ]
+    },
+    {
+      "author": "Shibodd",
+      "date": "2025-10-10T16:09:59Z",
+      "sha": "b7c4958cfb2b56aec6318c7cff30befa5101ebb3",
+      "message": "CMakeLists: add DATA_TAMER_BUILD_BENCHMARKS option",
+      "files_changed": 1,
+      "additions": 10,
+      "deletions": 6,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "388c9bede74d197a67f8ead7e426a7469b659236",
+          "filename": "data_tamer_cpp/CMakeLists.txt",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 6,
+          "changes": 16,
+          "blob_url": "https://github.com/PickNikRobotics/data_tamer/blob/b7c4958cfb2b56aec6318c7cff30befa5101ebb3/data_tamer_cpp%2FCMakeLists.txt",
+          "raw_url": "https://github.com/PickNikRobotics/data_tamer/raw/b7c4958cfb2b56aec6318c7cff30befa5101ebb3/data_tamer_cpp%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/data_tamer/contents/data_tamer_cpp%2FCMakeLists.txt?ref=b7c4958cfb2b56aec6318c7cff30befa5101ebb3",
+          "patch": "@@ -10,9 +10,11 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)\n if(${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})\n     option(DATA_TAMER_BUILD_TESTS \"Build tests\" ON)\n     option(DATA_TAMER_BUILD_EXAMPLES \"Build examples\" ON)\n+    option(DATA_TAMER_BUILD_BENCHMARKS \"Build benchmarks\" ON)\n else()\n     option(DATA_TAMER_BUILD_TESTS \"Build tests\" OFF)\n     option(DATA_TAMER_BUILD_EXAMPLES \"Build examples\" OFF)\n+    option(DATA_TAMER_BUILD_BENCHMARKS \"Build benchmarks\" OFF)\n endif()\n \n option(BUILD_SHARED_LIBS \"Build using shared libraries\" OFF)\n@@ -191,9 +193,11 @@ if(DATA_TAMER_BUILD_EXAMPLES)\n     add_subdirectory(examples)\n endif()\n \n-find_package(benchmark QUIET)\n-if(benchmark_FOUND)\n-    add_subdirectory(benchmarks)\n-else()\n-    message(\"Google Benchmark library not found\")\n-endif()\n+if(DATA_TAMER_BUILD_BENCHMARKS)\n+    find_package(benchmark QUIET)\n+    if(benchmark_FOUND)\n+        add_subdirectory(benchmarks)\n+    else()\n+        message(\"Google Benchmark library not found\")\n+    endif()\n+endif()\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "jlack1987",
+      "date": "2025-09-29T20:58:56Z",
+      "sha": "561dcf4ff2808ebae8b4498bf5d347dd16965a3f",
+      "message": "Inline operator== function to prevent multiple includes (#60)\n\nCo-authored-by: jlack <jlack@nauticusrobotics.com>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "25ca307820b29f1b6b8a1c5a270f0797d1a2be38",
+          "filename": "data_tamer_cpp/include/data_tamer_parser/data_tamer_parser.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/PickNikRobotics/data_tamer/blob/561dcf4ff2808ebae8b4498bf5d347dd16965a3f/data_tamer_cpp%2Finclude%2Fdata_tamer_parser%2Fdata_tamer_parser.hpp",
+          "raw_url": "https://github.com/PickNikRobotics/data_tamer/raw/561dcf4ff2808ebae8b4498bf5d347dd16965a3f/data_tamer_cpp%2Finclude%2Fdata_tamer_parser%2Fdata_tamer_parser.hpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/data_tamer/contents/data_tamer_cpp%2Finclude%2Fdata_tamer_parser%2Fdata_tamer_parser.hpp?ref=561dcf4ff2808ebae8b4498bf5d347dd16965a3f",
+          "patch": "@@ -207,7 +207,7 @@ inline bool GetBit(BufferSpan mask, size_t index)\n   return hash;\n }\n \n-bool TypeField::operator==(const TypeField& other) const\n+inline bool TypeField::operator==(const TypeField& other) const\n {\n   return is_vector == other.is_vector && type == other.type &&\n          array_size == other.array_size && field_name == other.field_name &&"
+        }
+      ]
+    },
+    {
+      "author": "traversaro",
+      "date": "2025-07-17T12:37:48Z",
+      "sha": "eb17fee731e97f357728cb117e9fb9684f6de979",
+      "message": "Fix compilation on Windows by exporting all symbols with CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS (#58)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "0f16b1014f1fda33363f5cb952a08c2f2455a911",
+          "filename": "data_tamer_cpp/CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/PickNikRobotics/data_tamer/blob/eb17fee731e97f357728cb117e9fb9684f6de979/data_tamer_cpp%2FCMakeLists.txt",
+          "raw_url": "https://github.com/PickNikRobotics/data_tamer/raw/eb17fee731e97f357728cb117e9fb9684f6de979/data_tamer_cpp%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/data_tamer/contents/data_tamer_cpp%2FCMakeLists.txt?ref=eb17fee731e97f357728cb117e9fb9684f6de979",
+          "patch": "@@ -5,6 +5,7 @@ project(data_tamer_cpp VERSION 1.0.0)\n set(CMAKE_CXX_STANDARD_REQUIRED ON)\n set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n set(CMAKE_CXX_STANDARD 17)\n+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)\n \n if(${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})\n     option(DATA_TAMER_BUILD_TESTS \"Build tests\" ON)"
+        }
+      ]
+    },
+    {
+      "author": "facontidavide",
+      "date": "2023-11-02T08:40:52Z",
+      "sha": "9e88eb914f5599656aceb2f5a5d13197a556aa9b",
+      "message": "Initial commit",
+      "files_changed": 2,
+      "additions": 33,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "259148fa18f9fb7ef58563f4ff15fc7b172339fb",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 32,
+          "deletions": 0,
+          "changes": 32,
+          "blob_url": "https://github.com/PickNikRobotics/data_tamer/blob/9e88eb914f5599656aceb2f5a5d13197a556aa9b/.gitignore",
+          "raw_url": "https://github.com/PickNikRobotics/data_tamer/raw/9e88eb914f5599656aceb2f5a5d13197a556aa9b/.gitignore",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/data_tamer/contents/.gitignore?ref=9e88eb914f5599656aceb2f5a5d13197a556aa9b",
+          "patch": "@@ -0,0 +1,32 @@\n+# Prerequisites\n+*.d\n+\n+# Compiled Object files\n+*.slo\n+*.lo\n+*.o\n+*.obj\n+\n+# Precompiled Headers\n+*.gch\n+*.pch\n+\n+# Compiled Dynamic libraries\n+*.so\n+*.dylib\n+*.dll\n+\n+# Fortran module files\n+*.mod\n+*.smod\n+\n+# Compiled Static libraries\n+*.lai\n+*.la\n+*.a\n+*.lib\n+\n+# Executables\n+*.exe\n+*.out\n+*.app"
+        },
+        {
+          "sha": "59975ed79d4efda620eb78ed400ff37b3c4581a4",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/PickNikRobotics/data_tamer/blob/9e88eb914f5599656aceb2f5a5d13197a556aa9b/README.md",
+          "raw_url": "https://github.com/PickNikRobotics/data_tamer/raw/9e88eb914f5599656aceb2f5a5d13197a556aa9b/README.md",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/data_tamer/contents/README.md?ref=9e88eb914f5599656aceb2f5a5d13197a556aa9b",
+          "patch": "@@ -0,0 +1 @@\n+# data_tamer\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "damien-robotsix",
+      "date": "2024-11-06T13:38:28Z",
+      "sha": "49b4c6c1e56a708da76c50dd94fb41694667dc0c",
+      "message": "fix: handling of custom containers that has a TypeDefinition",
+      "files_changed": 4,
+      "additions": 79,
+      "deletions": 66,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "6cee1a52885f8bdd38165e9d35a91b476d2af027",
+          "filename": "data_tamer_cpp/include/data_tamer/channel.hpp",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 6,
+          "changes": 17,
+          "blob_url": "https://github.com/PickNikRobotics/data_tamer/blob/49b4c6c1e56a708da76c50dd94fb41694667dc0c/data_tamer_cpp%2Finclude%2Fdata_tamer%2Fchannel.hpp",
+          "raw_url": "https://github.com/PickNikRobotics/data_tamer/raw/49b4c6c1e56a708da76c50dd94fb41694667dc0c/data_tamer_cpp%2Finclude%2Fdata_tamer%2Fchannel.hpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/data_tamer/contents/data_tamer_cpp%2Finclude%2Fdata_tamer%2Fchannel.hpp?ref=49b4c6c1e56a708da76c50dd94fb41694667dc0c",
+          "patch": "@@ -9,6 +9,7 @@\n \n namespace DataTamer\n {\n+using SerializeMe::has_TypeDefinition;\n \n // Utility\n inline std::chrono::nanoseconds NsecSinceEpoch()\n@@ -73,7 +74,7 @@ class LogChannel : public std::enable_shared_from_this<LogChannel>\n    * @param value  pointer to the value\n    * @return       the ID to be used to unregister or enable/disable this value.\n    */\n-  template <typename T>\n+  template <typename T, bool = true>\n   RegistrationID registerValue(const std::string& name, const T* value);\n \n   /**\n@@ -85,7 +86,8 @@ class LogChannel : public std::enable_shared_from_this<LogChannel>\n    * @param value  pointer to the vectors of values.\n    * @return       the ID to be used to unregister or enable/disable the values.\n    */\n-  template <template <class, class> class Container, class T, class... TArgs>\n+  template <template <class, class> class Container, class T, class... TArgs,\n+            std::enable_if_t<!has_TypeDefinition<Container<T, TArgs...>>::value, bool> = true>\n   RegistrationID registerValue(const std::string& name,\n                                const Container<T, TArgs...>* value);\n \n@@ -98,7 +100,8 @@ class LogChannel : public std::enable_shared_from_this<LogChannel>\n    * @param value  pointer to the array of values.\n    * @return       the ID to be used to unregister or enable/disable the values.\n    */\n-  template <typename T, size_t N>\n+  template <typename T, size_t N,\n+            std::enable_if_t<!has_TypeDefinition<std::array<T, N>>::value, bool> = true>\n   RegistrationID registerValue(const std::string& name, const std::array<T, N>* value);\n \n   /**\n@@ -259,7 +262,7 @@ inline void LogChannel::updateTypeRegistry()\n   }\n }\n \n-template <typename T>\n+template <typename T, bool>\n inline RegistrationID LogChannel::registerValue(const std::string& name,\n                                                 const T* value_ptr)\n {\n@@ -288,7 +291,8 @@ inline RegistrationID LogChannel::registerCustomValue(const std::string& name,\n   return registerValueImpl(name, ValuePtr(value_ptr, serializer), serializer);\n }\n \n-template <template <class, class> class Container, class T, class... TArgs>\n+template <template <class, class> class Container, class T, class... TArgs,\n+          std::enable_if_t<!has_TypeDefinition<Container<T, TArgs...>>::value, bool>>\n inline RegistrationID LogChannel::registerValue(const std::string& prefix,\n                                                 const Container<T, TArgs...>* vect)\n {\n@@ -304,7 +308,8 @@ inline RegistrationID LogChannel::registerValue(const std::string& prefix,\n   }\n }\n \n-template <typename T, size_t N>\n+template <typename T, size_t N,\n+          std::enable_if_t<!has_TypeDefinition<std::array<T, N>>::value, bool>>\n inline RegistrationID LogChannel::registerValue(const std::string& prefix,\n                                                 const std::array<T, N>* vect)\n {"
+        },
+        {
+          "sha": "f76c8bbd5b165d79025ece80d34e3fb54c12b5fa",
+          "filename": "data_tamer_cpp/include/data_tamer/contrib/SerializeMe.hpp",
+          "status": "modified",
+          "additions": 51,
+          "deletions": 43,
+          "changes": 94,
+          "blob_url": "https://github.com/PickNikRobotics/data_tamer/blob/49b4c6c1e56a708da76c50dd94fb41694667dc0c/data_tamer_cpp%2Finclude%2Fdata_tamer%2Fcontrib%2FSerializeMe.hpp",
+          "raw_url": "https://github.com/PickNikRobotics/data_tamer/raw/49b4c6c1e56a708da76c50dd94fb41694667dc0c/data_tamer_cpp%2Finclude%2Fdata_tamer%2Fcontrib%2FSerializeMe.hpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/data_tamer/contents/data_tamer_cpp%2Finclude%2Fdata_tamer%2Fcontrib%2FSerializeMe.hpp?ref=49b4c6c1e56a708da76c50dd94fb41694667dc0c",
+          "patch": "@@ -68,46 +68,73 @@ using SpanBytes = Span<uint8_t>;\n using SpanBytesConst = Span<uint8_t const>;\n using StringSize = uint16_t;\n \n-//------------- Forward declarations of BufferSize ------------------\n+// Check if a Function like this is implemented:\n+//\n+// template <typename Func> std::string_view TypeDefinition(T&, Func&);\n+\n+template <typename T, class = void>\n+struct has_TypeDefinition : std::false_type\n+{\n+};\n+\n+const auto EmptyFuncion = [](const char*, void*) {};\n+using EmptyFunc = decltype(EmptyFuncion);\n+\n+template <typename T1, typename T2>\n+using enable_if_same_t = std::enable_if_t<std::is_same_v<T1, T2>>;\n \n template <typename T>\n+struct has_TypeDefinition<\n+    T, enable_if_same_t<std::string_view,\n+                        decltype(TypeDefinition(std::declval<T&>(),\n+                                                std::declval<EmptyFunc&>()))>>\n+  : std::true_type\n+{\n+};\n+\n+//------------- Forward declarations of BufferSize ------------------\n+\n+template <typename T, bool = true>\n size_t BufferSize(const T& val);\n \n template <>\n size_t BufferSize(const std::string& str);\n \n-template <class T, size_t N>\n+template <class T, size_t N, std::enable_if_t<!has_TypeDefinition<std::array<T, N>>::value, bool> = true>\n size_t BufferSize(const std::array<T, N>& v);\n \n-template <template <class, class> class Container, class T, class... TArgs>\n+template <template <class, class> class Container, class T, class... TArgs,\n+          std::enable_if_t<!has_TypeDefinition<Container<T, TArgs...>>::value, bool> = true>\n size_t BufferSize(const Container<T, TArgs...>& vect);\n \n //---------- Forward declarations of DeserializeFromBuffer -----------\n \n-template <typename T>\n+template <typename T, bool = true>\n void DeserializeFromBuffer(SpanBytesConst& buffer, T& dest);\n \n template <>\n void DeserializeFromBuffer(SpanBytesConst& buffer, std::string& str);\n \n-template <class T, size_t N>\n+template <class T, size_t N, std::enable_if_t<!has_TypeDefinition<std::array<T, N>>::value, bool> = true>\n void DeserializeFromBuffer(SpanBytesConst& buffer, std::array<T, N>& v);\n \n-template <template <class, class> class Container, class T, class... TArgs>\n+template <template <class, class> class Container, class T, class... TArgs,\n+          std::enable_if_t<!has_TypeDefinition<Container<T, TArgs...>>::value, bool> = true>\n void DeserializeFromBuffer(SpanBytesConst& buffer, Container<T, TArgs...>& dest);\n \n //---------- Forward declarations of SerializeIntoBuffer -----------\n \n-template <typename T>\n+template <typename T, bool = true>\n void SerializeIntoBuffer(SpanBytes& buffer, const T& value);\n \n template <>\n void SerializeIntoBuffer(SpanBytes& buffer, const std::string& str);\n \n-template <class T, size_t N>\n+template <class T, size_t N, std::enable_if_t<!has_TypeDefinition<std::array<T, N>>::value, bool> = true>\n void SerializeIntoBuffer(SpanBytes& buffer, const std::array<T, N>& v);\n \n-template <template <class, class> class Container, class T, class... TArgs>\n+template <template <class, class> class Container, class T, class... TArgs,\n+          std::enable_if_t<!has_TypeDefinition<Container<T, TArgs...>>::value, bool> = true>\n void SerializeIntoBuffer(SpanBytes& buffer, const Container<T, TArgs...>& vect);\n \n //-----------------------------------------------------------------------\n@@ -228,31 +255,6 @@ inline T EndianSwap(T t)\n     std::runtime_error(\"Problem with IndianSwap\");\n   }\n }\n-\n-// Check if a Function like this is implemented:\n-//\n-// template <typename Func> std::string_view TypeDefinition(T&, Func&);\n-\n-template <typename T, class = void>\n-struct has_TypeDefinition : std::false_type\n-{\n-};\n-\n-const auto EmptyFuncion = [](const char*, void*) {};\n-using EmptyFunc = decltype(EmptyFuncion);\n-\n-template <typename T1, typename T2>\n-using enable_if_same_t = std::enable_if_t<std::is_same_v<T1, T2>>;\n-\n-template <typename T>\n-struct has_TypeDefinition<\n-    T, enable_if_same_t<std::string_view,\n-                        decltype(TypeDefinition(std::declval<T&>(),\n-                                                std::declval<EmptyFunc&>()))>>\n-  : std::true_type\n-{\n-};\n-\n template <typename T>\n inline constexpr bool is_number()\n {\n@@ -314,7 +316,7 @@ inline constexpr bool is_vector()\n //-----------------------------------------------------------------------\n //-----------------------------------------------------------------------\n \n-template <typename T>\n+template <typename T, bool>\n inline size_t BufferSize(const T& val)\n {\n   static_assert(is_number<T>() || has_TypeDefinition<T>(), \"Missing TypeDefinition\");\n@@ -341,13 +343,15 @@ inline size_t BufferSize(const std::string& str)\n   return sizeof(StringSize) + str.size();\n }\n \n-template <class T, size_t N>\n+template <class T, size_t N,\n+          std::enable_if_t<!has_TypeDefinition<std::array<T, N>>::value, bool>>\n inline size_t BufferSize(const std::array<T, N>&)\n {\n   return BufferSize(T{}) * N;\n }\n \n-template <template <class, class> class Container, class T, class... TArgs>\n+template <template <class, class> class Container, class T, class... TArgs,\n+          std::enable_if_t<!has_TypeDefinition<Container<T, TArgs...>>::value, bool>>\n inline size_t BufferSize(const Container<T, TArgs...>& vect)\n {\n   if constexpr(std::is_trivially_copyable_v<T> && is_vector<Container<T, TArgs...>>())\n@@ -369,7 +373,7 @@ inline size_t BufferSize(const Container<T, TArgs...>& vect)\n //-----------------------------------------------------------------------\n //-----------------------------------------------------------------------\n \n-template <typename T>\n+template <typename T, bool>\n inline void DeserializeFromBuffer(SpanBytesConst& buffer, T& dest)\n {\n   static_assert(is_number<T>() || has_TypeDefinition<T>(), \"Missing TypeDefinition\");\n@@ -412,7 +416,8 @@ inline void DeserializeFromBuffer(SpanBytesConst& buffer, std::string& dest)\n   buffer.trimFront(size);\n }\n \n-template <typename T, size_t N>\n+template <typename T, size_t N,\n+          std::enable_if_t<!has_TypeDefinition<std::array<T, N>>::value, bool>>\n inline void DeserializeFromBuffer(SpanBytesConst& buffer, std::array<T, N>& dest)\n {\n   if(N * BufferSize(T{}) > buffer.size())\n@@ -434,7 +439,8 @@ inline void DeserializeFromBuffer(SpanBytesConst& buffer, std::array<T, N>& dest\n   }\n }\n \n-template <template <class, class> class Container, class T, class... TArgs>\n+template <template <class, class> class Container, class T, class... TArgs,\n+          std::enable_if_t<!has_TypeDefinition<Container<T, TArgs...>>::value, bool>>\n inline void DeserializeFromBuffer(SpanBytesConst& buffer, Container<T, TArgs...>& dest)\n {\n   uint32_t num_values = 0;\n@@ -475,7 +481,7 @@ inline void DeserializeFromBuffer(SpanBytesConst& buffer, Container<T, TArgs...>\n //-----------------------------------------------------------------------\n //-----------------------------------------------------------------------\n \n-template <typename T>\n+template <typename T, bool>\n inline void SerializeIntoBuffer(SpanBytes& buffer, T const& value)\n {\n   static_assert(is_number<T>() || has_TypeDefinition<T>(), \"Missing TypeDefinition\");\n@@ -523,7 +529,8 @@ inline void SerializeIntoBuffer(SpanBytes& buffer, std::string const& str)\n   buffer.trimFront(size);\n }\n \n-template <typename T, size_t N>\n+template <typename T, size_t N,\n+          std::enable_if_t<!has_TypeDefinition<std::array<T, N>>::value, bool>>\n inline void SerializeIntoBuffer(SpanBytes& buffer, std::array<T, N> const& vect)\n {\n   if(N > std::numeric_limits<uint32_t>::max())\n@@ -553,7 +560,8 @@ inline void SerializeIntoBuffer(SpanBytes& buffer, std::array<T, N> const& vect)\n   }\n }\n \n-template <template <class, class> class Container, class T, class... TArgs>\n+template <template <class, class> class Container, class T, class... TArgs,\n+          std::enable_if_t<!has_TypeDefinition<Container<T, TArgs...>>::value, bool>>\n inline void SerializeIntoBuffer(SpanBytes& buffer, Container<T, TArgs...> const& vect)\n {\n   const auto num_values = static_cast<uint32_t>(vect.size());"
+        },
+        {
+          "sha": "c9da1524b7d120b1c6339df509c4a3528d7aedb8",
+          "filename": "data_tamer_cpp/include/data_tamer/custom_types.hpp",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 7,
+          "changes": 7,
+          "blob_url": "https://github.com/PickNikRobotics/data_tamer/blob/49b4c6c1e56a708da76c50dd94fb41694667dc0c/data_tamer_cpp%2Finclude%2Fdata_tamer%2Fcustom_types.hpp",
+          "raw_url": "https://github.com/PickNikRobotics/data_tamer/raw/49b4c6c1e56a708da76c50dd94fb41694667dc0c/data_tamer_cpp%2Finclude%2Fdata_tamer%2Fcustom_types.hpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/data_tamer/contents/data_tamer_cpp%2Finclude%2Fdata_tamer%2Fcustom_types.hpp?ref=49b4c6c1e56a708da76c50dd94fb41694667dc0c",
+          "patch": "@@ -151,9 +151,6 @@ template <typename T>\n inline CustomSerializerT<T>::CustomSerializerT(std::string type_name)\n   : _name(std::move(type_name))\n {\n-  static_assert(!SerializeMe::container_info<T>().is_container, \"Don't pass containers a \"\n-                                                                \"template type\");\n-\n   bool is_fixed_size = true;\n   GetFixedSize<T>(is_fixed_size, _fixed_size);\n   if(!is_fixed_size)\n@@ -198,8 +195,6 @@ inline CustomSerializer::Ptr TypesRegistry::getSerializer()\n {\n   static_assert(!IsNumericType<T>(), \"You don't need to create a serializer for a \"\n                                      \"numerical type.\");\n-  static_assert(!SerializeMe::container_info<T>().is_container, \"Don't pass containers \"\n-                                                                \"as template type\");\n \n   std::scoped_lock lk(_mutex);\n   T dummy;\n@@ -221,8 +216,6 @@ inline CustomSerializer::Ptr TypesRegistry::addType(const std::string& type_name\n {\n   static_assert(!IsNumericType<T>(), \"You don't need to create a serializer for a \"\n                                      \"numerical type.\");\n-  static_assert(!SerializeMe::container_info<T>().is_container, \"Don't pass containers \"\n-                                                                \"as template type\");\n \n   std::scoped_lock lk(_mutex);\n   if(skip_if_present && _types.count(type_name) != 0)"
+        },
+        {
+          "sha": "44c5cd1cefd8bf5839551a329e5a755c435e5ba3",
+          "filename": "data_tamer_cpp/include/data_tamer/values.hpp",
+          "status": "modified",
+          "additions": 17,
+          "deletions": 10,
+          "changes": 27,
+          "blob_url": "https://github.com/PickNikRobotics/data_tamer/blob/49b4c6c1e56a708da76c50dd94fb41694667dc0c/data_tamer_cpp%2Finclude%2Fdata_tamer%2Fvalues.hpp",
+          "raw_url": "https://github.com/PickNikRobotics/data_tamer/raw/49b4c6c1e56a708da76c50dd94fb41694667dc0c/data_tamer_cpp%2Finclude%2Fdata_tamer%2Fvalues.hpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/data_tamer/contents/data_tamer_cpp%2Finclude%2Fdata_tamer%2Fvalues.hpp?ref=49b4c6c1e56a708da76c50dd94fb41694667dc0c",
+          "patch": "@@ -9,6 +9,7 @@\n \n namespace DataTamer\n {\n+using SerializeMe::has_TypeDefinition;\n \n /**\n  * @brief The ValuePtr is a non-owning pointer to\n@@ -19,19 +20,23 @@ class ValuePtr\n public:\n   ValuePtr() = default;\n \n-  template <typename T>\n+  template <typename T, bool = true>\n   ValuePtr(const T* pointer, CustomSerializer::Ptr type_info = {});\n \n-  template <template <class, class> class Container, class T, class... TArgs>\n+  template <template <class, class> class Container, class T, class... TArgs,\n+            std::enable_if_t<!has_TypeDefinition<Container<T, TArgs...>>::value, bool> = true>\n   ValuePtr(const Container<T, TArgs...>* vect);\n \n-  template <template <class, class> class Container, class T, class... TArgs>\n+  template <template <class, class> class Container, class T, class... TArgs,\n+            std::enable_if_t<!has_TypeDefinition<Container<T, TArgs...>>::value, bool> = true>\n   ValuePtr(const Container<T, TArgs...>* vect, CustomSerializer::Ptr type_info);\n \n-  template <typename T, size_t N>\n+  template <typename T, size_t N,\n+            std::enable_if_t<!has_TypeDefinition<std::array<T, N>>::value, bool> = true>\n   ValuePtr(const std::array<T, N>* vect);\n \n-  template <typename T, size_t N>\n+  template <typename T, size_t N,\n+            std::enable_if_t<!has_TypeDefinition<std::array<T, N>>::value, bool> = true>\n   ValuePtr(const std::array<T, N>* vect, CustomSerializer::Ptr type_info);\n \n   ValuePtr(ValuePtr const& other) = delete;\n@@ -70,7 +75,7 @@ class ValuePtr\n //------------------------------------------------------------\n //------------------------------------------------------------\n \n-template <typename T>\n+template <typename T, bool>\n inline ValuePtr::ValuePtr(const T* pointer, CustomSerializer::Ptr type_info)\n   : v_ptr_(pointer)\n   , type_(GetBasicType<T>())\n@@ -89,7 +94,8 @@ inline ValuePtr::ValuePtr(const T* pointer, CustomSerializer::Ptr type_info)\n   }\n }\n \n-template <template <class, class> class Container, class T, class... TArgs>\n+template <template <class, class> class Container, class T, class... TArgs,\n+          std::enable_if_t<!has_TypeDefinition<Container<T, TArgs...>>::value, bool>>\n inline ValuePtr::ValuePtr(const Container<T, TArgs...>* vect)\n   : v_ptr_(vect)\n   , type_(GetBasicType<T>())\n@@ -103,7 +109,8 @@ inline ValuePtr::ValuePtr(const Container<T, TArgs...>* vect)\n   get_size_impl_ = [vect]() -> size_t { return SerializeMe::BufferSize(*vect); };\n }\n \n-template <template <class, class> class Container, class T, class... TArgs>\n+template <template <class, class> class Container, class T, class... TArgs,\n+          std::enable_if_t<!has_TypeDefinition<Container<T, TArgs...>>::value, bool>>\n inline ValuePtr::ValuePtr(const Container<T, TArgs...>* vect,\n                           CustomSerializer::Ptr type_info)\n   : v_ptr_(vect)\n@@ -137,7 +144,7 @@ inline ValuePtr::ValuePtr(const Container<T, TArgs...>* vect,\n   };\n }\n \n-template <typename T, size_t N>\n+template <typename T, size_t N, std::enable_if_t<!has_TypeDefinition<std::array<T, N>>::value, bool>>\n inline ValuePtr::ValuePtr(const std::array<T, N>* array)\n   : v_ptr_(array)\n   , type_(GetBasicType<T>())\n@@ -151,7 +158,7 @@ inline ValuePtr::ValuePtr(const std::array<T, N>* array)\n   get_size_impl_ = [array]() { return SerializeMe::BufferSize(*array); };\n }\n \n-template <typename T, size_t N>\n+template <typename T, size_t N, std::enable_if_t<!has_TypeDefinition<std::array<T, N>>::value, bool>>\n inline ValuePtr::ValuePtr(const std::array<T, N>* array, CustomSerializer::Ptr type_info)\n   : v_ptr_(array)\n   , type_(GetBasicType<T>())"
+        }
+      ]
+    },
+    {
+      "author": "danmou",
+      "date": "2024-09-09T14:10:10Z",
+      "sha": "736564282664ba9ced37ae69078c27ca7f6011e0",
+      "message": "Fix build error",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e1f598d1d7d1b18acf8d3c0bac037dea95780a60",
+          "filename": "data_tamer_cpp/include/data_tamer/details/locked_reference.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/PickNikRobotics/data_tamer/blob/736564282664ba9ced37ae69078c27ca7f6011e0/data_tamer_cpp%2Finclude%2Fdata_tamer%2Fdetails%2Flocked_reference.hpp",
+          "raw_url": "https://github.com/PickNikRobotics/data_tamer/raw/736564282664ba9ced37ae69078c27ca7f6011e0/data_tamer_cpp%2Finclude%2Fdata_tamer%2Fdetails%2Flocked_reference.hpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/data_tamer/contents/data_tamer_cpp%2Finclude%2Fdata_tamer%2Fdetails%2Flocked_reference.hpp?ref=736564282664ba9ced37ae69078c27ca7f6011e0",
+          "patch": "@@ -57,7 +57,7 @@ inline LockedPtr<T>::LockedPtr(LockedPtr&& other) : mutex_(other.mutex_)\n template <typename T>\n inline LockedPtr<T>& LockedPtr<T>::operator=(LockedPtr<T>&& other)\n {\n-  mutex_ = &other.mutex_;\n+  mutex_ = other.mutex_;\n   std::swap(obj_, other.obj_);\n   return *this;\n }"
+        }
+      ]
+    },
+    {
+      "author": "saikishor",
+      "date": "2024-07-16T13:05:30Z",
+      "sha": "94ddf9a8125ffaa4f71102bc7a0c5dea7ea72843",
+      "message": "Fix README.md broken references",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "9269c6d8c746fe0b702dabcd35502b4b4e1c3475",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/PickNikRobotics/data_tamer/blob/94ddf9a8125ffaa4f71102bc7a0c5dea7ea72843/README.md",
+          "raw_url": "https://github.com/PickNikRobotics/data_tamer/raw/94ddf9a8125ffaa4f71102bc7a0c5dea7ea72843/README.md",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/data_tamer/contents/README.md?ref=94ddf9a8125ffaa4f71102bc7a0c5dea7ea72843",
+          "patch": "@@ -177,6 +177,6 @@ cmake --build build/Debug --parallel\n \n I will write more extensively about the serialization format used by DataTamer, but for the time being I\n created a single header file without external dependencies that you can just copy into your project:\n-[data_tamer_parser.hpp](data_tamer/include/data_tamer_parser)\n+[data_tamer_parser.hpp](data_tamer_cpp/include/data_tamer_parser)\n \n-You can see how it is used in this example: [mcap_reader](data_tamer/examples/mcap_reader.cpp)\n+You can see how it is used in this example: [mcap_reader](data_tamer_cpp/examples/mcap_reader.cpp)"
+        }
+      ]
+    },
+    {
+      "author": "vicmassy",
+      "date": "2024-04-30T09:17:18Z",
+      "sha": "5ab4f02db223b5d9453285411717582bdce9628c",
+      "message": "Support lifecycle node for ros2 publisher sink (#17)\n\n* Support lifecycle node for ros2 publisher sink\r\n\r\n* Remove unused member variable node_\r\n\r\n* Add template for both constructors",
+      "files_changed": 4,
+      "additions": 28,
+      "deletions": 13,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "13901271e2af65642f90a8ad80149fd4e97b3c31",
+          "filename": "data_tamer_cpp/CMakeLists.txt",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 2,
+          "changes": 5,
+          "blob_url": "https://github.com/PickNikRobotics/data_tamer/blob/5ab4f02db223b5d9453285411717582bdce9628c/data_tamer_cpp%2FCMakeLists.txt",
+          "raw_url": "https://github.com/PickNikRobotics/data_tamer/raw/5ab4f02db223b5d9453285411717582bdce9628c/data_tamer_cpp%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/data_tamer/contents/data_tamer_cpp%2FCMakeLists.txt?ref=5ab4f02db223b5d9453285411717582bdce9628c",
+          "patch": "@@ -95,12 +95,13 @@ if ( ament_cmake_FOUND )\n \n     find_package(mcap_vendor REQUIRED)\n     find_package(rclcpp REQUIRED)\n+    find_package(rclcpp_lifecycle REQUIRED)\n     find_package(data_tamer_msgs REQUIRED)\n \n-    ament_target_dependencies(data_tamer mcap_vendor rclcpp data_tamer_msgs)\n+    ament_target_dependencies(data_tamer mcap_vendor rclcpp rclcpp_lifecycle data_tamer_msgs)\n \n     ament_export_targets(data_tamerTargets HAS_LIBRARY_TARGET)\n-    ament_export_dependencies(mcap_vendor rclcpp data_tamer_msgs)\n+    ament_export_dependencies(mcap_vendor rclcpp rclcpp_lifecycle data_tamer_msgs)\n     ament_package()\n \n elseif( USE_VENDORED_MCAP )"
+        },
+        {
+          "sha": "28aa512dd1bf58b53be3f28e05861ab72f251e7d",
+          "filename": "data_tamer_cpp/include/data_tamer/sinks/ros2_publisher_sink.hpp",
+          "status": "modified",
+          "additions": 18,
+          "deletions": 2,
+          "changes": 20,
+          "blob_url": "https://github.com/PickNikRobotics/data_tamer/blob/5ab4f02db223b5d9453285411717582bdce9628c/data_tamer_cpp%2Finclude%2Fdata_tamer%2Fsinks%2Fros2_publisher_sink.hpp",
+          "raw_url": "https://github.com/PickNikRobotics/data_tamer/raw/5ab4f02db223b5d9453285411717582bdce9628c/data_tamer_cpp%2Finclude%2Fdata_tamer%2Fsinks%2Fros2_publisher_sink.hpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/data_tamer/contents/data_tamer_cpp%2Finclude%2Fdata_tamer%2Fsinks%2Fros2_publisher_sink.hpp?ref=5ab4f02db223b5d9453285411717582bdce9628c",
+          "patch": "@@ -6,6 +6,7 @@\n #include \"data_tamer_msgs/msg/snapshot.hpp\"\n #include <unordered_map>\n #include <rclcpp/rclcpp.hpp>\n+#include <rclcpp_lifecycle/lifecycle_node.hpp>\n \n namespace DataTamer\n {\n@@ -15,13 +16,28 @@ class ROS2PublisherSink : public DataSinkBase\n public:\n   ROS2PublisherSink(std::shared_ptr<rclcpp::Node> node, const std::string& topic_prefix);\n \n+  ROS2PublisherSink(std::shared_ptr<rclcpp_lifecycle::LifecycleNode> node, const std::string& topic_prefix);\n+\n+  template<typename NodeT>\n+  void create_publishers(NodeT& node, const std::string& topic_prefix)\n+  {\n+    rclcpp::QoS schemas_qos{rclcpp::KeepAll()};\n+    schemas_qos.reliable();\n+    schemas_qos.transient_local();   // latch\n+\n+    const rclcpp::QoS data_qos{rclcpp::KeepAll()};\n+\n+    schema_publisher_ = node->template create_publisher<data_tamer_msgs::msg::Schemas>(\n+      topic_prefix + \"/schemas\", schemas_qos);\n+    data_publisher_ = node->template create_publisher<data_tamer_msgs::msg::Snapshot>(\n+      topic_prefix + \"/data\", data_qos);\n+  }\n+\n   void addChannel(const std::string& name, const Schema& schema) override;\n \n   bool storeSnapshot(const Snapshot& snapshot) override;\n \n private:\n-  std::shared_ptr<rclcpp::Node> node_;\n-\n   std::unordered_map<std::string, Schema> schemas_;\n   Mutex schema_mutex_;\n "
+        },
+        {
+          "sha": "a63acee8201df27a6fa077be62ad4582d2e88e10",
+          "filename": "data_tamer_cpp/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/PickNikRobotics/data_tamer/blob/5ab4f02db223b5d9453285411717582bdce9628c/data_tamer_cpp%2Fpackage.xml",
+          "raw_url": "https://github.com/PickNikRobotics/data_tamer/raw/5ab4f02db223b5d9453285411717582bdce9628c/data_tamer_cpp%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/data_tamer/contents/data_tamer_cpp%2Fpackage.xml?ref=5ab4f02db223b5d9453285411717582bdce9628c",
+          "patch": "@@ -15,6 +15,7 @@\n   <buildtool_depend>ament_cmake</buildtool_depend>\n \n   <depend>rclcpp</depend>\n+  <depend>rclcpp_lifecycle</depend>\n   <depend>mcap_vendor</depend>\n   <depend>data_tamer_msgs</depend>\n "
+        },
+        {
+          "sha": "7c6f780b11d10883bc6c590230f3a95213eae404",
+          "filename": "data_tamer_cpp/src/sinks/ros2_publisher_sink.cpp",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 9,
+          "changes": 15,
+          "blob_url": "https://github.com/PickNikRobotics/data_tamer/blob/5ab4f02db223b5d9453285411717582bdce9628c/data_tamer_cpp%2Fsrc%2Fsinks%2Fros2_publisher_sink.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/data_tamer/raw/5ab4f02db223b5d9453285411717582bdce9628c/data_tamer_cpp%2Fsrc%2Fsinks%2Fros2_publisher_sink.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/data_tamer/contents/data_tamer_cpp%2Fsrc%2Fsinks%2Fros2_publisher_sink.cpp?ref=5ab4f02db223b5d9453285411717582bdce9628c",
+          "patch": "@@ -5,16 +5,13 @@ namespace DataTamer\n ROS2PublisherSink::ROS2PublisherSink(std::shared_ptr<rclcpp::Node> node,\n                                      const std::string& topic_prefix)\n {\n-  rclcpp::QoS schemas_qos{ rclcpp::KeepAll() };\n-  schemas_qos.reliable();\n-  schemas_qos.transient_local();  // latch\n-\n-  const rclcpp::QoS data_qos{ rclcpp::KeepAll() };\n+  create_publishers(node, topic_prefix);\n+}\n \n-  schema_publisher_ = node->create_publisher<data_tamer_msgs::msg::Schemas>(\n-      topic_prefix + \"/schemas\", schemas_qos);\n-  data_publisher_ = node->create_publisher<data_tamer_msgs::msg::Snapshot>(\n-      topic_prefix + \"/data\", data_qos);\n+ROS2PublisherSink::ROS2PublisherSink(std::shared_ptr<rclcpp_lifecycle::LifecycleNode> node,\n+                                     const std::string& topic_prefix)\n+{\n+  create_publishers(node, topic_prefix);\n }\n \n void ROS2PublisherSink::addChannel(const std::string& channel_name, const Schema& schema)"
+        }
+      ]
+    },
+    {
+      "author": "awesomebytes",
+      "date": "2023-11-30T12:42:24Z",
+      "sha": "e29a122e55270222c249c4c52ccf1c52e757a3ff",
+      "message": "Minor consistency fixes (#7)\n\nFixed typos and consistency bits.",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 5,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "ead7c661ac4e0e3f37e8b0344c43df9f8261c1c7",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 5,
+          "changes": 10,
+          "blob_url": "https://github.com/PickNikRobotics/data_tamer/blob/e29a122e55270222c249c4c52ccf1c52e757a3ff/README.md",
+          "raw_url": "https://github.com/PickNikRobotics/data_tamer/raw/e29a122e55270222c249c4c52ccf1c52e757a3ff/README.md",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/data_tamer/contents/README.md?ref=e29a122e55270222c249c4c52ccf1c52e757a3ff",
+          "patch": "@@ -72,7 +72,7 @@ int main()\n \n   // Create a channel\n   auto channel = LogChannel::create(\"my_channel\");\n-  channel->addDataSink(dummy_sink);\n+  channel->addDataSink(mcap_sink);\n \n   // You can register any arithmetic value. You are responsible for their lifetime\n   double value_real = 3.14;\n@@ -82,15 +82,15 @@ int main()\n \n   // If you prefer to use RAII, use this method instead\n   // logged_real will disable itself when it goes out of scope.\n-  auto logged_float = channel->createLoggedValue<float>(\"my_real\");\n+  auto logged_real= channel->createLoggedValue<float>(\"my_real\");\n \n   // This is the way you store the current snapshot of the values\n   channel->takeSnapshot();\n \n   // You can disable (i.e., stop recording) a value\n   channel->setEnabled(id1, false);\n   // or\n-  logged_float->setEnabled(false);\n+  logged_real->setEnabled(false);\n \n   // The serialized data of the next snapshot will contain\n   // only [value_int], i.e. [id2], since the other two were disabled\n@@ -100,13 +100,13 @@ int main()\n \n # Compilation\n \n-### Compiling with ROS2\n+## Compiling with ROS2\n \n Just use colcon :)\n \n ## Compiling with Conan (not ROS2 support)\n \n-Note that th ROS2 publisher will **NOT** be built when using this method.\n+Note that the ROS2 publisher will **NOT** be built when using this method.\n \n Assuming conan 2.x installed. From the source directory.\n "
+        }
+      ]
+    }
+  ]
+}

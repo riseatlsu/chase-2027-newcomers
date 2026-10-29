@@ -1,0 +1,360 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T04:35:02Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "analogdevicesinc",
+    "repo": "depth-obstacle-detect-ros"
+  },
+  "data": [
+    {
+      "author": "anilsripadarao",
+      "date": "2025-03-25T14:39:00Z",
+      "sha": "8386dcf198e86743ff64ad9513a7df6b438930f6",
+      "message": "First commit.",
+      "files_changed": 16,
+      "additions": 7157,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "0f877d5729660eaf28e5d965e03e7e5d8f0e29e6",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 29,
+          "deletions": 0,
+          "changes": 29,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/8386dcf198e86743ff64ad9513a7df6b438930f6/LICENSE",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/8386dcf198e86743ff64ad9513a7df6b438930f6/LICENSE",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/LICENSE?ref=8386dcf198e86743ff64ad9513a7df6b438930f6",
+          "patch": "@@ -0,0 +1,29 @@\n+Copyright (c) 2024 Analog Devices, Inc.\r\n+All rights reserved.\r\n+\r\n+Redistribution and use in source and binary forms, with or without modification,\r\n+are permitted provided that the following conditions are met:\r\n+\r\n+  * Redistributions of source code must retain the above copyright notice, this\r\n+    list of conditions and the following disclaimer.\r\n+\r\n+  * Redistributions in binary form must reproduce the above copyright notice,\r\n+    this list of conditions and the following disclaimer in the documentation\r\n+    and/or other materials provided with the distribution.\r\n+\r\n+  * Neither the name of Analog Devices, Inc. nor the names of its contributors may\r\n+    be used to endorse or promote products derived from this software without\r\n+    specific prior written permission.\r\n+\r\n+\r\n+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND\r\n+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED\r\n+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\r\n+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR\r\n+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES\r\n+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS\r\n+OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY\r\n+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING\r\n+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN\r\n+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\r\n+\r"
+        },
+        {
+          "sha": "aef309482c812bdc87511ec94bbff528aaa1534b",
+          "filename": "NOTICE",
+          "status": "added",
+          "additions": 6598,
+          "deletions": 0,
+          "changes": 6598,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/8386dcf198e86743ff64ad9513a7df6b438930f6/NOTICE",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/8386dcf198e86743ff64ad9513a7df6b438930f6/NOTICE",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/NOTICE?ref=8386dcf198e86743ff64ad9513a7df6b438930f6"
+        },
+        {
+          "sha": "cdde16ff3765dead0ea44a500dafa024e6d65f93",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 47,
+          "deletions": 2,
+          "changes": 49,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/8386dcf198e86743ff64ad9513a7df6b438930f6/README.md",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/8386dcf198e86743ff64ad9513a7df6b438930f6/README.md",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/README.md?ref=8386dcf198e86743ff64ad9513a7df6b438930f6",
+          "patch": "@@ -1,2 +1,47 @@\n-# depth_obstacle_detect_ros\n-depth_obstacle_detect_ros\n+<h1 style=\"text-align: center;\" > Depth Obstacle Detection ROS</h1>\n+\n+# Overview\n+The **Depth Obstacle Detection ROS** package for the Robot Operating System (ROS) identifies surfaces near the depth camera within a specified threshold. The image is divided into a grid of multiple cells, and the minimum value in each cell is detected. Values below the threshold are highlighted in red to indicate the presence of an obstacle. There are two packages in this installation, the core package `depth_obstacle_detect_ros` which is dependant on `depth_obstacle_detect_ros_msg`.\n+\n+\n+[![Jazzy](https://img.shields.io/badge/-JAZZY-green?style=plastic&logo=ros)](https://docs.ros.org/en/rolling/Releases/Release-Jazzy-Jalisco.html) [![Ubuntu 24.04](https://img.shields.io/badge/-UBUNTU%2024.04-orange?style=plastic&logo=ubuntu&logoColor=white)](https://releases.ubuntu.com/noble/) [![License](https://img.shields.io/badge/License-BSD_3--Clause-purple.svg)](./LICENSE) ![x86_64](https://img.shields.io/badge/x86__64-blue?style=plastic&logo=intel&logoColor=white)\n+\n+> [!NOTE]  \n+> This node requires a custom ros message package to be installed in the same workspace. It can be found [here.](./depth_obstacle_detect_ros_msg)  \n+\n+# Background\n+The obstacle detection node subscribes to `/tof_cam/rect/depth` by default. The launch file can be edited to make the node subscribe to a topic that publishes depth images from a depth camera. Image encoding with `mono16` or `16UC1` are supported by the node. The node divides an image into a grid of specified number of cells vertically and horizontally. The minimum value of each cell is taken into account to decide if there is an obstacle within the range specified by the threshold. The [depth_obstacle_detect_ros_msg](depth_obstacle_detect_ros_msg/README.md) is used to publish obstacle information for any external use.\n+\n+# Hardware\n+ - Any Depth Camera, such as [EVAL-ADTF3175D-NXZ](https://www.analog.com/en/resources/evaluation-hardware-and-software/evaluation-boards-kits/eval-adtf3175.html) Module\n+ - A Desktop with Ubuntu 24.04, preferably with x86_64 architecture.\n+\n+\n+# Setting up topics\n+1. **Update Topic Names**: Ensure that the topic names in the launch file match the corresponding topics in your ROS environment.\n+2. **Set Namespace**: Define the desired namespace by setting the `namespace` field.\n+3. **Edit Parameters**: Modify the parameters in the launch file as needed to suit your specific requirements.\n+\n+# Parameters\n+|Parameter Field|Type|Description|\n+|:---|:---:|---:|\n+|obstacle_range_limit|double|Detection Distance in meters|\n+|width_regions|int|Number of segments horizontally|\n+|height_regions|int|Number of segments vertically|\n+|depth_topic|string|Topic where depth images are published|\n+|camera_info_topic|string|Topic where camera information is published|\n+|detect_topic|string|Topic where images marking obstacles are published|\n+|obstacle_state_topic|string|Topic where obstacle detection true or false grid is published|\n+|cam_id|string|Camera ID for message Header information|\n+|verbose|bool|Output debug information|\n+\n+\n+# Launch Commands\n+The obstacle detection node can be run using:\n+`ros2 launch depth_obstacle_detect_ros depth_obstacle_detect_ros.launch` \n+\n+The obstacle detection component can be run using:\n+`ros2 launch depth_obstacle_detect_ros obstacle_detect_component.launch.py`\n+\n+## Obstacle Detection output\n+<img src=\"./depth_obstacle_detect_ros/docs/images/obstacle_detection.png\" alt=\"Output_Image\" width=\"900\"/>\n\\ No newline at end of file"
+        },
+        {
+          "sha": "4e640f516b05d68d2352319258767ec167d34f6e",
+          "filename": "depth_obstacle_detect_ros/CMakeLists.txt",
+          "status": "added",
+          "additions": 81,
+          "deletions": 0,
+          "changes": 81,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros%2FCMakeLists.txt",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/depth_obstacle_detect_ros%2FCMakeLists.txt?ref=8386dcf198e86743ff64ad9513a7df6b438930f6",
+          "patch": "@@ -0,0 +1,81 @@\n+cmake_minimum_required(VERSION 3.10)\n+project(depth_obstacle_detect_ros)\n+if(NOT CMAKE_CXX_STANDARD)\n+  set(CMAKE_CXX_STANDARD 17)\n+endif()\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  add_compile_options(-Wall -Wextra -Wpedantic)\n+endif()\n+\n+set(CMAKE_POSITION_INDEPENDENT_CODE ON)\n+\n+if(NOT DEFINED ENV{ROS_DISTRO})\n+    message(FATAL_ERROR \"ROS_DISTRO is not set. Please source your ROS environment.\")\n+endif()\n+\n+set(ROS_DISTRO $ENV{ROS_DISTRO})\n+if(NOT \"${ROS_DISTRO}\" STREQUAL \"jazzy\")\n+  add_definitions(-DROS_HUMBLE)\n+endif()\n+\n+find_package(ament_cmake REQUIRED)\n+find_package(rclcpp REQUIRED)\n+find_package(rclpy REQUIRED)\n+find_package(rclcpp_components REQUIRED)\n+find_package(image_transport REQUIRED)\n+find_package(cv_bridge REQUIRED)\n+find_package(sensor_msgs REQUIRED)\n+find_package(depth_obstacle_detect_ros_msg REQUIRED)\n+\n+find_package(OpenCV)\n+if(OPENCV_FOUND OR\n+   OPENCV_CORE_FOUND) # we check for this because the OpenCVConfig.cmake(v2.4.9.1) used on dragonboards fails to set OPENCV_FOUND\n+  if(OpenCV_VERSION VERSION_LESS \"3.0.0\")\n+    message(STATUS \"USING OPENCV Version 2\")\n+    add_definitions(-DOPENCV2)\n+  endif(OpenCV_VERSION VERSION_LESS \"3.0.0\")\n+else()\n+  if (NOT OpenCV_INCLUDE_DIR OR NOT OpenCV_LIBS)\n+    message(FATAL_ERROR \"find_package(openCV) failed. OpenCV_INCLUDE_DIR and OpenCV_LIBS need to be set.\")\n+  else()\n+    message(STATUS \"OpenCV_INCLUDE_DIR and OpenCV_LIBS have been set manually.\")\n+  endif()\n+endif()## System dependencies are found with CMake's conventions\n+\n+include_directories(include PUBLIC)\n+add_library(depth_obstacle_detect src/depth_obstacle_detect_ros.cpp)\n+\n+add_executable(${PROJECT_NAME}_node src/depth_obstacle_detect_ros_node.cpp)\n+ament_target_dependencies(depth_obstacle_detect rclcpp image_transport cv_bridge sensor_msgs rclpy depth_obstacle_detect_ros_msg)\n+target_link_libraries(${PROJECT_NAME}_node depth_obstacle_detect ${OpenCV_LIBS} )\n+\n+add_library(${PROJECT_NAME}_component SHARED src/depth_obstacle_detect_ros_component.cpp)\n+ament_target_dependencies(${PROJECT_NAME}_component rclcpp_components)\n+target_link_libraries(${PROJECT_NAME}_component depth_obstacle_detect ${OpenCV_LIBS})\n+\n+rclcpp_components_register_node(\n+  ${PROJECT_NAME}_component\n+  PLUGIN \"DepthObstacleDetect\"\n+  EXECUTABLE obstacle_detect_component\n+)\n+\n+install(TARGETS ${PROJECT_NAME}_node\n+  DESTINATION lib/${PROJECT_NAME})\n+\n+install(DIRECTORY include\n+  DESTINATION include/${PROJECT_NAME})\n+\n+install(DIRECTORY launch\n+  DESTINATION share/${PROJECT_NAME})\n+\n+install(\n+  TARGETS ${PROJECT_NAME}_component\n+  EXPORT export_obstacle_component\n+  ARCHIVE DESTINATION lib\n+  LIBRARY DESTINATION lib\n+  RUNTIME DESTINATION bin\n+)\n+\n+ament_export_include_directories(include)\n+ament_export_dependencies(depth_obstacle_detect)\n+ament_package()"
+        },
+        {
+          "sha": "956056ce15549f4b77964931f0428e0e94923309",
+          "filename": "depth_obstacle_detect_ros/docs/images/obstacle_detection.png",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros%2Fdocs%2Fimages%2Fobstacle_detection.png",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros%2Fdocs%2Fimages%2Fobstacle_detection.png",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/depth_obstacle_detect_ros%2Fdocs%2Fimages%2Fobstacle_detection.png?ref=8386dcf198e86743ff64ad9513a7df6b438930f6"
+        },
+        {
+          "sha": "cb48ab72182c8f49aecd51ea2a955bb1ebb3adca",
+          "filename": "depth_obstacle_detect_ros/include/depth_obstacle_detect.hpp",
+          "status": "added",
+          "additions": 70,
+          "deletions": 0,
+          "changes": 70,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros%2Finclude%2Fdepth_obstacle_detect.hpp",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros%2Finclude%2Fdepth_obstacle_detect.hpp",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/depth_obstacle_detect_ros%2Finclude%2Fdepth_obstacle_detect.hpp?ref=8386dcf198e86743ff64ad9513a7df6b438930f6",
+          "patch": "@@ -0,0 +1,70 @@\n+#ifndef DEPTH_OBSTACLE_DETECT_H\n+#define DEPTH_OBSTACLE_DETECT_H\n+#include <string>\n+#include <rclcpp/rclcpp.hpp>\n+#include <image_transport/image_transport.hpp>\n+#ifdef ROS_HUMBLE\n+#include <cv_bridge/cv_bridge.h>\n+#else\n+#include <cv_bridge/cv_bridge.hpp>\n+#endif\n+#include <sensor_msgs/image_encodings.hpp>\n+#include <opencv2/highgui/highgui.hpp>\n+#include <opencv2/imgproc/imgproc.hpp>\n+#ifdef OPENCV2\n+#include <opencv2/contrib/contrib.hpp>\n+#endif\n+\n+#include \"depth_obstacle_detect_ros_msg/msg/obstacle_stamped_array.hpp\"\n+#include \"std_msgs/msg/bool.hpp\"\n+#include \"std_msgs/msg/float64.hpp\"\n+\n+class DepthObstacleDetect : public rclcpp::Node\n+{\n+public:\n+  explicit DepthObstacleDetect(const rclcpp::NodeOptions& options);\n+  void init();\n+  void imageCallback(const sensor_msgs::msg::Image::ConstSharedPtr&);\n+  void infoCallback(const sensor_msgs::msg::CameraInfo&);\n+\n+private:\n+  rclcpp::TimerBase::SharedPtr timer_;\n+  rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr sub_info_;\n+  rclcpp::Publisher<depth_obstacle_detect_ros_msg::msg::ObstacleStampedArray>::SharedPtr pub_obstacle_;\n+  image_transport::Subscriber sub_depth_;\n+  image_transport::Publisher pub_detect_;\n+  sensor_msgs::msg::CameraInfo cam_info_detect_;\n+  std_msgs::msg::Header msg_header_detect_;\n+  std::string depth_topic_;\n+  std::string camera_info_topic_;\n+  std::string detect_topic_;\n+  std::string obstacle_state_topic_;\n+  std::string cam_id_;\n+  cv::Mat detect_image_;\n+  cv::Mat detect_image_blur_;\n+  cv::Mat detect_image_8bit_;\n+  cv::Mat detect_image_out_;\n+  cv::Mat fov_border_mask_;\n+  int image_width_;\n+  int image_height_;\n+  int width_steps_;\n+  int height_steps_;\n+  int region_width_;\n+  int region_height_;\n+  int x_step_;\n+  int y_step_;\n+  int max_distance_;\n+  double minValue_, maxValue_;\n+  int image_maxValue_;\n+  double obstacle_range_;            // in m\n+  double obstacle_range_threshold_;  // in mm\n+  bool verbose_;\n+  bool is32FC1_;\n+  bool init_distance_conversion_;\n+  depth_obstacle_detect_ros_msg::msg::ObstacleStampedArray msg_obstacle_;\n+  std_msgs::msg::Header msg_header_obstacle_;\n+  bool obstacle_detected_;\n+  double obstacle_detected_range_;\n+};\n+\n+#endif\n\\ No newline at end of file"
+        },
+        {
+          "sha": "8fb90d03eaf11a1de97810e9801db016f5a2b871",
+          "filename": "depth_obstacle_detect_ros/launch/obstacle_detect.launch.py",
+          "status": "added",
+          "additions": 24,
+          "deletions": 0,
+          "changes": 24,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros%2Flaunch%2Fobstacle_detect.launch.py",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros%2Flaunch%2Fobstacle_detect.launch.py",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/depth_obstacle_detect_ros%2Flaunch%2Fobstacle_detect.launch.py?ref=8386dcf198e86743ff64ad9513a7df6b438930f6",
+          "patch": "@@ -0,0 +1,24 @@\n+from launch import LaunchDescription\n+from launch_ros.actions import Node\n+\n+def generate_launch_description():\n+    return LaunchDescription([\n+        Node(\n+            package='depth_obstacle_detect_ros',\n+            executable='depth_obstacle_detect_ros_node',\n+            name='obstacle_detection_node',\n+            namespace='cam1',\n+            parameters=[{\n+                'depth_topic':'depth_image',\n+                'camera_info_topic':'camera_info',\n+                'detect_topic':'detect',\n+                'cam_id':'cam1',\n+                'verbose': True,\n+                'width_regions':12,\n+                'height_regions':9,\n+                'obstacle_range_limit':1.0,\n+                'obstacle_state_topic':'obstacle_state',\n+                'max_distance_for_visualization':16\n+            }]\n+        )\n+    ])\n\\ No newline at end of file"
+        },
+        {
+          "sha": "3a5e22ee96d82e5358ab0f54de206165d1e5c4c8",
+          "filename": "depth_obstacle_detect_ros/launch/obstacle_detect_component.launch.py",
+          "status": "added",
+          "additions": 32,
+          "deletions": 0,
+          "changes": 32,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros%2Flaunch%2Fobstacle_detect_component.launch.py",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros%2Flaunch%2Fobstacle_detect_component.launch.py",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/depth_obstacle_detect_ros%2Flaunch%2Fobstacle_detect_component.launch.py?ref=8386dcf198e86743ff64ad9513a7df6b438930f6",
+          "patch": "@@ -0,0 +1,32 @@\n+from launch import LaunchDescription\n+from launch_ros.actions import ComposableNodeContainer\n+from launch_ros.descriptions import ComposableNode\n+\n+def generate_launch_description():\n+    ld = LaunchDescription()\n+    ld.add_action(ComposableNodeContainer(\n+        name='obstacle_detection_node',\n+        namespace='',\n+        package='rclcpp_components',\n+        executable='component_container',\n+        composable_node_descriptions=[\n+            ComposableNode(\n+                package='depth_obstacle_detect_ros',\n+                plugin='DepthObstacleDetect',\n+                name='obstacle_detect_component',\n+                parameters=[{\n+                'depth_topic':'/cam1/depth_image',\n+                'camera_info_topic':'/cam1/camera_info',\n+                'detect_topic':'/cam1/detect',\n+                'cam_id':'cam1',\n+                'verbose': True,\n+                'width_regions':12,\n+                'height_regions':9,\n+                'obstacle_range_limit':1.0,\n+                'obstacle_state_topic':'/cam1/obstacle_state'\n+                }],\n+                extra_arguments=[{'use_intra_process_comms': True}],\n+            ),\n+        ]\n+    ))\n+    return ld\n\\ No newline at end of file"
+        },
+        {
+          "sha": "0a32fc06228583dffb0c6f65e2c6e0f498afc712",
+          "filename": "depth_obstacle_detect_ros/package.xml",
+          "status": "added",
+          "additions": 27,
+          "deletions": 0,
+          "changes": 27,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros%2Fpackage.xml",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/depth_obstacle_detect_ros%2Fpackage.xml?ref=8386dcf198e86743ff64ad9513a7df6b438930f6",
+          "patch": "@@ -0,0 +1,27 @@\n+<?xml version=\"1.0\"?>\n+<package format=\"2\">\n+  <name>depth_obstacle_detect_ros</name>\n+  <version>1.0.0</version>\n+  <description>The depth based obstacle detection package</description>\n+\n+  <!-- One maintainer tag required, multiple allowed, one person per tag -->\n+  <!-- Example:  -->\n+  <!-- <maintainer email=\"jane.doe@example.com\">Jane Doe</maintainer> -->\n+  <maintainer email=\"ros@analog.com\">Analog Devices</maintainer>\n+  <license>BSD</license>\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+  <depend>rclcpp</depend>\n+  <depend>rclpy</depend>\n+  <depend>sensor_msgs</depend>\n+  <depend>cv_bridge</depend>\n+  <depend>image_transport</depend>\n+  <depend>depth_obstacle_detect_ros_msg</depend>\n+  <depend>rclcpp_components</depend>\n+  <exec_depend>ros2launch</exec_depend>\n+\n+  <!-- The export tag contains other, unspecified, tags -->\n+  <export>\n+    <!-- Other tools can request additional information be placed here -->\n+    <build_type>ament_cmake</build_type>\n+  </export>\n+</package>\n\\ No newline at end of file"
+        },
+        {
+          "sha": "2e31d9b0d03ddcd702bd21e7b56f602640d4926e",
+          "filename": "depth_obstacle_detect_ros/src/depth_obstacle_detect_ros.cpp",
+          "status": "added",
+          "additions": 184,
+          "deletions": 0,
+          "changes": 184,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros%2Fsrc%2Fdepth_obstacle_detect_ros.cpp",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros%2Fsrc%2Fdepth_obstacle_detect_ros.cpp",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/depth_obstacle_detect_ros%2Fsrc%2Fdepth_obstacle_detect_ros.cpp?ref=8386dcf198e86743ff64ad9513a7df6b438930f6",
+          "patch": "@@ -0,0 +1,184 @@\n+#include \"depth_obstacle_detect.hpp\"\r\n+#include <chrono>\r\n+\r\n+DepthObstacleDetect::DepthObstacleDetect(const rclcpp::NodeOptions& options) : Node(\"obstacle_detect_node\", options)\r\n+{\r\n+  // Reading parameters from the launch file\r\n+  this->declare_parameter(\"depth_topic\", \"tof_cam/rect/depth\");\r\n+  this->declare_parameter(\"detect_topic\", \"tof_cam/rect/detect\");\r\n+  this->declare_parameter(\"cam_id\", \"tof_cam\");\r\n+  this->declare_parameter(\"camera_info_topic\", \"tof_cam/rect/camera_info\");\r\n+  this->declare_parameter(\"verbose\", false);\r\n+  this->declare_parameter(\"width_regions\", 4);\r\n+  this->declare_parameter(\"height_regions\", 4);\r\n+  this->declare_parameter(\"obstacle_range_limit\", 1.0);\r\n+  this->declare_parameter(\"max_distance_for_visualization\", 16);\r\n+  this->declare_parameter(\"obstacle_state_topic\", \"tof_cam/obstacle_state\");\r\n+\r\n+  this->get_parameter(\"depth_topic\", depth_topic_);\r\n+  this->get_parameter(\"detect_topic\", detect_topic_);\r\n+  this->get_parameter(\"cam_id\", cam_id_);\r\n+  this->get_parameter(\"verbose\", verbose_);\r\n+  this->get_parameter(\"camera_info_topic\", camera_info_topic_);\r\n+  this->get_parameter(\"obstacle_range_limit\", obstacle_range_);\r\n+  this->get_parameter(\"width_regions\", width_steps_);\r\n+  this->get_parameter(\"height_regions\", height_steps_);\r\n+  this->get_parameter(\"max_distance_for_visualization\", max_distance_);\r\n+  this->get_parameter(\"obstacle_state_topic\", obstacle_state_topic_);\r\n+\r\n+  // Timer for initializing the node after the construction is done to avoid bad weak_ptr error\r\n+  timer_ = this->create_wall_timer(std::chrono::milliseconds(5), std::bind(&DepthObstacleDetect::init, this));\r\n+}\r\n+\r\n+void DepthObstacleDetect::init()\r\n+{\r\n+  // Disabling timer based callback to avoid re-initializations\r\n+  timer_->cancel();\r\n+  image_transport::ImageTransport it(this->shared_from_this());\r\n+  init_distance_conversion_ = true;\r\n+  sub_depth_ = it.subscribe(depth_topic_, 1, &DepthObstacleDetect::imageCallback, this);\r\n+  sub_info_ = this->create_subscription<sensor_msgs::msg::CameraInfo>(\r\n+      camera_info_topic_, 10, std::bind(&DepthObstacleDetect::infoCallback, this, std::placeholders::_1));\r\n+  pub_detect_ = it.advertise(detect_topic_, 1);\r\n+  pub_obstacle_ = create_publisher<depth_obstacle_detect_ros_msg::msg::ObstacleStampedArray>(obstacle_state_topic_, 1);\r\n+\r\n+  msg_header_detect_.frame_id = cam_id_;\r\n+  msg_header_detect_.stamp = this->get_clock()->now();\r\n+\r\n+  obstacle_range_threshold_ = obstacle_range_ * 1000.0;\r\n+  msg_header_obstacle_.frame_id = cam_id_;\r\n+  msg_header_obstacle_.stamp = this->get_clock()->now();\r\n+  msg_obstacle_.header = msg_header_obstacle_;\r\n+\r\n+  RCLCPP_INFO(this->get_logger(), \"##### Image Width Regions  = %d, Image Height Regions  = %d. #####\", width_steps_,\r\n+              height_steps_);\r\n+  RCLCPP_INFO(this->get_logger(), \"##### Obstacle Range Limit = %fm (or %fmm). #####\", obstacle_range_,\r\n+              obstacle_range_threshold_);\r\n+}\r\n+\r\n+void DepthObstacleDetect::imageCallback(const sensor_msgs::msg::Image::ConstSharedPtr& msg)\r\n+{\r\n+  try\r\n+  {\r\n+    // Convert Image message to cv::Mat\r\n+    if (msg->encoding == \"mono16\" || msg->encoding == \"16UC1\")\r\n+    {\r\n+      detect_image_ = cv_bridge::toCvCopy(msg, \"16UC1\")->image;\r\n+      is32FC1_ = false;\r\n+      if (verbose_)\r\n+        RCLCPP_INFO(this->get_logger(), \"Detected 16UC1 Image\");\r\n+    }\r\n+    else if (msg->encoding == \"32FC1\")\r\n+    {\r\n+      detect_image_ = cv_bridge::toCvCopy(msg, \"32FC1\")->image;\r\n+      is32FC1_ = true;\r\n+      if (init_distance_conversion_)\r\n+      {\r\n+        init_distance_conversion_ = false;\r\n+        obstacle_range_threshold_ /= 1000;\r\n+      }\r\n+      if (verbose_)\r\n+        RCLCPP_INFO(this->get_logger(), \"Detected 32FC1 Image\");\r\n+    }\r\n+    else\r\n+    {\r\n+      throw cv::Error::StsUnsupportedFormat;\r\n+    }\r\n+    // Get Image Size\r\n+    image_height_ = detect_image_.rows;\r\n+    image_width_ = detect_image_.cols;\r\n+    region_width_ = int(image_width_ / width_steps_);\r\n+    region_height_ = int(image_height_ / height_steps_);\r\n+\r\n+    // Scale factor is used to convert the printed distance to be in m or mm\r\n+    double scale_factor = (is32FC1_) ? 1.0 : 1000.0;\r\n+    double pixel_scale_factor = 255.0/(max_distance_*scale_factor);\r\n+    // ROS_INFO(\"Image Width  = %d, Image Height  = %d.\",  image_width_,  image_height_);\r\n+    // ROS_INFO(\"Width Steps  = %d, Height Steps  = %d.\",  width_steps_,  height_steps_);\r\n+    // ROS_INFO(\"Region Width = %d, Region Height = %d.\", region_width_, region_height_);\r\n+\r\n+    // Perpare Output Image - normalize and covert input depth image to RGB grayscale image.\r\n+    // cv::normalize(detect_image_, detect_image_8bit_, 0, 255, cv::NORM_MINMAX, CV_8UC1);\r\n+\r\n+    detect_image_.convertTo(detect_image_8bit_, CV_8UC1, pixel_scale_factor);\r\n+    cv::cvtColor(detect_image_8bit_, detect_image_out_, CV_GRAY2RGB);\r\n+    // Detect black (value=0) border area due to fov limiting and replace pixels with the highest values in the image.\r\n+    // This prevents the border areas from generating false obstacles triggers.\r\n+    cv::minMaxIdx(detect_image_, &minValue_, &maxValue_);  // Find the min and max pixel values in the image.\r\n+    image_maxValue_ = int(maxValue_);\r\n+    cv::inRange(detect_image_, 0, 0, fov_border_mask_);     // Create the border mask based on 0 value pixels/\r\n+    detect_image_.setTo(image_maxValue_, fov_border_mask_);  // Use the mask to set all of the border pixel values to the\r\n+                                                          // max image pixel value.\r\n+\r\n+    /* Use a Gaussian Filter to reduce depth image noise. */\r\n+    cv::GaussianBlur(detect_image_, detect_image_blur_, cv::Size(3, 3), 0, 0);\r\n+    /* Uncomment next line to bypass Gaussian Filter step. */\r\n+    // detect_image_blur_ = detect_image_;\r\n+\r\n+    // Clear Obstacle Message Arrays.\r\n+    msg_obstacle_.obstacle_detected.clear();\r\n+    msg_obstacle_.obstacle_distance.clear();\r\n+\r\n+    // Check each depth image region for an obstacle and highlight in output image.\r\n+    char buffer[5];\r\n+    for (int i = 0; i < width_steps_; i++)\r\n+    {\r\n+      for (int j = 0; j < height_steps_; j++)\r\n+      {\r\n+        x_step_ = i * region_width_;\r\n+        y_step_ = j * region_height_;\r\n+        cv::Rect rect(x_step_, y_step_, region_width_, region_height_);\r\n+        cv::minMaxIdx(detect_image_blur_(rect), &minValue_, &maxValue_);\r\n+        if (verbose_)\r\n+          RCLCPP_INFO(this->get_logger(), \"%f\", minValue_);\r\n+        if (minValue_ >= obstacle_range_threshold_)\r\n+        {\r\n+          cv::rectangle(detect_image_out_, rect, cv::Scalar(0, 255, 0));\r\n+          sprintf(buffer, \"%3.1f\", minValue_ / scale_factor);\r\n+          std::string overlay_string(buffer);\r\n+          cv::putText(detect_image_out_, overlay_string,\r\n+                      cv::Point(x_step_ + int(region_width_ / 6), y_step_ + int(region_height_ / 2) + 2),\r\n+                      cv::FONT_HERSHEY_DUPLEX, 0.5, CV_RGB(0, 255, 0), 1);\r\n+          obstacle_detected_ = false;\r\n+          msg_obstacle_.obstacle_detected.push_back(obstacle_detected_);\r\n+          obstacle_detected_range_ = minValue_ / scale_factor;\r\n+          msg_obstacle_.obstacle_distance.push_back(obstacle_detected_range_);\r\n+        }\r\n+        else\r\n+        {\r\n+          cv::rectangle(detect_image_out_, rect, cv::Scalar(255, 0, 0));\r\n+          sprintf(buffer, \"%3.1f\", minValue_ / scale_factor);\r\n+          std::string overlay_string(buffer);\r\n+          cv::putText(detect_image_out_, overlay_string,\r\n+                      cv::Point(x_step_ + int(region_width_ / 6), y_step_ + int(region_height_ / 2) + 2),\r\n+                      cv::FONT_HERSHEY_DUPLEX, 0.5, CV_RGB(0, 0, 255), 1);\r\n+          obstacle_detected_ = true;\r\n+          msg_obstacle_.obstacle_detected.push_back(obstacle_detected_);\r\n+          obstacle_detected_range_ = minValue_ / scale_factor;\r\n+          msg_obstacle_.obstacle_distance.push_back(obstacle_detected_range_);\r\n+          if (verbose_)\r\n+            RCLCPP_INFO(this->get_logger(), \"Obstacle Detected in Region (%d, %d), Range = %fm.\", i, j,\r\n+                        minValue_ / 1000.0);\r\n+        }\r\n+      }\r\n+    }\r\n+\r\n+    // Publish output Image and obstacle state message.\r\n+    msg_header_detect_.stamp = this->get_clock()->now();\r\n+    sensor_msgs::msg::Image::ConstSharedPtr msg_detect =\r\n+        cv_bridge::CvImage(msg_header_detect_, \"rgb8\", detect_image_out_).toImageMsg();\r\n+    pub_detect_.publish(msg_detect);\r\n+    msg_obstacle_.header.stamp = msg_header_detect_.stamp;\r\n+    pub_obstacle_->publish(msg_obstacle_);\r\n+  }\r\n+  catch (cv_bridge::Exception& e)\r\n+  {\r\n+    RCLCPP_ERROR(this->get_logger(), \"Error in Callback OpenCV processing.\");\r\n+  }\r\n+}\r\n+\r\n+void DepthObstacleDetect::infoCallback(const sensor_msgs::msg::CameraInfo& msg)\r\n+{\r\n+  cam_info_detect_ = msg;\r\n+  // Do nothing else - may be used to add future functionality.\r\n+}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "ea0310d75a883e0fa1cc31e7a9b1f81ea48765b7",
+          "filename": "depth_obstacle_detect_ros/src/depth_obstacle_detect_ros_component.cpp",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros%2Fsrc%2Fdepth_obstacle_detect_ros_component.cpp",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros%2Fsrc%2Fdepth_obstacle_detect_ros_component.cpp",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/depth_obstacle_detect_ros%2Fsrc%2Fdepth_obstacle_detect_ros_component.cpp?ref=8386dcf198e86743ff64ad9513a7df6b438930f6",
+          "patch": "@@ -0,0 +1,4 @@\n+#include \"depth_obstacle_detect.hpp\"\n+#include <rclcpp_components/register_node_macro.hpp>\n+\n+RCLCPP_COMPONENTS_REGISTER_NODE(DepthObstacleDetect)\n\\ No newline at end of file"
+        },
+        {
+          "sha": "00b348ef4d9bae66c4793b706689cf8f36f527e2",
+          "filename": "depth_obstacle_detect_ros/src/depth_obstacle_detect_ros_node.cpp",
+          "status": "added",
+          "additions": 10,
+          "deletions": 0,
+          "changes": 10,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros%2Fsrc%2Fdepth_obstacle_detect_ros_node.cpp",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros%2Fsrc%2Fdepth_obstacle_detect_ros_node.cpp",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/depth_obstacle_detect_ros%2Fsrc%2Fdepth_obstacle_detect_ros_node.cpp?ref=8386dcf198e86743ff64ad9513a7df6b438930f6",
+          "patch": "@@ -0,0 +1,10 @@\n+#include \"depth_obstacle_detect.hpp\"\r\n+\r\n+int main(int argc, char** argv)\r\n+{\r\n+  rclcpp::init(argc, argv);\r\n+  rclcpp::NodeOptions options;\r\n+  auto node = std::make_shared<DepthObstacleDetect>(options);\r\n+  rclcpp::spin(node);\r\n+  return 0;\r\n+}\r"
+        },
+        {
+          "sha": "d1c169596850850d1ed88147215e93fa01cd7d05",
+          "filename": "depth_obstacle_detect_ros_msg/CMakeLists.txt",
+          "status": "added",
+          "additions": 20,
+          "deletions": 0,
+          "changes": 20,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros_msg%2FCMakeLists.txt",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros_msg%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/depth_obstacle_detect_ros_msg%2FCMakeLists.txt?ref=8386dcf198e86743ff64ad9513a7df6b438930f6",
+          "patch": "@@ -0,0 +1,20 @@\n+cmake_minimum_required(VERSION 3.8)\n+set(CMAKE_CXX_STANDARD 17)\n+project(depth_obstacle_detect_ros_msg)\n+\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  add_compile_options(-Wall -Wextra -Wpedantic)\n+endif()\n+\n+# find dependencies\n+find_package(ament_cmake REQUIRED)\n+find_package(std_msgs REQUIRED)\n+find_package(rosidl_default_generators REQUIRED)\n+\n+rosidl_generate_interfaces(${PROJECT_NAME}\n+  \"msg/ObstacleStampedArray.msg\"\n+  DEPENDENCIES std_msgs\n+)\n+\n+\n+ament_package()"
+        },
+        {
+          "sha": "3b47734a1da73dc79cbd49c68ab4271084ee8234",
+          "filename": "depth_obstacle_detect_ros_msg/README.md",
+          "status": "added",
+          "additions": 10,
+          "deletions": 0,
+          "changes": 10,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros_msg%2FREADME.md",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros_msg%2FREADME.md",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/depth_obstacle_detect_ros_msg%2FREADME.md?ref=8386dcf198e86743ff64ad9513a7df6b438930f6",
+          "patch": "@@ -0,0 +1,10 @@\n+# depth_obstacle_detect_ros_msg\n+Custom ROS Message package dependency for depth_obstacle_detect_ros package detection state output.\n+## Background\n+The Message contains three data fields. The header contains the header information for the messages. The `obstacle_detected` variable is an array of booleans of whether or not a certain cell in the in the grid has an obstacle. The `obstacle_distance` variable is an array of 64 bit floating point values that stores the minimum distance of each cell in the grid.\n+## Message Structure\n+```\n+std_msgs/Header header\n+bool[] obstacle_detected\n+float64[] obstacle_distance\n+```\n\\ No newline at end of file"
+        },
+        {
+          "sha": "29be3552e3cc13d63fae6e1451efef8afc55e901",
+          "filename": "depth_obstacle_detect_ros_msg/msg/ObstacleStampedArray.msg",
+          "status": "added",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros_msg%2Fmsg%2FObstacleStampedArray.msg",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros_msg%2Fmsg%2FObstacleStampedArray.msg",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/depth_obstacle_detect_ros_msg%2Fmsg%2FObstacleStampedArray.msg?ref=8386dcf198e86743ff64ad9513a7df6b438930f6",
+          "patch": "@@ -0,0 +1,3 @@\n+std_msgs/Header header\n+bool[] obstacle_detected\n+float64[] obstacle_distance"
+        },
+        {
+          "sha": "0853494763844099269c6f4741c5fe1988873a4a",
+          "filename": "depth_obstacle_detect_ros_msg/package.xml",
+          "status": "added",
+          "additions": 18,
+          "deletions": 0,
+          "changes": 18,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros_msg%2Fpackage.xml",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/8386dcf198e86743ff64ad9513a7df6b438930f6/depth_obstacle_detect_ros_msg%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/depth_obstacle_detect_ros_msg%2Fpackage.xml?ref=8386dcf198e86743ff64ad9513a7df6b438930f6",
+          "patch": "@@ -0,0 +1,18 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n+  <name>depth_obstacle_detect_ros_msg</name>\n+  <version>1.0.0</version>\n+  <description>TODO: Package description</description>\n+  <maintainer email=\"ros@analog.com\">Analog Devices</maintainer>\n+  <license>BSD</license>\n+\n+  <depend>std_msgs</depend>\n+  <buildtool_depend>rosidl_default_generators</buildtool_depend>\n+  <exec_depend>rosidl_default_runtime</exec_depend>\n+  <member_of_group>rosidl_interface_packages</member_of_group>\n+\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n+</package>\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "raebelchristo-adi",
+      "date": "2025-04-01T07:48:20Z",
+      "sha": "76499f352b1f17896a82f4c00b5a7ab878f185a9",
+      "message": "Modification to messages package for REP standards",
+      "files_changed": 9,
+      "additions": 14,
+      "deletions": 14,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "681fbc69d2fc5beabc30fff334d30df1bbd21e97",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/76499f352b1f17896a82f4c00b5a7ab878f185a9/README.md",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/76499f352b1f17896a82f4c00b5a7ab878f185a9/README.md",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/README.md?ref=76499f352b1f17896a82f4c00b5a7ab878f185a9",
+          "patch": "@@ -1,16 +1,16 @@\n <h1 style=\"text-align: center;\" > Depth Obstacle Detection ROS</h1>\n \n # Overview\n-The **Depth Obstacle Detection ROS** package for the Robot Operating System (ROS) identifies surfaces near the depth camera within a specified threshold. The image is divided into a grid of multiple cells, and the minimum value in each cell is detected. Values below the threshold are highlighted in red to indicate the presence of an obstacle. There are two packages in this installation, the core package `depth_obstacle_detect_ros` which is dependant on `depth_obstacle_detect_ros_msg`.\n+The **Depth Obstacle Detection ROS** package for the Robot Operating System (ROS) identifies surfaces near the depth camera within a specified threshold. The image is divided into a grid of multiple cells, and the minimum value in each cell is detected. Values below the threshold are highlighted in red to indicate the presence of an obstacle. There are two packages in this installation, the core package `depth_obstacle_detect_ros` which is dependant on `depth_obstacle_detect_ros_msgs`.\n \n \n [![Jazzy](https://img.shields.io/badge/-JAZZY-green?style=plastic&logo=ros)](https://docs.ros.org/en/rolling/Releases/Release-Jazzy-Jalisco.html) [![Ubuntu 24.04](https://img.shields.io/badge/-UBUNTU%2024.04-orange?style=plastic&logo=ubuntu&logoColor=white)](https://releases.ubuntu.com/noble/) [![License](https://img.shields.io/badge/License-BSD_3--Clause-purple.svg)](./LICENSE) ![x86_64](https://img.shields.io/badge/x86__64-blue?style=plastic&logo=intel&logoColor=white)\n \n > [!NOTE]  \n-> This node requires a custom ros message package to be installed in the same workspace. It can be found [here.](./depth_obstacle_detect_ros_msg)  \n+> This node requires a custom ros message package to be installed in the same workspace. It can be found [here.](./depth_obstacle_detect_ros_msgs)  \n \n # Background\n-The obstacle detection node subscribes to `/tof_cam/rect/depth` by default. The launch file can be edited to make the node subscribe to a topic that publishes depth images from a depth camera. Image encoding with `mono16` or `16UC1` are supported by the node. The node divides an image into a grid of specified number of cells vertically and horizontally. The minimum value of each cell is taken into account to decide if there is an obstacle within the range specified by the threshold. The [depth_obstacle_detect_ros_msg](depth_obstacle_detect_ros_msg/README.md) is used to publish obstacle information for any external use.\n+The obstacle detection node subscribes to `/tof_cam/rect/depth` by default. The launch file can be edited to make the node subscribe to a topic that publishes depth images from a depth camera. Image encoding with `mono16` or `16UC1` are supported by the node. The node divides an image into a grid of specified number of cells vertically and horizontally. The minimum value of each cell is taken into account to decide if there is an obstacle within the range specified by the threshold. The [depth_obstacle_detect_ros_msgs](depth_obstacle_detect_ros_msgs/README.md) is used to publish obstacle information for any external use.\n \n # Hardware\n  - Any Depth Camera, such as [EVAL-ADTF3175D-NXZ](https://www.analog.com/en/resources/evaluation-hardware-and-software/evaluation-boards-kits/eval-adtf3175.html) Module"
+        },
+        {
+          "sha": "a21537c6d2f63b4213999a31c49b1ffbc76bd156",
+          "filename": "depth_obstacle_detect_ros/CMakeLists.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/76499f352b1f17896a82f4c00b5a7ab878f185a9/depth_obstacle_detect_ros%2FCMakeLists.txt",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/76499f352b1f17896a82f4c00b5a7ab878f185a9/depth_obstacle_detect_ros%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/depth_obstacle_detect_ros%2FCMakeLists.txt?ref=76499f352b1f17896a82f4c00b5a7ab878f185a9",
+          "patch": "@@ -25,7 +25,7 @@ find_package(rclcpp_components REQUIRED)\n find_package(image_transport REQUIRED)\n find_package(cv_bridge REQUIRED)\n find_package(sensor_msgs REQUIRED)\n-find_package(depth_obstacle_detect_ros_msg REQUIRED)\n+find_package(depth_obstacle_detect_ros_msgs REQUIRED)\n \n find_package(OpenCV)\n if(OPENCV_FOUND OR\n@@ -46,7 +46,7 @@ include_directories(include PUBLIC)\n add_library(depth_obstacle_detect src/depth_obstacle_detect_ros.cpp)\n \n add_executable(${PROJECT_NAME}_node src/depth_obstacle_detect_ros_node.cpp)\n-ament_target_dependencies(depth_obstacle_detect rclcpp image_transport cv_bridge sensor_msgs rclpy depth_obstacle_detect_ros_msg)\n+ament_target_dependencies(depth_obstacle_detect rclcpp image_transport cv_bridge sensor_msgs rclpy depth_obstacle_detect_ros_msgs)\n target_link_libraries(${PROJECT_NAME}_node depth_obstacle_detect ${OpenCV_LIBS} )\n \n add_library(${PROJECT_NAME}_component SHARED src/depth_obstacle_detect_ros_component.cpp)"
+        },
+        {
+          "sha": "a0376259242da75bc4fecdb0e22de63e5abf6434",
+          "filename": "depth_obstacle_detect_ros/include/depth_obstacle_detect.hpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/76499f352b1f17896a82f4c00b5a7ab878f185a9/depth_obstacle_detect_ros%2Finclude%2Fdepth_obstacle_detect.hpp",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/76499f352b1f17896a82f4c00b5a7ab878f185a9/depth_obstacle_detect_ros%2Finclude%2Fdepth_obstacle_detect.hpp",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/depth_obstacle_detect_ros%2Finclude%2Fdepth_obstacle_detect.hpp?ref=76499f352b1f17896a82f4c00b5a7ab878f185a9",
+          "patch": "@@ -15,7 +15,7 @@\n #include <opencv2/contrib/contrib.hpp>\n #endif\n \n-#include \"depth_obstacle_detect_ros_msg/msg/obstacle_stamped_array.hpp\"\n+#include \"depth_obstacle_detect_ros_msgs/msg/obstacle_stamped_array.hpp\"\n #include \"std_msgs/msg/bool.hpp\"\n #include \"std_msgs/msg/float64.hpp\"\n \n@@ -30,7 +30,7 @@ class DepthObstacleDetect : public rclcpp::Node\n private:\n   rclcpp::TimerBase::SharedPtr timer_;\n   rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr sub_info_;\n-  rclcpp::Publisher<depth_obstacle_detect_ros_msg::msg::ObstacleStampedArray>::SharedPtr pub_obstacle_;\n+  rclcpp::Publisher<depth_obstacle_detect_ros_msgs::msg::ObstacleStampedArray>::SharedPtr pub_obstacle_;\n   image_transport::Subscriber sub_depth_;\n   image_transport::Publisher pub_detect_;\n   sensor_msgs::msg::CameraInfo cam_info_detect_;\n@@ -61,7 +61,7 @@ class DepthObstacleDetect : public rclcpp::Node\n   bool verbose_;\n   bool is32FC1_;\n   bool init_distance_conversion_;\n-  depth_obstacle_detect_ros_msg::msg::ObstacleStampedArray msg_obstacle_;\n+  depth_obstacle_detect_ros_msgs::msg::ObstacleStampedArray msg_obstacle_;\n   std_msgs::msg::Header msg_header_obstacle_;\n   bool obstacle_detected_;\n   double obstacle_detected_range_;"
+        },
+        {
+          "sha": "17c1cc7c24dc263db0ad51189cff10047174b612",
+          "filename": "depth_obstacle_detect_ros/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/76499f352b1f17896a82f4c00b5a7ab878f185a9/depth_obstacle_detect_ros%2Fpackage.xml",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/76499f352b1f17896a82f4c00b5a7ab878f185a9/depth_obstacle_detect_ros%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/depth_obstacle_detect_ros%2Fpackage.xml?ref=76499f352b1f17896a82f4c00b5a7ab878f185a9",
+          "patch": "@@ -15,7 +15,7 @@\n   <depend>sensor_msgs</depend>\n   <depend>cv_bridge</depend>\n   <depend>image_transport</depend>\n-  <depend>depth_obstacle_detect_ros_msg</depend>\n+  <depend>depth_obstacle_detect_ros_msgs</depend>\n   <depend>rclcpp_components</depend>\n   <exec_depend>ros2launch</exec_depend>\n "
+        },
+        {
+          "sha": "0d0b3f7da037a31c3534b1a5725c74b231cc6d3b",
+          "filename": "depth_obstacle_detect_ros/src/depth_obstacle_detect_ros.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/76499f352b1f17896a82f4c00b5a7ab878f185a9/depth_obstacle_detect_ros%2Fsrc%2Fdepth_obstacle_detect_ros.cpp",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/76499f352b1f17896a82f4c00b5a7ab878f185a9/depth_obstacle_detect_ros%2Fsrc%2Fdepth_obstacle_detect_ros.cpp",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/depth_obstacle_detect_ros%2Fsrc%2Fdepth_obstacle_detect_ros.cpp?ref=76499f352b1f17896a82f4c00b5a7ab878f185a9",
+          "patch": "@@ -40,7 +40,7 @@ void DepthObstacleDetect::init()\n   sub_info_ = this->create_subscription<sensor_msgs::msg::CameraInfo>(\r\n       camera_info_topic_, 10, std::bind(&DepthObstacleDetect::infoCallback, this, std::placeholders::_1));\r\n   pub_detect_ = it.advertise(detect_topic_, 1);\r\n-  pub_obstacle_ = create_publisher<depth_obstacle_detect_ros_msg::msg::ObstacleStampedArray>(obstacle_state_topic_, 1);\r\n+  pub_obstacle_ = create_publisher<depth_obstacle_detect_ros_msgs::msg::ObstacleStampedArray>(obstacle_state_topic_, 1);\r\n \r\n   msg_header_detect_.frame_id = cam_id_;\r\n   msg_header_detect_.stamp = this->get_clock()->now();\r"
+        },
+        {
+          "sha": "d30dd01361cf071062b6832a0f04b6808c93efc8",
+          "filename": "depth_obstacle_detect_ros_msgs/CMakeLists.txt",
+          "status": "renamed",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/76499f352b1f17896a82f4c00b5a7ab878f185a9/depth_obstacle_detect_ros_msgs%2FCMakeLists.txt",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/76499f352b1f17896a82f4c00b5a7ab878f185a9/depth_obstacle_detect_ros_msgs%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/depth_obstacle_detect_ros_msgs%2FCMakeLists.txt?ref=76499f352b1f17896a82f4c00b5a7ab878f185a9",
+          "patch": "@@ -1,6 +1,6 @@\n cmake_minimum_required(VERSION 3.8)\n set(CMAKE_CXX_STANDARD 17)\n-project(depth_obstacle_detect_ros_msg)\n+project(depth_obstacle_detect_ros_msgs)\n \n if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n   add_compile_options(-Wall -Wextra -Wpedantic)",
+          "previous_filename": "depth_obstacle_detect_ros_msg/CMakeLists.txt"
+        },
+        {
+          "sha": "a7074fdae37bbc85c09ab7ca12dcca16f6da6328",
+          "filename": "depth_obstacle_detect_ros_msgs/README.md",
+          "status": "renamed",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/76499f352b1f17896a82f4c00b5a7ab878f185a9/depth_obstacle_detect_ros_msgs%2FREADME.md",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/76499f352b1f17896a82f4c00b5a7ab878f185a9/depth_obstacle_detect_ros_msgs%2FREADME.md",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/depth_obstacle_detect_ros_msgs%2FREADME.md?ref=76499f352b1f17896a82f4c00b5a7ab878f185a9",
+          "patch": "@@ -1,4 +1,4 @@\n-# depth_obstacle_detect_ros_msg\n+# depth_obstacle_detect_ros_msgs\n Custom ROS Message package dependency for depth_obstacle_detect_ros package detection state output.\n ## Background\n The Message contains three data fields. The header contains the header information for the messages. The `obstacle_detected` variable is an array of booleans of whether or not a certain cell in the in the grid has an obstacle. The `obstacle_distance` variable is an array of 64 bit floating point values that stores the minimum distance of each cell in the grid.",
+          "previous_filename": "depth_obstacle_detect_ros_msg/README.md"
+        },
+        {
+          "sha": "29be3552e3cc13d63fae6e1451efef8afc55e901",
+          "filename": "depth_obstacle_detect_ros_msgs/msg/ObstacleStampedArray.msg",
+          "status": "renamed",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/76499f352b1f17896a82f4c00b5a7ab878f185a9/depth_obstacle_detect_ros_msgs%2Fmsg%2FObstacleStampedArray.msg",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/76499f352b1f17896a82f4c00b5a7ab878f185a9/depth_obstacle_detect_ros_msgs%2Fmsg%2FObstacleStampedArray.msg",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/depth_obstacle_detect_ros_msgs%2Fmsg%2FObstacleStampedArray.msg?ref=76499f352b1f17896a82f4c00b5a7ab878f185a9",
+          "previous_filename": "depth_obstacle_detect_ros_msg/msg/ObstacleStampedArray.msg"
+        },
+        {
+          "sha": "70dd071509387d7920044664e6135648b289b2b4",
+          "filename": "depth_obstacle_detect_ros_msgs/package.xml",
+          "status": "renamed",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/76499f352b1f17896a82f4c00b5a7ab878f185a9/depth_obstacle_detect_ros_msgs%2Fpackage.xml",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/76499f352b1f17896a82f4c00b5a7ab878f185a9/depth_obstacle_detect_ros_msgs%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/depth_obstacle_detect_ros_msgs%2Fpackage.xml?ref=76499f352b1f17896a82f4c00b5a7ab878f185a9",
+          "patch": "@@ -1,9 +1,9 @@\n <?xml version=\"1.0\"?>\n <?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"3\">\n-  <name>depth_obstacle_detect_ros_msg</name>\n+  <name>depth_obstacle_detect_ros_msgs</name>\n   <version>1.0.0</version>\n-  <description>TODO: Package description</description>\n+  <description>A message package for depth_obstacle_detect_ros package</description>\n   <maintainer email=\"ros@analog.com\">Analog Devices</maintainer>\n   <license>BSD</license>\n ",
+          "previous_filename": "depth_obstacle_detect_ros_msg/package.xml"
+        }
+      ]
+    },
+    {
+      "author": "sarojkanalog",
+      "date": "2025-03-18T14:51:20Z",
+      "sha": "9e1c7056c03795bf183cba4218bce28f6544f9a2",
+      "message": "Initial commit",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "8d9b6c7c42c6802ac489c975955a6d218fe24b51",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/blob/9e1c7056c03795bf183cba4218bce28f6544f9a2/README.md",
+          "raw_url": "https://github.com/analogdevicesinc/depth-obstacle-detect-ros/raw/9e1c7056c03795bf183cba4218bce28f6544f9a2/README.md",
+          "contents_url": "https://api.github.com/repos/analogdevicesinc/depth-obstacle-detect-ros/contents/README.md?ref=9e1c7056c03795bf183cba4218bce28f6544f9a2",
+          "patch": "@@ -0,0 +1,2 @@\n+# depth_obstacle_detect_ros\n+depth_obstacle_detect_ros"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,745 @@
+{
+  "_meta": {
+    "fetched_at": "2026-09-24T14:51:24Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "pal-robotics",
+    "repo": "omni_base_simulation",
+    "refreshed_at": "2026-09-24T14:51:24Z",
+    "refresh_note": "incrementally added 1 author(s) missing from a prior stale cache"
+  },
+  "data": [
+    {
+      "author": "antoniobrandi",
+      "date": "2021-09-21T11:41:39Z",
+      "sha": "312f2d056f472a9ddd121dce8a9a1dd7a850e880",
+      "message": "omni base simulation initial commit",
+      "files_changed": 19,
+      "additions": 531,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "0c4c2c5994dfbefaef618e2bf109569cdeb8c1b7",
+          "filename": "omni_base_2dnav_gazebo/CMakeLists.txt",
+          "status": "added",
+          "additions": 11,
+          "deletions": 0,
+          "changes": 11,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_2dnav_gazebo%2FCMakeLists.txt",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_2dnav_gazebo%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_2dnav_gazebo%2FCMakeLists.txt?ref=312f2d056f472a9ddd121dce8a9a1dd7a850e880",
+          "patch": "@@ -0,0 +1,11 @@\n+cmake_minimum_required(VERSION 3.0.2)\n+project(omni_base_2dnav_gazebo)\n+\n+find_package(catkin REQUIRED)\n+\n+catkin_package()\n+\n+foreach(dir launch)\n+    install(DIRECTORY ${dir}/\n+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir})\n+endforeach(dir)\n\\ No newline at end of file"
+        },
+        {
+          "sha": "d1a7701339c40b7c0b1b4e1d127ae03f7a097e90",
+          "filename": "omni_base_2dnav_gazebo/launch/localization.launch",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_2dnav_gazebo%2Flaunch%2Flocalization.launch",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_2dnav_gazebo%2Flaunch%2Flocalization.launch",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_2dnav_gazebo%2Flaunch%2Flocalization.launch?ref=312f2d056f472a9ddd121dce8a9a1dd7a850e880",
+          "patch": "@@ -0,0 +1,23 @@\n+<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n+<launch>\n+\n+  <arg name=\"localization\"  default=\"amcl\"/>\n+\n+  <arg name=\"map\"     default=\"$(env HOME)/.pal/omni_base_maps/config\"/>\n+  <arg name=\"symlink\" default=\"$(env HOME)/.pal/omni_base_maps/config\"/>\n+  <arg name=\"scan_topic\" default=\"scan\"/>\n+  <arg name=\"laser_model\" default=\"sick-561\"/>\n+  <arg name=\"mapping\" default=\"\"/>\n+\n+  <!-- Map -->\n+  <include file=\"$(find pal_navigation_sm)/launch/map.launch\">\n+    <arg name=\"map\"     value=\"$(arg map)\"/>\n+    <arg name=\"symlink\" value=\"$(arg symlink)\"/>\n+  </include>\n+\n+  <!-- Localization -->\n+  <include file=\"$(find omni_base_2dnav)/launch/localization.launch\">\n+    <arg name=\"localization\" value=\"$(arg localization)\"/>\n+  </include>\n+\n+</launch>"
+        },
+        {
+          "sha": "01effb80bb93d70b2af78c1f4c5381dfad73d274",
+          "filename": "omni_base_2dnav_gazebo/launch/mapping.launch",
+          "status": "added",
+          "additions": 11,
+          "deletions": 0,
+          "changes": 11,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_2dnav_gazebo%2Flaunch%2Fmapping.launch",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_2dnav_gazebo%2Flaunch%2Fmapping.launch",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_2dnav_gazebo%2Flaunch%2Fmapping.launch?ref=312f2d056f472a9ddd121dce8a9a1dd7a850e880",
+          "patch": "@@ -0,0 +1,11 @@\n+<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n+<launch>\n+\n+  <arg name=\"mapping\" default=\"karto\"/>\n+\n+  <!-- SLAM -->\n+  <include file=\"$(find omni_base_2dnav)/launch/mapping.launch\">\n+    <arg name=\"mapping\" value=\"$(arg mapping)\"/>\n+  </include>\n+\n+</launch>"
+        },
+        {
+          "sha": "27f65d9085ee4f138520ae0937395fb6cc96ab5f",
+          "filename": "omni_base_2dnav_gazebo/launch/navigation.launch",
+          "status": "added",
+          "additions": 71,
+          "deletions": 0,
+          "changes": 71,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_2dnav_gazebo%2Flaunch%2Fnavigation.launch",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_2dnav_gazebo%2Flaunch%2Fnavigation.launch",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_2dnav_gazebo%2Flaunch%2Fnavigation.launch?ref=312f2d056f472a9ddd121dce8a9a1dd7a850e880",
+          "patch": "@@ -0,0 +1,71 @@\n+<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n+<launch>\n+\n+  <arg name=\"state\" default=\"localization\"/>\n+\n+  <arg name=\"planner\"        default=\"base\"/>\n+  <arg name=\"global_planner\" default=\"global_planner\"/>\n+  <arg name=\"local_planner\"  default=\"pal\"/>\n+  <arg name=\"localization\"   default=\"amcl\"/>\n+  <arg name=\"mapping\"        default=\"karto\"/>\n+  <arg name=\"public_sim\"     default=\"false\"/>\n+  <arg name=\"robot_namespace\" default=\"\"/>\n+  <arg name=\"laser_model\"    default=\"sick-561\"/>\n+\n+\n+  <arg name=\"map\" default=\"$(env HOME)/.pal/omni_base_maps/config\"/>\n+\n+  <!-- Localization or Mapping state -->\n+  <node pkg=\"pal_navigation_sm\" type=\"navigation.sh\" name=\"navigation\"\n+        args=\"omni_base $(arg state) $(arg localization) $(arg mapping) $(arg map) false scan $(arg laser_model)\"/>\n+\n+  <!-- Navigation State Machine -->\n+  <include file=\"$(find omni_base_2dnav)/launch/state_machine.launch\">\n+    <arg name=\"state\" value=\"$(arg state)\"/>\n+    <arg name=\"public_sim\" value=\"$(arg public_sim)\"/>\n+  </include>\n+\n+  <!-- Planning -->\n+  <include file=\"$(find omni_base_2dnav)/launch/move_$(arg planner).launch\">\n+    <arg name=\"global_planner\" value=\"$(arg global_planner)\"/>\n+    <arg name=\"local_planner\"  value=\"$(arg local_planner)\"/>\n+    <arg name=\"public_sim\"     value=\"$(arg public_sim)\"/>\n+  </include>\n+\n+  <include file=\"$(find robot_pose)/launch/robot_pose.launch\">\n+    <arg name=\"robot_prefix\"      value=\"$(arg robot_namespace)\"/>\n+  </include>\n+  \n+  <!-- Laser filter (empty for public sim) -->\n+  <!-- Laser Scan Merger -->\n+  <node pkg=\"ira_laser_tools\" name=\"laserscan_multi_merger\" type=\"laserscan_multi_merger\" output=\"screen\"\n+    launch-prefix=\"bash -c 'sleep 5; $0 $@' \">\n+    <param name=\"destination_frame\" value=\"base_laser_link\"/>\n+    <param name=\"cloud_destination_topic\" value=\"/merged_cloud\"/>\n+    <param name=\"scan_destination_topic\" value=\"/scan_raw\"/>\n+    <param name=\"laserscan_topics\" value =\"/scan_front_raw /scan_rear_raw\" /> \n+    <param name=\"time_increment\" value =\"0.0\" /> \n+    <param name=\"scan_time\" value =\"0.0\" /> \n+    <param name=\"range_min\" value =\"0.05\" /> \n+    <param name=\"range_max\" value =\"25.0\" /> \n+    <param name=\"angle_min\" value =\"-3.1459\" /> \n+    <param name=\"angle_max\" value =\"3.1459\" /> \n+    <param name=\"angle_increment\" value =\"0.005769\" /> \n+  </node>\n+\n+  <node name=\"laser_filter\" pkg=\"laser_filters\" type=\"scan_to_scan_filter_chain\">\n+    <rosparam file=\"$(find omni_base_laser_sensors)/config/$(arg laser_model)_filter.yaml\" command=\"load\"/>\n+    <remap from=\"scan\"          to=\"scan_raw\"/>\n+    <remap from=\"scan_filtered\" to=\"scan\"/>\n+  </node>\n+  \n+  <group unless=\"$(arg public_sim)\">\n+    <!-- VO map server -->\n+    <include file=\"$(find pal_vo_server)/launch/vo_server.launch\">\n+      <arg name=\"fill_with_unknown\" value=\"true\"/>\n+      <arg name=\"vo_resolution\" value=\"0.3\"/>\n+    </include>\n+  </group>\n+\n+\n+</launch>"
+        },
+        {
+          "sha": "ae41cbcaa9bf546ee280c850099d37d803a58e7e",
+          "filename": "omni_base_2dnav_gazebo/launch/omni_base_mapping.launch",
+          "status": "added",
+          "additions": 44,
+          "deletions": 0,
+          "changes": 44,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_2dnav_gazebo%2Flaunch%2Fomni_base_mapping.launch",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_2dnav_gazebo%2Flaunch%2Fomni_base_mapping.launch",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_2dnav_gazebo%2Flaunch%2Fomni_base_mapping.launch?ref=312f2d056f472a9ddd121dce8a9a1dd7a850e880",
+          "patch": "@@ -0,0 +1,44 @@\n+<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n+<launch>\n+  <arg name=\"namespace\" default=\"/\"/>\n+  <arg name=\"public_sim\"   default=\"false\"/>\n+  <arg name=\"world\"  default=\"small_office\"/>\n+  <arg name=\"laser_model\"  default=\"sick-561\"/>\n+  <arg name=\"gzpose\" default=\"-x 0.0 -y 0.0 -z 0.0 -R 0.0 -P 0.0 -Y 0.0\"/>\n+  <arg name=\"planner\"        default=\"base\"/>\n+  <arg name=\"global_planner\" default=\"global_planner\"/>\n+  <arg name=\"local_planner\"  default=\"teb\"/> \n+  <arg name=\"mapping\"        default=\"$(eval 'gmapping' if arg('public_sim') else 'karto')\"/> \n+\n+  <arg name=\"rviz\"     default=\"true\"/>\n+  <arg name=\"gzclient\" default=\"true\"/>\n+  <arg name=\"recording\" default=\"false\"/>\n+  <arg name=\"extra_gazebo_args\" default=\"\"/>\n+\n+  <group ns=\"$(arg namespace)\">\n+\n+    <include file=\"$(find omni_base_gazebo)/launch/omni_base_gazebo.launch\">\n+      <arg name=\"world\"  value=\"$(arg world)\"/>\n+      <arg name=\"laser_model\"  value=\"$(arg laser_model)\"/>\n+      <arg name=\"gzpose\" value=\"$(arg gzpose)\"/>\n+      <arg name=\"public_sim\" value=\"$(arg public_sim)\"/>\n+      <arg name=\"gui\"    value=\"$(arg gzclient)\"/>\n+      <arg name=\"recording\"  value=\"$(arg recording)\"/>\n+      <arg name=\"extra_gazebo_args\" value=\"$(arg extra_gazebo_args)\"/>\n+    </include>\n+\n+    <include file=\"$(find omni_base_2dnav_gazebo)/launch/navigation.launch\">\n+      <arg name=\"state\"          value=\"mapping\"/>\n+      <arg name=\"mapping\"        value=\"$(arg mapping)\"/>\n+      <arg name=\"planner\"        value=\"$(arg planner)\"/>\n+      <arg name=\"global_planner\" value=\"$(arg global_planner)\"/>\n+      <arg name=\"local_planner\"  value=\"$(arg local_planner)\"/>\n+      <arg name=\"public_sim\"     value=\"$(arg public_sim)\"/>\n+      <arg name=\"laser_model\"    value=\"$(arg laser_model)\"/>\n+    </include>\n+\n+    <node name=\"rviz\" pkg=\"rviz\" type=\"rviz\" if=\"$(arg rviz)\"\n+          args=\"-d $(find omni_base_2dnav)/config/rviz/navigation.rviz\"/>\n+  </group>\n+ \n+</launch>"
+        },
+        {
+          "sha": "fc803f146e64d394c6fb806ffcb9bdda904153ee",
+          "filename": "omni_base_2dnav_gazebo/launch/omni_base_navigation.launch",
+          "status": "added",
+          "additions": 68,
+          "deletions": 0,
+          "changes": 68,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_2dnav_gazebo%2Flaunch%2Fomni_base_navigation.launch",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_2dnav_gazebo%2Flaunch%2Fomni_base_navigation.launch",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_2dnav_gazebo%2Flaunch%2Fomni_base_navigation.launch?ref=312f2d056f472a9ddd121dce8a9a1dd7a850e880",
+          "patch": "@@ -0,0 +1,68 @@\n+<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n+<launch>\n+  <arg name=\"namespace\" default=\"/\"/>\n+\n+  <arg name=\"public_sim\"   default=\"false\"/>\n+  <arg name=\"world\"  default=\"small_office\"/>\n+  <arg name=\"laser_model\"  default=\"sick-561\"/>\n+  <arg name=\"lost\" default=\"false\"/>\n+  <arg name=\"gzpose\" default=\"-x 0.0  -y   0.0 -z  0.0   -R 0.0 -P 0.0 -Y  0.0\" unless=\"$(arg lost)\"/>\n+  <arg name=\"gzpose\" default=\"-x 0.78 -y -11.1 -z -0.003 -R 0.0 -P 0.0 -Y 70.0\" if=\"$(arg lost)\"/>\n+\n+  <arg name=\"planner\"        default=\"base\"/>\n+  <arg name=\"global_planner\" default=\"global_planner\"/>\n+  <arg name=\"local_planner\"  default=\"teb\"/> \n+  <arg name=\"localization\"   default=\"amcl\"/>\n+  <arg name=\"map\"            default=\"$(env HOME)/.pal/omni_base_maps/configurations/$(arg world)\"/>\n+  <arg name=\"octomap\"        default=\"false\"/>\n+\n+  <arg name=\"rviz\"     default=\"true\"/>\n+  <arg name=\"gzclient\" default=\"true\"/>\n+  <arg name=\"recording\" default=\"false\"/>\n+  <arg name=\"extra_gazebo_args\" default=\"\"/>\n+\n+  <arg name=\"advanced_navigation\" default=\"false\"/> <!-- Requires extra software from PAL Robotics-->\n+\n+  <group ns=\"$(arg namespace)\">\n+\n+    <include file=\"$(find omni_base_gazebo)/launch/omni_base_gazebo.launch\">\n+      <arg name=\"world\"  value=\"$(arg world)\"/>\n+      <arg name=\"laser_model\"  value=\"$(arg laser_model)\"/>\n+      <arg name=\"gzpose\" value=\"$(arg gzpose)\"/>\n+      <arg name=\"public_sim\" value=\"$(arg public_sim)\"/>\n+      <arg name=\"gui\"    value=\"$(arg gzclient)\"/>\n+      <arg name=\"recording\"  value=\"$(arg recording)\"/>\n+      <arg name=\"extra_gazebo_args\" value=\"$(arg extra_gazebo_args)\"/>\n+    </include>\n+\n+    <include file=\"$(find omni_base_2dnav_gazebo)/launch/navigation.launch\">\n+      <arg name=\"state\"          value=\"localization\"/>\n+      <arg name=\"planner\"        value=\"$(arg planner)\"/>\n+      <arg name=\"global_planner\" value=\"$(arg global_planner)\"/>\n+      <arg name=\"local_planner\"  value=\"$(arg local_planner)\"/>\n+      <arg name=\"localization\"   value=\"$(arg localization)\"/>\n+      <arg name=\"map\"            value=\"$(arg map)\"/>\n+      <arg name=\"public_sim\"     value=\"$(arg public_sim)\"/>\n+      <arg name=\"laser_model\"    value=\"$(arg laser_model)\"/>\n+    </include>\n+\n+    <group if=\"$(arg advanced_navigation)\">\n+      <node pkg=\"pal_zoi_detector\" type=\"zoi_detector_node\" name=\"zoi_detector\" />\n+      <include file=\"$(find pal_waypoint)/launch/pal_waypoint.launch\"/>\n+      <include file=\"$(find pal_navigation_manager)/launch/poi_navigation_server.launch\"/>\n+      <include file=\"$(find pal_map_utils)/launch/map_configuration_server.launch\">\n+        <env name=\"PAL_HOST\" value=\"omni_basec\"/>\n+      </include>\n+    </group>\n+\n+    <group if=\"$(arg advanced_navigation)\">\n+      <node name=\"rviz\" pkg=\"rviz\" type=\"rviz\" if=\"$(arg rviz)\"\n+            args=\"-d $(find omni_base_2dnav)/config/rviz/advanced_navigation.rviz\"/>\n+    </group>\n+    <group unless=\"$(arg advanced_navigation)\">\n+      <node name=\"rviz\" pkg=\"rviz\" type=\"rviz\" if=\"$(arg rviz)\"\n+            args=\"-d $(find omni_base_2dnav)/config/rviz/navigation.rviz\"/>\n+    </group>\n+  </group>\n+\n+</launch>"
+        },
+        {
+          "sha": "49b70b923f7795236529df8d9009793adae5c9d4",
+          "filename": "omni_base_2dnav_gazebo/package.xml",
+          "status": "added",
+          "additions": 18,
+          "deletions": 0,
+          "changes": 18,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_2dnav_gazebo%2Fpackage.xml",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_2dnav_gazebo%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_2dnav_gazebo%2Fpackage.xml?ref=312f2d056f472a9ddd121dce8a9a1dd7a850e880",
+          "patch": "@@ -0,0 +1,18 @@\n+<?xml version=\"1.0\"?>\n+<package format=\"2\">\n+  <name>omni_base_2dnav_gazebo</name>\n+  <version>0.0.1</version>\n+  <description>The omni_base_2dnav_gazebo package</description>\n+\n+  <maintainer email=\"antonio.brandi@pal-robotics.com\">Antonio Brandi</maintainer>\n+\n+  <license>Modified BSD</license>\n+  <author email=\"antonio.brandi@pal-robotics.com\">Antonio Brandi</author>\n+\n+\n+  <buildtool_depend>catkin</buildtool_depend>\n+\n+  <exec_depend>omni_base_gazebo</exec_depend>\n+  <exec_depend>omni_base_2dnav</exec_depend>\n+\n+</package>"
+        },
+        {
+          "sha": "280d4490e1ccc88479f405a5a04ec7d53f85a99b",
+          "filename": "omni_base_controller_configuration_gazebo/CMakeLists.txt",
+          "status": "added",
+          "additions": 30,
+          "deletions": 0,
+          "changes": 30,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_controller_configuration_gazebo%2FCMakeLists.txt",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_controller_configuration_gazebo%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_controller_configuration_gazebo%2FCMakeLists.txt?ref=312f2d056f472a9ddd121dce8a9a1dd7a850e880",
+          "patch": "@@ -0,0 +1,30 @@\n+cmake_minimum_required(VERSION 2.8.3)\n+project(omni_base_controller_configuration_gazebo)\n+\n+find_package(catkin REQUIRED)\n+\n+###################################\n+## catkin specific configuration ##\n+###################################\n+catkin_package()\n+\n+#############\n+## Install ##\n+#############\n+\n+install(DIRECTORY config launch\n+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}\n+)\n+\n+#############\n+## Testing ##\n+#############\n+\n+## Add gtest based cpp test target and link libraries\n+# catkin_add_gtest(${PROJECT_NAME}-test test/test_ivo_controller_configuration_gazebo.cpp)\n+# if(TARGET ${PROJECT_NAME}-test)\n+#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})\n+# endif()\n+\n+## Add folders to be run by python nosetests\n+# catkin_add_nosetests(test)"
+        },
+        {
+          "sha": "df389dccb710ce007ac8ae86e60d5bd4901d3986",
+          "filename": "omni_base_controller_configuration_gazebo/config/mobile_base_controller.yaml",
+          "status": "added",
+          "additions": 59,
+          "deletions": 0,
+          "changes": 59,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_controller_configuration_gazebo%2Fconfig%2Fmobile_base_controller.yaml",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_controller_configuration_gazebo%2Fconfig%2Fmobile_base_controller.yaml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_controller_configuration_gazebo%2Fconfig%2Fmobile_base_controller.yaml?ref=312f2d056f472a9ddd121dce8a9a1dd7a850e880",
+          "patch": "@@ -0,0 +1,59 @@\n+mobile_base_controller:\n+  type        : \"omni_drive_controller/OmniDriveController\"\n+  left_front_wheel  :   'wheel_front_left_joint'\n+  left_back_wheel   :   'wheel_back_left_joint'\n+  right_front_wheel :   'wheel_front_right_joint'\n+  right_back_wheel :    'wheel_back_right_joint'\n+  publish_rate: 0.0\n+  pose_covariance_diagonal : [0.001, 0.001, 1.0e-3, 1.0e-3, 1.0e-3, 0.01]\n+  twist_covariance_diagonal: [0.001, 0.001, 1.0e-3, 1.0e-3, 1.0e-3, 0.01]\n+\n+  enable_pose_covariance_update: true\n+  error_constant_left : 0.001\n+  error_constant_right: 0.001\n+\n+  # Velocity commands timeout [s]\n+  cmd_vel_timeout: 0.25\n+\n+  # Base frame_id\n+  base_frame_id: base_footprint\n+\n+  # Base frame_id\n+  odom_frame_id: odom\n+\n+  # Preserve turning radius when limiting speed/acceleration/jerk\n+  preserve_turning_radius: true\n+\n+  # Publish limited velocity\n+  publish_cmd: false\n+\n+  # Publish wheel data\n+  publish_wheel_data: true\n+\n+  # Velocity and acceleration limits\n+  # Whenever a min_* is unspecified, default to -max_*\n+  linear:\n+    x:\n+      has_velocity_limits    : true\n+      max_velocity           :  1.0 # m/s\n+      min_velocity           : -1.0 # m/s\n+      has_acceleration_limits: true\n+      max_acceleration       :  1.0 # m/s^2\n+      has_jerk_limits        : false\n+      max_jerk               :  5.0 # m/s^3\n+    y:\n+      has_velocity_limits    : true\n+      max_velocity           :  1.0 # m/s\n+      min_velocity           : -1.0 # m/s\n+      has_acceleration_limits: true\n+      max_acceleration       :  1.0 # m/s^2\n+      has_jerk_limits        : false\n+      max_jerk               :  5.0 # m/s^3\n+  angular:\n+    z:\n+      has_velocity_limits    : true\n+      max_velocity           : !degrees 120.0 # reduce pendulum effect\n+      has_acceleration_limits: true\n+      max_acceleration       : !degrees 120.0\n+      has_jerk_limits        : false\n+      max_jerk               : !degrees 600.0"
+        },
+        {
+          "sha": "e8008495a8efa85617ccd9ac1817e852becb0413",
+          "filename": "omni_base_controller_configuration_gazebo/config/pids.yaml",
+          "status": "added",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_controller_configuration_gazebo%2Fconfig%2Fpids.yaml",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_controller_configuration_gazebo%2Fconfig%2Fpids.yaml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_controller_configuration_gazebo%2Fconfig%2Fpids.yaml?ref=312f2d056f472a9ddd121dce8a9a1dd7a850e880",
+          "patch": "@@ -0,0 +1,6 @@\n+velocity:\n+  pid_gains:\n+     wheel_front_right_joint: {p: 30,  d: 0, i: 0, i_clamp: 1.0}\n+     wheel_front_left_joint:  {p: 30,  d: 0, i: 0, i_clamp: 1.0}\n+     wheel_back_right_joint: {p: 30,  d: 0, i: 0, i_clamp: 1.0}\n+     wheel_back_left_joint:  {p: 30,  d: 0, i: 0, i_clamp: 1.0}"
+        },
+        {
+          "sha": "bcb71e1943bf89ee13aa658e7856838bbcec4a0b",
+          "filename": "omni_base_controller_configuration_gazebo/launch/default_controllers.launch",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_controller_configuration_gazebo%2Flaunch%2Fdefault_controllers.launch",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_controller_configuration_gazebo%2Flaunch%2Fdefault_controllers.launch",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_controller_configuration_gazebo%2Flaunch%2Fdefault_controllers.launch?ref=312f2d056f472a9ddd121dce8a9a1dd7a850e880",
+          "patch": "@@ -0,0 +1,23 @@\n+<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n+<launch>\n+  <arg name=\"tf_prefix\" default=\"\"/>\n+\n+  <rosparam command=\"load\" file=\"$(find omni_base_controller_configuration)/config/joint_state_controller_extra_joints.yaml\" ns=\"joint_state_controller\"/>\n+  <rosparam command=\"load\" file=\"$(find joint_state_controller)/joint_state_controller.yaml\" />\n+  <rosparam command=\"load\" file=\"$(find omni_base_controller_configuration_gazebo)/config/mobile_base_controller.yaml\"/>\n+\n+  <param name=\"mobile_base_controller/base_frame_id\" value=\"$(arg tf_prefix)/base_footprint\"/>\n+  <param name=\"mobile_base_controller/odom_frame_id\" value=\"$(arg tf_prefix)/odom\"/>\n+\n+  <!-- Set up controllers -->\n+  <arg name=\"controller_list\"\n+       value=\"joint_state_controller\n+              mobile_base_controller\"/>\n+\n+  <!-- Controllers that come up started -->\n+  <node name=\"default_controllers_spawner\"\n+        pkg=\"controller_manager\" type=\"spawner\" output=\"screen\"\n+        args=\"--timeout 120\n+             $(arg controller_list) \" />\n+\n+</launch>"
+        },
+        {
+          "sha": "6ef0d581edacdafb4bf7f519123a2a31afd1e1be",
+          "filename": "omni_base_controller_configuration_gazebo/package.xml",
+          "status": "added",
+          "additions": 16,
+          "deletions": 0,
+          "changes": 16,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_controller_configuration_gazebo%2Fpackage.xml",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_controller_configuration_gazebo%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_controller_configuration_gazebo%2Fpackage.xml?ref=312f2d056f472a9ddd121dce8a9a1dd7a850e880",
+          "patch": "@@ -0,0 +1,16 @@\n+<?xml version=\"1.0\"?>\n+<package format=\"2\">\n+  <name>omni_base_controller_configuration_gazebo</name>\n+  <version>0.0.1</version>\n+  <description>The omni_base_controller_configuration_gazebo package</description>\n+\n+  <maintainer email=\"antonio.brandi@pal-robotics.com\">Antonio Brandi</maintainer>\n+\n+  <license>Proprietary</license>\n+\n+  <buildtool_depend>catkin</buildtool_depend>\n+\n+  <exec_depend>omni_base_controller_configuration</exec_depend>\n+  <exec_depend>omni_drive_controller</exec_depend>\n+\n+</package>"
+        },
+        {
+          "sha": "db63ef2cbb4af9280a5981cc1737a6fe7d64dc51",
+          "filename": "omni_base_gazebo/CMakeLists.txt",
+          "status": "added",
+          "additions": 18,
+          "deletions": 0,
+          "changes": 18,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_gazebo%2FCMakeLists.txt",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_gazebo%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_gazebo%2FCMakeLists.txt?ref=312f2d056f472a9ddd121dce8a9a1dd7a850e880",
+          "patch": "@@ -0,0 +1,18 @@\n+cmake_minimum_required(VERSION 2.8.3)\n+project(omni_base_gazebo)\n+\n+find_package(catkin REQUIRED)\n+\n+###################################\n+## catkin specific configuration ##\n+###################################\n+catkin_package()\n+\n+#############\n+## Install ##\n+#############\n+\n+install(DIRECTORY launch\n+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}\n+)\n+"
+        },
+        {
+          "sha": "da6d4d44d541eebd4db0ed3c25e86ce8e8e041a1",
+          "filename": "omni_base_gazebo/launch/omni_base_gazebo.launch",
+          "status": "added",
+          "additions": 39,
+          "deletions": 0,
+          "changes": 39,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_gazebo%2Flaunch%2Fomni_base_gazebo.launch",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_gazebo%2Flaunch%2Fomni_base_gazebo.launch",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_gazebo%2Flaunch%2Fomni_base_gazebo.launch?ref=312f2d056f472a9ddd121dce8a9a1dd7a850e880",
+          "patch": "@@ -0,0 +1,39 @@\n+<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n+\n+<launch>\n+  <arg name=\"world\"  default=\"empty\"/>  <!-- empty, ... (see ../worlds) -->\n+  <arg name=\"laser_model\"  default=\"sick-561\"/>\n+  <arg name=\"multi\" default=\"\"/>\n+  <arg name=\"gzpose\" default=\"-x 0.0 -y 0.0 -z 0.0 -R 0.0 -P 0.0 -Y 0.0\"/>\n+  <arg name=\"gui\" default=\"true\"/>\n+  <arg name=\"debug\" default=\"false\"/>\n+  <arg name=\"public_sim\" default=\"false\"/>\n+  <arg name=\"recording\" default=\"false\"/>\n+  <arg name=\"extra_gazebo_args\" default=\"\"/>\n+\n+  <env name=\"LC_NUMERIC\" value=\"C\" />\n+\n+  <!-- start up world -->\n+  <include file=\"$(find pal_gazebo_worlds)/launch/pal_gazebo.launch\">\n+    <arg name=\"world\" value=\"$(arg world)\"/>\n+    <arg name=\"gui\" value=\"$(arg gui)\"/>\n+    <arg name=\"debug\" value=\"$(arg debug)\"/>\n+    <arg name=\"recording\" value=\"$(arg recording)\"/>\n+    <arg name=\"extra_gz_model_path\" value=\"$(find omni_base_gazebo)/models\"/>\n+    <arg name=\"extra_gz_resource_path\" value=\"$(find omni_base_gazebo)\"/>\n+    <arg name=\"extra_gazebo_args\" value=\"$(arg extra_gazebo_args)\"/>\n+  </include>\n+\n+  <!-- spawn robot in simulation -->\n+  <include file=\"$(find omni_base_gazebo)/launch/omni_base_spawn.launch\">\n+    <arg name=\"laser_model\"  value=\"$(arg laser_model)\"/>\n+    <arg name=\"multi\" value=\"$(arg multi)\"/>\n+    <arg name=\"gzpose\" value=\"$(arg gzpose)\"/>\n+  </include>\n+\n+  <!-- bring up robot -->\n+  <include file=\"$(find omni_base_gazebo)/launch/simulation_omni_base_bringup.launch\">\n+    <arg name=\"public_sim\"  value=\"$(arg public_sim)\"/>\n+  </include>\n+\n+</launch>"
+        },
+        {
+          "sha": "cccb39bd308ba112c982dc260b05140921a15427",
+          "filename": "omni_base_gazebo/launch/omni_base_spawn.launch",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_gazebo%2Flaunch%2Fomni_base_spawn.launch",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_gazebo%2Flaunch%2Fomni_base_spawn.launch",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_gazebo%2Flaunch%2Fomni_base_spawn.launch?ref=312f2d056f472a9ddd121dce8a9a1dd7a850e880",
+          "patch": "@@ -0,0 +1,23 @@\n+<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n+<launch>\n+  <arg name=\"laser_model\"  default=\"sick-571\"/>\n+  <arg name=\"gzpose\" default=\"-x 0 -y 0 -z 0.0 -R 0.0 -P 0.0 -Y 0.0\"/>\n+  <arg name=\"multi\" default=\"\"/>\n+  <arg name=\"model_name\" default=\"omni_base\"/>\n+\n+  <rosparam ns=\"pal_robot_info\" param=\"type\">\"omni_base\"</rosparam>\n+\n+  <!-- PID gains -->\n+  <rosparam command=\"load\" file=\"$(find omni_base_controller_configuration_gazebo)/config/pids.yaml\"/>\n+\n+  <!-- Robot model -->\n+  <include file=\"$(find omni_base_description)/robots/upload.launch\">\n+    <arg name=\"laser_model\" value=\"$(arg laser_model)\"/>\n+    <arg name=\"multi\"  value=\"$(arg multi)\"/>\n+  </include>\n+\n+  <!-- Spawn robot in Gazebo -->\n+  <node pkg=\"gazebo_ros\" type=\"spawn_model\" name=\"spawn_model\"\n+    args=\"-urdf -param robot_description $(arg gzpose) -model $(arg model_name)\" />\n+\n+</launch>"
+        },
+        {
+          "sha": "89db01a0a784d6261b63c85ff2c747b4af4a0022",
+          "filename": "omni_base_gazebo/launch/simulation_omni_base_bringup.launch",
+          "status": "added",
+          "additions": 28,
+          "deletions": 0,
+          "changes": 28,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_gazebo%2Flaunch%2Fsimulation_omni_base_bringup.launch",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_gazebo%2Flaunch%2Fsimulation_omni_base_bringup.launch",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_gazebo%2Flaunch%2Fsimulation_omni_base_bringup.launch?ref=312f2d056f472a9ddd121dce8a9a1dd7a850e880",
+          "patch": "@@ -0,0 +1,28 @@\n+<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n+<launch>\n+  <arg name=\"public_sim\"     default=\"false\"/>\n+  <arg name=\"tf_prefix\" default=\"\"/>\n+\n+  <!-- Joint trajectory and omni drive controllers -->\n+  <rosparam command=\"load\" file=\"$(find omni_base_controller_configuration_gazebo)/config/mobile_base_controller.yaml\"/>\n+\n+  <include file=\"$(find omni_base_controller_configuration_gazebo)/launch/default_controllers.launch\">\n+    <arg name=\"tf_prefix\" value=\"$(arg tf_prefix)\"/>\n+  </include>\n+\n+  <!-- Robot state publisher -->\n+  <node pkg=\"robot_state_publisher\" type=\"robot_state_publisher\" name=\"robot_state_publisher\">\n+    <param name=\"publish_frequency\" type=\"double\" value=\"50.0\"/>\n+    <param name=\"tf_prefix\" type=\"string\" value=\"$(arg tf_prefix)\"/>\n+  </node>\n+\n+  <!-- TF lookup -->\n+  <node pkg=\"tf_lookup\" type=\"tf_lookup\" name=\"tf_lookup\" output=\"screen\"/>\n+\n+  <!-- Twist mux -->\n+  <include file=\"$(find omni_base_bringup)/launch/twist_mux.launch\"/>\n+\n+  <!-- Joystick controller -->\n+  <include file=\"$(find omni_base_bringup)/launch/joystick_teleop.launch\"/>\n+\n+</launch>"
+        },
+        {
+          "sha": "f7291f6cafe65ff97879ec84233cc4fd5848b0bb",
+          "filename": "omni_base_gazebo/package.xml",
+          "status": "added",
+          "additions": 21,
+          "deletions": 0,
+          "changes": 21,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_gazebo%2Fpackage.xml",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_gazebo%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_gazebo%2Fpackage.xml?ref=312f2d056f472a9ddd121dce8a9a1dd7a850e880",
+          "patch": "@@ -0,0 +1,21 @@\n+<?xml version=\"1.0\"?>\n+<package format=\"2\">\n+  <name>omni_base_gazebo</name>\n+  <version>0.0.1</version>\n+  <description>The omni_base_gazebo package</description>\n+\n+  <maintainer email=\"antonio.brandi@pal-robotics.com\">Antonio Brandi</maintainer>\n+\n+  <license>Proprietary</license>\n+\n+  <buildtool_depend>catkin</buildtool_depend>\n+  <exec_depend>gazebo_plugins</exec_depend>\n+  <exec_depend>pal_gazebo_plugins</exec_depend>\n+  <exec_depend>pal_gazebo_worlds</exec_depend>\n+  <exec_depend>pal_hardware_gazebo</exec_depend>\n+  <exec_depend>omni_base_bringup</exec_depend>\n+  <exec_depend>omni_base_controller_configuration_gazebo</exec_depend>\n+  <exec_depend>omni_base_description</exec_depend>\n+  <exec_depend>omni_base_laser_sensors</exec_depend>\n+\n+</package>"
+        },
+        {
+          "sha": "3e17ca03a57df1b9a1c6cd7252a397180237d219",
+          "filename": "omni_base_simulation/CMakeLists.txt",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_simulation%2FCMakeLists.txt",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_simulation%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_simulation%2FCMakeLists.txt?ref=312f2d056f472a9ddd121dce8a9a1dd7a850e880",
+          "patch": "@@ -0,0 +1,4 @@\n+cmake_minimum_required(VERSION 2.8.3)\n+project(omni_base_simulation)\n+find_package(catkin REQUIRED)\n+catkin_metapackage()"
+        },
+        {
+          "sha": "15a59621eb738eb6b277d952f9085270deded29d",
+          "filename": "omni_base_simulation/package.xml",
+          "status": "added",
+          "additions": 18,
+          "deletions": 0,
+          "changes": 18,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_simulation%2Fpackage.xml",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/312f2d056f472a9ddd121dce8a9a1dd7a850e880/omni_base_simulation%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_simulation%2Fpackage.xml?ref=312f2d056f472a9ddd121dce8a9a1dd7a850e880",
+          "patch": "@@ -0,0 +1,18 @@\n+<?xml version=\"1.0\"?>\n+<package format=\"2\">\n+  <name>omni_base_simulation</name>\n+  <version>0.0.1</version>\n+  <description>The omni_base_simulation package</description>\n+\n+  <maintainer email=\"antonio.brandi@pal-robotics.com\">Antonio Brandi</maintainer>\n+\n+  <license>BSD</license>\n+\n+  <buildtool_depend>catkin</buildtool_depend>\n+  <exec_depend>omni_base_gazebo</exec_depend>\n+  <exec_depend>pal_hardware_gazebo</exec_depend>\n+  <export>\n+    <metapackage/>\n+  </export>\n+\n+</package>"
+        }
+      ]
+    },
+    {
+      "author": "andreacapodacqua",
+      "date": "2023-10-23T08:30:30Z",
+      "sha": "a56ba359e2a07df3f6a960e0f3816c2778bc5355",
+      "message": "ROS 2 omni_base simulation",
+      "files_changed": 6,
+      "additions": 3,
+      "deletions": 172,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "07d3fe83bd108996a8f32c580f11ad08d9899115",
+          "filename": "omni_base_controller_configuration_gazebo/CHANGELOG.rst",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 30,
+          "changes": 30,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/565ff0d76aa988ea23bd1ba0f4e0fb1f22c17a87/omni_base_controller_configuration_gazebo%2FCHANGELOG.rst",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/565ff0d76aa988ea23bd1ba0f4e0fb1f22c17a87/omni_base_controller_configuration_gazebo%2FCHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_controller_configuration_gazebo%2FCHANGELOG.rst?ref=565ff0d76aa988ea23bd1ba0f4e0fb1f22c17a87",
+          "patch": "@@ -1,30 +0,0 @@\n-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n-Changelog for package omni_base_controller_configuration_gazebo\n-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n-\n-0.0.7 (2023-02-23)\n-------------------\n-\n-0.0.6 (2023-01-30)\n-------------------\n-\n-0.0.5 (2023-01-27)\n-------------------\n-\n-0.0.4 (2022-08-08)\n-------------------\n-\n-0.0.3 (2022-02-23)\n-------------------\n-\n-0.0.2 (2021-11-24)\n-------------------\n-* removing the needs for pid values for the wheels\n-* Contributors: antoniobrandi\n-\n-0.0.1 (2021-09-30)\n-------------------\n-* preparing release\n-* adapting to the new version of omni_base_robot\n-* omni base simulation initial commit\n-* Contributors: antoniobrandi"
+        },
+        {
+          "sha": "abf25fa80cb6979a492a670027575b21de111384",
+          "filename": "omni_base_controller_configuration_gazebo/CMakeLists.txt",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 11,
+          "changes": 11,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/565ff0d76aa988ea23bd1ba0f4e0fb1f22c17a87/omni_base_controller_configuration_gazebo%2FCMakeLists.txt",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/565ff0d76aa988ea23bd1ba0f4e0fb1f22c17a87/omni_base_controller_configuration_gazebo%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_controller_configuration_gazebo%2FCMakeLists.txt?ref=565ff0d76aa988ea23bd1ba0f4e0fb1f22c17a87",
+          "patch": "@@ -1,11 +0,0 @@\n-cmake_minimum_required(VERSION 3.8)\n-project(omni_base_controller_configuration_gazebo)\n-\n-find_package(ament_cmake_auto REQUIRED)\n-\n-# PAL Robotics stricter build flags, other developers should not worry about this\n-find_package(ament_cmake_pal QUIET)\n-\n-ament_auto_find_build_dependencies()\n-\n-ament_auto_package(INSTALL_TO_SHARE config launch)"
+        },
+        {
+          "sha": "7f7ec7ea9ceef9600681a5f0b143fc3692fa98de",
+          "filename": "omni_base_controller_configuration_gazebo/config/mobile_base_controller.yaml",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 66,
+          "changes": 66,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/565ff0d76aa988ea23bd1ba0f4e0fb1f22c17a87/omni_base_controller_configuration_gazebo%2Fconfig%2Fmobile_base_controller.yaml",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/565ff0d76aa988ea23bd1ba0f4e0fb1f22c17a87/omni_base_controller_configuration_gazebo%2Fconfig%2Fmobile_base_controller.yaml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_controller_configuration_gazebo%2Fconfig%2Fmobile_base_controller.yaml?ref=565ff0d76aa988ea23bd1ba0f4e0fb1f22c17a87",
+          "patch": "@@ -1,66 +0,0 @@\n-mobile_base_controller:\n-  ros__parameters:\n-    type: omni_drive_controller/OmniDriveController\n-    use_stamped_vel: False\n-    left_front_wheel_names  : ['wheel_front_left_joint']\n-    left_rear_wheel_names  : ['wheel_rear_left_joint']\n-    right_front_wheel_names : ['wheel_front_right_joint']\n-    right_rear_wheel_names : ['wheel_rear_right_joint']\n-\n-    # In ROS1 these physical properties were parsed from the URDF\n-    wheel_radius: 0.0985\n-    wheel_separation: 0.4044\n-\n-    wheel_separation_multiplier: 1.0\n-    left_wheel_radius_multiplier: 1.0\n-    right_wheel_radius_multiplier: 1.0\n-\n-    # The params below were used in ROS1 but not yet in ROS2\n-\n-    publish_rate: 0.0\n-    pose_covariance_diagonal : [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]\n-    twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]\n-\n-    # Velocity commands timeout [s]\n-    cmd_vel_timeout: 0.25\n-\n-    # Base frame_id\n-    base_frame_id: base_footprint\n-\n-    # Publish limited velocity\n-    publish_limited_velocity: true\n-\n-    # Velocity and acceleration limits\n-    # Whenever a min_* is unspecified, default to -max_*\n-    linear:\n-      x:\n-        has_velocity_limits    : true\n-        max_velocity           :  1.0 # m/s\n-        min_velocity           : -1.0 # m/s\n-        has_acceleration_limits: true\n-        max_acceleration       :  1.0 # m/s^2\n-        has_jerk_limits        : false\n-        max_jerk               :  5.0 # m/s^3\n-      y:\n-        has_velocity_limits    : true\n-        max_velocity           :  1.0 # m/s\n-        min_velocity           : -1.0 # m/s\n-        has_acceleration_limits: true\n-        max_acceleration       :  1.0 # m/s^2\n-        has_jerk_limits        : false\n-        max_jerk               :  5.0 # m/s^3\n-    angular:\n-      z:\n-        has_velocity_limits    : true\n-        max_velocity           : 2.09 # 120.0º reduce pendulum effect\n-        has_acceleration_limits: true\n-        max_acceleration       : 2.09 # 120.0º\n-        has_jerk_limits        : false\n-        max_jerk               : 10.47 # 600.0º\n-    space:\n-      xy:\n-        max_velocity           : 0.7\n-      xz:\n-        max_velocity           : 0.5\n-      xyz:\n-        max_velocity           : 0.4"
+        },
+        {
+          "sha": "66c2ca83aa1fa3f03754ac5dfc7fdf4d38284295",
+          "filename": "omni_base_controller_configuration_gazebo/launch/default_controllers.launch.py",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 44,
+          "changes": 44,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/565ff0d76aa988ea23bd1ba0f4e0fb1f22c17a87/omni_base_controller_configuration_gazebo%2Flaunch%2Fdefault_controllers.launch.py",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/565ff0d76aa988ea23bd1ba0f4e0fb1f22c17a87/omni_base_controller_configuration_gazebo%2Flaunch%2Fdefault_controllers.launch.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_controller_configuration_gazebo%2Flaunch%2Fdefault_controllers.launch.py?ref=565ff0d76aa988ea23bd1ba0f4e0fb1f22c17a87",
+          "patch": "@@ -1,44 +0,0 @@\n-# Copyright (c) 2023 PAL Robotics S.L. All rights reserved.\n-#\n-# Licensed under the Apache License, Version 2.0 (the \"License\");\n-# you may not use this file except in compliance with the License.\n-# You may obtain a copy of the License at\n-#\n-#     http://www.apache.org/licenses/LICENSE-2.0\n-#\n-# Unless required by applicable law or agreed to in writing, software\n-# distributed under the License is distributed on an \"AS IS\" BASIS,\n-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n-# See the License for the specific language governing permissions and\n-# limitations under the License.\n-\n-from launch import LaunchDescription\n-from launch.actions import DeclareLaunchArgument\n-from launch_pal.include_utils import include_launch_py_description\n-\n-\n-def generate_launch_description():\n-    declare_tf_prefix = DeclareLaunchArgument(\n-        'tf_prefix', default_value='',\n-        description='tf_prefix for mobile_base_controller param')\n-\n-    # <param name=\"mobile_base_controller/base_frame_id\" value=\"$(arg tf_prefix)/base_footprint\"/>\n-    # <param name=\"mobile_base_controller/odom_frame_id\" value=\"$(arg tf_prefix)/odom\"/>\n-\n-\n-    mobile_base_controller_launch = include_launch_py_description(\n-        'omni_base_controller_configuration', ['launch', 'mobile_base_controller.launch.py'])\n-\n-    # Not used because the extra joints were changed to fixed\n-    # joint_state_broadcaster_launch = include_launch_py_description(\n-    #     'omni_base_controller_configuration', ['launch', 'joint_state_broadcaster.launch.py'])\n-\n-\n-    ld = LaunchDescription()\n-\n-    ld.add_action(declare_tf_prefix)\n-    ld.add_action(mobile_base_controller_launch)\n-    # Not used because the extra joints were changed to fixed\n-    # ld.add_action(joint_state_broadcaster_launch)\n-\n-    return ld"
+        },
+        {
+          "sha": "ae994282af780275c768ca9e4c857951e192822b",
+          "filename": "omni_base_controller_configuration_gazebo/package.xml",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 19,
+          "changes": 19,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/565ff0d76aa988ea23bd1ba0f4e0fb1f22c17a87/omni_base_controller_configuration_gazebo%2Fpackage.xml",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/565ff0d76aa988ea23bd1ba0f4e0fb1f22c17a87/omni_base_controller_configuration_gazebo%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_controller_configuration_gazebo%2Fpackage.xml?ref=565ff0d76aa988ea23bd1ba0f4e0fb1f22c17a87",
+          "patch": "@@ -1,19 +0,0 @@\n-<?xml version=\"1.0\"?>\n-<package format=\"2\">\n-  <name>omni_base_controller_configuration_gazebo</name>\n-  <version>0.0.7</version>\n-  <description>The omni_base_controller_configuration_gazebo package</description>\n-  <author email=\"yue.erro@pal-robotics.com\">Yue Erro</author>\n-  <maintainer email=\"yue.erro@pal-robotics.com\">Yue Erro</maintainer>\n-  <license>Apache License 2.0</license>\n-\n-  <buildtool_depend>ament_cmake_auto</buildtool_depend>\n-\n-  <exec_depend>omni_base_controller_configuration</exec_depend>\n-  <!--@TODO: Migrate to ROS 2-->\n-  <!--<exec_depend>omni_drive_controller</exec_depend>-->\n-\n-  <export>\n-    <build_type>ament_cmake</build_type>\n-  </export>\n-</package>"
+        },
+        {
+          "sha": "355e8301e0da3dc2929d34a055e7052a4f0f3a6d",
+          "filename": "omni_base_gazebo/launch/omni_base_gazebo.launch.py",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 2,
+          "changes": 5,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/a56ba359e2a07df3f6a960e0f3816c2778bc5355/omni_base_gazebo%2Flaunch%2Fomni_base_gazebo.launch.py",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/a56ba359e2a07df3f6a960e0f3816c2778bc5355/omni_base_gazebo%2Flaunch%2Fomni_base_gazebo.launch.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_gazebo%2Flaunch%2Fomni_base_gazebo.launch.py?ref=a56ba359e2a07df3f6a960e0f3816c2778bc5355",
+          "patch": "@@ -39,8 +39,9 @@ def generate_launch_description():\n \n     gazebo = IncludeLaunchDescription(\n         PythonLaunchDescriptionSource([os.path.join(\n-            get_package_share_directory('pal_gazebo_worlds'),\n-            'launch'), '/pal_gazebo.launch.py']),\n+            get_package_share_directory('pal_gazebo_worlds'), 'launch'), '/pal_gazebo.launch.py']),\n+        launch_arguments={\n+            'world_name': LaunchConfiguration('world_name')}.items(),\n     )\n \n     omni_base_spawn = include_launch_py_description("
+        }
+      ]
+    },
+    {
+      "author": "martinaannicelli",
+      "date": "2024-04-11T11:04:35Z",
+      "sha": "bf22538a2cf17f20ba793100e301a359364adadd",
+      "message": "added pose conifiguration in spawn_entity args",
+      "files_changed": 1,
+      "additions": 11,
+      "deletions": 5,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "eda5603dcf9f08c5f36f037ea1fb02443511ebad",
+          "filename": "omni_base_gazebo/launch/omni_base_spawn.launch.py",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 5,
+          "changes": 16,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/bf22538a2cf17f20ba793100e301a359364adadd/omni_base_gazebo%2Flaunch%2Fomni_base_spawn.launch.py",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/bf22538a2cf17f20ba793100e301a359364adadd/omni_base_gazebo%2Flaunch%2Fomni_base_spawn.launch.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_gazebo%2Flaunch%2Fomni_base_spawn.launch.py?ref=bf22538a2cf17f20ba793100e301a359364adadd",
+          "patch": "@@ -23,10 +23,10 @@\n def generate_launch_description():\n     # This format doesn't work because because we have to expand gzpose into\n     # different args for spawn_entity.py\n-    # gz_pose = DeclareLaunchArgument(\n-    #     'gzpose', default_value='-x 0 -y 0 -z 0.0 -R 0.0 -P 0.0 -Y 0.0 ',\n-    #     description='Spawn gazebo position as provided to spawn_entity.py'\n-    # )\n+    #gzpose = DeclareLaunchArgument(\n+     #    'gzpose', default_value='-x 0 -y 0 -z 0.0 -R 0.0 -P 0.0 -Y 0.0 ',\n+     #    description='Spawn gazebo position as provided to spawn_entity.py'\n+     #)\n     model_name = DeclareLaunchArgument(\n         'model_name', default_value='omni_base',\n         description='Gazebo model name'\n@@ -36,7 +36,13 @@ def generate_launch_description():\n                         executable='spawn_entity.py',\n                         arguments=['-topic', 'robot_description', '-entity',\n                                    LaunchConfiguration('model_name'),\n-                                   # LaunchConfiguration('gzpose'),\n+                                   # LaunchConfiguration('gzpose'), \n+                                   '-x', '0.0',\n+                                   '-y', '0.0',\n+                                   '-z', '0.0',\n+                                   '-R', '0.0',\n+                                   '-P', '0.0',\n+                                   '-Y', '0.0'                                    \n                                    ],\n                         output='screen')\n "
+        }
+      ]
+    },
+    {
+      "author": "doterkuile",
+      "date": "2024-04-15T06:38:11Z",
+      "sha": "789904a6d5ca69445dec8f769c68f43596f59461",
+      "message": "Merge branch 'omm/feat/public_sim_control' into 'humble-devel'\n\nis_public_sim check\n\nSee merge request robots/omni_base_simulation!15",
+      "files_changed": 1,
+      "additions": 11,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "6685668f0f1dfd02e92293fb3e491e549052af53",
+          "filename": "omni_base_gazebo/launch/omni_base_gazebo.launch.py",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 1,
+          "changes": 12,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/789904a6d5ca69445dec8f769c68f43596f59461/omni_base_gazebo%2Flaunch%2Fomni_base_gazebo.launch.py",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/789904a6d5ca69445dec8f769c68f43596f59461/omni_base_gazebo%2Flaunch%2Fomni_base_gazebo.launch.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_gazebo%2Flaunch%2Fomni_base_gazebo.launch.py?ref=789904a6d5ca69445dec8f769c68f43596f59461",
+          "patch": "@@ -16,7 +16,7 @@\n from os import environ, pathsep\n \n from ament_index_python.packages import get_package_prefix, get_package_share_directory\n-\n+from launch_pal.actions import CheckPublicSim\n from launch import LaunchDescription\n from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, SetEnvironmentVariable\n from launch.conditions import IfCondition\n@@ -33,11 +33,19 @@ def generate_launch_description():\n         description='Specify if launching Navigation2'\n     )\n \n+    is_public_sim = DeclareLaunchArgument(\n+        name='is_public_sim',\n+        default_value='false',\n+        description='Enable public simulation.',\n+    )\n+\n     gazebo = IncludeLaunchDescription(\n         PythonLaunchDescriptionSource([os.path.join(\n             get_package_share_directory('pal_gazebo_worlds'), 'launch'), '/pal_gazebo.launch.py']),\n     )\n \n+    check_public_sim = CheckPublicSim()\n+\n     omni_base_spawn = include_launch_py_description(\n         'omni_base_gazebo', ['launch', 'omni_base_spawn.launch.py'])\n     omni_base_bringup = include_launch_py_description(\n@@ -65,6 +73,8 @@ def generate_launch_description():\n     # Using this prevents shared library from being found\n     # ld.add_action(SetEnvironmentVariable('GAZEBO_RESOURCE_PATH', omni_base_resource_path))\n \n+    ld.add_action(is_public_sim)\n+    ld.add_action(check_public_sim)\n     ld.add_action(gazebo)\n     ld.add_action(omni_base_spawn)\n     ld.add_action(omni_base_bringup)"
+        }
+      ]
+    },
+    {
+      "author": "ainairisarri",
+      "date": "2025-05-28T07:07:20Z",
+      "sha": "3a2a52432d836b22f8026ebd5d9f7314bf61c464",
+      "message": "Add pal_urdf_utils as env var path for gazebo",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b0d5a4ec2c0c44e1bf7d74070d2dd664242e9ccf",
+          "filename": "omni_base_gazebo/launch/omni_base_gazebo.launch.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/3a2a52432d836b22f8026ebd5d9f7314bf61c464/omni_base_gazebo%2Flaunch%2Fomni_base_gazebo.launch.py",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/3a2a52432d836b22f8026ebd5d9f7314bf61c464/omni_base_gazebo%2Flaunch%2Fomni_base_gazebo.launch.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_gazebo%2Flaunch%2Fomni_base_gazebo.launch.py?ref=3a2a52432d836b22f8026ebd5d9f7314bf61c464",
+          "patch": "@@ -257,7 +257,7 @@ def declare_actions(\n     launch_description.add_action(public_sim_check)\n \n     robot_name = 'omni_base'\n-    packages = ['omni_base_description']\n+    packages = ['omni_base_description', 'pal_urdf_utils']\n \n     model_path = get_model_paths(packages)\n "
+        }
+      ]
+    },
+    {
+      "author": "salvatorepiccolo",
+      "date": "2025-04-08T13:29:12Z",
+      "sha": "668004b78994d8a01bcf8b57040b577259dafcf4",
+      "message": "rviz_typo",
+      "files_changed": 1,
+      "additions": 0,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "ac3e015b4367a033d638ccac755853ca10456987",
+          "filename": "omni_base_gazebo/launch/omni_base_gazebo.launch.py",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 3,
+          "changes": 3,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/668004b78994d8a01bcf8b57040b577259dafcf4/omni_base_gazebo%2Flaunch%2Fomni_base_gazebo.launch.py",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/668004b78994d8a01bcf8b57040b577259dafcf4/omni_base_gazebo%2Flaunch%2Fomni_base_gazebo.launch.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_gazebo%2Flaunch%2Fomni_base_gazebo.launch.py?ref=668004b78994d8a01bcf8b57040b577259dafcf4",
+          "patch": "@@ -224,9 +224,6 @@ def public_navigation(context, *args, **kwargs):\n     rviz_bringup_launch = include_scoped_launch_py_description(\n         pkg_name='nav2_bringup',\n         paths=['launch', 'rviz_launch.py'],\n-        launch_arguments={\n-            'rviz': param_file\n-        },\n     )\n     actions.append(rviz_bringup_launch)\n     return actions"
+        }
+      ]
+    },
+    {
+      "author": "Noel215",
+      "date": "2023-11-10T11:37:41Z",
+      "sha": "ed20c54ba7dc4efbd2244ab419845613639dde90",
+      "message": "Set use_sim_time true",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "926b71fd942b85c983458c8f7eee2fb1c08d6ba4",
+          "filename": "omni_base_gazebo/launch/omni_base_gazebo.launch.py",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "changes": 4,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/ed20c54ba7dc4efbd2244ab419845613639dde90/omni_base_gazebo%2Flaunch%2Fomni_base_gazebo.launch.py",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/ed20c54ba7dc4efbd2244ab419845613639dde90/omni_base_gazebo%2Flaunch%2Fomni_base_gazebo.launch.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_gazebo%2Flaunch%2Fomni_base_gazebo.launch.py?ref=ed20c54ba7dc4efbd2244ab419845613639dde90",
+          "patch": "@@ -47,10 +47,12 @@ def generate_launch_description():\n     omni_base_spawn = include_launch_py_description(\n         'omni_base_gazebo', ['launch', 'omni_base_spawn.launch.py'])\n     omni_base_bringup = include_launch_py_description(\n-        'omni_base_bringup', ['launch', 'omni_base_bringup.launch.py'])\n+        'omni_base_bringup', ['launch', 'omni_base_bringup.launch.py'],\n+        launch_arguments={'use_sim_time': 'True'}.items())\n \n     navigation = include_launch_py_description(\n         'omni_base_2dnav', ['launch', 'omni_base_sim_nav_bringup.launch.py'],\n+        launch_arguments={'use_sim_time': 'True'}.items(),\n         condition=IfCondition(LaunchConfiguration('navigation')))\n \n     pkg_path = get_package_prefix('omni_base_description')"
+        }
+      ]
+    },
+    {
+      "author": "Oscar",
+      "date": "2024-04-11T10:03:52Z",
+      "sha": "e16181094724f4098eed65fcbf5d9caa7b49fb1c",
+      "message": "Using new launch action",
+      "files_changed": 1,
+      "additions": 11,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "6685668f0f1dfd02e92293fb3e491e549052af53",
+          "filename": "omni_base_gazebo/launch/omni_base_gazebo.launch.py",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 1,
+          "changes": 12,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/e16181094724f4098eed65fcbf5d9caa7b49fb1c/omni_base_gazebo%2Flaunch%2Fomni_base_gazebo.launch.py",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/e16181094724f4098eed65fcbf5d9caa7b49fb1c/omni_base_gazebo%2Flaunch%2Fomni_base_gazebo.launch.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_gazebo%2Flaunch%2Fomni_base_gazebo.launch.py?ref=e16181094724f4098eed65fcbf5d9caa7b49fb1c",
+          "patch": "@@ -16,7 +16,7 @@\n from os import environ, pathsep\n \n from ament_index_python.packages import get_package_prefix, get_package_share_directory\n-\n+from launch_pal.actions import CheckPublicSim\n from launch import LaunchDescription\n from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, SetEnvironmentVariable\n from launch.conditions import IfCondition\n@@ -33,11 +33,19 @@ def generate_launch_description():\n         description='Specify if launching Navigation2'\n     )\n \n+    is_public_sim = DeclareLaunchArgument(\n+        name='is_public_sim',\n+        default_value='false',\n+        description='Enable public simulation.',\n+    )\n+\n     gazebo = IncludeLaunchDescription(\n         PythonLaunchDescriptionSource([os.path.join(\n             get_package_share_directory('pal_gazebo_worlds'), 'launch'), '/pal_gazebo.launch.py']),\n     )\n \n+    check_public_sim = CheckPublicSim()\n+\n     omni_base_spawn = include_launch_py_description(\n         'omni_base_gazebo', ['launch', 'omni_base_spawn.launch.py'])\n     omni_base_bringup = include_launch_py_description(\n@@ -65,6 +73,8 @@ def generate_launch_description():\n     # Using this prevents shared library from being found\n     # ld.add_action(SetEnvironmentVariable('GAZEBO_RESOURCE_PATH', omni_base_resource_path))\n \n+    ld.add_action(is_public_sim)\n+    ld.add_action(check_public_sim)\n     ld.add_action(gazebo)\n     ld.add_action(omni_base_spawn)\n     ld.add_action(omni_base_bringup)"
+        }
+      ]
+    },
+    {
+      "author": "YueErro",
+      "date": "2023-05-16T09:02:24Z",
+      "sha": "f9dc010535b2be7d1b9f7819bbab80b025f5b00b",
+      "message": "rm omni_base_2dnav",
+      "files_changed": 8,
+      "additions": 0,
+      "deletions": 301,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "8f68e45675329339771e47e4d71018b47fc321d6",
+          "filename": "omni_base_2dnav_gazebo/CHANGELOG.rst",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 48,
+          "changes": 48,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/8786436292e7c0aab0bab9f395b488dceb73cc54/omni_base_2dnav_gazebo%2FCHANGELOG.rst",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/8786436292e7c0aab0bab9f395b488dceb73cc54/omni_base_2dnav_gazebo%2FCHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_2dnav_gazebo%2FCHANGELOG.rst?ref=8786436292e7c0aab0bab9f395b488dceb73cc54",
+          "patch": "@@ -1,48 +0,0 @@\n-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n-Changelog for package omni_base_2dnav_gazebo\n-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n-\n-0.0.7 (2023-02-23)\n-------------------\n-* Merge branch 'feat/share-mmap' into 'ferrum-devel'\n-  deprecating map_configuration_manager\n-  See merge request robots/omni_base_simulation!6\n-* deprecating map_configuration_manager\n-* Contributors: antoniobrandi\n-\n-0.0.6 (2023-01-30)\n-------------------\n-\n-0.0.5 (2023-01-27)\n-------------------\n-* Merge branch 'feat/map-manager' into 'ferrum-devel'\n-  Move to map manager\n-  See merge request robots/omni_base_simulation!4\n-* Move to map manager\n-* Contributors: antoniobrandi\n-\n-0.0.4 (2022-08-08)\n-------------------\n-* Merge branch 'fix_public_sim' into 'ferrum-devel'\n-  remove the loading the filter in the public sim to avoid error\n-  See merge request robots/omni_base_simulation!2\n-* remove the loading the filter in the public sim to avoid error\n-* Contributors: antoniobrandi, thomaspeyrucain\n-\n-0.0.3 (2022-02-23)\n-------------------\n-* Merge branch 'layered_costmap' into 'ferrum-devel'\n-  Adapting to the new vo_server\n-  See merge request robots/omni_base_simulation!1\n-* Adapting to the new vo_server\n-* Contributors: antoniobrandi\n-\n-0.0.2 (2021-11-24)\n-------------------\n-\n-0.0.1 (2021-09-30)\n-------------------\n-* preparing release\n-* adapting to the new version of omni_base_robot\n-* omni base simulation initial commit\n-* Contributors: antoniobrandi"
+        },
+        {
+          "sha": "0c4c2c5994dfbefaef618e2bf109569cdeb8c1b7",
+          "filename": "omni_base_2dnav_gazebo/CMakeLists.txt",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 11,
+          "changes": 11,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/8786436292e7c0aab0bab9f395b488dceb73cc54/omni_base_2dnav_gazebo%2FCMakeLists.txt",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/8786436292e7c0aab0bab9f395b488dceb73cc54/omni_base_2dnav_gazebo%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_2dnav_gazebo%2FCMakeLists.txt?ref=8786436292e7c0aab0bab9f395b488dceb73cc54",
+          "patch": "@@ -1,11 +0,0 @@\n-cmake_minimum_required(VERSION 3.0.2)\n-project(omni_base_2dnav_gazebo)\n-\n-find_package(catkin REQUIRED)\n-\n-catkin_package()\n-\n-foreach(dir launch)\n-    install(DIRECTORY ${dir}/\n-        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir})\n-endforeach(dir)\n\\ No newline at end of file"
+        },
+        {
+          "sha": "2c81fd52553e5699cd6133cd3d8623376b2f3cdb",
+          "filename": "omni_base_2dnav_gazebo/launch/localization.launch",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 24,
+          "changes": 24,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/8786436292e7c0aab0bab9f395b488dceb73cc54/omni_base_2dnav_gazebo%2Flaunch%2Flocalization.launch",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/8786436292e7c0aab0bab9f395b488dceb73cc54/omni_base_2dnav_gazebo%2Flaunch%2Flocalization.launch",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_2dnav_gazebo%2Flaunch%2Flocalization.launch?ref=8786436292e7c0aab0bab9f395b488dceb73cc54",
+          "patch": "@@ -1,24 +0,0 @@\n-<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n-<!-- Only used for public simulations -->\n-<launch>\n-\n-  <arg name=\"localization\"  default=\"amcl\"/>\n-\n-  <arg name=\"map\"     default=\"$(env HOME)/.pal/omni_base_maps/config\"/>\n-  <arg name=\"symlink\" default=\"$(env HOME)/.pal/omni_base_maps/config\"/>\n-  <arg name=\"scan_topic\" default=\"scan\"/>\n-  <arg name=\"laser_model\" default=\"sick-561\"/>\n-  <arg name=\"mapping\" default=\"\"/>\n-\n-  <!-- Map -->\n-  <include file=\"$(find pal_navigation_sm)/launch/map.launch\">\n-    <arg name=\"map\"     value=\"$(arg map)\"/>\n-    <arg name=\"symlink\" value=\"$(arg symlink)\"/>\n-  </include>\n-\n-  <!-- Localization -->\n-  <include file=\"$(find omni_base_2dnav)/launch/localization.launch\">\n-    <arg name=\"localization\" value=\"$(arg localization)\"/>\n-  </include>\n-\n-</launch>\n\\ No newline at end of file"
+        },
+        {
+          "sha": "c53bfc19ebdc6cb16b03d14a9368a86276bb7690",
+          "filename": "omni_base_2dnav_gazebo/launch/mapping.launch",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 12,
+          "changes": 12,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/8786436292e7c0aab0bab9f395b488dceb73cc54/omni_base_2dnav_gazebo%2Flaunch%2Fmapping.launch",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/8786436292e7c0aab0bab9f395b488dceb73cc54/omni_base_2dnav_gazebo%2Flaunch%2Fmapping.launch",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_2dnav_gazebo%2Flaunch%2Fmapping.launch?ref=8786436292e7c0aab0bab9f395b488dceb73cc54",
+          "patch": "@@ -1,12 +0,0 @@\n-<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n-<!-- Only used for public simulations -->\n-<launch>\n-\n-  <arg name=\"mapping\" default=\"karto\"/>\n-\n-  <!-- SLAM -->\n-  <include file=\"$(find omni_base_2dnav)/launch/mapping.launch\">\n-    <arg name=\"mapping\" value=\"$(arg mapping)\"/>\n-  </include>\n-\n-</launch>\n\\ No newline at end of file"
+        },
+        {
+          "sha": "41a6ac7279bb734d6cbd97deb133932bee113a20",
+          "filename": "omni_base_2dnav_gazebo/launch/navigation.launch",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 79,
+          "changes": 79,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/8786436292e7c0aab0bab9f395b488dceb73cc54/omni_base_2dnav_gazebo%2Flaunch%2Fnavigation.launch",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/8786436292e7c0aab0bab9f395b488dceb73cc54/omni_base_2dnav_gazebo%2Flaunch%2Fnavigation.launch",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_2dnav_gazebo%2Flaunch%2Fnavigation.launch?ref=8786436292e7c0aab0bab9f395b488dceb73cc54",
+          "patch": "@@ -1,79 +0,0 @@\n-<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n-<launch>\n-\n-  <arg name=\"state\" default=\"localization\"/>\n-\n-  <arg name=\"planner\"         default=\"base\"/>\n-  <arg name=\"global_planner\"  default=\"global_planner\"/>\n-  <arg name=\"local_planner\"   default=\"pal\"/>\n-  <arg name=\"localization\"    default=\"amcl\"/>\n-  <arg name=\"mapping\"         default=\"karto\"/>\n-  <arg name=\"public_sim\"      default=\"false\"/>\n-  <arg name=\"robot_namespace\" default=\"\"/>\n-  <arg name=\"laser_model\"     default=\"sick-561\"/>\n-  <arg name=\"map\"             default=\"$(env HOME)/.pal/omni_base_maps/config\"/>\n-\n-  <!-- Map -->\n-  <!-- Localization or Mapping state -->\n-  <group if=\"$(arg public_sim)\">\n-    <node pkg=\"pal_navigation_sm\" type=\"navigation.sh\" name=\"navigation\"\n-        args=\"omni_base $(arg state) $(arg localization) $(arg mapping) $(arg map) scan $(arg laser_model)\"/>\n-  </group>\n-\n-  <group unless=\"$(arg public_sim)\">\n-    <include file=\"$(find pal_map_manager)/launch/pal_map_manager.launch\">\n-      <arg name=\"map\"       value=\"$(arg map)\"/>\n-    </include>\n-  </group>\n-\n-  <!-- Navigation State Machine -->\n-  <include file=\"$(find omni_base_2dnav)/launch/state_machine.launch\">\n-    <arg name=\"state\"           value=\"$(arg state)\"/>\n-    <arg name=\"public_sim\"      value=\"$(arg public_sim)\"/>\n-    <arg name=\"is_sim\"          value=\"true\"/>\n-    <arg name=\"robot_namespace\" value=\"$(arg robot_namespace)\"/>\n-  </include>\n-\n-  <!-- Planning -->\n-  <include file=\"$(find omni_base_2dnav)/launch/move_$(arg planner).launch\">\n-    <arg name=\"global_planner\" value=\"$(arg global_planner)\"/>\n-    <arg name=\"local_planner\"  value=\"$(arg local_planner)\"/>\n-    <arg name=\"public_sim\"     value=\"$(arg public_sim)\"/>\n-  </include>\n-\n-  <include file=\"$(find robot_pose)/launch/robot_pose.launch\">\n-    <arg name=\"robot_prefix\"      value=\"$(arg robot_namespace)\"/>\n-  </include>\n-  \n-  <!-- Laser Scan Merger -->\n-  <node pkg=\"ira_laser_tools\" name=\"laserscan_multi_merger\" type=\"laserscan_multi_merger\" output=\"screen\"\n-    launch-prefix=\"bash -c 'sleep 5; $0 $@' \">\n-    <param name=\"destination_frame\" value=\"virtual_base_laser_link\"/>\n-    <param name=\"cloud_destination_topic\" value=\"/merged_cloud\"/>\n-    <param name=\"scan_destination_topic\" value=\"/scan_raw\"/>\n-    <param name=\"laserscan_topics\" value =\"/scan_front_raw /scan_rear_raw\" /> \n-    <param name=\"time_increment\" value =\"0.0\" /> \n-    <param name=\"scan_time\" value =\"0.0\" /> \n-    <param name=\"range_min\" value =\"0.05\" /> \n-    <param name=\"range_max\" value =\"25.0\" /> \n-    <param name=\"angle_min\" value =\"-3.1459\" /> \n-    <param name=\"angle_max\" value =\"3.1459\" /> \n-    <param name=\"angle_increment\" value =\"0.005769\" /> \n-  </node>\n-\n-  <!-- Laser filter (empty for public sim) -->\n-  <node name=\"laser_filter\" pkg=\"laser_filters\" type=\"scan_to_scan_filter_chain\">\n-    <rosparam file=\"$(find omni_base_laser_sensors)/config/$(arg laser_model)_filter.yaml\"\n-              command=\"load\"\n-              unless=\"$(arg public_sim)\"/>\n-    <remap from=\"scan\"          to=\"scan_raw\"/>\n-    <remap from=\"scan_filtered\" to=\"scan\"/>\n-  </node>\n-  \n-  <group unless=\"$(arg public_sim)\">\n-    <!-- VO map server -->\n-    <include file=\"$(find pal_vo_server)/launch/vo_server.launch\"/>\n-  </group>\n-\n-\n-</launch>"
+        },
+        {
+          "sha": "ae41cbcaa9bf546ee280c850099d37d803a58e7e",
+          "filename": "omni_base_2dnav_gazebo/launch/omni_base_mapping.launch",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 44,
+          "changes": 44,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/8786436292e7c0aab0bab9f395b488dceb73cc54/omni_base_2dnav_gazebo%2Flaunch%2Fomni_base_mapping.launch",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/8786436292e7c0aab0bab9f395b488dceb73cc54/omni_base_2dnav_gazebo%2Flaunch%2Fomni_base_mapping.launch",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_2dnav_gazebo%2Flaunch%2Fomni_base_mapping.launch?ref=8786436292e7c0aab0bab9f395b488dceb73cc54",
+          "patch": "@@ -1,44 +0,0 @@\n-<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n-<launch>\n-  <arg name=\"namespace\" default=\"/\"/>\n-  <arg name=\"public_sim\"   default=\"false\"/>\n-  <arg name=\"world\"  default=\"small_office\"/>\n-  <arg name=\"laser_model\"  default=\"sick-561\"/>\n-  <arg name=\"gzpose\" default=\"-x 0.0 -y 0.0 -z 0.0 -R 0.0 -P 0.0 -Y 0.0\"/>\n-  <arg name=\"planner\"        default=\"base\"/>\n-  <arg name=\"global_planner\" default=\"global_planner\"/>\n-  <arg name=\"local_planner\"  default=\"teb\"/> \n-  <arg name=\"mapping\"        default=\"$(eval 'gmapping' if arg('public_sim') else 'karto')\"/> \n-\n-  <arg name=\"rviz\"     default=\"true\"/>\n-  <arg name=\"gzclient\" default=\"true\"/>\n-  <arg name=\"recording\" default=\"false\"/>\n-  <arg name=\"extra_gazebo_args\" default=\"\"/>\n-\n-  <group ns=\"$(arg namespace)\">\n-\n-    <include file=\"$(find omni_base_gazebo)/launch/omni_base_gazebo.launch\">\n-      <arg name=\"world\"  value=\"$(arg world)\"/>\n-      <arg name=\"laser_model\"  value=\"$(arg laser_model)\"/>\n-      <arg name=\"gzpose\" value=\"$(arg gzpose)\"/>\n-      <arg name=\"public_sim\" value=\"$(arg public_sim)\"/>\n-      <arg name=\"gui\"    value=\"$(arg gzclient)\"/>\n-      <arg name=\"recording\"  value=\"$(arg recording)\"/>\n-      <arg name=\"extra_gazebo_args\" value=\"$(arg extra_gazebo_args)\"/>\n-    </include>\n-\n-    <include file=\"$(find omni_base_2dnav_gazebo)/launch/navigation.launch\">\n-      <arg name=\"state\"          value=\"mapping\"/>\n-      <arg name=\"mapping\"        value=\"$(arg mapping)\"/>\n-      <arg name=\"planner\"        value=\"$(arg planner)\"/>\n-      <arg name=\"global_planner\" value=\"$(arg global_planner)\"/>\n-      <arg name=\"local_planner\"  value=\"$(arg local_planner)\"/>\n-      <arg name=\"public_sim\"     value=\"$(arg public_sim)\"/>\n-      <arg name=\"laser_model\"    value=\"$(arg laser_model)\"/>\n-    </include>\n-\n-    <node name=\"rviz\" pkg=\"rviz\" type=\"rviz\" if=\"$(arg rviz)\"\n-          args=\"-d $(find omni_base_2dnav)/config/rviz/navigation.rviz\"/>\n-  </group>\n- \n-</launch>"
+        },
+        {
+          "sha": "d4a85cd0abbbf277dbea8c9e3f47e4e901c8c614",
+          "filename": "omni_base_2dnav_gazebo/launch/omni_base_navigation.launch",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 64,
+          "changes": 64,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/8786436292e7c0aab0bab9f395b488dceb73cc54/omni_base_2dnav_gazebo%2Flaunch%2Fomni_base_navigation.launch",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/8786436292e7c0aab0bab9f395b488dceb73cc54/omni_base_2dnav_gazebo%2Flaunch%2Fomni_base_navigation.launch",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_2dnav_gazebo%2Flaunch%2Fomni_base_navigation.launch?ref=8786436292e7c0aab0bab9f395b488dceb73cc54",
+          "patch": "@@ -1,64 +0,0 @@\n-<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n-<launch>\n-  <arg name=\"namespace\" default=\"/\"/>\n-\n-  <arg name=\"public_sim\"   default=\"false\"/>\n-  <arg name=\"world\"  default=\"small_office\"/>\n-  <arg name=\"laser_model\"  default=\"sick-561\"/>\n-  <arg name=\"lost\" default=\"false\"/>\n-  <arg name=\"gzpose\" default=\"-x 0.0  -y   0.0 -z  0.0   -R 0.0 -P 0.0 -Y  0.0\" unless=\"$(arg lost)\"/>\n-  <arg name=\"gzpose\" default=\"-x 0.78 -y -11.1 -z -0.003 -R 0.0 -P 0.0 -Y 70.0\" if=\"$(arg lost)\"/>\n-\n-  <arg name=\"planner\"        default=\"base\"/>\n-  <arg name=\"global_planner\" default=\"global_planner\"/>\n-  <arg name=\"local_planner\"  default=\"teb\"/> \n-  <arg name=\"localization\"   default=\"amcl\"/>\n-  <arg name=\"map\"            default=\"$(env HOME)/.pal/omni_base_maps/configurations/$(arg world)\"/>\n-\n-  <arg name=\"rviz\"     default=\"true\"/>\n-  <arg name=\"gzclient\" default=\"true\"/>\n-  <arg name=\"recording\" default=\"false\"/>\n-  <arg name=\"extra_gazebo_args\" default=\"\"/>\n-\n-  <arg name=\"advanced_navigation\" default=\"false\"/> <!-- Requires extra software from PAL Robotics-->\n-\n-  <group ns=\"$(arg namespace)\">\n-\n-    <include file=\"$(find omni_base_gazebo)/launch/omni_base_gazebo.launch\">\n-      <arg name=\"world\"  value=\"$(arg world)\"/>\n-      <arg name=\"laser_model\"  value=\"$(arg laser_model)\"/>\n-      <arg name=\"gzpose\" value=\"$(arg gzpose)\"/>\n-      <arg name=\"public_sim\" value=\"$(arg public_sim)\"/>\n-      <arg name=\"gui\"    value=\"$(arg gzclient)\"/>\n-      <arg name=\"recording\"  value=\"$(arg recording)\"/>\n-      <arg name=\"extra_gazebo_args\" value=\"$(arg extra_gazebo_args)\"/>\n-    </include>\n-\n-    <include file=\"$(find omni_base_2dnav_gazebo)/launch/navigation.launch\">\n-      <arg name=\"state\"          value=\"localization\"/>\n-      <arg name=\"planner\"        value=\"$(arg planner)\"/>\n-      <arg name=\"global_planner\" value=\"$(arg global_planner)\"/>\n-      <arg name=\"local_planner\"  value=\"$(arg local_planner)\"/>\n-      <arg name=\"localization\"   value=\"$(arg localization)\"/>\n-      <arg name=\"map\"            value=\"$(arg map)\"/>\n-      <arg name=\"public_sim\"     value=\"$(arg public_sim)\"/>\n-      <arg name=\"laser_model\"    value=\"$(arg laser_model)\"/>\n-    </include>\n-\n-    <group if=\"$(arg advanced_navigation)\">\n-      <node pkg=\"pal_zoi_detector\" type=\"zoi_detector_node\" name=\"zoi_detector\" />\n-      <include file=\"$(find pal_waypoint)/launch/pal_waypoint.launch\"/>\n-      <include file=\"$(find pal_navigation_manager)/launch/poi_navigation_server.launch\"/>\n-    </group>\n-\n-    <group if=\"$(arg advanced_navigation)\">\n-      <node name=\"rviz\" pkg=\"rviz\" type=\"rviz\" if=\"$(arg rviz)\"\n-            args=\"-d $(find omni_base_2dnav)/config/rviz/advanced_navigation.rviz\"/>\n-    </group>\n-    <group unless=\"$(arg advanced_navigation)\">\n-      <node name=\"rviz\" pkg=\"rviz\" type=\"rviz\" if=\"$(arg rviz)\"\n-            args=\"-d $(find omni_base_2dnav)/config/rviz/navigation.rviz\"/>\n-    </group>\n-  </group>\n-\n-</launch>"
+        },
+        {
+          "sha": "68a4f3597e4e1294f26c16c64708d30b6a496d92",
+          "filename": "omni_base_2dnav_gazebo/package.xml",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 19,
+          "changes": 19,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/8786436292e7c0aab0bab9f395b488dceb73cc54/omni_base_2dnav_gazebo%2Fpackage.xml",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/8786436292e7c0aab0bab9f395b488dceb73cc54/omni_base_2dnav_gazebo%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_2dnav_gazebo%2Fpackage.xml?ref=8786436292e7c0aab0bab9f395b488dceb73cc54",
+          "patch": "@@ -1,19 +0,0 @@\n-<?xml version=\"1.0\"?>\n-<package format=\"2\">\n-  <name>omni_base_2dnav_gazebo</name>\n-  <version>0.0.7</version>\n-  <description>The omni_base_2dnav_gazebo package</description>\n-\n-  <maintainer email=\"antonio.brandi@pal-robotics.com\">Antonio Brandi</maintainer>\n-\n-  <license>Modified BSD</license>\n-  <author email=\"antonio.brandi@pal-robotics.com\">Antonio Brandi</author>\n-\n-\n-  <buildtool_depend>catkin</buildtool_depend>\n-\n-  <exec_depend>omni_base_gazebo</exec_depend>\n-  <exec_depend>omni_base_2dnav</exec_depend>\n-  <exec_depend>pal_map_manager</exec_depend>\n-\n-</package>"
+        }
+      ]
+    },
+    {
+      "author": "Antonio Brandi",
+      "date": "2022-08-08T09:44:48Z",
+      "sha": "1cd6d576b1106e5d01488a1465f2ddf1cef1ce37",
+      "message": "Update Changelog",
+      "files_changed": 4,
+      "additions": 17,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "895ee7eebcd3adda483e572387e5efd0075013a0",
+          "filename": "omni_base_2dnav_gazebo/CHANGELOG.rst",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/1cd6d576b1106e5d01488a1465f2ddf1cef1ce37/omni_base_2dnav_gazebo%2FCHANGELOG.rst",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/1cd6d576b1106e5d01488a1465f2ddf1cef1ce37/omni_base_2dnav_gazebo%2FCHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_2dnav_gazebo%2FCHANGELOG.rst?ref=1cd6d576b1106e5d01488a1465f2ddf1cef1ce37",
+          "patch": "@@ -2,6 +2,14 @@\n Changelog for package omni_base_2dnav_gazebo\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+Forthcoming\n+-----------\n+* Merge branch 'fix_public_sim' into 'ferrum-devel'\n+  remove the loading the filter in the public sim to avoid error\n+  See merge request robots/omni_base_simulation!2\n+* remove the loading the filter in the public sim to avoid error\n+* Contributors: antoniobrandi, thomaspeyrucain\n+\n 0.0.3 (2022-02-23)\n ------------------\n * Merge branch 'layered_costmap' into 'ferrum-devel'"
+        },
+        {
+          "sha": "1b8389360060e31ada32dee652d9d4e1c7d3aff8",
+          "filename": "omni_base_controller_configuration_gazebo/CHANGELOG.rst",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/1cd6d576b1106e5d01488a1465f2ddf1cef1ce37/omni_base_controller_configuration_gazebo%2FCHANGELOG.rst",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/1cd6d576b1106e5d01488a1465f2ddf1cef1ce37/omni_base_controller_configuration_gazebo%2FCHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_controller_configuration_gazebo%2FCHANGELOG.rst?ref=1cd6d576b1106e5d01488a1465f2ddf1cef1ce37",
+          "patch": "@@ -2,6 +2,9 @@\n Changelog for package omni_base_controller_configuration_gazebo\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+Forthcoming\n+-----------\n+\n 0.0.3 (2022-02-23)\n ------------------\n "
+        },
+        {
+          "sha": "60a1664c5df74299df0ae15c05c94269879894ee",
+          "filename": "omni_base_gazebo/CHANGELOG.rst",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/1cd6d576b1106e5d01488a1465f2ddf1cef1ce37/omni_base_gazebo%2FCHANGELOG.rst",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/1cd6d576b1106e5d01488a1465f2ddf1cef1ce37/omni_base_gazebo%2FCHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_gazebo%2FCHANGELOG.rst?ref=1cd6d576b1106e5d01488a1465f2ddf1cef1ce37",
+          "patch": "@@ -2,6 +2,9 @@\n Changelog for package omni_base_gazebo\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+Forthcoming\n+-----------\n+\n 0.0.3 (2022-02-23)\n ------------------\n "
+        },
+        {
+          "sha": "a9a508dbe67d232054f75379971d25881eb93389",
+          "filename": "omni_base_simulation/CHANGELOG.rst",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/1cd6d576b1106e5d01488a1465f2ddf1cef1ce37/omni_base_simulation%2FCHANGELOG.rst",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/1cd6d576b1106e5d01488a1465f2ddf1cef1ce37/omni_base_simulation%2FCHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_simulation%2FCHANGELOG.rst?ref=1cd6d576b1106e5d01488a1465f2ddf1cef1ce37",
+          "patch": "@@ -2,6 +2,9 @@\n Changelog for package omni_base_simulation\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+Forthcoming\n+-----------\n+\n 0.0.3 (2022-02-23)\n ------------------\n "
+        }
+      ]
+    },
+    {
+      "author": "thomaspeyrucain",
+      "date": "2022-08-05T12:29:45Z",
+      "sha": "40692bddfac11e6232f92cce493bd936cbac854b",
+      "message": "remove the loading the filter in the public sim to avoid error",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 2,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "7bd2b34eb947f17dc3fbb403835a5b78eea8e6f7",
+          "filename": "omni_base_2dnav_gazebo/launch/navigation.launch",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 2,
+          "changes": 6,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/40692bddfac11e6232f92cce493bd936cbac854b/omni_base_2dnav_gazebo%2Flaunch%2Fnavigation.launch",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/40692bddfac11e6232f92cce493bd936cbac854b/omni_base_2dnav_gazebo%2Flaunch%2Fnavigation.launch",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_2dnav_gazebo%2Flaunch%2Fnavigation.launch?ref=40692bddfac11e6232f92cce493bd936cbac854b",
+          "patch": "@@ -36,7 +36,6 @@\n     <arg name=\"robot_prefix\"      value=\"$(arg robot_namespace)\"/>\n   </include>\n   \n-  <!-- Laser filter (empty for public sim) -->\n   <!-- Laser Scan Merger -->\n   <node pkg=\"ira_laser_tools\" name=\"laserscan_multi_merger\" type=\"laserscan_multi_merger\" output=\"screen\"\n     launch-prefix=\"bash -c 'sleep 5; $0 $@' \">\n@@ -53,8 +52,11 @@\n     <param name=\"angle_increment\" value =\"0.005769\" /> \n   </node>\n \n+  <!-- Laser filter (empty for public sim) -->\n   <node name=\"laser_filter\" pkg=\"laser_filters\" type=\"scan_to_scan_filter_chain\">\n-    <rosparam file=\"$(find omni_base_laser_sensors)/config/$(arg laser_model)_filter.yaml\" command=\"load\"/>\n+    <rosparam file=\"$(find omni_base_laser_sensors)/config/$(arg laser_model)_filter.yaml\"\n+              command=\"load\"\n+              unless=\"$(arg public_sim)\"/>\n     <remap from=\"scan\"          to=\"scan_raw\"/>\n     <remap from=\"scan_filtered\" to=\"scan\"/>\n   </node>"
+        }
+      ]
+    },
+    {
+      "author": "tomkimsour",
+      "date": "2026-02-23T10:21:23Z",
+      "sha": "dcb58b2158cc66c6b733d1792931c8ee551abfb6",
+      "message": "add parameters for gazebo version",
+      "files_changed": 5,
+      "additions": 112,
+      "deletions": 22,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "1eb0fd974ac1cacbc9e302e7a9f80312106452e6",
+          "filename": "omni_base_gazebo/CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/dcb58b2158cc66c6b733d1792931c8ee551abfb6/omni_base_gazebo%2FCMakeLists.txt",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/dcb58b2158cc66c6b733d1792931c8ee551abfb6/omni_base_gazebo%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_gazebo%2FCMakeLists.txt?ref=dcb58b2158cc66c6b733d1792931c8ee551abfb6",
+          "patch": "@@ -11,4 +11,4 @@ if(BUILD_TESTING)\n   ament_lint_auto_find_test_dependencies()\n endif()\n \n-ament_auto_package(USE_SCOPED_HEADER_INSTALL_DIR INSTALL_TO_SHARE launch)\n+ament_auto_package(USE_SCOPED_HEADER_INSTALL_DIR INSTALL_TO_SHARE launch config)"
+        },
+        {
+          "sha": "cfde8df4ee46953a39921053aeb26294948f207d",
+          "filename": "omni_base_gazebo/config/omni_base_gz_bridge.yaml",
+          "status": "added",
+          "additions": 32,
+          "deletions": 0,
+          "changes": 32,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/dcb58b2158cc66c6b733d1792931c8ee551abfb6/omni_base_gazebo%2Fconfig%2Fomni_base_gz_bridge.yaml",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/dcb58b2158cc66c6b733d1792931c8ee551abfb6/omni_base_gazebo%2Fconfig%2Fomni_base_gz_bridge.yaml",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_gazebo%2Fconfig%2Fomni_base_gz_bridge.yaml?ref=dcb58b2158cc66c6b733d1792931c8ee551abfb6",
+          "patch": "@@ -0,0 +1,32 @@\n+# gz topic published by the simulator core\n+- ros_topic_name: \"clock\"\n+  gz_topic_name: \"/clock\"\n+  ros_type_name: \"rosgraph_msgs/msg/Clock\"\n+  gz_type_name: \"gz.msgs.Clock\"\n+  direction: GZ_TO_ROS\n+\n+# gz topic published by IMU plugin\n+- ros_topic_name: \"base_imu\"\n+  gz_topic_name: \"base_imu\"\n+  ros_type_name: \"sensor_msgs/msg/Imu\"\n+  gz_type_name: \"gz.msgs.IMU\"\n+  direction: GZ_TO_ROS\n+\n+  # gz topic published by Sensors plugin\n+- ros_topic_name: \"scan_rear_raw\"\n+  gz_topic_name: \"/scan_rear_raw\"\n+  ros_type_name: \"sensor_msgs/msg/LaserScan\"\n+  gz_type_name: \"gz.msgs.LaserScan\"\n+  direction: GZ_TO_ROS\n+\n+- ros_topic_name: \"scan_front_raw\"\n+  gz_topic_name: \"/scan_front_raw\"\n+  ros_type_name: \"sensor_msgs/msg/LaserScan\"\n+  gz_type_name: \"gz.msgs.LaserScan\"\n+  direction: GZ_TO_ROS\n+\n+- ros_topic_name: \"odom\"\n+  gz_topic_name: \"odom\"\n+  ros_type_name: \"nav_msgs/msg/Odometry\"\n+  gz_type_name: \"gz.msgs.Odometry\"\n+  direction: GZ_TO_ROS"
+        },
+        {
+          "sha": "4b94c4b841a29a2ffd6426aeb3b5a526b8dadd3e",
+          "filename": "omni_base_gazebo/launch/navigation_public_sim.launch.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/dcb58b2158cc66c6b733d1792931c8ee551abfb6/omni_base_gazebo%2Flaunch%2Fnavigation_public_sim.launch.py",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/dcb58b2158cc66c6b733d1792931c8ee551abfb6/omni_base_gazebo%2Flaunch%2Fnavigation_public_sim.launch.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_gazebo%2Flaunch%2Fnavigation_public_sim.launch.py?ref=dcb58b2158cc66c6b733d1792931c8ee551abfb6",
+          "patch": "@@ -32,6 +32,7 @@ class LaunchArguments(LaunchArgumentsBase):\n     slam: DeclareLaunchArgument = CommonArgs.slam\n     use_sim_time: DeclareLaunchArgument = CommonArgs.use_sim_time\n     rviz: DeclareLaunchArgument = CommonArgs.rviz\n+    gazebo_version: DeclareLaunchArgument = CommonArgs.gazebo_version\n \n \n def generate_launch_description():"
+        },
+        {
+          "sha": "59bd0bcd0e36e5639179882469261f9ef6ccf12f",
+          "filename": "omni_base_gazebo/launch/omni_base_gazebo.launch.py",
+          "status": "modified",
+          "additions": 39,
+          "deletions": 20,
+          "changes": 59,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/dcb58b2158cc66c6b733d1792931c8ee551abfb6/omni_base_gazebo%2Flaunch%2Fomni_base_gazebo.launch.py",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/dcb58b2158cc66c6b733d1792931c8ee551abfb6/omni_base_gazebo%2Flaunch%2Fomni_base_gazebo.launch.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_gazebo%2Flaunch%2Fomni_base_gazebo.launch.py?ref=dcb58b2158cc66c6b733d1792931c8ee551abfb6",
+          "patch": "@@ -21,6 +21,7 @@\n from launch import LaunchDescription\n from launch.actions import (\n     DeclareLaunchArgument,\n+    OpaqueFunction,\n     SetEnvironmentVariable,\n     SetLaunchConfiguration,\n )\n@@ -33,7 +34,7 @@\n from launch_pal.actions import CheckPublicSim\n from launch_pal.conditions import UnlessNodeRunning\n from launch_pal.robot_arguments import CommonArgs\n-from launch_pal.arg_utils import LaunchArgumentsBase\n+from launch_pal.arg_utils import LaunchArgumentsBase, read_launch_argument\n from launch_pal.include_utils import include_scoped_launch_py_description\n from omni_base_description.launch_arguments import OmniBaseArgs\n \n@@ -57,6 +58,7 @@ class LaunchArguments(LaunchArgumentsBase):\n     namespace: DeclareLaunchArgument = CommonArgs.namespace\n     rviz: DeclareLaunchArgument = CommonArgs.rviz\n     gzclient: DeclareLaunchArgument = CommonArgs.gzclient\n+    gazebo_version: DeclareLaunchArgument = CommonArgs.gazebo_version\n \n \n def generate_launch_description():\n@@ -71,6 +73,39 @@ def generate_launch_description():\n \n     return ld\n \n+def start_gazebo(context, *args, **kwargs):\n+    world_name = read_launch_argument('world_name', context)\n+    gzclient = read_launch_argument('gzclient', context)\n+    gazebo_version = read_launch_argument('gazebo_version', context)\n+\n+    packages = ['omni_base_description', 'pal_urdf_utils']\n+    model_path = get_model_paths(packages)\n+\n+    if gazebo_version == 'gazebo':\n+        PATH = 'GZ_SIM_RESOURCE_PATH'\n+    else:\n+        PATH = 'GAZEBO_MODEL_PATH'\n+\n+    if PATH in environ:\n+        model_path += pathsep + environ[PATH]\n+\n+    gazebo_model_path_env_var = SetEnvironmentVariable(PATH, model_path)\n+\n+    gazebo = include_scoped_launch_py_description(\n+        pkg_name='pal_gazebo_worlds',\n+        paths=['launch', 'pal_gazebo.launch.py'],\n+        env_vars=[gazebo_model_path_env_var],\n+        launch_arguments={\n+            'world_name': world_name,\n+            'model_paths': packages,\n+            'resource_paths': packages,\n+            'gzclient': gzclient,\n+            'gazebo_version': gazebo_version,\n+        },\n+        condition=UnlessNodeRunning('gazebo'),\n+    )\n+    return [gazebo]\n+\n \n def declare_actions(\n     launch_description: LaunchDescription, launch_args: LaunchArguments\n@@ -85,27 +120,9 @@ def declare_actions(\n     launch_description.add_action(public_sim_check)\n \n     robot_name = 'omni_base'\n-    packages = ['omni_base_description', 'pal_urdf_utils']\n-\n-    model_path = get_model_paths(packages)\n-\n-    gazebo_model_path_env_var = SetEnvironmentVariable(\n-        'GAZEBO_MODEL_PATH', model_path)\n \n-    gazebo = include_scoped_launch_py_description(\n-        pkg_name='pal_gazebo_worlds',\n-        paths=['launch', 'pal_gazebo.launch.py'],\n-        env_vars=[gazebo_model_path_env_var],\n-        launch_arguments={\n-            'world_name':  launch_args.world_name,\n-            'model_paths': packages,\n-            'resource_paths': packages,\n-            'gzclient': launch_args.gzclient,\n-        },\n-        condition=UnlessNodeRunning(\"gazebo\"),\n-    )\n+    launch_description.add_action(OpaqueFunction(function=start_gazebo))\n \n-    launch_description.add_action(gazebo)\n \n     robot_spawn = include_scoped_launch_py_description(\n         pkg_name='omni_base_gazebo',\n@@ -117,6 +134,7 @@ def declare_actions(\n             'y': launch_args.y,\n             'z': launch_args.z,\n             'yaw': launch_args.yaw,\n+            'gazebo_version': launch_args.gazebo_version,\n         }\n     )\n \n@@ -131,6 +149,7 @@ def declare_actions(\n             'add_on_module': launch_args.add_on_module,\n             'camera_model': launch_args.camera_model,\n             'use_sim_time': LaunchConfiguration('use_sim_time'),\n+            'gazebo_version': launch_args.gazebo_version,\n             'is_public_sim': launch_args.is_public_sim,\n         }\n     )"
+        },
+        {
+          "sha": "b237729f41c05bcd4afa83e2d5a30187b894794b",
+          "filename": "omni_base_gazebo/launch/robot_spawn.launch.py",
+          "status": "modified",
+          "additions": 39,
+          "deletions": 1,
+          "changes": 40,
+          "blob_url": "https://github.com/pal-robotics/omni_base_simulation/blob/dcb58b2158cc66c6b733d1792931c8ee551abfb6/omni_base_gazebo%2Flaunch%2Frobot_spawn.launch.py",
+          "raw_url": "https://github.com/pal-robotics/omni_base_simulation/raw/dcb58b2158cc66c6b733d1792931c8ee551abfb6/omni_base_gazebo%2Flaunch%2Frobot_spawn.launch.py",
+          "contents_url": "https://api.github.com/repos/pal-robotics/omni_base_simulation/contents/omni_base_gazebo%2Flaunch%2Frobot_spawn.launch.py?ref=dcb58b2158cc66c6b733d1792931c8ee551abfb6",
+          "patch": "@@ -12,11 +12,14 @@\n # See the License for the specific language governing permissions and\n # limitations under the License.\n \n+import os\n \n from dataclasses import dataclass\n \n+from ament_index_python import get_package_share_directory\n from launch import LaunchDescription\n from launch.actions import DeclareLaunchArgument\n+from launch.conditions import LaunchConfigurationEquals\n from launch.substitutions import LaunchConfiguration, PythonExpression\n from launch_pal.robot_arguments import CommonArgs\n from launch_pal.arg_utils import LaunchArgumentsBase\n@@ -34,6 +37,7 @@ class LaunchArguments(LaunchArgumentsBase):\n     z: DeclareLaunchArgument = CommonArgs.z\n     yaw: DeclareLaunchArgument = CommonArgs.yaw\n     namespace: DeclareLaunchArgument = CommonArgs.namespace\n+    gazebo_version: DeclareLaunchArgument = CommonArgs.gazebo_version\n \n \n def generate_launch_description():\n@@ -79,9 +83,43 @@ def declare_actions(\n             '-z', LaunchConfiguration('z'),\n             '-Y', LaunchConfiguration('yaw'),\n         ],\n-\n+        condition=LaunchConfigurationEquals('gazebo_version', 'classic'),\n         output='screen',\n     )\n     launch_description.add_action(robot_entity)\n \n+    gazebo_spawn_robot = Node(\n+        package='ros_gz_sim',\n+        executable='create',\n+        output='screen',\n+        arguments=[\n+            '-model',\n+            LaunchConfiguration('robot_name'),\n+            '-topic',\n+            'robot_description',\n+        ],\n+        condition=LaunchConfigurationEquals('gazebo_version', 'gazebo'),\n+    )\n+    launch_description.add_action(gazebo_spawn_robot)\n+\n+    # TODO: Add support for namespace\n+    bridge = Node(\n+        package='ros_gz_bridge',\n+        executable='parameter_bridge',\n+        name='bridge_ros_gz',\n+        parameters=[\n+            {\n+                'config_file': os.path.join(\n+                    get_package_share_directory('omni_base_gazebo'),\n+                    'config',\n+                    'omni_base_gz_bridge.yaml',\n+                ),\n+                'use_sim_time': True,\n+            }\n+        ],\n+        output='screen',\n+        condition=LaunchConfigurationEquals('gazebo_version', 'gazebo'),\n+    )\n+    launch_description.add_action(bridge)\n+\n     return"
+        }
+      ]
+    }
+  ]
+}

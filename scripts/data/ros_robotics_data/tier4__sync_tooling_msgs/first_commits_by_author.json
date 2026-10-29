@@ -1,0 +1,167 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T06:44:10Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "tier4",
+    "repo": "sync_tooling_msgs"
+  },
+  "data": [
+    {
+      "author": "mojomex",
+      "date": "2025-01-24T07:21:16Z",
+      "sha": "79da350ea63e280126151101c349ab33eed730ba",
+      "message": "chore: initial protos and build system for Python/C++ mostly done\n\nSigned-off-by: Max SCHMELLER <max.schmeller@tier4.jp>",
+      "files_changed": 12,
+      "additions": 180,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "73586e3bffc7776ad4c822f2c2e1c2e223e67889",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/tier4/sync_tooling_msgs/blob/79da350ea63e280126151101c349ab33eed730ba/.gitignore",
+          "raw_url": "https://github.com/tier4/sync_tooling_msgs/raw/79da350ea63e280126151101c349ab33eed730ba/.gitignore",
+          "contents_url": "https://api.github.com/repos/tier4/sync_tooling_msgs/contents/.gitignore?ref=79da350ea63e280126151101c349ab33eed730ba",
+          "patch": "@@ -0,0 +1,4 @@\n+.cache\n+.venv\n+build\n+dist\n\\ No newline at end of file"
+        },
+        {
+          "sha": "34ffe65b87507f06193f81b5568a2671a125e1b2",
+          "filename": ".vscode/settings.json",
+          "status": "added",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/tier4/sync_tooling_msgs/blob/79da350ea63e280126151101c349ab33eed730ba/.vscode%2Fsettings.json",
+          "raw_url": "https://github.com/tier4/sync_tooling_msgs/raw/79da350ea63e280126151101c349ab33eed730ba/.vscode%2Fsettings.json",
+          "contents_url": "https://api.github.com/repos/tier4/sync_tooling_msgs/contents/.vscode%2Fsettings.json?ref=79da350ea63e280126151101c349ab33eed730ba",
+          "patch": "@@ -0,0 +1,7 @@\n+{\n+  \"protoc\": {\n+    \"options\": [\n+      \"-Iproto\"\n+    ]\n+  }\n+}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "cf02f4017d409e04aec5dbf0edb8f78f85bf2101",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 43,
+          "deletions": 0,
+          "changes": 43,
+          "blob_url": "https://github.com/tier4/sync_tooling_msgs/blob/79da350ea63e280126151101c349ab33eed730ba/CMakeLists.txt",
+          "raw_url": "https://github.com/tier4/sync_tooling_msgs/raw/79da350ea63e280126151101c349ab33eed730ba/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/tier4/sync_tooling_msgs/contents/CMakeLists.txt?ref=79da350ea63e280126151101c349ab33eed730ba",
+          "patch": "@@ -0,0 +1,43 @@\n+cmake_minimum_required(VERSION 3.14)\n+project(sync_tooling_msgs)\n+\n+find_package(Protobuf 3.12 REQUIRED)\n+\n+set(PROTO_DIR proto)\n+set(PYTHON_OUT_DIR python_out)\n+set(CPP_OUT_DIR cpp_out)\n+\n+set(PROTO_FILES\n+  proto/unknown.proto\n+  proto/ok.proto\n+  proto/warning.proto\n+  proto/error.proto\n+  proto/diag_status.proto\n+  proto/diag_tree.proto\n+)\n+\n+set(CPP_SRCS \"\")\n+set(CPP_HDRS \"\")\n+set(PY_SRCS \"\")\n+\n+foreach(PROTO_FILE ${PROTO_FILES})\n+  get_filename_component(PROTO_NAME ${PROTO_FILE} NAME_WE)\n+  list(APPEND CPP_SRCS ${CPP_OUT_DIR}/${PROTO_NAME}.pb.cc)\n+  list(APPEND CPP_HDRS ${CPP_OUT_DIR}/${PROTO_NAME}.pb.h)\n+  list(APPEND PY_SRCS ${PYTHON_OUT_DIR}/${PROTO_NAME}_pb2.py)\n+endforeach()\n+\n+list(TRANSFORM PROTO_FILES PREPEND ${CMAKE_CURRENT_SOURCE_DIR}/)\n+\n+make_directory(${CPP_OUT_DIR})\n+make_directory(${PYTHON_OUT_DIR})\n+\n+add_custom_command(\n+  OUTPUT ${CPP_SRCS} ${CPP_HDRS} ${PY_SRCS}\n+  COMMAND ${Protobuf_PROTOC_EXECUTABLE}\n+  ARGS --python_out=${PYTHON_OUT_DIR} --cpp_out=${CPP_OUT_DIR} --experimental_allow_proto3_optional -I${CMAKE_SOURCE_DIR}/proto ${PROTO_FILES}\n+  DEPENDS ${PROTO_FILES}\n+)\n+\n+add_library(sync_tooling_msgs_cpp ${CPP_SRCS} SHARED)\n+file(TOUCH ${CMAKE_CURRENT_BINARY_DIR}/${PYTHON_OUT_DIR}/__init__.py)\n\\ No newline at end of file"
+        },
+        {
+          "sha": "31232205663b3e7afd7546fa5c6a8ec5cf2b46fe",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 19,
+          "deletions": 0,
+          "changes": 19,
+          "blob_url": "https://github.com/tier4/sync_tooling_msgs/blob/79da350ea63e280126151101c349ab33eed730ba/README.md",
+          "raw_url": "https://github.com/tier4/sync_tooling_msgs/raw/79da350ea63e280126151101c349ab33eed730ba/README.md",
+          "contents_url": "https://api.github.com/repos/tier4/sync_tooling_msgs/contents/README.md?ref=79da350ea63e280126151101c349ab33eed730ba",
+          "patch": "@@ -0,0 +1,19 @@\n+# Getting Started\n+\n+## Prerequisites\n+\n+- Protobuf >= 3.12 (`sudo apt install libprotoc-dev libprotoc23`)\n+- Python >= 3.10\n+- CMake >= 3.14\n+- uv (`pip install uv`)\n+\n+## Building\n+\n+```shell\n+mkdir -p build && \\\n+cd build && \\\n+cmake .. && \\\n+make && \\\n+cd .. && \\\n+uv build\n+```\n\\ No newline at end of file"
+        },
+        {
+          "sha": "d87371afb8e889ade7f48b7649db65c403e1827b",
+          "filename": "proto/diag_status.proto",
+          "status": "added",
+          "additions": 15,
+          "deletions": 0,
+          "changes": 15,
+          "blob_url": "https://github.com/tier4/sync_tooling_msgs/blob/79da350ea63e280126151101c349ab33eed730ba/proto%2Fdiag_status.proto",
+          "raw_url": "https://github.com/tier4/sync_tooling_msgs/raw/79da350ea63e280126151101c349ab33eed730ba/proto%2Fdiag_status.proto",
+          "contents_url": "https://api.github.com/repos/tier4/sync_tooling_msgs/contents/proto%2Fdiag_status.proto?ref=79da350ea63e280126151101c349ab33eed730ba",
+          "patch": "@@ -0,0 +1,15 @@\n+syntax = \"proto3\";\n+\n+import \"unknown.proto\";\n+import \"ok.proto\";\n+import \"warning.proto\";\n+import \"error.proto\";\n+\n+message DiagStatus {\n+  oneof status {\n+    Unknown unknown = 1;\n+    Ok ok = 2;\n+    Warning warning = 3;\n+    Error error = 4;\n+  }\n+}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "5fbeabe17e1d87488b2934f184194e0618ec836c",
+          "filename": "proto/diag_tree.proto",
+          "status": "added",
+          "additions": 19,
+          "deletions": 0,
+          "changes": 19,
+          "blob_url": "https://github.com/tier4/sync_tooling_msgs/blob/79da350ea63e280126151101c349ab33eed730ba/proto%2Fdiag_tree.proto",
+          "raw_url": "https://github.com/tier4/sync_tooling_msgs/raw/79da350ea63e280126151101c349ab33eed730ba/proto%2Fdiag_tree.proto",
+          "contents_url": "https://api.github.com/repos/tier4/sync_tooling_msgs/contents/proto%2Fdiag_tree.proto?ref=79da350ea63e280126151101c349ab33eed730ba",
+          "patch": "@@ -0,0 +1,19 @@\n+syntax = \"proto3\";\n+\n+import \"diag_status.proto\";\n+\n+message DiagTree {\n+  message DiagList {\n+    repeated DiagTree list = 1;\n+  }\n+\n+  message DiagMap {\n+    map<string, DiagTree> map = 1;\n+  }\n+\n+  oneof tree {\n+    DiagStatus status = 1;\n+    DiagList list = 2;\n+    DiagMap map = 3;\n+  }\n+}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "da30b1a42bd8919ef153a716168ea12eac19bf73",
+          "filename": "proto/error.proto",
+          "status": "added",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/tier4/sync_tooling_msgs/blob/79da350ea63e280126151101c349ab33eed730ba/proto%2Ferror.proto",
+          "raw_url": "https://github.com/tier4/sync_tooling_msgs/raw/79da350ea63e280126151101c349ab33eed730ba/proto%2Ferror.proto",
+          "contents_url": "https://api.github.com/repos/tier4/sync_tooling_msgs/contents/proto%2Ferror.proto?ref=79da350ea63e280126151101c349ab33eed730ba",
+          "patch": "@@ -0,0 +1,5 @@\n+syntax = \"proto3\";\n+\n+message Error {\n+  string msg = 1;\n+}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "b62bdd628e7f485778f39345aa3a56a7bd52a3b4",
+          "filename": "proto/ok.proto",
+          "status": "added",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/tier4/sync_tooling_msgs/blob/79da350ea63e280126151101c349ab33eed730ba/proto%2Fok.proto",
+          "raw_url": "https://github.com/tier4/sync_tooling_msgs/raw/79da350ea63e280126151101c349ab33eed730ba/proto%2Fok.proto",
+          "contents_url": "https://api.github.com/repos/tier4/sync_tooling_msgs/contents/proto%2Fok.proto?ref=79da350ea63e280126151101c349ab33eed730ba",
+          "patch": "@@ -0,0 +1,5 @@\n+syntax = \"proto3\";\n+\n+message Ok {\n+  optional string msg = 1;\n+}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "f29afc2b1ee5b7c30de3ec6dc191d5c1441bdc98",
+          "filename": "proto/unknown.proto",
+          "status": "added",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/tier4/sync_tooling_msgs/blob/79da350ea63e280126151101c349ab33eed730ba/proto%2Funknown.proto",
+          "raw_url": "https://github.com/tier4/sync_tooling_msgs/raw/79da350ea63e280126151101c349ab33eed730ba/proto%2Funknown.proto",
+          "contents_url": "https://api.github.com/repos/tier4/sync_tooling_msgs/contents/proto%2Funknown.proto?ref=79da350ea63e280126151101c349ab33eed730ba",
+          "patch": "@@ -0,0 +1,5 @@\n+syntax = \"proto3\";\n+\n+message Unknown {\n+  optional string msg = 1;\n+}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "cedccbd093382149cbebe7266ba4c414ecad067c",
+          "filename": "proto/warning.proto",
+          "status": "added",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/tier4/sync_tooling_msgs/blob/79da350ea63e280126151101c349ab33eed730ba/proto%2Fwarning.proto",
+          "raw_url": "https://github.com/tier4/sync_tooling_msgs/raw/79da350ea63e280126151101c349ab33eed730ba/proto%2Fwarning.proto",
+          "contents_url": "https://api.github.com/repos/tier4/sync_tooling_msgs/contents/proto%2Fwarning.proto?ref=79da350ea63e280126151101c349ab33eed730ba",
+          "patch": "@@ -0,0 +1,5 @@\n+syntax = \"proto3\";\n+\n+message Warning {\n+  string msg = 1;\n+}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "a8a49e4449e91d8ae61e11e2503b2039569ad35c",
+          "filename": "pyproject.toml",
+          "status": "added",
+          "additions": 26,
+          "deletions": 0,
+          "changes": 26,
+          "blob_url": "https://github.com/tier4/sync_tooling_msgs/blob/79da350ea63e280126151101c349ab33eed730ba/pyproject.toml",
+          "raw_url": "https://github.com/tier4/sync_tooling_msgs/raw/79da350ea63e280126151101c349ab33eed730ba/pyproject.toml",
+          "contents_url": "https://api.github.com/repos/tier4/sync_tooling_msgs/contents/pyproject.toml?ref=79da350ea63e280126151101c349ab33eed730ba",
+          "patch": "@@ -0,0 +1,26 @@\n+[project]\n+name = \"sync-tooling-msgs\"\n+version = \"0.1.0\"\n+description = \"Protobuf definitions for sync tooling.\"\n+authors = [\n+    { name = \"Max SCHMELLER\", email = \"max.schmeller@tier4.jp\" }\n+]\n+requires-python = \">=3.10\"\n+dependencies = [\n+    \"protobuf>=5.29.3\",\n+]\n+\n+[build-system]\n+requires = [\"hatchling\"]\n+build-backend = \"hatchling.build\"\n+\n+[tool.hatch.build.targets.sdist]\n+artifacts = [\"build/python_out\"]\n+\n+[tool.hatch.build.targets.wheel.force-include]\n+\"./build/python_out\" = \"sync_tooling_msgs\"\n+\n+[tool.pytest.ini_options]\n+addopts = [\n+    \"--import-mode=importlib\",\n+]"
+        },
+        {
+          "sha": "e0cbe48b433a96e001db13d8e3ca863804dfacf5",
+          "filename": "uv.lock",
+          "status": "added",
+          "additions": 27,
+          "deletions": 0,
+          "changes": 27,
+          "blob_url": "https://github.com/tier4/sync_tooling_msgs/blob/79da350ea63e280126151101c349ab33eed730ba/uv.lock",
+          "raw_url": "https://github.com/tier4/sync_tooling_msgs/raw/79da350ea63e280126151101c349ab33eed730ba/uv.lock",
+          "contents_url": "https://api.github.com/repos/tier4/sync_tooling_msgs/contents/uv.lock?ref=79da350ea63e280126151101c349ab33eed730ba",
+          "patch": "@@ -0,0 +1,27 @@\n+version = 1\n+requires-python = \">=3.10\"\n+\n+[[package]]\n+name = \"protobuf\"\n+version = \"5.29.3\"\n+source = { registry = \"https://pypi.org/simple\" }\n+sdist = { url = \"https://files.pythonhosted.org/packages/f7/d1/e0a911544ca9993e0f17ce6d3cc0932752356c1b0a834397f28e63479344/protobuf-5.29.3.tar.gz\", hash = \"sha256:5da0f41edaf117bde316404bad1a486cb4ededf8e4a54891296f648e8e076620\", size = 424945 }\n+wheels = [\n+    { url = \"https://files.pythonhosted.org/packages/dc/7a/1e38f3cafa022f477ca0f57a1f49962f21ad25850c3ca0acd3b9d0091518/protobuf-5.29.3-cp310-abi3-win32.whl\", hash = \"sha256:3ea51771449e1035f26069c4c7fd51fba990d07bc55ba80701c78f886bf9c888\", size = 422708 },\n+    { url = \"https://files.pythonhosted.org/packages/61/fa/aae8e10512b83de633f2646506a6d835b151edf4b30d18d73afd01447253/protobuf-5.29.3-cp310-abi3-win_amd64.whl\", hash = \"sha256:a4fa6f80816a9a0678429e84973f2f98cbc218cca434abe8db2ad0bffc98503a\", size = 434508 },\n+    { url = \"https://files.pythonhosted.org/packages/dd/04/3eaedc2ba17a088961d0e3bd396eac764450f431621b58a04ce898acd126/protobuf-5.29.3-cp38-abi3-macosx_10_9_universal2.whl\", hash = \"sha256:a8434404bbf139aa9e1300dbf989667a83d42ddda9153d8ab76e0d5dcaca484e\", size = 417825 },\n+    { url = \"https://files.pythonhosted.org/packages/4f/06/7c467744d23c3979ce250397e26d8ad8eeb2bea7b18ca12ad58313c1b8d5/protobuf-5.29.3-cp38-abi3-manylinux2014_aarch64.whl\", hash = \"sha256:daaf63f70f25e8689c072cfad4334ca0ac1d1e05a92fc15c54eb9cf23c3efd84\", size = 319573 },\n+    { url = \"https://files.pythonhosted.org/packages/a8/45/2ebbde52ad2be18d3675b6bee50e68cd73c9e0654de77d595540b5129df8/protobuf-5.29.3-cp38-abi3-manylinux2014_x86_64.whl\", hash = \"sha256:c027e08a08be10b67c06bf2370b99c811c466398c357e615ca88c91c07f0910f\", size = 319672 },\n+    { url = \"https://files.pythonhosted.org/packages/fd/b2/ab07b09e0f6d143dfb839693aa05765257bceaa13d03bf1a696b78323e7a/protobuf-5.29.3-py3-none-any.whl\", hash = \"sha256:0a18ed4a24198528f2333802eb075e59dea9d679ab7a6c5efb017a59004d849f\", size = 172550 },\n+]\n+\n+[[package]]\n+name = \"sync-tooling-msgs\"\n+version = \"0.1.0\"\n+source = { editable = \".\" }\n+dependencies = [\n+    { name = \"protobuf\" },\n+]\n+\n+[package.metadata]\n+requires-dist = [{ name = \"protobuf\", specifier = \">=5.29.3\" }]"
+        }
+      ]
+    }
+  ]
+}

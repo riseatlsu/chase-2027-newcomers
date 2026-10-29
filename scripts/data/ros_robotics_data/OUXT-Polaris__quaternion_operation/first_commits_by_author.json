@@ -1,0 +1,226 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T06:07:07Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "OUXT-Polaris",
+    "repo": "quaternion_operation"
+  },
+  "data": [
+    {
+      "author": "wam-v-tan",
+      "date": "2021-08-16T02:41:27Z",
+      "sha": "3dc3dd8a7ae3a1b4dfdece9fcb9adb05ca123c94",
+      "message": "Setup scenario test workflow",
+      "files_changed": 1,
+      "additions": 48,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "cd0c651c8aeca049c03ced5cd418ce8794810d59",
+          "filename": ".github/workflows/ScenarioTest.yaml",
+          "status": "added",
+          "additions": 48,
+          "deletions": 0,
+          "changes": 48,
+          "blob_url": "https://github.com/OUXT-Polaris/quaternion_operation/blob/3dc3dd8a7ae3a1b4dfdece9fcb9adb05ca123c94/.github%2Fworkflows%2FScenarioTest.yaml",
+          "raw_url": "https://github.com/OUXT-Polaris/quaternion_operation/raw/3dc3dd8a7ae3a1b4dfdece9fcb9adb05ca123c94/.github%2Fworkflows%2FScenarioTest.yaml",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/quaternion_operation/contents/.github%2Fworkflows%2FScenarioTest.yaml?ref=3dc3dd8a7ae3a1b4dfdece9fcb9adb05ca123c94",
+          "patch": "@@ -0,0 +1,48 @@\n+name: Scenario Test\n+\n+on:\n+  schedule:\n+    - cron: 0 0 * * *\n+  push:\n+  workflow_dispatch:\n+\n+jobs:\n+  scenario_test:\n+    name: Build\n+    runs-on: ubuntu-20.04\n+    steps:\n+    - uses: actions/checkout@v2-beta\n+    - run: gh run download -n packages\n+      env:\n+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n+        GH_REPO: OUXT-Polaris/robotx_setup\n+    - uses: OUXT-Polaris/update-repos-action@0.0.1\n+      with:\n+        input_repos_file: packages.repos\n+        output_repos_file: packages.repos\n+        package_name: hermite_path_planner\n+        target_version: ${{ github.sha }}\n+    - name: check repos file\n+      run: cat packages.repos\n+    - uses: actions/upload-artifact@v2\n+      with:\n+        name: packages\n+        path: packages.repos\n+    - name: Run ros integration test action from base image\n+      uses: OUXT-Polaris/ros-integration-test-action@0.0.9\n+      with:\n+        base_image: hakuturu583/robotx_scenario_test\n+        tag: master\n+        rosdistro: foxy\n+        test_command: ros2 launch navi_sim with_planner.launch.py\n+        check_result_command: ros2 run navi_sim check_result\n+        artifact_name: scenario_test_result\n+        repos_artifact_name: packages\n+        repos_filename: packages.repos\n+        lcov_artifacts_name: lcov\n+      env:\n+        ACTIONS_RUNTIME_TOKEN: ${{ secrets.GITHUB_TOKEN }} \n+        ACTIONS_RUNTIME_URL: ${{ env.ACTIONS_RUNTIME_URL }}\n+        GITHUB_RUN_ID: ${env.GITHUB_RUN_ID}\n+        GITHUB_CLONE_TOKEN: ${{ secrets.WAMV_TAN_BOT_SECRET }} # access token for cloning your package in private repository.\n+        GITHUB_CLONE_USERNAME: wam-v-tan # username of access token\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "hakuturu583",
+      "date": "2019-04-16T00:36:43Z",
+      "sha": "ebd6f6f9903dbf319558431d81835ca0e03a5f5e",
+      "message": "initial commit",
+      "files_changed": 7,
+      "additions": 160,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "ce6e5dd98a0b91a797301abba5ebcd100ee038a2",
+          "filename": ".travis.yml",
+          "status": "added",
+          "additions": 26,
+          "deletions": 0,
+          "changes": 26,
+          "blob_url": "https://github.com/OUXT-Polaris/quaternion_operation/blob/ebd6f6f9903dbf319558431d81835ca0e03a5f5e/.travis.yml",
+          "raw_url": "https://github.com/OUXT-Polaris/quaternion_operation/raw/ebd6f6f9903dbf319558431d81835ca0e03a5f5e/.travis.yml",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/quaternion_operation/contents/.travis.yml?ref=ebd6f6f9903dbf319558431d81835ca0e03a5f5e",
+          "patch": "@@ -0,0 +1,26 @@\n+# This config file for Travis CI utilizes ros-industrial/industrial_ci package.\t\t\n+# For more info for the package, see https://github.com/ros-industrial/industrial_ci/blob/master/README.rst\t\t\n+sudo: required \t\t\n+dist: trusty \t\t\n+services:\t\t\n+  - docker\t\t\n+language: generic \t\t\n+compiler:\t\t\n+  - gcc\t\t\n+notifications:\t\t\n+  email:\n+    on_success: never\n+    on_failue: never\n+  slack: ouxt-polaris-2018:NclavkPPXCVkysAoOTr47aUg\n+env:\t\t\n+  global:\t\t\n+    - CATKIN_PARALLEL_TEST_JOBS=-p1\n+    - ROS_PARALLEL_TEST_JOBS=-j`nproc`\n+    - UPSTREAM_WORKSPACE=file\n+    - ROSINSTALL_FILENAME=dependencies.rosinstall\n+  matrix:\t\t\n+    - ROS_DISTRO=kinetic ROS_REPOSITORY_PATH=http://packages.ros.org/ros/ubuntu\n+install:\t\n+  - git clone https://github.com/ros-industrial/industrial_ci.git .ci_config\t\t\n+script:\t\t\n+  - source .ci_config/travis.sh \n\\ No newline at end of file"
+        },
+        {
+          "sha": "e17a5a3daff3229ba99707a3ff05f52bc94f0edf",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 36,
+          "deletions": 0,
+          "changes": 36,
+          "blob_url": "https://github.com/OUXT-Polaris/quaternion_operation/blob/ebd6f6f9903dbf319558431d81835ca0e03a5f5e/CMakeLists.txt",
+          "raw_url": "https://github.com/OUXT-Polaris/quaternion_operation/raw/ebd6f6f9903dbf319558431d81835ca0e03a5f5e/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/quaternion_operation/contents/CMakeLists.txt?ref=ebd6f6f9903dbf319558431d81835ca0e03a5f5e",
+          "patch": "@@ -0,0 +1,36 @@\n+cmake_minimum_required(VERSION 2.8.3)\n+project(quaternion_operation)\n+\n+add_compile_options(-std=c++11)\n+\n+find_package(catkin REQUIRED COMPONENTS\n+  geometry_msgs\n+  roscpp\n+)\n+\n+catkin_package(\n+  INCLUDE_DIRS include\n+#  LIBRARIES quaternion_operation\n+  CATKIN_DEPENDS geometry_msgs roscpp\n+#  DEPENDS system_lib\n+)\n+\n+include_directories(\n+  include\n+  ${catkin_INCLUDE_DIRS}\n+)\n+\n+# Install header files\n+install(DIRECTORY include/${PROJECT_NAME}/\n+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}\n+)\n+\n+if (CATKIN_ENABLE_TESTING)\n+  find_package(rostest REQUIRED)\n+  add_rostest_gtest(test-quaternion_operation\n+  test/test_quaternion_operation.test\n+  test/src/test_quaternion_operation.cpp\n+  ${NODE_STATUS_PUBLISHER_SRC})\n+  target_link_libraries(test-quaternion_operation\n+  ${catkin_LIBRARIES})\n+endif ()\n\\ No newline at end of file"
+        },
+        {
+          "sha": "750301236279371942cb1789264380eab1fa86ce",
+          "filename": "include/quaternion_operation/quaternion_operation.h",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/OUXT-Polaris/quaternion_operation/blob/ebd6f6f9903dbf319558431d81835ca0e03a5f5e/include%2Fquaternion_operation%2Fquaternion_operation.h",
+          "raw_url": "https://github.com/OUXT-Polaris/quaternion_operation/raw/ebd6f6f9903dbf319558431d81835ca0e03a5f5e/include%2Fquaternion_operation%2Fquaternion_operation.h",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/quaternion_operation/contents/include%2Fquaternion_operation%2Fquaternion_operation.h?ref=ebd6f6f9903dbf319558431d81835ca0e03a5f5e",
+          "patch": "@@ -0,0 +1,4 @@\n+#ifndef QUATERNION_OPERATION_QUATERNION_OPERATION_H_INCLUDED\n+#define QUATERNION_OPERATION_QUATERNION_OPERATION_H_INCLUDED\n+\n+#endif  //QUATERNION_OPERATION_QUATERNION_OPERATION_H_INCLUDED\n\\ No newline at end of file"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "include/quaternion_operation/rotation.h",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/OUXT-Polaris/quaternion_operation/blob/ebd6f6f9903dbf319558431d81835ca0e03a5f5e/include%2Fquaternion_operation%2Frotation.h",
+          "raw_url": "https://github.com/OUXT-Polaris/quaternion_operation/raw/ebd6f6f9903dbf319558431d81835ca0e03a5f5e/include%2Fquaternion_operation%2Frotation.h",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/quaternion_operation/contents/include%2Fquaternion_operation%2Frotation.h?ref=ebd6f6f9903dbf319558431d81835ca0e03a5f5e"
+        },
+        {
+          "sha": "025b5696b33b0aeaa8a57a602fcbbb314926b962",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 65,
+          "deletions": 0,
+          "changes": 65,
+          "blob_url": "https://github.com/OUXT-Polaris/quaternion_operation/blob/ebd6f6f9903dbf319558431d81835ca0e03a5f5e/package.xml",
+          "raw_url": "https://github.com/OUXT-Polaris/quaternion_operation/raw/ebd6f6f9903dbf319558431d81835ca0e03a5f5e/package.xml",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/quaternion_operation/contents/package.xml?ref=ebd6f6f9903dbf319558431d81835ca0e03a5f5e",
+          "patch": "@@ -0,0 +1,65 @@\n+<?xml version=\"1.0\"?>\n+<package format=\"2\">\n+  <name>quaternion_operation</name>\n+  <version>0.0.0</version>\n+  <description>The quaternion_operation package</description>\n+\n+  <!-- One maintainer tag required, multiple allowed, one person per tag -->\n+  <!-- Example:  -->\n+  <!-- <maintainer email=\"jane.doe@example.com\">Jane Doe</maintainer> -->\n+  <maintainer email=\"masaya@todo.todo\">masaya</maintainer>\n+\n+\n+  <!-- One license tag required, multiple allowed, one license per tag -->\n+  <!-- Commonly used license strings: -->\n+  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->\n+  <license>TODO</license>\n+\n+\n+  <!-- Url tags are optional, but multiple are allowed, one per tag -->\n+  <!-- Optional attribute type can be: website, bugtracker, or repository -->\n+  <!-- Example: -->\n+  <!-- <url type=\"website\">http://wiki.ros.org/quaternion_operation</url> -->\n+\n+\n+  <!-- Author tags are optional, multiple are allowed, one per tag -->\n+  <!-- Authors do not have to be maintainers, but could be -->\n+  <!-- Example: -->\n+  <!-- <author email=\"jane.doe@example.com\">Jane Doe</author> -->\n+\n+\n+  <!-- The *depend tags are used to specify dependencies -->\n+  <!-- Dependencies can be catkin packages or system dependencies -->\n+  <!-- Examples: -->\n+  <!-- Use depend as a shortcut for packages that are both build and exec dependencies -->\n+  <!--   <depend>roscpp</depend> -->\n+  <!--   Note that this is equivalent to the following: -->\n+  <!--   <build_depend>roscpp</build_depend> -->\n+  <!--   <exec_depend>roscpp</exec_depend> -->\n+  <!-- Use build_depend for packages you need at compile time: -->\n+  <!--   <build_depend>message_generation</build_depend> -->\n+  <!-- Use build_export_depend for packages you need in order to build against this package: -->\n+  <!--   <build_export_depend>message_generation</build_export_depend> -->\n+  <!-- Use buildtool_depend for build tool packages: -->\n+  <!--   <buildtool_depend>catkin</buildtool_depend> -->\n+  <!-- Use exec_depend for packages you need at runtime: -->\n+  <!--   <exec_depend>message_runtime</exec_depend> -->\n+  <!-- Use test_depend for packages you need only for testing: -->\n+  <!--   <test_depend>gtest</test_depend> -->\n+  <!-- Use doc_depend for packages you need only for building documentation: -->\n+  <!--   <doc_depend>doxygen</doc_depend> -->\n+  <buildtool_depend>catkin</buildtool_depend>\n+  <build_depend>geometry_msgs</build_depend>\n+  <build_depend>roscpp</build_depend>\n+  <build_export_depend>geometry_msgs</build_export_depend>\n+  <build_export_depend>roscpp</build_export_depend>\n+  <exec_depend>geometry_msgs</exec_depend>\n+  <exec_depend>roscpp</exec_depend>\n+\n+\n+  <!-- The export tag contains other, unspecified, tags -->\n+  <export>\n+    <!-- Other tools can request additional information be placed here -->\n+\n+  </export>\n+</package>"
+        },
+        {
+          "sha": "998a596fb8dce9a9f29e347d858dbbb4cdebf6ea",
+          "filename": "test/src/test_quaternion_operation.cpp",
+          "status": "added",
+          "additions": 26,
+          "deletions": 0,
+          "changes": 26,
+          "blob_url": "https://github.com/OUXT-Polaris/quaternion_operation/blob/ebd6f6f9903dbf319558431d81835ca0e03a5f5e/test%2Fsrc%2Ftest_quaternion_operation.cpp",
+          "raw_url": "https://github.com/OUXT-Polaris/quaternion_operation/raw/ebd6f6f9903dbf319558431d81835ca0e03a5f5e/test%2Fsrc%2Ftest_quaternion_operation.cpp",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/quaternion_operation/contents/test%2Fsrc%2Ftest_quaternion_operation.cpp?ref=ebd6f6f9903dbf319558431d81835ca0e03a5f5e",
+          "patch": "@@ -0,0 +1,26 @@\n+//headers in Google Test\n+#include <gtest/gtest.h>\n+\n+//headers in ROS\n+#include <ros/ros.h>\n+\n+//headers in this package\n+#include <quaternion_operation/quaternion_operation.h>\n+\n+// Declare a test\n+TEST(TestSuite, testCase1)\n+{\n+    EXPECT_EQ(10, 10);\n+}\n+\n+// Declare another test\n+TEST(TestSuite, testCase2)\n+{\n+    EXPECT_EQ(10, 10);\n+}\n+\n+// Run all the tests that were declared with TEST()\n+int main(int argc, char **argv){\n+    testing::InitGoogleTest(&argc, argv);\n+    return RUN_ALL_TESTS();\n+}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "ff8e4ba87116051146dbaed59e9f876a735253e8",
+          "filename": "test/test_quaternion_operation.test",
+          "status": "added",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/OUXT-Polaris/quaternion_operation/blob/ebd6f6f9903dbf319558431d81835ca0e03a5f5e/test%2Ftest_quaternion_operation.test",
+          "raw_url": "https://github.com/OUXT-Polaris/quaternion_operation/raw/ebd6f6f9903dbf319558431d81835ca0e03a5f5e/test%2Ftest_quaternion_operation.test",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/quaternion_operation/contents/test%2Ftest_quaternion_operation.test?ref=ebd6f6f9903dbf319558431d81835ca0e03a5f5e",
+          "patch": "@@ -0,0 +1,3 @@\n+<launch>\n+  <test test-name=\"test-quaternion_operation\" pkg=\"quaternion_operation\" type=\"test-quaternion_operation\" name=\"test\"/>\n+</launch>\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "nuclearsandwich",
+      "date": "2022-02-02T08:27:23Z",
+      "sha": "6dbdf754654e89e16380ca77dfbf378489087c41",
+      "message": "Add ament_lint_auto dependency to package.xml. (#58)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "7291c9ef7f2e4e8f8d84702d5c137d772536fa7d",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/OUXT-Polaris/quaternion_operation/blob/6dbdf754654e89e16380ca77dfbf378489087c41/package.xml",
+          "raw_url": "https://github.com/OUXT-Polaris/quaternion_operation/raw/6dbdf754654e89e16380ca77dfbf378489087c41/package.xml",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/quaternion_operation/contents/package.xml?ref=6dbdf754654e89e16380ca77dfbf378489087c41",
+          "patch": "@@ -24,6 +24,7 @@\n   <exec_depend>tf2_ros</exec_depend>\n   <depend>ament_cmake_auto</depend>\n   <test_depend>ament_cmake_gtest</test_depend>\n+  <test_depend>ament_lint_auto</test_depend>\n   <test_depend>ouxt_lint_common</test_depend>\n \n   <!-- The export tag contains other, unspecified, tags -->"
+        }
+      ]
+    },
+    {
+      "author": "robotx_buildfarm",
+      "date": "2021-01-16T14:25:17Z",
+      "sha": "3776e41519dc9b3f636e691951ff60c974305b42",
+      "message": "update .github/workflows/ROS2-Foxy.yaml",
+      "files_changed": 1,
+      "additions": 57,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "cdacf41d3dc5a97e6b3d2be6a0ead38b1bdd963d",
+          "filename": ".github/workflows/ROS2-Foxy.yaml",
+          "status": "added",
+          "additions": 57,
+          "deletions": 0,
+          "changes": 57,
+          "blob_url": "https://github.com/OUXT-Polaris/quaternion_operation/blob/3776e41519dc9b3f636e691951ff60c974305b42/.github%2Fworkflows%2FROS2-Foxy.yaml",
+          "raw_url": "https://github.com/OUXT-Polaris/quaternion_operation/raw/3776e41519dc9b3f636e691951ff60c974305b42/.github%2Fworkflows%2FROS2-Foxy.yaml",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/quaternion_operation/contents/.github%2Fworkflows%2FROS2-Foxy.yaml?ref=3776e41519dc9b3f636e691951ff60c974305b42",
+          "patch": "@@ -0,0 +1,57 @@\n+\n+name: ROS2-Foxy\n+\n+on:\n+  schedule:\n+    - cron: 0 0 * * *\n+  push:\n+  workflow_dispatch:\n+\n+jobs:\n+    job1:\n+        name: Build\n+        runs-on: ubuntu-20.04\n+        steps:\n+            - name: ROS2 Install\n+              run: |\n+                  # Ref: https://index.ros.org/doc/ros2/Installation/eloquent/Linux-Install-Debians/\n+                  sudo locale-gen en_US en_US.UTF-8\n+                  sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8\n+                  export LANG=en_US.UTF-8\n+                  sudo apt update && sudo apt install curl gnupg2 lsb-release\n+                  curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -\n+                  sudo sh -c 'echo \"deb [arch=amd64,arm64] http://packages.ros.org/ros2/ubuntu `lsb_release -cs` main\" > /etc/apt/sources.list.d/ros2-latest.list'\n+                  sudo apt update\n+                  sudo apt install ros-foxy-desktop\n+                  source /opt/ros/foxy/setup.bash\n+            - uses: actions/checkout@v2-beta\n+            - name: Copy repository\n+              run: |\n+                  mkdir -p ~/ros2_ws/src/quaternion_operation\n+                  cp -rf . ~/ros2_ws/src/quaternion_operation\n+            - name: Install dependencies\n+              run: |\n+                  source /opt/ros/foxy/setup.bash\n+                  sudo apt install -y python3-rosdep python3-vcstool python3-sphinx-rtd-theme \n+                  sudo rosdep init\n+                  rosdep update\n+                  cd ~/ros2_ws\n+                  vcs import src < src/quaternion_operation/dependency.repos\n+                  cd ~/ros2_ws/src\n+                  rosdep install -r -y --from-paths . --ignore-src\n+            - name: Build packages\n+              run: |\n+                  source /opt/ros/foxy/setup.bash\n+                  # Install colcon\n+                  # Ref: https://index.ros.org/doc/ros2/Tutorials/Colcon-Tutorial/\n+                  sudo apt install python3-colcon-common-extensions\n+                  cd ~/ros2_ws\n+                  colcon build\n+                  source ~/ros2_ws/install/setup.bash\n+            - name: Test packages\n+              run: |\n+                  source /opt/ros/foxy/setup.bash\n+                  source ~/ros2_ws/install/setup.bash\n+                  cd ~/ros2_ws\n+                  colcon test\n+                  colcon test-result --verbose\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "HansRobo",
+      "date": "2020-04-01T14:24:04Z",
+      "sha": "27f7bdf58554a25e8fde44013bf6b957e8da6c48",
+      "message": "Create main.yml",
+      "files_changed": 1,
+      "additions": 51,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "bfcf072a9c3e9afa83061b302a0540a12ad74385",
+          "filename": ".github/workflows/main.yml",
+          "status": "added",
+          "additions": 51,
+          "deletions": 0,
+          "changes": 51,
+          "blob_url": "https://github.com/OUXT-Polaris/quaternion_operation/blob/27f7bdf58554a25e8fde44013bf6b957e8da6c48/.github%2Fworkflows%2Fmain.yml",
+          "raw_url": "https://github.com/OUXT-Polaris/quaternion_operation/raw/27f7bdf58554a25e8fde44013bf6b957e8da6c48/.github%2Fworkflows%2Fmain.yml",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/quaternion_operation/contents/.github%2Fworkflows%2Fmain.yml?ref=27f7bdf58554a25e8fde44013bf6b957e8da6c48",
+          "patch": "@@ -0,0 +1,51 @@\n+name: ROS2-Eloquent\n+\n+on: [push, pull_request]\n+\n+jobs:\n+    job1:\n+        name: Build\n+        runs-on: ubuntu-18.04\n+        steps:\n+            - name: ROS2 Install\n+              run: |\n+                  # Ref: https://index.ros.org/doc/ros2/Installation/Eloquent/Linux-Install-Debians/\n+                  sudo locale-gen en_US en_US.UTF-8\n+                  sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8\n+                  export LANG=en_US.UTF-8\n+                  sudo apt update && sudo apt install curl gnupg2 lsb-release\n+                  curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -\n+                  sudo sh -c 'echo \"deb [arch=amd64,arm64] http://packages.ros.org/ros2/ubuntu `lsb_release -cs` main\" > /etc/apt/sources.list.d/ros2-latest.list'\n+                  sudo apt update\n+                  sudo apt install ros-eloquent-desktop\n+                  source /opt/ros/eloquent/setup.bash\n+            - uses: actions/checkout@v2-beta\n+            - name: Copy repository\n+              run: |\n+                  mkdir -p ~/ros2_ws/src/quaternion_operation\n+                  cp -rf . ~/ros2_ws/src/quaternion_operation\n+            - name: Install dependencies\n+              run: |\n+                  source /opt/ros/eloquent/setup.bash\n+                  sudo apt install -y python-rosdep\n+                  sudo rosdep init\n+                  rosdep update\n+                  cd ~/ros2_ws/src\n+                  rosdep install -r -y --from-paths . --ignore-src\n+            - name: Build packages\n+              run: |\n+                  source /opt/ros/eloquent/setup.bash\n+                  # Install colcon\n+                  # Ref: https://index.ros.org/doc/ros2/Tutorials/Colcon-Tutorial/\n+                  sudo apt install python3-colcon-common-extensions\n+                  cd ~/ros2_ws\n+                  colcon build --packages-select robotx_behavior_tree\n+                  colcon build\n+                  source ~/ros2_ws/install/setup.bash\n+            - name: Test packages\n+              run: |\n+                  source /opt/ros/eloquent/setup.bash\n+                  source ~/ros2_ws/install/setup.bash\n+                  cd ~/ros2_ws\n+                  colcon test\n+                  colcon test-result --verbose"
+        }
+      ]
+    },
+    {
+      "author": "sloretz",
+      "date": "2019-04-22T22:53:38Z",
+      "sha": "f1b692b29165e5a5f20201b88ceaa036f596ff9f",
+      "message": "Fixed typo in license name",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "ebbe0ffb23d0c1e3fcfde641f072251c37033e20",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/OUXT-Polaris/quaternion_operation/blob/f1b692b29165e5a5f20201b88ceaa036f596ff9f/package.xml",
+          "raw_url": "https://github.com/OUXT-Polaris/quaternion_operation/raw/f1b692b29165e5a5f20201b88ceaa036f596ff9f/package.xml",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/quaternion_operation/contents/package.xml?ref=f1b692b29165e5a5f20201b88ceaa036f596ff9f",
+          "patch": "@@ -6,7 +6,7 @@\n \n   <maintainer email=\"ms.kataoka@gmail.com\">Masaya Kataoka</maintainer>\n \n-  <license>Aoache v2</license>\n+  <license>Apache License 2.0</license>\n \n   <buildtool_depend>catkin</buildtool_depend>\n   <build_depend>geometry_msgs</build_depend>"
+        }
+      ]
+    }
+  ]
+}

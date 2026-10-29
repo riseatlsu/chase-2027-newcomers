@@ -1,0 +1,201 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T05:50:54Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "osrf",
+    "repo": "nodl_to_policy"
+  },
+  "data": [
+    {
+      "author": "aprotyas",
+      "date": "2021-06-17T16:07:33Z",
+      "sha": "9010469cc771526237bf7741f242528131a89889",
+      "message": "Initial development of the NoDL conversion module\n\nSigned-off-by: Abrar Rahman Protyasha <abrar@openrobotics.org>",
+      "files_changed": 8,
+      "additions": 299,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "664488c6c985400a0eb5238e25adf27fecbbda78",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/osrf/nodl_to_policy/blob/9010469cc771526237bf7741f242528131a89889/README.md",
+          "raw_url": "https://github.com/osrf/nodl_to_policy/raw/9010469cc771526237bf7741f242528131a89889/README.md",
+          "contents_url": "https://api.github.com/repos/osrf/nodl_to_policy/contents/README.md?ref=9010469cc771526237bf7741f242528131a89889",
+          "patch": "@@ -1,5 +1,7 @@\n # nodl_to_policy\n \n+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)\n+\n This repository contains tooling to generate a\n [ROS 2 Access Control Policy](https://design.ros2.org/articles/ros2_access_control_policies.html)\n from the [Node Interface Definition Language (NoDL)](https://github.com/ros2/design/pull/266)"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "nodl_to_policy/_command/__init__.py",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/osrf/nodl_to_policy/blob/9010469cc771526237bf7741f242528131a89889/nodl_to_policy%2F_command%2F__init__.py",
+          "raw_url": "https://github.com/osrf/nodl_to_policy/raw/9010469cc771526237bf7741f242528131a89889/nodl_to_policy%2F_command%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/osrf/nodl_to_policy/contents/nodl_to_policy%2F_command%2F__init__.py?ref=9010469cc771526237bf7741f242528131a89889"
+        },
+        {
+          "sha": "e317f21bc3a9a02de7141236926774e9922daf8a",
+          "filename": "nodl_to_policy/_command/_nodl_to_policy.py",
+          "status": "added",
+          "additions": 46,
+          "deletions": 0,
+          "changes": 46,
+          "blob_url": "https://github.com/osrf/nodl_to_policy/blob/9010469cc771526237bf7741f242528131a89889/nodl_to_policy%2F_command%2F_nodl_to_policy.py",
+          "raw_url": "https://github.com/osrf/nodl_to_policy/raw/9010469cc771526237bf7741f242528131a89889/nodl_to_policy%2F_command%2F_nodl_to_policy.py",
+          "contents_url": "https://api.github.com/repos/osrf/nodl_to_policy/contents/nodl_to_policy%2F_command%2F_nodl_to_policy.py?ref=9010469cc771526237bf7741f242528131a89889",
+          "patch": "@@ -0,0 +1,46 @@\n+# Copyright 2021 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+import argparse\n+from typing import Any, List, Optional\n+\n+from ros2cli.command import CommandExtension\n+from ros2cli.command import add_subparsers_on_demand\n+\n+\n+class _NoDLToPolicyCommand(CommandExtension):\n+    \"\"\"Convert node interface descriptions exported from packages.\"\"\"\n+\n+    def add_arguments(\n+            self, parser: argparse.ArgumentParser, cli_name: str, *, argv: Optional[List] = None):\n+        self._subparser = parser\n+        # get verb extensions and let them add their arguments\n+        add_subparsers_on_demand(\n+            parser,\n+            cli_name,\n+            dest='_verb',\n+            group_name='nodl_to_policy.verb',\n+            required=False,\n+            argv=argv\n+        )\n+\n+    def main(self, *, parser: argparse.ArgumentParser, args: Any) -> int:\n+        if not hasattr(args, '_verb'):\n+            # in case no verb was passed\n+            self._subparser.print_help()\n+            return 0\n+        extension = getattr(args, '_verb')\n+\n+        # call the verb's main method\n+        return extension.main(args=args)"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "nodl_to_policy/_verb/__init__.py",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/osrf/nodl_to_policy/blob/9010469cc771526237bf7741f242528131a89889/nodl_to_policy%2F_verb%2F__init__.py",
+          "raw_url": "https://github.com/osrf/nodl_to_policy/raw/9010469cc771526237bf7741f242528131a89889/nodl_to_policy%2F_verb%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/osrf/nodl_to_policy/contents/nodl_to_policy%2F_verb%2F__init__.py?ref=9010469cc771526237bf7741f242528131a89889"
+        },
+        {
+          "sha": "440c02c0297a0b18ee820adcfbae5bbc63203882",
+          "filename": "nodl_to_policy/_verb/_convert.py",
+          "status": "added",
+          "additions": 73,
+          "deletions": 0,
+          "changes": 73,
+          "blob_url": "https://github.com/osrf/nodl_to_policy/blob/9010469cc771526237bf7741f242528131a89889/nodl_to_policy%2F_verb%2F_convert.py",
+          "raw_url": "https://github.com/osrf/nodl_to_policy/raw/9010469cc771526237bf7741f242528131a89889/nodl_to_policy%2F_verb%2F_convert.py",
+          "contents_url": "https://api.github.com/repos/osrf/nodl_to_policy/contents/nodl_to_policy%2F_verb%2F_convert.py?ref=9010469cc771526237bf7741f242528131a89889",
+          "patch": "@@ -0,0 +1,73 @@\n+# Copyright 2021 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+import os\n+import sys\n+import argparse\n+import pathlib\n+from argcomplete.completers import FilesCompleter\n+\n+import nodl\n+from nodl._index import _FILE_EXTENSION as _NODL_FILE_EXTENSION\n+from ros2cli.verb import VerbExtension\n+\n+from nodl_to_policy.policy import (\n+    convert_to_policy,\n+    write_policy,\n+    _POLICY_FILE_EXTENSION\n+)\n+\n+class _ConvertVerb(VerbExtension):\n+    \"\"\"Convert NoDL XML documents to ROS 2 Access Control Policies\"\"\"\n+\n+    def add_arguments(self, parser: argparse.ArgumentParser, cli_name: None = None) -> None:\n+        arg = parser.add_argument(\n+            'NODL_FILE_PATHS',\n+            nargs='*',\n+            default=[],\n+            metavar='nodl_file',\n+            type=pathlib.Path,\n+            help=f'Specific {_NODL_FILE_EXTENSION} file(s) to convert.'\n+        )\n+        arg.completer = FilesCompleter(allowednames=[_NODL_FILE_EXTENSION], directories=False)\n+\n+        parser.add_argument(\n+            'POLICY_FILE_PATH',\n+            metavar='policy_file',\n+            type=pathlib.Path,\n+            help='Path of the policy XML file'\n+        ).completer = FilesCompleter(allowednames=[_POLICY_FILE_EXTENSION], directories=False)\n+\n+        parser.add_argument('-p', '--print', action='store_true', help='Print converted output.')\n+\n+    def main(self, *, args: argparse.Namespace) -> int:\n+        if not args.NODL_FILE_PATHS:\n+            print('No files to validate', file=sys.stderr)\n+            return 1\n+\n+        for nodl_file_path in args.NODL_FILE_PATHS:\n+            if not nodl_file_path.is_file():\n+                print(f'{nodl_file_path} is not a file')\n+                return 1\n+\n+            try:\n+                nodl_description = nodl.parse(path=nodl_file_path)\n+            except nodl.errors.NoDLError as e:\n+                print(f'Failed to parse {nodl_file_path}', file=sys.stderr)\n+                print(e, file=sys.stderr)\n+                return 1\n+\n+            policy = convert_to_policy(args.POLICY_FILE_PATH, nodl_description)\n+            write_policy(args.POLICY_FILE_PATH, policy)\n+        return 0"
+        },
+        {
+          "sha": "d8e81ddbba87e6fbf38ba23e3958d26f21062018",
+          "filename": "nodl_to_policy/policy.py",
+          "status": "added",
+          "additions": 160,
+          "deletions": 0,
+          "changes": 160,
+          "blob_url": "https://github.com/osrf/nodl_to_policy/blob/9010469cc771526237bf7741f242528131a89889/nodl_to_policy%2Fpolicy.py",
+          "raw_url": "https://github.com/osrf/nodl_to_policy/raw/9010469cc771526237bf7741f242528131a89889/nodl_to_policy%2Fpolicy.py",
+          "contents_url": "https://api.github.com/repos/osrf/nodl_to_policy/contents/nodl_to_policy%2Fpolicy.py?ref=9010469cc771526237bf7741f242528131a89889",
+          "patch": "@@ -0,0 +1,160 @@\n+# Copyright 2021 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+import pathlib\n+from typing import Dict, List, Optional, Tuple\n+\n+from lxml import etree\n+\n+import nodl  # noqa: F401\n+from nodl.types import (\n+    Node,\n+    PubSubRole,\n+    ServerClientRole,\n+)\n+\n+from sros2.policy import (\n+    POLICY_VERSION,\n+    dump_policy,\n+    load_policy,\n+)\n+\n+\n+_POLICY_FILE_EXTENSION = '.policy.xml'\n+\n+\n+def get_policy(policy_file_path: pathlib.Path) -> etree._ElementTree:\n+    # Reference: https://github.com/ros2/sros2/blob/e5e90f05c3d800c51648e02d48d30ed4d6158820/sros2/sros2/verb/generate_policy.py#L60-L68\n+    if policy_file_path.is_file():\n+        return load_policy(policy_file_path)\n+    else:\n+        enclaves = etree.Element('enclaves')\n+        policy = etree.Element('policy')\n+        policy.attrib['version'] = POLICY_VERSION\n+        policy.append(enclaves)\n+        return policy\n+\n+\n+def get_profile(policy: etree._ElementTree, node_name: str) -> etree._ElementTree:\n+    enclave = policy.find(path=f'enclaves/enclave[@path=\"\"]')\n+    if enclave is None:\n+        enclave = etree.Element('enclave')\n+        # unqualified enclave path for now, refer to https://design.ros2.org/articles/ros2_security_enclaves.html\n+        enclave.attrib['path'] = ''\n+        profiles = etree.Element('profiles')\n+        enclave.append(profiles)\n+        enclaves = policy.find('enclaves')\n+        enclaves.append(enclave)\n+\n+    profile = enclave.find(path=f'profiles/profile[@ns=\"\"][@node=\"{node_name}\"]')\n+    if profile is None:\n+        profile = etree.Element('profile')\n+        # namespace information not provided in NoDL description yet\n+        profile.attrib['ns'] = ''\n+        profile.attrib['node'] = node_name\n+        profiles = enclave.find('profiles')\n+        profiles.append(profile)\n+\n+    return profile\n+\n+\n+def get_permission(profile: etree._ElementTree, permission_type: str, rule_type: str, rule_expression: str) -> etree._ElementTree:\n+    permissions = profile.find(path=f'{permission_type}s[@{rule_type}=\"{rule_expression}\"]')\n+    if permissions is None:\n+        permissions = etree.Element(permission_type + 's')\n+        permissions.attrib[rule_type] = rule_expression\n+        profile.append(permissions)\n+    return permissions\n+\n+\n+def add_permission(profile: etree._ElementTree, node: Node, permission_type: str, rule_type: str, rule_expression: str, expressions: Dict) -> None:\n+    # get permission\n+    permissions = get_permission(profile, permission_type, rule_type, rule_expression)\n+\n+    # add permission\n+    for expression_name in expressions:\n+        permission = etree.Element(permission_type)\n+        if expression_name.startswith(node.name + '/'):\n+            permission.text = '~' + expression_name[len(node.name):]\n+        elif expression_name.startswith('/'):\n+            permission.text = expression_name[len('/'):]\n+        else:\n+            permission.text = expression_name\n+        permissions.append(permission)\n+\n+\n+def convert_to_policy(policy_file_path: pathlib.Path, nodl_description: List[Node]) -> etree._ElementTree:\n+    policy = get_policy(policy_file_path)\n+\n+    for node in nodl_description:\n+        # profile: need to find enclave path and node namespace somehow\n+        profile = get_profile(policy, node.name)\n+\n+        # parameters? Not specified in access control policy\n+        subscribe_topics, publish_topics = _get_topics_by_role(node.topics)\n+        reply_services, request_services = _get_services_by_role(node.services)\n+        reply_actions, request_actions = _get_actions_by_role(node.actions)\n+\n+        if len(subscribe_topics) != 0:\n+            add_permission(profile, node, 'topic', 'subscribe', 'ALLOW', subscribe_topics)\n+        if len(publish_topics) != 0:\n+            add_permission(profile, node, 'topic', 'publish', 'ALLOW', publish_topics)\n+        if len(reply_services) != 0:\n+            add_permission(profile, node, 'service', 'reply', 'ALLOW', reply_services)\n+        if len(request_services) != 0:\n+            add_permission(profile, node, 'service', 'request', 'ALLOW', request_services)\n+        if len(reply_actions) != 0:\n+            add_permission(profile, node, 'action', 'execute', 'ALLOW', reply_actions)\n+        if len(request_actions) != 0:\n+            add_permission(profile, node, 'action', 'call', 'ALLOW', request_actions)\n+\n+    return policy\n+\n+\n+def write_policy(policy_file_path: pathlib.Path, policy: etree._ElementTree) -> None:\n+    with open(policy_file_path, 'w') as stream:\n+        dump_policy(policy, stream)\n+\n+\n+def _get_topics_by_role(topics: Optional[Dict]) -> Tuple[Dict, Dict]:\n+    subscribe_topics = {}\n+    publish_topics = {}\n+    for _, topic in topics.items():\n+        if PubSubRole(topic.role) is PubSubRole.SUBSCRIPTION:\n+            subscribe_topics[topic.name] = topic\n+        elif PubSubRole(topic.role) is PubSubRole.PUBLISHER:\n+            publish_topics[topic.name] = topic\n+        else:  # PubSubRole(topic.role) is PubSubRole.BOTH\n+            subscribe_topics[topic.name] = topic\n+            publish_topics[topic.name] = topic\n+    return subscribe_topics, publish_topics\n+\n+\n+def _get_services_by_role(services: Optional[Dict]) -> Tuple[Dict, Dict]:\n+    reply_services = {}\n+    request_services = {}\n+    for _, service in services.items():\n+        if ServerClientRole(service.role) is ServerClientRole.CLIENT:\n+            request_services[service.name] = service\n+        elif ServerClientRole(service.role) is ServerClientRole.SERVER:\n+            reply_services[service.name] = service\n+        else:  # ServerClientRole(service.role) is ServerClientRole.BOTH\n+            request_services[service.name] = service\n+            reply_services[service.name] = service\n+\n+    return reply_services, request_services\n+\n+\n+def _get_actions_by_role(actions: Optional[Dict]) -> Tuple[Dict, Dict]:\n+    return _get_services_by_role(actions)"
+        },
+        {
+          "sha": "51170422e03e3648902479f1355636c47b9dda8e",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 0,
+          "changes": 11,
+          "blob_url": "https://github.com/osrf/nodl_to_policy/blob/9010469cc771526237bf7741f242528131a89889/package.xml",
+          "raw_url": "https://github.com/osrf/nodl_to_policy/raw/9010469cc771526237bf7741f242528131a89889/package.xml",
+          "contents_url": "https://api.github.com/repos/osrf/nodl_to_policy/contents/package.xml?ref=9010469cc771526237bf7741f242528131a89889",
+          "patch": "@@ -10,11 +10,22 @@\n \n   <exec_depend>ros2nodl</exec_depend>\n   <exec_depend>nodl_python</exec_depend>\n+  <exec_depend>python3-argcomplete</exec_depend>\n+  <exec_depend>ros2cli</exec_depend>\n+  <exec_depend>ros2pkg</exec_depend>\n+  <exec_depend>ros2run</exec_depend>\n \n+  <test_depend>ament_lint_auto</test_depend>\n+  <test_depend>ament_lint_common</test_depend>\n   <test_depend>ament_copyright</test_depend>\n   <test_depend>ament_flake8</test_depend>\n   <test_depend>ament_pep257</test_depend>\n+  <test_depend>ament_mypy</test_depend>\n   <test_depend>python3-pytest</test_depend>\n+  <test_depend>python3-pytest-mock</test_depend>\n+  \n+  <test_depend>ros_testing</test_depend>\n+  <test_depend>test_msgs</test_depend>\n \n   <export>\n     <build_type>ament_python</build_type>"
+        },
+        {
+          "sha": "4992efa13e398f20123ab464f0effa9f8b53b68e",
+          "filename": "setup.py",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/osrf/nodl_to_policy/blob/9010469cc771526237bf7741f242528131a89889/setup.py",
+          "raw_url": "https://github.com/osrf/nodl_to_policy/raw/9010469cc771526237bf7741f242528131a89889/setup.py",
+          "contents_url": "https://api.github.com/repos/osrf/nodl_to_policy/contents/setup.py?ref=9010469cc771526237bf7741f242528131a89889",
+          "patch": "@@ -25,6 +25,7 @@\n         'Intended Audience :: Developers',\n         'License :: OSI Approved :: Apache Software License 2.0',\n         'Programming Language :: Python',\n+        'Topic :: Software Development',\n     ],\n     description='NoDL description to ROS 2 policy generator',\n     long_description='Package to generate a ROS 2 Access Control Policy from \\\n@@ -34,5 +35,11 @@\n     entry_points={\n         'console_scripts': [\n         ],\n+        'ros2cli.command': [\n+            'nodl_to_policy = nodl_to_policy._command._nodl_to_policy:_NoDLToPolicyCommand',\n+        ],\n+        'nodl_to_policy.verb': [\n+            'convert = nodl_to_policy._verb._convert:_ConvertVerb'\n+        ]\n     },\n )"
+        }
+      ]
+    },
+    {
+      "author": "wjwwood",
+      "date": "2021-08-11T20:22:05Z",
+      "sha": "986c0545506c5cd88df82fd8d1ddde37a362d024",
+      "message": "changelogs\n\nSigned-off-by: William Woodall <william@osrfoundation.org>",
+      "files_changed": 1,
+      "additions": 8,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "c3a74288d5cbd90944cc54a11ac9626187b47750",
+          "filename": "CHANGELOG.rst",
+          "status": "added",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/osrf/nodl_to_policy/blob/986c0545506c5cd88df82fd8d1ddde37a362d024/CHANGELOG.rst",
+          "raw_url": "https://github.com/osrf/nodl_to_policy/raw/986c0545506c5cd88df82fd8d1ddde37a362d024/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/osrf/nodl_to_policy/contents/CHANGELOG.rst?ref=986c0545506c5cd88df82fd8d1ddde37a362d024",
+          "patch": "@@ -0,0 +1,8 @@\n+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n+Changelog for package nodl_to_policy\n+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n+\n+Forthcoming\n+-----------\n+* Inital release.\n+* Contributors: Abrar Rahman Protyasha, Chris Lalancette"
+        }
+      ]
+    },
+    {
+      "author": "Abrar Rahman Protyasha",
+      "date": "2021-06-02T22:58:18Z",
+      "sha": "c66fed4801c88128235791fe9de7df79fc8c0fbb",
+      "message": "Initial commit\n\nSigned-off-by: Abrar Rahman Protyasha <abrar@openrobotics.org>",
+      "files_changed": 2,
+      "additions": 208,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "d645695673349e3947e8e5ae42332d0ac3164cd7",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 202,
+          "deletions": 0,
+          "changes": 202,
+          "blob_url": "https://github.com/osrf/nodl_to_policy/blob/c66fed4801c88128235791fe9de7df79fc8c0fbb/LICENSE",
+          "raw_url": "https://github.com/osrf/nodl_to_policy/raw/c66fed4801c88128235791fe9de7df79fc8c0fbb/LICENSE",
+          "contents_url": "https://api.github.com/repos/osrf/nodl_to_policy/contents/LICENSE?ref=c66fed4801c88128235791fe9de7df79fc8c0fbb",
+          "patch": "@@ -0,0 +1,202 @@\n+\n+                                 Apache License\n+                           Version 2.0, January 2004\n+                        http://www.apache.org/licenses/\n+\n+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION\n+\n+   1. Definitions.\n+\n+      \"License\" shall mean the terms and conditions for use, reproduction,\n+      and distribution as defined by Sections 1 through 9 of this document.\n+\n+      \"Licensor\" shall mean the copyright owner or entity authorized by\n+      the copyright owner that is granting the License.\n+\n+      \"Legal Entity\" shall mean the union of the acting entity and all\n+      other entities that control, are controlled by, or are under common\n+      control with that entity. For the purposes of this definition,\n+      \"control\" means (i) the power, direct or indirect, to cause the\n+      direction or management of such entity, whether by contract or\n+      otherwise, or (ii) ownership of fifty percent (50%) or more of the\n+      outstanding shares, or (iii) beneficial ownership of such entity.\n+\n+      \"You\" (or \"Your\") shall mean an individual or Legal Entity\n+      exercising permissions granted by this License.\n+\n+      \"Source\" form shall mean the preferred form for making modifications,\n+      including but not limited to software source code, documentation\n+      source, and configuration files.\n+\n+      \"Object\" form shall mean any form resulting from mechanical\n+      transformation or translation of a Source form, including but\n+      not limited to compiled object code, generated documentation,\n+      and conversions to other media types.\n+\n+      \"Work\" shall mean the work of authorship, whether in Source or\n+      Object form, made available under the License, as indicated by a\n+      copyright notice that is included in or attached to the work\n+      (an example is provided in the Appendix below).\n+\n+      \"Derivative Works\" shall mean any work, whether in Source or Object\n+      form, that is based on (or derived from) the Work and for which the\n+      editorial revisions, annotations, elaborations, or other modifications\n+      represent, as a whole, an original work of authorship. For the purposes\n+      of this License, Derivative Works shall not include works that remain\n+      separable from, or merely link (or bind by name) to the interfaces of,\n+      the Work and Derivative Works thereof.\n+\n+      \"Contribution\" shall mean any work of authorship, including\n+      the original version of the Work and any modifications or additions\n+      to that Work or Derivative Works thereof, that is intentionally\n+      submitted to Licensor for inclusion in the Work by the copyright owner\n+      or by an individual or Legal Entity authorized to submit on behalf of\n+      the copyright owner. For the purposes of this definition, \"submitted\"\n+      means any form of electronic, verbal, or written communication sent\n+      to the Licensor or its representatives, including but not limited to\n+      communication on electronic mailing lists, source code control systems,\n+      and issue tracking systems that are managed by, or on behalf of, the\n+      Licensor for the purpose of discussing and improving the Work, but\n+      excluding communication that is conspicuously marked or otherwise\n+      designated in writing by the copyright owner as \"Not a Contribution.\"\n+\n+      \"Contributor\" shall mean Licensor and any individual or Legal Entity\n+      on behalf of whom a Contribution has been received by Licensor and\n+      subsequently incorporated within the Work.\n+\n+   2. Grant of Copyright License. Subject to the terms and conditions of\n+      this License, each Contributor hereby grants to You a perpetual,\n+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n+      copyright license to reproduce, prepare Derivative Works of,\n+      publicly display, publicly perform, sublicense, and distribute the\n+      Work and such Derivative Works in Source or Object form.\n+\n+   3. Grant of Patent License. Subject to the terms and conditions of\n+      this License, each Contributor hereby grants to You a perpetual,\n+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n+      (except as stated in this section) patent license to make, have made,\n+      use, offer to sell, sell, import, and otherwise transfer the Work,\n+      where such license applies only to those patent claims licensable\n+      by such Contributor that are necessarily infringed by their\n+      Contribution(s) alone or by combination of their Contribution(s)\n+      with the Work to which such Contribution(s) was submitted. If You\n+      institute patent litigation against any entity (including a\n+      cross-claim or counterclaim in a lawsuit) alleging that the Work\n+      or a Contribution incorporated within the Work constitutes direct\n+      or contributory patent infringement, then any patent licenses\n+      granted to You under this License for that Work shall terminate\n+      as of the date such litigation is filed.\n+\n+   4. Redistribution. You may reproduce and distribute copies of the\n+      Work or Derivative Works thereof in any medium, with or without\n+      modifications, and in Source or Object form, provided that You\n+      meet the following conditions:\n+\n+      (a) You must give any other recipients of the Work or\n+          Derivative Works a copy of this License; and\n+\n+      (b) You must cause any modified files to carry prominent notices\n+          stating that You changed the files; and\n+\n+      (c) You must retain, in the Source form of any Derivative Works\n+          that You distribute, all copyright, patent, trademark, and\n+          attribution notices from the Source form of the Work,\n+          excluding those notices that do not pertain to any part of\n+          the Derivative Works; and\n+\n+      (d) If the Work includes a \"NOTICE\" text file as part of its\n+          distribution, then any Derivative Works that You distribute must\n+          include a readable copy of the attribution notices contained\n+          within such NOTICE file, excluding those notices that do not\n+          pertain to any part of the Derivative Works, in at least one\n+          of the following places: within a NOTICE text file distributed\n+          as part of the Derivative Works; within the Source form or\n+          documentation, if provided along with the Derivative Works; or,\n+          within a display generated by the Derivative Works, if and\n+          wherever such third-party notices normally appear. The contents\n+          of the NOTICE file are for informational purposes only and\n+          do not modify the License. You may add Your own attribution\n+          notices within Derivative Works that You distribute, alongside\n+          or as an addendum to the NOTICE text from the Work, provided\n+          that such additional attribution notices cannot be construed\n+          as modifying the License.\n+\n+      You may add Your own copyright statement to Your modifications and\n+      may provide additional or different license terms and conditions\n+      for use, reproduction, or distribution of Your modifications, or\n+      for any such Derivative Works as a whole, provided Your use,\n+      reproduction, and distribution of the Work otherwise complies with\n+      the conditions stated in this License.\n+\n+   5. Submission of Contributions. Unless You explicitly state otherwise,\n+      any Contribution intentionally submitted for inclusion in the Work\n+      by You to the Licensor shall be under the terms and conditions of\n+      this License, without any additional terms or conditions.\n+      Notwithstanding the above, nothing herein shall supersede or modify\n+      the terms of any separate license agreement you may have executed\n+      with Licensor regarding such Contributions.\n+\n+   6. Trademarks. This License does not grant permission to use the trade\n+      names, trademarks, service marks, or product names of the Licensor,\n+      except as required for reasonable and customary use in describing the\n+      origin of the Work and reproducing the content of the NOTICE file.\n+\n+   7. Disclaimer of Warranty. Unless required by applicable law or\n+      agreed to in writing, Licensor provides the Work (and each\n+      Contributor provides its Contributions) on an \"AS IS\" BASIS,\n+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or\n+      implied, including, without limitation, any warranties or conditions\n+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A\n+      PARTICULAR PURPOSE. You are solely responsible for determining the\n+      appropriateness of using or redistributing the Work and assume any\n+      risks associated with Your exercise of permissions under this License.\n+\n+   8. Limitation of Liability. In no event and under no legal theory,\n+      whether in tort (including negligence), contract, or otherwise,\n+      unless required by applicable law (such as deliberate and grossly\n+      negligent acts) or agreed to in writing, shall any Contributor be\n+      liable to You for damages, including any direct, indirect, special,\n+      incidental, or consequential damages of any character arising as a\n+      result of this License or out of the use or inability to use the\n+      Work (including but not limited to damages for loss of goodwill,\n+      work stoppage, computer failure or malfunction, or any and all\n+      other commercial damages or losses), even if such Contributor\n+      has been advised of the possibility of such damages.\n+\n+   9. Accepting Warranty or Additional Liability. While redistributing\n+      the Work or Derivative Works thereof, You may choose to offer,\n+      and charge a fee for, acceptance of support, warranty, indemnity,\n+      or other liability obligations and/or rights consistent with this\n+      License. However, in accepting such obligations, You may act only\n+      on Your own behalf and on Your sole responsibility, not on behalf\n+      of any other Contributor, and only if You agree to indemnify,\n+      defend, and hold each Contributor harmless for any liability\n+      incurred by, or claims asserted against, such Contributor by reason\n+      of your accepting any such warranty or additional liability.\n+\n+   END OF TERMS AND CONDITIONS\n+\n+   APPENDIX: How to apply the Apache License to your work.\n+\n+      To apply the Apache License to your work, attach the following\n+      boilerplate notice, with the fields enclosed by brackets \"[]\"\n+      replaced with your own identifying information. (Don't include\n+      the brackets!)  The text should be enclosed in the appropriate\n+      comment syntax for the file format. We also recommend that a\n+      file or class name and description of purpose be included on the\n+      same \"printed page\" as the copyright notice for easier\n+      identification within third-party archives.\n+\n+   Copyright [yyyy] [name of copyright owner]\n+\n+   Licensed under the Apache License, Version 2.0 (the \"License\");\n+   you may not use this file except in compliance with the License.\n+   You may obtain a copy of the License at\n+\n+       http://www.apache.org/licenses/LICENSE-2.0\n+\n+   Unless required by applicable law or agreed to in writing, software\n+   distributed under the License is distributed on an \"AS IS\" BASIS,\n+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+   See the License for the specific language governing permissions and\n+   limitations under the License."
+        },
+        {
+          "sha": "226777d512eb3c06b28c74c6aa62946485d367b0",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/osrf/nodl_to_policy/blob/c66fed4801c88128235791fe9de7df79fc8c0fbb/README.md",
+          "raw_url": "https://github.com/osrf/nodl_to_policy/raw/c66fed4801c88128235791fe9de7df79fc8c0fbb/README.md",
+          "contents_url": "https://api.github.com/repos/osrf/nodl_to_policy/contents/README.md?ref=c66fed4801c88128235791fe9de7df79fc8c0fbb",
+          "patch": "@@ -0,0 +1,6 @@\n+# nodl_to_policy\n+\n+This repository contains tooling to generate a\n+[ROS 2 Access Control Policy](https://design.ros2.org/articles/ros2_access_control_policies.html)\n+from the [Node Interface Definition Language (NoDL)](https://github.com/ros2/design/pull/266)\n+description of a ROS graph, primarily to be used in conjunction with the `SROS2` utilities."
+        }
+      ]
+    },
+    {
+      "author": "clalancette",
+      "date": "2021-06-30T11:58:26Z",
+      "sha": "e1c69929e5c27ec02ef1ee6ad0bedd4c4bb62b38",
+      "message": "Initial commit.\n\nSigned-off-by: Chris Lalancette <clalancette@openrobotics.org>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "26a1c71820a525c840981aea5e72c855a8bfcbb0",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/osrf/nodl_to_policy/blob/e1c69929e5c27ec02ef1ee6ad0bedd4c4bb62b38/README.md",
+          "raw_url": "https://github.com/osrf/nodl_to_policy/raw/e1c69929e5c27ec02ef1ee6ad0bedd4c4bb62b38/README.md",
+          "contents_url": "https://api.github.com/repos/osrf/nodl_to_policy/contents/README.md?ref=e1c69929e5c27ec02ef1ee6ad0bedd4c4bb62b38",
+          "patch": "@@ -0,0 +1 @@\n+NoDL to Policy"
+        }
+      ]
+    }
+  ]
+}

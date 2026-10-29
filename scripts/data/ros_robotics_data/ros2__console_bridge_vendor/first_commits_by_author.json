@@ -1,0 +1,419 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T04:49:52Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ros2",
+    "repo": "console_bridge_vendor"
+  },
+  "data": [
+    {
+      "author": "clalancette",
+      "date": "2020-05-27T15:31:39Z",
+      "sha": "10d7daef21275cb66797d6b5b580b6e1c9185d4c",
+      "message": "Make sure console_bridge_vendor is relocatable. (#9)\n\nUpstream console_bridge 0.5.1 contains the fix to use a\r\nTARGET for console_bridge, so switch to that.\r\n\r\nSigned-off-by: Chris Lalancette <clalancette@openrobotics.org>",
+      "files_changed": 1,
+      "additions": 6,
+      "deletions": 5,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "c0fb0bae6631582c31091025fcb4db5b263a4c28",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 5,
+          "changes": 11,
+          "blob_url": "https://github.com/ros2/console_bridge_vendor/blob/10d7daef21275cb66797d6b5b580b6e1c9185d4c/CMakeLists.txt",
+          "raw_url": "https://github.com/ros2/console_bridge_vendor/raw/10d7daef21275cb66797d6b5b580b6e1c9185d4c/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros2/console_bridge_vendor/contents/CMakeLists.txt?ref=10d7daef21275cb66797d6b5b580b6e1c9185d4c",
+          "patch": "@@ -49,10 +49,11 @@ macro(build_console_bridge)\n   list(APPEND extra_cmake_args \"-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}\")\n \n   include(ExternalProject)\n-  # Get console_bridge 0.4.1\n-  externalproject_add(console_bridge-0.4.1\n-    URL https://github.com/ros/console_bridge/archive/0.4.1.tar.gz\n-    URL_MD5 6bb0f640db1712cf2277e7923e7bab68\n+\n+  # Get console_bridge 0.5.1\n+  externalproject_add(console_bridge-0.5.1\n+    URL https://github.com/ros/console_bridge/archive/0.5.1.tar.gz\n+    URL_MD5 c49ac3396ef364862ea8aef5ce28bb66\n     TIMEOUT 600\n     CMAKE_ARGS\n       -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_install\n@@ -69,7 +70,7 @@ macro(build_console_bridge)\n   )\n endmacro()\n \n-if(NOT console_bridge_FOUND OR \"${console_bridge_VERSION}\" VERSION_LESS 0.4.1)\n+if(NOT console_bridge_FOUND OR \"${console_bridge_VERSION}\" VERSION_LESS 0.5.1)\n   build_console_bridge()\n endif()\n "
+        }
+      ]
+    },
+    {
+      "author": "ahcorde",
+      "date": "2020-05-27T13:02:28Z",
+      "sha": "d8d1205b915a6462faff26a60a0d673a5c65db9c",
+      "message": "QD Update Version Stability to stable version (#14)\n\nSigned-off-by: ahcorde <ahcorde@gmail.com>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "f977401469a7a7f3d5ae3ee502b7f595562ee4e5",
+          "filename": "QUALITY_DECLARATION.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/console_bridge_vendor/blob/d8d1205b915a6462faff26a60a0d673a5c65db9c/QUALITY_DECLARATION.md",
+          "raw_url": "https://github.com/ros2/console_bridge_vendor/raw/d8d1205b915a6462faff26a60a0d673a5c65db9c/QUALITY_DECLARATION.md",
+          "contents_url": "https://api.github.com/repos/ros2/console_bridge_vendor/contents/QUALITY_DECLARATION.md?ref=d8d1205b915a6462faff26a60a0d673a5c65db9c",
+          "patch": "@@ -14,7 +14,7 @@ Below are the rationales, notes, and caveats for this claim, organized by each r\n \n ### Version Stability [1.ii]\n \n-`console_bridge_vendor` is at or above a stable version, i.e. `>= 1.0.0`.\n+`console_bridge_vendor` is at a stable version, i.e. >= 1.0.0. The current version can be found in its [package.xml](./package.xml).\n \n ### Public API Declaration [1.iii]\n "
+        }
+      ]
+    },
+    {
+      "author": "cottsay",
+      "date": "2021-02-11T18:45:14Z",
+      "sha": "c6839f96cb80dd144d70c71fa838682384cc8e75",
+      "message": "Always preserve source permissions in vendor packages (#29)\n\nIn vendor packages where we're installing an executable, we use\r\nUSE_SOURCE_PERMISSIONS to make sure that the executable permissions on\r\nthe binaries are maintained when the external project's staging\r\ndirectory is recursively installed to the final installation directory.\r\n\r\nIn most of our vendor packages, we aren't using that flag where we don't\r\nexpect an executable binary to be installed. However, for reasons I\r\nwon't go into here, some systems use executable permissions on shared\r\nobject libraries as well. The linker seems to handle this on our behalf,\r\nbut we're losing the permissions during the recursive copy operation if\r\nwe don't use this flag.\r\n\r\nSigned-off-by: Scott K Logan <logans@cottsay.net>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "8c5e95981ae6a25ee165083e5475e913e76a726a",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros2/console_bridge_vendor/blob/c6839f96cb80dd144d70c71fa838682384cc8e75/CMakeLists.txt",
+          "raw_url": "https://github.com/ros2/console_bridge_vendor/raw/c6839f96cb80dd144d70c71fa838682384cc8e75/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros2/console_bridge_vendor/contents/CMakeLists.txt?ref=c6839f96cb80dd144d70c71fa838682384cc8e75",
+          "patch": "@@ -84,6 +84,7 @@ macro(build_console_bridge)\n       ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_install/\n     DESTINATION\n       ${CMAKE_INSTALL_PREFIX}\n+    USE_SOURCE_PERMISSIONS\n   )\n \n   set(console_bridge_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_install/${CMAKE_INSTALL_INCLUDEDIR})"
+        }
+      ]
+    },
+    {
+      "author": "marcoag",
+      "date": "2024-04-26T14:58:25Z",
+      "sha": "bebb7efc58b93d81a468bf9fa71b40df8bd564ae",
+      "message": "Changelog.\n\nSigned-off-by: Marco A. Gutierrez <marcogg@marcogg.com>",
+      "files_changed": 1,
+      "additions": 8,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "327417f4b7132db8343cacb616a4034f0270b444",
+          "filename": "CHANGELOG.rst",
+          "status": "added",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/ros2/console_bridge_vendor/blob/bebb7efc58b93d81a468bf9fa71b40df8bd564ae/CHANGELOG.rst",
+          "raw_url": "https://github.com/ros2/console_bridge_vendor/raw/bebb7efc58b93d81a468bf9fa71b40df8bd564ae/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ros2/console_bridge_vendor/contents/CHANGELOG.rst?ref=bebb7efc58b93d81a468bf9fa71b40df8bd564ae",
+          "patch": "@@ -0,0 +1,8 @@\n+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n+Changelog for package console_bridge_vendor\n+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n+\n+Forthcoming\n+-----------\n+* Update quality declaration doc (`#41 <https://github.com/ros2/console_bridge_vendor/issues/41>`_)\n+* Contributors: Christophe Bedard"
+        }
+      ]
+    },
+    {
+      "author": "christophebedard",
+      "date": "2024-04-23T20:44:25Z",
+      "sha": "e20efd4ec46b6074ba0dfb60d76a34ed53484c5e",
+      "message": "Update quality declaration doc (#41)\n\nSigned-off-by: Christophe Bedard <christophe.bedard@apex.ai>",
+      "files_changed": 1,
+      "additions": 15,
+      "deletions": 8,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "b23ac0250a7f70788825ff07d51e99392916a183",
+          "filename": "QUALITY_DECLARATION.md",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 8,
+          "changes": 23,
+          "blob_url": "https://github.com/ros2/console_bridge_vendor/blob/e20efd4ec46b6074ba0dfb60d76a34ed53484c5e/QUALITY_DECLARATION.md",
+          "raw_url": "https://github.com/ros2/console_bridge_vendor/raw/e20efd4ec46b6074ba0dfb60d76a34ed53484c5e/QUALITY_DECLARATION.md",
+          "contents_url": "https://api.github.com/repos/ros2/console_bridge_vendor/contents/QUALITY_DECLARATION.md?ref=e20efd4ec46b6074ba0dfb60d76a34ed53484c5e",
+          "patch": "@@ -4,7 +4,7 @@ This document is a declaration of software quality for the `console_bridge_vendo\n \n The package `console_bridge_vendor` claims to be in the **Quality Level 1** category.\n \n-Below are the rationales, notes, and caveats for this claim, organized by each requirement listed in the [Package Quality Categories in REP-2004](https://www.ros.org/reps/rep-2004.html) of the ROS2 developer guide.\n+Below are the rationales, notes, and caveats for this claim, organized by each requirement listed in the [Package Quality Categories in REP-2004](https://www.ros.org/reps/rep-2004.html).\n \n ## Version Policy [1]\n \n@@ -14,7 +14,8 @@ Below are the rationales, notes, and caveats for this claim, organized by each r\n \n ### Version Stability [1.ii]\n \n-`console_bridge_vendor` is at a stable version, i.e. >= 1.0.0. The current version can be found in its [package.xml](./package.xml).\n+`console_bridge_vendor` is at a stable version, i.e. >= 1.0.0.\n+The current version can be found in its [package.xml](./package.xml).\n \n ### Public API Declaration [1.iii]\n \n@@ -38,7 +39,8 @@ All changes will occur through a pull request, check the [ROS 2 Developer Guide]\n \n ### Contributor Origin [2.ii]\n \n-This package uses DCO as its confirmation of contributor origin policy. More information can be found in [CONTRIBUTING](./CONTRIBUTING.md).\n+This package uses DCO as its confirmation of contributor origin policy.\n+More information can be found in [CONTRIBUTING](./CONTRIBUTING.md).\n \n ### Peer Review Policy [2.iii]\n \n@@ -70,7 +72,8 @@ All pull requests must resolve related documentation changes before merging.\n \n ### License [3.iii]\n \n-The license for `console_bridge_vendor` is Apache 2.0, and a summary is in each source file, the type is declared in the [`package.xml`](./package.xml) manifest file, and a full copy of the license is in the `LICENSE` file. The vendored library, `libconsole-bridge-dev` license is BSD as stated in its quality declaration document (Section 5.iii).\n+The license for `console_bridge_vendor` is Apache 2.0, and a summary is in each source file, the type is declared in the [`package.xml`](./package.xml) manifest file, and a full copy of the license is in the `LICENSE` file.\n+The license of the vendored library, `libconsole-bridge-dev`, is BSD as stated in its quality declaration document (Section 5.iii).\n \n ### Copyright Statements [3.iv]\n \n@@ -80,21 +83,25 @@ The copyright holders each provide a statement of copyright in each source code\n \n ### Feature Testing [4.i]\n \n-`console_bridge_vendor` does not have feature testing. For vendored packages, this will be considered to be addressed in the external dependency.\n+`console_bridge_vendor` does not have feature testing.\n+For vendored packages, this will be considered to be addressed in the external dependency.\n \n ### Public API Testing [4.ii]\n \n-`console_bridge_vendor` does not have Public API testing. For vendored packages, this will be considered to be addressed in the external dependency.\n+`console_bridge_vendor` does not have Public API testing.\n+For vendored packages, this will be considered to be addressed in the external dependency.\n \n ### Coverage [4.iii]\n \n-`console_bridge_vendor` does not provide coverage testing. For vendored packages, this will be considered to be addressed in the external dependency.\n+`console_bridge_vendor` does not provide coverage testing.\n+For vendored packages, this will be considered to be addressed in the external dependency.\n \n ### Performance [4.iv]\n \n The Console Bridge package is benchmarked and the most recent test results can be found [here](http://build.ros2.org/view/Rci/job/Rci__benchmark_ubuntu_focal_amd64/BenchmarkTable/).\n \n-`console_bridge_vendor` does not provide performance testing. For vendored packages, this will be considered to be addressed in the external dependency.\n+`console_bridge_vendor` does not provide performance testing.\n+For vendored packages, this will be considered to be addressed in the external dependency.\n \n ### Linters and Static Analysis [4.v]\n "
+        }
+      ]
+    },
+    {
+      "author": "Yadunund",
+      "date": "2023-04-27T04:44:04Z",
+      "sha": "afa0c3183285e0052e2cbeb166e683754166c588",
+      "message": "1.7.0",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "1ff7dccd542e1d41459e1ce74ebf1fbd3210518c",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/console_bridge_vendor/blob/afa0c3183285e0052e2cbeb166e683754166c588/package.xml",
+          "raw_url": "https://github.com/ros2/console_bridge_vendor/raw/afa0c3183285e0052e2cbeb166e683754166c588/package.xml",
+          "contents_url": "https://api.github.com/repos/ros2/console_bridge_vendor/contents/package.xml?ref=afa0c3183285e0052e2cbeb166e683754166c588",
+          "patch": "@@ -4,7 +4,7 @@\n   schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"2\">\n   <name>console_bridge_vendor</name>\n-  <version>1.6.0</version>\n+  <version>1.7.0</version>\n   <description>\n     Wrapper around console_bridge, providing nothing but a dependency on console_bridge, on some systems.\n     On others, it provides an ExternalProject build of console_bridge."
+        }
+      ]
+    },
+    {
+      "author": "audrow",
+      "date": "2020-09-18T17:29:02Z",
+      "sha": "4b77b221c647bc50a0e28667497770b7d3cbfaf8",
+      "message": "Enable -Wall, -Wextra, and -Wpedantic (#20)\n\nSigned-off-by: Audrow Nash <audrow.nash@gmail.com>",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "98ba9678c8578658b9c74c2ddc6f866bb9e7f889",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ros2/console_bridge_vendor/blob/4b77b221c647bc50a0e28667497770b7d3cbfaf8/CMakeLists.txt",
+          "raw_url": "https://github.com/ros2/console_bridge_vendor/raw/4b77b221c647bc50a0e28667497770b7d3cbfaf8/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros2/console_bridge_vendor/contents/CMakeLists.txt?ref=4b77b221c647bc50a0e28667497770b7d3cbfaf8",
+          "patch": "@@ -59,6 +59,9 @@ macro(build_console_bridge)\n       -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_install\n       ${extra_cmake_args}\n       -Wno-dev\n+      -Wall\n+      -Wextra\n+      -Wpedantic\n   )\n \n   # The external project will install to the build folder, but we'll install that on make install."
+        }
+      ]
+    },
+    {
+      "author": "Crola1702",
+      "date": "2022-09-12T14:39:39Z",
+      "sha": "1d818435e8e6258fa00fe87c5eb1c477955d249f",
+      "message": "Fixes policy CMP0135 warning for CMake >= 3.24 (#36)\n\n* Fixes policy CMP0135 warning for CMake >= 3.24\r\n\r\nSigned-off-by: Crola1702 <cristobal.arroyo@ekumenlabs.com>",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "9fa3780b8b4ccec6b96f2ed43bf2a5b799d186c8",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/ros2/console_bridge_vendor/blob/1d818435e8e6258fa00fe87c5eb1c477955d249f/CMakeLists.txt",
+          "raw_url": "https://github.com/ros2/console_bridge_vendor/raw/1d818435e8e6258fa00fe87c5eb1c477955d249f/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros2/console_bridge_vendor/contents/CMakeLists.txt?ref=1d818435e8e6258fa00fe87c5eb1c477955d249f",
+          "patch": "@@ -17,6 +17,11 @@ option(FORCE_BUILD_VENDOR_PKG\n   \"Build console_bridge from source, even if system-installed package is available\"\n   OFF)\n \n+# Avoid DOWNLOAD_EXTRACT_TIMESTAMP warning for CMake >= 3.24\n+if(POLICY CMP0135)\n+  cmake_policy(SET CMP0135 NEW)\n+endif()\n+\n if(NOT FORCE_BUILD_VENDOR_PKG)\n   find_package(console_bridge QUIET)\n endif()"
+        }
+      ]
+    },
+    {
+      "author": "paudrow",
+      "date": "2022-05-05T17:20:01Z",
+      "sha": "bcc48159f3afc00308c029096938151dffb99e37",
+      "message": "1.5.1 (#34)\n\n* 1.5.0\r\n\r\nSigned-off-by: Audrow Nash <audrow@hey.com>\r\n\r\n* 1.5.1\r\n\r\nSigned-off-by: Audrow Nash <audrow@hey.com>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "5a405b6f00c99d24397c338a8595e9750fc1e403",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/console_bridge_vendor/blob/bcc48159f3afc00308c029096938151dffb99e37/package.xml",
+          "raw_url": "https://github.com/ros2/console_bridge_vendor/raw/bcc48159f3afc00308c029096938151dffb99e37/package.xml",
+          "contents_url": "https://api.github.com/repos/ros2/console_bridge_vendor/contents/package.xml?ref=bcc48159f3afc00308c029096938151dffb99e37",
+          "patch": "@@ -4,7 +4,7 @@\n   schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"2\">\n   <name>console_bridge_vendor</name>\n-  <version>1.4.0</version>\n+  <version>1.5.1</version>\n   <description>\n     Wrapper around console_bridge, providing nothing but a dependency on console_bridge, on some systems.\n     On others, it provides an ExternalProject build of console_bridge."
+        }
+      ]
+    },
+    {
+      "author": "sloretz",
+      "date": "2022-03-11T21:14:13Z",
+      "sha": "eb6227f0a6a42e88e676eb2b729d588b1f1dfea4",
+      "message": "Install headers to include/${PROJECT_NAME} (#33)\n\n* Install headers to include/${PROJECT_NAME}\r\n\r\nSigned-off-by: Shane Loretz <sloretz@osrfoundation.org>\r\n\r\n* Hardcode updated include path\r\n\r\nSigned-off-by: Shane Loretz <sloretz@osrfoundation.org>\r\n\r\n* Build 1.0.2 instead of patching\r\n\r\nSigned-off-by: Shane Loretz <sloretz@osrfoundation.org>\r\n\r\n* Use URL and URL_HASH\r\n\r\nSigned-off-by: Shane Loretz <sloretz@osrfoundation.org>",
+      "files_changed": 1,
+      "additions": 9,
+      "deletions": 7,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "e56cc43ad7cca3ae2ef7f801a5ab4f2b5017d1ec",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 7,
+          "changes": 16,
+          "blob_url": "https://github.com/ros2/console_bridge_vendor/blob/eb6227f0a6a42e88e676eb2b729d588b1f1dfea4/CMakeLists.txt",
+          "raw_url": "https://github.com/ros2/console_bridge_vendor/raw/eb6227f0a6a42e88e676eb2b729d588b1f1dfea4/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros2/console_bridge_vendor/contents/CMakeLists.txt?ref=eb6227f0a6a42e88e676eb2b729d588b1f1dfea4",
+          "patch": "@@ -26,7 +26,7 @@ macro(build_console_bridge)\n \n   set(extra_cmake_args\n     \"-DCMAKE_INSTALL_LIBDIR=${CMAKE_INSTALL_LIBDIR}\"\n-    \"-DCMAKE_INSTALL_INCLUDEDIR=${CMAKE_INSTALL_INCLUDEDIR}\"\n+    \"-DCMAKE_INSTALL_INCLUDEDIR=${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}\"\n   )\n   if(DEFINED CMAKE_BUILD_TYPE)\n     list(APPEND extra_cmake_args -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})\n@@ -64,10 +64,10 @@ macro(build_console_bridge)\n \n   include(ExternalProject)\n \n-  # Get console_bridge 0.5.1\n-  externalproject_add(console_bridge-1.0.1\n-    URL https://github.com/ros/console_bridge/archive/1.0.1.tar.gz\n-    URL_MD5 9f5351994c7690b37f88e9f70e478061\n+  # Download and build console_bridge\n+  externalproject_add(console_bridge-1.0.2\n+    URL https://github.com/ros/console_bridge/archive/1.0.2.tar.gz\n+    URL_HASH SHA256=303a619c01a9e14a3c82eb9762b8a428ef5311a6d46353872ab9a904358be4a4\n     TIMEOUT 600\n     CMAKE_ARGS\n       -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_install\n@@ -87,14 +87,16 @@ macro(build_console_bridge)\n     USE_SOURCE_PERMISSIONS\n   )\n \n-  set(console_bridge_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_install/${CMAKE_INSTALL_INCLUDEDIR})\n+  set(console_bridge_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_install/${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})\n   set(console_bridge_LIBRARY_DIRS ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_install/${CMAKE_INSTALL_LIBDIR})\n   set(console_bridge_LIBRARIES console_bridge)\n endmacro()\n \n+# Version 1.0.1 is fine if it's already installed on the system\n if(NOT console_bridge_FOUND OR \"${console_bridge_VERSION}\" VERSION_LESS 1.0.1)\n   build_console_bridge()\n-  set(extra_test_dependencies console_bridge-1.0.1)\n+  # 1.0.2 is necessary when building in a workspace so others can override it\n+  set(extra_test_dependencies console_bridge-1.0.2)\n endif()\n \n # TODO(blast545): This section and package.xml should be updated once copyright auto is solved."
+        }
+      ]
+    },
+    {
+      "author": "shonigmann",
+      "date": "2021-04-02T06:31:17Z",
+      "sha": "2dfeedba69fc73b13d103d0e2a8586e7a7c5bdb6",
+      "message": "updating quality declaration links (re: ros2/docs.ros2.org#52) (#30)\n\nSigned-off-by: Simon Honigmann <shonigmann@blueorigin.com>\r\n\r\nCo-authored-by: Simon Honigmann <shonigmann@blueorigin.com>",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 5,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "043ae511882b699b592fc3dc30f90d1360165262",
+          "filename": "QUALITY_DECLARATION.md",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 5,
+          "changes": 10,
+          "blob_url": "https://github.com/ros2/console_bridge_vendor/blob/2dfeedba69fc73b13d103d0e2a8586e7a7c5bdb6/QUALITY_DECLARATION.md",
+          "raw_url": "https://github.com/ros2/console_bridge_vendor/raw/2dfeedba69fc73b13d103d0e2a8586e7a7c5bdb6/QUALITY_DECLARATION.md",
+          "contents_url": "https://api.github.com/repos/ros2/console_bridge_vendor/contents/QUALITY_DECLARATION.md?ref=2dfeedba69fc73b13d103d0e2a8586e7a7c5bdb6",
+          "patch": "@@ -4,13 +4,13 @@ This document is a declaration of software quality for the `console_bridge_vendo\n \n The package `console_bridge_vendor` claims to be in the **Quality Level 1** category.\n \n-Below are the rationales, notes, and caveats for this claim, organized by each requirement listed in the [Package Quality Categories in REP-2004](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#package-quality-categories) of the ROS2 developer guide.\n+Below are the rationales, notes, and caveats for this claim, organized by each requirement listed in the [Package Quality Categories in REP-2004](https://www.ros.org/reps/rep-2004.html) of the ROS2 developer guide.\n \n ## Version Policy [1]\n \n ### Version Scheme [1.i]\n \n-`console_bridge_vendor` uses `semver` according to the recommendation for ROS Core packages in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#versioning).\n+`console_bridge_vendor` uses `semver` according to the recommendation for ROS Core packages in the [ROS 2 Developer Guide](https://docs.ros.org/en/rolling/Contributing/Developer-Guide.html#versioning).\n \n ### Version Stability [1.ii]\n \n@@ -30,19 +30,19 @@ This is a vendor package for `libconsole-bridge-dev` and as such does not declar\n \n ## Change Control Process [2]\n \n-`console_bridge_vendor` follows the recommended guidelines for ROS Core packages in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#change-control-process).\n+`console_bridge_vendor` follows the recommended guidelines for ROS Core packages in the [ROS 2 Developer Guide](https://docs.ros.org/en/rolling/Contributing/Developer-Guide.html#change-control-process).\n \n ### Change Requests [2.i]\n \n-All changes will occur through a pull request, check the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#change-control-process) for additional information.\n+All changes will occur through a pull request, check the [ROS 2 Developer Guide](https://docs.ros.org/en/rolling/Contributing/Developer-Guide.html#change-control-process) for additional information.\n \n ### Contributor Origin [2.ii]\n \n This package uses DCO as its confirmation of contributor origin policy. More information can be found in [CONTRIBUTING](./CONTRIBUTING.md).\n \n ### Peer Review Policy [2.iii]\n \n-All pull requests will be peer-reviewed, check [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#change-control-process) for additional information.\n+All pull requests will be peer-reviewed, check [ROS 2 Developer Guide](https://docs.ros.org/en/rolling/Contributing/Developer-Guide.html#change-control-process) for additional information.\n \n ### Continuous Integration [2.iv]\n "
+        }
+      ]
+    },
+    {
+      "author": "jacobperron",
+      "date": "2020-08-03T22:44:49Z",
+      "sha": "6cffe405a707a4cbf6ff7a1d13ac22552b3e22ae",
+      "message": "1.2.2",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "c953c90a6251352ff38f2c954dc30d57d5e112d3",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/console_bridge_vendor/blob/6cffe405a707a4cbf6ff7a1d13ac22552b3e22ae/package.xml",
+          "raw_url": "https://github.com/ros2/console_bridge_vendor/raw/6cffe405a707a4cbf6ff7a1d13ac22552b3e22ae/package.xml",
+          "contents_url": "https://api.github.com/repos/ros2/console_bridge_vendor/contents/package.xml?ref=6cffe405a707a4cbf6ff7a1d13ac22552b3e22ae",
+          "patch": "@@ -4,7 +4,7 @@\n   schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"2\">\n   <name>console_bridge_vendor</name>\n-  <version>1.2.1</version>\n+  <version>1.2.2</version>\n   <description>\n     Wrapper around console_bridge, providing nothing but a dependency on console_bridge, on some systems.\n     On others, it provides an ExternalProject build of console_bridge."
+        }
+      ]
+    },
+    {
+      "author": "Blast545",
+      "date": "2020-05-07T20:58:56Z",
+      "sha": "ce24a6f27262c612273f75ab077e763e239ae138",
+      "message": "Add quality declaration console_bridge_vendor (#8)\n\n* Add 1st quality declaration draft for the package\r\n* Reformat to match REP-2004 template\r\n* Fix link to external dependency QD\r\n* Add review suggestion Quality_Declaration.md\r\n* Add review suggestion Quality_Declaration.md\r\n* Address review feedback\r\n* Fix peer review comments\r\n* Rephrase API/ABI ROS stability section\r\n* Rename QD file to all caps\r\n* Renamed file\r\n* Add missing CONTRIBUTING.md file\r\n* Improve License section\r\n* Rephrase license improv\r\n* Reformat to include 1.vi with 1.v and 1.iv\r\n* Address small nit\r\n\r\nSigned-off-by: Jorge Perez <jjperez@ekumenlabs.com>\r\nCo-authored-by: brawner <brawner@gmail.com>",
+      "files_changed": 2,
+      "additions": 131,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "cfba094dace53df09974dc9bf5bb9e3c2c677e97",
+          "filename": "CONTRIBUTING.md",
+          "status": "added",
+          "additions": 18,
+          "deletions": 0,
+          "changes": 18,
+          "blob_url": "https://github.com/ros2/console_bridge_vendor/blob/ce24a6f27262c612273f75ab077e763e239ae138/CONTRIBUTING.md",
+          "raw_url": "https://github.com/ros2/console_bridge_vendor/raw/ce24a6f27262c612273f75ab077e763e239ae138/CONTRIBUTING.md",
+          "contents_url": "https://api.github.com/repos/ros2/console_bridge_vendor/contents/CONTRIBUTING.md?ref=ce24a6f27262c612273f75ab077e763e239ae138",
+          "patch": "@@ -0,0 +1,18 @@\n+Any contribution that you make to this repository will\n+be under the Apache 2 License, as dictated by that\n+[license](http://www.apache.org/licenses/LICENSE-2.0.html):\n+\n+~~~\n+5. Submission of Contributions. Unless You explicitly state otherwise,\n+   any Contribution intentionally submitted for inclusion in the Work\n+   by You to the Licensor shall be under the terms and conditions of\n+   this License, without any additional terms or conditions.\n+   Notwithstanding the above, nothing herein shall supersede or modify\n+   the terms of any separate license agreement you may have executed\n+   with Licensor regarding such Contributions.\n+~~~\n+\n+Contributors must sign-off each commit by adding a `Signed-off-by: ...`\n+line to commit messages to certify that they have the right to submit\n+the code they are contributing to the project according to the\n+[Developer Certificate of Origin (DCO)](https://developercertificate.org/)."
+        },
+        {
+          "sha": "eef0deca4a339f0736836723470a6d196c92c07c",
+          "filename": "QUALITY_DECLARATION.md",
+          "status": "added",
+          "additions": 113,
+          "deletions": 0,
+          "changes": 113,
+          "blob_url": "https://github.com/ros2/console_bridge_vendor/blob/ce24a6f27262c612273f75ab077e763e239ae138/QUALITY_DECLARATION.md",
+          "raw_url": "https://github.com/ros2/console_bridge_vendor/raw/ce24a6f27262c612273f75ab077e763e239ae138/QUALITY_DECLARATION.md",
+          "contents_url": "https://api.github.com/repos/ros2/console_bridge_vendor/contents/QUALITY_DECLARATION.md?ref=ce24a6f27262c612273f75ab077e763e239ae138",
+          "patch": "@@ -0,0 +1,113 @@\n+This document is a declaration of software quality for the `console_bridge_vendor` package, based on the guidelines in [REP-2004](https://www.ros.org/reps/rep-2004.html).\n+\n+# `console_bridge_vendor` Quality Declaration\n+\n+The package `console_bridge_vendor` claims to be in the **Quality Level 4** category.\n+\n+Below are the rationales, notes, and caveats for this claim, organized by each requirement listed in the [Package Quality Categories in REP-2004](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#package-quality-categories) of the ROS2 developer guide.\n+\n+## Version Policy [1]\n+\n+### Version Scheme [1.i]\n+\n+`console_bridge_vendor` uses `semver` according to the recommendation for ROS Core packages in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#versioning).\n+\n+### Version Stability [1.ii]\n+\n+`console_bridge_vendor` is at or above a stable version, i.e. `>= 1.0.0`.\n+\n+### Public API Declaration [1.iii]\n+\n+This is a vendor package for `libconsole-bridge-dev` and as such does not declare its own API.\n+\n+### API Stability Policy [1.iv]/[1.vi]\n+\n+`console_bridge_vendor` does not have an API of its own, and will limit its dependency on `libconsole-bridge-dev` to API stable releases within a released ROS distribution.\n+\n+### ABI Stability Policy [1.v]/[1.vi]\n+\n+`console_bridge_vendor` does not have an ABI of its own, and will limit its dependency on `libconsole-bridge-dev` to ABI stable releases within a released ROS distribution.\n+\n+## Change Control Process [2]\n+\n+`console_bridge_vendor` follows the recommended guidelines for ROS Core packages in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#change-control-process).\n+\n+### Change Requests [2.i]\n+\n+All changes will occur through a pull request, check the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#change-control-process) for additional information.\n+\n+### Contributor Origin [2.ii]\n+\n+This package uses DCO as its confirmation of contributor origin policy. More information can be found in [CONTRIBUTING](./CONTRIBUTING.md).\n+\n+### Peer Review Policy [2.iii]\n+\n+All pull requests will be peer-reviewed, check [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#change-control-process) for additional information.\n+\n+### Continuous Integration [2.iv]\n+\n+This package is not being tested under ROS2 CI.\n+\n+###  Documentation Policy [2.v]\n+\n+All pull requests must resolve related documentation changes before merging.\n+\n+## Documentation [3]\n+\n+### Feature Documentation [3.i]\n+\n+There is some documentation on its latest [wiki](http://wiki.ros.org/console_bridge). This information might require to be updated and expanded further for the use of `console_bridge_vendor`.\n+\n+### Public API Documentation [3.ii]\n+\n+`console_bridge_vendor` does not have an API and therefore does not require API documentation.\n+\n+### License [3.iii]\n+\n+The license for `console_bridge_vendor` is Apache 2.0, and a summary is in each source file, the type is declared in the [`package.xml`](./package.xml) manifest file, and a full copy of the license is in the `LICENSE` file. The vendored library, `libconsole-bridge-dev` license is BSD as stated in its quality declaration document (Section 5.iii).\n+\n+### Copyright Statements [3.iv]\n+\n+The copyright holders each provide a statement of copyright in each source code file in `console_bridge_vendor`.\n+\n+## Testing [4]\n+\n+### Feature Testing [4.i]\n+\n+`console_bridge_vendor` does not have feature testing. For vendored packages, this will be considered to be addressed in the external dependency.\n+\n+### Public API Testing [4.ii]\n+\n+`console_bridge_vendor` does not have Public API testing. For vendored packages, this will be considered to be addressed in the external dependency.\n+\n+### Coverage [4.iii]\n+\n+`console_bridge_vendor` does not provide coverage testing. For vendored packages, this will be considered to be addressed in the external dependency.\n+\n+### Performance [4.iv]\n+\n+`console_bridge_vendor` does not provide performance testing. For vendored packages, this will be considered to be addressed in the external dependency.\n+\n+### Linters and Static Analysis [4.v]\n+\n+`console_bridge_vendor` is not being tested with linters or static analysis tools.\n+\n+## Dependencies [5]\n+\n+### Direct and Optional Runtime ROS Dependencies [5.i]/[5.ii]\n+\n+`console_bridge_vendor` does not have direct/optional runtime ROS dependencies.\n+\n+### Direct Runtime non-ROS Dependency [5.iii]\n+\n+`console_bridge_vendor` depends directly on the external dependency `libconsole-bridge-dev`, which is qualified as quality level 4 in its [Quality Declaration](https://github.com/ros/console_bridge/blob/master/QUALITY_DECLARATION.md).\n+\n+## Platform Support [6]\n+\n+`console_bridge_vendor` supports all of the tier 1 platforms as described in [REP-2000](https://www.ros.org/reps/rep-2000.html#support-tiers).\n+\n+## Security [7]\n+\n+### Vulnerability Disclosure Policy [7.i]\n+\n+This package does not yet have a Vulnerability Disclosure Policy."
+        }
+      ]
+    },
+    {
+      "author": "nuclearsandwich",
+      "date": "2018-11-16T18:55:41Z",
+      "sha": "37579afaa7cdd472c33f9cec0fc11c7cebe544a6",
+      "message": "Require console-bridge 0.4.1 or build it from source.",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 7,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "8a2fc2b0eb079a4050972fa8c30e8e9bee3e21ec",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 7,
+          "changes": 12,
+          "blob_url": "https://github.com/ros2/console_bridge_vendor/blob/37579afaa7cdd472c33f9cec0fc11c7cebe544a6/CMakeLists.txt",
+          "raw_url": "https://github.com/ros2/console_bridge_vendor/raw/37579afaa7cdd472c33f9cec0fc11c7cebe544a6/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros2/console_bridge_vendor/contents/CMakeLists.txt?ref=37579afaa7cdd472c33f9cec0fc11c7cebe544a6",
+          "patch": "@@ -36,12 +36,10 @@ macro(build_console_bridge)\n     endif()\n   endif()\n   include(ExternalProject)\n-  # Get console_bridge 0.4.0 + 2 patches:\n-  # 4a52e5dfe6b8301bc18e472ad585ea216f3762f7: explicitly enable CMake policy 42 to prevent warning\n-  # ad25f7307da76be2857545e7e5c2a20727eee542: use new version of gtest to fix windows warnings\n-  ExternalProject_Add(console_bridge-ad25f73\n-    URL https://github.com/ros/console_bridge/archive/ad25f7307da76be2857545e7e5c2a20727eee542.tar.gz\n-    URL_MD5 5a7ab572593e2483ab1b08154c2af0b6\n+  # Get console_bridge 0.4.1\n+  ExternalProject_Add(console_bridge-0.4.1\n+    URL https://github.com/ros/console_bridge/archive/0.4.1.tar.gz\n+    URL_MD5 6bb0f640db1712cf2277e7923e7bab68\n     TIMEOUT 600\n     CMAKE_ARGS\n       -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_install\n@@ -60,7 +58,7 @@ endmacro()\n \n find_package(console_bridge QUIET)\n \n-if(NOT console_bridge_FOUND OR \"${console_bridge_VERSION}\" VERSION_LESS 0.4.0)\n+if(NOT console_bridge_FOUND OR \"${console_bridge_VERSION}\" VERSION_LESS 0.4.1)\n   build_console_bridge()\n endif()\n "
+        }
+      ]
+    },
+    {
+      "author": "emersonknapp",
+      "date": "2019-03-21T21:23:15Z",
+      "sha": "7415ba81c8c10553e90a45f80f24bd64f63ce986",
+      "message": "Pass through c++ build flags (#4)\n\n* Pass through c++ build flags\r\n\r\nSigned-off-by: Emerson Knapp <eknapp@amazon.com>",
+      "files_changed": 1,
+      "additions": 13,
+      "deletions": 2,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "795c6dfc2aa6d277c81608709e9912dd2b20f7a0",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 2,
+          "changes": 15,
+          "blob_url": "https://github.com/ros2/console_bridge_vendor/blob/7415ba81c8c10553e90a45f80f24bd64f63ce986/CMakeLists.txt",
+          "raw_url": "https://github.com/ros2/console_bridge_vendor/raw/7415ba81c8c10553e90a45f80f24bd64f63ce986/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros2/console_bridge_vendor/contents/CMakeLists.txt?ref=7415ba81c8c10553e90a45f80f24bd64f63ce986",
+          "patch": "@@ -4,6 +4,14 @@ project(console_bridge_vendor)\n \n find_package(ament_cmake REQUIRED)\n \n+option(FORCE_BUILD_VENDOR_PKG\n+  \"Build console_bridge from source, even if system-installed package is available\"\n+  OFF)\n+\n+if(NOT FORCE_BUILD_VENDOR_PKG)\n+  find_package(console_bridge QUIET)\n+endif()\n+\n macro(build_console_bridge)\n   set(extra_cmake_args)\n   if(DEFINED CMAKE_BUILD_TYPE)\n@@ -34,7 +42,12 @@ macro(build_console_bridge)\n         list(APPEND extra_cmake_args \"-DANDROID_TOOLCHAIN_NAME=${ANDROID_TOOLCHAIN_NAME}\")\n       endif()\n     endif()\n+  else()\n+    list(APPEND extra_cmake_args \"-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}\")\n+    list(APPEND extra_cmake_args \"-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}\")\n   endif()\n+  list(APPEND extra_cmake_args \"-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}\")\n+\n   include(ExternalProject)\n   # Get console_bridge 0.4.1\n   ExternalProject_Add(console_bridge-0.4.1\n@@ -56,8 +69,6 @@ macro(build_console_bridge)\n   )\n endmacro()\n \n-find_package(console_bridge QUIET)\n-\n if(NOT console_bridge_FOUND OR \"${console_bridge_VERSION}\" VERSION_LESS 0.4.1)\n   build_console_bridge()\n endif()"
+        }
+      ]
+    },
+    {
+      "author": "mikaelarguedas",
+      "date": "2018-07-05T15:30:47Z",
+      "sha": "126a9e1b075ebfdcd7343ae3b181cab25231f705",
+      "message": "Initial commit",
+      "files_changed": 2,
+      "additions": 203,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 201,
+          "deletions": 0,
+          "changes": 201,
+          "blob_url": "https://github.com/ros2/console_bridge_vendor/blob/126a9e1b075ebfdcd7343ae3b181cab25231f705/LICENSE",
+          "raw_url": "https://github.com/ros2/console_bridge_vendor/raw/126a9e1b075ebfdcd7343ae3b181cab25231f705/LICENSE",
+          "contents_url": "https://api.github.com/repos/ros2/console_bridge_vendor/contents/LICENSE?ref=126a9e1b075ebfdcd7343ae3b181cab25231f705",
+          "patch": "@@ -0,0 +1,201 @@\n+                                 Apache License\n+                           Version 2.0, January 2004\n+                        http://www.apache.org/licenses/\n+\n+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION\n+\n+   1. Definitions.\n+\n+      \"License\" shall mean the terms and conditions for use, reproduction,\n+      and distribution as defined by Sections 1 through 9 of this document.\n+\n+      \"Licensor\" shall mean the copyright owner or entity authorized by\n+      the copyright owner that is granting the License.\n+\n+      \"Legal Entity\" shall mean the union of the acting entity and all\n+      other entities that control, are controlled by, or are under common\n+      control with that entity. For the purposes of this definition,\n+      \"control\" means (i) the power, direct or indirect, to cause the\n+      direction or management of such entity, whether by contract or\n+      otherwise, or (ii) ownership of fifty percent (50%) or more of the\n+      outstanding shares, or (iii) beneficial ownership of such entity.\n+\n+      \"You\" (or \"Your\") shall mean an individual or Legal Entity\n+      exercising permissions granted by this License.\n+\n+      \"Source\" form shall mean the preferred form for making modifications,\n+      including but not limited to software source code, documentation\n+      source, and configuration files.\n+\n+      \"Object\" form shall mean any form resulting from mechanical\n+      transformation or translation of a Source form, including but\n+      not limited to compiled object code, generated documentation,\n+      and conversions to other media types.\n+\n+      \"Work\" shall mean the work of authorship, whether in Source or\n+      Object form, made available under the License, as indicated by a\n+      copyright notice that is included in or attached to the work\n+      (an example is provided in the Appendix below).\n+\n+      \"Derivative Works\" shall mean any work, whether in Source or Object\n+      form, that is based on (or derived from) the Work and for which the\n+      editorial revisions, annotations, elaborations, or other modifications\n+      represent, as a whole, an original work of authorship. For the purposes\n+      of this License, Derivative Works shall not include works that remain\n+      separable from, or merely link (or bind by name) to the interfaces of,\n+      the Work and Derivative Works thereof.\n+\n+      \"Contribution\" shall mean any work of authorship, including\n+      the original version of the Work and any modifications or additions\n+      to that Work or Derivative Works thereof, that is intentionally\n+      submitted to Licensor for inclusion in the Work by the copyright owner\n+      or by an individual or Legal Entity authorized to submit on behalf of\n+      the copyright owner. For the purposes of this definition, \"submitted\"\n+      means any form of electronic, verbal, or written communication sent\n+      to the Licensor or its representatives, including but not limited to\n+      communication on electronic mailing lists, source code control systems,\n+      and issue tracking systems that are managed by, or on behalf of, the\n+      Licensor for the purpose of discussing and improving the Work, but\n+      excluding communication that is conspicuously marked or otherwise\n+      designated in writing by the copyright owner as \"Not a Contribution.\"\n+\n+      \"Contributor\" shall mean Licensor and any individual or Legal Entity\n+      on behalf of whom a Contribution has been received by Licensor and\n+      subsequently incorporated within the Work.\n+\n+   2. Grant of Copyright License. Subject to the terms and conditions of\n+      this License, each Contributor hereby grants to You a perpetual,\n+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n+      copyright license to reproduce, prepare Derivative Works of,\n+      publicly display, publicly perform, sublicense, and distribute the\n+      Work and such Derivative Works in Source or Object form.\n+\n+   3. Grant of Patent License. Subject to the terms and conditions of\n+      this License, each Contributor hereby grants to You a perpetual,\n+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n+      (except as stated in this section) patent license to make, have made,\n+      use, offer to sell, sell, import, and otherwise transfer the Work,\n+      where such license applies only to those patent claims licensable\n+      by such Contributor that are necessarily infringed by their\n+      Contribution(s) alone or by combination of their Contribution(s)\n+      with the Work to which such Contribution(s) was submitted. If You\n+      institute patent litigation against any entity (including a\n+      cross-claim or counterclaim in a lawsuit) alleging that the Work\n+      or a Contribution incorporated within the Work constitutes direct\n+      or contributory patent infringement, then any patent licenses\n+      granted to You under this License for that Work shall terminate\n+      as of the date such litigation is filed.\n+\n+   4. Redistribution. You may reproduce and distribute copies of the\n+      Work or Derivative Works thereof in any medium, with or without\n+      modifications, and in Source or Object form, provided that You\n+      meet the following conditions:\n+\n+      (a) You must give any other recipients of the Work or\n+          Derivative Works a copy of this License; and\n+\n+      (b) You must cause any modified files to carry prominent notices\n+          stating that You changed the files; and\n+\n+      (c) You must retain, in the Source form of any Derivative Works\n+          that You distribute, all copyright, patent, trademark, and\n+          attribution notices from the Source form of the Work,\n+          excluding those notices that do not pertain to any part of\n+          the Derivative Works; and\n+\n+      (d) If the Work includes a \"NOTICE\" text file as part of its\n+          distribution, then any Derivative Works that You distribute must\n+          include a readable copy of the attribution notices contained\n+          within such NOTICE file, excluding those notices that do not\n+          pertain to any part of the Derivative Works, in at least one\n+          of the following places: within a NOTICE text file distributed\n+          as part of the Derivative Works; within the Source form or\n+          documentation, if provided along with the Derivative Works; or,\n+          within a display generated by the Derivative Works, if and\n+          wherever such third-party notices normally appear. The contents\n+          of the NOTICE file are for informational purposes only and\n+          do not modify the License. You may add Your own attribution\n+          notices within Derivative Works that You distribute, alongside\n+          or as an addendum to the NOTICE text from the Work, provided\n+          that such additional attribution notices cannot be construed\n+          as modifying the License.\n+\n+      You may add Your own copyright statement to Your modifications and\n+      may provide additional or different license terms and conditions\n+      for use, reproduction, or distribution of Your modifications, or\n+      for any such Derivative Works as a whole, provided Your use,\n+      reproduction, and distribution of the Work otherwise complies with\n+      the conditions stated in this License.\n+\n+   5. Submission of Contributions. Unless You explicitly state otherwise,\n+      any Contribution intentionally submitted for inclusion in the Work\n+      by You to the Licensor shall be under the terms and conditions of\n+      this License, without any additional terms or conditions.\n+      Notwithstanding the above, nothing herein shall supersede or modify\n+      the terms of any separate license agreement you may have executed\n+      with Licensor regarding such Contributions.\n+\n+   6. Trademarks. This License does not grant permission to use the trade\n+      names, trademarks, service marks, or product names of the Licensor,\n+      except as required for reasonable and customary use in describing the\n+      origin of the Work and reproducing the content of the NOTICE file.\n+\n+   7. Disclaimer of Warranty. Unless required by applicable law or\n+      agreed to in writing, Licensor provides the Work (and each\n+      Contributor provides its Contributions) on an \"AS IS\" BASIS,\n+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or\n+      implied, including, without limitation, any warranties or conditions\n+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A\n+      PARTICULAR PURPOSE. You are solely responsible for determining the\n+      appropriateness of using or redistributing the Work and assume any\n+      risks associated with Your exercise of permissions under this License.\n+\n+   8. Limitation of Liability. In no event and under no legal theory,\n+      whether in tort (including negligence), contract, or otherwise,\n+      unless required by applicable law (such as deliberate and grossly\n+      negligent acts) or agreed to in writing, shall any Contributor be\n+      liable to You for damages, including any direct, indirect, special,\n+      incidental, or consequential damages of any character arising as a\n+      result of this License or out of the use or inability to use the\n+      Work (including but not limited to damages for loss of goodwill,\n+      work stoppage, computer failure or malfunction, or any and all\n+      other commercial damages or losses), even if such Contributor\n+      has been advised of the possibility of such damages.\n+\n+   9. Accepting Warranty or Additional Liability. While redistributing\n+      the Work or Derivative Works thereof, You may choose to offer,\n+      and charge a fee for, acceptance of support, warranty, indemnity,\n+      or other liability obligations and/or rights consistent with this\n+      License. However, in accepting such obligations, You may act only\n+      on Your own behalf and on Your sole responsibility, not on behalf\n+      of any other Contributor, and only if You agree to indemnify,\n+      defend, and hold each Contributor harmless for any liability\n+      incurred by, or claims asserted against, such Contributor by reason\n+      of your accepting any such warranty or additional liability.\n+\n+   END OF TERMS AND CONDITIONS\n+\n+   APPENDIX: How to apply the Apache License to your work.\n+\n+      To apply the Apache License to your work, attach the following\n+      boilerplate notice, with the fields enclosed by brackets \"[]\"\n+      replaced with your own identifying information. (Don't include\n+      the brackets!)  The text should be enclosed in the appropriate\n+      comment syntax for the file format. We also recommend that a\n+      file or class name and description of purpose be included on the\n+      same \"printed page\" as the copyright notice for easier\n+      identification within third-party archives.\n+\n+   Copyright [yyyy] [name of copyright owner]\n+\n+   Licensed under the Apache License, Version 2.0 (the \"License\");\n+   you may not use this file except in compliance with the License.\n+   You may obtain a copy of the License at\n+\n+       http://www.apache.org/licenses/LICENSE-2.0\n+\n+   Unless required by applicable law or agreed to in writing, software\n+   distributed under the License is distributed on an \"AS IS\" BASIS,\n+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+   See the License for the specific language governing permissions and\n+   limitations under the License."
+        },
+        {
+          "sha": "700f57af556ffc83b76119f0e0cf9a4346cde8d5",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/console_bridge_vendor/blob/126a9e1b075ebfdcd7343ae3b181cab25231f705/README.md",
+          "raw_url": "https://github.com/ros2/console_bridge_vendor/raw/126a9e1b075ebfdcd7343ae3b181cab25231f705/README.md",
+          "contents_url": "https://api.github.com/repos/ros2/console_bridge_vendor/contents/README.md?ref=126a9e1b075ebfdcd7343ae3b181cab25231f705",
+          "patch": "@@ -0,0 +1,2 @@\n+# console_bridge_vendor\n+CMake shim over the console_bridge library: https://github.com/ros/console_bridge.git"
+        }
+      ]
+    }
+  ]
+}

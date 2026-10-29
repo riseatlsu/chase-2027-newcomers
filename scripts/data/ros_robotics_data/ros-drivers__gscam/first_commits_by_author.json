@@ -1,0 +1,515 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T05:04:58Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ros-drivers",
+    "repo": "gscam"
+  },
+  "data": [
+    {
+      "author": "k-okada",
+      "date": "2017-05-14T09:18:36Z",
+      "sha": "fc1d8293ecbd0287fc5db9b60f36bfdb8138edcc",
+      "message": "add ROS Orphaned Package Maintainers to maintainer tag",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "bcb620b5de5a6f42beb629233f6e2a86db1cc7be",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/fc1d8293ecbd0287fc5db9b60f36bfdb8138edcc/package.xml",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/fc1d8293ecbd0287fc5db9b60f36bfdb8138edcc/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/package.xml?ref=fc1d8293ecbd0287fc5db9b60f36bfdb8138edcc",
+          "patch": "@@ -6,6 +6,7 @@\n     devices such as webcams.\n   </description>\n   <maintainer email=\"jbo@jhu.edu\">Jonathan Bohren</maintainer>\n+  <maintainer email=\"ros-orphaned-packages@googlegroups.com\">ROS Orphaned Package Maintainers</maintainer>\n   <license>BSD</license>\n \n   <author email=\"jbo@jhu.edu\">Jonathan Bohren</author>"
+        }
+      ]
+    },
+    {
+      "author": "mikaelarguedas",
+      "date": "2017-10-27T21:07:46Z",
+      "sha": "0f8db5e1757c61ff1bb385c2e1aea3eaecb7e115",
+      "message": "update to use non deprecated pluginlib macro",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "2bd5fa73ecb5dddcc437514e0bed5696d246b359",
+          "filename": "src/gscam_nodelet.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/0f8db5e1757c61ff1bb385c2e1aea3eaecb7e115/src%2Fgscam_nodelet.cpp",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/0f8db5e1757c61ff1bb385c2e1aea3eaecb7e115/src%2Fgscam_nodelet.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/src%2Fgscam_nodelet.cpp?ref=0f8db5e1757c61ff1bb385c2e1aea3eaecb7e115",
+          "patch": "@@ -4,7 +4,7 @@\n #include <pluginlib/class_list_macros.h>\n #include <gscam/gscam_nodelet.h>\n \n-PLUGINLIB_DECLARE_CLASS(gscam, GSCamNodelet, gscam::GSCamNodelet, nodelet::Nodelet) \n+PLUGINLIB_EXPORT_CLASS(gscam::GSCamNodelet, nodelet::Nodelet) \n \n namespace gscam {\n   GSCamNodelet::GSCamNodelet() :"
+        }
+      ]
+    },
+    {
+      "author": "jbohren",
+      "date": "2012-06-12T21:15:33Z",
+      "sha": "3e72e77f9362ae8c6469c2d4ea8c79f9a660ce41",
+      "message": "Adding changes that were made to the distribution branch that\nshould have gone into the exerpeimental branch in r2862.\n\nAdded a bunch of enhancements and fixed bugs involving data\nmissing fromthe image message headers.\n\nIndex: src/gscam.cpp\n===================================================================\nAdded camera_name and camera_parameters_file globals for camera\ninfo.\n\nMoved ros init to the top of the main function.\n\nGets the gstreamer configuration either from environment variable\nGSCAM_CONFIG or ROS param \"~/gscam_config\".\n\nGets the camera calibration parameters from the file located at ROS\nparam \"~/camera_parameters_file\", will look at\n\"../camera_settings.txt\" by default.\n\nA bunch of re-indenting for consistency.\n\nUpdated a lot of error fprintfs to ROS_ERROR calls.\n\nGets the TF frame_id from the ROS param \"~/frame_id\", can be over-\nwritten by camera parameters.\n\nNow sets the appropriate ROS timestap in the image message header.\n\nNow sets the appropriate TF frame in the image message header.\n\nAdded more detailed info/error/warn messages.\n\nModified the warning / segfault avoidance added to experimental in\nr2756. Instead of skipping the frame, it just copies only the\namount of data that it was received, and reports the warning each\ntime, instead of just once. In a large scale system with lots of\nmessages, a single warning might easily get lost in the noise.\n\nIndex: examples/webcam_parameters.txt\n===================================================================\nAdded example camera parameters (uncalibrated) for a laptop webcam.\n\nIndex: examples/webcam.launch\n===================================================================\nAdded a launchfile that makes use of the new rosparam options and\nTF frame.\n\ngit-svn-id: http://brown-ros-pkg.googlecode.com/svn/trunk/experimental/gscam@2863 0d49d21e-669f-11de-873c-fb8c264d332a",
+      "files_changed": 3,
+      "additions": 226,
+      "deletions": 151,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "548a7140ab882227c47e78e003adca5932642d98",
+          "filename": "examples/webcam.launch",
+          "status": "added",
+          "additions": 10,
+          "deletions": 0,
+          "changes": 10,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/3e72e77f9362ae8c6469c2d4ea8c79f9a660ce41/examples%2Fwebcam.launch",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/3e72e77f9362ae8c6469c2d4ea8c79f9a660ce41/examples%2Fwebcam.launch",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/examples%2Fwebcam.launch?ref=3e72e77f9362ae8c6469c2d4ea8c79f9a660ce41",
+          "patch": "@@ -0,0 +1,10 @@\n+<launch>\n+  <!-- This launchfile should bring up a st -->\n+  <node name=\"webcam\" pkg=\"gscam\" type=\"gscam\" output=\"screen\">\n+    <param name=\"camera_parameters_file\" value=\"$(find gscam)/examples/webcam_parameters.txt\"/>\n+    <param name=\"gscam_config\" value=\"v4l2src device=/dev/video0 ! video/x-raw-rgb,framerate=30/1 ! ffmpegcolorspace\"/>\n+    <param name=\"frame_id\" value=\"/webcam_frame\"/>\n+  </node>\n+\n+  <node name=\"webcam_transform\" pkg=\"tf\" type=\"static_transform_publisher\" args=\"1 2 3 0 -3.141 0 /world /webcam_frame 10\"/>\n+</launch>"
+        },
+        {
+          "sha": "5e99f626b9bd2b6ae0fbc8eefeb5465ccac829cb",
+          "filename": "examples/webcam_parameters.txt",
+          "status": "added",
+          "additions": 30,
+          "deletions": 0,
+          "changes": 30,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/3e72e77f9362ae8c6469c2d4ea8c79f9a660ce41/examples%2Fwebcam_parameters.txt",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/3e72e77f9362ae8c6469c2d4ea8c79f9a660ce41/examples%2Fwebcam_parameters.txt",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/examples%2Fwebcam_parameters.txt?ref=3e72e77f9362ae8c6469c2d4ea8c79f9a660ce41",
+          "patch": "@@ -0,0 +1,30 @@\n+# Camera intrinsics\n+\n+[image]\n+\n+width\n+640\n+\n+height\n+480\n+\n+[default]\n+\n+camera matrix\n+1.00000 0.00000 1.00000 \n+0.00000 1.00000 1.00000\n+0.00000 0.00000 1.00000 \n+\n+distortion\n+0.00000 0.00000 0.00000 0.00000 0.00000 \n+\n+\n+rectification\n+1.00000 0.00000 0.00000 \n+0.00000 1.00000 0.00000 \n+0.00000 0.00000 1.00000 \n+\n+projection\n+1.00000 0.00000 1.00000 0.00000 \n+0.00000 1.00000 1.00000 0.00000 \n+0.00000 0.00000 1.00000 0.00000 "
+        },
+        {
+          "sha": "f7385061e2dbd4f7c496f1f319782fdfbc6237ec",
+          "filename": "src/gscam.cpp",
+          "status": "modified",
+          "additions": 186,
+          "deletions": 151,
+          "changes": 337,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/3e72e77f9362ae8c6469c2d4ea8c79f9a660ce41/src%2Fgscam.cpp",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/3e72e77f9362ae8c6469c2d4ea8c79f9a660ce41/src%2Fgscam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/src%2Fgscam.cpp?ref=3e72e77f9362ae8c6469c2d4ea8c79f9a660ce41",
+          "patch": "@@ -22,189 +22,224 @@ extern \"C\"{\n static gboolean processData(GstPad *pad, GstBuffer *buffer, gpointer u_data);\n bool setCameraInfo(sensor_msgs::SetCameraInfo::Request &req, sensor_msgs::SetCameraInfo::Response &rsp);\n \n-//globals\n+// Globals / camera configuration\n bool gstreamerPad, rosPad;\n int width, height;\n sensor_msgs::CameraInfo camera_info;\n+std::string camera_name;\n+std::string camera_parameters_file;\n \n int main(int argc, char** argv) {\n-\tchar *config = getenv(\"GSCAM_CONFIG\");\n-\tif (config == NULL) {\n-\t\tstd::cout << \"Problem getting GSCAM_CONFIG variable.\" << std::endl;\n-\t\texit(-1);\n-\t}\n-\n-\tgst_init(0,0);\n-\tstd::cout << \"Gstreamer Version: \" << gst_version_string() << std::endl;\n-\n-\tGError *error = 0; //assignment to zero is a gst requirement\n-\tGstElement *pipeline = gst_parse_launch(config,&error);\n-\tif (pipeline == NULL) {\n-\t\tstd::cout << error->message << std::endl;\n-\t\texit(-1);\n-\t}\n-\tGstElement * sink = gst_element_factory_make(\"appsink\",NULL);\n-\tGstCaps * caps = gst_caps_new_simple(\"video/x-raw-rgb\", NULL);\n-\tgst_app_sink_set_caps(GST_APP_SINK(sink), caps);\n-\tgst_caps_unref(caps);\n-\n-\tgst_base_sink_set_sync(GST_BASE_SINK(sink), TRUE);\n-\n-\tif(GST_IS_PIPELINE(pipeline)) {\n-\t    GstPad *outpad = gst_bin_find_unlinked_pad(GST_BIN(pipeline), GST_PAD_SRC);\n-\t    g_assert(outpad);\n-\t    GstElement *outelement = gst_pad_get_parent_element(outpad);\n-\t    g_assert(outelement);\n-\t    gst_object_unref(outpad);\n-\n-\n-\t    if(!gst_bin_add(GST_BIN(pipeline), sink)) {\n-\t\tfprintf(stderr, \"gst_bin_add() failed\\n\"); // TODO: do some unref\n-\t\tgst_object_unref(outelement);\n-\t\tgst_object_unref(pipeline);\n-\t\treturn -1;\n-\t    }\n-\n-\t    if(!gst_element_link(outelement, sink)) {\n-\t\tfprintf(stderr, \"GStreamer: cannot link outelement(\\\"%s\\\") -> sink\\n\", gst_element_get_name(outelement));\n-\t\tgst_object_unref(outelement);\n-\t\tgst_object_unref(pipeline);\n-\t\treturn -1;\n-\t    }\n-\n-\t    gst_object_unref(outelement);\n-\t} else {\n-\t    GstElement* launchpipe = pipeline;\n-\t    pipeline = gst_pipeline_new(NULL);\n-\t    g_assert(pipeline);\n-\n-\t    gst_object_unparent(GST_OBJECT(launchpipe));\n-\n-\t    gst_bin_add_many(GST_BIN(pipeline), launchpipe, sink, NULL);\n-\n-\t    if(!gst_element_link(launchpipe, sink)) {\n-\t\tfprintf(stderr, \"GStreamer: cannot link launchpipe -> sink\\n\");\n-\t\tgst_object_unref(pipeline);\n-\t\treturn -1;\n-\t    }\n-\t}\n-\n-\tgst_element_set_state(pipeline, GST_STATE_PAUSED);\n-\n-\tif (gst_element_get_state(pipeline, NULL, NULL, -1) == GST_STATE_CHANGE_FAILURE) {\n-\t\tstd::cout << \"Failed to PAUSE.\" << std::endl;\n-\t\texit(-1);\n-\t} else {\n-\t\tstd::cout << \"stream is PAUSED.\" << std::endl;\n-\t}\n-\n-\t// We could probably do something with the camera name, check\n-\t// errors or something, but at the moment, we don't care.\n-\tstd::string camera_name;\n-\tif (camera_calibration_parsers::readCalibrationIni(\"../camera_parameters.txt\", camera_name, camera_info)) {\n-\t  ROS_INFO(\"Successfully read camera calibration.  Rerun camera calibrator if it is incorrect.\");\n-\t}\n-\telse {\n-\t  ROS_ERROR(\"No camera_parameters.txt file found.  Use default file if no other is available.\");\n-\t}\n-\n-\tros::init(argc, argv, \"gscam_publisher\");\n-\tros::NodeHandle nh;\n-\n-\tint preroll;\n-\tnh.param(\"brown/gscam/preroll\", preroll, 0);\n-\tif (preroll) {\n-\t\t//The PAUSE, PLAY, PAUSE, PLAY cycle is to ensure proper pre-roll\n-\t\t//I am told this is needed and am erring on the side of caution.\n-\t\tgst_element_set_state(pipeline, GST_STATE_PLAYING);\n-\n-\t\tif (gst_element_get_state(pipeline, NULL, NULL, -1) == GST_STATE_CHANGE_FAILURE) {\n-\t\t\tstd::cout << \"Failed to PLAY.\" << std::endl;\n-\t\t\texit(-1);\n-\t\t} else {\n-\t\t\tstd::cout << \"stream is PLAYING.\" << std::endl;\n-\t\t}\n+  ros::init(argc, argv, \"gscam_publisher\");\n+  ros::NodeHandle nh;\n+\n+  // Get gstreamer configuration (either from environment variable or ROS param)\n+  std::string gsconfig = \"\";\n+  std::string gsconfig_rosparam = \"\";\n+  bool gsconfig_rosparam_defined = false;\n+  char *gsconfig_env = NULL;\n+\n+  gsconfig_rosparam_defined = ros::param::get(\"~/gscam_config\",gsconfig_rosparam);\n+  gsconfig_env = getenv(\"GSCAM_CONFIG\");\n+\n+  if (!gsconfig_env && !gsconfig_rosparam_defined) {\n+    ROS_FATAL( \"Problem getting GSCAM_CONFIG environment variable and 'gscam_config' rosparam is not set. This is needed to set up a gstreamer pipeline.\" );\n+    return -1;\n+  } else if(gsconfig_env && gsconfig_rosparam_defined) {\n+    ROS_FATAL( \"Both GSCAM_CONFIG environment variable and 'gscam_config' rosparam are set. Please only define one.\" );\n+    return -1;\n+  } else if(gsconfig_env) {\n+    gsconfig = gsconfig_env;\n+  } else if(gsconfig_rosparam_defined) {\n+    gsconfig = gsconfig_rosparam;\n+  }\n \n-\t\tgst_element_set_state(pipeline, GST_STATE_PAUSED);\n+  // Initialize gstreamer pipeline\n+  gst_init(0,0);\n+  ROS_DEBUG_STREAM( \"Gstreamer Version: \" << gst_version_string() );\n \n-\t\tif (gst_element_get_state(pipeline, NULL, NULL, -1) == GST_STATE_CHANGE_FAILURE) {\n-\t\t\tstd::cout << \"Failed to PAUSE.\" << std::endl;\n-\t\t\texit(-1);\n-\t\t} else {\n-\t\t\tstd::cout << \"stream is PAUSED.\" << std::endl;\n-\t\t}\n-\t}\n+  GError *error = 0; //assignment to zero is a gst requirement\n+  GstElement *pipeline = gst_parse_launch(gsconfig.c_str(),&error);\n+  if (pipeline == NULL) {\n+    ROS_FATAL_STREAM( error->message );\n+    return -1;\n+  }\n+  GstElement * sink = gst_element_factory_make(\"appsink\",NULL);\n+  GstCaps * caps = gst_caps_new_simple(\"video/x-raw-rgb\", NULL);\n+  gst_app_sink_set_caps(GST_APP_SINK(sink), caps);\n+  gst_caps_unref(caps);\n+\n+  gst_base_sink_set_sync(GST_BASE_SINK(sink), TRUE);\n+\n+  if(GST_IS_PIPELINE(pipeline)) {\n+    GstPad *outpad = gst_bin_find_unlinked_pad(GST_BIN(pipeline), GST_PAD_SRC);\n+    g_assert(outpad);\n+    GstElement *outelement = gst_pad_get_parent_element(outpad);\n+    g_assert(outelement);\n+    gst_object_unref(outpad);\n+\n+\n+    if(!gst_bin_add(GST_BIN(pipeline), sink)) {\n+      ROS_FATAL(\"gst_bin_add() failed\"); // TODO: do some unref\n+      gst_object_unref(outelement);\n+      gst_object_unref(pipeline);\n+      return -1;\n+    }\n+\n+    if(!gst_element_link(outelement, sink)) {\n+      ROS_FATAL(\"GStreamer: cannot link outelement(\\\"%s\\\") -> sink\\n\", gst_element_get_name(outelement));\n+      gst_object_unref(outelement);\n+      gst_object_unref(pipeline);\n+      return -1;\n+    }\n+\n+    gst_object_unref(outelement);\n+  } else {\n+    GstElement* launchpipe = pipeline;\n+    pipeline = gst_pipeline_new(NULL);\n+    g_assert(pipeline);\n+\n+    gst_object_unparent(GST_OBJECT(launchpipe));\n+\n+    gst_bin_add_many(GST_BIN(pipeline), launchpipe, sink, NULL);\n+\n+    if(!gst_element_link(launchpipe, sink)) {\n+      ROS_FATAL(\"GStreamer: cannot link launchpipe -> sink\");\n+      gst_object_unref(pipeline);\n+      return -1;\n+    }\n+  }\n \n-\timage_transport::ImageTransport it(nh);\n-\timage_transport::CameraPublisher pub = it.advertiseCamera(\"gscam/image_raw\", 1);\n+  gst_element_set_state(pipeline, GST_STATE_PAUSED);\n \n-\tros::ServiceServer set_camera_info = nh.advertiseService(\"gscam/set_camera_info\", setCameraInfo);\n+  if (gst_element_get_state(pipeline, NULL, NULL, -1) == GST_STATE_CHANGE_FAILURE) {\n+    ROS_FATAL(\"Failed to PAUSE stream, check your gstreamer configuration.\");\n+    return -1;\n+  } else {\n+    ROS_INFO_STREAM(\"Stream is PAUSED.\");\n+  }\n \n-\tstd::cout << \"Processing...\" << std::endl;\n+  // Get the camera parameters file\n+  ros::param::param<std::string>(\"~/camera_parameters_file\",camera_parameters_file,\"../camera_parameters.txt\"); // default path is to preserve backwards-compatibilitiy\n \n-\t//processVideo\n-\trosPad = false;\n-\tgstreamerPad = true;\n-\tgst_element_set_state(pipeline, GST_STATE_PLAYING);\n-\twhile(nh.ok()) {\n-                // This should block until a new frame is awake, this way, we'll run at the \n-                // actual capture framerate of the device.\n-\t\tGstBuffer* buf = gst_app_sink_pull_buffer(GST_APP_SINK(sink));\n-\t\tif (!buf) break;\n+  // We could probably do something with the camera name, check\n+  // errors or something, but at the moment, we don't care.\n+  if (camera_calibration_parsers::readCalibrationIni(camera_parameters_file, camera_name, camera_info)) {\n+    ROS_INFO_STREAM(\"Successfully read camera calibration from \\\"\"<<camera_parameters_file<<\"\\\" for camera \\\"\"<<camera_name<<\"\\\".  Rerun camera calibrator if it is incorrect.\");\n+  }\n+  else {\n+    ROS_ERROR_STREAM(\"Camera parameters file \\\"\"<<camera_parameters_file<<\"\\\" not found.  Use default file if no other is available.\");\n+  }\n+\n+  // Get TF Frame\n+  if(!ros::param::get(\"~/frame_id\",camera_info.header.frame_id)){\n+    ROS_WARN(\"No camera frame_id set.\");\n+  }\n \n-\t\tGstPad* pad = gst_element_get_static_pad(sink, \"sink\");\n-\t\tconst GstCaps *caps = gst_pad_get_negotiated_caps(pad);\n-\t\tGstStructure *structure = gst_caps_get_structure(caps,0);\n-\t\tgst_structure_get_int(structure,\"width\",&width);\n-\t\tgst_structure_get_int(structure,\"height\",&height);\n+  // Pre-roll camera if needed\n+  int preroll;\n+  nh.param(\"brown/gscam/preroll\", preroll, 0);\n+  if (preroll) {\n+    //The PAUSE, PLAY, PAUSE, PLAY cycle is to ensure proper pre-roll\n+    //I am told this is needed and am erring on the side of caution.\n+    gst_element_set_state(pipeline, GST_STATE_PLAYING);\n+\n+    if (gst_element_get_state(pipeline, NULL, NULL, -1) == GST_STATE_CHANGE_FAILURE) {\n+      std::cout << \"Failed to PLAY.\" << std::endl;\n+      exit(-1);\n+    } else {\n+      std::cout << \"stream is PLAYING.\" << std::endl;\n+    }\n+\n+    gst_element_set_state(pipeline, GST_STATE_PAUSED);\n+\n+    if (gst_element_get_state(pipeline, NULL, NULL, -1) == GST_STATE_CHANGE_FAILURE) {\n+      std::cout << \"Failed to PAUSE.\" << std::endl;\n+      exit(-1);\n+    } else {\n+      std::cout << \"stream is PAUSED.\" << std::endl;\n+    }\n+  }\n \n-\t\t// Don't segfault if we get an unexpected buffer size\n+  // Create ROS camera interface\n+  image_transport::ImageTransport it(nh);\n+  image_transport::CameraPublisher pub = it.advertiseCamera(\"gscam/image_raw\", 1);\n+  ros::ServiceServer set_camera_info = nh.advertiseService(\"gscam/set_camera_info\", setCameraInfo);\n+\n+  ROS_INFO_STREAM(\"Processing...\");\n+\n+  //processVideo\n+  rosPad = false;\n+  gstreamerPad = true;\n+  gst_element_set_state(pipeline, GST_STATE_PLAYING);\n+  while(nh.ok()) {\n+    // This should block until a new frame is awake, this way, we'll run at the \n+    // actual capture framerate of the device.\n+    GstBuffer* buf = gst_app_sink_pull_buffer(GST_APP_SINK(sink));\n+\n+    // Stop on end of stream\n+    if (!buf) {\n+      ROS_WARN(\"GStreamer stream stopped! Cleaning up and exiting...\");\n+      break;\n+    }\n+\n+    GstPad* pad = gst_element_get_static_pad(sink, \"sink\");\n+    const GstCaps *caps = gst_pad_get_negotiated_caps(pad);\n+    GstStructure *structure = gst_caps_get_structure(caps,0);\n+    gst_structure_get_int(structure,\"width\",&width);\n+    gst_structure_get_int(structure,\"height\",&height);\n+\n+\t\t// Complain if the returned buffer is smaller than we expect\n \t\tif (buf->size < width * height * 3) {\n-\t\t\tstatic bool warning = false;\n-\t\t\tif (!warning) {\n-\t\t\t\twarning = true;\n-\t\t\t\tstd::cout << \"warning: expected frame to be \" << (width * height * 3) << \" bytes but got only \"\n-\t\t\t\t\t<< buf->size << \" bytes, ignoring unusable frames (make sure frames are raw RGB encoded)\" << std::endl;\n-\t\t\t}\n-\t\t\tcontinue;\n+      ROS_WARN_STREAM( \"GStreamer image buffer underflow: Expected frame to be \"\n+          << (width * height * 3) << \" bytes but got only \"\n+          << (buf->size) << \" bytes. (make sure frames are raw RGB encoded)\");\n \t\t}\n \n-\t\tsensor_msgs::Image msg;\n-\t\tmsg.width = width;\n-\t\tmsg.height = height;\n-\t\tmsg.encoding = \"rgb8\";\n-\t\tmsg.is_bigendian = false;\n-\t\tmsg.step = width*3;\n-\t\tmsg.data.resize(width*height*3);\n-\t\tstd::copy(buf->data, buf->data+(width*height*3), msg.data.begin());\n+    // Construct Image message\n+    sensor_msgs::Image msg;\n \n-\t\tpub.publish(msg, camera_info);\n+    // Header information\n+    msg.header.stamp = ros::Time::now();\n+    msg.header.frame_id = camera_info.header.frame_id;\n \n-                gst_buffer_unref(buf);\n+    // Image data and metadata\n+    msg.width = width; \n+    msg.height = height;\n+    msg.encoding = \"rgb8\";\n+    msg.is_bigendian = false;\n+    msg.step = width*3;\n+    msg.data.resize(width*height*3);\n \n-\t\tros::spinOnce();\n+    // Copy only the data we received\n+    std::copy(buf->data, (buf->data)+(buf->size), msg.data.begin());\n \n-\t}\n+    pub.publish(msg, camera_info);\n+\n+    gst_buffer_unref(buf);\n+\n+    ros::spinOnce();\n+  }\n \n-\t//close out\n-\tstd::cout << \"\\nquitting...\" << std::endl;\n-\tgst_element_set_state(pipeline, GST_STATE_NULL);\n-\tgst_object_unref(pipeline);\n+  // Clean up\n+  std::cout<<\"Stopping gstreamer pipeline...\"<<std::endl;\n+  gst_element_set_state(pipeline, GST_STATE_NULL);\n+  gst_object_unref(pipeline);\n \n-\treturn 0;\n+  return 0;\n }\n \n bool setCameraInfo(sensor_msgs::SetCameraInfo::Request &req, sensor_msgs::SetCameraInfo::Response &rsp) {\n \n   ROS_INFO(\"New camera info received\");\n   camera_info = req.camera_info;\n \n-  if (camera_calibration_parsers::writeCalibrationIni(\"../camera_parameters.txt\", \"gscam\", camera_info)) {\n-    ROS_INFO(\"Camera information written to camera_parameters.txt\");\n+  if (camera_calibration_parsers::writeCalibrationIni(camera_parameters_file, camera_name, camera_info)) {\n+    ROS_INFO_STREAM(\"Camera calibration info written to \\\"\"<<camera_parameters_file<<\"\\\" for camera \\\"\"<<camera_name<<\"\\\".\");\n     return true;\n   }\n   else {\n-    ROS_ERROR(\"Could not write camera_parameters.txt\");\n+    ROS_ERROR_STREAM(\"Could not write \\\"\"<<camera_parameters_file<<\"\\\"\");\n     return false;\n   }\n }"
+        }
+      ]
+    },
+    {
+      "author": "bulwahn",
+      "date": "2015-01-20T07:41:49Z",
+      "sha": "bac79bd5dc702ff2ffcdb2b270707fb52095f4c5",
+      "message": "gscam_nodelet.h: include scoped_ptr.hpp to compile with boost 1.57\n\nWhen compiling gscam with the currently latest boost version 1.57,\nit fails with:\nIn file included from [...]/src/gscam_nodelet.cpp:5:0:\n[...]/include/gscam/gscam_nodelet.h:20:12: error: 'scoped_ptr' in namespace 'boost' does not name a template type\n     boost::scoped_ptr<GSCam> gscam_driver_;\n            ^\n[...]/include/gscam/gscam_nodelet.h:21:12: error: 'scoped_ptr' in namespace 'boost' does not name a template type\n     boost::scoped_ptr<boost::thread> stream_thread_;\n            ^\n\nIt seems that the dependencies of boost/thread.hpp have changed\nand boost/scoped_ptr.hpp is not included anymore with\nboost/thread.hpp. Hence, the scoped_ptr is not defined in the\ngscam_nodelet header. After scanning quickly through the release\nnotes of version 1.57, the boost bug tracker and a few changesets,\nI could not find not a hint what has changed in the thread library\nthat gscam must include scoped_ptr itself.\n\nThis commit simply addresses the compiler error by explicitly\nadding boost's scoped_ptr header in the gscam_nodelet header.\nAs this commit also compiles with boost version 1.56, the commit\nis not expected to cause any problems with other build\nconfigurations.\n\nSigned-off-by: Lukas Bulwahn <lukas.bulwahn@oss.bmw-carit.de>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "c450dab01dd64b77eafcbbf1a04d44e3d1fb58b2",
+          "filename": "include/gscam/gscam_nodelet.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/bac79bd5dc702ff2ffcdb2b270707fb52095f4c5/include%2Fgscam%2Fgscam_nodelet.h",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/bac79bd5dc702ff2ffcdb2b270707fb52095f4c5/include%2Fgscam%2Fgscam_nodelet.h",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/include%2Fgscam%2Fgscam_nodelet.h?ref=bac79bd5dc702ff2ffcdb2b270707fb52095f4c5",
+          "patch": "@@ -6,6 +6,7 @@\n #include <gscam/gscam.h>\n \n #include <boost/thread.hpp>\n+#include <boost/scoped_ptr.hpp>\n \n namespace gscam {\n   class GSCamNodelet : public nodelet::Nodelet"
+        }
+      ]
+    },
+    {
+      "author": "blutack",
+      "date": "2014-10-01T16:09:41Z",
+      "sha": "30edca450554271b00ae464b5a430363d15f7e0b",
+      "message": "Remove dependency on opencv2 to fix under indigo\n\nPackages can no longer depend on opencv2 as of indigo. \r\nI've updated the package to depend instead on cv_bridge as suggested by http://wiki.ros.org/indigo/Migration#OpenCV.",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "458be1fb13d918b3d65d91dc5c6dcedfaeb794cc",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/30edca450554271b00ae464b5a430363d15f7e0b/package.xml",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/30edca450554271b00ae464b5a430363d15f7e0b/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/package.xml?ref=30edca450554271b00ae464b5a430363d15f7e0b",
+          "patch": "@@ -18,15 +18,15 @@\n   <build_depend>libgstreamer-plugins-base0.10-dev</build_depend>\n \n   <build_depend>nodelet</build_depend>\n-  <build_depend>opencv2</build_depend>\n+  <build_depend>cv_bridge</build_depend>\n   <build_depend>roscpp</build_depend>\n   <build_depend>image_transport</build_depend>\n   <build_depend>sensor_msgs</build_depend>\n   <build_depend>camera_calibration_parsers</build_depend>\n   <build_depend>camera_info_manager</build_depend>\n \n   <run_depend>nodelet</run_depend>\n-  <run_depend>opencv2</run_depend>\n+  <run_depend>cv_bridge</run_depend>\n   <run_depend>roscpp</run_depend>\n   <run_depend>image_transport</run_depend>\n   <run_depend>sensor_msgs</run_depend>"
+        }
+      ]
+    },
+    {
+      "author": "dhood",
+      "date": "2014-08-18T11:10:26Z",
+      "sha": "c5867b7a1ba3bd7063ea268d729c9c0b006f5f0b",
+      "message": "Install the parameters file refered to in v4l.launch",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "4d80953d376dc0acb722d957f7a5ecbce94f87a6",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/c5867b7a1ba3bd7063ea268d729c9c0b006f5f0b/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/c5867b7a1ba3bd7063ea268d729c9c0b006f5f0b/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/CMakeLists.txt?ref=c5867b7a1ba3bd7063ea268d729c9c0b006f5f0b",
+          "patch": "@@ -97,6 +97,10 @@ else()\n     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}\n     )\n \n+  install(FILES examples/uncalibrated_parameters.ini\n+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/examples\n+    )\n+\n   # Interim compatibility\n   # Remove this in the next release\n   install(FILES ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/gscam_node"
+        }
+      ]
+    },
+    {
+      "author": "rctoris",
+      "date": "2013-12-04T03:05:11Z",
+      "sha": "ac5657a02e258c6ec77333f9e1f4aed9d999bfd8",
+      "message": "Merge pull request #11 from cedricpradalier/master\n\nAdd jpeg direct publishing without decoding",
+      "files_changed": 3,
+      "additions": 118,
+      "deletions": 50,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "78902bea7b8611c478e9fa7e82c4aca5a56481bd",
+          "filename": "examples/v4ljpeg.launch",
+          "status": "added",
+          "additions": 20,
+          "deletions": 0,
+          "changes": 20,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/ac5657a02e258c6ec77333f9e1f4aed9d999bfd8/examples%2Fv4ljpeg.launch",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/ac5657a02e258c6ec77333f9e1f4aed9d999bfd8/examples%2Fv4ljpeg.launch",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/examples%2Fv4ljpeg.launch?ref=ac5657a02e258c6ec77333f9e1f4aed9d999bfd8",
+          "patch": "@@ -0,0 +1,20 @@\n+<launch>\n+  <!-- This launchfile should bring up a node that broadcasts a ros image\n+       transport on /webcam/image_raw -->\n+\n+  <arg name=\"DEVICE\" default=\"/dev/video0\"/>\n+  <!-- The GStreamer framerate needs to be an integral fraction -->\n+  <arg name=\"FPS\" default=\"30/1\"/>\n+  <arg name=\"PUBLISH_FRAME\" default=\"false\"/>\n+\n+  <node ns=\"v4l\" name=\"gscam_driver_v4l\" pkg=\"gscam\" type=\"gscam\" output=\"screen\">\n+    <param name=\"camera_name\" value=\"default\"/>\n+    <param name=\"camera_info_url\" value=\"package://gscam/examples/uncalibrated_parameters.ini\"/>\n+    <param name=\"gscam_config\" value=\"v4l2src do-timestamp=true is-live=true ! video/x-raw-yuv ! jpegenc ! multipartmux ! multipartdemux ! jpegparse\"/>\n+    <param name=\"use_gst_timestamps\" value=\"true\"/>\n+    <param name=\"image_encoding\" value=\"jpeg\"/>\n+    <param name=\"frame_id\" value=\"/v4l_frame\"/>\n+    <param name=\"sync_sink\" value=\"true\"/>\n+  </node>\n+\n+</launch>"
+        },
+        {
+          "sha": "e4b4ee2e47cbafde6ceb9701dd001fe5e3b055cb",
+          "filename": "include/gscam/gscam.h",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/ac5657a02e258c6ec77333f9e1f4aed9d999bfd8/include%2Fgscam%2Fgscam.h",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/ac5657a02e258c6ec77333f9e1f4aed9d999bfd8/include%2Fgscam%2Fgscam.h",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/include%2Fgscam%2Fgscam.h?ref=ac5657a02e258c6ec77333f9e1f4aed9d999bfd8",
+          "patch": "@@ -43,6 +43,7 @@ namespace gscam {\n     bool sync_sink_;\n     bool preroll_;\n     bool reopen_on_eof_;\n+    bool use_gst_timestamps_;\n \n     // Camera publisher configuration\n     std::string frame_id_;\n@@ -52,10 +53,15 @@ namespace gscam {\n     std::string camera_info_url_;\n \n     // ROS Inteface\n+    // Calibration between ros::Time and gst timestamps\n+    double time_offset_;\n     ros::NodeHandle nh_, nh_private_;\n     image_transport::ImageTransport image_transport_;\n     camera_info_manager::CameraInfoManager camera_info_manager_;\n     image_transport::CameraPublisher camera_pub_;\n+    // Case of a jpeg only publisher\n+    ros::Publisher jpeg_pub_;\n+    ros::Publisher cinfo_pub_;\n   };\n \n }"
+        },
+        {
+          "sha": "dc96c226d16978ad3fd889c74c555e6cc4aadba0",
+          "filename": "src/gscam.cpp",
+          "status": "modified",
+          "additions": 92,
+          "deletions": 50,
+          "changes": 142,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/ac5657a02e258c6ec77333f9e1f4aed9d999bfd8/src%2Fgscam.cpp",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/ac5657a02e258c6ec77333f9e1f4aed9d999bfd8/src%2Fgscam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/src%2Fgscam.cpp?ref=ac5657a02e258c6ec77333f9e1f4aed9d999bfd8",
+          "patch": "@@ -18,6 +18,7 @@ extern \"C\"{\n \n \n #include <sensor_msgs/Image.h>\n+#include <sensor_msgs/CompressedImage.h>\n #include <sensor_msgs/CameraInfo.h>\n #include <sensor_msgs/SetCameraInfo.h>\n #include <sensor_msgs/image_encodings.h>\n@@ -71,6 +72,7 @@ namespace gscam {\n     // Get additional gscam configuration\n     nh_private_.param(\"sync_sink\", sync_sink_, true);\n     nh_private_.param(\"preroll\", preroll_, false);\n+    nh_private_.param(\"use_gst_timestamps\", use_gst_timestamps_, false);\n \n     nh_private_.param(\"reopen_on_eof\", reopen_on_eof_, false);\n \n@@ -81,7 +83,8 @@ namespace gscam {\n     // Get the image encoding\n     nh_private_.param(\"image_encoding\", image_encoding_, sensor_msgs::image_encodings::RGB8);\n     if (image_encoding_ != sensor_msgs::image_encodings::RGB8 &&\n-        image_encoding_ != sensor_msgs::image_encodings::MONO8) {\n+        image_encoding_ != sensor_msgs::image_encodings::MONO8 && \n+        image_encoding_ != \"jpeg\") {\n       ROS_FATAL_STREAM(\"Unsupported image encoding: \" + image_encoding_);\n     }\n \n@@ -124,9 +127,14 @@ namespace gscam {\n \n     // Create RGB sink\n     sink_ = gst_element_factory_make(\"appsink\",NULL);\n-    GstCaps * caps = image_encoding_ == sensor_msgs::image_encodings::RGB8 ?\n-        gst_caps_new_simple(\"video/x-raw-rgb\", NULL) :\n-        gst_caps_new_simple(\"video/x-raw-gray\", NULL);\n+    GstCaps * caps = NULL;\n+    if (image_encoding_ == sensor_msgs::image_encodings::RGB8) {\n+        caps = gst_caps_new_simple(\"video/x-raw-rgb\", NULL); \n+    } else if (image_encoding_ == sensor_msgs::image_encodings::MONO8) {\n+        caps = gst_caps_new_simple(\"video/x-raw-gray\", NULL);\n+    } else if (image_encoding_ == \"jpeg\") {\n+        caps = gst_caps_new_simple(\"image/jpeg\", NULL);\n+    }\n     gst_app_sink_set_caps(GST_APP_SINK(sink_), caps);\n     gst_caps_unref(caps);\n \n@@ -176,6 +184,14 @@ namespace gscam {\n       }\n     }\n \n+    // Calibration between ros::Time and gst timestamps\n+    GstClock * clock = gst_system_clock_obtain();\n+    ros::Time now = ros::Time::now();\n+    GstClockTime ct = gst_clock_get_time(clock);\n+    gst_object_unref(clock);\n+    time_offset_ = now.toSec() - GST_TIME_AS_USECONDS(ct)/1e6;\n+    ROS_INFO(\"Time offset: %.3f\",time_offset_);\n+\n     gst_element_set_state(pipeline_, GST_STATE_PAUSED);\n \n     if (gst_element_get_state(pipeline_, NULL, NULL, -1) == GST_STATE_CHANGE_FAILURE) {\n@@ -186,7 +202,12 @@ namespace gscam {\n     }\n \n     // Create ROS camera interface\n-    camera_pub_ = image_transport_.advertiseCamera(\"camera/image_raw\", 1);\n+    if (image_encoding_ == \"jpeg\") {\n+        jpeg_pub_ = nh_.advertise<sensor_msgs::CompressedImage>(\"camera/image_raw/compressed\",1);\n+        cinfo_pub_ = nh_.advertise<sensor_msgs::CameraInfo>(\"camera/camera_info\",1);\n+    } else {\n+        camera_pub_ = image_transport_.advertiseCamera(\"camera/image_raw\", 1);\n+    }\n \n     return true;\n   }\n@@ -228,25 +249,30 @@ namespace gscam {\n     while(ros::ok()) {\n       // This should block until a new frame is awake, this way, we'll run at the\n       // actual capture framerate of the device.\n-      ROS_DEBUG(\"Getting data...\");\n+      // ROS_DEBUG(\"Getting data...\");\n       GstBuffer* buf = gst_app_sink_pull_buffer(GST_APP_SINK(sink_));\n+      GstClockTime bt = gst_element_get_base_time(pipeline_);\n+      // ROS_INFO(\"New buffer: timestamp %.6f %lu %lu %.3f\",\n+      //         GST_TIME_AS_USECONDS(buf->timestamp+bt)/1e6+time_offset_, buf->timestamp, bt, time_offset_);\n \n \n+#if 0\n       GstFormat fmt = GST_FORMAT_TIME;\n       gint64 current = -1;\n \n-      // Query the current position of the stream\n-      //if (gst_element_query_position(pipeline_, &fmt, &current)) {\n-        //ROS_INFO_STREAM(\"Position \"<<current);\n-      //}\n+       Query the current position of the stream\n+      if (gst_element_query_position(pipeline_, &fmt, &current)) {\n+          ROS_INFO_STREAM(\"Position \"<<current);\n+      }\n+#endif\n \n       // Stop on end of stream\n       if (!buf) {\n         ROS_INFO(\"Stream ended.\");\n         break;\n       }\n \n-      ROS_DEBUG(\"Got data.\");\n+      // ROS_DEBUG(\"Got data.\");\n \n       // Get the image width and height\n       GstPad* pad = gst_element_get_static_pad(sink_, \"sink\");\n@@ -255,50 +281,66 @@ namespace gscam {\n       gst_structure_get_int(structure,\"width\",&width_);\n       gst_structure_get_int(structure,\"height\",&height_);\n \n-      // Complain if the returned buffer is smaller than we expect\n-      const unsigned int expected_frame_size =\n-          image_encoding_ == sensor_msgs::image_encodings::RGB8\n-              ? width_ * height_ * 3\n-              : width_ * height_;\n-\n-      if (buf->size < expected_frame_size) {\n-        ROS_WARN_STREAM( \"GStreamer image buffer underflow: Expected frame to be \"\n-            << expected_frame_size << \" bytes but got only \"\n-            << (buf->size) << \" bytes. (make sure frames are correctly encoded)\");\n-      }\n-\n-      // Construct Image message\n-      sensor_msgs::ImagePtr img(new sensor_msgs::Image());\n-      sensor_msgs::CameraInfoPtr cinfo;\n-\n       // Update header information\n+      sensor_msgs::CameraInfoPtr cinfo;\n       cinfo.reset(new sensor_msgs::CameraInfo(camera_info_manager_.getCameraInfo()));\n-      cinfo->header.stamp = ros::Time::now();\n-      cinfo->header.frame_id = frame_id_;\n-      img->header = cinfo->header;\n-\n-      // Image data and metadata\n-      img->width = width_;\n-      img->height = height_;\n-      img->encoding = image_encoding_;\n-      img->is_bigendian = false;\n-      img->data.resize(expected_frame_size);\n-\n-      // Copy only the data we received\n-      // Since we're publishing shared pointers, we need to copy the image so\n-      // we can free the buffer allocated by gstreamer\n-      if (image_encoding_ == sensor_msgs::image_encodings::RGB8) {\n-        img->step = width_ * 3;\n+      if (use_gst_timestamps_) {\n+          cinfo->header.stamp = ros::Time(GST_TIME_AS_USECONDS(buf->timestamp+bt)/1e6+time_offset_);\n       } else {\n-        img->step = width_;\n+          cinfo->header.stamp = ros::Time::now();\n       }\n-      std::copy(\n-          buf->data,\n-          (buf->data)+(buf->size),\n-          img->data.begin());\n+      // ROS_INFO(\"Image time stamp: %.3f\",cinfo->header.stamp.toSec());\n+      cinfo->header.frame_id = frame_id_;\n+      if (image_encoding_ == \"jpeg\") {\n+          sensor_msgs::CompressedImagePtr img(new sensor_msgs::CompressedImage());\n+          img->header = cinfo->header;\n+          img->format = \"jpeg\";\n+          img->data.resize(buf->size);\n+          std::copy(buf->data, (buf->data)+(buf->size),\n+                  img->data.begin());\n+          jpeg_pub_.publish(img);\n+          cinfo_pub_.publish(cinfo);\n+      } else {\n+          // Complain if the returned buffer is smaller than we expect\n+          const unsigned int expected_frame_size =\n+              image_encoding_ == sensor_msgs::image_encodings::RGB8\n+              ? width_ * height_ * 3\n+              : width_ * height_;\n \n-      // Publish the image/info\n-      camera_pub_.publish(img, cinfo);\n+          if (buf->size < expected_frame_size) {\n+              ROS_WARN_STREAM( \"GStreamer image buffer underflow: Expected frame to be \"\n+                      << expected_frame_size << \" bytes but got only \"\n+                      << (buf->size) << \" bytes. (make sure frames are correctly encoded)\");\n+          }\n+\n+          // Construct Image message\n+          sensor_msgs::ImagePtr img(new sensor_msgs::Image());\n+\n+          img->header = cinfo->header;\n+\n+          // Image data and metadata\n+          img->width = width_;\n+          img->height = height_;\n+          img->encoding = image_encoding_;\n+          img->is_bigendian = false;\n+          img->data.resize(expected_frame_size);\n+\n+          // Copy only the data we received\n+          // Since we're publishing shared pointers, we need to copy the image so\n+          // we can free the buffer allocated by gstreamer\n+          if (image_encoding_ == sensor_msgs::image_encodings::RGB8) {\n+              img->step = width_ * 3;\n+          } else {\n+              img->step = width_;\n+          }\n+          std::copy(\n+                  buf->data,\n+                  (buf->data)+(buf->size),\n+                  img->data.begin());\n+\n+          // Publish the image/info\n+          camera_pub_.publish(img, cinfo);\n+      }\n \n       // Release the buffer\n       gst_buffer_unref(buf);"
+        }
+      ]
+    },
+    {
+      "author": "kubark42",
+      "date": "2014-05-21T02:22:59Z",
+      "sha": "543ec261de5ce9117500eefe948e8ee822717ca9",
+      "message": "Examples: Added example for OSX\n\nAdd a simple launch configuration for OSX. The camera can be selected by\nchanging the default=\"0\" to the appropriate integer.",
+      "files_changed": 1,
+      "additions": 20,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "797385177a904baa9de56b7711bc86f302698c8d",
+          "filename": "examples/osx.launch",
+          "status": "added",
+          "additions": 20,
+          "deletions": 0,
+          "changes": 20,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/543ec261de5ce9117500eefe948e8ee822717ca9/examples%2Fosx.launch",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/543ec261de5ce9117500eefe948e8ee822717ca9/examples%2Fosx.launch",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/examples%2Fosx.launch?ref=543ec261de5ce9117500eefe948e8ee822717ca9",
+          "patch": "@@ -0,0 +1,20 @@\n+<launch>\n+  <!-- This launchfile should bring up a node that broadcasts a ros image\n+       transport on /webcam/image_raw -->\n+\n+  <!-- The GStreamer device-index needs to be an integer -->\n+  <arg name=\"DEVICE_INDEX\" default=\"0\"/>\n+  <!-- The GStreamer framerate needs to be an integral fraction -->\n+  <arg name=\"FPS\" default=\"30/1\"/>\n+  <arg name=\"PUBLISH_FRAME\" default=\"false\"/>\n+\n+  <node ns=\"qtkit\" name=\"gscam_driver_qtkit\" pkg=\"gscam\" type=\"gscam\" output=\"screen\">\n+    <param name=\"camera_name\" value=\"default\"/>\n+    <param name=\"camera_info_url\" value=\"package://gscam/examples/uncalibrated_parameters.ini\"/>\n+    <param name=\"gscam_config\" value=\"qtkitvideosrc device-index=$(arg DEVICE_INDEX) ! video/x-raw-yuv,framerate=$(arg FPS) ! ffmpegcolorspace\"/>\n+    <param name=\"frame_id\" value=\"/qtkit_frame\"/>\n+    <param name=\"sync_sink\" value=\"true\"/>\n+  </node>\n+\n+  <node if=\"$(arg PUBLISH_FRAME)\" name=\"qtkit_transform\" pkg=\"tf\" type=\"static_transform_publisher\" args=\"1 2 3 0 -3.141 0 /world /qtkit_frame 10\"/>\n+</launch>"
+        }
+      ]
+    },
+    {
+      "author": "cedricpradalier",
+      "date": "2013-11-26T13:05:01Z",
+      "sha": "e45140e992183f4548c81882efca4aaedcf14ea2",
+      "message": "Prepared for jpeg-only subscription",
+      "files_changed": 2,
+      "additions": 69,
+      "deletions": 43,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "f671e1436f9da4c5db95cf0da7999bb69a071a0a",
+          "filename": "include/gscam/gscam.h",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/e45140e992183f4548c81882efca4aaedcf14ea2/include%2Fgscam%2Fgscam.h",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/e45140e992183f4548c81882efca4aaedcf14ea2/include%2Fgscam%2Fgscam.h",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/include%2Fgscam%2Fgscam.h?ref=e45140e992183f4548c81882efca4aaedcf14ea2",
+          "patch": "@@ -56,6 +56,9 @@ namespace gscam {\n     image_transport::ImageTransport image_transport_;\n     camera_info_manager::CameraInfoManager camera_info_manager_;\n     image_transport::CameraPublisher camera_pub_;\n+    // Case of a jpeg only publisher\n+    ros::Publisher jpeg_pub_;\n+    ros::Publisher cinfo_pub_;\n   };\n \n }"
+        },
+        {
+          "sha": "7e7905bc6ef4a82e4b1d9721f2aad4c82dd168a8",
+          "filename": "src/gscam.cpp",
+          "status": "modified",
+          "additions": 66,
+          "deletions": 43,
+          "changes": 109,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/e45140e992183f4548c81882efca4aaedcf14ea2/src%2Fgscam.cpp",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/e45140e992183f4548c81882efca4aaedcf14ea2/src%2Fgscam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/src%2Fgscam.cpp?ref=e45140e992183f4548c81882efca4aaedcf14ea2",
+          "patch": "@@ -18,6 +18,7 @@ extern \"C\"{\n \n \n #include <sensor_msgs/Image.h>\n+#include <sensor_msgs/CompressedImage.h>\n #include <sensor_msgs/CameraInfo.h>\n #include <sensor_msgs/SetCameraInfo.h>\n #include <sensor_msgs/image_encodings.h>\n@@ -81,7 +82,8 @@ namespace gscam {\n     // Get the image encoding\n     nh_private_.param(\"image_encoding\", image_encoding_, sensor_msgs::image_encodings::RGB8);\n     if (image_encoding_ != sensor_msgs::image_encodings::RGB8 &&\n-        image_encoding_ != sensor_msgs::image_encodings::MONO8) {\n+        image_encoding_ != sensor_msgs::image_encodings::MONO8 && \n+        image_encoding_ != \"jpeg\") {\n       ROS_FATAL_STREAM(\"Unsupported image encoding: \" + image_encoding_);\n     }\n \n@@ -124,9 +126,14 @@ namespace gscam {\n \n     // Create RGB sink\n     sink_ = gst_element_factory_make(\"appsink\",NULL);\n-    GstCaps * caps = image_encoding_ == sensor_msgs::image_encodings::RGB8 ?\n-        gst_caps_new_simple(\"video/x-raw-rgb\", NULL) :\n-        gst_caps_new_simple(\"video/x-raw-gray\", NULL);\n+    GstCaps * caps = NULL;\n+    if (image_encoding_ == sensor_msgs::image_encodings::RGB8) {\n+        caps = gst_caps_new_simple(\"video/x-raw-rgb\", NULL); \n+    } else if (image_encoding_ == sensor_msgs::image_encodings::MONO8) {\n+        caps = gst_caps_new_simple(\"video/x-raw-gray\", NULL);\n+    } else if (image_encoding_ == \"jpeg\") {\n+        caps = gst_caps_new_simple(\"image/jpeg\", NULL);\n+    }\n     gst_app_sink_set_caps(GST_APP_SINK(sink_), caps);\n     gst_caps_unref(caps);\n \n@@ -186,7 +193,12 @@ namespace gscam {\n     }\n \n     // Create ROS camera interface\n-    camera_pub_ = image_transport_.advertiseCamera(\"camera/image_raw\", 1);\n+    if (image_encoding_ == \"jpeg\") {\n+        jpeg_pub_ = nh_.advertise<sensor_msgs::CompressedImage>(\"camera/image_raw/compressed\",1);\n+        cinfo_pub_ = nh_.advertise<sensor_msgs::CameraInfo>(\"camera/camera_info\",1);\n+    } else {\n+        camera_pub_ = image_transport_.advertiseCamera(\"camera/image_raw\", 1);\n+    }\n \n     return true;\n   }\n@@ -255,50 +267,61 @@ namespace gscam {\n       gst_structure_get_int(structure,\"width\",&width_);\n       gst_structure_get_int(structure,\"height\",&height_);\n \n-      // Complain if the returned buffer is smaller than we expect\n-      const unsigned int expected_frame_size =\n-          image_encoding_ == sensor_msgs::image_encodings::RGB8\n-              ? width_ * height_ * 3\n-              : width_ * height_;\n-\n-      if (buf->size < expected_frame_size) {\n-        ROS_WARN_STREAM( \"GStreamer image buffer underflow: Expected frame to be \"\n-            << expected_frame_size << \" bytes but got only \"\n-            << (buf->size) << \" bytes. (make sure frames are correctly encoded)\");\n-      }\n-\n-      // Construct Image message\n-      sensor_msgs::ImagePtr img(new sensor_msgs::Image());\n-      sensor_msgs::CameraInfoPtr cinfo;\n-\n       // Update header information\n+      sensor_msgs::CameraInfoPtr cinfo;\n       cinfo.reset(new sensor_msgs::CameraInfo(camera_info_manager_.getCameraInfo()));\n       cinfo->header.stamp = ros::Time::now();\n       cinfo->header.frame_id = frame_id_;\n-      img->header = cinfo->header;\n-\n-      // Image data and metadata\n-      img->width = width_;\n-      img->height = height_;\n-      img->encoding = image_encoding_;\n-      img->is_bigendian = false;\n-      img->data.resize(expected_frame_size);\n-\n-      // Copy only the data we received\n-      // Since we're publishing shared pointers, we need to copy the image so\n-      // we can free the buffer allocated by gstreamer\n-      if (image_encoding_ == sensor_msgs::image_encodings::RGB8) {\n-        img->step = width_ * 3;\n+      if (image_encoding_ == \"jpeg\") {\n+          sensor_msgs::CompressedImagePtr img(new sensor_msgs::CompressedImage());\n+          img->header = cinfo->header;\n+          img->format = \"jpeg\";\n+          img->data.resize(buf->size);\n+          std::copy(buf->data, (buf->data)+(buf->size),\n+                  img->data.begin());\n+          jpeg_pub_.publish(img);\n+          cinfo_pub_.publish(cinfo);\n       } else {\n-        img->step = width_;\n-      }\n-      std::copy(\n-          buf->data,\n-          (buf->data)+(buf->size),\n-          img->data.begin());\n+          // Complain if the returned buffer is smaller than we expect\n+          const unsigned int expected_frame_size =\n+              image_encoding_ == sensor_msgs::image_encodings::RGB8\n+              ? width_ * height_ * 3\n+              : width_ * height_;\n \n-      // Publish the image/info\n-      camera_pub_.publish(img, cinfo);\n+          if (buf->size < expected_frame_size) {\n+              ROS_WARN_STREAM( \"GStreamer image buffer underflow: Expected frame to be \"\n+                      << expected_frame_size << \" bytes but got only \"\n+                      << (buf->size) << \" bytes. (make sure frames are correctly encoded)\");\n+          }\n+\n+          // Construct Image message\n+          sensor_msgs::ImagePtr img(new sensor_msgs::Image());\n+\n+          img->header = cinfo->header;\n+\n+          // Image data and metadata\n+          img->width = width_;\n+          img->height = height_;\n+          img->encoding = image_encoding_;\n+          img->is_bigendian = false;\n+          img->data.resize(expected_frame_size);\n+\n+          // Copy only the data we received\n+          // Since we're publishing shared pointers, we need to copy the image so\n+          // we can free the buffer allocated by gstreamer\n+          if (image_encoding_ == sensor_msgs::image_encodings::RGB8) {\n+              img->step = width_ * 3;\n+          } else {\n+              img->step = width_;\n+          }\n+          std::copy(\n+                  buf->data,\n+                  (buf->data)+(buf->size),\n+                  img->data.begin());\n+\n+          // Publish the image/info\n+          camera_pub_.publish(img, cinfo);\n+      }\n \n       // Release the buffer\n       gst_buffer_unref(buf);"
+        }
+      ]
+    },
+    {
+      "author": "Séverin Lemaignan",
+      "date": "2013-11-19T12:16:45Z",
+      "sha": "a77a4743828fda1d19ed103569c8a7a57e96b42d",
+      "message": "Added missing bits to install the nodelet",
+      "files_changed": 2,
+      "additions": 9,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "69c05b7d17cef5983ddcfd5f3e4d8cf1ddcdd82e",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/a77a4743828fda1d19ed103569c8a7a57e96b42d/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/a77a4743828fda1d19ed103569c8a7a57e96b42d/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/CMakeLists.txt?ref=a77a4743828fda1d19ed103569c8a7a57e96b42d",
+          "patch": "@@ -73,6 +73,10 @@ else()\n     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n     )\n \n+   install(FILES nodelet_plugins.xml\n+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}\n+        )\n+\n \n   # Interim compatibility\n   # Remove this in the next release"
+        },
+        {
+          "sha": "421d6b0901ae5cb3461f28f11f3523fe87dd2edc",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/a77a4743828fda1d19ed103569c8a7a57e96b42d/package.xml",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/a77a4743828fda1d19ed103569c8a7a57e96b42d/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/package.xml?ref=a77a4743828fda1d19ed103569c8a7a57e96b42d",
+          "patch": "@@ -33,6 +33,11 @@\n   <run_depend>sensor_msgs</run_depend>\n   <run_depend>camera_calibration_parsers</run_depend>\n   <run_depend>camera_info_manager</run_depend>\n+  \n+  <export>\n+      <nodelet plugin=\"${prefix}/nodelet_plugins.xml\"/>\n+  </export>\n+\n \n </package>\n "
+        }
+      ]
+    },
+    {
+      "author": "SirVer",
+      "date": "2013-06-03T12:28:11Z",
+      "sha": "8dce9c9de6b83f409834a7a4a7650e00126f332e",
+      "message": "Add in support for mono cameras.",
+      "files_changed": 2,
+      "additions": 36,
+      "deletions": 15,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b93ce45bc12e6d9c1ca2711147b814151ff5ca35",
+          "filename": "include/gscam/gscam.h",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/8dce9c9de6b83f409834a7a4a7650e00126f332e/include%2Fgscam%2Fgscam.h",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/8dce9c9de6b83f409834a7a4a7650e00126f332e/include%2Fgscam%2Fgscam.h",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/include%2Fgscam%2Fgscam.h?ref=8dce9c9de6b83f409834a7a4a7650e00126f332e",
+          "patch": "@@ -46,7 +46,8 @@ namespace gscam {\n \n     // Camera publisher configuration\n     std::string frame_id_;\n-    int width_, height_;\n+    int width_, height_, bpp_;\n+    std::string image_encoding_;\n     std::string camera_name_;\n     std::string camera_info_url_;\n "
+        },
+        {
+          "sha": "7c4762bede050976da8c12afc0542a747b93e105",
+          "filename": "src/gscam.cpp",
+          "status": "modified",
+          "additions": 34,
+          "deletions": 14,
+          "changes": 48,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/8dce9c9de6b83f409834a7a4a7650e00126f332e/src%2Fgscam.cpp",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/8dce9c9de6b83f409834a7a4a7650e00126f332e/src%2Fgscam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/src%2Fgscam.cpp?ref=8dce9c9de6b83f409834a7a4a7650e00126f332e",
+          "patch": "@@ -19,21 +19,23 @@ extern \"C\"{\n #include <sensor_msgs/Image.h>\n #include <sensor_msgs/CameraInfo.h>\n #include <sensor_msgs/SetCameraInfo.h>\n+#include <sensor_msgs/image_encodings.h>\n \n #include <camera_calibration_parsers/parse_ini.h>\n \n #include <gscam/gscam.h>\n \n namespace gscam {\n \n-  GSCam::GSCam(ros::NodeHandle nh_camera, ros::NodeHandle nh_private) : \n+  GSCam::GSCam(ros::NodeHandle nh_camera, ros::NodeHandle nh_private) :\n     gsconfig_(\"\"),\n     pipeline_(NULL),\n     sink_(NULL),\n     nh_(nh_camera),\n     nh_private_(nh_private),\n     image_transport_(nh_camera),\n-    camera_info_manager_(nh_camera)\n+    camera_info_manager_(nh_camera),\n+    image_encoding_(sensor_msgs::image_encodings::RGB8)\n   {\n   }\n \n@@ -76,10 +78,17 @@ namespace gscam {\n     nh_private_.getParam(\"camera_info_url\", camera_info_url_);\n     nh_private_.getParam(\"camera_name\", camera_name_);\n \n+    // Get the image encoding\n+    nh_private_.getParam(\"image_encoding\", image_encoding_);\n+    if (image_encoding_ != sensor_msgs::image_encodings::RGB8 &&\n+        image_encoding_ != sensor_msgs::image_encodings::MONO8) {\n+      ROS_FATAL_STREAM(\"Unsupported image encoding: \" + image_encoding_);\n+    }\n+\n     camera_info_manager_.setCameraName(camera_name_);\n \n     if(camera_info_manager_.validateURL(camera_info_url_)) {\n-      camera_info_manager_.loadCameraInfo(camera_info_url_); \n+      camera_info_manager_.loadCameraInfo(camera_info_url_);\n       ROS_INFO_STREAM(\"Loaded camera calibration from \"<<camera_info_url_);\n     } else {\n       ROS_WARN_STREAM(\"Camera info at: \"<<camera_info_url_<<\" not found. Using an uncalibrated config.\");\n@@ -115,15 +124,17 @@ namespace gscam {\n \n     // Create RGB sink\n     sink_ = gst_element_factory_make(\"appsink\",NULL);\n-    GstCaps * caps = gst_caps_new_simple(\"video/x-raw-rgb\", NULL);\n+    GstCaps * caps = image_encoding_ == sensor_msgs::image_encodings::RGB8 ?\n+        gst_caps_new_simple(\"video/x-raw-rgb\", NULL) :\n+        gst_caps_new_simple(\"video/x-raw-gray\", NULL);\n     gst_app_sink_set_caps(GST_APP_SINK(sink_), caps);\n     gst_caps_unref(caps);\n \n     // Set whether the sink should sync\n     // Sometimes setting this to true can cause a large number of frames to be\n     // dropped\n     gst_base_sink_set_sync(\n-        GST_BASE_SINK(sink_), \n+        GST_BASE_SINK(sink_),\n         (sync_sink_) ? TRUE : FALSE);\n \n     if(GST_IS_PIPELINE(pipeline_)) {\n@@ -180,7 +191,7 @@ namespace gscam {\n     return true;\n   }\n \n-  void GSCam::publish_stream() \n+  void GSCam::publish_stream()\n   {\n     ROS_INFO_STREAM(\"Publishing stream...\");\n \n@@ -215,7 +226,7 @@ namespace gscam {\n \n     // Poll the data as fast a spossible\n     while(ros::ok()) {\n-      // This should block until a new frame is awake, this way, we'll run at the \n+      // This should block until a new frame is awake, this way, we'll run at the\n       // actual capture framerate of the device.\n       ROS_DEBUG(\"Getting data...\");\n       GstBuffer* buf = gst_app_sink_pull_buffer(GST_APP_SINK(sink_));\n@@ -245,10 +256,15 @@ namespace gscam {\n       gst_structure_get_int(structure,\"height\",&height_);\n \n       // Complain if the returned buffer is smaller than we expect\n-      if (buf->size < unsigned(width_ * height_ * 3)) {\n+      const unsigned int expected_frame_size =\n+          image_encoding_ == sensor_msgs::image_encodings::RGB8\n+              ? width_ * height_ * 3\n+              : width_ * height_;\n+\n+      if (buf->size < expected_frame_size) {\n         ROS_WARN_STREAM( \"GStreamer image buffer underflow: Expected frame to be \"\n-            << (width_ * height_ * 3) << \" bytes but got only \"\n-            << (buf->size) << \" bytes. (make sure frames are raw RGB encoded)\");\n+            << expected_frame_size << \" bytes but got only \"\n+            << (buf->size) << \" bytes. (make sure frames are correctly encoded)\");\n       }\n \n       // Construct Image message\n@@ -262,16 +278,20 @@ namespace gscam {\n       img->header = cinfo->header;\n \n       // Image data and metadata\n-      img->width = width_; \n+      img->width = width_;\n       img->height = height_;\n-      img->encoding = \"rgb8\";\n+      img->encoding = image_encoding_;\n       img->is_bigendian = false;\n-      img->step = width_*3;\n-      img->data.resize(width_*height_*3);\n+      img->data.resize(expected_frame_size);\n \n       // Copy only the data we received\n       // Since we're publishing shared pointers, we need to copy the image so\n       // we can free the buffer allocated by gstreamer\n+      if (image_encoding_ == sensor_msgs::image_encodings::RGB8) {\n+        img->step = width_ * 3;\n+      } else {\n+        img->step = width_;\n+      }\n       std::copy(\n           buf->data,\n           (buf->data)+(buf->size),"
+        }
+      ]
+    },
+    {
+      "author": "evan.exe@gmail.com",
+      "date": "2012-05-08T16:55:53Z",
+      "sha": "d7e79163225ed2a6eb8c0df3b5b023d3be185cde",
+      "message": "avoid segfault when buffer size is too small\n\ngit-svn-id: http://brown-ros-pkg.googlecode.com/svn/trunk/experimental/gscam@2756 0d49d21e-669f-11de-873c-fb8c264d332a",
+      "files_changed": 1,
+      "additions": 12,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "2aa26fdb05ad17e368b3adce9d289152adaac421",
+          "filename": "src/gscam.cpp",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 1,
+          "changes": 13,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/d7e79163225ed2a6eb8c0df3b5b023d3be185cde/src%2Fgscam.cpp",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/d7e79163225ed2a6eb8c0df3b5b023d3be185cde/src%2Fgscam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/src%2Fgscam.cpp?ref=d7e79163225ed2a6eb8c0df3b5b023d3be185cde",
+          "patch": "@@ -158,8 +158,19 @@ int main(int argc, char** argv) {\n \t\tgst_structure_get_int(structure,\"width\",&width);\n \t\tgst_structure_get_int(structure,\"height\",&height);\n \n+\t\t// Don't segfault if we get an unexpected buffer size\n+\t\tif (buf->size < width * height * 3) {\n+\t\t\tstatic bool warning = false;\n+\t\t\tif (!warning) {\n+\t\t\t\twarning = true;\n+\t\t\t\tstd::cout << \"warning: expected frame to be \" << (width * height * 3) << \" bytes but got only \"\n+\t\t\t\t\t<< buf->size << \" bytes, ignoring unusable frames (make sure frames are raw RGB encoded)\" << std::endl;\n+\t\t\t}\n+\t\t\tcontinue;\n+\t\t}\n+\n \t\tsensor_msgs::Image msg;\n-\t\tmsg.width = width; \n+\t\tmsg.width = width;\n \t\tmsg.height = height;\n \t\tmsg.encoding = \"rgb8\";\n \t\tmsg.is_bigendian = false;"
+        }
+      ]
+    },
+    {
+      "author": "nevernim@gmail.com",
+      "date": "2012-01-23T15:47:04Z",
+      "sha": "7de52ed09a145d96a501e31f714aad218d1b4006",
+      "message": "ROSProcessingjs clean-up\n\ngit-svn-id: http://brown-ros-pkg.googlecode.com/svn/trunk/experimental/gscam@1864 0d49d21e-669f-11de-873c-fb8c264d332a",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "bb725c888e3012c6867716cee72b4941253f225a",
+          "filename": "camera_parameters.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/7de52ed09a145d96a501e31f714aad218d1b4006/camera_parameters.txt",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/7de52ed09a145d96a501e31f714aad218d1b4006/camera_parameters.txt",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/camera_parameters.txt?ref=7de52ed09a145d96a501e31f714aad218d1b4006",
+          "patch": "@@ -3,10 +3,10 @@\n [image]\n \n width\n-640\n+320\n \n height\n-480\n+240\n \n [default]\n "
+        }
+      ]
+    },
+    {
+      "author": "trevorjay",
+      "date": "2010-06-01T15:08:28Z",
+      "sha": "710d918861fb17f9feb2bbcc6e2b8dd7bc9800b4",
+      "message": "two publishers\n\ngit-svn-id: http://brown-ros-pkg.googlecode.com/svn/trunk/experimental/gscam@632 0d49d21e-669f-11de-873c-fb8c264d332a",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "eb044f89843eb282b3e3fd11d2755dfa38a4f2e5",
+          "filename": "src/gscam.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/710d918861fb17f9feb2bbcc6e2b8dd7bc9800b4/src%2Fgscam.cpp",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/710d918861fb17f9feb2bbcc6e2b8dd7bc9800b4/src%2Fgscam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/src%2Fgscam.cpp?ref=710d918861fb17f9feb2bbcc6e2b8dd7bc9800b4",
+          "patch": "@@ -101,6 +101,7 @@ int main(int argc, char** argv) {\n \n \timage_transport::ImageTransport it(nh);\n \timage_transport::CameraPublisher pub = it.advertiseCamera(\"gscam/image_raw\", 1);\n+\timage_transport::Publisher trans = it.advertise(\"gscam/image\", 1);\n \n \tros::ServiceServer set_camera_info = nh.advertiseService(\"gscam/set_camera_info\", setCameraInfo);\n \n@@ -127,6 +128,7 @@ int main(int argc, char** argv) {\n \t\tstd::copy(buffer, buffer+(width*height*3), msg.data.begin());\n \n \t\tpub.publish(msg, camera_info);\n+\t\ttrans.publish(msg);\n \n \t\tros::spinOnce();\n "
+        }
+      ]
+    },
+    {
+      "author": "chriscrick",
+      "date": "2010-04-08T17:47:15Z",
+      "sha": "15a9648f32d99d353b93c878734bb3116d128235",
+      "message": "Changed the name of the GStreamer camera package.  probe will henceforth be known as gscam.\n\n\n\ngit-svn-id: http://brown-ros-pkg.googlecode.com/svn/trunk/experimental/gscam@506 0d49d21e-669f-11de-873c-fb8c264d332a",
+      "files_changed": 6,
+      "additions": 266,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "00949bd2955018e725a99004ae67af2a87f7bfbb",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 34,
+          "deletions": 0,
+          "changes": 34,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/15a9648f32d99d353b93c878734bb3116d128235/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/15a9648f32d99d353b93c878734bb3116d128235/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/CMakeLists.txt?ref=15a9648f32d99d353b93c878734bb3116d128235",
+          "patch": "@@ -0,0 +1,34 @@\n+cmake_minimum_required(VERSION 2.4.6)\n+include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)\n+\n+# Set the build type.  Options are:\n+#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage\n+#  Debug          : w/ debug symbols, w/o optimization\n+#  Release        : w/o debug symbols, w/ optimization\n+#  RelWithDebInfo : w/ debug symbols, w/ optimization\n+#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries\n+#set(ROS_BUILD_TYPE RelWithDebInfo)\n+\n+rosbuild_init()\n+\n+#set the default path for built executables to the \"bin\" directory\n+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)\n+#set the default path for built libraries to the \"lib\" directory\n+set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)\n+\n+#uncomment if you have defined messages\n+#rosbuild_genmsg()\n+#uncomment if you have defined services\n+#rosbuild_gensrv()\n+\n+#common commands for building c++ executables and libraries\n+#rosbuild_add_library(${PROJECT_NAME} src/example.cpp)\n+#target_link_libraries(${PROJECT_NAME} another_library)\n+#rosbuild_add_boost_directories()\n+#rosbuild_link_boost(${PROJECT_NAME} thread)\n+#rosbuild_add_executable(example examples/example.cpp)\n+#target_link_libraries(example ${PROJECT_NAME})\n+\n+include_directories(/usr/include/gstreamer-0.10 /usr/include/glib-2.0 /usr/lib/glib-2.0/include /usr/include/libxml2)\n+rosbuild_add_executable(gscam src/gscam.cpp)\n+target_link_libraries(gscam gstreamer-0.10 gobject-2.0 gmodule-2.0 gthread-2.0 rt xml2 glib-2.0 pthread)"
+        },
+        {
+          "sha": "b75b928f20ef9ea4f509a17db62e4e31b422c27f",
+          "filename": "Makefile",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/15a9648f32d99d353b93c878734bb3116d128235/Makefile",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/15a9648f32d99d353b93c878734bb3116d128235/Makefile",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/Makefile?ref=15a9648f32d99d353b93c878734bb3116d128235",
+          "patch": "@@ -0,0 +1 @@\n+include $(shell rospack find mk)/cmake.mk\n\\ No newline at end of file"
+        },
+        {
+          "sha": "f11fd65fc68ba42e439284baf2a3b48b1476c33b",
+          "filename": "README.txt",
+          "status": "added",
+          "additions": 63,
+          "deletions": 0,
+          "changes": 63,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/15a9648f32d99d353b93c878734bb3116d128235/README.txt",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/15a9648f32d99d353b93c878734bb3116d128235/README.txt",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/README.txt?ref=15a9648f32d99d353b93c878734bb3116d128235",
+          "patch": "@@ -0,0 +1,63 @@\n+------------------------------------------------------------\n+------------------------------------------------------------\n+Overview:\n+------------------------------------------------------------\n+\tgscam is meant as a simple approach to using a webcam in ROS that\n+maximizes compatibility. gscam leverages Gstreamer [ http://www.gstreamer.net/\n+], a multimedia framework similiar to DirectShow. Specifically: Gstreamer can be\n+used to build up multimedia \"pipelines\" consisting of sources, sinks, and\n+filters. For example: a v4l webcam *source* might be *filtered* by an upscaler\n+before being sent to the screen (a *sink*). Alternately, a mp4 file might act as\n+a source and be filtered into an avi file as a sink. There are many\n+possibilities. For an overview see: [\"Using Gstreamer\"\n+http://gstreamer.freedesktop.org/data/doc/gstreamer/head/faq/html/chapter-using.html\n+]. gscam can attach itself to an identity filter within any Gstreamer pipeline\n+that gscam itself launches. Provided this pipeline is processing RGB video,\n+gscam will rebroadcast the video over a standard ROS image transport. Since\n+Gstreamer is compatibile with almost every video capture standard under Linux\n+(and many on OSX), gscam makes ROS defacto compatible with almost every Linux\n+webcam or video system available. Moreover, because there are a number of\n+Gstreamer filters for processing video (e.g. white-balancing, cropping, etc.)\n+gscam allows for a more advanced video processing even with cheaper webcams.\n+\n+\tGstreamer is an extremely rich framework, but basic usage is fairly\n+simple. Please see the \"Basic Usage\" section to get started. You may also find\n+the Gstreamer documentation on their website to be helpful.\n+\n+------------------------------------------------------------\n+------------------------------------------------------------\n+Requirements:\n+------------------------------------------------------------\n+\tObviously, gscam requires the Gstreamer libraries and include files to\n+be available in order to build. Additionally, most operating systems tend to\n+make available various seperate packages of Gstreamer \"plugins\" (sources, sinks,\n+and filters). The more of these the merrier, as each adds a unique feature\n+possibility to the available pipelines.\n+\n+------------------------------------------------------------\n+------------------------------------------------------------\n+Basic Usage:\n+------------------------------------------------------------\n+\n+gscam expects an enviromental variable, GSCAM_CONFIG, to contain a gstreamer\n+pipeline definition for it to launch. There are two restrictions:\n+\n+1) At some point in the pipeline there *must* be an identity filter named ros .\n+2) At the point in the pipeline where the ros identity filter is attached, the\n+pipeline *must* be carrying RGB formatted video.\n+\n+Here's an example launch that should work on almost any machine where Gstreamer\n+is installed and a camera of some kind is available:\n+\n+export GSCAM_CONFIG=\"v4l2src device=/dev/video2 ! video/x-raw-rgb ! ffmpegcolorspace ! identity name=ros ! fakesink\"\n+rosrun gscam gscam\n+\n+If you see a message about a \"failure to PAUSE\" or something similiar, the most\n+likely cause is a permission issue with the available video devices.\n+\n+If you see a \"Processing...\" message, it means gscam is happily publising to\n+the /gscam/image_raw image transport.\n+\n+You can graphically explore many of the available video devices with the\n+gstreamer-properties utility. gst-inspect-0.10 (or .09 or whatever is your\n+Gstreamer version number) will list all of the available plugins."
+        },
+        {
+          "sha": "dd0b73b7ff702538060c3aa670cb1ebc8d78bc78",
+          "filename": "manifest.xml",
+          "status": "added",
+          "additions": 20,
+          "deletions": 0,
+          "changes": 20,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/15a9648f32d99d353b93c878734bb3116d128235/manifest.xml",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/15a9648f32d99d353b93c878734bb3116d128235/manifest.xml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/manifest.xml?ref=15a9648f32d99d353b93c878734bb3116d128235",
+          "patch": "@@ -0,0 +1,20 @@\n+<package>\n+  <description brief=\"gscam\">\n+\n+A ROS camera driver that uses gstreamer to connect to Video4Linux\n+devices such as webcams.\n+\n+  </description>\n+  <author>Graylin Trevor Jay, Christopher Crick</author>\n+  <email>tjay@cs.brown.edu, chriscrick@cs.brown.edu</email>\n+  <license>Creative Commons Attribution</license>\n+  <review status=\"unreviewed\" notes=\"\"/>\n+\n+  <rosdep name=\"libgstreamer0.10-dev\"/>\n+  <depend package=\"roscpp\"/>\n+  <depend package=\"image_transport\"/>\n+  <depend package=\"sensor_msgs\"/>\n+\n+</package>\n+\n+"
+        },
+        {
+          "sha": "ba61cd19885d179452c827fedf7529a6f2040ef6",
+          "filename": "rosdep.yaml",
+          "status": "added",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/15a9648f32d99d353b93c878734bb3116d128235/rosdep.yaml",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/15a9648f32d99d353b93c878734bb3116d128235/rosdep.yaml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/rosdep.yaml?ref=15a9648f32d99d353b93c878734bb3116d128235",
+          "patch": "@@ -0,0 +1,3 @@\n+libgstreamer0.10-dev:\n+  ubuntu:\n+    libgstreamer0.10-dev"
+        },
+        {
+          "sha": "9f7b8122c55b89d955df8425e61b3ec128f60e95",
+          "filename": "src/gscam.cpp",
+          "status": "added",
+          "additions": 145,
+          "deletions": 0,
+          "changes": 145,
+          "blob_url": "https://github.com/ros-drivers/gscam/blob/15a9648f32d99d353b93c878734bb3116d128235/src%2Fgscam.cpp",
+          "raw_url": "https://github.com/ros-drivers/gscam/raw/15a9648f32d99d353b93c878734bb3116d128235/src%2Fgscam.cpp",
+          "contents_url": "https://api.github.com/repos/ros-drivers/gscam/contents/src%2Fgscam.cpp?ref=15a9648f32d99d353b93c878734bb3116d128235",
+          "patch": "@@ -0,0 +1,145 @@\n+#include <stdlib.h>\n+#include <unistd.h>\n+\n+#include <iostream>\n+#include <gst/gst.h>\n+\n+#include <ros/ros.h>\n+#include <image_transport/image_transport.h>\n+#include <sensor_msgs/Image.h>\n+\n+#include <unistd.h>\n+#include <sys/ipc.h>\n+#include <sys/shm.h>\n+\n+//forward declarations\n+static gboolean processData(GstPad *pad, GstBuffer *buffer, gpointer u_data);\n+\n+//globals\n+bool gstreamerPad, rosPad;\n+int width, height;\n+unsigned char *buffer = NULL;\n+\n+int main(int argc, char** argv) {\n+\tchar *config = getenv(\"GSCAM_CONFIG\");\n+\tif (config == NULL) {\n+\t\tstd::cout << \"Problem getting GSCAM_CONFIG variable.\" << std::endl;\n+\t\texit(-1);\n+\t}\n+\n+\tgst_init(0,0);\n+\tstd::cout << \"Gstreamer Version: \" << gst_version_string() << std::endl;\n+\n+\tGError *error = 0; //assignment to zero is a gst requirement\n+\tGstElement *pipeline = gst_parse_launch(config,&error);\n+\tif (pipeline == NULL) {\n+\t\tstd::cout << error->message << std::endl;\n+\t\texit(-1);\n+\t}\n+\n+\tGstElement *probe = gst_bin_get_by_name(GST_BIN(pipeline), \"ros\");\n+\tif (probe == NULL) {\n+\t\tstd::cout << \"Your Gstreamer pipeline needs an identity element named \\\"ros\\\".\" << std::endl;\n+\t\texit(-1);\n+\t}\n+\n+\tGstPad *pad = gst_element_get_pad(probe, \"src\"); \n+\tgst_pad_add_buffer_probe(pad, G_CALLBACK(processData), NULL);\n+\n+\tgst_element_set_state(pipeline, GST_STATE_PAUSED);\n+\n+\tgst_object_unref(pad);\n+\n+\tif (gst_element_get_state(pipeline, NULL, NULL, -1) == GST_STATE_CHANGE_FAILURE) {\n+\t\tstd::cout << \"Failed to PAUSE.\" << std::endl;\n+\t\texit(-1);\n+\t} else {\n+\t\tstd::cout << \"stream is PAUSED.\" << std::endl;\n+\t}\n+\n+\n+\tros::init(argc, argv, \"gscam_publisher\");\n+\tros::NodeHandle nh;\n+\n+\tint preroll;\n+\tnh.param(\"brown/gscam/preroll\", preroll, 0);\n+\tif (preroll) {\n+\t\t//The PAUSE, PLAY, PAUSE, PLAY cycle is to ensure proper pre-roll\n+\t\t//I am told this is needed and am erring on the side of caution.\n+\t\tgst_element_set_state(pipeline, GST_STATE_PLAYING);\n+\n+\t\tif (gst_element_get_state(pipeline, NULL, NULL, -1) == GST_STATE_CHANGE_FAILURE) {\n+\t\t\tstd::cout << \"Failed to PLAY.\" << std::endl;\n+\t\t\texit(-1);\n+\t\t} else {\n+\t\t\tstd::cout << \"stream is PLAYING.\" << std::endl;\n+\t\t}\n+\n+\t\tgst_element_set_state(pipeline, GST_STATE_PAUSED);\n+\n+\t\tif (gst_element_get_state(pipeline, NULL, NULL, -1) == GST_STATE_CHANGE_FAILURE) {\n+\t\t\tstd::cout << \"Failed to PAUSE.\" << std::endl;\n+\t\t\texit(-1);\n+\t\t} else {\n+\t\t\tstd::cout << \"stream is PAUSED.\" << std::endl;\n+\t\t}\n+\t}\n+\n+\timage_transport::ImageTransport it(nh);\n+\timage_transport::Publisher pub = it.advertise(\"gscam/image_raw\", 1);\n+\n+\tstd::cout << \"Processing...\" << std::endl;\n+\n+\t//processVideo\n+\trosPad = false;\n+\tgstreamerPad = true;\n+\tgst_element_set_state(pipeline, GST_STATE_PLAYING);\n+\tros::Rate loop_rate(200);\n+\twhile(nh.ok()) {\n+\t\tloop_rate.sleep();\n+\n+\t\tif (!rosPad) continue;\n+\t\trosPad = false;\n+\n+\t\tsensor_msgs::Image msg;\n+\t\tmsg.width = width;\n+\t\tmsg.height = height;\n+\t\tmsg.encoding = \"rgb8\";\n+\t\tmsg.is_bigendian = false;\n+\t\tmsg.step = width*3;\n+\t\tmsg.data.resize(width*height*3);\n+\t\tstd::copy(buffer, buffer+(width*height*3), msg.data.begin());\n+\n+\t\tpub.publish(msg);\n+\n+\t\tros::spinOnce();\n+\n+\t\tgstreamerPad = true;\n+\t}\n+\n+\t//close out\n+\tstd::cout << \"\\nquitting...\" << std::endl;\n+\tgst_element_set_state(pipeline, GST_STATE_NULL);\n+\tgst_object_unref(pipeline);\n+\tfree(buffer);\n+\n+\treturn 0;\n+}\n+\n+static gboolean processData(GstPad *pad, GstBuffer *gBuffer, gpointer u_data) {\n+\tif (!gstreamerPad) return TRUE;\n+\tgstreamerPad = false;\n+\n+\tif (buffer == NULL) {\n+\t\tconst GstCaps *caps = gst_pad_get_negotiated_caps(pad);\n+\t\tGstStructure *structure = gst_caps_get_structure(caps,0);\n+\t\tgst_structure_get_int(structure,\"width\",&width);\n+\t\tgst_structure_get_int(structure,\"height\",&height);\n+\t\tbuffer = (unsigned char*) malloc(sizeof(unsigned char)*width*height*3);\n+\t}\n+\n+\tmemcpy(buffer, gBuffer->data, sizeof(unsigned char)*width*height*3);\n+\n+\trosPad = true;\n+\treturn TRUE;\n+}"
+        }
+      ]
+    }
+  ]
+}

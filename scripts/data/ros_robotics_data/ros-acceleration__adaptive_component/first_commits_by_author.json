@@ -1,0 +1,107 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T04:35:54Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ros-acceleration",
+    "repo": "adaptive_component"
+  },
+  "data": [
+    {
+      "author": "vmayoral",
+      "date": "2021-11-09T09:33:23Z",
+      "sha": "bbc8cb9712b0def4daa0487ba56cafa4f400c91f",
+      "message": "Initial commit\n\nSigned-off-by: Víctor Mayoral Vilches <v.mayoralv@gmail.com>",
+      "files_changed": 5,
+      "additions": 346,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "da2739055f8328fd4445858ebbe36038efbe3970",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 47,
+          "deletions": 0,
+          "changes": 47,
+          "blob_url": "https://github.com/ros-acceleration/adaptive_component/blob/bbc8cb9712b0def4daa0487ba56cafa4f400c91f/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-acceleration/adaptive_component/raw/bbc8cb9712b0def4daa0487ba56cafa4f400c91f/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/adaptive_component/contents/CMakeLists.txt?ref=bbc8cb9712b0def4daa0487ba56cafa4f400c91f",
+          "patch": "@@ -0,0 +1,47 @@\n+cmake_minimum_required(VERSION 3.5)\n+project(adaptive_component)\n+\n+# Default to C++14\n+if(NOT CMAKE_CXX_STANDARD)\n+  set(CMAKE_CXX_STANDARD 14)\n+endif()\n+\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  add_compile_options(-Wall -Wextra -Wpedantic -Wno-unknown-pragmas)\n+endif()\n+\n+find_package(ament_cmake REQUIRED)\n+find_package(rclcpp REQUIRED)\n+find_package(rclcpp_components REQUIRED)\n+\n+include_directories(include)\n+\n+# create ament index resource which references the libraries in the binary dir\n+set(node_plugins \"\")\n+\n+set(COMPONENT_AMENT_DEPENDENCIES\n+  rclcpp\n+  rclcpp_components)\n+\n+## Simple composition\n+add_library(adaptive_component SHARED\n+src/adaptive_component.cpp)\n+target_compile_definitions(adaptive_component\n+  PRIVATE \"COMPOSITION_BUILDING_DLL\")\n+ament_target_dependencies(adaptive_component ${COMPONENT_AMENT_DEPENDENCIES})\n+rclcpp_components_register_nodes(adaptive_component \"composition::AdaptiveComponent\")\n+set(node_plugins \"${node_plugins}composition::AdaptiveComponent;$<TARGET_FILE:adaptive_component>\\n\")\n+\n+# install components\n+install(TARGETS\n+  adaptive_component\n+  ARCHIVE DESTINATION lib\n+  LIBRARY DESTINATION lib\n+  RUNTIME DESTINATION bin)\n+\n+if(BUILD_TESTING)\n+  find_package(ament_lint_auto REQUIRED)\n+  ament_lint_auto_find_test_dependencies()\n+endif()\n+\n+ament_package()"
+        },
+        {
+          "sha": "d322bba5093319ef5060c0a6b0f6219d8d1ba751",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 37,
+          "deletions": 0,
+          "changes": 37,
+          "blob_url": "https://github.com/ros-acceleration/adaptive_component/blob/bbc8cb9712b0def4daa0487ba56cafa4f400c91f/README.md",
+          "raw_url": "https://github.com/ros-acceleration/adaptive_component/raw/bbc8cb9712b0def4daa0487ba56cafa4f400c91f/README.md",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/adaptive_component/contents/README.md?ref=bbc8cb9712b0def4daa0487ba56cafa4f400c91f",
+          "patch": "@@ -0,0 +1,37 @@\n+# `adaptive_component`\n+\n+Nodes using hardware acceleration are able to perform computations faster relying on FPGAs or GPUs, improving performance. <ins>Adaptive ROS 2 Nodes</ins> leverage hardware acceleration at run-time, allowing robotics engineers to <ins>select which computational resource the Node uses *on-the-go*</ins>, giving roboticists a finer-grained control over the resources their computional graphs use in the underlying hardware.\n+\n+The `adaptive_component` package provides `AdaptiveComponent`, a ROS 2 `Node`[^1] subclass programmed as a `Component`[^2] to build adaptive computations. Adaptive ROS 2 `Nodes` are able to perform computations in the CPU, the FPGA or the GPU. Adaptive behavior is controlled through the `adaptive` ROS 2 parameter with the following values allowed:\n+\n+- `0`: Hardware::CPU\n+- `1`: Hardware::FPGA\n+- `2`: Hardware::GPU\n+\n+[^1]: A `Node` is a process that performs computations. ROS 2 is designed to be modular at a fine-grained scale; a robot control system usually comprises many nodes. Nodes execute arbitrary logic that contribute to the overall robotics behavior.\n+\n+[^2]: A ROS 2 `Component` is a `Node` compiled into a shared library which is then loaded at runtime by a container process. This offers roboticists additional flexibility while building their computational graphs, making the layout process a deploy-time decision. A `Component` is commonly a subclass of `rclcpp::Node`. To maintain flexibility and modularity, `Components` shouldn’t perform any long running or blocking tasks in their constructors. Instead, they can use timers to get periodic notifications and use callbacks for publishers, subscribers, servers, or clients.\n+\n+## How does it work?\n+\n+```cpp\n+// Create an executor\n+rclcpp::executors::MultiThreadedExecutor exec;\n+\n+// Create an adaptive ROS 2 Node using \"components\", the resulting\n+// Node is also programed as a \"component\", retaining composability\n+auto adaptive_node = std::make_shared<composition::AdaptiveComponent>(\n+      \"doublevadd_publisher_adaptive\",        // name of the adaptive Node\n+      options,                                // Node options'\n+                                              // CPU and FPGA 'components' below:\n+      std::make_shared<composition::DoubleVaddComponent>(\"_doublevadd_publisher_adaptive_cpu\", options),\n+      std::make_shared<composition::DoubleVaddComponentFPGA>(\"_doublevadd_publisher_adaptive_fpga\", options));\n+\n+// Add the adaptive Node to an executor\n+exec.add_node(adaptive_node);\n+exec.spin();  // spin the executor\n+```\n+\n+Then, dynamically, one could switch from CPU to FPGA by setting the `adaptive` parameter in the `doublevadd_publisher_adaptive`:\n+- To run in the CPU: `ros2 param set /doublevadd_publisher_adaptive adaptive 0`\n+- To run in the FPGA: `ros2 param set /doublevadd_publisher_adaptive adaptive 1`"
+        },
+        {
+          "sha": "b7584d07ea2e68e5ce30496d0b36c9a5ed2af684",
+          "filename": "include/adaptive_component.hpp",
+          "status": "added",
+          "additions": 81,
+          "deletions": 0,
+          "changes": 81,
+          "blob_url": "https://github.com/ros-acceleration/adaptive_component/blob/bbc8cb9712b0def4daa0487ba56cafa4f400c91f/include%2Fadaptive_component.hpp",
+          "raw_url": "https://github.com/ros-acceleration/adaptive_component/raw/bbc8cb9712b0def4daa0487ba56cafa4f400c91f/include%2Fadaptive_component.hpp",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/adaptive_component/contents/include%2Fadaptive_component.hpp?ref=bbc8cb9712b0def4daa0487ba56cafa4f400c91f",
+          "patch": "@@ -0,0 +1,81 @@\n+/*\n+      ____  ____\n+     /   /\\/   /\n+    /___/  \\  /   Copyright (c) 2021, Xilinx®.\n+    \\   \\   \\/    Author: Víctor Mayoral Vilches <victorma@xilinx.com>\n+     \\   \\\n+     /   /\n+    /___/   /\\\n+    \\   \\  /  \\\n+     \\___\\/\\___\\\n+\n+Licensed under the Apache License, Version 2.0 (the \"License\");\n+you may not use this file except in compliance with the License.\n+You may obtain a copy of the License at\n+\n+    http://www.apache.org/licenses/LICENSE-2.0\n+\n+Unless required by applicable law or agreed to in writing, software\n+distributed under the License is distributed on an \"AS IS\" BASIS,\n+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+See the License for the specific language governing permissions and\n+limitations under the License.\n+*/\n+\n+#ifndef ADAPTIVE_COMPONENT_HPP_\n+#define ADAPTIVE_COMPONENT_HPP_\n+\n+#include \"rclcpp/rclcpp.hpp\"\n+#include \"rclcpp/executor.hpp\"\n+\n+namespace composition\n+{\n+\n+class AdaptiveComponent : public rclcpp::Node\n+{\n+public:\n+  // Define within the class to avoid polluting the global namespace\n+  enum Hardware {\n+    CPU  = 0,\n+    FPGA = 1,\n+    GPU  = 2,\n+  };\n+\n+  explicit AdaptiveComponent(const rclcpp::NodeOptions & options): Node(\"adaptive_component\", options) {};\n+\n+  explicit AdaptiveComponent(const rclcpp::NodeOptions & options,\n+                              std::shared_ptr<rclcpp::Node> cpu_node,\n+                              std::shared_ptr<rclcpp::Node> fpga_node,\n+                              std::shared_ptr<rclcpp::Node> gpu_node);\n+\n+  explicit AdaptiveComponent(const std::string &node_name,\n+                              const rclcpp::NodeOptions & options,\n+                              std::shared_ptr<rclcpp::Node> cpu_node,\n+                              std::shared_ptr<rclcpp::Node> fpga_node,\n+                              std::shared_ptr<rclcpp::Node> gpu_node);\n+\n+  void add_cpu(std::shared_ptr<rclcpp::Node> node_ptr) {cpu_node_ = node_ptr;};\n+  void add_fpga(std::shared_ptr<rclcpp::Node> node_ptr) {fpga_node_ = node_ptr;};\n+  void add_gpu(std::shared_ptr<rclcpp::Node> node_ptr) {gpu_node_ = node_ptr;};\n+\n+protected:\n+  void on_timer();\n+  void spin(void);\n+\n+private:\n+  void initialize();\n+\n+  rclcpp::executors::SingleThreadedExecutor exec_;\n+\n+  // Should be nullptr by default, C++11 spec.\n+  std::shared_ptr<rclcpp::Node> cpu_node_;\n+  std::shared_ptr<rclcpp::Node> fpga_node_;\n+  std::shared_ptr<rclcpp::Node> gpu_node_;\n+\n+  rclcpp::TimerBase::SharedPtr timer_;\n+  int adaptive_value_;\n+};\n+\n+}  // namespace composition\n+\n+#endif  // ADAPTIVE_COMPONENT_HPP_"
+        },
+        {
+          "sha": "a325ee5129b31f2fd3ff85d0e86a26b941f6397d",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 29,
+          "deletions": 0,
+          "changes": 29,
+          "blob_url": "https://github.com/ros-acceleration/adaptive_component/blob/bbc8cb9712b0def4daa0487ba56cafa4f400c91f/package.xml",
+          "raw_url": "https://github.com/ros-acceleration/adaptive_component/raw/bbc8cb9712b0def4daa0487ba56cafa4f400c91f/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/adaptive_component/contents/package.xml?ref=bbc8cb9712b0def4daa0487ba56cafa4f400c91f",
+          "patch": "@@ -0,0 +1,29 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n+  <name>adaptive_component</name>\n+  <version>0.1.0</version>\n+  <description>\n+    A ROS 2 Node subclass programmed as a \"Component\" to build\n+    adaptive computations. Adaptive ROS 2 Nodes are able to\n+    perform computations in the CPU, the FPGA or the GPU, adaptively.\n+    Adaptive behavior is controlled through the \"adaptive\" ROS 2\n+    parameter.\n+\n+    Adaptive ROS 2 Nodes give roboticists a finer-grained control\n+    over the resources their computional graphs use in the underlying\n+    hardware.\n+  </description>\n+  <maintainer email=\"victorma@xilinx.com\">Víctor Mayoral Vilches</maintainer>\n+  <license>Apache License 2.0</license>\n+  <author email=\"victorma@xilinx.com\">Víctor Mayoral Vilches</author>\n+\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+  <depend>rclcpp</depend>\n+  <test_depend>ament_lint_auto</test_depend>\n+  <test_depend>ament_lint_common</test_depend>\n+\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n+</package>"
+        },
+        {
+          "sha": "f502b3dcd9b0718f20fe7f56a7ee9419e6f33922",
+          "filename": "src/adaptive_component.cpp",
+          "status": "added",
+          "additions": 152,
+          "deletions": 0,
+          "changes": 152,
+          "blob_url": "https://github.com/ros-acceleration/adaptive_component/blob/bbc8cb9712b0def4daa0487ba56cafa4f400c91f/src%2Fadaptive_component.cpp",
+          "raw_url": "https://github.com/ros-acceleration/adaptive_component/raw/bbc8cb9712b0def4daa0487ba56cafa4f400c91f/src%2Fadaptive_component.cpp",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/adaptive_component/contents/src%2Fadaptive_component.cpp?ref=bbc8cb9712b0def4daa0487ba56cafa4f400c91f",
+          "patch": "@@ -0,0 +1,152 @@\n+/*\n+      ____  ____\n+     /   /\\/   /\n+    /___/  \\  /   Copyright (c) 2021, Xilinx®.\n+    \\   \\   \\/    Author: Víctor Mayoral Vilches <victorma@xilinx.com>\n+     \\   \\\n+     /   /\n+    /___/   /\\\n+    \\   \\  /  \\\n+     \\___\\/\\___\\\n+\n+AdaptiveComponent is a ROS 2 Node subclass programmed as a \"Component\" to build\n+adaptive computations. Adaptive ROS 2 Nodes are able to perform computations in\n+the CPU, the FPGA or the GPU, adaptively. Adaptive behavior is controlled\n+through the \"adaptive\" ROS 2 parameter.\n+\n+Adaptive ROS 2 Nodes give roboticists a finer-grained control over the\n+resources their computional graphs use in the underlying hardware.\n+*/\n+\n+#include <chrono>  // NOLINT\n+#include <functional>\n+#include <memory>\n+#include <string>\n+\n+// #include <lttng/tracef.h>  // uncoment if using tracef\n+#include \"tracetools/tracetools.h\"\n+#include \"tracetools_acceleration/tracetools.h\"\n+\n+#include \"rclcpp/rclcpp.hpp\"\n+#include \"rclcpp/clock.hpp\"\n+#include \"adaptive_component.hpp\"\n+\n+using namespace std::chrono_literals;  // NOLINT\n+\n+namespace composition\n+{\n+\n+AdaptiveComponent::AdaptiveComponent(\n+    const rclcpp::NodeOptions & options,\n+    std::shared_ptr<rclcpp::Node> cpu_node,\n+    std::shared_ptr<rclcpp::Node> fpga_node,\n+    std::shared_ptr<rclcpp::Node> gpu_node)\n+    : Node(\"adaptive_component\", options), cpu_node_(cpu_node),\n+      fpga_node_(fpga_node), gpu_node_(gpu_node)\n+{\n+  initialize();\n+}\n+\n+\n+AdaptiveComponent::AdaptiveComponent(\n+  const std::string &node_name,\n+  const rclcpp::NodeOptions & options,\n+  std::shared_ptr<rclcpp::Node> cpu_node = nullptr,\n+  std::shared_ptr<rclcpp::Node> fpga_node = nullptr,\n+  std::shared_ptr<rclcpp::Node> gpu_node = nullptr\n+)\n+    : Node(node_name, options), cpu_node_(cpu_node),\n+      fpga_node_(fpga_node), gpu_node_(gpu_node)\n+{\n+  initialize();\n+}\n+\n+void\n+AdaptiveComponent::initialize()\n+{\n+  const char * param_name = \"adaptive\";\n+\n+  // Default to CPU\n+  this->declare_parameter<int>(param_name, 0);\n+  exec_.add_node(cpu_node_);\n+  // exec.add_node(fpga_node_);\n+\n+  // Spin internal executor in a detached thread\n+  std::thread (&AdaptiveComponent::spin, this).detach();\n+\n+  // Parameter callback to adapt computational behavior\n+  // NOTE: not available in Foxy\n+  //\n+  // TODO: re-evaluate in Rolling or Humble, see\n+  // https://github.com/ros2/demos/blob/master/demo_nodes_cpp/src/parameters/parameter_event_handler.cpp#L83-L91\n+  //\n+  // // Now, create a parameter subscriber that can be used to monitor parameter changes on\n+  // // our own local node as well as other remote nodes\n+  // auto param_subscriber = std::make_shared<rclcpp::ParameterEventHandler>(this);\n+  //\n+  // // First, set a callback for the local integer parameter. In this case, we don't\n+  // // provide a node name (the third, optional, parameter).\n+  // auto cb1 = [this](const rclcpp::Parameter & p) {\n+  //     RCLCPP_INFO(\n+  //       this->get_logger(),\n+  //       \"cb1: Received an update to parameter \\\"%s\\\" of type %s: \\\"%\" PRId64 \"\\\"\",\n+  //       p.get_name().c_str(),\n+  //       p.get_type_name().c_str(),\n+  //       p.as_int());\n+  //   };\n+  // auto handle1 = param_subscriber->add_parameter_callback(param_name, cb1);\n+\n+  // Use a timer instead to adapt computational behavior\n+  // TODO: replace this by the parameter callback\n+  timer_ = create_wall_timer(1s, std::bind(&AdaptiveComponent::on_timer, this));\n+}\n+\n+void\n+AdaptiveComponent::spin(void)\n+{\n+  exec_.spin();\n+}\n+\n+void AdaptiveComponent::on_timer()\n+{\n+  int new_adaptive_value_;\n+  this->get_parameter(\"adaptive\", new_adaptive_value_);\n+\n+  if (new_adaptive_value_ != adaptive_value_) {  // if there's change\n+    // Remove Nodes in current hardware\n+    if (adaptive_value_ == Hardware::FPGA) {\n+      exec_.remove_node(fpga_node_);\n+    } else if (adaptive_value_ == Hardware::CPU) {\n+      exec_.remove_node(cpu_node_);\n+    } else if (adaptive_value_ == Hardware::GPU) {\n+      exec_.remove_node(gpu_node_);\n+    } else {\n+      RCLCPP_ERROR(\n+        this->get_logger(),\n+        \"Invalid 'adaptive' parameter value\");\n+    }\n+    // Add new nodes\n+    if (new_adaptive_value_ == Hardware::FPGA) {\n+      exec_.add_node(fpga_node_);\n+    } else if (new_adaptive_value_ == Hardware::CPU) {\n+      exec_.add_node(cpu_node_);\n+    } else if (new_adaptive_value_ == Hardware::GPU) {\n+      exec_.add_node(gpu_node_);\n+    } else {\n+      RCLCPP_ERROR(\n+        this->get_logger(),\n+        \"Invalid 'adaptive' parameter value\");\n+    }\n+    adaptive_value_ = new_adaptive_value_;\n+  }\n+  \n+}  // on_timer\n+\n+}  // namespace composition\n+\n+#include \"rclcpp_components/register_node_macro.hpp\"\n+\n+// Register the component with class_loader.\n+// This acts as a sort of entry point, allowing the component to be discoverable when its library\n+// is being loaded into a running process.\n+RCLCPP_COMPONENTS_REGISTER_NODE(composition::AdaptiveComponent)"
+        }
+      ]
+    },
+    {
+      "author": "methylDragon",
+      "date": "2022-04-11T18:56:52Z",
+      "sha": "85d1499e805545dd6f27a4b86d0ed4a8cd2a4842",
+      "message": "Add rclcpp_components dependency",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "002c3d905b3d01aa176b9323ef45372b01d23ba4",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-acceleration/adaptive_component/blob/85d1499e805545dd6f27a4b86d0ed4a8cd2a4842/package.xml",
+          "raw_url": "https://github.com/ros-acceleration/adaptive_component/raw/85d1499e805545dd6f27a4b86d0ed4a8cd2a4842/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-acceleration/adaptive_component/contents/package.xml?ref=85d1499e805545dd6f27a4b86d0ed4a8cd2a4842",
+          "patch": "@@ -20,7 +20,10 @@\n   <author email=\"victorma@xilinx.com\">Víctor Mayoral Vilches</author>\n \n   <buildtool_depend>ament_cmake</buildtool_depend>\n+\n   <depend>rclcpp</depend>\n+  <depend>rclcpp_components</depend>\n+  \n   <test_depend>ament_lint_auto</test_depend>\n   <test_depend>ament_lint_common</test_depend>\n "
+        }
+      ]
+    }
+  ]
+}

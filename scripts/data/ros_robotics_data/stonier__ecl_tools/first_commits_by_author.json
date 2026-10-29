@@ -1,0 +1,155 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T03:40:58Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "stonier",
+    "repo": "ecl_tools"
+  },
+  "data": [
+    {
+      "author": "stonier",
+      "date": "2012-11-17T12:44:04Z",
+      "sha": "8ac9cbaf340e0f80937c49c398c692ec50c172fc",
+      "message": "Initial commit",
+      "files_changed": 2,
+      "additions": 17,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "620d3dc8a49200fcfae26619eb8a01741fcc41c5",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 13,
+          "deletions": 0,
+          "changes": 13,
+          "blob_url": "https://github.com/stonier/ecl_tools/blob/8ac9cbaf340e0f80937c49c398c692ec50c172fc/.gitignore",
+          "raw_url": "https://github.com/stonier/ecl_tools/raw/8ac9cbaf340e0f80937c49c398c692ec50c172fc/.gitignore",
+          "contents_url": "https://api.github.com/repos/stonier/ecl_tools/contents/.gitignore?ref=8ac9cbaf340e0f80937c49c398c692ec50c172fc",
+          "patch": "@@ -0,0 +1,13 @@\n+# Compiled Object files\n+*.slo\n+*.lo\n+*.o\n+\n+# Compiled Dynamic libraries\n+*.so\n+*.dylib\n+\n+# Compiled Static libraries\n+*.lai\n+*.la\n+*.a"
+        },
+        {
+          "sha": "4fe6cd709ba62dd48bee1c612c41b23711f23946",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/stonier/ecl_tools/blob/8ac9cbaf340e0f80937c49c398c692ec50c172fc/README.md",
+          "raw_url": "https://github.com/stonier/ecl_tools/raw/8ac9cbaf340e0f80937c49c398c692ec50c172fc/README.md",
+          "contents_url": "https://api.github.com/repos/stonier/ecl_tools/contents/README.md?ref=8ac9cbaf340e0f80937c49c398c692ec50c172fc",
+          "patch": "@@ -0,0 +1,4 @@\n+ecl_tools\n+=========\n+\n+Tools and utilities for the embedded control libraries.\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "bfjelds",
+      "date": "2018-01-08T17:27:21Z",
+      "sha": "2e013173e4cfe986ec7a5761473d326fbad3661e",
+      "message": "Make ecl_tools build for ros2 (on windows 10)",
+      "files_changed": 6,
+      "additions": 43,
+      "deletions": 33,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "c1335d32d7d6e6ace769b6369a4fecf4af873665",
+          "filename": "ecl_build/CMakeLists.txt",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 15,
+          "changes": 27,
+          "blob_url": "https://github.com/stonier/ecl_tools/blob/2e013173e4cfe986ec7a5761473d326fbad3661e/ecl_build%2FCMakeLists.txt",
+          "raw_url": "https://github.com/stonier/ecl_tools/raw/2e013173e4cfe986ec7a5761473d326fbad3661e/ecl_build%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/stonier/ecl_tools/contents/ecl_build%2FCMakeLists.txt?ref=2e013173e4cfe986ec7a5761473d326fbad3661e",
+          "patch": "@@ -2,34 +2,31 @@\n # Cmake\n ##############################################################################\n \n-cmake_minimum_required(VERSION 2.8.3)\n+cmake_minimum_required(VERSION 3.5)\n project(ecl_build)\n \n ##############################################################################\n-# Catkin\n+# ament\n ##############################################################################\n \n-find_package(catkin REQUIRED)\n+find_package(ament_cmake REQUIRED)\n \n set(${PROJECT_NAME}_MODULES \"\")\n-list(APPEND ${PROJECT_NAME}_MODULES ecl_platform_detection.cmake)\n-list(APPEND ${PROJECT_NAME}_MODULES ecl_package.cmake)\n-list(APPEND ${PROJECT_NAME}_MODULES ecl_find_sse.cmake)\n-list(APPEND ${PROJECT_NAME}_MODULES ecl_build_utilities.cmake)\n-list(APPEND ${PROJECT_NAME}_MODULES ecl_cx11.cmake)\n-list(APPEND ${PROJECT_NAME}_MODULES cotire.cmake)\n-\n-catkin_package(\n-    CFG_EXTRAS ${${PROJECT_NAME}_MODULES}\n-)\n+list(APPEND ${PROJECT_NAME}_MODULES ${CMAKE_SOURCE_DIR}/cmake/ecl_platform_detection.cmake)\n+list(APPEND ${PROJECT_NAME}_MODULES ${CMAKE_SOURCE_DIR}/cmake/ecl_package.cmake)\n+list(APPEND ${PROJECT_NAME}_MODULES ${CMAKE_SOURCE_DIR}/cmake/ecl_find_sse.cmake)\n+list(APPEND ${PROJECT_NAME}_MODULES ${CMAKE_SOURCE_DIR}/cmake/ecl_build_utilities.cmake)\n+list(APPEND ${PROJECT_NAME}_MODULES ${CMAKE_SOURCE_DIR}/cmake/ecl_cx11.cmake)\n+list(APPEND ${PROJECT_NAME}_MODULES ${CMAKE_SOURCE_DIR}/cmake/cotire.cmake)\n \n+ament_export_include_directories(include)\n+ament_package(CONFIG_EXTRAS ${${PROJECT_NAME}_MODULES})\n \n ##############################################################################\n # Work\n ##############################################################################\n \n install(DIRECTORY cmake\n-        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}\n+        DESTINATION share\n )\n \n-"
+        },
+        {
+          "sha": "21740671391ca02801202fb5d7b1f43b9396ad01",
+          "filename": "ecl_build/package.xml",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 3,
+          "changes": 10,
+          "blob_url": "https://github.com/stonier/ecl_tools/blob/2e013173e4cfe986ec7a5761473d326fbad3661e/ecl_build%2Fpackage.xml",
+          "raw_url": "https://github.com/stonier/ecl_tools/raw/2e013173e4cfe986ec7a5761473d326fbad3661e/ecl_build%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/stonier/ecl_tools/contents/ecl_build%2Fpackage.xml?ref=2e013173e4cfe986ec7a5761473d326fbad3661e",
+          "patch": "@@ -1,5 +1,5 @@\n <?xml version=\"1.0\"?>\n-<package>\n+<package format=\"2\">\n   <name>ecl_build</name>\n   <version>0.61.7</version>\n   <description>\n@@ -13,9 +13,13 @@\n   <url type=\"repository\">https://github.com/stonier/ecl_tools</url>\n   <url type=\"bugtracker\">https://github.com/stonier/ecl_tools/issues</url>\n \n-  <buildtool_depend>catkin</buildtool_depend>\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+\n   <build_depend>ecl_license</build_depend>\n-  <run_depend>ecl_license</run_depend>\n+  <exec_depend>ecl_license</exec_depend>\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n </package>\n \n "
+        },
+        {
+          "sha": "82093cdf4fc47850e87ae6fc0e6e917809a2128d",
+          "filename": "ecl_license/CMakeLists.txt",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 6,
+          "changes": 13,
+          "blob_url": "https://github.com/stonier/ecl_tools/blob/2e013173e4cfe986ec7a5761473d326fbad3661e/ecl_license%2FCMakeLists.txt",
+          "raw_url": "https://github.com/stonier/ecl_tools/raw/2e013173e4cfe986ec7a5761473d326fbad3661e/ecl_license%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/stonier/ecl_tools/contents/ecl_license%2FCMakeLists.txt?ref=2e013173e4cfe986ec7a5761473d326fbad3661e",
+          "patch": "@@ -2,16 +2,14 @@\n # Cmake\n ##############################################################################\n \n-cmake_minimum_required(VERSION 2.8.3)\n+cmake_minimum_required(VERSION 3.5)\n project(ecl_license)\n \n ##############################################################################\n-# Catkin\n+# ament\n ##############################################################################\n \n-find_package(catkin)\n-\n-catkin_package()\n+find_package(ament_cmake)\n \n \n ##############################################################################\n@@ -20,7 +18,10 @@ catkin_package()\n \n \n install(DIRECTORY licenses \n-        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}\n+        DESTINATION share\n         PATTERN \".svn\" EXCLUDE\n         PATTERN \"CMakeLists.txt\" EXCLUDE\n        )\n+\n+ament_export_include_directories(include)\n+ament_package()"
+        },
+        {
+          "sha": "b2139e85cb37fdf23f41d09a69f937b5129551a8",
+          "filename": "ecl_license/package.xml",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 2,
+          "changes": 7,
+          "blob_url": "https://github.com/stonier/ecl_tools/blob/2e013173e4cfe986ec7a5761473d326fbad3661e/ecl_license%2Fpackage.xml",
+          "raw_url": "https://github.com/stonier/ecl_tools/raw/2e013173e4cfe986ec7a5761473d326fbad3661e/ecl_license%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/stonier/ecl_tools/contents/ecl_license%2Fpackage.xml?ref=2e013173e4cfe986ec7a5761473d326fbad3661e",
+          "patch": "@@ -1,5 +1,5 @@\n <?xml version=\"1.0\"?>\n-<package>\n+<package format=\"2\">\n   <name>ecl_license</name>\n   <version>0.61.7</version>\n   <description>\n@@ -13,7 +13,10 @@\n   <url type=\"repository\">https://github.com/stonier/ecl_tools</url>\n   <url type=\"bugtracker\">https://github.com/stonier/ecl_tools/issues</url>\n \n-  <buildtool_depend>catkin</buildtool_depend>\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n </package>\n \n "
+        },
+        {
+          "sha": "13974d4ac80834e1d15737f931f52afa30c3ab24",
+          "filename": "ecl_tools/CMakeLists.txt",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 3,
+          "changes": 8,
+          "blob_url": "https://github.com/stonier/ecl_tools/blob/2e013173e4cfe986ec7a5761473d326fbad3661e/ecl_tools%2FCMakeLists.txt",
+          "raw_url": "https://github.com/stonier/ecl_tools/raw/2e013173e4cfe986ec7a5761473d326fbad3661e/ecl_tools%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/stonier/ecl_tools/contents/ecl_tools%2FCMakeLists.txt?ref=2e013173e4cfe986ec7a5761473d326fbad3661e",
+          "patch": "@@ -1,4 +1,6 @@\n-cmake_minimum_required(VERSION 2.8.3)\n+cmake_minimum_required(VERSION 3.5)\n project(ecl_tools)\n-find_package(catkin REQUIRED)\n-catkin_metapackage()\n+find_package(ament_cmake REQUIRED)\n+#catkin_metapackage()\n+\n+ament_package()"
+        },
+        {
+          "sha": "ffcc916a77d48aebc83292db750cd4e1e57efc36",
+          "filename": "ecl_tools/package.xml",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 4,
+          "changes": 11,
+          "blob_url": "https://github.com/stonier/ecl_tools/blob/2e013173e4cfe986ec7a5761473d326fbad3661e/ecl_tools%2Fpackage.xml",
+          "raw_url": "https://github.com/stonier/ecl_tools/raw/2e013173e4cfe986ec7a5761473d326fbad3661e/ecl_tools%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/stonier/ecl_tools/contents/ecl_tools%2Fpackage.xml?ref=2e013173e4cfe986ec7a5761473d326fbad3661e",
+          "patch": "@@ -1,4 +1,5 @@\n-<package>\n+<?xml version=\"1.0\"?>\n+<package format=\"2\">\n   <name>ecl_tools</name>\n   <version>0.61.7</version>\n   <description>\n@@ -11,10 +12,12 @@\n   <url type=\"repository\">https://github.com/stonier/ecl_tools</url>\n   <url type=\"bugtracker\">https://github.com/stonier/ecl_tools/issues</url>\n \n-  <buildtool_depend>catkin</buildtool_depend>\n-  <run_depend>ecl_license</run_depend>\n-  <run_depend>ecl_build</run_depend>\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+\n+  <exec_depend>ecl_license</exec_depend>\n+  <exec_depend>ecl_build</exec_depend>\n   <export>\n+    <build_type>ament_cmake</build_type>\n     <metapackage/>\n   </export>\n </package>"
+        }
+      ]
+    },
+    {
+      "author": "corot",
+      "date": "2013-02-26T08:27:21Z",
+      "sha": "30d4710c78d4cb5a77c7e0dfb7861e7caa6b1c60",
+      "message": "Demoing pull requests for jorge.",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "6a9ac9b33d0214b53fd6104a7e72364ad57c9dbc",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/stonier/ecl_tools/blob/30d4710c78d4cb5a77c7e0dfb7861e7caa6b1c60/README.md",
+          "raw_url": "https://github.com/stonier/ecl_tools/raw/30d4710c78d4cb5a77c7e0dfb7861e7caa6b1c60/README.md",
+          "contents_url": "https://api.github.com/repos/stonier/ecl_tools/contents/README.md?ref=30d4710c78d4cb5a77c7e0dfb7861e7caa6b1c60",
+          "patch": "@@ -1,4 +1,4 @@\n ecl_tools\n =========\n \n-Tools and utilities for the embedded control libraries.\n\\ No newline at end of file\n+Build environment tools and utilities for the embedded control libraries."
+        }
+      ]
+    }
+  ]
+}

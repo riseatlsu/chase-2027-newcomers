@@ -1,0 +1,263 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T05:04:42Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ethz-asl",
+    "repo": "grid_map_geo"
+  },
+  "data": [
+    {
+      "author": "Jaeyoung-Lim",
+      "date": "2022-04-23T11:34:57Z",
+      "sha": "bdf63835344ea158569ce85a03fb2f3749b4f496",
+      "message": "Initial commit",
+      "files_changed": 2,
+      "additions": 30,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "56cbd9c73f14942a247727bc61b9c677f9d69013",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 29,
+          "deletions": 0,
+          "changes": 29,
+          "blob_url": "https://github.com/ethz-asl/grid_map_geo/blob/bdf63835344ea158569ce85a03fb2f3749b4f496/LICENSE",
+          "raw_url": "https://github.com/ethz-asl/grid_map_geo/raw/bdf63835344ea158569ce85a03fb2f3749b4f496/LICENSE",
+          "contents_url": "https://api.github.com/repos/ethz-asl/grid_map_geo/contents/LICENSE?ref=bdf63835344ea158569ce85a03fb2f3749b4f496",
+          "patch": "@@ -0,0 +1,29 @@\n+BSD 3-Clause License\n+\n+Copyright (c) 2022, JaeyoungLim\n+All rights reserved.\n+\n+Redistribution and use in source and binary forms, with or without\n+modification, are permitted provided that the following conditions are met:\n+\n+1. Redistributions of source code must retain the above copyright notice, this\n+   list of conditions and the following disclaimer.\n+\n+2. Redistributions in binary form must reproduce the above copyright notice,\n+   this list of conditions and the following disclaimer in the documentation\n+   and/or other materials provided with the distribution.\n+\n+3. Neither the name of the copyright holder nor the names of its\n+   contributors may be used to endorse or promote products derived from\n+   this software without specific prior written permission.\n+\n+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\n+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE\n+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL\n+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR\n+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\n+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+        },
+        {
+          "sha": "7cb1d0c1bb8d4b657acc41b3f525a0c9ea3242c8",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ethz-asl/grid_map_geo/blob/bdf63835344ea158569ce85a03fb2f3749b4f496/README.md",
+          "raw_url": "https://github.com/ethz-asl/grid_map_geo/raw/bdf63835344ea158569ce85a03fb2f3749b4f496/README.md",
+          "contents_url": "https://api.github.com/repos/ethz-asl/grid_map_geo/contents/README.md?ref=bdf63835344ea158569ce85a03fb2f3749b4f496",
+          "patch": "@@ -0,0 +1 @@\n+# grid_map_geo\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "Ryanf55",
+      "date": "2023-10-22T00:25:40Z",
+      "sha": "47746fa0e418cdf666e914293329d7a75154e226",
+      "message": "ros2: updates to cmake and launch files to support build on macOS\n\nPort to ROS 2\n\nSigned-off-by: Ryan Friedman <ryanfriedman5410+github@gmail.com>\n\nGet launch file running aside from resources\n\n* Update docs\n* Remove ROS1 cruft\n\nSigned-off-by: Ryan Friedman <ryanfriedman5410+github@gmail.com>\n\n- update gdal include path if __APPLE__\n- consolidate cmake files and install executable\n- update rviz to rviz2 in launch file\n- add arguments and rename python launch file\n- link directory workaround for yaml-cpp on aarch64.\n- update launch files to use correct param name for tif_color_path.\n- CMakeLists.txt improvements.\n- remove target_include_directories for test_tif_loader.\n- add dependency on yaml_cpp_vendor.\n- restore namespace to tif_loader node in launch file.\n- exclude executable from target exports and fix header install directory.\n\nSigned-off-by: Rhys Mainwaring <rhys.mainwaring@me.com>\n\nCo-authored-by: Ryan Friedman <ryanfriedman5410+github@gmail.com>\nCo-authored-by: Rhys Mainwaring <rhys.mainwaring@me.com>",
+      "files_changed": 10,
+      "additions": 175,
+      "deletions": 75,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "89167a47eea8e886062333d1b6a5f37f81dec455",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 61,
+          "deletions": 24,
+          "changes": 85,
+          "blob_url": "https://github.com/ethz-asl/grid_map_geo/blob/47746fa0e418cdf666e914293329d7a75154e226/CMakeLists.txt",
+          "raw_url": "https://github.com/ethz-asl/grid_map_geo/raw/47746fa0e418cdf666e914293329d7a75154e226/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ethz-asl/grid_map_geo/contents/CMakeLists.txt?ref=47746fa0e418cdf666e914293329d7a75154e226",
+          "patch": "@@ -15,54 +15,91 @@ if(CMAKE_CXX_COMPILER_ID MATCHES \"GNU\" OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n   add_compile_options(-Wall -Wextra -Wpedantic)\n endif()\n \n-find_package(GDAL 3 REQUIRED)\n find_package(ament_cmake REQUIRED)\n+find_package(grid_map_msgs REQUIRED)\n find_package(grid_map_ros REQUIRED)\n find_package(grid_map_core REQUIRED)\n+find_package(rclcpp REQUIRED)\n+\n find_package(Eigen3 REQUIRED)\n+find_package(GDAL 3 REQUIRED)\n \n-add_library(${PROJECT_NAME})\n-add_subdirectory(src)\n-\n-target_include_directories(${PROJECT_NAME}\n-    PUBLIC\n-    \"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>\"\n-    \"$<INSTALL_INTERFACE:include/${PROJECT_NAME}>\"\n-)\n+find_package(yaml_cpp_vendor REQUIRED)\n+link_directories(${yaml_cpp_vendor_LIBRARY_DIRS})\n \n # Reverse compatability for GDAL<3.5\n # https://gdal.org/development/cmake.html\n if(NOT TARGET GDAL::GDAL)\n-    add_library(GDAL::GDAL ALIAS ${GDAL_LIBRARY})\n+  add_library(GDAL::GDAL ALIAS ${GDAL_LIBRARY})\n endif()\n \n-target_link_libraries(${PROJECT_NAME} Eigen3::Eigen GDAL::GDAL grid_map_core::grid_map_core)\n+# Build\n+add_library(${PROJECT_NAME}\n+  src/grid_map_geo.cpp\n+)\n+\n+target_include_directories(${PROJECT_NAME}\n+  PUBLIC\n+  \"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>\"\n+  \"$<INSTALL_INTERFACE:include/${PROJECT_NAME}>\"\n+)\n \n-ament_export_targets(${PROJECT_NAME}Targets HAS_LIBRARY_TARGET)\n-ament_export_dependencies(GDAL)\n+target_link_libraries(${PROJECT_NAME} Eigen3::Eigen GDAL::GDAL)\n+\n+ament_target_dependencies(${PROJECT_NAME} SYSTEM\n+  grid_map_core\n+  grid_map_ros\n+)\n+\n+add_executable(test_tif_loader\n+  src/test_tif_loader.cpp\n+)\n+\n+target_link_libraries(test_tif_loader\n+  ${PROJECT_NAME}\n+)\n \n+# Install\n install(\n   DIRECTORY include/\n-  DESTINATION include\n+  DESTINATION include/${PROJECT_NAME}\n )\n \n-install(DIRECTORY\n-  launch\n-  DESTINATION share/${PROJECT_NAME}/\n+install(\n+  TARGETS\n+  ${PROJECT_NAME}\n+  EXPORT export_${PROJECT_NAME}\n+  ARCHIVE DESTINATION lib/${PROJECT_NAME}\n+  LIBRARY DESTINATION lib/${PROJECT_NAME}\n+  RUNTIME DESTINATION bin/${PROJECT_NAME}\n )\n \n+ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)\n+ament_export_dependencies(GDAL)\n+\n+# NOTE: if RUNTIME DESTINATION is set to bin/${PROJECT_NAME} the executable\n+# is not found by ros2 launch:\n+# \n+# Caught exception in launch (see debug for traceback): executable\n+# 'test_tif_loader' not found on the libexec directory \n+# '<ws_path>/ros2-aerial/install/grid_map_geo/lib/grid_map_geo'\n install(\n-  TARGETS ${PROJECT_NAME}\n-  EXPORT ${PROJECT_NAME}Targets\n-  LIBRARY DESTINATION lib\n-  ARCHIVE DESTINATION lib\n-  RUNTIME DESTINATION bin\n-  INCLUDES DESTINATION include\n+  TARGETS\n+  test_tif_loader\n+  ARCHIVE DESTINATION lib/${PROJECT_NAME}\n+  LIBRARY DESTINATION lib/${PROJECT_NAME}\n+  RUNTIME DESTINATION lib/${PROJECT_NAME}\n+)\n+\n+install(DIRECTORY\n+  launch\n+  DESTINATION share/${PROJECT_NAME}/\n )\n \n+# Test\n include(CTest)\n if(BUILD_TESTING)\n-    add_subdirectory(test)\n+  add_subdirectory(test)\n endif()\n \n ament_package()"
+        },
+        {
+          "sha": "aef380a6d5425aa7cd0b6258a63a34d2d340eb23",
+          "filename": "include/grid_map_geo/grid_map_geo.hpp",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 0,
+          "changes": 9,
+          "blob_url": "https://github.com/ethz-asl/grid_map_geo/blob/47746fa0e418cdf666e914293329d7a75154e226/include%2Fgrid_map_geo%2Fgrid_map_geo.hpp",
+          "raw_url": "https://github.com/ethz-asl/grid_map_geo/raw/47746fa0e418cdf666e914293329d7a75154e226/include%2Fgrid_map_geo%2Fgrid_map_geo.hpp",
+          "contents_url": "https://api.github.com/repos/ethz-asl/grid_map_geo/contents/include%2Fgrid_map_geo%2Fgrid_map_geo.hpp?ref=47746fa0e418cdf666e914293329d7a75154e226",
+          "patch": "@@ -39,11 +39,20 @@\n #include <grid_map_core/GridMap.hpp>\n #include <grid_map_core/iterators/GridMapIterator.hpp>\n \n+#if __APPLE__\n+#include <cpl_string.h>\n+#include <gdal.h>\n+#include <gdal_priv.h>\n+#include <ogr_p.h>\n+#include <ogr_spatialref.h>\n+#else\n #include <gdal/cpl_string.h>\n #include <gdal/gdal.h>\n #include <gdal/gdal_priv.h>\n #include <gdal/ogr_p.h>\n #include <gdal/ogr_spatialref.h>\n+#endif\n+\n #include <iostream>\n struct Location {\n   ESPG espg{ESPG::WGS84};"
+        },
+        {
+          "sha": "d03006edd73a193e2df2dc320a51c4085f1ef0a4",
+          "filename": "include/grid_map_geo/transform.hpp",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/ethz-asl/grid_map_geo/blob/47746fa0e418cdf666e914293329d7a75154e226/include%2Fgrid_map_geo%2Ftransform.hpp",
+          "raw_url": "https://github.com/ethz-asl/grid_map_geo/raw/47746fa0e418cdf666e914293329d7a75154e226/include%2Fgrid_map_geo%2Ftransform.hpp",
+          "contents_url": "https://api.github.com/repos/ethz-asl/grid_map_geo/contents/include%2Fgrid_map_geo%2Ftransform.hpp?ref=47746fa0e418cdf666e914293329d7a75154e226",
+          "patch": "@@ -34,10 +34,17 @@\n #ifndef GRID_MAP_GEO_TRANSFORM_H\n #define GRID_MAP_GEO_TRANSFORM_H\n \n+#if __APPLE__\n+#include <gdal.h>\n+#include <gdal_priv.h>\n+#include <ogr_p.h>\n+#include <ogr_spatialref.h>\n+#else\n #include <gdal/gdal.h>\n #include <gdal/gdal_priv.h>\n #include <gdal/ogr_p.h>\n #include <gdal/ogr_spatialref.h>\n+#endif\n \n #include <Eigen/Dense>\n "
+        },
+        {
+          "sha": "e69628d9f1f36760ab38263538c2093edb6c2285",
+          "filename": "launch/load_tif.launch.py",
+          "status": "added",
+          "additions": 84,
+          "deletions": 0,
+          "changes": 84,
+          "blob_url": "https://github.com/ethz-asl/grid_map_geo/blob/47746fa0e418cdf666e914293329d7a75154e226/launch%2Fload_tif.launch.py",
+          "raw_url": "https://github.com/ethz-asl/grid_map_geo/raw/47746fa0e418cdf666e914293329d7a75154e226/launch%2Fload_tif.launch.py",
+          "contents_url": "https://api.github.com/repos/ethz-asl/grid_map_geo/contents/launch%2Fload_tif.launch.py?ref=47746fa0e418cdf666e914293329d7a75154e226",
+          "patch": "@@ -0,0 +1,84 @@\n+import os\n+\n+from ament_index_python.packages import get_package_share_directory\n+\n+from launch import LaunchDescription\n+from launch.actions import DeclareLaunchArgument\n+from launch.conditions import IfCondition\n+from launch.substitutions import LaunchConfiguration\n+\n+from launch_ros.actions import Node\n+\n+\n+def generate_launch_description():\n+    \"\"\"Generate a launch description.\"\"\"\n+\n+    pkg_grid_map_geo = get_package_share_directory(\"grid_map_geo\")\n+\n+    # static transform node\n+    static_transform_publisher = Node(\n+        package=\"tf2_ros\",\n+        executable=\"static_transform_publisher\",\n+        name=\"world_map\",\n+        arguments=[\n+            \"--frame-id\",\n+            \"world\",\n+            \"--child-frame-id\",\n+            \"map\",\n+        ],\n+    )\n+\n+    # tif loader node\n+    tif_loader = Node(\n+        package=\"grid_map_geo\",\n+        namespace=\"grid_map_geo\",\n+        executable=\"test_tif_loader\",\n+        name=\"tif_loader\",\n+        parameters=[\n+            {\"tif_path\": LaunchConfiguration(\"tif_path\")},\n+            {\"tif_color_path\": LaunchConfiguration(\"tif_color_path\")},\n+        ],\n+        output=\"screen\",\n+        emulate_tty=True,\n+    )\n+\n+    # rviz node\n+    rviz = Node(\n+        package=\"rviz2\",\n+        executable=\"rviz2\",\n+        arguments=[\"-d\", os.path.join(pkg_grid_map_geo, \"launch\", \"config.rviz\")],\n+        condition=IfCondition(LaunchConfiguration(\"rviz\")),\n+    )\n+\n+    default_location = \"sargans\"\n+    default_tif_file = \"sargans.tif\"\n+    default_tif_color_file = \"sargans_color.tif\"\n+    return LaunchDescription(\n+        [\n+            DeclareLaunchArgument(\n+                \"rviz\", default_value=\"true\", description=\"Open RViz.\"\n+            ),\n+            DeclareLaunchArgument(\n+                \"location\",\n+                default_value=default_location,\n+                description=\"Location.\",\n+            ),\n+            DeclareLaunchArgument(\n+                \"tif_path\",\n+                default_value=os.path.join(\n+                    pkg_grid_map_geo, \"resources\", default_tif_file\n+                ),\n+                description=\"Full path to the elevation map file.\",\n+            ),\n+            DeclareLaunchArgument(\n+                \"tif_color_path\",\n+                default_value=os.path.join(\n+                    pkg_grid_map_geo, \"resources\", default_tif_color_file\n+                ),\n+                description=\"Full path to the elevation texture file.\",\n+            ),\n+            static_transform_publisher,\n+            tif_loader,\n+            rviz,\n+        ]\n+    )"
+        },
+        {
+          "sha": "3f143aa06b538e0ad94705ae08f6e546e5a81808",
+          "filename": "launch/load_tif_launch.xml",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 5,
+          "changes": 10,
+          "blob_url": "https://github.com/ethz-asl/grid_map_geo/blob/47746fa0e418cdf666e914293329d7a75154e226/launch%2Fload_tif_launch.xml",
+          "raw_url": "https://github.com/ethz-asl/grid_map_geo/raw/47746fa0e418cdf666e914293329d7a75154e226/launch%2Fload_tif_launch.xml",
+          "contents_url": "https://api.github.com/repos/ethz-asl/grid_map_geo/contents/launch%2Fload_tif_launch.xml?ref=47746fa0e418cdf666e914293329d7a75154e226",
+          "patch": "@@ -1,14 +1,14 @@\n <launch>\n-    <arg name=\"visualization\" default=\"true\"/>\n+    <arg name=\"rviz\" default=\"true\"/>\n     <arg name=\"location\" default=\"sargans\"/>\n     <node pkg=\"tf2_ros\" exec=\"static_transform_publisher\" name=\"world_map\" args=\"--frame-id world --child-frame-id map\"/>\n \n     <node pkg=\"grid_map_geo\" exec=\"test_tif_loader\" name=\"test_tif_loader\" output=\"screen\">\n-        <param name=\"tif_path\" value=\"$(find-pkg-share grid_map_geo)/resources/sertig.tif\"/>\n-        <param name=\"color_path\" value=\"$(find-pkg-share grid_map_geo)/resources/sertig_color.tif\"/>\n+        <param name=\"tif_path\" value=\"$(find-pkg-share grid_map_geo)/resources/sargans.tif\"/>\n+        <param name=\"tif_color_path\" value=\"$(find-pkg-share grid_map_geo)/resources/sargans_color.tif\"/>\n     </node>\n \n-    <group if=\"$(var visualization)\">\n-        <node exec=\"rviz\" name=\"rviz\" pkg=\"rviz\"  args=\"-d $(find-pkg-share grid_map_geo)/launch/config.rviz\" />\n+    <group if=\"$(var rviz)\">\n+        <node exec=\"rviz2\" name=\"rviz2\" pkg=\"rviz2\"  args=\"-d $(find-pkg-share grid_map_geo)/launch/config.rviz\" />\n     </group>\n </launch>"
+        },
+        {
+          "sha": "69c2e6c2d235599113383804bdcbb457ce943454",
+          "filename": "launch/run.launch.py",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 30,
+          "changes": 30,
+          "blob_url": "https://github.com/ethz-asl/grid_map_geo/blob/6eea0ef0c0f3fe14b8bed83257c80a1744f27f8f/launch%2Frun.launch.py",
+          "raw_url": "https://github.com/ethz-asl/grid_map_geo/raw/6eea0ef0c0f3fe14b8bed83257c80a1744f27f8f/launch%2Frun.launch.py",
+          "contents_url": "https://api.github.com/repos/ethz-asl/grid_map_geo/contents/launch%2Frun.launch.py?ref=6eea0ef0c0f3fe14b8bed83257c80a1744f27f8f",
+          "patch": "@@ -1,30 +0,0 @@\n-from launch import LaunchDescription\n-from launch_ros.actions import Node\n-from ament_index_python.packages import get_package_share_directory\n-import os\n-\n-def generate_launch_description():\n-    package_dir = get_package_share_directory('grid_map_geo')\n-    tif_loader = Node(\n-        package='grid_map_geo',\n-        namespace='grid_map_geo',\n-        executable='test_tif_loader',\n-        name='tif_loader',\n-        output=\"screen\",\n-        emulate_tty=True,\n-        parameters=[\n-                {\"tif_path\": \"/home/jaeyoung/dev/terrain-models/models/hinwil.tif\"},\n-                {\"tif_color_path\": \"/home/jaeyoung/dev/terrain-models/models/hinwil_color.tif\"},\n-        ]        \n-    )\n-    rviz = Node(\n-        package='rviz2',\n-        namespace='',\n-        executable='rviz2',\n-        name='rviz2',\n-        arguments=['-d', [os.path.join(package_dir, 'launch/config.rviz')]]\n-    )\n-    return LaunchDescription([\n-        tif_loader,\n-        rviz\n-])"
+        },
+        {
+          "sha": "b99615821fcc5305b9193513c97fcc8f854e8c5e",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ethz-asl/grid_map_geo/blob/47746fa0e418cdf666e914293329d7a75154e226/package.xml",
+          "raw_url": "https://github.com/ethz-asl/grid_map_geo/raw/47746fa0e418cdf666e914293329d7a75154e226/package.xml",
+          "contents_url": "https://api.github.com/repos/ethz-asl/grid_map_geo/contents/package.xml?ref=47746fa0e418cdf666e914293329d7a75154e226",
+          "patch": "@@ -18,6 +18,7 @@\n   <depend>grid_map_ros</depend>\n   <depend>libgdal-dev</depend>\n   <depend>rclcpp</depend>\n+  <depend>yaml_cpp_vendor</depend>\n   <exec_depend>ros2launch</exec_depend>\n \n   <export>"
+        },
+        {
+          "sha": "9352845b97e3b4f5ed2f160dd1bef4c684bb5cb7",
+          "filename": "src/CMakeLists.txt",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 10,
+          "changes": 10,
+          "blob_url": "https://github.com/ethz-asl/grid_map_geo/blob/6eea0ef0c0f3fe14b8bed83257c80a1744f27f8f/src%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ethz-asl/grid_map_geo/raw/6eea0ef0c0f3fe14b8bed83257c80a1744f27f8f/src%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ethz-asl/grid_map_geo/contents/src%2FCMakeLists.txt?ref=6eea0ef0c0f3fe14b8bed83257c80a1744f27f8f",
+          "patch": "@@ -1,10 +0,0 @@\n-target_sources(${PROJECT_NAME} PRIVATE grid_map_geo.cpp)\n-\n-\n-find_package(rclcpp REQUIRED)\n-find_package(grid_map_msgs REQUIRED)\n-find_package(grid_map_ros REQUIRED)\n-add_executable(test_tif_loader)\n-target_sources(test_tif_loader PRIVATE test_tif_loader.cpp)\n-target_link_libraries(test_tif_loader PRIVATE ${PROJECT_NAME} rclcpp::rclcpp ${grid_map_msgs_TARGETS})\n-ament_target_dependencies(${PROJECT_NAME} grid_map_ros)\n\\ No newline at end of file"
+        },
+        {
+          "sha": "9132f778475d2a0aaa817c3700af521c0c882b69",
+          "filename": "src/test_tif_loader.cpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ethz-asl/grid_map_geo/blob/47746fa0e418cdf666e914293329d7a75154e226/src%2Ftest_tif_loader.cpp",
+          "raw_url": "https://github.com/ethz-asl/grid_map_geo/raw/47746fa0e418cdf666e914293329d7a75154e226/src%2Ftest_tif_loader.cpp",
+          "contents_url": "https://api.github.com/repos/ethz-asl/grid_map_geo/contents/src%2Ftest_tif_loader.cpp?ref=47746fa0e418cdf666e914293329d7a75154e226",
+          "patch": "@@ -55,6 +55,9 @@ class MapPublisher : public rclcpp::Node {\n       std::string file_path = this->declare_parameter(\"tif_path\", \".\");\n       std::string color_path = this->declare_parameter(\"tif_color_path\", \".\");\n \n+      RCLCPP_INFO_STREAM(get_logger(), \"file_path \" << file_path);\n+      RCLCPP_INFO_STREAM(get_logger(), \"color_path \" << color_path);\n+\n       map_ = std::make_shared<GridMapGeo>();\n       map_->Load(file_path, false, color_path);\n       timer_ = this->create_wall_timer(5s, std::bind(&MapPublisher::timer_callback, this));"
+        },
+        {
+          "sha": "eaea08e5fcb66d77c08dacc6823ea11cd5e57dfc",
+          "filename": "test/CMakeLists.txt",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 6,
+          "changes": 11,
+          "blob_url": "https://github.com/ethz-asl/grid_map_geo/blob/47746fa0e418cdf666e914293329d7a75154e226/test%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ethz-asl/grid_map_geo/raw/47746fa0e418cdf666e914293329d7a75154e226/test%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ethz-asl/grid_map_geo/contents/test%2FCMakeLists.txt?ref=47746fa0e418cdf666e914293329d7a75154e226",
+          "patch": "@@ -1,13 +1,12 @@\n # Add gtest based cpp test target and link libraries\n find_package(ament_cmake_gtest)\n ament_add_gtest(${PROJECT_NAME}-test \n-    main.cpp\n-    test_grid_map_geo.cpp\n+  main.cpp\n+  test_grid_map_geo.cpp\n )\n \n-\n target_link_libraries(${PROJECT_NAME}-test\n-    ${PROJECT_NAME}\n-        # ${YAML_CPP_LIBRARIES}\n-        # ${GDAL_LIBRARY}\n+  ${PROJECT_NAME}\n+  # ${YAML_CPP_LIBRARIES}\n+  # ${GDAL_LIBRARY}\n )"
+        }
+      ]
+    },
+    {
+      "author": "avcuenes",
+      "date": "2024-01-18T20:02:10Z",
+      "sha": "93339b8a66e1a7f0471f80bc07f4430a53fb584f",
+      "message": "add dockerfile and makefile",
+      "files_changed": 2,
+      "additions": 46,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "6a5f6a0532ca52d2fd774e464ebcb0a47098b4c0",
+          "filename": "Dockerfile",
+          "status": "added",
+          "additions": 35,
+          "deletions": 0,
+          "changes": 35,
+          "blob_url": "https://github.com/ethz-asl/grid_map_geo/blob/93339b8a66e1a7f0471f80bc07f4430a53fb584f/Dockerfile",
+          "raw_url": "https://github.com/ethz-asl/grid_map_geo/raw/93339b8a66e1a7f0471f80bc07f4430a53fb584f/Dockerfile",
+          "contents_url": "https://api.github.com/repos/ethz-asl/grid_map_geo/contents/Dockerfile?ref=93339b8a66e1a7f0471f80bc07f4430a53fb584f",
+          "patch": "@@ -0,0 +1,35 @@\n+# Use the official ROS 2 humble base image\n+FROM ros:humble\n+\n+# Set the working directory\n+WORKDIR /ros2_workspace/src\n+\n+COPY . .\n+# Install additional dependencies\n+RUN apt-get update \\\n+    && apt-get -y --quiet --no-install-recommends install \\\n+    gcc \\\n+    git \\\n+    libxml2-dev \\\n+    libxslt-dev \\\n+    python3 \\\n+    ros-humble-ament-cmake-clang-format\\\n+    ros-humble-rviz2\n+\n+# Set environment variables\n+ENV ROS_DISTRO humble\n+ENV ROS_VERSION 2\n+WORKDIR /ros2_workspace\n+RUN . /opt/ros/humble/setup.sh\n+RUN rosdep update\n+RUN rosdep install --from-paths src --ignore-src -y\n+\n+RUN . /opt/ros/humble/setup.sh && colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release --packages-up-to grid_map_geo\n+\n+# Source the ROS2 setup file\n+RUN echo \"source /ros2_workspace/install/setup.bash\" >> ~/.bashrc\n+# Expose the default ROS 2 communication ports\n+EXPOSE 11311\n+\n+# Run a default command, e.g., starting a bash shell\n+CMD [\"bash\"]\n\\ No newline at end of file"
+        },
+        {
+          "sha": "50865b8a79e237f18d95fe7e4d621d8f68f2366a",
+          "filename": "Makefile",
+          "status": "added",
+          "additions": 11,
+          "deletions": 0,
+          "changes": 11,
+          "blob_url": "https://github.com/ethz-asl/grid_map_geo/blob/93339b8a66e1a7f0471f80bc07f4430a53fb584f/Makefile",
+          "raw_url": "https://github.com/ethz-asl/grid_map_geo/raw/93339b8a66e1a7f0471f80bc07f4430a53fb584f/Makefile",
+          "contents_url": "https://api.github.com/repos/ethz-asl/grid_map_geo/contents/Makefile?ref=93339b8a66e1a7f0471f80bc07f4430a53fb584f",
+          "patch": "@@ -0,0 +1,11 @@\n+.PHONY : docker_build\n+docker_build:\n+\tdocker build -t gmg .\n+\n+.PHONY : docker_run\n+docker_run:\n+\tdocker run -it --net=host --ipc=host --privileged --env=\"DISPLAY\"  --env=\"QT_X11_NO_MITSHM=1\" --volume=\"/tmp/.X11-unix:/tmp/.X11-unix:rw\" --volume=\"${XAUTHORITY}:/root/.Xauthority\"  --entrypoint /bin/bash gmg\n+\n+\n+\n+"
+        }
+      ]
+    },
+    {
+      "author": "MichaelRazum",
+      "date": "2024-01-20T08:41:50Z",
+      "sha": "b0080bcb8fdda956cec34fe73fbbe636e19a17fe",
+      "message": "Switch to pathlib",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 8,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "0692a54a15e65e228b776519d5e605de82def581",
+          "filename": "launch/load_tif.launch.py",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 8,
+          "changes": 12,
+          "blob_url": "https://github.com/ethz-asl/grid_map_geo/blob/b0080bcb8fdda956cec34fe73fbbe636e19a17fe/launch%2Fload_tif.launch.py",
+          "raw_url": "https://github.com/ethz-asl/grid_map_geo/raw/b0080bcb8fdda956cec34fe73fbbe636e19a17fe/launch%2Fload_tif.launch.py",
+          "contents_url": "https://api.github.com/repos/ethz-asl/grid_map_geo/contents/launch%2Fload_tif.launch.py?ref=b0080bcb8fdda956cec34fe73fbbe636e19a17fe",
+          "patch": "@@ -1,4 +1,4 @@\n-import os\n+from pathlib import Path\n \n from ament_index_python.packages import get_package_share_directory\n \n@@ -46,7 +46,7 @@ def generate_launch_description():\n     rviz = Node(\n         package=\"rviz2\",\n         executable=\"rviz2\",\n-        arguments=[\"-d\", os.path.join(pkg_grid_map_geo, \"rviz\", \"config.rviz\")],\n+        arguments=[\"-d\", f'{Path(pkg_grid_map_geo) / \"rviz\" / \"config.rviz\"}'],\n         condition=IfCondition(LaunchConfiguration(\"rviz\")),\n     )\n \n@@ -65,16 +65,12 @@ def generate_launch_description():\n             ),\n             DeclareLaunchArgument(\n                 \"tif_path\",\n-                default_value=os.path.join(\n-                    pkg_grid_map_geo, \"resources\", default_tif_file\n-                ),\n+                default_value=f'{Path(pkg_grid_map_geo) / \"resources\" / default_tif_file}',\n                 description=\"Full path to the elevation map file.\",\n             ),\n             DeclareLaunchArgument(\n                 \"tif_color_path\",\n-                default_value=os.path.join(\n-                    pkg_grid_map_geo, \"resources\", default_tif_color_file\n-                ),\n+                default_value=f'{Path(pkg_grid_map_geo) / \"resources\" / default_tif_color_file}',\n                 description=\"Full path to the elevation texture file.\",\n             ),\n             static_transform_publisher,"
+        }
+      ]
+    },
+    {
+      "author": "srmainwaring",
+      "date": "2023-11-08T10:08:26Z",
+      "sha": "47cbef7b4206dff68d48e2dc53a19255e4a4c7fa",
+      "message": "ros2: change ament_target_dependencies from SYSTEM to PUBLIC\n\nSigned-off-by: Rhys Mainwaring <rhys.mainwaring@me.com>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "5859112c07b75bfd28aed546e410db3bfb87cc49",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ethz-asl/grid_map_geo/blob/47cbef7b4206dff68d48e2dc53a19255e4a4c7fa/CMakeLists.txt",
+          "raw_url": "https://github.com/ethz-asl/grid_map_geo/raw/47cbef7b4206dff68d48e2dc53a19255e4a4c7fa/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ethz-asl/grid_map_geo/contents/CMakeLists.txt?ref=47cbef7b4206dff68d48e2dc53a19255e4a4c7fa",
+          "patch": "@@ -46,7 +46,7 @@ target_include_directories(${PROJECT_NAME}\n \n target_link_libraries(${PROJECT_NAME} Eigen3::Eigen GDAL::GDAL)\n \n-ament_target_dependencies(${PROJECT_NAME} SYSTEM\n+ament_target_dependencies(${PROJECT_NAME} PUBLIC\n   grid_map_core\n   grid_map_ros\n )"
+        }
+      ]
+    }
+  ]
+}

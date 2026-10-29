@@ -1,0 +1,191 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T05:51:09Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "wg-perception",
+    "repo": "object_recognition_msgs"
+  },
+  "data": [
+    {
+      "author": "vrabaud",
+      "date": "2012-03-17T21:19:34Z",
+      "sha": "7c15f34b408cb5828ff0c94f58e7fc2bc6e0a9d0",
+      "message": "create a special package for the messages",
+      "files_changed": 6,
+      "additions": 137,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "059e535a2ae22e48803413762f3da188885a5633",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 29,
+          "deletions": 0,
+          "changes": 29,
+          "blob_url": "https://github.com/wg-perception/object_recognition_msgs/blob/7c15f34b408cb5828ff0c94f58e7fc2bc6e0a9d0/CMakeLists.txt",
+          "raw_url": "https://github.com/wg-perception/object_recognition_msgs/raw/7c15f34b408cb5828ff0c94f58e7fc2bc6e0a9d0/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/wg-perception/object_recognition_msgs/contents/CMakeLists.txt?ref=7c15f34b408cb5828ff0c94f58e7fc2bc6e0a9d0",
+          "patch": "@@ -0,0 +1,29 @@\n+cmake_minimum_required(VERSION 2.8)\n+project(object_recognition_msgs)\n+\n+find_package(catkin REQUIRED)\n+catkin_stack()\n+catkin_project(object_recognition_msgs)\n+\n+# generate the messages and the actionlib server for ROS\n+find_package(genmsg REQUIRED)\n+\n+if (genmsg_FOUND)\n+    if (ROS_ELECTRIC_FOUND)\n+        find_ros_package(actionlib_msgs)\n+        find_ros_package(geometry_msgs)\n+        find_ros_package(sensor_msgs)\n+        find_ros_package(std_msgs)\n+        find_ros_package(visualization_msgs)\n+        include_directories(SYSTEM\n+                            ${ecto_ros_INCLUDE_DIRS}\n+        )\n+    else()\n+        find_package(ROS REQUIRED actionlib_msgs geometry_msgs rosbag roscpp sensor_msgs visualization_msgs)\n+    endif()\n+\n+    add_message_files(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/msg FILES RecognizedObject.msg RecognizedObjectArray.msg Shape.msg)\n+#    add_action_files(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/action FILES ObjectRecognition.action)\n+\n+    generate_messages(DEPENDENCIES actionlib_msgs geometry_msgs sensor_msgs std_msgs visualization_msgs)\n+endif()"
+        },
+        {
+          "sha": "51973d99ec7e5b492e777a44b08b42dd3fa15b96",
+          "filename": "action/ObjectRecognition.action",
+          "status": "added",
+          "additions": 9,
+          "deletions": 0,
+          "changes": 9,
+          "blob_url": "https://github.com/wg-perception/object_recognition_msgs/blob/7c15f34b408cb5828ff0c94f58e7fc2bc6e0a9d0/action%2FObjectRecognition.action",
+          "raw_url": "https://github.com/wg-perception/object_recognition_msgs/raw/7c15f34b408cb5828ff0c94f58e7fc2bc6e0a9d0/action%2FObjectRecognition.action",
+          "contents_url": "https://api.github.com/repos/wg-perception/object_recognition_msgs/contents/action%2FObjectRecognition.action?ref=7c15f34b408cb5828ff0c94f58e7fc2bc6e0a9d0",
+          "patch": "@@ -0,0 +1,9 @@\n+# Empty goal its just a thunk\n+---\n+# Define the result\n+Header header\n+geometry_msgs/Pose[] poses\n+string[] object_ids\n+float32[] confidence\n+---\n+#no feedback"
+        },
+        {
+          "sha": "f6305c0f78091059d986aa6635f7acfae7065e98",
+          "filename": "msg/RecognizedObject.msg",
+          "status": "added",
+          "additions": 49,
+          "deletions": 0,
+          "changes": 49,
+          "blob_url": "https://github.com/wg-perception/object_recognition_msgs/blob/7c15f34b408cb5828ff0c94f58e7fc2bc6e0a9d0/msg%2FRecognizedObject.msg",
+          "raw_url": "https://github.com/wg-perception/object_recognition_msgs/raw/7c15f34b408cb5828ff0c94f58e7fc2bc6e0a9d0/msg%2FRecognizedObject.msg",
+          "contents_url": "https://api.github.com/repos/wg-perception/object_recognition_msgs/contents/msg%2FRecognizedObject.msg?ref=7c15f34b408cb5828ff0c94f58e7fc2bc6e0a9d0",
+          "patch": "@@ -0,0 +1,49 @@\n+################################################## OBJECT INFO #########################################################\n+\n+# Contains information about the identity and the position of a found object\n+# Some of those fields might not be filled because the used techniques do not fill them or because the user does not\n+# request them\n+\n+# The id of the found object\n+string id\n+\n+# The db parameters stored as a JSON/compressed YAML string. An object id does not make sense without the corresponding\n+# database. E.g., in object_recognition, it can look like: \"{'type':'CouchDB', 'root':'http://localhost'}\"\n+# There is no conventional format for those parameters and it's nice to keep that flexibility.\n+string db\n+\n+#confidence: how sure you are it is that object and not another one\n+float32 confidence\n+\n+############################################## VISUALIZATION INFO ######################################################\n+################### THIS INFO SHOULD BE OBTAINED INDEPENDENTLY FROM THE CORE, LIKE IN AN RVIZ PLUGIN ###################\n+\n+# The human readable name of the object\n+string name\n+\n+# The full mesh of the object: this can be useful for display purposes, augmented reality ... but it can be big\n+# Make sure the type is MESH_RESOURCE\n+object_recognition_msgs/Shape ground_truth_mesh\n+geometry_msgs/PoseStamped ground_truth_mesh_pose\n+\n+# Sometimes, you only have a cloud in the DB\n+# Make sure the type is POINTS\n+sensor_msgs/PointCloud2[] ground_truth_point_cloud\n+\n+################################################ OBJECT CLUSTERS #######################################################\n+\n+# Sometimes you can extract the 3d points that belong to the object\n+sensor_msgs/PointCloud2[] point_cloud\n+\n+# Sometimes, you can only provide a bounding box/shape, even in 3d. We probably need a non visualization type there\n+visualization_msgs/Marker bounding_mesh\n+\n+# Sometimes, you only have 2d input so you can't really give a pose, you just get a contour, or a box\n+# The last point will be linked to the first one automatically\n+geometry_msgs/Point[] bounding_contour\n+\n+#################################################### POSE INFO #########################################################\n+\n+# This is the result that everybody expects : the pose in some frame given with the input. The units are radian/meters\n+# as usual\n+geometry_msgs/PoseWithCovarianceStamped pose"
+        },
+        {
+          "sha": "d06b601213c59ce99d6330f07203e011b96f1d2a",
+          "filename": "msg/RecognizedObjectArray.msg",
+          "status": "added",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/wg-perception/object_recognition_msgs/blob/7c15f34b408cb5828ff0c94f58e7fc2bc6e0a9d0/msg%2FRecognizedObjectArray.msg",
+          "raw_url": "https://github.com/wg-perception/object_recognition_msgs/raw/7c15f34b408cb5828ff0c94f58e7fc2bc6e0a9d0/msg%2FRecognizedObjectArray.msg",
+          "contents_url": "https://api.github.com/repos/wg-perception/object_recognition_msgs/contents/msg%2FRecognizedObjectArray.msg?ref=7c15f34b408cb5828ff0c94f58e7fc2bc6e0a9d0",
+          "patch": "@@ -0,0 +1,7 @@\n+# This message type describes a potential scene configuration: a set of objects that can explain the scene\n+object_recognition_msgs/RecognizedObject[] objects\n+\n+##################################################### SEARCH ###########################################################\n+\n+# The co-occurrence matrix between the recognized objects\n+float32[] cooccurrence"
+        },
+        {
+          "sha": "dc742472c21bdb9461ef93f5b83dc9310e996969",
+          "filename": "msg/Shape.msg",
+          "status": "added",
+          "additions": 32,
+          "deletions": 0,
+          "changes": 32,
+          "blob_url": "https://github.com/wg-perception/object_recognition_msgs/blob/7c15f34b408cb5828ff0c94f58e7fc2bc6e0a9d0/msg%2FShape.msg",
+          "raw_url": "https://github.com/wg-perception/object_recognition_msgs/raw/7c15f34b408cb5828ff0c94f58e7fc2bc6e0a9d0/msg%2FShape.msg",
+          "contents_url": "https://api.github.com/repos/wg-perception/object_recognition_msgs/contents/msg%2FShape.msg?ref=7c15f34b408cb5828ff0c94f58e7fc2bc6e0a9d0",
+          "patch": "@@ -0,0 +1,32 @@\n+byte SPHERE=0\n+byte BOX=1\n+byte CYLINDER=2\n+byte MESH=3\n+\n+byte type\n+\n+\n+#### define sphere, box, cylinder ####\n+# the origin of each shape is considered at the shape's center\n+\n+# for sphere\n+# radius := dimensions[0]\n+\n+# for cylinder\n+# radius := dimensions[0]\n+# length := dimensions[1]\n+# the length is along the Z axis\n+\n+# for box\n+# size_x := dimensions[0]\n+# size_y := dimensions[1]\n+# size_z := dimensions[2]\n+float64[] dimensions\n+\n+\n+#### define mesh ####\n+\n+# list of triangles; triangle k is defined by tre vertices located\n+# at indices triangles[3k], triangles[3k+1], triangles[3k+2]\n+int32[] triangles\n+geometry_msgs/Point[] vertices"
+        },
+        {
+          "sha": "47b353faf6cf4c0168cda41c18259ef0060bdbd2",
+          "filename": "stack.yaml",
+          "status": "added",
+          "additions": 11,
+          "deletions": 0,
+          "changes": 11,
+          "blob_url": "https://github.com/wg-perception/object_recognition_msgs/blob/7c15f34b408cb5828ff0c94f58e7fc2bc6e0a9d0/stack.yaml",
+          "raw_url": "https://github.com/wg-perception/object_recognition_msgs/raw/7c15f34b408cb5828ff0c94f58e7fc2bc6e0a9d0/stack.yaml",
+          "contents_url": "https://api.github.com/repos/wg-perception/object_recognition_msgs/contents/stack.yaml?ref=7c15f34b408cb5828ff0c94f58e7fc2bc6e0a9d0",
+          "patch": "@@ -0,0 +1,11 @@\n+Catkin-ProjectName: object_recognition_msgs\n+Version: 0.1.0\n+Description: Object_recognition_msgs contains the ROS message and the actionlib definition used in object_recognition_core\n+Author: Vincent Rabaud <vrabaud@willowgarage.com>\n+Maintainer:  Vincent Rabaud <vrabaud@willowgarage.com>\n+Homepage:  http://www.ros.org/wiki/object_recognition\n+\n+Depends: catkin\n+\n+Catkin-CopyrightType:  willowgarage\n+Catkin-DebRulesType: cmake"
+        }
+      ]
+    },
+    {
+      "author": "Mac Mason",
+      "date": "2012-07-11T04:05:53Z",
+      "sha": "6b0ebef6943d3e133692e00c259eca3d8281b666",
+      "message": "Forgotten shape message",
+      "files_changed": 1,
+      "additions": 32,
+      "deletions": 0,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "dc742472c21bdb9461ef93f5b83dc9310e996969",
+          "filename": "msg/Shape.msg",
+          "status": "added",
+          "additions": 32,
+          "deletions": 0,
+          "changes": 32,
+          "blob_url": "https://github.com/wg-perception/object_recognition_msgs/blob/6b0ebef6943d3e133692e00c259eca3d8281b666/msg%2FShape.msg",
+          "raw_url": "https://github.com/wg-perception/object_recognition_msgs/raw/6b0ebef6943d3e133692e00c259eca3d8281b666/msg%2FShape.msg",
+          "contents_url": "https://api.github.com/repos/wg-perception/object_recognition_msgs/contents/msg%2FShape.msg?ref=6b0ebef6943d3e133692e00c259eca3d8281b666",
+          "patch": "@@ -0,0 +1,32 @@\n+byte SPHERE=0\n+byte BOX=1\n+byte CYLINDER=2\n+byte MESH=3\n+\n+byte type\n+\n+\n+#### define sphere, box, cylinder ####\n+# the origin of each shape is considered at the shape's center\n+\n+# for sphere\n+# radius := dimensions[0]\n+\n+# for cylinder\n+# radius := dimensions[0]\n+# length := dimensions[1]\n+# the length is along the Z axis\n+\n+# for box\n+# size_x := dimensions[0]\n+# size_y := dimensions[1]\n+# size_z := dimensions[2]\n+float64[] dimensions\n+\n+\n+#### define mesh ####\n+\n+# list of triangles; triangle k is defined by tre vertices located\n+# at indices triangles[3k], triangles[3k+1], triangles[3k+2]\n+int32[] triangles\n+geometry_msgs/Point[] vertices"
+        }
+      ]
+    },
+    {
+      "author": "tcavallari",
+      "date": "2012-11-09T06:26:40Z",
+      "sha": "ced66b027f16dca8fb4dcf8c085a1f2a7504f976",
+      "message": "added header to RecognizedObjectArray",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 0,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "e67b654c52954dda332071a7f7801880aa99b556",
+          "filename": "msg/RecognizedObjectArray.msg",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/wg-perception/object_recognition_msgs/blob/ced66b027f16dca8fb4dcf8c085a1f2a7504f976/msg%2FRecognizedObjectArray.msg",
+          "raw_url": "https://github.com/wg-perception/object_recognition_msgs/raw/ced66b027f16dca8fb4dcf8c085a1f2a7504f976/msg%2FRecognizedObjectArray.msg",
+          "contents_url": "https://api.github.com/repos/wg-perception/object_recognition_msgs/contents/msg%2FRecognizedObjectArray.msg?ref=ced66b027f16dca8fb4dcf8c085a1f2a7504f976",
+          "patch": "@@ -1,3 +1,6 @@\n+##################################################### HEADER ###########################################################\n+Header header\n+\n # This message type describes a potential scene configuration: a set of objects that can explain the scene\n object_recognition_msgs/RecognizedObject[] objects\n "
+        }
+      ]
+    },
+    {
+      "author": "Jonathan Binney",
+      "date": "2012-07-11T17:30:23Z",
+      "sha": "979bbcaf1f58d45ab527ebab4961233f66cdac4a",
+      "message": "updated shape_conversions to use the common_msgs shape message\ninstead of the arm_navigation one",
+      "files_changed": 1,
+      "additions": 13,
+      "deletions": 7,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "3f31ddf4b016f15c27f45bfa9da432e9b2d8ffa4",
+          "filename": "include/object_recognition_msgs/shape_conversion.h",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 7,
+          "changes": 20,
+          "blob_url": "https://github.com/wg-perception/object_recognition_msgs/blob/979bbcaf1f58d45ab527ebab4961233f66cdac4a/include%2Fobject_recognition_msgs%2Fshape_conversion.h",
+          "raw_url": "https://github.com/wg-perception/object_recognition_msgs/raw/979bbcaf1f58d45ab527ebab4961233f66cdac4a/include%2Fobject_recognition_msgs%2Fshape_conversion.h",
+          "contents_url": "https://api.github.com/repos/wg-perception/object_recognition_msgs/contents/include%2Fobject_recognition_msgs%2Fshape_conversion.h?ref=979bbcaf1f58d45ab527ebab4961233f66cdac4a",
+          "patch": "@@ -37,19 +37,25 @@\n #define SHAPE_CONVERSION_H_\n \n #include <arm_navigation_msgs/Shape.h>\n-#include <object_recognition_msgs/Shape.h>\n+#include <shape_msgs/Mesh.h>\n+#include <shape_msgs/MeshTriangle.h>\n \n arm_navigation_msgs::Shape\n-or_to_an_shape(const object_recognition_msgs::Shape & or_shape)\n+mesh_to_an_shape(const shape_msgs::Mesh & mesh)\n {\n   arm_navigation_msgs::Shape an_shape;\n-  an_shape.type = or_shape.type;\n-  an_shape.dimensions = or_shape.dimensions;\n-  an_shape.triangles = or_shape.triangles;\n-  an_shape.vertices = or_shape.vertices;\n-  an_shape.__connection_header = or_shape.__connection_header;\n+  an_shape.type = arm_navigation_msgs::Shape::MESH;\n+  an_shape.vertices = mesh.vertices;\n+  for(int tri_i=0; tri_i < mesh.triangles.size(); tri_i++)\n+    {\n+      an_shape.triangles.push_back(mesh.triangles[tri_i].vertex_indices[0]);\n+      an_shape.triangles.push_back(mesh.triangles[tri_i].vertex_indices[1]);\n+      an_shape.triangles.push_back(mesh.triangles[tri_i].vertex_indices[2]);\n+    }\n+  an_shape.__connection_header = mesh.__connection_header;\n \n   return an_shape;\n }\n \n+\n #endif /* SHAPE_CONVERSION_H_ */"
+        }
+      ]
+    },
+    {
+      "author": "pantofaru",
+      "date": "2012-04-05T08:42:55Z",
+      "sha": "3c9cd7520b0f8ad66cc1610764d4807ebbc492e3",
+      "message": "Update msg/RecognizedObject.msg",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 0,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "48b8807d35036cd06ec390c905d87ffb00e23864",
+          "filename": "msg/RecognizedObject.msg",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/wg-perception/object_recognition_msgs/blob/3c9cd7520b0f8ad66cc1610764d4807ebbc492e3/msg%2FRecognizedObject.msg",
+          "raw_url": "https://github.com/wg-perception/object_recognition_msgs/raw/3c9cd7520b0f8ad66cc1610764d4807ebbc492e3/msg%2FRecognizedObject.msg",
+          "contents_url": "https://api.github.com/repos/wg-perception/object_recognition_msgs/contents/msg%2FRecognizedObject.msg?ref=3c9cd7520b0f8ad66cc1610764d4807ebbc492e3",
+          "patch": "@@ -1,3 +1,8 @@\n+##################################################### HEADER ###########################################################\n+\n+# The header frame corresponds to the pose frame, NOT the point_cloud frame.\n+Header header\n+\n ################################################## OBJECT INFO #########################################################\n \n # Contains information about the identity and the position of a found object"
+        }
+      ]
+    }
+  ]
+}

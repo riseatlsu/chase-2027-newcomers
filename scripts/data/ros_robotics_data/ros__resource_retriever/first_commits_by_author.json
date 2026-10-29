@@ -1,0 +1,1308 @@
+{
+  "_meta": {
+    "fetched_at": "2026-09-24T14:51:22Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ros",
+    "repo": "resource_retriever",
+    "refreshed_at": "2026-09-24T14:51:22Z",
+    "refresh_note": "incrementally added 3 author(s) missing from a prior stale cache"
+  },
+  "data": [
+    {
+      "author": "ahcorde",
+      "date": "2020-04-22T14:16:40Z",
+      "sha": "9f029080c762c1862133c0c5f95d8bc9eeee369a",
+      "message": "Towards Quality Level 1 - Added common_linters and fixed tests  (#43)\n\n* Added common_linters and fixed tests\r\n\r\nSigned-off-by: ahcorde <ahcorde@gmail.com>\r\n\r\n* Removed test/CMakeLists.txt\r\n\r\nSigned-off-by: ahcorde <ahcorde@gmail.com>\r\n\r\n* Update resource_retriever/test/test.cpp\r\n\r\nCo-Authored-By: Chris Lalancette <clalancette@openrobotics.org>\r\n\r\n* Const exceptions\r\n\r\nSigned-off-by: ahcorde <ahcorde@gmail.com>\r\n\r\n* Added message when throws an exception\r\n\r\nSigned-off-by: ahcorde <ahcorde@gmail.com>\r\n\r\n* combine file plut error\r\n\r\nSigned-off-by: ahcorde <ahcorde@gmail.com>\r\n\r\n* Removed trace when the test is right\r\n\r\nSigned-off-by: ahcorde <ahcorde@gmail.com>\r\n\r\n* Installing only the test.txt file when BUILD_TESTING is active\r\n\r\nSigned-off-by: ahcorde <ahcorde@gmail.com>\r\n\r\n* no need to check for target in test\r\n\r\nSigned-off-by: ahcorde <ahcorde@gmail.com>\r\n\r\n* Attemp to fix windows path\r\n\r\nSigned-off-by: ahcorde <ahcorde@gmail.com>\r\n\r\n* Fixed warning on Windows\r\n\r\nSigned-off-by: ahcorde <ahcorde@gmail.com>\r\n\r\nCo-authored-by: Chris Lalancette <clalancette@openrobotics.org>",
+      "files_changed": 9,
+      "additions": 264,
+      "deletions": 256,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "5198148b655f44e88b5527a383a63f5003d7b699",
+          "filename": "resource_retriever/CMakeLists.txt",
+          "status": "modified",
+          "additions": 41,
+          "deletions": 4,
+          "changes": 45,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/9f029080c762c1862133c0c5f95d8bc9eeee369a/resource_retriever%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/9f029080c762c1862133c0c5f95d8bc9eeee369a/resource_retriever%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/resource_retriever%2FCMakeLists.txt?ref=9f029080c762c1862133c0c5f95d8bc9eeee369a",
+          "patch": "@@ -15,7 +15,7 @@ find_package(ament_index_cpp REQUIRED)\n # TODO(wjwwood): remove libcurl_vendor and just use system curl when possible\n find_package(libcurl_vendor REQUIRED)\n \n-# TODO(wjwwood): split cpp and python apis into separate packages and fix python api\n+# TODO(wjwwood): split cpp and python apis into separate packages\n \n add_library(${PROJECT_NAME} src/retriever.cpp)\n target_include_directories(${PROJECT_NAME}\n@@ -38,11 +38,48 @@ ament_export_targets(${PROJECT_NAME} HAS_LIBRARY_TARGET)\n ament_export_dependencies(ament_index_cpp)\n ament_export_dependencies(libcurl_vendor)\n \n+ament_python_install_package(${PROJECT_NAME}\n+  PACKAGE_DIR src/${PROJECT_NAME})\n+\n if(BUILD_TESTING)\n-  # TODO(wjwwood): add ament linters\n+  find_package(ament_cmake_gtest REQUIRED)\n+  find_package(ament_lint_auto REQUIRED)\n+\n+  list(APPEND AMENT_LINT_AUTO_EXCLUDE\n+    ament_cmake_cppcheck\n+    ament_cmake_uncrustify\n+  )\n+  ament_lint_auto_find_test_dependencies()\n+\n+  ament_cppcheck(LANGUAGE \"c++\")\n+  ament_uncrustify(LANGUAGE \"C++\")\n+\n+  ament_add_gtest(${PROJECT_NAME}_test test/test.cpp)\n+  target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})\n+\n+  # Python test\n+  # Provides PYTHON_EXECUTABLE_DEBUG\n+  find_package(python_cmake_module REQUIRED)\n+  find_package(PythonExtra REQUIRED)\n+\n+  set(_PYTHON_EXECUTABLE \"${PYTHON_EXECUTABLE}\")\n+  if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL \"Debug\")\n+    set(PYTHON_EXECUTABLE \"${PYTHON_EXECUTABLE_DEBUG}\")\n+  endif()\n+\n+  find_package(ament_cmake_pytest REQUIRED)\n+  ament_add_pytest_test(resource_retriever_python_test test/test.py\n+    PYTHON_EXECUTABLE \"${PYTHON_EXECUTABLE}\"\n+    APPEND_ENV PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}\n+    TIMEOUT 60\n+  )\n+\n+  set(PYTHON_EXECUTABLE \"${_PYTHON_EXECUTABLE}\")\n \n-  # TODO(wjwwood): reenable tests from ROS 1\n-  # add_subdirectory(test EXCLUDE_FROM_ALL)\n+  install(\n+    FILES test/test.txt\n+    DESTINATION share/${PROJECT_NAME}/test\n+  )\n endif()\n \n install("
+        },
+        {
+          "sha": "53f7c90b0e555c6decbb8f66387d3b02a0488d0f",
+          "filename": "resource_retriever/include/resource_retriever/retriever.h",
+          "status": "modified",
+          "additions": 38,
+          "deletions": 36,
+          "changes": 74,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/9f029080c762c1862133c0c5f95d8bc9eeee369a/resource_retriever%2Finclude%2Fresource_retriever%2Fretriever.h",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/9f029080c762c1862133c0c5f95d8bc9eeee369a/resource_retriever%2Finclude%2Fresource_retriever%2Fretriever.h",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/resource_retriever%2Finclude%2Fresource_retriever%2Fretriever.h?ref=9f029080c762c1862133c0c5f95d8bc9eeee369a",
+          "patch": "@@ -1,32 +1,33 @@\n-/*\n- * Copyright (C) 2009, Willow Garage, Inc.\n- *\n- * Redistribution and use in source and binary forms, with or without\n- * modification, are permitted provided that the following conditions are met:\n- *   * Redistributions of source code must retain the above copyright notice,\n- *     this list of conditions and the following disclaimer.\n- *   * Redistributions in binary form must reproduce the above copyright\n- *     notice, this list of conditions and the following disclaimer in the\n- *     documentation and/or other materials provided with the distribution.\n- *   * Neither the names of Stanford University or Willow Garage, Inc. nor the names of its\n- *     contributors may be used to endorse or promote products derived from\n- *     this software without specific prior written permission.\n- *\n- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE\n- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n- * POSSIBILITY OF SUCH DAMAGE.\n- */\n+// Copyright 2009, Willow Garage, Inc. All rights reserved.\n+//\n+// Redistribution and use in source and binary forms, with or without\n+// modification, are permitted provided that the following conditions are met:\n+//\n+//    * Redistributions of source code must retain the above copyright\n+//      notice, this list of conditions and the following disclaimer.\n+//\n+//    * Redistributions in binary form must reproduce the above copyright\n+//      notice, this list of conditions and the following disclaimer in the\n+//      documentation and/or other materials provided with the distribution.\n+//\n+//    * Neither the name of the  Willow Garage, Inc. nor the names of its\n+//      contributors may be used to endorse or promote products derived from\n+//      this software without specific prior written permission.\n+//\n+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE\n+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+// POSSIBILITY OF SUCH DAMAGE.\n \n-#ifndef RESOURCE_RETRIEVER_RETRIEVER_H\n-#define RESOURCE_RETRIEVER_RETRIEVER_H\n+#ifndef RESOURCE_RETRIEVER__RETRIEVER_H_\n+#define RESOURCE_RETRIEVER__RETRIEVER_H_\n \n #include <cstdint>\n #include <memory>\n@@ -39,13 +40,13 @@ typedef void CURL;\n \n namespace resource_retriever\n {\n-\n class Exception : public std::runtime_error\n {\n public:\n-  Exception(const std::string& file, const std::string& error_msg)\n+  Exception(const std::string & file, const std::string & error_msg)\n   : std::runtime_error(\"Error retrieving file [\" + file + \"]: \" + error_msg)\n-  {}\n+  {\n+  }\n };\n \n /**\n@@ -55,7 +56,8 @@ struct MemoryResource\n {\n   MemoryResource()\n   : size(0)\n-  {}\n+  {\n+  }\n \n   std::shared_ptr<uint8_t> data;\n   size_t size;\n@@ -78,14 +80,14 @@ class RESOURCE_RETRIEVER_PUBLIC Retriever\n    * \\return The file, loaded into memory\n    * \\throws resource_retriever::Exception if anything goes wrong.\n    */\n-  MemoryResource get(const std::string& url);\n+  MemoryResource get(const std::string & url);\n \n private:\n   Retriever(const Retriever & ret) = delete;\n \n-  CURL* curl_handle_;\n+  CURL * curl_handle_;\n };\n \n-} // namespace resource_retriever\n+}  //  namespace resource_retriever\n \n-#endif // RESOURCE_RETRIEVER_RETRIEVER_H\n+#endif  //  RESOURCE_RETRIEVER__RETRIEVER_H_"
+        },
+        {
+          "sha": "4de364d85aec1d3e099468e79c534f3285de659f",
+          "filename": "resource_retriever/package.xml",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/9f029080c762c1862133c0c5f95d8bc9eeee369a/resource_retriever%2Fpackage.xml",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/9f029080c762c1862133c0c5f95d8bc9eeee369a/resource_retriever%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/resource_retriever%2Fpackage.xml?ref=9f029080c762c1862133c0c5f95d8bc9eeee369a",
+          "patch": "@@ -24,8 +24,15 @@\n   <buildtool_depend>ament_cmake_ros</buildtool_depend>\n \n   <depend>ament_index_cpp</depend>\n+  <depend>ament_index_python</depend>\n   <depend>libcurl_vendor</depend>\n \n+  <test_depend>ament_cmake_gtest</test_depend>\n+  <test_depend>ament_cmake_pytest</test_depend>\n+  <test_depend>ament_lint_auto</test_depend>\n+  <test_depend>ament_lint_common</test_depend>\n+  <test_depend>python_cmake_module</test_depend>\n+\n   <export>\n     <build_type>ament_cmake</build_type>\n   </export>"
+        },
+        {
+          "sha": "d685358da52fdb42ae51c00b992b9027234ad611",
+          "filename": "resource_retriever/setup.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/9f029080c762c1862133c0c5f95d8bc9eeee369a/resource_retriever%2Fsetup.py",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/9f029080c762c1862133c0c5f95d8bc9eeee369a/resource_retriever%2Fsetup.py",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/resource_retriever%2Fsetup.py?ref=9f029080c762c1862133c0c5f95d8bc9eeee369a",
+          "patch": "@@ -1,4 +1,5 @@\n from distutils.core import setup\n+\n from catkin_pkg.python_setup import generate_distutils_setup\n \n d = generate_distutils_setup()"
+        },
+        {
+          "sha": "1a0f506089920c8a70f43dc142a7e35c9f01f673",
+          "filename": "resource_retriever/src/resource_retriever/__init__.py",
+          "status": "modified",
+          "additions": 40,
+          "deletions": 38,
+          "changes": 78,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/9f029080c762c1862133c0c5f95d8bc9eeee369a/resource_retriever%2Fsrc%2Fresource_retriever%2F__init__.py",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/9f029080c762c1862133c0c5f95d8bc9eeee369a/resource_retriever%2Fsrc%2Fresource_retriever%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/resource_retriever%2Fsrc%2Fresource_retriever%2F__init__.py?ref=9f029080c762c1862133c0c5f95d8bc9eeee369a",
+          "patch": "@@ -1,39 +1,35 @@\n-# Software License Agreement (BSD License)\n-#\n-# Copyright (c) 2008, Willow Garage, Inc.\n-# All rights reserved.\n+# Copyright 2008, Willow Garage, Inc. All rights reserved.\n #\n # Redistribution and use in source and binary forms, with or without\n-# modification, are permitted provided that the following conditions\n-# are met:\n+# modification, are permitted provided that the following conditions are met:\n #\n-#  * Redistributions of source code must retain the above copyright\n-#    notice, this list of conditions and the following disclaimer.\n-#  * Redistributions in binary form must reproduce the above\n-#    copyright notice, this list of conditions and the following\n-#    disclaimer in the documentation and/or other materials provided\n-#    with the distribution.\n-#  * Neither the name of the Willow Garage nor the names of its\n-#    contributors may be used to endorse or promote products derived\n-#    from this software without specific prior written permission.\n+#    * Redistributions of source code must retain the above copyright\n+#      notice, this list of conditions and the following disclaimer.\n #\n-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n-# \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS\n-# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\n-# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,\n-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,\n-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\n-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN\n-# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n-# POSSIBILITY OF SUCH DAMAGE.\n+#    * Redistributions in binary form must reproduce the above copyright\n+#      notice, this list of conditions and the following disclaimer in the\n+#      documentation and/or other materials provided with the distribution.\n+#\n+#    * Neither the name of the {copyright_holder} nor the names of its\n+#      contributors may be used to endorse or promote products derived from\n+#      this software without specific prior written permission.\n #\n+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE\n+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+# POSSIBILITY OF SUCH DAMAGE.\n+\n+import sys\n+\n+from ament_index_python import get_package_share_directory\n \n-import roslib; roslib.load_manifest('resource_retriever')\n-import subprocess\n-import rospkg\n try:\n     from urllib.request import urlopen\n     from urllib.error import URLError\n@@ -42,30 +38,36 @@\n     from urllib2 import URLError\n \n PACKAGE_PREFIX = 'package://'\n-r = rospkg.RosPack()\n \n-def get_filename(url, use_protocol=True ):\n+\n+def get_filename(url, use_protocol=True):\n     mod_url = url\n     if url.find(PACKAGE_PREFIX) == 0:\n         mod_url = url[len(PACKAGE_PREFIX):]\n         pos = mod_url.find('/')\n         if pos == -1:\n-            raise Exception(\"Could not parse package:// format into file:// format for \"+url)\n+            raise Exception('Could not parse package:// format into file:// format for ' + url)\n \n         package = mod_url[0:pos]\n         mod_url = mod_url[pos:]\n-        package_path = r.get_path(package)\n+        package_path = get_package_share_directory(package)\n \n         if use_protocol:\n-            protocol = \"file://\"\n+            protocol = 'file://'\n         else:\n-            protocol = \"\"\n-        mod_url = protocol + package_path + mod_url;\n+            protocol = ''\n+        if sys.platform.startswith('win'):\n+            path_without_protocol = package_path + mod_url\n+            path_without_protocol = '/' + path_without_protocol.replace('/', '\\\\')\n+            mod_url = protocol + path_without_protocol\n+        else:\n+            mod_url = protocol + package_path + mod_url\n     return mod_url\n \n+\n def get(url):\n     filename = get_filename(url)\n     try:\n         return urlopen(filename).read()\n     except URLError:\n-        raise Exception(\"Invalid URL: {}\".format(filename))\n+        raise Exception('Invalid URL: {}'.format(filename))"
+        },
+        {
+          "sha": "0f24005b2a05998dc25160655c0b33163d96b168",
+          "filename": "resource_retriever/src/retriever.cpp",
+          "status": "modified",
+          "additions": 42,
+          "deletions": 51,
+          "changes": 93,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/9f029080c762c1862133c0c5f95d8bc9eeee369a/resource_retriever%2Fsrc%2Fretriever.cpp",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/9f029080c762c1862133c0c5f95d8bc9eeee369a/resource_retriever%2Fsrc%2Fretriever.cpp",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/resource_retriever%2Fsrc%2Fretriever.cpp?ref=9f029080c762c1862133c0c5f95d8bc9eeee369a",
+          "patch": "@@ -1,39 +1,40 @@\n-/*\n- * Copyright (C) 2009, Willow Garage, Inc.\n- *\n- * Redistribution and use in source and binary forms, with or without\n- * modification, are permitted provided that the following conditions are met:\n- *   * Redistributions of source code must retain the above copyright notice,\n- *     this list of conditions and the following disclaimer.\n- *   * Redistributions in binary form must reproduce the above copyright\n- *     notice, this list of conditions and the following disclaimer in the\n- *     documentation and/or other materials provided with the distribution.\n- *   * Neither the names of Stanford University or Willow Garage, Inc. nor the names of its\n- *     contributors may be used to endorse or promote products derived from\n- *     this software without specific prior written permission.\n- *\n- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE\n- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n- * POSSIBILITY OF SUCH DAMAGE.\n- */\n+// Copyright 2009, Willow Garage, Inc. All rights reserved.\n+//\n+// Redistribution and use in source and binary forms, with or without\n+// modification, are permitted provided that the following conditions are met:\n+//\n+//    * Redistributions of source code must retain the above copyright\n+//      notice, this list of conditions and the following disclaimer.\n+//\n+//    * Redistributions in binary form must reproduce the above copyright\n+//      notice, this list of conditions and the following disclaimer in the\n+//      documentation and/or other materials provided with the distribution.\n+//\n+//    * Neither the name of the  Willow Garage, Inc. nor the names of its\n+//      contributors may be used to endorse or promote products derived from\n+//      this software without specific prior written permission.\n+//\n+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE\n+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+// POSSIBILITY OF SUCH DAMAGE.\n \n #include \"resource_retriever/retriever.h\"\n \n+#include <curl/curl.h>\n+\n #include <cstring>\n #include <memory>\n #include <string>\n #include <vector>\n \n-#include <curl/curl.h>\n-\n #include \"ament_index_cpp/get_package_prefix.hpp\"\n #include \"ament_index_cpp/get_package_share_directory.hpp\"\n \n@@ -47,20 +48,16 @@ class CURLStaticInit\n   : initialized_(false)\n   {\n     CURLcode ret = curl_global_init(CURL_GLOBAL_ALL);\n-    if (ret != 0)\n-    {\n+    if (ret != 0) {\n       fprintf(stderr, \"Error initializing libcurl! retcode = %d\", ret);\n-    }\n-    else\n-    {\n+    } else {\n       initialized_ = true;\n     }\n   }\n \n   ~CURLStaticInit()\n   {\n-    if (initialized_)\n-    {\n+    if (initialized_) {\n       curl_global_cleanup();\n     }\n   }\n@@ -76,8 +73,7 @@ Retriever::Retriever()\n \n Retriever::~Retriever()\n {\n-  if (curl_handle_)\n-  {\n+  if (curl_handle_) {\n     curl_easy_cleanup(curl_handle_);\n   }\n }\n@@ -87,9 +83,9 @@ struct MemoryBuffer\n   std::vector<uint8_t> v;\n };\n \n-size_t curlWriteFunc(void* buffer, size_t size, size_t nmemb, void* userp)\n+size_t curlWriteFunc(void * buffer, size_t size, size_t nmemb, void * userp)\n {\n-  MemoryBuffer* membuf = (MemoryBuffer*)userp;\n+  MemoryBuffer * membuf = reinterpret_cast<MemoryBuffer *>(userp);\n \n   size_t prev_size = membuf->v.size();\n   membuf->v.resize(prev_size + size * nmemb);\n@@ -98,15 +94,13 @@ size_t curlWriteFunc(void* buffer, size_t size, size_t nmemb, void* userp)\n   return size * nmemb;\n }\n \n-MemoryResource Retriever::get(const std::string& url)\n+MemoryResource Retriever::get(const std::string & url)\n {\n   std::string mod_url = url;\n-  if (url.find(\"package://\") == 0)\n-  {\n+  if (url.find(\"package://\") == 0) {\n     mod_url.erase(0, strlen(\"package://\"));\n     size_t pos = mod_url.find(\"/\");\n-    if (pos == std::string::npos)\n-    {\n+    if (pos == std::string::npos) {\n       throw Exception(url, \"Could not parse package:// format into file:// format\");\n     }\n \n@@ -126,19 +120,16 @@ MemoryResource Retriever::get(const std::string& url)\n   curl_easy_setopt(curl_handle_, CURLOPT_WRITEFUNCTION, curlWriteFunc);\n \n   char error_buffer[CURL_ERROR_SIZE];\n-  curl_easy_setopt(curl_handle_, CURLOPT_ERRORBUFFER , error_buffer);\n+  curl_easy_setopt(curl_handle_, CURLOPT_ERRORBUFFER, error_buffer);\n \n   MemoryResource res;\n   MemoryBuffer buf;\n   curl_easy_setopt(curl_handle_, CURLOPT_WRITEDATA, &buf);\n \n   CURLcode ret = curl_easy_perform(curl_handle_);\n-  if (ret != 0)\n-  {\n+  if (ret != 0) {\n     throw Exception(mod_url, error_buffer);\n-  }\n-  else if (!buf.v.empty())\n-  {\n+  } else if (!buf.v.empty()) {\n     res.size = buf.v.size();\n     // Converted from boost::shared_array, see: https://stackoverflow.com/a/8624884\n     res.data.reset(new uint8_t[res.size], std::default_delete<uint8_t[]>());\n@@ -148,4 +139,4 @@ MemoryResource Retriever::get(const std::string& url)\n   return res;\n }\n \n-}\n+}  // namespace resource_retriever"
+        },
+        {
+          "sha": "e311f59668bf4eca3fad7f5d3ced17826be0e2f0",
+          "filename": "resource_retriever/test/CMakeLists.txt",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 6,
+          "changes": 6,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/a997a38654059518f15cae30b9abd9674e38b31a/resource_retriever%2Ftest%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/a997a38654059518f15cae30b9abd9674e38b31a/resource_retriever%2Ftest%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/resource_retriever%2Ftest%2FCMakeLists.txt?ref=a997a38654059518f15cae30b9abd9674e38b31a",
+          "patch": "@@ -1,6 +0,0 @@\n-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR})\n-\n-catkin_add_gtest(${PROJECT_NAME}_utest test.cpp)\n-target_link_libraries(${PROJECT_NAME}_utest ${PROJECT_NAME})\n-\n-catkin_add_nosetests(test.py)"
+        },
+        {
+          "sha": "e7eafa18e6c4a89e2cb500f7d394c3b06d996cec",
+          "filename": "resource_retriever/test/test.cpp",
+          "status": "modified",
+          "additions": 55,
+          "deletions": 104,
+          "changes": 159,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/9f029080c762c1862133c0c5f95d8bc9eeee369a/resource_retriever%2Ftest%2Ftest.cpp",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/9f029080c762c1862133c0c5f95d8bc9eeee369a/resource_retriever%2Ftest%2Ftest.cpp",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/resource_retriever%2Ftest%2Ftest.cpp?ref=9f029080c762c1862133c0c5f95d8bc9eeee369a",
+          "patch": "@@ -1,140 +1,91 @@\n-/*********************************************************************\n-* Software License Agreement (BSD License)\n-*\n-*  Copyright (c) 2008, Willow Garage, Inc.\n-*  All rights reserved.\n-*\n-*  Redistribution and use in source and binary forms, with or without\n-*  modification, are permitted provided that the following conditions\n-*  are met:\n-*\n-*   * Redistributions of source code must retain the above copyright\n-*     notice, this list of conditions and the following disclaimer.\n-*   * Redistributions in binary form must reproduce the above\n-*     copyright notice, this list of conditions and the following\n-*     disclaimer in the documentation and/or other materials provided\n-*     with the distribution.\n-*   * Neither the name of the Willow Garage nor the names of its\n-*     contributors may be used to endorse or promote products derived\n-*     from this software without specific prior written permission.\n-*\n-*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n-*  \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n-*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS\n-*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\n-*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,\n-*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,\n-*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n-*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n-*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\n-*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN\n-*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n-*  POSSIBILITY OF SUCH DAMAGE.\n-*********************************************************************/\n+// Copyright 2008, Willow Garage, Inc. All rights reserved.\n+//\n+// Redistribution and use in source and binary forms, with or without\n+// modification, are permitted provided that the following conditions are met:\n+//\n+//    * Redistributions of source code must retain the above copyright\n+//      notice, this list of conditions and the following disclaimer.\n+//\n+//    * Redistributions in binary form must reproduce the above copyright\n+//      notice, this list of conditions and the following disclaimer in the\n+//      documentation and/or other materials provided with the distribution.\n+//\n+//    * Neither the name of the  Willow Garage, Inc. nor the names of its\n+//      contributors may be used to endorse or promote products derived from\n+//      this software without specific prior written permission.\n+//\n+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE\n+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+// POSSIBILITY OF SUCH DAMAGE.\n \n #include <gtest/gtest.h>\n \n #include <resource_retriever/retriever.h>\n-#include <ros/package.h>\n-#include <ros/console.h>\n \n-using namespace resource_retriever;\n+#include <string>\n+#include <exception>\n \n TEST(Retriever, getByPackage)\n {\n-  try\n-  {\n-    Retriever r;\n-    MemoryResource res = r.get(\"package://\" ROS_PACKAGE_NAME \"/test/test.txt\");\n-\n-    ASSERT_EQ(res.size, 1);\n-    ASSERT_EQ(res.data[0], 'A');\n-  }\n-  catch (Exception& e)\n-  {\n-    FAIL();\n-  }\n-}\n-\n-TEST(Retriever, largeFile)\n-{\n-  try\n-  {\n-    std::string path = ros::package::getPath(ROS_PACKAGE_NAME) + \"/test/large_file.dat\";\n-\n-    FILE* f = fopen(path.c_str(), \"w\");\n-\n-    ASSERT_TRUE(f);\n-\n-    for (int i = 0; i < 1024*1024*50; ++i)\n-    {\n-      fprintf(f, \"A\");\n-    }\n-    fclose(f);\n-\n-    Retriever r;\n-    MemoryResource res = r.get(\"package://\" ROS_PACKAGE_NAME \"/test/large_file.dat\");\n-\n-    ASSERT_EQ(res.size, 1024*1024*50);\n-  }\n-  catch (Exception& e)\n-  {\n-    FAIL();\n+  try {\n+    resource_retriever::Retriever r;\n+    resource_retriever::MemoryResource res = r.get(\"package://resource_retriever/test/test.txt\");\n+\n+    ASSERT_EQ(res.size, 1u);\n+    ASSERT_EQ(*res.data, 'A');\n+  } catch (const std::exception & e) {\n+    FAIL() << \"Exception caught: \" << e.what() << '\\n';\n   }\n }\n \n TEST(Retriever, http)\n {\n-  try\n-  {\n-    Retriever r;\n-    MemoryResource res = r.get(\"http://packages.ros.org/ros.key\");\n+  try {\n+    resource_retriever::Retriever r;\n+    resource_retriever::MemoryResource res = r.get(\"http://packages.ros.org/ros.key\");\n \n-    ASSERT_GT(res.size, 0);\n-  }\n-  catch (Exception& e)\n-  {\n-    FAIL();\n+    ASSERT_GT(res.size, 0u);\n+  } catch (const std::exception & e) {\n+    FAIL() << \"Exception caught: \" << e.what() << '\\n';\n   }\n }\n \n TEST(Retriever, invalidFiles)\n {\n-  Retriever r;\n+  resource_retriever::Retriever r;\n \n-  try\n-  {\n+  try {\n     r.get(\"file://fail\");\n     FAIL();\n-  }\n-  catch (Exception& e)\n-  {\n-    ROS_INFO(\"%s\", e.what());\n+  } catch (const std::exception & e) {\n+    (void)e;\n   }\n \n-  try\n-  {\n+  try {\n     r.get(\"package://roscpp\");\n     FAIL();\n-  }\n-  catch (Exception& e)\n-  {\n-    ROS_INFO(\"%s\", e.what());\n+  } catch (const std::exception & e) {\n+    (void)e;\n   }\n \n-  try\n-  {\n+  try {\n     r.get(\"package://invalid_package_blah/test.xml\");\n     FAIL();\n-  }\n-  catch (Exception& e)\n-  {\n-    ROS_INFO(\"%s\", e.what());\n+  } catch (const std::exception & e) {\n+    (void)e;\n   }\n }\n \n-int main(int argc, char **argv){\n+int main(int argc, char ** argv)\n+{\n   testing::InitGoogleTest(&argc, argv);\n   return RUN_ALL_TESTS();\n }\n-"
+        },
+        {
+          "sha": "171e38f0b35b0a6920956a6da851a36a8cf86abe",
+          "filename": "resource_retriever/test/test.py",
+          "status": "modified",
+          "additions": 40,
+          "deletions": 17,
+          "changes": 57,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/9f029080c762c1862133c0c5f95d8bc9eeee369a/resource_retriever%2Ftest%2Ftest.py",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/9f029080c762c1862133c0c5f95d8bc9eeee369a/resource_retriever%2Ftest%2Ftest.py",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/resource_retriever%2Ftest%2Ftest.py?ref=9f029080c762c1862133c0c5f95d8bc9eeee369a",
+          "patch": "@@ -1,36 +1,59 @@\n-import resource_retriever as r\n+# Copyright 2020, Willow Garage, Inc. All rights reserved.\n+#\n+# Redistribution and use in source and binary forms, with or without\n+# modification, are permitted provided that the following conditions are met:\n+#\n+#    * Redistributions of source code must retain the above copyright\n+#      notice, this list of conditions and the following disclaimer.\n+#\n+#    * Redistributions in binary form must reproduce the above copyright\n+#      notice, this list of conditions and the following disclaimer in the\n+#      documentation and/or other materials provided with the distribution.\n+#\n+#    * Neither the name of the {copyright_holder} nor the names of its\n+#      contributors may be used to endorse or promote products derived from\n+#      this software without specific prior written permission.\n+#\n+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE\n+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+# POSSIBILITY OF SUCH DAMAGE.\n+\n+import ament_index_python\n \n-import os\n-import rospkg\n from nose.tools import raises\n \n-rospack = rospkg.RosPack()\n+import resource_retriever as r\n+\n \n def test_get_by_package():\n-    res = r.get(\"package://resource_retriever/test/test.txt\")\n+    res = r.get('package://resource_retriever/test/test.txt')\n     assert len(res) == 1\n     assert res == 'A'.encode()\n \n-def test_get_large_file():\n-    res_path = os.path.join(rospack.get_path(\"resource_retriever\"), \"test/large_filepy.dat\")\n-    with open(res_path, 'w') as f:\n-        for _ in range(1024*1024*50):\n-            f.write('A')\n-    res = r.get(\"package://resource_retriever/test/large_filepy.dat\")\n-    assert len(res) == 1024*1024*50\n \n def test_http():\n-    res = r.get(\"http://packages.ros.org/ros.key\")\n+    res = r.get('http://packages.ros.org/ros.key')\n     assert len(res) > 0\n \n+\n @raises(Exception)\n def test_invalid_file():\n-    r.get(\"file://fail\")\n+    r.get('file://fail')\n+\n \n @raises(Exception)\n def test_no_file():\n-    r.get(\"package://roscpp\")\n+    r.get('package://roscpp')\n+\n \n-@raises(rospkg.common.ResourceNotFound)\n+@raises(ament_index_python.PackageNotFoundError)\n def test_invalid_package():\n-    r.get(\"package://invalid_package_blah/test.xml\")\n+    r.get('package://invalid_package_blah/test.xml')"
+        }
+      ]
+    },
+    {
+      "author": "clalancette",
+      "date": "2017-03-27T18:47:59Z",
+      "sha": "366c0a4a0f36ad78e393ee9b04f9a687f66c3bee",
+      "message": "Make Shane and Chris the maintainers.\n\nSigned-off-by: Chris Lalancette <clalancette@osrfoundation.org>",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "62812d92ce0b57c0638326e3de87c2d486fb9933",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "changes": 4,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/366c0a4a0f36ad78e393ee9b04f9a687f66c3bee/package.xml",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/366c0a4a0f36ad78e393ee9b04f9a687f66c3bee/package.xml",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/package.xml?ref=366c0a4a0f36ad78e393ee9b04f9a687f66c3bee",
+          "patch": "@@ -11,7 +11,9 @@\n   </description>\n \n   <author email=\"jfaust@willowgarage.com\">Josh Faust</author>\n-  <maintainer email=\"isucan@gmail.com\">Ioan Sucan</maintainer>\n+  <author email=\"isucan@gmail.com\">Ioan Sucan</author>\n+  <maintainer email=\"clalancette@osrfoundation.org\">Chris Lalancette</maintainer>\n+  <maintainer email=\"sloretz@osrfoundation.org\">Shane Loretz</maintainer>\n \n   <license>BSD</license>\n "
+        }
+      ]
+    },
+    {
+      "author": "mosfet80",
+      "date": "2025-03-06T12:22:11Z",
+      "sha": "168300fba1c4f507d1e3bea0c4f97d468cbad477",
+      "message": "uniform  MinCMakeVersion (#108)\n\nSigned-off-by: mosfet80 <realeandrea@yahoo.it>\nSigned-off-by: Alejandro Hernandez Cordero <ahcorde@gmail.com>\nCo-authored-by: Alejandro Hernandez Cordero <ahcorde@gmail.com>",
+      "files_changed": 2,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "10edd42d91c8d935d2354bbe3c312dc78bbd4bbb",
+          "filename": "libcurl_vendor/CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/168300fba1c4f507d1e3bea0c4f97d468cbad477/libcurl_vendor%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/168300fba1c4f507d1e3bea0c4f97d468cbad477/libcurl_vendor%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/libcurl_vendor%2FCMakeLists.txt?ref=168300fba1c4f507d1e3bea0c4f97d468cbad477",
+          "patch": "@@ -1,4 +1,4 @@\n-cmake_minimum_required(VERSION 3.10)\n+cmake_minimum_required(VERSION 3.14)\n project(libcurl_vendor C)\n \n find_package(ament_cmake REQUIRED)"
+        },
+        {
+          "sha": "1b0c7b237e2c2d12b3c0a4fdab633e2e9bd6da74",
+          "filename": "resource_retriever/CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/168300fba1c4f507d1e3bea0c4f97d468cbad477/resource_retriever%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/168300fba1c4f507d1e3bea0c4f97d468cbad477/resource_retriever%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/resource_retriever%2FCMakeLists.txt?ref=168300fba1c4f507d1e3bea0c4f97d468cbad477",
+          "patch": "@@ -1,4 +1,4 @@\n-cmake_minimum_required(VERSION 3.5)\n+cmake_minimum_required(VERSION 3.14)\n project(resource_retriever)\n \n # Default to C++17"
+        }
+      ]
+    },
+    {
+      "author": "cottsay",
+      "date": "2020-04-08T19:06:58Z",
+      "sha": "dd142bbe27ef3f3704108ed4c081d19e39e6ba36",
+      "message": "Ignore broken curl-config.cmake (#40)\n\n* Ignore broken curl-config.cmake\r\n\r\nThis flag was introduced to maintain existing behavior in CMake 3.17 and\r\nnewer, where FindCURL.cmake was changed to use curl-config.cmake if it\r\nis found.\r\n\r\nIt appears that the curl-config.cmake that comes with the current\r\nversion of curl that this package includes does not work properly. Until\r\nwe target a version of curl that has a working curl-config.cmake on\r\nWindows, we should continue with the CMake behavior prior to 3.17 by\r\nspecifying CURL_NO_CURL_CMAKE.\r\n\r\nSigned-off-by: Scott K Logan <logans@cottsay.net>\r\n\r\n* Only ignore curl-config.cmake for vendor-built curl",
+      "files_changed": 2,
+      "additions": 6,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "de542e112edfcbfd5b362d88686e79162c96300c",
+          "filename": "libcurl_vendor/CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/dd142bbe27ef3f3704108ed4c081d19e39e6ba36/libcurl_vendor%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/dd142bbe27ef3f3704108ed4c081d19e39e6ba36/libcurl_vendor%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/libcurl_vendor%2FCMakeLists.txt?ref=dd142bbe27ef3f3704108ed4c081d19e39e6ba36",
+          "patch": "@@ -85,6 +85,7 @@ if(NOT CURL_FOUND)\n     set(ENV_VAR_VALUE \"opt/libcurl_vendor/lib\")\n   endif()\n   ament_environment_hooks(env_hook/libcurl_vendor_library_path.dsv.in)\n+  set(CURL_FOUND FALSE)\n endif()\n \n ament_package("
+        },
+        {
+          "sha": "75dbd2486af2e1d54a3f03400774dfbef821fa62",
+          "filename": "libcurl_vendor/libcurl_vendor-extras.cmake.in",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/dd142bbe27ef3f3704108ed4c081d19e39e6ba36/libcurl_vendor%2Flibcurl_vendor-extras.cmake.in",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/dd142bbe27ef3f3704108ed4c081d19e39e6ba36/libcurl_vendor%2Flibcurl_vendor-extras.cmake.in",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/libcurl_vendor%2Flibcurl_vendor-extras.cmake.in?ref=dd142bbe27ef3f3704108ed4c081d19e39e6ba36",
+          "patch": "@@ -1,3 +1,8 @@\n+# Ignore the broken curl-config.cmake in 7.58\n+if(NOT @CURL_FOUND@)\n+  set(CURL_NO_CURL_CMAKE ON)\n+endif()\n+\n # Look for system curl first.\n find_package(CURL QUIET)\n "
+        }
+      ]
+    },
+    {
+      "author": "mjcarroll",
+      "date": "2024-04-12T15:14:13Z",
+      "sha": "b0c989d446350f667921536fd41844c7e4fe5f0d",
+      "message": "Revert \"Stop using python_cmake_module. (#90)\" (#93)\n\nThis reverts commit 5f4f2c0df0b6c325b5b9bc8462369d56c07e9f4b.\r\n\r\nSigned-off-by: Michael Carroll <mjcarroll@intrinsic.ai>",
+      "files_changed": 2,
+      "additions": 14,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "b6b95025e0ecfe6b664805fc3262e71e41e8ccda",
+          "filename": "resource_retriever/CMakeLists.txt",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 0,
+          "changes": 13,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/b0c989d446350f667921536fd41844c7e4fe5f0d/resource_retriever%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/b0c989d446350f667921536fd41844c7e4fe5f0d/resource_retriever%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/resource_retriever%2FCMakeLists.txt?ref=b0c989d446350f667921536fd41844c7e4fe5f0d",
+          "patch": "@@ -58,12 +58,25 @@ if(BUILD_TESTING)\n   ament_add_gtest(${PROJECT_NAME}_test test/test.cpp)\n   target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})\n \n+  # Python test\n+  # Provides PYTHON_EXECUTABLE_DEBUG\n+  find_package(python_cmake_module REQUIRED)\n+  find_package(PythonExtra REQUIRED)\n+\n+  set(_PYTHON_EXECUTABLE \"${PYTHON_EXECUTABLE}\")\n+  if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL \"Debug\")\n+    set(PYTHON_EXECUTABLE \"${PYTHON_EXECUTABLE_DEBUG}\")\n+  endif()\n+\n   find_package(ament_cmake_pytest REQUIRED)\n   ament_add_pytest_test(resource_retriever_python_test test/test.py\n+    PYTHON_EXECUTABLE \"${PYTHON_EXECUTABLE}\"\n     APPEND_ENV PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}\n     TIMEOUT 60\n   )\n \n+  set(PYTHON_EXECUTABLE \"${_PYTHON_EXECUTABLE}\")\n+\n   install(\n     FILES test/test.txt\n     DESTINATION share/${PROJECT_NAME}/test"
+        },
+        {
+          "sha": "843fa819445237b4d2803c6b7505e0fcc471ec17",
+          "filename": "resource_retriever/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/b0c989d446350f667921536fd41844c7e4fe5f0d/resource_retriever%2Fpackage.xml",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/b0c989d446350f667921536fd41844c7e4fe5f0d/resource_retriever%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/resource_retriever%2Fpackage.xml?ref=b0c989d446350f667921536fd41844c7e4fe5f0d",
+          "patch": "@@ -34,6 +34,7 @@\n   <test_depend>ament_lint_auto</test_depend>\n   <test_depend>ament_lint_common</test_depend>\n   <test_depend>python3-pytest</test_depend>\n+  <test_depend>python_cmake_module</test_depend>\n \n   <export>\n     <build_type>ament_cmake</build_type>"
+        }
+      ]
+    },
+    {
+      "author": "marcoag",
+      "date": "2024-04-16T09:42:28Z",
+      "sha": "feeb023d860a9a2ee42c1b3ab4e05fd24f786939",
+      "message": "Changelog.\n\nSigned-off-by: Marco A. Gutierrez <marcogg@marcogg.com>",
+      "files_changed": 2,
+      "additions": 9,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "58937a43474df4f0776c223aeb9f75966e732a64",
+          "filename": "libcurl_vendor/CHANGELOG.rst",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/feeb023d860a9a2ee42c1b3ab4e05fd24f786939/libcurl_vendor%2FCHANGELOG.rst",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/feeb023d860a9a2ee42c1b3ab4e05fd24f786939/libcurl_vendor%2FCHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/libcurl_vendor%2FCHANGELOG.rst?ref=feeb023d860a9a2ee42c1b3ab4e05fd24f786939",
+          "patch": "@@ -2,6 +2,9 @@\n Changelog for package libcurl_vendor\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+Forthcoming\n+-----------\n+\n 3.4.0 (2023-12-26)\n ------------------\n "
+        },
+        {
+          "sha": "60ce66ecea7ff9c23a6cce560739f95f6a018fed",
+          "filename": "resource_retriever/CHANGELOG.rst",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/feeb023d860a9a2ee42c1b3ab4e05fd24f786939/resource_retriever%2FCHANGELOG.rst",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/feeb023d860a9a2ee42c1b3ab4e05fd24f786939/resource_retriever%2FCHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/resource_retriever%2FCHANGELOG.rst?ref=feeb023d860a9a2ee42c1b3ab4e05fd24f786939",
+          "patch": "@@ -2,6 +2,12 @@\n Changelog for package resource_retriever\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+Forthcoming\n+-----------\n+* Update resource retreiver to use rule of five (`#95 <https://github.com/ros/resource_retriever/issues/95>`_)\n+* Use default ament_lint_auto (`#92 <https://github.com/ros/resource_retriever/issues/92>`_)\n+* Contributors: Chris Lalancette, Michael Carroll\n+\n 3.4.0 (2023-12-26)\n ------------------\n * Switch to target_link_libraries. (`#89 <https://github.com/ros/resource_retriever/issues/89>`_)"
+        }
+      ]
+    },
+    {
+      "author": "jasonbeach",
+      "date": "2022-10-19T20:31:26Z",
+      "sha": "958589636d0d72a8e4161ccf00b2d7d171a51875",
+      "message": "merge libcurl_vendor build instructions (#81)\n\n* merge libcurl_vendor build instructions\r\n\r\nCo-authored-by: Jason Beach <jason.beach@ssci.com>\r\nCo-authored-by: Chris Lalancette <clalancette@gmail.com>",
+      "files_changed": 1,
+      "additions": 16,
+      "deletions": 39,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "e1c8085d5846e52691d719f0e4308efe46f3e16a",
+          "filename": "libcurl_vendor/CMakeLists.txt",
+          "status": "modified",
+          "additions": 16,
+          "deletions": 39,
+          "changes": 55,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/958589636d0d72a8e4161ccf00b2d7d171a51875/libcurl_vendor%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/958589636d0d72a8e4161ccf00b2d7d171a51875/libcurl_vendor%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/libcurl_vendor%2FCMakeLists.txt?ref=958589636d0d72a8e4161ccf00b2d7d171a51875",
+          "patch": "@@ -14,57 +14,34 @@ if (POLICY CMP0135)\n endif()\n \n macro(build_libcurl)\n-  set(extra_cxx_flags)\n+\n   set(extra_c_flags)\n   if(NOT WIN32)\n-    list(APPEND extra_cxx_flags \"-std=c++14 -w\")\n     list(APPEND extra_c_flags \"-w\")\n   endif()\n \n-  set(PKGCONFIG_FOR_OPENSSL)\n-  if(APPLE)\n-    set(PKGCONFIG_FOR_OPENSSL \"/usr/local/opt/openssl/lib/pkgconfig\")\n-  endif()\n-\n   if(WIN32 AND NOT ${CMAKE_VERBOSE_MAKEFILE})\n     set(should_log ON)  # prevent warnings in Windows CI\n   else()\n     set(should_log OFF)\n   endif()\n \n   include(ExternalProject)\n-  if(WIN32)\n-    ExternalProject_Add(curl-7.81.0\n-      URL https://github.com/curl/curl/releases/download/curl-7_81_0/curl-7.81.0.tar.gz\n-      URL_MD5 9e5e81fc7657eea8dc66672768082c46\n-      LOG_CONFIGURE ${should_log}\n-      LOG_BUILD ${should_log}\n-      CMAKE_ARGS\n-        -DENABLE_MANUAL=OFF\n-        -DBUILD_TESTING=OFF\n-        -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/libcurl_install\n-        -Wno-dev\n-      TIMEOUT 600\n-    )\n-  else()\n-    ExternalProject_Add(curl-7.81.0\n-      URL https://github.com/curl/curl/releases/download/curl-7_81_0/curl-7.81.0.tar.gz\n-      URL_MD5 9e5e81fc7657eea8dc66672768082c46\n-      CONFIGURE_COMMAND\n-        <SOURCE_DIR>/configure\n-        CFLAGS=${extra_c_flags}\n-        CXXFLAGS=${extra_cxx_flags}\n-        PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${PKGCONFIG_FOR_OPENSSL}\n-        --prefix=${CMAKE_CURRENT_BINARY_DIR}/libcurl_install\n-        --with-ssl\n-        --without-libgsasl\n-        --without-libpsl\n-        --without-libidn2\n-      BUILD_COMMAND $(MAKE)\n-      INSTALL_COMMAND $(MAKE) install\n-      TIMEOUT 600\n-    )\n-  endif()\n+\n+  ExternalProject_Add(curl-7.81.0\n+    URL https://github.com/curl/curl/releases/download/curl-7_81_0/curl-7.81.0.tar.gz\n+    URL_MD5 9e5e81fc7657eea8dc66672768082c46\n+    LOG_CONFIGURE ${should_log}\n+    LOG_BUILD ${should_log}\n+    CMAKE_ARGS\n+      -DCMAKE_C_FLAGS=${extra_c_flags}\n+      -DENABLE_MANUAL=OFF\n+      -DBUILD_TESTING=OFF\n+      -DCURL_ENABLE_SSL=ON  # default, but just to make clear\n+      -DUSE_LIBIDN2=OFF\n+      -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/libcurl_install\n+    TIMEOUT 600\n+  )\n \n   # The external project will install to the build folder, but we'll install that on make install.\n   install("
+        }
+      ]
+    },
+    {
+      "author": "Crola1702",
+      "date": "2022-09-09T20:26:34Z",
+      "sha": "81103e56dd225272b0cac7612d5d05723af9adc3",
+      "message": "Fixes policy CMP0135 warning for CMake >= 3.24\n\nSigned-off-by: Crola1702 <cristobal.arroyo@ekumenlabs.com>",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "e507295644514765c85cd7c0c291a169650dfb52",
+          "filename": "libcurl_vendor/CMakeLists.txt",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/81103e56dd225272b0cac7612d5d05723af9adc3/libcurl_vendor%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/81103e56dd225272b0cac7612d5d05723af9adc3/libcurl_vendor%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/libcurl_vendor%2FCMakeLists.txt?ref=81103e56dd225272b0cac7612d5d05723af9adc3",
+          "patch": "@@ -8,6 +8,11 @@ option(FORCE_BUILD_VENDOR_PKG\n \n find_package(ament_cmake REQUIRED)\n \n+# Avoid DOWNLOAD_EXTRACT_TIMESTAMP warning for CMake >= 3.24\n+if (POLICY CMP0135)\n+  cmake_policy(SET CMP0135 OLD)\n+endif()\n+\n macro(build_libcurl)\n   set(extra_cxx_flags)\n   set(extra_c_flags)"
+        }
+      ]
+    },
+    {
+      "author": "paudrow",
+      "date": "2021-11-19T18:54:11Z",
+      "sha": "716c76288d33e9cd01b7552d3a62b2fa900c6d6f",
+      "message": "Update maintainers (#66)\n\n* Update maintainers to Alejandro Hernandez Cordero\r\n\r\nSigned-off-by: Audrow Nash <audrow@hey.com>\r\n\r\n* Remove Alex from author\r\n\r\nSigned-off-by: Audrow Nash <audrow@hey.com>",
+      "files_changed": 2,
+      "additions": 6,
+      "deletions": 4,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "8bcd81d10f51c54295460400fc467f71dfdfc208",
+          "filename": "libcurl_vendor/package.xml",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "changes": 4,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/716c76288d33e9cd01b7552d3a62b2fa900c6d6f/libcurl_vendor%2Fpackage.xml",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/716c76288d33e9cd01b7552d3a62b2fa900c6d6f/libcurl_vendor%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/libcurl_vendor%2Fpackage.xml?ref=716c76288d33e9cd01b7552d3a62b2fa900c6d6f",
+          "patch": "@@ -8,7 +8,9 @@\n   <description>\n     Wrapper around libcurl, it provides a fixed CMake module and an ExternalProject build of it.\n   </description>\n-  <maintainer email=\"alejandro@osrfoundation.org\">Alejandro Hernandez</maintainer>\n+\n+  <maintainer email=\"alejandro@openrobotics.org\">Alejandro Hernandez Cordero</maintainer>\n+\n   <license>Apache License 2.0</license>  <!-- the contents of this package are Apache 2.0 -->\n   <!-- https://curl.haxx.se/docs/copyright.html -->\n   <license>MIT</license>  <!-- libcurl is \"MIT style\" -->"
+        },
+        {
+          "sha": "9d9ded8f5d01483d7cfa39ca1c3e8ca3b4c48e64",
+          "filename": "resource_retriever/package.xml",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/716c76288d33e9cd01b7552d3a62b2fa900c6d6f/resource_retriever%2Fpackage.xml",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/716c76288d33e9cd01b7552d3a62b2fa900c6d6f/resource_retriever%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/resource_retriever%2Fpackage.xml?ref=716c76288d33e9cd01b7552d3a62b2fa900c6d6f",
+          "patch": "@@ -10,13 +10,13 @@\n    data. The resource retriever is based on the the libcurl library.\n   </description>\n \n-  <maintainer email=\"alejandro@osrfoundation.org\">Alejandro Hernandez</maintainer>\n+  <maintainer email=\"alejandro@openrobotics.org\">Alejandro Hernandez Cordero</maintainer>\n \n   <license>BSD</license>\n \n-  <author email=\"jfaust@willowgarage.com\">Josh Faust</author>\n-  <author email=\"isucan@gmail.com\">Ioan Sucan</author>\n   <author email=\"clalancette@osrfoundation.org\">Chris Lalancette</author>\n+  <author email=\"isucan@gmail.com\">Ioan Sucan</author>\n+  <author email=\"jfaust@willowgarage.com\">Josh Faust</author>\n   <author email=\"sloretz@osrfoundation.org\">Shane Loretz</author>\n \n   <url type=\"website\">http://ros.org/wiki/resource_retriever</url>"
+        }
+      ]
+    },
+    {
+      "author": "sloretz",
+      "date": "2019-11-21T22:00:01Z",
+      "sha": "27d70a0e976a8851db0b2aef2ffbadc3011072a6",
+      "message": "Catch ament_index_cpp::PackageNotFoundError (#32)\n\nSigned-off-by: Shane Loretz <sloretz@osrfoundation.org>",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 4,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "6ddc80b5e4ef0e727e185276122a1e094b13e477",
+          "filename": "resource_retriever/src/retriever.cpp",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 4,
+          "changes": 9,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/27d70a0e976a8851db0b2aef2ffbadc3011072a6/resource_retriever%2Fsrc%2Fretriever.cpp",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/27d70a0e976a8851db0b2aef2ffbadc3011072a6/resource_retriever%2Fsrc%2Fretriever.cpp",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/resource_retriever%2Fsrc%2Fretriever.cpp?ref=27d70a0e976a8851db0b2aef2ffbadc3011072a6",
+          "patch": "@@ -34,6 +34,7 @@\n \n #include <curl/curl.h>\n \n+#include \"ament_index_cpp/get_package_prefix.hpp\"\n #include \"ament_index_cpp/get_package_share_directory.hpp\"\n \n namespace resource_retriever\n@@ -111,10 +112,10 @@ MemoryResource Retriever::get(const std::string& url)\n \n     std::string package = mod_url.substr(0, pos);\n     mod_url.erase(0, pos);\n-    std::string package_path = ament_index_cpp::get_package_share_directory(package);\n-\n-    if (package_path.empty())\n-    {\n+    std::string package_path;\n+    try {\n+      package_path = ament_index_cpp::get_package_share_directory(package);\n+    } catch (const ament_index_cpp::PackageNotFoundError &) {\n       throw Exception(url, \"Package [\" + package + \"] does not exist\");\n     }\n "
+        }
+      ]
+    },
+    {
+      "author": "jacobperron",
+      "date": "2020-10-16T00:27:03Z",
+      "sha": "e4d26c98de484fdf5ce29db3d678406fe06c6458",
+      "message": "Throw exception if package name is empty (#54)\n\nOtherwise, ament_index_cpp will throw a std::runtime_error.\r\nThrowing an exception from resource_retriever instead makes for a more useful error message.\r\n\r\nSigned-off-by: Jacob Perron <jacob@openrobotics.org>",
+      "files_changed": 2,
+      "additions": 11,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "f80ce54f3a636b7b93627987c8fcbe852308d17a",
+          "filename": "resource_retriever/src/retriever.cpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/e4d26c98de484fdf5ce29db3d678406fe06c6458/resource_retriever%2Fsrc%2Fretriever.cpp",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/e4d26c98de484fdf5ce29db3d678406fe06c6458/resource_retriever%2Fsrc%2Fretriever.cpp",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/resource_retriever%2Fsrc%2Fretriever.cpp?ref=e4d26c98de484fdf5ce29db3d678406fe06c6458",
+          "patch": "@@ -105,6 +105,9 @@ MemoryResource Retriever::get(const std::string & url)\n     }\n \n     std::string package = mod_url.substr(0, pos);\n+    if (package.empty()) {\n+      throw Exception(url, \"Package name must not be empty\");\n+    }\n     mod_url.erase(0, pos);\n     std::string package_path;\n     try {"
+        },
+        {
+          "sha": "e0dbbade6eac64ecf0f1e80f422cd46e737a3991",
+          "filename": "resource_retriever/test/test.cpp",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/e4d26c98de484fdf5ce29db3d678406fe06c6458/resource_retriever%2Ftest%2Ftest.cpp",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/e4d26c98de484fdf5ce29db3d678406fe06c6458/resource_retriever%2Ftest%2Ftest.cpp",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/resource_retriever%2Ftest%2Ftest.cpp?ref=e4d26c98de484fdf5ce29db3d678406fe06c6458",
+          "patch": "@@ -82,6 +82,14 @@ TEST(Retriever, invalidFiles)\n   } catch (const std::exception & e) {\n     (void)e;\n   }\n+\n+  // Empty package name\n+  try {\n+    r.get(\"package:///test.xml\");\n+    FAIL();\n+  } catch (const std::exception & e) {\n+    (void)e;\n+  }\n }\n \n int main(int argc, char ** argv)"
+        }
+      ]
+    },
+    {
+      "author": "dirk-thomas",
+      "date": "2012-09-04T16:55:56Z",
+      "sha": "6098be245521f62467d152672cf998021de44b84",
+      "message": "fixed gtest usage",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "2043280d11fb6c845f87a320ff699d1f31d2a3b9",
+          "filename": "test/CMakeLists.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/6098be245521f62467d152672cf998021de44b84/test%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/6098be245521f62467d152672cf998021de44b84/test%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/test%2FCMakeLists.txt?ref=6098be245521f62467d152672cf998021de44b84",
+          "patch": "@@ -1,4 +1,4 @@\n set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR})\n \n-add_gtest(test/utest test.cpp)\n-target_link_libraries(test/utest ${PROJECT_NAME})\n+add_gtest(${PROJECT_NAME}_utest test.cpp)\n+target_link_libraries(${PROJECT_NAME}_utest ${PROJECT_NAME})"
+        }
+      ]
+    },
+    {
+      "author": "nbbrooks",
+      "date": "2020-02-03T23:41:15Z",
+      "sha": "98a87917df4afb96311ba1ed391dd3265999f637",
+      "message": "Update curl reference from 7.57 to 7.58 (#36)\n\nPulls in curl fix curl/curl#2154 to fix resource retrieval in Windows",
+      "files_changed": 1,
+      "additions": 6,
+      "deletions": 6,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "27c4f505c5f85ecd469ef5097f3768f78f453a75",
+          "filename": "libcurl_vendor/CMakeLists.txt",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 6,
+          "changes": 12,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/98a87917df4afb96311ba1ed391dd3265999f637/libcurl_vendor%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/98a87917df4afb96311ba1ed391dd3265999f637/libcurl_vendor%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/libcurl_vendor%2FCMakeLists.txt?ref=98a87917df4afb96311ba1ed391dd3265999f637",
+          "patch": "@@ -27,9 +27,9 @@ macro(build_libcurl)\n \n   include(ExternalProject)\n   if(WIN32)\n-    ExternalProject_Add(curl-7.57.0\n-      URL https://github.com/curl/curl/releases/download/curl-7_57_0/curl-7.57.0.tar.gz\n-      URL_MD5 c7aab73aaf5e883ca1d7518f93649dc2\n+    ExternalProject_Add(curl-7.58.0\n+      URL https://github.com/curl/curl/releases/download/curl-7_58_0/curl-7.58.0.tar.gz\n+      URL_MD5 7E9E9D5405C61148D53035426F162B0A\n       LOG_CONFIGURE ${should_log}\n       LOG_BUILD ${should_log}\n       CMAKE_ARGS\n@@ -40,9 +40,9 @@ macro(build_libcurl)\n       TIMEOUT 600\n     )\n   else()\n-    ExternalProject_Add(curl-7.57.0\n-      URL https://github.com/curl/curl/releases/download/curl-7_57_0/curl-7.57.0.tar.gz\n-      URL_MD5 c7aab73aaf5e883ca1d7518f93649dc2\n+    ExternalProject_Add(curl-7.58.0\n+      URL https://github.com/curl/curl/releases/download/curl-7_58_0/curl-7.58.0.tar.gz\n+      URL_MD5 7E9E9D5405C61148D53035426F162B0A\n       CONFIGURE_COMMAND\n         <SOURCE_DIR>/configure\n         CFLAGS=${extra_c_flags}"
+        }
+      ]
+    },
+    {
+      "author": "wjwwood",
+      "date": "2012-12-14T22:31:16Z",
+      "sha": "b505b8a99e52c5860f02f67f291e8c76a62b3640",
+      "message": "buildtool_depend on catkin",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 12,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "da24f9887fa131472d2b67daf0111fde88d17638",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 12,
+          "changes": 14,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/b505b8a99e52c5860f02f67f291e8c76a62b3640/package.xml",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/b505b8a99e52c5860f02f67f291e8c76a62b3640/package.xml",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/package.xml?ref=b505b8a99e52c5860f02f67f291e8c76a62b3640",
+          "patch": "@@ -16,24 +16,14 @@\n   <license>BSD</license>\n   <url type=\"website\">http://ros.org/wiki/resource_retriever</url>\n \n-  <build_depend>catkin</build_depend>\n+  <buildtool_depend>catkin</buildtool_depend>\n+\n   <build_depend>curl</build_depend>\n   <build_depend>rosconsole</build_depend> \n   <build_depend>roslib</build_depend> \n \n-\n-  <run_depend>catkin</run_depend>\n   <run_depend>curl</run_depend>\n   <run_depend>rosconsole</run_depend> \n   <run_depend>roslib</run_depend> \n \n-<!--\n-  <depend package=\"roslib\"/>\n-  <depend package=\"rosconsole\"/>\n-  <rosdep name=\"curl\"/>\n--->\n-  <export>\n-  </export>\n-\n-\n </package>"
+        }
+      ]
+    },
+    {
+      "author": "nuclearsandwich",
+      "date": "2019-03-15T20:20:49Z",
+      "sha": "66d5b00cfebf8b923a1e505fd45d22026d66fb61",
+      "message": "Export resource retriever to enable hooks. (#26)\n\n* Export resource retriever to enable hooks.\r\n\r\n* Replaces ament_export_libraries with HAS_LIBRARY_TARGET option.\r\n\r\nSigned-off-by: Steven! Ragnarök <steven@nuclearsandwich.com>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "9b28ef994b04a54c0b2d3fa3b6efb4b964d0d81e",
+          "filename": "resource_retriever/CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/66d5b00cfebf8b923a1e505fd45d22026d66fb61/resource_retriever%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/66d5b00cfebf8b923a1e505fd45d22026d66fb61/resource_retriever%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/resource_retriever%2FCMakeLists.txt?ref=66d5b00cfebf8b923a1e505fd45d22026d66fb61",
+          "patch": "@@ -33,7 +33,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE \"RESOURCE_RETRIEVER_BUILDING_\n \n # specific order: dependents before dependencies\n ament_export_include_directories(include)\n-ament_export_interfaces(${PROJECT_NAME})\n+ament_export_interfaces(${PROJECT_NAME} HAS_LIBRARY_TARGET)\n \n ament_export_dependencies(ament_index_cpp)\n ament_export_dependencies(libcurl_vendor)"
+        }
+      ]
+    },
+    {
+      "author": "mikaelarguedas",
+      "date": "2017-12-09T01:24:54Z",
+      "sha": "04a2512ec4b583fb8a1eb4aa8f543e8a451c5e2d",
+      "message": "2.0.0",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "f2ef2ffc483053ce7beff4164a92caa2e82652bc",
+          "filename": "resource_retriever/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/04a2512ec4b583fb8a1eb4aa8f543e8a451c5e2d/resource_retriever%2Fpackage.xml",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/04a2512ec4b583fb8a1eb4aa8f543e8a451c5e2d/resource_retriever%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/resource_retriever%2Fpackage.xml?ref=04a2512ec4b583fb8a1eb4aa8f543e8a451c5e2d",
+          "patch": "@@ -1,6 +1,6 @@\n <package format=\"2\">\n   <name>resource_retriever</name>\n-  <version>1.12.3</version>\n+  <version>2.0.0</version>\n   <description>\n    This package retrieves data from url-format files such as http://,\n    ftp://, package:// file://, etc., and loads the data into memory."
+        }
+      ]
+    },
+    {
+      "author": "mikepurvis",
+      "date": "2016-09-21T19:45:19Z",
+      "sha": "41a4297ae8a756a6553e6c0a3ce943183f2c4d0c",
+      "message": "Update URL in http test to something which exists (#8)\n\n* Update URL in http test to something which exists",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "89b95a3bc6c55efce54116f8c6552c0da22d111f",
+          "filename": "test/test.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/41a4297ae8a756a6553e6c0a3ce943183f2c4d0c/test%2Ftest.cpp",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/41a4297ae8a756a6553e6c0a3ce943183f2c4d0c/test%2Ftest.cpp",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/test%2Ftest.cpp?ref=41a4297ae8a756a6553e6c0a3ce943183f2c4d0c",
+          "patch": "@@ -88,7 +88,7 @@ TEST(Retriever, http)\n   try\n   {\n     Retriever r;\n-    MemoryResource res = r.get(\"http://pr.willowgarage.com/downloads/svnmerge.py\");\n+    MemoryResource res = r.get(\"http://packages.ros.org/ros.key\");\n \n     ASSERT_GT(res.size, 0);\n   }"
+        }
+      ]
+    },
+    {
+      "author": "Ruben Smits",
+      "date": "2017-02-13T17:02:23Z",
+      "sha": "0124b46f273bc5d3812ad2923a0bba7b563fddba",
+      "message": "Python3 compatibility (#10)\n\n* Replace urlgrabber with urllib[2]\r\n\r\nAs urlgrabber is not supported for Python 3 replace it with either the built-in urllib (Python 2) or urllib2 (Python 3)\r\n\r\n* Use rospkg instead of system call for rospack\r\n\r\n* Add test for python functionality\r\n\r\n* Fix rospkg dependency definition",
+      "files_changed": 4,
+      "additions": 53,
+      "deletions": 13,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "c222a3cea59549813aa10368f254250748d5672e",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/0124b46f273bc5d3812ad2923a0bba7b563fddba/package.xml",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/0124b46f273bc5d3812ad2923a0bba7b563fddba/package.xml",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/package.xml?ref=0124b46f273bc5d3812ad2923a0bba7b563fddba",
+          "patch": "@@ -28,6 +28,6 @@\n   <run_depend>curl</run_depend>\n   <run_depend>rosconsole</run_depend>\n   <run_depend>roslib</run_depend>\n-  <run_depend>python-urlgrabber</run_depend>\n+  <run_depend>python-rospkg</run_depend>\n \n </package>"
+        },
+        {
+          "sha": "747a63f673cc2618afc6e1ddd2b977888979d13b",
+          "filename": "src/resource_retriever/__init__.py",
+          "status": "modified",
+          "additions": 14,
+          "deletions": 12,
+          "changes": 26,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/0124b46f273bc5d3812ad2923a0bba7b563fddba/src%2Fresource_retriever%2F__init__.py",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/0124b46f273bc5d3812ad2923a0bba7b563fddba/src%2Fresource_retriever%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/src%2Fresource_retriever%2F__init__.py?ref=0124b46f273bc5d3812ad2923a0bba7b563fddba",
+          "patch": "@@ -33,17 +33,16 @@\n \n import roslib; roslib.load_manifest('resource_retriever')\n import subprocess\n-import urlgrabber, string\n+import rospkg\n+try:\n+    from urllib.request import urlopen\n+    from urllib.error import URLError\n+except ImportError:\n+    from urllib2 import urlopen\n+    from urllib2 import URLError\n \n PACKAGE_PREFIX = 'package://'\n-\n-def rospack_find(package):\n-    process = subprocess.Popen(['rospack', 'find', package], shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)\n-    (stdout, stderr) = process.communicate()\n-    if len(stderr) > 0:\n-        raise Exception(stderr)\n-    else:\n-        return string.strip(stdout)\n+r = rospkg.RosPack()\n \n def get_filename(url, use_protocol=True ):\n     mod_url = url\n@@ -55,7 +54,7 @@ def get_filename(url, use_protocol=True ):\n \n         package = mod_url[0:pos]\n         mod_url = mod_url[pos:]\n-        package_path = rospack_find(package)\n+        package_path = r.get_path(package)\n \n         if use_protocol:\n             protocol = \"file://\"\n@@ -65,5 +64,8 @@ def get_filename(url, use_protocol=True ):\n     return mod_url\n \n def get(url):\n-    return urlgrabber.urlopen(get_filename(url))\n-\n+    filename = get_filename(url)\n+    try:\n+        return urlopen(filename).read()\n+    except URLError:\n+        raise Exception(\"Invalid URL: {}\".format(filename))"
+        },
+        {
+          "sha": "e311f59668bf4eca3fad7f5d3ced17826be0e2f0",
+          "filename": "test/CMakeLists.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/0124b46f273bc5d3812ad2923a0bba7b563fddba/test%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/0124b46f273bc5d3812ad2923a0bba7b563fddba/test%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/test%2FCMakeLists.txt?ref=0124b46f273bc5d3812ad2923a0bba7b563fddba",
+          "patch": "@@ -2,3 +2,5 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR})\n \n catkin_add_gtest(${PROJECT_NAME}_utest test.cpp)\n target_link_libraries(${PROJECT_NAME}_utest ${PROJECT_NAME})\n+\n+catkin_add_nosetests(test.py)"
+        },
+        {
+          "sha": "ce1843f05473e78a94d03f4dc54552e5c8c6a3b6",
+          "filename": "test/test.py",
+          "status": "added",
+          "additions": 36,
+          "deletions": 0,
+          "changes": 36,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/0124b46f273bc5d3812ad2923a0bba7b563fddba/test%2Ftest.py",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/0124b46f273bc5d3812ad2923a0bba7b563fddba/test%2Ftest.py",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/test%2Ftest.py?ref=0124b46f273bc5d3812ad2923a0bba7b563fddba",
+          "patch": "@@ -0,0 +1,36 @@\n+import resource_retriever as r\n+\n+import os\n+import rospkg\n+from nose.tools import raises\n+\n+rospack = rospkg.RosPack()\n+\n+def test_get_by_package():\n+    res = r.get(\"package://resource_retriever/test/test.txt\")\n+    assert len(res) == 1\n+    assert res == 'A'.encode()\n+\n+def test_get_large_file():\n+    res_path = os.path.join(rospack.get_path(\"resource_retriever\"), \"test/large_file.dat\")\n+    with open(res_path, 'w') as f:\n+        for _ in range(1024*1024*50):\n+            f.write('A')\n+    res = r.get(\"package://resource_retriever/test/large_file.dat\")\n+    assert len(res) == 1024*1024*50\n+\n+def test_http():\n+    res = r.get(\"http://packages.ros.org/ros.key\")\n+    assert len(res) > 0\n+\n+@raises(Exception)\n+def test_invalid_file():\n+    r.get(\"file://fail\")\n+\n+@raises(Exception)\n+def test_no_file():\n+    r.get(\"package://roscpp\")\n+\n+@raises(rospkg.common.ResourceNotFound)\n+def test_invalid_package():\n+    r.get(\"package://invalid_package_blah/test.xml\")"
+        }
+      ]
+    },
+    {
+      "author": "jacquelinekay",
+      "date": "2016-05-23T16:22:38Z",
+      "sha": "3a0ddefa5c053e0491c9411b849a978668f6306d",
+      "message": "Merge pull request #4 from DLu/kinetic-devel\n\nAdd c++11 flag",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "43ee3e1646ad15516452692e7b9956c2cef07647",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/3a0ddefa5c053e0491c9411b849a978668f6306d/CMakeLists.txt",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/3a0ddefa5c053e0491c9411b849a978668f6306d/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/CMakeLists.txt?ref=3a0ddefa5c053e0491c9411b849a978668f6306d",
+          "patch": "@@ -12,6 +12,11 @@ catkin_package(\n include_directories(include)\n \n find_package(catkin REQUIRED COMPONENTS rosconsole roslib)\n+\n+\n+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} \" -std=c++11\")\n+\n+\n include_directories(${catkin_INCLUDE_DIRS})\n link_directories(${catkin_LIBRARY_DIRS})\n "
+        }
+      ]
+    },
+    {
+      "author": "scpeters",
+      "date": "2016-06-10T17:26:23Z",
+      "sha": "0edc66f642ad66cdb110c19cfe0f7378ae2144bb",
+      "message": "Fix warnings in test (#5)\n\nadd spaces around ROS_PACKAGE_NAME",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "d5c903412c19a8a463ae2fc290dcb1b87e1bb848",
+          "filename": "test/test.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/0edc66f642ad66cdb110c19cfe0f7378ae2144bb/test%2Ftest.cpp",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/0edc66f642ad66cdb110c19cfe0f7378ae2144bb/test%2Ftest.cpp",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/test%2Ftest.cpp?ref=0edc66f642ad66cdb110c19cfe0f7378ae2144bb",
+          "patch": "@@ -45,7 +45,7 @@ TEST(Retriever, getByPackage)\n   try\n   {\n     Retriever r;\n-    MemoryResource res = r.get(\"package://\"ROS_PACKAGE_NAME\"/test/test.txt\");\n+    MemoryResource res = r.get(\"package://\" ROS_PACKAGE_NAME \"/test/test.txt\");\n \n     ASSERT_EQ(res.size, 1);\n     ASSERT_EQ(res.data[0], 'A');\n@@ -73,7 +73,7 @@ TEST(Retriever, largeFile)\n     fclose(f);\n \n     Retriever r;\n-    MemoryResource res = r.get(\"package://\"ROS_PACKAGE_NAME\"/test/large_file.dat\");\n+    MemoryResource res = r.get(\"package://\" ROS_PACKAGE_NAME \"/test/large_file.dat\");\n \n     ASSERT_EQ(res.size, 1024*1024*50);\n   }"
+        }
+      ]
+    },
+    {
+      "author": "DLu",
+      "date": "2016-05-23T13:39:34Z",
+      "sha": "bf09c86b92eb61330af1db8ba54afbd881392752",
+      "message": "Add c++11 flag",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "43ee3e1646ad15516452692e7b9956c2cef07647",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/bf09c86b92eb61330af1db8ba54afbd881392752/CMakeLists.txt",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/bf09c86b92eb61330af1db8ba54afbd881392752/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/CMakeLists.txt?ref=bf09c86b92eb61330af1db8ba54afbd881392752",
+          "patch": "@@ -12,6 +12,11 @@ catkin_package(\n include_directories(include)\n \n find_package(catkin REQUIRED COMPONENTS rosconsole roslib)\n+\n+\n+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} \" -std=c++11\")\n+\n+\n include_directories(${catkin_INCLUDE_DIRS})\n link_directories(${catkin_LIBRARY_DIRS})\n "
+        }
+      ]
+    },
+    {
+      "author": "Jackie Kay",
+      "date": "2016-03-22T16:47:06Z",
+      "sha": "4d71f0ee2e1421c91621ded79d7c4e69e7b7e7ff",
+      "message": "Delete default copy constructor",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "39e66a4b8365ade7d01afc46f1a311df395f3a6c",
+          "filename": "include/resource_retriever/retriever.h",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/4d71f0ee2e1421c91621ded79d7c4e69e7b7e7ff/include%2Fresource_retriever%2Fretriever.h",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/4d71f0ee2e1421c91621ded79d7c4e69e7b7e7ff/include%2Fresource_retriever%2Fretriever.h",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/include%2Fresource_retriever%2Fretriever.h?ref=4d71f0ee2e1421c91621ded79d7c4e69e7b7e7ff",
+          "patch": "@@ -79,6 +79,8 @@ class Retriever\n \n private:\n   CURL* curl_handle_;\n+\n+  Retriever(const Retriever & ret) = delete;\n };\n \n } // namespace resource_retriever"
+        }
+      ]
+    },
+    {
+      "author": "isucan",
+      "date": "2013-07-02T05:41:29Z",
+      "sha": "0d0bd8bd473ce3fc575d61379047717c6be89fc7",
+      "message": "1.10.12",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "0223b59d10013dd7b0b2a440b23e33b3afc46ce3",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/0d0bd8bd473ce3fc575d61379047717c6be89fc7/package.xml",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/0d0bd8bd473ce3fc575d61379047717c6be89fc7/package.xml",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/package.xml?ref=0d0bd8bd473ce3fc575d61379047717c6be89fc7",
+          "patch": "@@ -1,6 +1,6 @@\n <package>\n   <name>resource_retriever</name>\n-  <version>1.10.11</version>\n+  <version>1.10.12</version>\n   <description>\n    This package retrieves data from url-format files such as http://,\n    ftp://, package:// file://, etc., and loads the data into memory."
+        }
+      ]
+    },
+    {
+      "author": "jbohren",
+      "date": "2015-03-18T14:35:38Z",
+      "sha": "8e44e44818127f003008444715c690ec16537476",
+      "message": "resource_retriever: adding missing dep\n\nUsing the python resource_retriever requires the `python-urlgrabber` system dependency: http://rosindex.github.io/d/python-urlgrabber/",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "cb41684054cb377110fc7c62b1fdd0dfc36b2c8e",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/8e44e44818127f003008444715c690ec16537476/package.xml",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/8e44e44818127f003008444715c690ec16537476/package.xml",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/package.xml?ref=8e44e44818127f003008444715c690ec16537476",
+          "patch": "@@ -28,5 +28,6 @@\n   <run_depend>curl</run_depend>\n   <run_depend>rosconsole</run_depend>\n   <run_depend>roslib</run_depend>\n+  <run_depend>python-urlgrabber</run_depend>\n \n </package>"
+        }
+      ]
+    },
+    {
+      "author": "tfoote",
+      "date": "2012-10-07T02:20:12Z",
+      "sha": "3ed63c89f3e7c7be0efa37cd956f05edb9369a4e",
+      "message": "updated to new version of catkin with package.xml",
+      "files_changed": 3,
+      "additions": 42,
+      "deletions": 26,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "e985c13a2a04cff711f4ba03916d46b277daae38",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "changes": 4,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/3ed63c89f3e7c7be0efa37cd956f05edb9369a4e/CMakeLists.txt",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/3ed63c89f3e7c7be0efa37cd956f05edb9369a4e/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/CMakeLists.txt?ref=3ed63c89f3e7c7be0efa37cd956f05edb9369a4e",
+          "patch": "@@ -1,6 +1,8 @@\n project(resource_retriever)\n \n-catkin_project(${PROJECT_NAME} \n+find_package(catkin REQUIRED COMPONENTS rosconsole roslib)\n+\n+catkin_package(\n   LIBRARIES ${PROJECT_NAME}\n   INCLUDE_DIRS include)\n "
+        },
+        {
+          "sha": "21e1bdcb41127ff8a2d0237a3222a57db0aceb3a",
+          "filename": "manifest.xml",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 25,
+          "changes": 25,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/5bdd6228a7215f868b5208dc976a6739e31fd72b/manifest.xml",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/5bdd6228a7215f868b5208dc976a6739e31fd72b/manifest.xml",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/manifest.xml?ref=5bdd6228a7215f868b5208dc976a6739e31fd72b",
+          "patch": "@@ -1,25 +0,0 @@\n-<package>\n-  <description brief=\"resource_retriever\">\n-\n-   This package retrieves data from url-format files such as http://,\n-   ftp://, package:// file://, etc., and loads the data into memory.\n-   The package:// url for ros packages is translated into a local\n-   file:// url.  The resourse retriever was initially designed to load\n-   mesh files into memory, but it can be used for any type of\n-   data. The resource retriever is based on the the libcurl library.\n-\n-  </description>\n-  <author>Josh Faust (jfaust@willowgarage.com)</author>\n-  <license>BSD</license>\n-  <review status=\"Doc reviewed\" notes=\"\"/>\n-  <url>http://ros.org/wiki/resource_retriever</url>\n-  <depend package=\"roslib\"/>\n-  <depend package=\"rosconsole\"/>\n-\n-  <export>\n-    <cpp cflags=\"`pkg-config --cflags resource_retriever`\" lflags=\"`pkg-config --libs resource_retriever`\"/>\n-  </export>\n-\n-  <rosdep name=\"curl\"/>\n-\n-</package>"
+        },
+        {
+          "sha": "f8054ab31458ac6b581ea6ee06c653e147557a0e",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 39,
+          "deletions": 0,
+          "changes": 39,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/3ed63c89f3e7c7be0efa37cd956f05edb9369a4e/package.xml",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/3ed63c89f3e7c7be0efa37cd956f05edb9369a4e/package.xml",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/package.xml?ref=3ed63c89f3e7c7be0efa37cd956f05edb9369a4e",
+          "patch": "@@ -0,0 +1,39 @@\n+<package>\n+  <name>resource_retriever</name>\n+  <version>1.9.13</version>\n+  <description>\n+\n+   This package retrieves data from url-format files such as http://,\n+   ftp://, package:// file://, etc., and loads the data into memory.\n+   The package:// url for ros packages is translated into a local\n+   file:// url.  The resourse retriever was initially designed to load\n+   mesh files into memory, but it can be used for any type of\n+   data. The resource retriever is based on the the libcurl library.\n+\n+  </description>\n+  <author email=\"jfaust@willowgarage.com\">Josh Faust</author>\n+  <maintainer email=\"isucan@willowgarage.com\">Ioan Sucan</maintainer>\n+  <license>BSD</license>\n+  <url type=\"website\">http://ros.org/wiki/resource_retriever</url>\n+\n+  <build_depend>catkin</build_depend>\n+  <build_depend>curl</build_depend>\n+  <build_depend>rosconsole</build_depend> \n+  <build_depend>roslib</build_depend> \n+\n+\n+  <run_depend>catkin</run_depend>\n+  <run_depend>curl</run_depend>\n+  <run_depend>rosconsole</run_depend> \n+  <run_depend>roslib</run_depend> \n+\n+<!--\n+  <depend package=\"roslib\"/>\n+  <depend package=\"rosconsole\"/>\n+  <rosdep name=\"curl\"/>\n+-->\n+  <export>\n+  </export>\n+\n+\n+</package>"
+        }
+      ]
+    },
+    {
+      "author": "bulwahn",
+      "date": "2013-09-15T12:35:12Z",
+      "sha": "1e0f5c9c81f702931c37f60683351e8f57c0440a",
+      "message": "check for CATKIN_ENABLE_TESTING",
+      "files_changed": 2,
+      "additions": 4,
+      "deletions": 2,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "f34b0daeddbf4fdca19571ed4b434c57351dc1f2",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "changes": 4,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/1e0f5c9c81f702931c37f60683351e8f57c0440a/CMakeLists.txt",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/1e0f5c9c81f702931c37f60683351e8f57c0440a/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/CMakeLists.txt?ref=1e0f5c9c81f702931c37f60683351e8f57c0440a",
+          "patch": "@@ -26,7 +26,9 @@ include_directories(${CURL_INCLUDE_DIRS})\n add_library(${PROJECT_NAME} src/retriever.cpp)\n target_link_libraries(${PROJECT_NAME} ${CURL_LIBRARIES} ${catkin_LIBRARIES})\n \n-add_subdirectory(test EXCLUDE_FROM_ALL)\n+if(CATKIN_ENABLE_TESTING)\n+  add_subdirectory(test EXCLUDE_FROM_ALL)\n+endif()\n \n install(TARGETS ${PROJECT_NAME}\n   DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})"
+        },
+        {
+          "sha": "6e98408a91ca37125c5193cd16fd52ad5be678a5",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/1e0f5c9c81f702931c37f60683351e8f57c0440a/package.xml",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/1e0f5c9c81f702931c37f60683351e8f57c0440a/package.xml",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/package.xml?ref=1e0f5c9c81f702931c37f60683351e8f57c0440a",
+          "patch": "@@ -19,7 +19,7 @@\n   <url type=\"repository\">https://github.com/ros/robot_model</url>\n   <url type=\"bugtracker\">https://github.com/ros/robot_model/issues</url>\n \n-  <buildtool_depend>catkin</buildtool_depend>\n+  <buildtool_depend version_gte=\"0.5.68\">catkin</buildtool_depend>\n \n   <build_depend>curl</build_depend>\n   <build_depend>rosconsole</build_depend>"
+        }
+      ]
+    },
+    {
+      "author": "Ioan Sucan",
+      "date": "2012-08-03T00:51:31Z",
+      "sha": "a76c29aa37da9b82b7476a04013d5aeda31d68f9",
+      "message": "switching to catkin",
+      "files_changed": 2,
+      "additions": 18,
+      "deletions": 26,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "6985a71f6a28c3b1990acf81f44a74c32cf997bd",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 17,
+          "deletions": 25,
+          "changes": 42,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/a76c29aa37da9b82b7476a04013d5aeda31d68f9/CMakeLists.txt",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/a76c29aa37da9b82b7476a04013d5aeda31d68f9/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/CMakeLists.txt?ref=a76c29aa37da9b82b7476a04013d5aeda31d68f9",
+          "patch": "@@ -1,35 +1,27 @@\n-cmake_minimum_required(VERSION 2.4.6)\n-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)\n+project(resource_retriever)\n \n-# Set the build type.  Options are:\n-#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage\n-#  Debug          : w/ debug symbols, w/o optimization\n-#  Release        : w/o debug symbols, w/ optimization\n-#  RelWithDebInfo : w/ debug symbols, w/ optimization\n-#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries\n-#set(ROS_BUILD_TYPE RelWithDebInfo)\n+catkin_project(${PROJECT_NAME} \n+  LIBRARIES ${PROJECT_NAME}\n+  INCLUDE_DIRS include)\n \n-rosbuild_init()\n+include_directories(include)\n \n-#set the default path for built executables to the \"bin\" directory\n-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)\n-#set the default path for built libraries to the \"lib\" directory\n-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)\n-\n-#uncomment if you have defined messages\n-#rosbuild_genmsg()\n-#uncomment if you have defined services\n-#rosbuild_gensrv()\n+find_package(ROS REQUIRED COMPONENTS rosconsole roslib)\n+include_directories(${ROS_INCLUDE_DIRS})\n \n include(FindCURL)\n-\n if(NOT CURL_FOUND)\n-message(\"CURL not found!  Aborting...\")\n-fail()\n+  message(\"CURL not found!  Aborting...\")\n+  fail()\n endif(NOT CURL_FOUND)\n-\n include_directories(${CURL_INCLUDE_DIRS})\n-rosbuild_add_library(${PROJECT_NAME} src/retriever.cpp)\n-target_link_libraries(${PROJECT_NAME} ${CURL_LIBRARIES})\n+\n+\n+add_library(${PROJECT_NAME} src/retriever.cpp)\n+target_link_libraries(${PROJECT_NAME} ${CURL_LIBRARIES} ${ROS_LIBRARIES})\n \n add_subdirectory(test EXCLUDE_FROM_ALL)\n+\n+# for compatibility with old build system\n+install(FILES manifest.xml\n+        DESTINATION share/${PROJECT_NAME})"
+        },
+        {
+          "sha": "967e9e2ec0590730963308b7e223f0e04678f9b3",
+          "filename": "test/CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/a76c29aa37da9b82b7476a04013d5aeda31d68f9/test%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/a76c29aa37da9b82b7476a04013d5aeda31d68f9/test%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/test%2FCMakeLists.txt?ref=a76c29aa37da9b82b7476a04013d5aeda31d68f9",
+          "patch": "@@ -1,4 +1,4 @@\n set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR})\n \n-rosbuild_add_gtest(test/utest test.cpp)\n+add_gtest(test/utest test.cpp)\n target_link_libraries(test/utest ${PROJECT_NAME})"
+        }
+      ]
+    },
+    {
+      "author": "William Woodall",
+      "date": "2012-12-19T00:59:48Z",
+      "sha": "1f08972607b4911d36989bf43133c3df58f863bd",
+      "message": "1.9.31",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "da438473b1428e7bb6cc8be9264aca8f26d8c1c2",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/1f08972607b4911d36989bf43133c3df58f863bd/package.xml",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/1f08972607b4911d36989bf43133c3df58f863bd/package.xml",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/package.xml?ref=1f08972607b4911d36989bf43133c3df58f863bd",
+          "patch": "@@ -1,6 +1,6 @@\n <package>\n   <name>resource_retriever</name>\n-  <version>1.9.30</version>\n+  <version>1.9.31</version>\n   <description>\n \n    This package retrieves data from url-format files such as http://,"
+        }
+      ]
+    },
+    {
+      "author": "vrabaud",
+      "date": "2012-10-30T05:49:32Z",
+      "sha": "76531aa43270352726e41240f3b495f3ae2b46cd",
+      "message": "1.9.25",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "b212939a20356705f74cb6674e539ceea8f56c01",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/76531aa43270352726e41240f3b495f3ae2b46cd/package.xml",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/76531aa43270352726e41240f3b495f3ae2b46cd/package.xml",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/package.xml?ref=76531aa43270352726e41240f3b495f3ae2b46cd",
+          "patch": "@@ -1,6 +1,6 @@\n <package>\n   <name>resource_retriever</name>\n-  <version>1.9.24</version>\n+  <version>1.9.25</version>\n   <description>\n \n    This package retrieves data from url-format files such as http://,"
+        }
+      ]
+    },
+    {
+      "author": "davidlu",
+      "date": "2012-06-09T23:29:46Z",
+      "sha": "fa9f66d8ec740a364ec39c7d1ee11b38107e1953",
+      "message": "Updates to simmechanics_to_urdf and resource_retriever",
+      "files_changed": 2,
+      "additions": 36,
+      "deletions": 31,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "3f8d85530b2aece5666830adf292cc7ed32e47ba",
+          "filename": "src/resource_retriever/__init__.py",
+          "status": "modified",
+          "additions": 36,
+          "deletions": 0,
+          "changes": 36,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/fa9f66d8ec740a364ec39c7d1ee11b38107e1953/src%2Fresource_retriever%2F__init__.py",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/fa9f66d8ec740a364ec39c7d1ee11b38107e1953/src%2Fresource_retriever%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/src%2Fresource_retriever%2F__init__.py?ref=fa9f66d8ec740a364ec39c7d1ee11b38107e1953",
+          "patch": "@@ -0,0 +1,36 @@\n+import roslib; roslib.load_manifest('resource_retriever')\n+import subprocess\n+import urlgrabber, string\n+\n+PACKAGE_PREFIX = 'package://'\n+\n+def rospack_find(package):\n+    process = subprocess.Popen(['rospack', 'find', package], shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)\n+    (stdout, stderr) = process.communicate()\n+    if len(stderr) > 0:\n+        raise Exception(stderr)\n+    else:\n+        return string.strip(stdout)\n+\n+def get_filename(url, use_protocol=True ):\n+    mod_url = url\n+    if url.find(PACKAGE_PREFIX) == 0:\n+        mod_url = url[len(PACKAGE_PREFIX):]\n+        pos = mod_url.find('/')\n+        if pos == -1:\n+            raise Exception(\"Could not parse package:// format into file:// format for \"+url)\n+\n+        package = mod_url[0:pos]\n+        mod_url = mod_url[pos:]\n+        package_path = rospack_find(package)\n+\n+        if use_protocol:\n+            protocol = \"file://\"\n+        else:\n+            protocol = \"\"\n+        mod_url = protocol + package_path + mod_url;\n+    return mod_url\n+\n+def get(url):\n+    return urlgrabber.urlopen(get_filename(url))\n+"
+        },
+        {
+          "sha": "f6edbac8a45073035d9cbf0f4904c740f9682f98",
+          "filename": "src/resource_retriever/retriever.py",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 31,
+          "changes": 31,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/45819720e771d49f86ca6f2877af24a9a1d7dd28/src%2Fresource_retriever%2Fretriever.py",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/45819720e771d49f86ca6f2877af24a9a1d7dd28/src%2Fresource_retriever%2Fretriever.py",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/src%2Fresource_retriever%2Fretriever.py?ref=45819720e771d49f86ca6f2877af24a9a1d7dd28",
+          "patch": "@@ -1,31 +0,0 @@\n-import roslib; roslib.load_manifest('resource_retriever2')\n-import rospy\n-import subprocess\n-import urlgrabber, string\n-\n-PACKAGE_PREFIX = 'package://'\n-\n-def rospack_find(package):\n-    process = subprocess.Popen(['rospack', 'find', package], shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)\n-    (stdout, stderr) = process.communicate()\n-    if len(stderr) > 0:\n-        raise Exception(stderr)\n-    else:\n-        return string.strip(stdout)\n-\n-def get(url):\n-    mod_url = url\n-    if url.find(PACKAGE_PREFIX) == 0:\n-        mod_url = url[len(PACKAGE_PREFIX):]\n-        pos = mod_url.find('/')\n-        if pos == -1:\n-            raise Exception(\"Could not parse package:// format into file:// format for \"+url)\n-\n-        package = mod_url[0:pos]\n-        mod_url = mod_url[pos:]\n-        package_path = rospack_find(package)\n-\n-        mod_url = \"file://\" + package_path + mod_url;\n-\n-    return urlgrabber.urlopen(mod_url)\t\n-"
+        }
+      ]
+    },
+    {
+      "author": "Wim Meeussen",
+      "date": "2011-06-16T16:35:29Z",
+      "sha": "45819720e771d49f86ca6f2877af24a9a1d7dd28",
+      "message": "add David to author list",
+      "files_changed": 2,
+      "additions": 31,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "src/resource_retriever/__init__.py",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/45819720e771d49f86ca6f2877af24a9a1d7dd28/src%2Fresource_retriever%2F__init__.py",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/45819720e771d49f86ca6f2877af24a9a1d7dd28/src%2Fresource_retriever%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/src%2Fresource_retriever%2F__init__.py?ref=45819720e771d49f86ca6f2877af24a9a1d7dd28"
+        },
+        {
+          "sha": "f6edbac8a45073035d9cbf0f4904c740f9682f98",
+          "filename": "src/resource_retriever/retriever.py",
+          "status": "added",
+          "additions": 31,
+          "deletions": 0,
+          "changes": 31,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/45819720e771d49f86ca6f2877af24a9a1d7dd28/src%2Fresource_retriever%2Fretriever.py",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/45819720e771d49f86ca6f2877af24a9a1d7dd28/src%2Fresource_retriever%2Fretriever.py",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/src%2Fresource_retriever%2Fretriever.py?ref=45819720e771d49f86ca6f2877af24a9a1d7dd28",
+          "patch": "@@ -0,0 +1,31 @@\n+import roslib; roslib.load_manifest('resource_retriever2')\n+import rospy\n+import subprocess\n+import urlgrabber, string\n+\n+PACKAGE_PREFIX = 'package://'\n+\n+def rospack_find(package):\n+    process = subprocess.Popen(['rospack', 'find', package], shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)\n+    (stdout, stderr) = process.communicate()\n+    if len(stderr) > 0:\n+        raise Exception(stderr)\n+    else:\n+        return string.strip(stdout)\n+\n+def get(url):\n+    mod_url = url\n+    if url.find(PACKAGE_PREFIX) == 0:\n+        mod_url = url[len(PACKAGE_PREFIX):]\n+        pos = mod_url.find('/')\n+        if pos == -1:\n+            raise Exception(\"Could not parse package:// format into file:// format for \"+url)\n+\n+        package = mod_url[0:pos]\n+        mod_url = mod_url[pos:]\n+        package_path = rospack_find(package)\n+\n+        mod_url = \"file://\" + package_path + mod_url;\n+\n+    return urlgrabber.urlopen(mod_url)\t\n+"
+        }
+      ]
+    },
+    {
+      "author": "gerkey",
+      "date": "2010-05-19T20:26:42Z",
+      "sha": "1da41a617fd61a86552a67f6a7288e128fc72b90",
+      "message": "Added Ubuntu platform tags to manifest",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "5ab0755493900d63d90763d3a37d24471ddfb850",
+          "filename": "manifest.xml",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/1da41a617fd61a86552a67f6a7288e128fc72b90/manifest.xml",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/1da41a617fd61a86552a67f6a7288e128fc72b90/manifest.xml",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/manifest.xml?ref=1da41a617fd61a86552a67f6a7288e128fc72b90",
+          "patch": "@@ -21,6 +21,9 @@\n   </export>\n \n   <rosdep name=\"curl\"/>\n+  <platform os=\"ubuntu\" version=\"9.04\"/>\n+  <platform os=\"ubuntu\" version=\"9.10\"/>\n+  <platform os=\"ubuntu\" version=\"10.04\"/>\n </package>\n \n "
+        }
+      ]
+    },
+    {
+      "author": "wheeler",
+      "date": "2009-12-01T01:23:38Z",
+      "sha": "fc46066e7c56e534c85a6ae50b0ba00b4ef67383",
+      "message": "Remove use of deprecated rosbuild macros",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "f1c0fa6dc8454d0993fa9bf11740abb5ba780af5",
+          "filename": "test/CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/fc46066e7c56e534c85a6ae50b0ba00b4ef67383/test%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/fc46066e7c56e534c85a6ae50b0ba00b4ef67383/test%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/test%2FCMakeLists.txt?ref=fc46066e7c56e534c85a6ae50b0ba00b4ef67383",
+          "patch": "@@ -1,4 +1,4 @@\n set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR})\n \n-rospack_add_gtest(test/utest test.cpp)\n+rosbuild_add_gtest(test/utest test.cpp)\n target_link_libraries(test/utest ${PROJECT_NAME})"
+        }
+      ]
+    },
+    {
+      "author": "meeussen",
+      "date": "2009-10-06T19:00:13Z",
+      "sha": "5fb94e3e2137697cbda1beee169ba0014c182ba2",
+      "message": "doc review of resource retriever",
+      "files_changed": 1,
+      "additions": 6,
+      "deletions": 3,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "a4b18f39804ff9155863f2ff5ea5766c2481293f",
+          "filename": "manifest.xml",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 3,
+          "changes": 9,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/5fb94e3e2137697cbda1beee169ba0014c182ba2/manifest.xml",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/5fb94e3e2137697cbda1beee169ba0014c182ba2/manifest.xml",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/manifest.xml?ref=5fb94e3e2137697cbda1beee169ba0014c182ba2",
+          "patch": "@@ -1,13 +1,16 @@\n <package>\n   <description brief=\"resource_retriever\">\n \n-     A package for retrieving resources used in a urdf.  Uses libcurl to support url-format files, such as http://, ftp://, etc.  Translates package:// to a local file://\n+   This package retrieves data from url-format files such as http://,\n+   ftp://, etc., and loads the data into memory.  The package:// url\n+   is translated into a local file:// url. The resourse retriever uses\n+   the libcurl library. \n \n   </description>\n   <author>Josh Faust (jfaust@willowgarage.com)</author>\n   <license>BSD</license>\n-  <review status=\"API reviewed\" notes=\"\"/>\n-  <url>http://pr.willowgarage.com/wiki/resource_retriever</url>\n+  <review status=\"Doc reviewed\" notes=\"\"/>\n+  <url>http://ros.org/wiki/resource_retriever</url>\n   <depend package=\"roslib\"/>\n   <depend package=\"rosconsole\"/>\n "
+        }
+      ]
+    },
+    {
+      "author": "kwc",
+      "date": "2009-09-04T23:10:08Z",
+      "sha": "725c377df2450c8ab363fcaabc50f2e873c000f5",
+      "message": "migration part 1",
+      "files_changed": 9,
+      "additions": 448,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "86b57355169eaaeb1d4a395f154cc346c52cf5ff",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 35,
+          "deletions": 0,
+          "changes": 35,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/725c377df2450c8ab363fcaabc50f2e873c000f5/CMakeLists.txt",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/725c377df2450c8ab363fcaabc50f2e873c000f5/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/CMakeLists.txt?ref=725c377df2450c8ab363fcaabc50f2e873c000f5",
+          "patch": "@@ -0,0 +1,35 @@\n+cmake_minimum_required(VERSION 2.4.6)\n+include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)\n+\n+# Set the build type.  Options are:\n+#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage\n+#  Debug          : w/ debug symbols, w/o optimization\n+#  Release        : w/o debug symbols, w/ optimization\n+#  RelWithDebInfo : w/ debug symbols, w/ optimization\n+#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries\n+#set(ROS_BUILD_TYPE RelWithDebInfo)\n+\n+rosbuild_init()\n+\n+#set the default path for built executables to the \"bin\" directory\n+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)\n+#set the default path for built libraries to the \"lib\" directory\n+set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)\n+\n+#uncomment if you have defined messages\n+#rosbuild_genmsg()\n+#uncomment if you have defined services\n+#rosbuild_gensrv()\n+\n+include(FindCURL)\n+\n+if(NOT CURL_FOUND)\n+message(\"CURL not found!  Aborting...\")\n+fail()\n+endif(NOT CURL_FOUND)\n+\n+include_directories(${CURL_INCLUDE_DIRS})\n+rosbuild_add_library(${PROJECT_NAME} src/retriever.cpp)\n+target_link_libraries(${PROJECT_NAME} ${CURL_LIBRARIES})\n+\n+add_subdirectory(test EXCLUDE_FROM_ALL)"
+        },
+        {
+          "sha": "b75b928f20ef9ea4f509a17db62e4e31b422c27f",
+          "filename": "Makefile",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/725c377df2450c8ab363fcaabc50f2e873c000f5/Makefile",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/725c377df2450c8ab363fcaabc50f2e873c000f5/Makefile",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/Makefile?ref=725c377df2450c8ab363fcaabc50f2e873c000f5",
+          "patch": "@@ -0,0 +1 @@\n+include $(shell rospack find mk)/cmake.mk\n\\ No newline at end of file"
+        },
+        {
+          "sha": "a328057d8c37dd91ff14cead8f628e7efa4ee11f",
+          "filename": "include/resource_retriever/retriever.h",
+          "status": "added",
+          "additions": 85,
+          "deletions": 0,
+          "changes": 85,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/725c377df2450c8ab363fcaabc50f2e873c000f5/include%2Fresource_retriever%2Fretriever.h",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/725c377df2450c8ab363fcaabc50f2e873c000f5/include%2Fresource_retriever%2Fretriever.h",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/include%2Fresource_retriever%2Fretriever.h?ref=725c377df2450c8ab363fcaabc50f2e873c000f5",
+          "patch": "@@ -0,0 +1,85 @@\n+/*\n+ * Copyright (C) 2009, Willow Garage, Inc.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ *   * Redistributions of source code must retain the above copyright notice,\n+ *     this list of conditions and the following disclaimer.\n+ *   * Redistributions in binary form must reproduce the above copyright\n+ *     notice, this list of conditions and the following disclaimer in the\n+ *     documentation and/or other materials provided with the distribution.\n+ *   * Neither the names of Stanford University or Willow Garage, Inc. nor the names of its\n+ *     contributors may be used to endorse or promote products derived from\n+ *     this software without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE\n+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+ * POSSIBILITY OF SUCH DAMAGE.\n+ */\n+\n+#ifndef RESOURCE_RETRIEVER_RETRIEVER_H\n+#define RESOURCE_RETRIEVER_RETRIEVER_H\n+\n+#include <string>\n+#include <boost/shared_array.hpp>\n+#include <stdexcept>\n+\n+typedef void CURL;\n+\n+namespace resource_retriever\n+{\n+\n+class Exception : public std::runtime_error\n+{\n+public:\n+  Exception(const std::string& file, const std::string& error_msg)\n+  : std::runtime_error(\"Error retrieving file [\" + file + \"]: \" + error_msg)\n+  {}\n+};\n+\n+/**\n+ * \\brief A combination of a pointer to data in memory along with the data's size.\n+ */\n+struct MemoryResource\n+{\n+  MemoryResource()\n+  : size(0)\n+  {}\n+\n+  boost::shared_array<uint8_t> data;\n+  uint32_t size;\n+};\n+\n+/**\n+ * \\brief Retrieves files from from a url.  Caches a CURL handle so multiple accesses to a single url\n+ * will keep connections open.\n+ */\n+class Retriever\n+{\n+public:\n+  Retriever();\n+  ~Retriever();\n+\n+  /**\n+   * \\brief Get a file and store it in memory\n+   * \\param url The url to retrieve.  package://package/file will be turned into the correct file:// invocation\n+   * \\return The file, loaded into memory\n+   * \\throws resource_retriever::Exception if anything goes wrong.\n+   */\n+  MemoryResource get(const std::string& url);\n+\n+private:\n+  CURL* curl_handle_;\n+};\n+\n+} // namespace resource_retriever\n+\n+#endif // RESOURCE_RETRIEVER_RETRIEVER_H"
+        },
+        {
+          "sha": "a06a758dff23b1a23691e1abeefb4d1d854e0966",
+          "filename": "mainpage.dox",
+          "status": "added",
+          "additions": 14,
+          "deletions": 0,
+          "changes": 14,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/725c377df2450c8ab363fcaabc50f2e873c000f5/mainpage.dox",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/725c377df2450c8ab363fcaabc50f2e873c000f5/mainpage.dox",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/mainpage.dox?ref=725c377df2450c8ab363fcaabc50f2e873c000f5",
+          "patch": "@@ -0,0 +1,14 @@\n+/**\n+\\mainpage\n+\\htmlinclude manifest.html\n+\n+\\b resource_retriever is a package used for downloading files from a url.  It also provides special handling of the package:// prefix, allowing things to be referenced\n+by path relative to a package.\n+\n+\n+\\section codeapi Code API\n+\n+ - resource_retriever::Retriever -- Use this class to download files.\n+\n+\n+*/\n\\ No newline at end of file"
+        },
+        {
+          "sha": "80058d9775b3b10f1484b96cb9be5cdf7dd7094b",
+          "filename": "manifest.xml",
+          "status": "added",
+          "additions": 21,
+          "deletions": 0,
+          "changes": 21,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/725c377df2450c8ab363fcaabc50f2e873c000f5/manifest.xml",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/725c377df2450c8ab363fcaabc50f2e873c000f5/manifest.xml",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/manifest.xml?ref=725c377df2450c8ab363fcaabc50f2e873c000f5",
+          "patch": "@@ -0,0 +1,21 @@\n+<package>\n+  <description brief=\"resource_retriever\">\n+\n+     A package for retrieving resources used in a urdf.  Uses libcurl to support url-format files, such as http://, ftp://, etc.  Translates package:// to a local file://\n+\n+  </description>\n+  <author>Josh Faust (jfaust@willowgarage.com)</author>\n+  <license>BSD</license>\n+  <review status=\"API reviewed\" notes=\"\"/>\n+  <url>http://pr.willowgarage.com/wiki/resource_retriever</url>\n+  <depend package=\"roslib\"/>\n+  <depend package=\"rosconsole\"/>\n+\n+  <export>\n+    <cpp cflags=\"-I${prefix}/include\" lflags=\"-L${prefix}/lib -Wl,-rpath,${prefix}/lib -lresource_retriever\"/>\n+  </export>\n+\n+  <rosdep name=\"curl\"/>\n+</package>\n+\n+"
+        },
+        {
+          "sha": "b09a9815df36afc619d340f80f6d4109b1be22f3",
+          "filename": "src/retriever.cpp",
+          "status": "added",
+          "additions": 147,
+          "deletions": 0,
+          "changes": 147,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/725c377df2450c8ab363fcaabc50f2e873c000f5/src%2Fretriever.cpp",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/725c377df2450c8ab363fcaabc50f2e873c000f5/src%2Fretriever.cpp",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/src%2Fretriever.cpp?ref=725c377df2450c8ab363fcaabc50f2e873c000f5",
+          "patch": "@@ -0,0 +1,147 @@\n+/*\n+ * Copyright (C) 2009, Willow Garage, Inc.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ *   * Redistributions of source code must retain the above copyright notice,\n+ *     this list of conditions and the following disclaimer.\n+ *   * Redistributions in binary form must reproduce the above copyright\n+ *     notice, this list of conditions and the following disclaimer in the\n+ *     documentation and/or other materials provided with the distribution.\n+ *   * Neither the names of Stanford University or Willow Garage, Inc. nor the names of its\n+ *     contributors may be used to endorse or promote products derived from\n+ *     this software without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE\n+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+ * POSSIBILITY OF SUCH DAMAGE.\n+ */\n+\n+#include \"resource_retriever/retriever.h\"\n+\n+#include <string.h>\n+\n+#include <ros/package.h>\n+#include <ros/console.h>\n+\n+#include <curl/curl.h>\n+\n+namespace resource_retriever\n+{\n+\n+class CURLStaticInit\n+{\n+public:\n+  CURLStaticInit()\n+  : initialized_(false)\n+  {\n+    CURLcode ret = curl_global_init(CURL_GLOBAL_ALL);\n+    if (ret != 0)\n+    {\n+      ROS_ERROR(\"Error initializing libcurl! retcode = %d\", ret);\n+    }\n+    else\n+    {\n+      initialized_ = true;\n+    }\n+  }\n+\n+  ~CURLStaticInit()\n+  {\n+    if (initialized_)\n+    {\n+      curl_global_cleanup();\n+    }\n+  }\n+\n+  bool initialized_;\n+};\n+static CURLStaticInit g_curl_init;\n+\n+Retriever::Retriever()\n+{\n+  curl_handle_ = curl_easy_init();\n+}\n+\n+Retriever::~Retriever()\n+{\n+  if (curl_handle_)\n+  {\n+    curl_easy_cleanup(curl_handle_);\n+  }\n+}\n+\n+struct MemoryBuffer\n+{\n+  std::vector<uint8_t> v;\n+};\n+\n+size_t curlWriteFunc(void* buffer, size_t size, size_t nmemb, void* userp)\n+{\n+  MemoryBuffer* membuf = (MemoryBuffer*)userp;\n+\n+  size_t prev_size = membuf->v.size();\n+  membuf->v.resize(prev_size + size * nmemb);\n+  memcpy(&membuf->v[prev_size], buffer, size * nmemb);\n+\n+  return size * nmemb;\n+}\n+\n+MemoryResource Retriever::get(const std::string& url)\n+{\n+  std::string mod_url = url;\n+  if (url.find(\"package://\") == 0)\n+  {\n+    mod_url.erase(0, strlen(\"package://\"));\n+    size_t pos = mod_url.find(\"/\");\n+    if (pos == std::string::npos)\n+    {\n+      throw Exception(url, \"Could not parse package:// format into file:// format\");\n+    }\n+\n+    std::string package = mod_url.substr(0, pos);\n+    mod_url.erase(0, pos);\n+    std::string package_path = ros::package::getPath(package);\n+\n+    if (package_path.empty())\n+    {\n+      throw Exception(url, \"Package [\" + package + \"] does not exist\");\n+    }\n+\n+    mod_url = \"file://\" + package_path + mod_url;\n+  }\n+\n+  curl_easy_setopt(curl_handle_, CURLOPT_URL, mod_url.c_str());\n+  curl_easy_setopt(curl_handle_, CURLOPT_WRITEFUNCTION, curlWriteFunc);\n+\n+  char error_buffer[CURL_ERROR_SIZE];\n+  curl_easy_setopt(curl_handle_, CURLOPT_ERRORBUFFER , error_buffer);\n+\n+  MemoryResource res;\n+  MemoryBuffer buf;\n+  curl_easy_setopt(curl_handle_, CURLOPT_WRITEDATA, &buf);\n+\n+  CURLcode ret = curl_easy_perform(curl_handle_);\n+  if (ret != 0)\n+  {\n+    throw Exception(mod_url, error_buffer);\n+  }\n+  else if (!buf.v.empty())\n+  {\n+    res.size = buf.v.size();\n+    res.data.reset(new uint8_t[res.size]);\n+    memcpy(res.data.get(), &buf.v[0], res.size);\n+  }\n+\n+  return res;\n+}\n+\n+}"
+        },
+        {
+          "sha": "7624c4cadfc339be017e144e6df76fbfa84af381",
+          "filename": "test/CMakeLists.txt",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/725c377df2450c8ab363fcaabc50f2e873c000f5/test%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/725c377df2450c8ab363fcaabc50f2e873c000f5/test%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/test%2FCMakeLists.txt?ref=725c377df2450c8ab363fcaabc50f2e873c000f5",
+          "patch": "@@ -0,0 +1,4 @@\n+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR})\n+\n+rospack_add_gtest(test/utest test.cpp)\n+target_link_libraries(test/utest ${PROJECT_NAME})"
+        },
+        {
+          "sha": "b29f40e652b1ce48bad7b734bc926948091c8634",
+          "filename": "test/test.cpp",
+          "status": "added",
+          "additions": 140,
+          "deletions": 0,
+          "changes": 140,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/725c377df2450c8ab363fcaabc50f2e873c000f5/test%2Ftest.cpp",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/725c377df2450c8ab363fcaabc50f2e873c000f5/test%2Ftest.cpp",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/test%2Ftest.cpp?ref=725c377df2450c8ab363fcaabc50f2e873c000f5",
+          "patch": "@@ -0,0 +1,140 @@\n+/*********************************************************************\n+* Software License Agreement (BSD License)\n+*\n+*  Copyright (c) 2008, Willow Garage, Inc.\n+*  All rights reserved.\n+*\n+*  Redistribution and use in source and binary forms, with or without\n+*  modification, are permitted provided that the following conditions\n+*  are met:\n+*\n+*   * Redistributions of source code must retain the above copyright\n+*     notice, this list of conditions and the following disclaimer.\n+*   * Redistributions in binary form must reproduce the above\n+*     copyright notice, this list of conditions and the following\n+*     disclaimer in the documentation and/or other materials provided\n+*     with the distribution.\n+*   * Neither the name of the Willow Garage nor the names of its\n+*     contributors may be used to endorse or promote products derived\n+*     from this software without specific prior written permission.\n+*\n+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n+*  \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n+*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS\n+*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\n+*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,\n+*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,\n+*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\n+*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN\n+*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+*  POSSIBILITY OF SUCH DAMAGE.\n+*********************************************************************/\n+\n+#include <gtest/gtest.h>\n+\n+#include <resource_retriever/retriever.h>\n+#include <ros/package.h>\n+#include <ros/console.h>\n+\n+using namespace resource_retriever;\n+\n+TEST(Retriever, getByPackage)\n+{\n+  try\n+  {\n+    Retriever r;\n+    MemoryResource res = r.get(\"package://\"ROS_PACKAGE_NAME\"/test/test.txt\");\n+\n+    ASSERT_EQ(res.size, 1);\n+    ASSERT_EQ(res.data[0], 'A');\n+  }\n+  catch (Exception& e)\n+  {\n+    FAIL();\n+  }\n+}\n+\n+TEST(Retriever, largeFile)\n+{\n+  try\n+  {\n+    std::string path = ros::package::getPath(ROS_PACKAGE_NAME) + \"/test/large_file.dat\";\n+\n+    FILE* f = fopen(path.c_str(), \"w\");\n+\n+    ASSERT_TRUE(f);\n+\n+    for (int i = 0; i < 1024*1024*50; ++i)\n+    {\n+      fprintf(f, \"A\");\n+    }\n+    fclose(f);\n+\n+    Retriever r;\n+    MemoryResource res = r.get(\"package://\"ROS_PACKAGE_NAME\"/test/large_file.dat\");\n+\n+    ASSERT_EQ(res.size, 1024*1024*50);\n+  }\n+  catch (Exception& e)\n+  {\n+    FAIL();\n+  }\n+}\n+\n+TEST(Retriever, http)\n+{\n+  try\n+  {\n+    Retriever r;\n+    MemoryResource res = r.get(\"http://pr.willowgarage.com/downloads/svnmerge.py\");\n+\n+    ASSERT_GT(res.size, 0);\n+  }\n+  catch (Exception& e)\n+  {\n+    FAIL();\n+  }\n+}\n+\n+TEST(Retriever, invalidFiles)\n+{\n+  Retriever r;\n+\n+  try\n+  {\n+    r.get(\"file://fail\");\n+    FAIL();\n+  }\n+  catch (Exception& e)\n+  {\n+    ROS_INFO(\"%s\", e.what());\n+  }\n+\n+  try\n+  {\n+    r.get(\"package://roscpp\");\n+    FAIL();\n+  }\n+  catch (Exception& e)\n+  {\n+    ROS_INFO(\"%s\", e.what());\n+  }\n+\n+  try\n+  {\n+    r.get(\"package://invalid_package_blah/test.xml\");\n+    FAIL();\n+  }\n+  catch (Exception& e)\n+  {\n+    ROS_INFO(\"%s\", e.what());\n+  }\n+}\n+\n+int main(int argc, char **argv){\n+  testing::InitGoogleTest(&argc, argv);\n+  return RUN_ALL_TESTS();\n+}\n+"
+        },
+        {
+          "sha": "8c7e5a667f1b771847fe88c01c3de34413a1b220",
+          "filename": "test/test.txt",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/725c377df2450c8ab363fcaabc50f2e873c000f5/test%2Ftest.txt",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/725c377df2450c8ab363fcaabc50f2e873c000f5/test%2Ftest.txt",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/test%2Ftest.txt?ref=725c377df2450c8ab363fcaabc50f2e873c000f5",
+          "patch": "@@ -0,0 +1 @@\n+A\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "InvincibleRMC",
+      "date": "2026-03-09T14:24:39Z",
+      "sha": "a57e1c31885c15f8c1642c0b8d44ec2c3e6dd643",
+      "message": "Delete resource_retriever/setup.py (#120)\n\nSigned-off-by: Michael Carlstrom <rmc@carlstrom.com>",
+      "files_changed": 1,
+      "additions": 0,
+      "deletions": 10,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "d685358da52fdb42ae51c00b992b9027234ad611",
+          "filename": "resource_retriever/setup.py",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 10,
+          "changes": 10,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/50774cf752fe27b63ae1a9b88b13e142ec0206ce/resource_retriever%2Fsetup.py",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/50774cf752fe27b63ae1a9b88b13e142ec0206ce/resource_retriever%2Fsetup.py",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/resource_retriever%2Fsetup.py?ref=50774cf752fe27b63ae1a9b88b13e142ec0206ce",
+          "patch": "@@ -1,10 +0,0 @@\n-from distutils.core import setup\n-\n-from catkin_pkg.python_setup import generate_distutils_setup\n-\n-d = generate_distutils_setup()\n-d['packages'] = ['resource_retriever']\n-d['scripts'] = []\n-d['package_dir'] = {'': 'src'}\n-\n-setup(**d)"
+        }
+      ]
+    },
+    {
+      "author": "Michael Carroll",
+      "date": "2024-04-12T15:14:13Z",
+      "sha": "b0c989d446350f667921536fd41844c7e4fe5f0d",
+      "message": "Revert \"Stop using python_cmake_module. (#90)\" (#93)\n\nThis reverts commit 5f4f2c0df0b6c325b5b9bc8462369d56c07e9f4b.\r\n\r\nSigned-off-by: Michael Carroll <mjcarroll@intrinsic.ai>",
+      "files_changed": 2,
+      "additions": 14,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "b6b95025e0ecfe6b664805fc3262e71e41e8ccda",
+          "filename": "resource_retriever/CMakeLists.txt",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 0,
+          "changes": 13,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/b0c989d446350f667921536fd41844c7e4fe5f0d/resource_retriever%2FCMakeLists.txt",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/b0c989d446350f667921536fd41844c7e4fe5f0d/resource_retriever%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/resource_retriever%2FCMakeLists.txt?ref=b0c989d446350f667921536fd41844c7e4fe5f0d",
+          "patch": "@@ -58,12 +58,25 @@ if(BUILD_TESTING)\n   ament_add_gtest(${PROJECT_NAME}_test test/test.cpp)\n   target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME})\n \n+  # Python test\n+  # Provides PYTHON_EXECUTABLE_DEBUG\n+  find_package(python_cmake_module REQUIRED)\n+  find_package(PythonExtra REQUIRED)\n+\n+  set(_PYTHON_EXECUTABLE \"${PYTHON_EXECUTABLE}\")\n+  if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL \"Debug\")\n+    set(PYTHON_EXECUTABLE \"${PYTHON_EXECUTABLE_DEBUG}\")\n+  endif()\n+\n   find_package(ament_cmake_pytest REQUIRED)\n   ament_add_pytest_test(resource_retriever_python_test test/test.py\n+    PYTHON_EXECUTABLE \"${PYTHON_EXECUTABLE}\"\n     APPEND_ENV PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}\n     TIMEOUT 60\n   )\n \n+  set(PYTHON_EXECUTABLE \"${_PYTHON_EXECUTABLE}\")\n+\n   install(\n     FILES test/test.txt\n     DESTINATION share/${PROJECT_NAME}/test"
+        },
+        {
+          "sha": "843fa819445237b4d2803c6b7505e0fcc471ec17",
+          "filename": "resource_retriever/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/b0c989d446350f667921536fd41844c7e4fe5f0d/resource_retriever%2Fpackage.xml",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/b0c989d446350f667921536fd41844c7e4fe5f0d/resource_retriever%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/resource_retriever%2Fpackage.xml?ref=b0c989d446350f667921536fd41844c7e4fe5f0d",
+          "patch": "@@ -34,6 +34,7 @@\n   <test_depend>ament_lint_auto</test_depend>\n   <test_depend>ament_lint_common</test_depend>\n   <test_depend>python3-pytest</test_depend>\n+  <test_depend>python_cmake_module</test_depend>\n \n   <export>\n     <build_type>ament_cmake</build_type>"
+        }
+      ]
+    },
+    {
+      "author": "jackieokay",
+      "date": "2016-05-23T16:22:38Z",
+      "sha": "3a0ddefa5c053e0491c9411b849a978668f6306d",
+      "message": "Merge pull request #4 from DLu/kinetic-devel\n\nAdd c++11 flag",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "43ee3e1646ad15516452692e7b9956c2cef07647",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/ros/resource_retriever/blob/3a0ddefa5c053e0491c9411b849a978668f6306d/CMakeLists.txt",
+          "raw_url": "https://github.com/ros/resource_retriever/raw/3a0ddefa5c053e0491c9411b849a978668f6306d/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/resource_retriever/contents/CMakeLists.txt?ref=3a0ddefa5c053e0491c9411b849a978668f6306d",
+          "patch": "@@ -12,6 +12,11 @@ catkin_package(\n include_directories(include)\n \n find_package(catkin REQUIRED COMPONENTS rosconsole roslib)\n+\n+\n+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} \" -std=c++11\")\n+\n+\n include_directories(${catkin_INCLUDE_DIRS})\n link_directories(${catkin_LIBRARY_DIRS})\n "
+        }
+      ]
+    }
+  ]
+}

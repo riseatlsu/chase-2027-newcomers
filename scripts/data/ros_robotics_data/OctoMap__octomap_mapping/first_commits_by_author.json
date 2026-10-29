@@ -1,0 +1,947 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T04:17:49Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "OctoMap",
+    "repo": "octomap_mapping"
+  },
+  "data": [
+    {
+      "author": "wep21",
+      "date": "2021-12-12T07:22:13Z",
+      "sha": "a7d7e54f9769ff9c49793e96d54c0e4181b91183",
+      "message": "Ros2 migrtion for octomap mapping\n\nSigned-off-by: wep21 <border_goldenmarket@yahoo.co.jp>",
+      "files_changed": 2,
+      "additions": 19,
+      "deletions": 7,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "1882cdf94d10885297dfef6ae0d283a3dfbc0b4b",
+          "filename": "octomap_mapping/CMakeLists.txt",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 3,
+          "changes": 12,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/a7d7e54f9769ff9c49793e96d54c0e4181b91183/octomap_mapping%2FCMakeLists.txt",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/a7d7e54f9769ff9c49793e96d54c0e4181b91183/octomap_mapping%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_mapping%2FCMakeLists.txt?ref=a7d7e54f9769ff9c49793e96d54c0e4181b91183",
+          "patch": "@@ -1,4 +1,10 @@\n-cmake_minimum_required(VERSION 3.0.2)\n+cmake_minimum_required(VERSION 3.5)\n project(octomap_mapping)\n-find_package(catkin REQUIRED)\n-catkin_metapackage()\n+find_package(ament_cmake REQUIRED)\n+\n+if(BUILD_TESTING)\n+  find_package(ament_lint_auto REQUIRED)\n+  ament_lint_auto_find_test_dependencies()\n+endif()\n+\n+ament_package()"
+        },
+        {
+          "sha": "123037c0a03b36c1213d29ae3fa97c5735c9e85a",
+          "filename": "octomap_mapping/package.xml",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 4,
+          "changes": 14,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/a7d7e54f9769ff9c49793e96d54c0e4181b91183/octomap_mapping%2Fpackage.xml",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/a7d7e54f9769ff9c49793e96d54c0e4181b91183/octomap_mapping%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_mapping%2Fpackage.xml?ref=a7d7e54f9769ff9c49793e96d54c0e4181b91183",
+          "patch": "@@ -1,4 +1,6 @@\n-<package>\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n   <name>octomap_mapping</name>\n   <version>0.6.7</version>\n   <description>\n@@ -12,10 +14,14 @@\n   <url type=\"bugtracker\">https://github.com/OctoMap/octomap_mapping/issues</url>\n   <url type=\"repository\">https://github.com/OctoMap/octomap_mapping</url>\n \n-  <buildtool_depend>catkin</buildtool_depend>\n-  <run_depend>octomap_server</run_depend>\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+\n+  <exec_depend>octomap_server</exec_depend>\n+\n+  <test_depend>ament_lint_auto</test_depend>\n+  <test_depend>ament_lint_common</test_depend>\n \n   <export>\n-    <metapackage/>\n+    <build_type>ament_cmake</build_type>\n   </export>\n </package>"
+        }
+      ]
+    },
+    {
+      "author": "wxmerkt",
+      "date": "2015-07-08T11:13:49Z",
+      "sha": "fc42fa8cb982759c099742f6b3af847a134093cf",
+      "message": "Change iterator (potential copy and paste error?)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "9979e992710335e0a35249f2463f522f68411f46",
+          "filename": "octomap_server/src/OctomapServer.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/fc42fa8cb982759c099742f6b3af847a134093cf/octomap_server%2Fsrc%2FOctomapServer.cpp",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/fc42fa8cb982759c099742f6b3af847a134093cf/octomap_server%2Fsrc%2FOctomapServer.cpp",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fsrc%2FOctomapServer.cpp?ref=fc42fa8cb982759c099742f6b3af847a134093cf",
+          "patch": "@@ -391,7 +391,7 @@ void OctomapServer::insertScan(const tf::Point& sensorOriginTf, const PCLPointCl\n   }\n \n   // now mark all occupied cells:\n-  for (KeySet::iterator it = occupied_cells.begin(), end=free_cells.end(); it!= end; it++) {\n+  for (KeySet::iterator it = occupied_cells.begin(), end=occupied_cells.end(); it!= end; it++) {\n     m_octree->updateNode(*it, true);\n   }\n "
+        }
+      ]
+    },
+    {
+      "author": "clalancette",
+      "date": "2024-06-24T17:58:49Z",
+      "sha": "ef1f6c6d0f44a1160833b3ab2349c665b4478342",
+      "message": "Switch to the system-provided octomap library.\n\nThis ensures that we don't use the ROS-provided one,\nwhich can lead to ABI problems.  We'll eventually remove\nthe ROS-provided one.\n\nSigned-off-by: Chris Lalancette <clalancette@gmail.com>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "6679b2f819bb1a6675d35e09da01f3f02259ece0",
+          "filename": "octomap_server/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/ef1f6c6d0f44a1160833b3ab2349c665b4478342/octomap_server%2Fpackage.xml",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/ef1f6c6d0f44a1160833b3ab2349c665b4478342/octomap_server%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fpackage.xml?ref=ef1f6c6d0f44a1160833b3ab2349c665b4478342",
+          "patch": "@@ -16,10 +16,10 @@\n   <buildtool_depend>ament_cmake_auto</buildtool_depend>\n \n   <depend>geometry_msgs</depend>\n+  <depend>liboctomap-dev</depend>\n   <depend>libpcl-all-dev</depend>\n   <depend>message_filters</depend>\n   <depend>nav_msgs</depend>\n-  <depend>octomap</depend>\n   <depend>octomap_msgs</depend>\n   <depend>octomap_ros</depend>\n   <depend>pcl_conversions</depend>"
+        }
+      ]
+    },
+    {
+      "author": "ahcorde",
+      "date": "2024-02-08T14:28:50Z",
+      "sha": "23d4995f5897f5602e4b33ba2632435b581e4549",
+      "message": "Removed geometry2 deprecated headers\n\nSigned-off-by: Alejandro Hernández Cordero <ahcorde@gmail.com>",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "c603534a6d31c0dd290025444006c02058537210",
+          "filename": "octomap_server/src/octomap_server.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/23d4995f5897f5602e4b33ba2632435b581e4549/octomap_server%2Fsrc%2Foctomap_server.cpp",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/23d4995f5897f5602e4b33ba2632435b581e4549/octomap_server%2Fsrc%2Foctomap_server.cpp",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fsrc%2Foctomap_server.cpp?ref=23d4995f5897f5602e4b33ba2632435b581e4549",
+          "patch": "@@ -28,8 +28,8 @@\n \n #include <octomap_server/octomap_server.hpp>\n \n-#include <tf2_eigen/tf2_eigen.h>\n-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>\n+#include <tf2_eigen/tf2_eigen.hpp>\n+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>\n \n #include <algorithm>\n #include <limits>"
+        }
+      ]
+    },
+    {
+      "author": "Daisuke Nishimatsu",
+      "date": "2022-05-12T01:24:39Z",
+      "sha": "428c7f818e14921b02542893a59798621aaa622a",
+      "message": "chore: add workaround for octomap\n\nSigned-off-by: Daisuke Nishimatsu <border_goldenmarket@yahoo.co.jp>",
+      "files_changed": 1,
+      "additions": 6,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "e90657b70e2426e8b1b602e29a8d8a5db5ffdc6c",
+          "filename": "octomap_server/CMakeLists.txt",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/428c7f818e14921b02542893a59798621aaa622a/octomap_server%2FCMakeLists.txt",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/428c7f818e14921b02542893a59798621aaa622a/octomap_server%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2FCMakeLists.txt?ref=428c7f818e14921b02542893a59798621aaa622a",
+          "patch": "@@ -15,6 +15,7 @@ include_directories(${PCL_INCLUDE_DIRS})\n \n find_package(ament_cmake_auto REQUIRED)\n ament_auto_find_build_dependencies()\n+find_package(OCTOMAP REQUIRED)\n \n ament_auto_add_library(octomap_server_static SHARED\n   src/octomap_server_static.cpp\n@@ -25,6 +26,11 @@ target_link_libraries(octomap_server_static\n   ${PCL_LIBRARIES}\n )\n \n+target_include_directories(octomap_server_static\n+  PUBLIC\n+    ${OCTOMAP_INCLUDE_DIRS}\n+)\n+\n rclcpp_components_register_node(octomap_server_static\n   PLUGIN \"octomap_server::OctomapServerStatic\"\n   EXECUTABLE octomap_server_static_node"
+        }
+      ]
+    },
+    {
+      "author": "clunietp",
+      "date": "2020-04-11T13:27:24Z",
+      "sha": "cdf620e6ebefdc4981cf0fb6469e3f69d07d99ac",
+      "message": "Add color nodelet",
+      "files_changed": 3,
+      "additions": 11,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "cdf2024fccb1498c8e210491651f5978c2a0249b",
+          "filename": "octomap_server/CMakeLists.txt",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/cdf620e6ebefdc4981cf0fb6469e3f69d07d99ac/octomap_server%2FCMakeLists.txt",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/cdf620e6ebefdc4981cf0fb6469e3f69d07d99ac/octomap_server%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2FCMakeLists.txt?ref=cdf620e6ebefdc4981cf0fb6469e3f69d07d99ac",
+          "patch": "@@ -73,6 +73,9 @@ target_link_libraries(octomap_tracking_server_node ${PROJECT_NAME} ${LINK_LIBS})\n add_library(octomap_server_nodelet src/octomap_server_nodelet.cpp)\n target_link_libraries(octomap_server_nodelet ${PROJECT_NAME} ${LINK_LIBS})\n \n+add_library(octomap_color_server_nodelet src/octomap_server_nodelet.cpp)\n+target_link_libraries(octomap_color_server_nodelet ${PROJECT_NAME}_color ${LINK_LIBS})\n+\n # install targets:\n install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_color\n   octomap_server_node"
+        },
+        {
+          "sha": "ef0ba546f68f35298691c654b3794fd425d3cd10",
+          "filename": "octomap_server/color_nodelet_plugins.xml",
+          "status": "added",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/cdf620e6ebefdc4981cf0fb6469e3f69d07d99ac/octomap_server%2Fcolor_nodelet_plugins.xml",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/cdf620e6ebefdc4981cf0fb6469e3f69d07d99ac/octomap_server%2Fcolor_nodelet_plugins.xml",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fcolor_nodelet_plugins.xml?ref=cdf620e6ebefdc4981cf0fb6469e3f69d07d99ac",
+          "patch": "@@ -0,0 +1,7 @@\n+<library path=\"lib/liboctomap_color_server_nodelet\">\n+  <class name=\"octomap_color_server/OctomapServerNodelet\" type=\"octomap_server::OctomapServerNodelet\" base_class_type=\"nodelet::Nodelet\">\n+    <description>\n+      Nodelet for running the color Octomap server\n+    </description>\n+  </class>\n+</library>\n\\ No newline at end of file"
+        },
+        {
+          "sha": "bbb9dba54621f4e4610b9d3f67f67656078c8330",
+          "filename": "octomap_server/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/cdf620e6ebefdc4981cf0fb6469e3f69d07d99ac/octomap_server%2Fpackage.xml",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/cdf620e6ebefdc4981cf0fb6469e3f69d07d99ac/octomap_server%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fpackage.xml?ref=cdf620e6ebefdc4981cf0fb6469e3f69d07d99ac",
+          "patch": "@@ -13,6 +13,7 @@\n   \n   <export>\n     <nodelet plugin=\"${prefix}/nodelet_plugins.xml\" />\n+    <nodelet plugin=\"${prefix}/color_nodelet_plugins.xml\" />\n   </export>\n \n   <buildtool_depend>catkin</buildtool_depend>"
+        }
+      ]
+    },
+    {
+      "author": "mpowelson",
+      "date": "2019-09-23T20:44:29Z",
+      "sha": "9dc5373541a8bf7dab6a577c23dc9345c3a3f1b7",
+      "message": "Add octomap_server_color library\n\nCreate another target with the same source code but add the compile definition COLOR_OCTOMAP_SERVER",
+      "files_changed": 2,
+      "additions": 11,
+      "deletions": 5,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "a51988a4dd4d02eb437020793766a7886faf7fb6",
+          "filename": "octomap_server/CMakeLists.txt",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 4,
+          "changes": 14,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/9dc5373541a8bf7dab6a577c23dc9345c3a3f1b7/octomap_server%2FCMakeLists.txt",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/9dc5373541a8bf7dab6a577c23dc9345c3a3f1b7/octomap_server%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2FCMakeLists.txt?ref=9dc5373541a8bf7dab6a577c23dc9345c3a3f1b7",
+          "patch": "@@ -46,11 +46,16 @@ add_library(${PROJECT_NAME} src/OctomapServer.cpp src/OctomapServerMultilayer.cp\n target_link_libraries(${PROJECT_NAME} ${LINK_LIBS})\n add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencfg)\n \n+add_library(${PROJECT_NAME}_color src/OctomapServer.cpp src/OctomapServerMultilayer.cpp src/TrackingOctomapServer.cpp)\n+target_link_libraries(${PROJECT_NAME}_color ${LINK_LIBS})\n+add_dependencies(${PROJECT_NAME}_color ${PROJECT_NAME}_gencfg)\n+target_compile_definitions(${PROJECT_NAME}_color PUBLIC COLOR_OCTOMAP_SERVER)\n+\n add_executable(octomap_server_node src/octomap_server_node.cpp)\n target_link_libraries(octomap_server_node ${PROJECT_NAME} ${LINK_LIBS})\n \n-#add_executable(octomap_color_server_node src/octomap_color_server_node.cpp)\n-#target_link_libraries(octomap_color_server_node ${PROJECT_NAME} ${LINK_LIBS})\n+add_executable(octomap_color_server_node src/octomap_server_node.cpp)\n+target_link_libraries(octomap_color_server_node ${PROJECT_NAME}_color ${LINK_LIBS})\n \n add_executable(octomap_server_static src/octomap_server_static.cpp)\n target_link_libraries(octomap_server_static ${PROJECT_NAME} ${LINK_LIBS})\n@@ -69,8 +74,9 @@ add_library(octomap_server_nodelet src/octomap_server_nodelet.cpp)\n target_link_libraries(octomap_server_nodelet ${PROJECT_NAME} ${LINK_LIBS})\n \n # install targets:\n-install(TARGETS ${PROJECT_NAME}\n+install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_color\n   octomap_server_node\n+  octomap_color_server_node\n   octomap_server_static\n   octomap_server_multilayer\n   octomap_saver\n@@ -93,4 +99,4 @@ install(DIRECTORY launch/\n )\n \n install(FILES nodelet_plugins.xml\n-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})\n\\ No newline at end of file\n+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})"
+        },
+        {
+          "sha": "c238ff41c14d20d913f3f15af49024fa43c365f9",
+          "filename": "octomap_server/include/octomap_server/OctomapServer.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/9dc5373541a8bf7dab6a577c23dc9345c3a3f1b7/octomap_server%2Finclude%2Foctomap_server%2FOctomapServer.h",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/9dc5373541a8bf7dab6a577c23dc9345c3a3f1b7/octomap_server%2Finclude%2Foctomap_server%2FOctomapServer.h",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Finclude%2Foctomap_server%2FOctomapServer.h?ref=9dc5373541a8bf7dab6a577c23dc9345c3a3f1b7",
+          "patch": "@@ -66,7 +66,7 @@\n #include <octomap/octomap.h>\n #include <octomap/OcTreeKey.h>\n \n-//#define COLOR_OCTOMAP_SERVER // turned off here, turned on identical ColorOctomapServer.h - easier maintenance, only maintain OctomapServer and then copy and paste to ColorOctomapServer and change define. There are prettier ways to do this, but this works for now\n+//#define COLOR_OCTOMAP_SERVER // switch color here - easier maintenance, only maintain OctomapServer. Two targets are defined in the cmake, octomap_server_color and octomap_server. One has this defined, and the other doesn't\n \n #ifdef COLOR_OCTOMAP_SERVER\n #include <octomap/ColorOcTree.h>"
+        }
+      ]
+    },
+    {
+      "author": "jazzpi",
+      "date": "2019-08-14T15:28:22Z",
+      "sha": "a85cbbd3c452f69082d8d2e497cce445f5e8691c",
+      "message": "Check if part of a voxel is in occupancy range\n\nPreviously, only voxels with centers in the occupancy range were\nconsidered.",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b38628c5b79cd372a63e0cc082854e9ba68bf50c",
+          "filename": "octomap_server/src/OctomapServer.cpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 2,
+          "changes": 6,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/a85cbbd3c452f69082d8d2e497cce445f5e8691c/octomap_server%2Fsrc%2FOctomapServer.cpp",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/a85cbbd3c452f69082d8d2e497cce445f5e8691c/octomap_server%2Fsrc%2FOctomapServer.cpp",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fsrc%2FOctomapServer.cpp?ref=a85cbbd3c452f69082d8d2e497cce445f5e8691c",
+          "patch": "@@ -529,7 +529,8 @@ void OctomapServer::publishAll(const ros::Time& rostime){\n \n     if (m_octree->isNodeOccupied(*it)){\n       double z = it.getZ();\n-      if (z > m_occupancyMinZ && z < m_occupancyMaxZ)\n+      double half_size = it.getSize() / 2.0;\n+      if (z + half_size > m_occupancyMinZ && z - half_size < m_occupancyMaxZ)\n       {\n         double size = it.getSize();\n         double x = it.getX();\n@@ -594,7 +595,8 @@ void OctomapServer::publishAll(const ros::Time& rostime){\n       }\n     } else{ // node not occupied => mark as free in 2D map if unknown so far\n       double z = it.getZ();\n-      if (z > m_occupancyMinZ && z < m_occupancyMaxZ)\n+      double half_size = it.getSize() / 2.0;\n+      if (z + half_size > m_occupancyMinZ && z - half_size < m_occupancyMaxZ)\n       {\n         handleFreeNode(it);\n         if (inUpdateBBX)"
+        }
+      ]
+    },
+    {
+      "author": "wkentaro",
+      "date": "2016-08-30T16:51:21Z",
+      "sha": "46baf50a0a68339e23af64cacf2342737c294555",
+      "message": "Get rgb from point cloud iterator without byte shift",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 5,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "56f56064b739eabc9cdd1f4725bca9e6f06d04bf",
+          "filename": "octomap_server/src/OctomapServer.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 5,
+          "changes": 6,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/46baf50a0a68339e23af64cacf2342737c294555/octomap_server%2Fsrc%2FOctomapServer.cpp",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/46baf50a0a68339e23af64cacf2342737c294555/octomap_server%2Fsrc%2FOctomapServer.cpp",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fsrc%2FOctomapServer.cpp?ref=46baf50a0a68339e23af64cacf2342737c294555",
+          "patch": "@@ -409,11 +409,7 @@ void OctomapServer::insertScan(const tf::Point& sensorOriginTf, const PCLPointCl\n         updateMaxKey(key, m_updateBBXMax);\n \n #ifdef COLOR_OCTOMAP_SERVER // NB: Only read and interpret color if it's an occupied node\n-        const int rgb = *reinterpret_cast<const int*>(&(it->rgb)); // TODO: there are other ways to encode color than this one\n-        colors[0] = ((rgb >> 16) & 0xff);\n-        colors[1] = ((rgb >> 8) & 0xff);\n-        colors[2] = (rgb & 0xff);\n-        m_octree->averageNodeColor(it->x, it->y, it->z, colors[0], colors[1], colors[2]);\n+        m_octree->averageNodeColor(it->x, it->y, it->z, /*r=*/it->r, /*g=*/it->g, /*b=*/it->b);\n #endif\n       }\n     } else {// ray longer than maxrange:;"
+        }
+      ]
+    },
+    {
+      "author": "ahornung",
+      "date": "2015-06-19T16:05:22Z",
+      "sha": "b4baa8b342bea2d7a077bb66f49ee7ddf18006b6",
+      "message": "Merge pull request #14 from rapyuta/master\n\nImproved dynamic reconfigure server",
+      "files_changed": 5,
+      "additions": 41,
+      "deletions": 21,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "75906e53dbbb61a0ecd65f5c846444d1a636890e",
+          "filename": "octomap_server/cfg/OctomapServer.cfg",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 1,
+          "changes": 14,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/b4baa8b342bea2d7a077bb66f49ee7ddf18006b6/octomap_server%2Fcfg%2FOctomapServer.cfg",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/b4baa8b342bea2d7a077bb66f49ee7ddf18006b6/octomap_server%2Fcfg%2FOctomapServer.cfg",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fcfg%2FOctomapServer.cfg?ref=b4baa8b342bea2d7a077bb66f49ee7ddf18006b6",
+          "patch": "@@ -5,6 +5,18 @@ from dynamic_reconfigure.parameter_generator_catkin import *\n \n gen = ParameterGenerator()\n \n+gen.add(\"compress_map\", bool_t, 0, \"Compresses the map losslessly\", True)\n+gen.add(\"incremental_2D_projection\", bool_t, 0, \"Incremental 2D projection\", False)\n+gen.add(\"filter_speckles\", bool_t, 0, \"Filter speckle nodes (with no neighbors)\", False)\n gen.add(\"max_depth\", int_t, 0, \"Maximum depth when traversing the octree to send out markers. 16: full depth / max. resolution\", 16, 1, 16)\n+gen.add(\"pointcloud_min_z\", double_t, 0, \"Minimim height of points to consider for insertion\", -100, -100, 100)\n+gen.add(\"pointcloud_max_z\", double_t, 0, \"Maximum height of points to consider for insertion\", 100, -100, 100)\n+gen.add(\"occupancy_min_z\", double_t, 0, \"Minimim height of occupied cells to consider in the final map\", -100, -100, 100)\n+gen.add(\"occupancy_max_z\", double_t, 0, \"Maximum height of occupied cells to consider in the final map\", 100, -100, 100)\n+gen.add(\"sensor_model_max_range\", double_t, 0, \"Sensor maximum range\", -1.0, -1.0, 100)\n+gen.add(\"filter_ground\", bool_t, 0, \"Filter ground plane\", False)\n+gen.add(\"ground_filter_distance\", double_t, 0, \"Distance threshold to consider a point as ground\", 0.04, 0.001, 1)\n+gen.add(\"ground_filter_angle\", double_t, 0, \"Angular threshold of the detected plane from the horizontal plane to be detected as ground \", 0.15, 0.001, 15)\n+gen.add(\"ground_filter_plane_distance\", double_t, 0, \"Distance threshold from z=0 for a plane to be detected as ground\", 0.07, 0.001, 1)\n \n-exit(gen.generate(PACKAGE, \"octomap_server_node\", \"OctomapServer\"))\n\\ No newline at end of file\n+exit(gen.generate(PACKAGE, \"octomap_server_node\", \"OctomapServer\"))"
+        },
+        {
+          "sha": "90a85562dbf289068e637b9ef57325d8385669d8",
+          "filename": "octomap_server/include/octomap_server/OctomapServer.h",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/b4baa8b342bea2d7a077bb66f49ee7ddf18006b6/octomap_server%2Finclude%2Foctomap_server%2FOctomapServer.h",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/b4baa8b342bea2d7a077bb66f49ee7ddf18006b6/octomap_server%2Finclude%2Foctomap_server%2FOctomapServer.h",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Finclude%2Foctomap_server%2FOctomapServer.h?ref=b4baa8b342bea2d7a077bb66f49ee7ddf18006b6",
+          "patch": "@@ -92,12 +92,12 @@ class OctomapServer{\n     for (unsigned i=0; i<3; ++i)\n       min[i] = std::min(in[i], min[i]);\n   };\n-  \n+\n   inline static void updateMaxKey(const octomap::OcTreeKey& in, octomap::OcTreeKey& max){\n     for (unsigned i=0; i<3; ++i)\n       max[i] = std::max(in[i], max[i]);\n   };\n- \n+\n   /// Test if key is within update area of map (2D, ignores height)\n   inline bool isInUpdateBBX(const octomap::OcTree::iterator& it) const{\n     // 2^(tree_depth-depth) voxels wide:"
+        },
+        {
+          "sha": "3834a2f85ded0d22966f0561454e6c6bcf5c9270",
+          "filename": "octomap_server/params/default.yaml",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/b4baa8b342bea2d7a077bb66f49ee7ddf18006b6/octomap_server%2Fparams%2Fdefault.yaml",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/b4baa8b342bea2d7a077bb66f49ee7ddf18006b6/octomap_server%2Fparams%2Fdefault.yaml",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fparams%2Fdefault.yaml?ref=b4baa8b342bea2d7a077bb66f49ee7ddf18006b6",
+          "patch": "@@ -0,0 +1 @@\n+# Empty file to load default parameters."
+        },
+        {
+          "sha": "eb3480a7e383f16374841b53481078531fd2edf2",
+          "filename": "octomap_server/src/OctomapServer.cpp",
+          "status": "modified",
+          "additions": 24,
+          "deletions": 16,
+          "changes": 40,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/b4baa8b342bea2d7a077bb66f49ee7ddf18006b6/octomap_server%2Fsrc%2FOctomapServer.cpp",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/b4baa8b342bea2d7a077bb66f49ee7ddf18006b6/octomap_server%2Fsrc%2FOctomapServer.cpp",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fsrc%2FOctomapServer.cpp?ref=b4baa8b342bea2d7a077bb66f49ee7ddf18006b6",
+          "patch": "@@ -93,9 +93,9 @@ OctomapServer::OctomapServer(ros::NodeHandle private_nh_)\n   private_nh.param(\"incremental_2D_projection\", m_incrementalUpdate, m_incrementalUpdate);\n \n   if (m_filterGroundPlane && (m_pointcloudMinZ > 0.0 || m_pointcloudMaxZ < 0.0)){\n-\t  ROS_WARN_STREAM(\"You enabled ground filtering but incoming pointclouds will be pre-filtered in [\"\n-\t\t\t  <<m_pointcloudMinZ <<\", \"<< m_pointcloudMaxZ << \"], excluding the ground level z=0. \"\n-\t\t\t  << \"This will not work.\");\n+    ROS_WARN_STREAM(\"You enabled ground filtering but incoming pointclouds will be pre-filtered in [\"\n+              <<m_pointcloudMinZ <<\", \"<< m_pointcloudMaxZ << \"], excluding the ground level z=0. \"\n+              << \"This will not work.\");\n \n   }\n \n@@ -142,7 +142,7 @@ OctomapServer::OctomapServer(ros::NodeHandle private_nh_)\n   m_binaryMapPub = m_nh.advertise<Octomap>(\"octomap_binary\", 1, m_latchedTopics);\n   m_fullMapPub = m_nh.advertise<Octomap>(\"octomap_full\", 1, m_latchedTopics);\n   m_pointCloudPub = m_nh.advertise<sensor_msgs::PointCloud2>(\"octomap_point_cloud_centers\", 1, m_latchedTopics);\n-  m_mapPub = m_nh.advertise<nav_msgs::OccupancyGrid>(\"projected_map\", 5, m_latchedTopics);\t\n+  m_mapPub = m_nh.advertise<nav_msgs::OccupancyGrid>(\"projected_map\", 5, m_latchedTopics);\n   m_fmarkerPub = m_nh.advertise<visualization_msgs::MarkerArray>(\"free_cells_vis_array\", 1, m_latchedTopics);\n \n   m_pointCloudSub = new message_filters::Subscriber<sensor_msgs::PointCloud2> (m_nh, \"cloud_in\", 5);\n@@ -221,11 +221,11 @@ bool OctomapServer::openFile(const std::string& filename){\n   m_updateBBXMin[0] = m_octree->coordToKey(minX);\n   m_updateBBXMin[1] = m_octree->coordToKey(minY);\n   m_updateBBXMin[2] = m_octree->coordToKey(minZ);\n-  \n+\n   m_updateBBXMax[0] = m_octree->coordToKey(maxX);\n   m_updateBBXMax[1] = m_octree->coordToKey(maxY);\n   m_updateBBXMax[2] = m_octree->coordToKey(maxZ);\n-  \n+\n   publishAll();\n \n   return true;\n@@ -696,10 +696,8 @@ bool OctomapServer::resetSrv(std_srvs::Empty::Request& req, std_srvs::Empty::Res\n     occupiedNodesVis.markers[i].action = visualization_msgs::Marker::DELETE;\n   }\n \n-\n   m_markerPub.publish(occupiedNodesVis);\n \n-\n   visualization_msgs::MarkerArray freeNodesVis;\n   freeNodesVis.markers.resize(m_treeDepth +1);\n \n@@ -868,7 +866,7 @@ void OctomapServer::handlePreNodeTraversal(const ros::Time& rostime){\n     octomap::point3d maxPt(maxX, maxY, maxZ);\n     octomap::OcTreeKey minKey = m_octree->coordToKey(minPt, m_maxTreeDepth);\n     octomap::OcTreeKey maxKey = m_octree->coordToKey(maxPt, m_maxTreeDepth);\n-    \n+\n     ROS_DEBUG(\"MinKey: %d %d %d / MaxKey: %d %d %d\", minKey[0], minKey[1], minKey[2], maxKey[0], maxKey[1], maxKey[2]);\n \n     // add padding if requested (= new min/maxPts in x&y):\n@@ -913,7 +911,7 @@ void OctomapServer::handlePreNodeTraversal(const ros::Time& rostime){\n       m_gridmap.info.origin.position.x -= m_res/2.0;\n       m_gridmap.info.origin.position.y -= m_res/2.0;\n     }\n-    \n+\n     // workaround for  multires. projection not working properly for inner nodes:\n     // force re-building complete map\n     if (m_maxTreeDepth < m_treeDepth)\n@@ -955,7 +953,7 @@ void OctomapServer::handlePreNodeTraversal(const ros::Time& rostime){\n        }\n \n     }\n-       \n+\n \n \n   }\n@@ -1050,13 +1048,23 @@ bool OctomapServer::isSpeckleNode(const OcTreeKey&nKey) const {\n }\n \n void OctomapServer::reconfigureCallback(octomap_server::OctomapServerConfig& config, uint32_t level){\n-  if (m_maxTreeDepth != unsigned(config.max_depth)){\n+  if (m_maxTreeDepth != unsigned(config.max_depth))\n     m_maxTreeDepth = unsigned(config.max_depth);\n-\n-    publishAll();\n+  else{\n+    m_pointcloudMinZ            = config.pointcloud_min_z;\n+    m_pointcloudMaxZ            = config.pointcloud_max_z;\n+    m_occupancyMinZ             = config.occupancy_min_z;\n+    m_occupancyMaxZ             = config.occupancy_max_z;\n+    m_filterSpeckles            = config.filter_speckles;\n+    m_filterGroundPlane         = config.filter_ground;\n+    m_groundFilterDistance      = config.ground_filter_distance;\n+    m_groundFilterAngle         = config.ground_filter_angle;\n+    m_groundFilterPlaneDistance = config.ground_filter_plane_distance;\n+    m_maxRange                  = config.sensor_model_max_range;\n+    m_compressMap               = config.compress_map;\n+    m_incrementalUpdate         = config.incremental_2D_projection;\n   }\n-\n-\n+  publishAll();\n }\n \n void OctomapServer::adjustMapData(nav_msgs::OccupancyGrid& map, const nav_msgs::MapMetaData& oldMapInfo) const{"
+        },
+        {
+          "sha": "9788e824f8c36a6b88fe158548334d095293091a",
+          "filename": "octomap_server/src/octomap_server_node.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 2,
+          "changes": 3,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/b4baa8b342bea2d7a077bb66f49ee7ddf18006b6/octomap_server%2Fsrc%2Foctomap_server_node.cpp",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/b4baa8b342bea2d7a077bb66f49ee7ddf18006b6/octomap_server%2Fsrc%2Foctomap_server_node.cpp",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fsrc%2Foctomap_server_node.cpp?ref=b4baa8b342bea2d7a077bb66f49ee7ddf18006b6",
+          "patch": "@@ -40,7 +40,7 @@\n #include <octomap_server/OctomapServer.h>\n \n #define USAGE \"\\nUSAGE: octomap_server <map.[bt|ot]>\\n\" \\\n-\t\t\"  map.bt: inital octomap 3D map file to read\\n\"\n+        \"  map.bt: inital octomap 3D map file to read\\n\"\n \n using namespace octomap_server;\n \n@@ -53,7 +53,6 @@ int main(int argc, char** argv){\n     exit(-1);\n   }\n \n-\n   OctomapServer server;\n   ros::spinOnce();\n "
+        }
+      ]
+    },
+    {
+      "author": "mikaelarguedas",
+      "date": "2017-10-27T20:56:22Z",
+      "sha": "7ca00fba3822e425b6e5c9ec7d4d922554c72f25",
+      "message": "update to use non deprecated pluginlib macro",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "3720c5cc15c958c945ecd20ec4ee8cacf5077c23",
+          "filename": "octomap_server/src/octomap_server_nodelet.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/7ca00fba3822e425b6e5c9ec7d4d922554c72f25/octomap_server%2Fsrc%2Foctomap_server_nodelet.cpp",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/7ca00fba3822e425b6e5c9ec7d4d922554c72f25/octomap_server%2Fsrc%2Foctomap_server_nodelet.cpp",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fsrc%2Foctomap_server_nodelet.cpp?ref=7ca00fba3822e425b6e5c9ec7d4d922554c72f25",
+          "patch": "@@ -65,4 +65,4 @@ class OctomapServerNodelet : public nodelet::Nodelet\n \n } // namespace\n \n-PLUGINLIB_DECLARE_CLASS(octomap_server, OctomapServerNodelet, octomap_server::OctomapServerNodelet, nodelet::Nodelet);\n+PLUGINLIB_EXPORT_CLASS(octomap_server::OctomapServerNodelet, nodelet::Nodelet)"
+        }
+      ]
+    },
+    {
+      "author": "hycwuy",
+      "date": "2016-11-22T08:48:28Z",
+      "sha": "61935f40f4d8216c5a495214e882015d940bd16a",
+      "message": "fixed memory leak of colors pointer\n\nif COLOR_OCTOMAP_SERVER defined",
+      "files_changed": 1,
+      "additions": 7,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "c8e11b5479c1234a3e2d9d931a1265714a33a903",
+          "filename": "octomap_server/src/OctomapServer.cpp",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 1,
+          "changes": 8,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/61935f40f4d8216c5a495214e882015d940bd16a/octomap_server%2Fsrc%2FOctomapServer.cpp",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/61935f40f4d8216c5a495214e882015d940bd16a/octomap_server%2Fsrc%2FOctomapServer.cpp",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fsrc%2FOctomapServer.cpp?ref=61935f40f4d8216c5a495214e882015d940bd16a",
+          "patch": "@@ -474,7 +474,13 @@ void OctomapServer::insertScan(const tf::Point& sensorOriginTf, const PCLPointCl\n   if (m_compressMap)\n     m_octree->prune();\n \n-\n+#ifdef COLOR_OCTOMAP_SERVER\n+  if (colors)\n+  {\n+    delete[] colors;\n+    colors = NULL;\n+  }\n+#endif\n }\n \n "
+        }
+      ]
+    },
+    {
+      "author": "felixendres",
+      "date": "2016-06-08T08:11:02Z",
+      "sha": "cbc333757b512fc2c892f58a0c8dd6d89ae3b45d",
+      "message": "Fix for Colored Octomap: Use PCLPoint everywhere\n\nFixes compiler error when enabling the define\nfor color.",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "4204cecc35d803d422f195f9869a166f1ec2659b",
+          "filename": "octomap_server/src/OctomapServer.cpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/cbc333757b512fc2c892f58a0c8dd6d89ae3b45d/octomap_server%2Fsrc%2FOctomapServer.cpp",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/cbc333757b512fc2c892f58a0c8dd6d89ae3b45d/octomap_server%2Fsrc%2FOctomapServer.cpp",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fsrc%2FOctomapServer.cpp?ref=cbc333757b512fc2c892f58a0c8dd6d89ae3b45d",
+          "patch": "@@ -282,13 +282,13 @@ void OctomapServer::insertCloudCallback(const sensor_msgs::PointCloud2::ConstPtr\n \n \n   // set up filter for height range, also removes NANs:\n-  pcl::PassThrough<pcl::PointXYZ> pass_x;\n+  pcl::PassThrough<PCLPoint> pass_x;\n   pass_x.setFilterFieldName(\"x\");\n   pass_x.setFilterLimits(m_pointcloudMinX, m_pointcloudMaxX);\n-  pcl::PassThrough<pcl::PointXYZ> pass_y;\n+  pcl::PassThrough<PCLPoint> pass_y;\n   pass_y.setFilterFieldName(\"y\");\n   pass_y.setFilterLimits(m_pointcloudMinY, m_pointcloudMaxY);\n-  pcl::PassThrough<pcl::PointXYZ> pass_z;\n+  pcl::PassThrough<PCLPoint> pass_z;\n   pass_z.setFilterFieldName(\"z\");\n   pass_z.setFilterLimits(m_pointcloudMinZ, m_pointcloudMaxZ);\n "
+        }
+      ]
+    },
+    {
+      "author": "bkinman",
+      "date": "2016-05-15T05:14:31Z",
+      "sha": "f85a306d3cf38b25f08f38ce3ac5358dea937d4a",
+      "message": "Fixed maxRange bug in OctomapServer.cpp\n\nIt's possible for a voxel at sensor_model/max_range to be set, but not cleared.\r\nThis small change ensures that voxels at max_range get cleared properly.",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "a9c3bd0141053cd3e56d32f55091aa9ba55d293b",
+          "filename": "octomap_server/src/OctomapServer.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/f85a306d3cf38b25f08f38ce3ac5358dea937d4a/octomap_server%2Fsrc%2FOctomapServer.cpp",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/f85a306d3cf38b25f08f38ce3ac5358dea937d4a/octomap_server%2Fsrc%2FOctomapServer.cpp",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fsrc%2FOctomapServer.cpp?ref=f85a306d3cf38b25f08f38ce3ac5358dea937d4a",
+          "patch": "@@ -423,6 +423,7 @@ void OctomapServer::insertScan(const tf::Point& sensorOriginTf, const PCLPointCl\n \n         octomap::OcTreeKey endKey;\n         if (m_octree->coordToKeyChecked(new_end, endKey)){\n+          free_cells.insert(endKey);\n           updateMinKey(endKey, m_updateBBXMin);\n           updateMaxKey(endKey, m_updateBBXMax);\n         } else{"
+        }
+      ]
+    },
+    {
+      "author": "jvgomez",
+      "date": "2015-06-02T11:24:49Z",
+      "sha": "59d8a344c200510cddeae0f3371c35609315c783",
+      "message": "Reconfigure server improved",
+      "files_changed": 4,
+      "additions": 40,
+      "deletions": 19,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "c07f76ec7fc066e4fd55b8f87979915403cb7b72",
+          "filename": "octomap_server/cfg/OctomapServer.cfg",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 1,
+          "changes": 14,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/59d8a344c200510cddeae0f3371c35609315c783/octomap_server%2Fcfg%2FOctomapServer.cfg",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/59d8a344c200510cddeae0f3371c35609315c783/octomap_server%2Fcfg%2FOctomapServer.cfg",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fcfg%2FOctomapServer.cfg?ref=59d8a344c200510cddeae0f3371c35609315c783",
+          "patch": "@@ -5,6 +5,18 @@ from dynamic_reconfigure.parameter_generator_catkin import *\n \n gen = ParameterGenerator()\n \n+gen.add(\"compress_map\", bool_t, 0, \"Compresses the map losslessly\", True)\n+gen.add(\"incremental_2D_projection\", bool_t, 0, \"Incremental 2D projection\", False)\n+gen.add(\"filter_speckles\", bool_t, 0, \"Filter speckle nodes (with no neighbors)\", False)\n gen.add(\"max_depth\", int_t, 0, \"Maximum depth when traversing the octree to send out markers. 16: full depth / max. resolution\", 16, 1, 16)\n+gen.add(\"pointcloud_min_z\", double_t, 0, \"Minimim height of points to consider for insertion\", -100, -100, 100)\n+gen.add(\"pointcloud_max_z\", double_t, 0, \"Maximum height of points to consider for insertion\", 100, -100, 100)\n+gen.add(\"occupancy_min_z\", double_t, 0, \"Minimim height of occupied cells to consider in the final map\", -100, -100, 100)\n+gen.add(\"occupancy_max_z\", double_t, 0, \"Maximum height of occupied cells to consider in the final map\", 100, -100, 100)\n+gen.add(\"max_range\", double_t, 0, \"Sensor maximum range\", -1.0, -1.0, 100)\n+gen.add(\"filter_ground\", bool_t, 0, \"Filter ground plane\", False)\n+gen.add(\"distance\", double_t, 0, \"Distance threshold to consider a point as ground\", 0.04, 0.001, 1)\n+gen.add(\"angle\", double_t, 0, \"Angular threshold of the detected plane from the horizontal plane to be detected as ground \", 0.15, 0.001, 15)\n+gen.add(\"plane_distance\", double_t, 0, \"Distance threshold from z=0 for a plane to be detected as ground\", 0.07, 0.001, 1)\n \n-exit(gen.generate(PACKAGE, \"octomap_server_node\", \"OctomapServer\"))\n\\ No newline at end of file\n+exit(gen.generate(PACKAGE, \"octomap_server_node\", \"OctomapServer\"))"
+        },
+        {
+          "sha": "90a85562dbf289068e637b9ef57325d8385669d8",
+          "filename": "octomap_server/include/octomap_server/OctomapServer.h",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/59d8a344c200510cddeae0f3371c35609315c783/octomap_server%2Finclude%2Foctomap_server%2FOctomapServer.h",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/59d8a344c200510cddeae0f3371c35609315c783/octomap_server%2Finclude%2Foctomap_server%2FOctomapServer.h",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Finclude%2Foctomap_server%2FOctomapServer.h?ref=59d8a344c200510cddeae0f3371c35609315c783",
+          "patch": "@@ -92,12 +92,12 @@ class OctomapServer{\n     for (unsigned i=0; i<3; ++i)\n       min[i] = std::min(in[i], min[i]);\n   };\n-  \n+\n   inline static void updateMaxKey(const octomap::OcTreeKey& in, octomap::OcTreeKey& max){\n     for (unsigned i=0; i<3; ++i)\n       max[i] = std::max(in[i], max[i]);\n   };\n- \n+\n   /// Test if key is within update area of map (2D, ignores height)\n   inline bool isInUpdateBBX(const octomap::OcTree::iterator& it) const{\n     // 2^(tree_depth-depth) voxels wide:"
+        },
+        {
+          "sha": "4f8c4beeb752e49a4d87d61f01ebc5ad975f675d",
+          "filename": "octomap_server/src/OctomapServer.cpp",
+          "status": "modified",
+          "additions": 24,
+          "deletions": 14,
+          "changes": 38,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/59d8a344c200510cddeae0f3371c35609315c783/octomap_server%2Fsrc%2FOctomapServer.cpp",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/59d8a344c200510cddeae0f3371c35609315c783/octomap_server%2Fsrc%2FOctomapServer.cpp",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fsrc%2FOctomapServer.cpp?ref=59d8a344c200510cddeae0f3371c35609315c783",
+          "patch": "@@ -93,9 +93,9 @@ OctomapServer::OctomapServer(ros::NodeHandle private_nh_)\n   private_nh.param(\"incremental_2D_projection\", m_incrementalUpdate, m_incrementalUpdate);\n \n   if (m_filterGroundPlane && (m_pointcloudMinZ > 0.0 || m_pointcloudMaxZ < 0.0)){\n-\t  ROS_WARN_STREAM(\"You enabled ground filtering but incoming pointclouds will be pre-filtered in [\"\n-\t\t\t  <<m_pointcloudMinZ <<\", \"<< m_pointcloudMaxZ << \"], excluding the ground level z=0. \"\n-\t\t\t  << \"This will not work.\");\n+    ROS_WARN_STREAM(\"You enabled ground filtering but incoming pointclouds will be pre-filtered in [\"\n+              <<m_pointcloudMinZ <<\", \"<< m_pointcloudMaxZ << \"], excluding the ground level z=0. \"\n+              << \"This will not work.\");\n \n   }\n \n@@ -142,7 +142,7 @@ OctomapServer::OctomapServer(ros::NodeHandle private_nh_)\n   m_binaryMapPub = m_nh.advertise<Octomap>(\"octomap_binary\", 1, m_latchedTopics);\n   m_fullMapPub = m_nh.advertise<Octomap>(\"octomap_full\", 1, m_latchedTopics);\n   m_pointCloudPub = m_nh.advertise<sensor_msgs::PointCloud2>(\"octomap_point_cloud_centers\", 1, m_latchedTopics);\n-  m_mapPub = m_nh.advertise<nav_msgs::OccupancyGrid>(\"projected_map\", 5, m_latchedTopics);\t\n+  m_mapPub = m_nh.advertise<nav_msgs::OccupancyGrid>(\"projected_map\", 5, m_latchedTopics);\n   m_fmarkerPub = m_nh.advertise<visualization_msgs::MarkerArray>(\"free_cells_vis_array\", 1, m_latchedTopics);\n \n   m_pointCloudSub = new message_filters::Subscriber<sensor_msgs::PointCloud2> (m_nh, \"cloud_in\", 5);\n@@ -221,11 +221,11 @@ bool OctomapServer::openFile(const std::string& filename){\n   m_updateBBXMin[0] = m_octree->coordToKey(minX);\n   m_updateBBXMin[1] = m_octree->coordToKey(minY);\n   m_updateBBXMin[2] = m_octree->coordToKey(minZ);\n-  \n+\n   m_updateBBXMax[0] = m_octree->coordToKey(maxX);\n   m_updateBBXMax[1] = m_octree->coordToKey(maxY);\n   m_updateBBXMax[2] = m_octree->coordToKey(maxZ);\n-  \n+\n   publishAll();\n \n   return true;\n@@ -696,10 +696,8 @@ bool OctomapServer::resetSrv(std_srvs::Empty::Request& req, std_srvs::Empty::Res\n     occupiedNodesVis.markers[i].action = visualization_msgs::Marker::DELETE;\n   }\n \n-\n   m_markerPub.publish(occupiedNodesVis);\n \n-\n   visualization_msgs::MarkerArray freeNodesVis;\n   freeNodesVis.markers.resize(m_treeDepth +1);\n \n@@ -868,7 +866,7 @@ void OctomapServer::handlePreNodeTraversal(const ros::Time& rostime){\n     octomap::point3d maxPt(maxX, maxY, maxZ);\n     octomap::OcTreeKey minKey = m_octree->coordToKey(minPt, m_maxTreeDepth);\n     octomap::OcTreeKey maxKey = m_octree->coordToKey(maxPt, m_maxTreeDepth);\n-    \n+\n     ROS_DEBUG(\"MinKey: %d %d %d / MaxKey: %d %d %d\", minKey[0], minKey[1], minKey[2], maxKey[0], maxKey[1], maxKey[2]);\n \n     // add padding if requested (= new min/maxPts in x&y):\n@@ -913,7 +911,7 @@ void OctomapServer::handlePreNodeTraversal(const ros::Time& rostime){\n       m_gridmap.info.origin.position.x -= m_res/2.0;\n       m_gridmap.info.origin.position.y -= m_res/2.0;\n     }\n-    \n+\n     // workaround for  multires. projection not working properly for inner nodes:\n     // force re-building complete map\n     if (m_maxTreeDepth < m_treeDepth)\n@@ -955,7 +953,7 @@ void OctomapServer::handlePreNodeTraversal(const ros::Time& rostime){\n        }\n \n     }\n-       \n+\n \n \n   }\n@@ -1052,11 +1050,23 @@ bool OctomapServer::isSpeckleNode(const OcTreeKey&nKey) const {\n void OctomapServer::reconfigureCallback(octomap_server::OctomapServerConfig& config, uint32_t level){\n   if (m_maxTreeDepth != unsigned(config.max_depth)){\n     m_maxTreeDepth = unsigned(config.max_depth);\n-\n     publishAll();\n   }\n-\n-\n+  else{\n+    m_pointcloudMinZ = config.pointcloud_min_z;\n+    m_pointcloudMaxZ = config.pointcloud_max_z;\n+    m_occupancyMinZ = config.occupancy_min_z;\n+    m_occupancyMaxZ = config.occupancy_max_z;\n+    m_filterSpeckles = config.filter_speckles;\n+    m_filterGroundPlane = config.filter_ground;\n+    m_groundFilterDistance = config.distance;\n+    m_groundFilterAngle = config.angle;\n+    m_groundFilterPlaneDistance = config.plane_distance;\n+    m_maxRange = config.max_range;\n+    m_compressMap = config.compress_map;\n+    m_incrementalUpdate = config.incremental_2D_projection;\n+    //resetOctomapServer();\n+  }\n }\n \n void OctomapServer::adjustMapData(nav_msgs::OccupancyGrid& map, const nav_msgs::MapMetaData& oldMapInfo) const{"
+        },
+        {
+          "sha": "9788e824f8c36a6b88fe158548334d095293091a",
+          "filename": "octomap_server/src/octomap_server_node.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 2,
+          "changes": 3,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/59d8a344c200510cddeae0f3371c35609315c783/octomap_server%2Fsrc%2Foctomap_server_node.cpp",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/59d8a344c200510cddeae0f3371c35609315c783/octomap_server%2Fsrc%2Foctomap_server_node.cpp",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fsrc%2Foctomap_server_node.cpp?ref=59d8a344c200510cddeae0f3371c35609315c783",
+          "patch": "@@ -40,7 +40,7 @@\n #include <octomap_server/OctomapServer.h>\n \n #define USAGE \"\\nUSAGE: octomap_server <map.[bt|ot]>\\n\" \\\n-\t\t\"  map.bt: inital octomap 3D map file to read\\n\"\n+        \"  map.bt: inital octomap 3D map file to read\\n\"\n \n using namespace octomap_server;\n \n@@ -53,7 +53,6 @@ int main(int argc, char** argv){\n     exit(-1);\n   }\n \n-\n   OctomapServer server;\n   ros::spinOnce();\n "
+        }
+      ]
+    },
+    {
+      "author": "Shohei Fujii",
+      "date": "2016-01-11T02:01:50Z",
+      "sha": "c044ad511c1e66891de4fc9bc4bb7a020042e7dc",
+      "message": "load map file set from rosparam",
+      "files_changed": 2,
+      "additions": 11,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "23a34b01f78591c3f33390bcb54a002fae4e8fdf",
+          "filename": "octomap_server/include/octomap_server/OctomapServer.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/c044ad511c1e66891de4fc9bc4bb7a020042e7dc/octomap_server%2Finclude%2Foctomap_server%2FOctomapServer.h",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/c044ad511c1e66891de4fc9bc4bb7a020042e7dc/octomap_server%2Finclude%2Foctomap_server%2FOctomapServer.h",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Finclude%2Foctomap_server%2FOctomapServer.h?ref=c044ad511c1e66891de4fc9bc4bb7a020042e7dc",
+          "patch": "@@ -218,6 +218,7 @@ class OctomapServer {\n   std_msgs::ColorRGBA m_color;\n   std_msgs::ColorRGBA m_colorFree;\n   double m_colorFactor;\n+  std::string m_map_file;\n \n   bool m_latchedTopics;\n   bool m_publishFreeSpace;"
+        },
+        {
+          "sha": "fee9f135c26417b7627b18c56e5b93fd9345dfc2",
+          "filename": "octomap_server/src/OctomapServer.cpp",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 0,
+          "changes": 10,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/c044ad511c1e66891de4fc9bc4bb7a020042e7dc/octomap_server%2Fsrc%2FOctomapServer.cpp",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/c044ad511c1e66891de4fc9bc4bb7a020042e7dc/octomap_server%2Fsrc%2FOctomapServer.cpp",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fsrc%2FOctomapServer.cpp?ref=c044ad511c1e66891de4fc9bc4bb7a020042e7dc",
+          "patch": "@@ -71,6 +71,7 @@ OctomapServer::OctomapServer(ros::NodeHandle private_nh_)\n   private_nh.param(\"height_map\", m_useHeightMap, m_useHeightMap);\n   private_nh.param(\"colored_map\", m_useColoredMap, m_useColoredMap);\n   private_nh.param(\"color_factor\", m_colorFactor, m_colorFactor);\n+  private_nh.param(\"map_file\", m_map_file, m_map_file);\n \n   private_nh.param(\"pointcloud_min_x\", m_pointcloudMinX,m_pointcloudMinX);\n   private_nh.param(\"pointcloud_max_x\", m_pointcloudMaxX,m_pointcloudMaxX);\n@@ -179,6 +180,15 @@ OctomapServer::OctomapServer(ros::NodeHandle private_nh_)\n \n   f = boost::bind(&OctomapServer::reconfigureCallback, this, _1, _2);\n   m_reconfigureServer.setCallback(f);\n+\n+\n+  if (m_map_file != \"\") {\n+    if (!openFile(m_map_file)){\n+      ROS_WARN(\"Could not open file %s\", m_map_file.c_str());\n+    } else {\n+      ROS_INFO(\"Succeeded to open file %s\", m_map_file.c_str());\n+    }\n+  }\n }\n \n OctomapServer::~OctomapServer(){"
+        }
+      ]
+    },
+    {
+      "author": "mmurooka",
+      "date": "2015-09-19T02:03:27Z",
+      "sha": "99337a09c55aed2915d630b3dbc4abfd3e59419e",
+      "message": "change publishAll to virtual function",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b88f22a9782e3741956ef478d3bb6076f9f18030",
+          "filename": "octomap_server/include/octomap_server/OctomapServer.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/99337a09c55aed2915d630b3dbc4abfd3e59419e/octomap_server%2Finclude%2Foctomap_server%2FOctomapServer.h",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/99337a09c55aed2915d630b3dbc4abfd3e59419e/octomap_server%2Finclude%2Foctomap_server%2FOctomapServer.h",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Finclude%2Foctomap_server%2FOctomapServer.h?ref=99337a09c55aed2915d630b3dbc4abfd3e59419e",
+          "patch": "@@ -112,7 +112,7 @@ class OctomapServer{\n   void reconfigureCallback(octomap_server::OctomapServerConfig& config, uint32_t level);\n   void publishBinaryOctoMap(const ros::Time& rostime = ros::Time::now()) const;\n   void publishFullOctoMap(const ros::Time& rostime = ros::Time::now()) const;\n-  void publishAll(const ros::Time& rostime = ros::Time::now());\n+  virtual void publishAll(const ros::Time& rostime = ros::Time::now());\n \n   /**\n   * @brief update occupancy map with a scan labeled as ground and nonground."
+        }
+      ]
+    },
+    {
+      "author": "Armin Hornung",
+      "date": "2012-04-27T16:24:13Z",
+      "sha": "34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+      "message": "missing multilayer cpp node added",
+      "files_changed": 24,
+      "additions": 2193,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "f7304ef16949d35fe5cf933f74d28db3221a8e47",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 17,
+          "deletions": 0,
+          "changes": 17,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/CMakeLists.txt",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/CMakeLists.txt?ref=34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+          "patch": "@@ -0,0 +1,17 @@\n+cmake_minimum_required(VERSION 2.4.6)\n+include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)\n+\n+# Append to CPACK_SOURCE_IGNORE_FILES a semicolon-separated list of\n+# directories (or patterns, but directories should suffice) that should\n+# be excluded from the distro.  This is not the place to put things that\n+# should be ignored everywhere, like \"build\" directories; that happens in\n+# rosbuild/rosbuild.cmake.  Here should be listed packages that aren't\n+# ready for inclusion in a distro.\n+#\n+# This list is combined with the list in rosbuild/rosbuild.cmake.  Note\n+# that CMake 2.6 may be required to ensure that the two lists are combined\n+# properly.  CMake 2.4 seems to have unpredictable scoping rules for such\n+# variables.\n+#list(APPEND CPACK_SOURCE_IGNORE_FILES /core/experimental)\n+\n+rosbuild_make_distribution(0.4.4)"
+        },
+        {
+          "sha": "a818ccadb911aa86a9120d25981d64abf102dd30",
+          "filename": "Makefile",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/Makefile",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/Makefile",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/Makefile?ref=34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+          "patch": "@@ -0,0 +1 @@\n+include $(shell rospack find mk)/cmake_stack.mk\n\\ No newline at end of file"
+        },
+        {
+          "sha": "6facc8029a768f25a9865f72eb6dd72ae5b665f8",
+          "filename": "octomap/Makefile",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap%2FMakefile",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap%2FMakefile",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap%2FMakefile?ref=34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+          "patch": "@@ -0,0 +1,2 @@\n+all: \n+"
+        },
+        {
+          "sha": "ff679cfc5c54883e43b9308d0f0bb47d985af33c",
+          "filename": "octomap/manifest.xml",
+          "status": "added",
+          "additions": 26,
+          "deletions": 0,
+          "changes": 26,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap%2Fmanifest.xml",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap%2Fmanifest.xml",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap%2Fmanifest.xml?ref=34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+          "patch": "@@ -0,0 +1,26 @@\n+<package>\n+  <description brief=\"OctoMap -  A  probabilistic, flexible, and compact 3D mapping library for robotic systems.\">\n+\n+     <p>The <a href=\"http://octomap.sourceforge.net/\">OctoMap library</a> implements a 3D occupancy grid mapping approach, \n+     providing data structures and mapping algorithms. The map implementation is based on an octree.</p>\n+     <p>Deprecated. This package now forwards octomap pkgconfig flags through the manifest,\n+     do not depend on this feature. Instead use cmake's\n+     find_package infrastructure for the octomap package.</p>\n+     <p>More details are available at <a href=\"http://octomap.sourceforge.net/\">http://octomap.sourceforge.net/</a>.</p>\n+\n+  </description>\n+  <author>Kai M. Wurm and Armin Hornung</author>\n+  <license>BSD</license>\n+  <review status=\"unreviewed\" notes=\"\"/>\n+  <url>http://www.ros.org/wiki/octomap</url>\n+  <export>\n+    <cpp cflags=\"`pkg-config octomap --cflags`\" lflags=\"`pkg-config octomap --libs`\"/>\n+    <rosdoc external=\"http://octomap.sourceforge.net/doxygen/\"/>\n+  </export>\n+  \n+  <depend package=\"roscpp\" />\n+  <rosdep name=\"octomap\" />\n+\n+</package>\n+\n+"
+        },
+        {
+          "sha": "9801f33d36198f7b0e69e5f1e76a918675a422bc",
+          "filename": "octomap_server/CMakeLists.txt",
+          "status": "added",
+          "additions": 49,
+          "deletions": 0,
+          "changes": 49,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2FCMakeLists.txt",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2FCMakeLists.txt?ref=34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+          "patch": "@@ -0,0 +1,49 @@\n+cmake_minimum_required(VERSION 2.4.6)\n+include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)\n+\n+# Set the build type.  Options are:\n+#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage\n+#  Debug          : w/ debug symbols, w/o optimization\n+#  Release        : w/o debug symbols, w/ optimization\n+#  RelWithDebInfo : w/ debug symbols, w/ optimization\n+#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries\n+set(ROS_BUILD_TYPE RelWithDebInfo)\n+#set(ROS_BUILD_TYPE Release)\n+\n+rosbuild_init()\n+\n+find_package(octomap REQUIRED)\n+include_directories(${OCTOMAP_INCLUDE_DIRS})\n+link_directories(${OCTOMAP_LIBRARY_DIRS})\n+link_libraries(${PROJECT_NAME} ${OCTOMAP_LIBRARIES})\n+\n+#set the default path for built executables to the \"bin\" directory\n+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)\n+#set the default path for built libraries to the \"lib\" directory\n+set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)\n+\n+#uncomment if you have defined messages\n+#rosbuild_genmsg()\n+#uncomment if you have defined services\n+#rosbuild_gensrv()\n+\n+#add dynamic reconfigure api\n+rosbuild_find_ros_package(dynamic_reconfigure)\n+include(${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)\n+gencfg()\n+\n+\n+#common commands for building c++ executables and libraries\n+rosbuild_add_library(${PROJECT_NAME} src/OctomapServer.cpp src/OctomapServerMultilayer.cpp src/TrackingOctomapServer.cpp)\n+\n+rosbuild_add_executable(octomap_server_node src/octomap_server_node.cpp)\n+target_link_libraries(octomap_server_node ${PROJECT_NAME})\n+\n+rosbuild_add_executable(octomap_server_multilayer src/octomap_server_multilayer.cpp)\n+target_link_libraries(octomap_server_multilayer ${PROJECT_NAME})\n+\n+rosbuild_add_executable(octomap_saver src/octomap_saver.cpp)\n+target_link_libraries(octomap_saver ${PROJECT_NAME})\n+\n+rosbuild_add_executable(octomap_tracking_server_node src/octomap_tracking_server_node.cpp)\n+target_link_libraries(octomap_tracking_server_node ${PROJECT_NAME})"
+        },
+        {
+          "sha": "b75b928f20ef9ea4f509a17db62e4e31b422c27f",
+          "filename": "octomap_server/Makefile",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2FMakefile",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2FMakefile",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2FMakefile?ref=34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+          "patch": "@@ -0,0 +1 @@\n+include $(shell rospack find mk)/cmake.mk\n\\ No newline at end of file"
+        },
+        {
+          "sha": "257c43e042a281fbcf054d784472e6d82ab91471",
+          "filename": "octomap_server/cfg/OctomapServer.cfg",
+          "status": "added",
+          "additions": 11,
+          "deletions": 0,
+          "changes": 11,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Fcfg%2FOctomapServer.cfg",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Fcfg%2FOctomapServer.cfg",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fcfg%2FOctomapServer.cfg?ref=34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+          "patch": "@@ -0,0 +1,11 @@\n+#!/usr/bin/env python\n+PACKAGE = \"octomap_server\"\n+import roslib;roslib.load_manifest(PACKAGE)\n+\n+from dynamic_reconfigure.parameter_generator import *\n+\n+gen = ParameterGenerator()\n+\n+gen.add(\"max_depth\", int_t, 0, \"Maximum depth when traversing the octree to send out markers. 16: full depth / max. resolution\", 16, 1, 16)\n+\n+exit(gen.generate(PACKAGE, \"octomap_server_node\", \"OctomapServer\"))\n\\ No newline at end of file"
+        },
+        {
+          "sha": "98d21a017fc61b52e046028ccf424c96241a060d",
+          "filename": "octomap_server/include/octomap_server/OctomapServer.h",
+          "status": "added",
+          "additions": 185,
+          "deletions": 0,
+          "changes": 185,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Finclude%2Foctomap_server%2FOctomapServer.h",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Finclude%2Foctomap_server%2FOctomapServer.h",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Finclude%2Foctomap_server%2FOctomapServer.h?ref=34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+          "patch": "@@ -0,0 +1,185 @@\n+/**\n+* octomap_server: A Tool to serve 3D OctoMaps in ROS (binary and as visualization)\n+* (inspired by the ROS map_saver)\n+* @author A. Hornung, University of Freiburg, Copyright (C) 2010-2012.\n+* @see http://octomap.sourceforge.net/\n+* License: BSD\n+*/\n+\n+/*\n+ * Copyright (c) 2010-2012, A. Hornung, University of Freiburg\n+ * All rights reserved.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ *\n+ *     * Redistributions of source code must retain the above copyright\n+ *       notice, this list of conditions and the following disclaimer.\n+ *     * Redistributions in binary form must reproduce the above copyright\n+ *       notice, this list of conditions and the following disclaimer in the\n+ *       documentation and/or other materials provided with the distribution.\n+ *     * Neither the name of the University of Freiburg nor the names of its\n+ *       contributors may be used to endorse or promote products derived from\n+ *       this software without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE\n+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+ * POSSIBILITY OF SUCH DAMAGE.\n+ */\n+\n+\n+#include <ros/ros.h>\n+#include <visualization_msgs/MarkerArray.h>\n+#include <nav_msgs/OccupancyGrid.h>\n+#include <std_msgs/ColorRGBA.h>\n+#include <arm_navigation_msgs/CollisionObject.h>\n+#include <arm_navigation_msgs/CollisionMap.h>\n+#include <sensor_msgs/PointCloud2.h>\n+#include <std_srvs/Empty.h>\n+#include <dynamic_reconfigure/server.h>\n+#include <octomap_server/OctomapServerConfig.h>\n+\n+#include <pcl/point_types.h>\n+#include <pcl/ros/conversions.h>\n+#include <pcl_ros/transforms.h>\n+#include <pcl/sample_consensus/method_types.h>\n+#include <pcl/sample_consensus/model_types.h>\n+#include <pcl/segmentation/sac_segmentation.h>\n+#include <pcl/io/pcd_io.h>\n+#include <pcl/filters/extract_indices.h>\n+#include <pcl/filters/passthrough.h>\n+\n+\n+#include <tf/transform_listener.h>\n+#include <tf/message_filter.h>\n+#include <message_filters/subscriber.h>\n+#include <octomap_msgs/OctomapBinary.h>\n+#include <octomap_msgs/GetOctomap.h>\n+#include <octomap_msgs/BoundingBoxQuery.h>\n+#include <octomap_ros/OctomapROS.h>\n+#include <octomap/OcTreeKey.h>\n+\n+\n+namespace octomap_server {\n+class OctomapServer{\n+\n+public:\n+  typedef pcl::PointCloud<pcl::PointXYZ> PCLPointCloud;\n+\n+\n+  OctomapServer();\n+  virtual ~OctomapServer();\n+  virtual bool serviceCallback(octomap_msgs::GetOctomap::Request  &req, octomap_msgs::GetOctomap::Response &res);\n+  bool clearBBXSrv(octomap_msgs::BoundingBoxQueryRequest& req, octomap_msgs::BoundingBoxQueryResponse& resp);\n+  bool resetSrv(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp);\n+\n+  virtual void insertCloudCallback(const sensor_msgs::PointCloud2::ConstPtr& cloud);\n+  virtual bool openFile(const std::string& filename);\n+\n+protected:\n+  void reconfigureCallback(octomap_server::OctomapServerConfig& config, uint32_t level);\n+  void publishMap(const ros::Time& rostime = ros::Time::now()) const;\n+  void publishAll(const ros::Time& rostime = ros::Time::now());\n+\n+  /**\n+  * @brief update occupancy map with a scan labeled as ground and nonground.\n+  * The scans should be in the global map frame.\n+  *\n+  * @param sensorOrigin origin of the measurements for raycasting\n+  * @param ground scan endpoints on the ground plane (only clear space)\n+  * @param nonground all other endpoints (clear up to occupied endpoint)\n+  */\n+  virtual void insertScan(const tf::Point& sensorOrigin, const PCLPointCloud& ground, const PCLPointCloud& nonground);\n+\n+  /// label the input cloud \"pc\" into ground and nonground. Should be in the robot's fixed frame (not world!)\n+  void filterGroundPlane(const PCLPointCloud& pc, PCLPointCloud& ground, PCLPointCloud& nonground) const;\n+\n+  /**\n+  * @brief Find speckle nodes (single occupied voxels with no neighbors). Only works on lowest resolution!\n+  * @param key\n+  * @return\n+  */\n+  bool isSpeckleNode(const octomap::OcTreeKey& key) const;\n+\n+  /// hook that is called after traversing all nodes\n+  virtual void handlePreNodeTraversal(const ros::Time& rostime);\n+\n+  /// hook that is called when traversing all nodes of the updated Octree (does nothing here)\n+  virtual void handleNode(const octomap::OcTreeROS::OcTreeType::iterator& it) {};\n+\n+  /// hook that is called when traversing occupied nodes of the updated Octree (updates 2D map projection here)\n+  virtual void handleOccupiedNode(const octomap::OcTreeROS::OcTreeType::iterator& it);\n+\n+  /// hook that is called when traversing free nodes of the updated Octree (updates 2D map projection here)\n+  virtual void handleFreeNode(const octomap::OcTreeROS::OcTreeType::iterator& it);\n+\n+  /// hook that is called after traversing all nodes\n+  virtual void handlePostNodeTraversal(const ros::Time& rostime);\n+\n+  inline unsigned mapIdx(int i, int j) const{\n+    return m_gridmap.info.width*j + i;\n+  }\n+\n+  inline unsigned mapIdx(const octomap::OcTreeKey& key) const{\n+    return mapIdx((key[0] - m_paddedMinKey[0])/m_multires2DScale,\n+        (key[1] - m_paddedMinKey[1])/m_multires2DScale);\n+\n+  }\n+\n+  std_msgs::ColorRGBA heightMapColor(double h) const;\n+  ros::NodeHandle m_nh;\n+  ros::Publisher m_markerPub, m_binaryMapPub, m_pointCloudPub, m_collisionObjectPub, m_mapPub, m_cmapPub;\n+  message_filters::Subscriber<sensor_msgs::PointCloud2>* m_pointCloudSub;\n+  tf::MessageFilter<sensor_msgs::PointCloud2>* m_tfPointCloudSub;\n+  ros::ServiceServer m_octomapService, m_clearBBXService, m_resetService;\n+  tf::TransformListener m_tfListener;\n+  dynamic_reconfigure::Server<OctomapServerConfig> m_reconfigureServer;\n+\n+  octomap::OcTreeROS *m_octoMap;\n+  octomap::KeyRay m_keyRay;  // temp storage for ray casting\n+  double m_maxRange;\n+  std::string m_worldFrameId; // the map frame\n+  std::string m_baseFrameId; // base of the robot for ground plane filtering\n+  bool m_useHeightMap;\n+  std_msgs::ColorRGBA m_color;\n+  double m_colorFactor;\n+\n+  bool m_latchedTopics;\n+\n+  double m_res;\n+  unsigned m_treeDepth;\n+  unsigned m_maxTreeDepth;\n+  double m_probHit;\n+  double m_probMiss;\n+  double m_thresMin;\n+  double m_thresMax;\n+\n+  double m_pointcloudMinZ;\n+  double m_pointcloudMaxZ;\n+  double m_occupancyMinZ;\n+  double m_occupancyMaxZ;\n+  double m_minSizeX;\n+  double m_minSizeY;\n+  bool m_filterSpeckles;\n+\n+  bool m_filterGroundPlane;\n+  double m_groundFilterDistance;\n+  double m_groundFilterAngle;\n+  double m_groundFilterPlaneDistance;\n+\n+  // downprojected 2D map:\n+  nav_msgs::OccupancyGrid m_gridmap;\n+  bool m_publish2DMap;\n+  octomap::OcTreeKey m_paddedMinKey;\n+  unsigned m_multires2DScale;\n+};\n+}\n+"
+        },
+        {
+          "sha": "35fcb23aef36d29db16e8b59b40decca20e81861",
+          "filename": "octomap_server/include/octomap_server/OctomapServerMultilayer.h",
+          "status": "added",
+          "additions": 80,
+          "deletions": 0,
+          "changes": 80,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Finclude%2Foctomap_server%2FOctomapServerMultilayer.h",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Finclude%2Foctomap_server%2FOctomapServerMultilayer.h",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Finclude%2Foctomap_server%2FOctomapServerMultilayer.h?ref=34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+          "patch": "@@ -0,0 +1,80 @@\n+/*\n+ * Copyright (c) 2010-2011, A. Hornung, M. Philips\n+ * All rights reserved.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ *\n+ *     * Redistributions of source code must retain the above copyright\n+ *       notice, this list of conditions and the following disclaimer.\n+ *     * Redistributions in binary form must reproduce the above copyright\n+ *       notice, this list of conditions and the following disclaimer in the\n+ *       documentation and/or other materials provided with the distribution.\n+ *     * Neither the name of the University of Freiburg nor the names of its\n+ *       contributors may be used to endorse or promote products derived from\n+ *       this software without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE\n+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+ * POSSIBILITY OF SUCH DAMAGE.\n+ */\n+\n+\n+#include <octomap_server/OctomapServer.h>\n+#include <arm_navigation_msgs/AttachedCollisionObject.h>\n+\n+namespace octomap_server {\n+class OctomapServerMultilayer : public OctomapServer{\n+\n+public:\n+  OctomapServerMultilayer();\n+  virtual ~OctomapServerMultilayer();\n+  void attachedCallback(const arm_navigation_msgs::AttachedCollisionObjectConstPtr& msg);\n+\n+protected:\n+  struct ProjectedMap{\n+    double minZ;\n+    double maxZ;\n+    double z; // for visualization\n+    std::string name;\n+    nav_msgs::OccupancyGrid map;\n+  };\n+  typedef std::vector<ProjectedMap> MultilevelGrid;\n+\n+  /// hook that is called after traversing all nodes\n+  virtual void handlePreNodeTraversal(const ros::Time& rostime);\n+\n+  /// hook that is called when traversing all nodes of the updated Octree (does nothing here)\n+  virtual void handleNode(const octomap::OcTreeROS::OcTreeType::iterator& it) {};\n+\n+  /// hook that is called when traversing occupied nodes of the updated Octree (updates 2D map projection here)\n+  virtual void handleOccupiedNode(const octomap::OcTreeROS::OcTreeType::iterator& it);\n+\n+  /// hook that is called when traversing free nodes of the updated Octree (updates 2D map projection here)\n+  virtual void handleFreeNode(const octomap::OcTreeROS::OcTreeType::iterator& it);\n+\n+  /// hook that is called after traversing all nodes\n+  virtual void handlePostNodeTraversal(const ros::Time& rostime);\n+\n+  std::vector<ros::Publisher*> m_multiMapPub;\n+  ros::Subscriber m_attachedObjectsSub;\n+\n+  std::string m_attachedFrame;\n+  double m_attachedMaxOffset;\n+  double m_attachedMinOffset;\n+  bool m_haveAttachedObject;\n+\n+  MultilevelGrid m_multiGridmap;\n+\n+\n+};\n+}\n+"
+        },
+        {
+          "sha": "fc358302f40a7bb680773c370eeeb2c06757f0d7",
+          "filename": "octomap_server/include/octomap_server/TrackingOctomapServer.h",
+          "status": "added",
+          "additions": 57,
+          "deletions": 0,
+          "changes": 57,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Finclude%2Foctomap_server%2FTrackingOctomapServer.h",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Finclude%2Foctomap_server%2FTrackingOctomapServer.h",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Finclude%2Foctomap_server%2FTrackingOctomapServer.h?ref=34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+          "patch": "@@ -0,0 +1,57 @@\n+/*\n+ * Copyright (c) 2012, D. Kuhner, P. Ruchti, University of Freiburg\n+ * All rights reserved.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ *\n+ *     * Redistributions of source code must retain the above copyright\n+ *       notice, this list of conditions and the following disclaimer.\n+ *     * Redistributions in binary form must reproduce the above copyright\n+ *       notice, this list of conditions and the following disclaimer in the\n+ *       documentation and/or other materials provided with the distribution.\n+ *     * Neither the name of the University of Freiburg nor the names of its\n+ *       contributors may be used to endorse or promote products derived from\n+ *       this software without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE\n+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+ * POSSIBILITY OF SUCH DAMAGE.\n+ */\n+\n+#ifndef TRACKINGOCTOMAPSERVER_H_\n+#define TRACKINGOCTOMAPSERVER_H_\n+\n+#include \"octomap_server/OctomapServer.h\"\n+\n+namespace octomap_server {\n+\n+class TrackingOctomapServer: public OctomapServer {\n+public:\n+  TrackingOctomapServer(const std::string& filename = \"\");\n+  virtual ~TrackingOctomapServer();\n+\n+  void trackCallback(sensor_msgs::PointCloud2Ptr cloud);\n+  void insertScan(const tf::Point& sensorOrigin, const PCLPointCloud& ground, const PCLPointCloud& nonground);\n+\n+protected:\n+  void trackChanges();\n+\n+  bool listen_changes;\n+  bool track_changes;\n+  ros::Publisher pubFreeChangeSet;\n+  ros::Publisher pubChangeSet;\n+  ros::Subscriber subChangeSet;\n+  ros::Subscriber subFreeChanges;\n+};\n+\n+} /* namespace octomap */\n+#endif /* TRACKINGOCTOMAPSERVER_H_ */"
+        },
+        {
+          "sha": "a05ed75fb3599335ed6f162bb260dfe17423181f",
+          "filename": "octomap_server/launch/octomap_mapping.launch",
+          "status": "added",
+          "additions": 17,
+          "deletions": 0,
+          "changes": 17,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Flaunch%2Foctomap_mapping.launch",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Flaunch%2Foctomap_mapping.launch",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Flaunch%2Foctomap_mapping.launch?ref=34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+          "patch": "@@ -0,0 +1,17 @@\n+<!-- Launch octomap_server for mapping: Listens to incoming PointCloud2 data \n+and incrementally builds an octomap. The data is sent out in different representations. -->\n+<launch>\n+\t<node pkg=\"octomap_server\" type=\"octomap_server_node\" name=\"octomap_server\">\n+\t\t<param name=\"resolution\" value=\"0.05\" />\n+\t\t\n+\t\t<!-- fixed map frame (set to 'map' if SLAM or localization running!) -->\n+\t\t<param name=\"frame_id\" type=\"string\" value=\"odom_combined\" />\n+\t\t\n+\t\t<!-- maximum range to integrate (speedup!) -->\n+\t\t<param name=\"max_sensor_range\" value=\"5.0\" />\n+\t\t\n+\t\t<!-- data source to integrate (PointCloud2) -->\n+\t\t<remap from=\"cloud_in\" to=\"/narrow_stereo/points_filtered2\" />\n+\t\n+\t</node>\n+</launch>\n\\ No newline at end of file"
+        },
+        {
+          "sha": "1ca7600defb946f16e06f61c53f0938fae4f25fa",
+          "filename": "octomap_server/launch/octomap_tracking_client.launch",
+          "status": "added",
+          "additions": 13,
+          "deletions": 0,
+          "changes": 13,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Flaunch%2Foctomap_tracking_client.launch",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Flaunch%2Foctomap_tracking_client.launch",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Flaunch%2Foctomap_tracking_client.launch?ref=34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+          "patch": "@@ -0,0 +1,13 @@\n+<launch>\n+\t<!-- you can load an exisiting tree with <node ... args=\"tree.bt\"> !-->\n+\t<node pkg=\"octomap_server\" type=\"octomap_tracking_server_node\" name=\"octomap_listener\" output=\"screen\">\n+\t\t<param name=\"resolution\" value=\"0.02\" />\n+\t\t<param name=\"frame_id\" type=\"string\" value=\"dev0\" />\n+\t\t<param name=\"max_sensor_range\" value=\"4.0\" />\n+\t\t<param name=\"save_directory\" value=\"$(optenv OCTOMAP_SAVE_DIR2 ./)\" />\n+\t\t<param name=\"track_changes\" value=\"false\"/>\n+\t\t<param name=\"listen_changes\" value=\"true\"/>\n+\t\t<param name=\"topic_changes\" value=\"/octomap_tracking_server/changeset\" />\n+\t\t<!--remap from=\"cloud_in\" to=\"/rgbdslam/void\" /-->\n+\t</node>\n+</launch>"
+        },
+        {
+          "sha": "1a639253989884766e7a729b4dc7c3787e297a71",
+          "filename": "octomap_server/launch/octomap_tracking_server.launch",
+          "status": "added",
+          "additions": 13,
+          "deletions": 0,
+          "changes": 13,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Flaunch%2Foctomap_tracking_server.launch",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Flaunch%2Foctomap_tracking_server.launch",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Flaunch%2Foctomap_tracking_server.launch?ref=34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+          "patch": "@@ -0,0 +1,13 @@\n+<launch>\n+\t<!-- you can load an exisiting tree with <node ... args=\"tree.bt\"> !-->\n+\t<node pkg=\"octomap_server\" type=\"octomap_tracking_server_node\" name=\"octomap_talker\" output=\"screen\">\n+\t\t<param name=\"resolution\" value=\"0.02\" />\n+\t\t<param name=\"frame_id\" type=\"string\" value=\"map\" />\n+\t\t<param name=\"max_sensor_range\" value=\"4.0\" />\n+\t\t<param name=\"save_directory\" value=\"$(optenv OCTOMAP_SAVE_DIR ./)\" />\n+\t\t<param name=\"track_changes\" value=\"true\"/>\n+\t\t<param name=\"listen_changes\" value=\"false\"/>\n+\t\t<param name=\"topic_changes\" value=\"/octomap_tracking_server/changeset\" />\n+\t\t<!--remap from=\"cloud_in\" to=\"/rgbdslam/batch_clouds\" /-->\n+\t</node>\n+</launch>"
+        },
+        {
+          "sha": "2d8a6bc6a71274e2c9d4fa7acd6a5132e6c341b0",
+          "filename": "octomap_server/mainpage.dox",
+          "status": "added",
+          "additions": 30,
+          "deletions": 0,
+          "changes": 30,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Fmainpage.dox",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Fmainpage.dox",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fmainpage.dox?ref=34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+          "patch": "@@ -0,0 +1,30 @@\n+/**\n+\\mainpage\n+\\htmlinclude manifest.html\n+\n+\\b octomap_server is ... \n+\n+<!-- \n+In addition to providing an overview of your package,\n+this is the section where the specification and design/architecture \n+should be detailed. While the original specification may be done on the\n+wiki, it should be transferred here once your package starts to take shape.\n+You can then link to this documentation page from the Wiki. \n+-->\n+\n+\n+\\section codeapi Code API\n+\n+<!--\n+Provide links to specific auto-generated API documentation within your\n+package that is of particular interest to a reader. Doxygen will\n+document pretty much every part of your code, so do your best here to\n+point the reader to the actual API.\n+\n+If your codebase is fairly large or has different sets of APIs, you\n+should use the doxygen 'group' tag to keep these APIs together. For\n+example, the roscpp documentation has 'libros' group.\n+-->\n+\n+\n+*/\n\\ No newline at end of file"
+        },
+        {
+          "sha": "d66de3171be7d8bd901c2cdc104c8ceb6eb6e4e2",
+          "filename": "octomap_server/manifest.xml",
+          "status": "added",
+          "additions": 31,
+          "deletions": 0,
+          "changes": 31,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Fmanifest.xml",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Fmanifest.xml",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fmanifest.xml?ref=34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+          "patch": "@@ -0,0 +1,31 @@\n+<package>\n+  <description brief=\"octomap_server - map server for the OctoMap 3D maps\">\n+\n+     octomap_server loads a 3D map (as Octree-based OctoMap) and distributes it to other nodes in a compact binary format. \n+\t See octomap_saver on how to request or save a map file. A visualization of the occupied cells is sent as MarkerArray.\n+\n+  </description>\n+  <author>Armin Hornung</author>\n+  <license>BSD</license>\n+  <review status=\"unreviewed\" notes=\"\"/>\n+  <url>http://www.ros.org/wiki/octomap_server</url>\n+  \n+  <export>\n+    <cpp cflags=\"-I${prefix}/include\"  lflags=\"-L${prefix}/lib -Wl,-rpath,${prefix}/lib -loctomap_server\"/>\n+  </export>\n+  \n+  <depend package=\"visualization_msgs\"/> \n+  <depend package=\"octomap_msgs\"/>\n+  <depend package=\"octomap_ros\"/>\n+  <depend package=\"pcl_ros\"/>\n+  <depend package=\"nav_msgs\"/>\n+  <depend package=\"arm_navigation_msgs\"/>\n+  <depend package=\"std_msgs\"/>\n+  <depend package=\"std_srvs\"/>\n+  \n+  <rosdep name=\"octomap\" />\n+  <depend package=\"dynamic_reconfigure\"/>\n+  \n+</package>\n+\n+"
+        },
+        {
+          "sha": "407f282a8bf7f5abf144ad26a7357d821e2de922",
+          "filename": "octomap_server/scripts/octomap_eraser_cli.py",
+          "status": "added",
+          "additions": 31,
+          "deletions": 0,
+          "changes": 31,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Fscripts%2Foctomap_eraser_cli.py",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Fscripts%2Foctomap_eraser_cli.py",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fscripts%2Foctomap_eraser_cli.py?ref=34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+          "patch": "@@ -0,0 +1,31 @@\n+#!/usr/bin/env python\n+\n+\"\"\"Clear a region specified by a global axis-aligned bounding box in stored\n+OctoMap.\n+\n+\"\"\"\n+\n+import sys\n+from time import sleep\n+\n+import roslib\n+roslib.load_manifest('octomap_server')\n+from geometry_msgs.msg import Point\n+import octomap_msgs.srv\n+import rospy\n+\n+\n+SRV_NAME = '/octomap_server/clear_bbx'\n+SRV_INTERFACE = octomap_msgs.srv.BoundingBoxQuery\n+\n+\n+if __name__ == '__main__':\n+    min = Point(*[float(x) for x in sys.argv[1:4]])\n+    max = Point(*[float(x) for x in sys.argv[4:7]])\n+\n+    rospy.init_node('octomap_eraser_cli', anonymous=True)\n+    sleep(1)\n+    service = rospy.ServiceProxy(SRV_NAME, SRV_INTERFACE)\n+    rospy.loginfo(\"Connected to %s service.\" % SRV_NAME)\n+    \n+    service(min, max)"
+        },
+        {
+          "sha": "b19d8225934f54ac7a503227345edab101b78959",
+          "filename": "octomap_server/src/OctomapServer.cpp",
+          "status": "added",
+          "additions": 904,
+          "deletions": 0,
+          "changes": 904,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Fsrc%2FOctomapServer.cpp",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Fsrc%2FOctomapServer.cpp",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fsrc%2FOctomapServer.cpp?ref=34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+          "patch": "@@ -0,0 +1,904 @@\n+/**\n+* octomap_server: A Tool to serve 3D OctoMaps in ROS (binary and as visualization)\n+* (inspired by the ROS map_saver)\n+* @author A. Hornung, University of Freiburg, Copyright (C) 2010-2012.\n+* @see http://octomap.sourceforge.net/\n+* License: BSD\n+*/\n+\n+/*\n+ * Copyright (c) 2010-2012, A. Hornung, University of Freiburg\n+ * All rights reserved.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ *\n+ *     * Redistributions of source code must retain the above copyright\n+ *       notice, this list of conditions and the following disclaimer.\n+ *     * Redistributions in binary form must reproduce the above copyright\n+ *       notice, this list of conditions and the following disclaimer in the\n+ *       documentation and/or other materials provided with the distribution.\n+ *     * Neither the name of the University of Freiburg nor the names of its\n+ *       contributors may be used to endorse or promote products derived from\n+ *       this software without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE\n+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+ * POSSIBILITY OF SUCH DAMAGE.\n+ */\n+\n+#include <octomap_server/OctomapServer.h>\n+\n+using namespace octomap;\n+\n+namespace octomap_server{\n+\n+OctomapServer::OctomapServer()\n+: m_nh(),\n+  m_pointCloudSub(NULL),\n+  m_tfPointCloudSub(NULL),\n+  m_octoMap(NULL),\n+  m_maxRange(-1.0),\n+  m_worldFrameId(\"/map\"), m_baseFrameId(\"base_footprint\"),\n+  m_useHeightMap(true),\n+  m_colorFactor(0.8),\n+  m_latchedTopics(true),\n+  m_res(0.05),\n+  m_treeDepth(0),\n+  m_maxTreeDepth(0),\n+  m_probHit(0.7), m_probMiss(0.4),\n+  m_thresMin(0.12), m_thresMax(0.97),\n+  m_pointcloudMinZ(-std::numeric_limits<double>::max()),\n+  m_pointcloudMaxZ(std::numeric_limits<double>::max()),\n+  m_occupancyMinZ(-std::numeric_limits<double>::max()),\n+  m_occupancyMaxZ(std::numeric_limits<double>::max()),\n+  m_minSizeX(0.0), m_minSizeY(0.0),\n+  m_filterSpeckles(false), m_filterGroundPlane(false),\n+  m_groundFilterDistance(0.04), m_groundFilterAngle(0.15), m_groundFilterPlaneDistance(0.07)\n+{\n+  ros::NodeHandle private_nh(\"~\");\n+  private_nh.param(\"frame_id\", m_worldFrameId, m_worldFrameId);\n+  private_nh.param(\"base_frame_id\", m_baseFrameId, m_baseFrameId);\n+  private_nh.param(\"height_map\", m_useHeightMap, m_useHeightMap);\n+  private_nh.param(\"color_factor\", m_colorFactor, m_colorFactor);\n+\n+  private_nh.param(\"pointcloud_min_z\", m_pointcloudMinZ,m_pointcloudMinZ);\n+  private_nh.param(\"pointcloud_max_z\", m_pointcloudMaxZ,m_pointcloudMaxZ);\n+  private_nh.param(\"occupancy_min_z\", m_occupancyMinZ,m_occupancyMinZ);\n+  private_nh.param(\"occupancy_max_z\", m_occupancyMaxZ,m_occupancyMaxZ);\n+  private_nh.param(\"min_x_size\", m_minSizeX,m_minSizeX);\n+  private_nh.param(\"min_y_size\", m_minSizeY,m_minSizeY);\n+\n+  private_nh.param(\"filter_speckles\", m_filterSpeckles, m_filterSpeckles);\n+  private_nh.param(\"filter_ground\", m_filterGroundPlane, m_filterGroundPlane);\n+  // distance of points from plane for RANSAC\n+  private_nh.param(\"ground_filter/distance\", m_groundFilterDistance, m_groundFilterDistance);\n+  // angular derivation of found plane:\n+  private_nh.param(\"ground_filter/angle\", m_groundFilterAngle, m_groundFilterAngle);\n+  // distance of found plane from z=0 to be detected as ground (e.g. to exclude tables)\n+  private_nh.param(\"ground_filter/plane_distance\", m_groundFilterPlaneDistance, m_groundFilterPlaneDistance);\n+\n+  private_nh.param(\"sensor_model/max_range\", m_maxRange, m_maxRange);\n+\n+  private_nh.param(\"resolution\", m_res, m_res);\n+  private_nh.param(\"sensor_model/hit\", m_probHit, m_probHit);\n+  private_nh.param(\"sensor_model/miss\", m_probMiss, m_probMiss);\n+  private_nh.param(\"sensor_model/min\", m_thresMin, m_thresMin);\n+  private_nh.param(\"sensor_model/max\", m_thresMax, m_thresMax);\n+\n+\n+  // initialize octomap object & params\n+  m_octoMap = new OcTreeROS(m_res);\n+  m_octoMap->octree.setProbHit(m_probHit);\n+  m_octoMap->octree.setProbMiss(m_probMiss);\n+  m_octoMap->octree.setClampingThresMin(m_thresMin);\n+  m_octoMap->octree.setClampingThresMax(m_thresMax);\n+  m_treeDepth = m_octoMap->octree.getTreeDepth();\n+  m_maxTreeDepth = m_treeDepth;\n+  m_gridmap.info.resolution = m_res;\n+\n+\n+  double r, g, b, a;\n+  private_nh.param(\"color/r\", r, 0.0);\n+  private_nh.param(\"color/g\", g, 0.0);\n+  private_nh.param(\"color/b\", b, 1.0);\n+  private_nh.param(\"color/a\", a, 1.0);\n+  m_color.r = r;\n+  m_color.g = g;\n+  m_color.b = b;\n+  m_color.a = a;\n+\n+  private_nh.param(\"latch\", m_latchedTopics, m_latchedTopics);\n+  if (m_latchedTopics){\n+    ROS_INFO(\"Publishing latched (single publish will take longer, all topics are prepared)\");\n+  } else\n+    ROS_INFO(\"Publishing non-latched (topics are only prepared as needed, will only be re-published on map change\");\n+\n+  m_markerPub = m_nh.advertise<visualization_msgs::MarkerArray>(\"occupied_cells_vis_array\", 1, m_latchedTopics);\n+  m_binaryMapPub = m_nh.advertise<octomap_msgs::OctomapBinary>(\"octomap_binary\", 1, m_latchedTopics);\n+  m_pointCloudPub = m_nh.advertise<sensor_msgs::PointCloud2>(\"octomap_point_cloud_centers\", 1, m_latchedTopics);\n+  m_collisionObjectPub = m_nh.advertise<arm_navigation_msgs::CollisionObject>(\"octomap_collision_object\", 1, m_latchedTopics);\n+  m_mapPub = m_nh.advertise<nav_msgs::OccupancyGrid>(\"projected_map\", 5, m_latchedTopics);\n+  m_cmapPub = m_nh.advertise<arm_navigation_msgs::CollisionMap>(\"collision_map_out\", 1, m_latchedTopics);\n+\n+\n+  m_pointCloudSub = new message_filters::Subscriber<sensor_msgs::PointCloud2> (m_nh, \"cloud_in\", 5);\n+  m_tfPointCloudSub = new tf::MessageFilter<sensor_msgs::PointCloud2> (*m_pointCloudSub, m_tfListener, m_worldFrameId, 5);\n+  m_tfPointCloudSub->registerCallback(boost::bind(&OctomapServer::insertCloudCallback, this, _1));\n+\n+  m_octomapService = m_nh.advertiseService(\"octomap_binary\", &OctomapServer::serviceCallback, this);\n+  m_clearBBXService = private_nh.advertiseService(\"clear_bbx\", &OctomapServer::clearBBXSrv, this);\n+  m_resetService = private_nh.advertiseService(\"reset\", &OctomapServer::resetSrv, this);\n+\n+  dynamic_reconfigure::Server<OctomapServerConfig>::CallbackType f;\n+\n+  f = boost::bind(&OctomapServer::reconfigureCallback, this, _1, _2);\n+  m_reconfigureServer.setCallback(f);\n+}\n+\n+OctomapServer::~OctomapServer(){\n+  if (m_tfPointCloudSub)\n+    delete m_tfPointCloudSub;\n+\n+  if (m_pointCloudSub)\n+    delete m_pointCloudSub;\n+\n+\n+  if (m_octoMap)\n+    delete m_octoMap;\n+\n+}\n+\n+bool OctomapServer::openFile(const std::string& filename){\n+  if (!m_octoMap->octree.readBinary(filename)){\n+    // TODO: read .ot through factory\n+\n+    return false;\n+  }\n+\n+  ROS_INFO(\"Octomap file %s loaded (%zu nodes).\", filename.c_str(),m_octoMap->octree.size());\n+\n+  m_treeDepth = m_octoMap->octree.getTreeDepth();\n+  m_maxTreeDepth = m_treeDepth;\n+  m_res = m_octoMap->octree.getResolution();\n+  m_gridmap.info.resolution = m_res;\n+\n+  publishAll();\n+\n+  return true;\n+\n+}\n+\n+void OctomapServer::insertCloudCallback(const sensor_msgs::PointCloud2::ConstPtr& cloud){\n+  ros::WallTime startTime = ros::WallTime::now();\n+\n+\n+  //\n+  // ground filtering in base frame\n+  //\n+  PCLPointCloud pc; // input cloud for filtering and ground-detection\n+  pcl::fromROSMsg(*cloud, pc);\n+\n+  tf::StampedTransform sensorToWorldTf;\n+  try {\n+    m_tfListener.lookupTransform(m_worldFrameId, cloud->header.frame_id, cloud->header.stamp, sensorToWorldTf);\n+  } catch(tf::TransformException& ex){\n+    ROS_ERROR_STREAM( \"Transform error of sensor data: \" << ex.what() << \", quitting callback\");\n+    return;\n+  }\n+\n+  Eigen::Matrix4f sensorToWorld;\n+  pcl_ros::transformAsMatrix(sensorToWorldTf, sensorToWorld);\n+\n+\n+  // set up filter for height range, also removes NANs:\n+  pcl::PassThrough<pcl::PointXYZ> pass;\n+  pass.setFilterFieldName(\"z\");\n+  pass.setFilterLimits(m_pointcloudMinZ, m_pointcloudMaxZ);\n+\n+  PCLPointCloud pc_ground; // segmented ground plane\n+  PCLPointCloud pc_nonground; // everything else\n+\n+  if (m_filterGroundPlane){\n+    tf::StampedTransform sensorToBaseTf, baseToWorldTf;\n+    try{\n+      m_tfListener.waitForTransform(m_baseFrameId, cloud->header.frame_id, cloud->header.stamp, ros::Duration(0.2));\n+      m_tfListener.lookupTransform(m_baseFrameId, cloud->header.frame_id, cloud->header.stamp, sensorToBaseTf);\n+      m_tfListener.lookupTransform(m_worldFrameId, m_baseFrameId, cloud->header.stamp, baseToWorldTf);\n+\n+\n+    }catch(tf::TransformException& ex){\n+      ROS_ERROR_STREAM( \"Transform error for ground plane filter: \" << ex.what() << \", quitting callback.\\n\"\n+                        \"You need to set the base_frame_id or disable filter_ground.\");\n+    }\n+\n+\n+    Eigen::Matrix4f sensorToBase, baseToWorld;\n+    pcl_ros::transformAsMatrix(sensorToBaseTf, sensorToBase);\n+    pcl_ros::transformAsMatrix(baseToWorldTf, baseToWorld);\n+\n+    // transform pointcloud from sensor frame to fixed robot frame\n+    pcl::transformPointCloud(pc, pc, sensorToBase);\n+    pass.setInputCloud(pc.makeShared());\n+    pass.filter(pc);\n+    filterGroundPlane(pc, pc_ground, pc_nonground);\n+\n+    // transform clouds to world frame for insertion\n+    pcl::transformPointCloud(pc_ground, pc_ground, baseToWorld);\n+    pcl::transformPointCloud(pc_nonground, pc_nonground, baseToWorld);\n+  } else {\n+    // directly transform to map frame:\n+    pcl::transformPointCloud(pc, pc, sensorToWorld);\n+\n+    // just filter height range:\n+    pass.setInputCloud(pc.makeShared());\n+    pass.filter(pc);\n+\n+    pc_nonground = pc;\n+    // pc_nonground is empty without ground segmentation\n+    pc_ground.header = pc.header;\n+    pc_nonground.header = pc.header;\n+  }\n+\n+\n+  insertScan(sensorToWorldTf.getOrigin(), pc_ground, pc_nonground);\n+\n+  double total_elapsed = (ros::WallTime::now() - startTime).toSec();\n+  ROS_DEBUG(\"Pointcloud insertion in OctomapServer done (%zu+%zu pts (ground/nonground), %f sec)\", pc_ground.size(), pc_nonground.size(), total_elapsed);\n+\n+  publishAll(cloud->header.stamp);\n+}\n+\n+void OctomapServer::insertScan(const tf::Point& sensorOriginTf, const PCLPointCloud& ground, const PCLPointCloud& nonground){\n+  point3d sensorOrigin = pointTfToOctomap(sensorOriginTf);\n+\n+  // instead of direct scan insertion, compute update to filter ground:\n+  KeySet free_cells, occupied_cells;\n+  // insert ground points only as free:\n+  for (PCLPointCloud::const_iterator it = ground.begin(); it != ground.end(); ++it){\n+    point3d point(it->x, it->y, it->z);\n+    // maxrange check\n+    if ((m_maxRange > 0.0) && ((point - sensorOrigin).norm() > m_maxRange) ) {\n+      point = sensorOrigin + (point - sensorOrigin).normalized() * m_maxRange;\n+    }\n+\n+    // only clear space (ground points)\n+    if (m_octoMap->octree.computeRayKeys(sensorOrigin, point, m_keyRay)){\n+      free_cells.insert(m_keyRay.begin(), m_keyRay.end());\n+    }\n+  }\n+\n+  // all other points: free on ray, occupied on endpoint:\n+  for (PCLPointCloud::const_iterator it = nonground.begin(); it != nonground.end(); ++it){\n+    point3d point(it->x, it->y, it->z);\n+    // maxrange check\n+    if ((m_maxRange < 0.0) || ((point - sensorOrigin).norm() <= m_maxRange) ) {\n+\n+      // free cells\n+      if (m_octoMap->octree.computeRayKeys(sensorOrigin, point, m_keyRay)){\n+        free_cells.insert(m_keyRay.begin(), m_keyRay.end());\n+      }\n+      // occupied endpoint\n+      OcTreeKey key;\n+      if (m_octoMap->octree.genKey(point, key)){\n+        occupied_cells.insert(key);\n+      }\n+    } else {// ray longer than maxrange:;\n+      point3d new_end = sensorOrigin + (point - sensorOrigin).normalized() * m_maxRange;\n+      if (m_octoMap->octree.computeRayKeys(sensorOrigin, new_end, m_keyRay)){\n+        free_cells.insert(m_keyRay.begin(), m_keyRay.end());\n+      }\n+    }\n+  }\n+\n+  // mark free cells only if not seen occupied in this cloud\n+  for(KeySet::iterator it = free_cells.begin(), end=free_cells.end(); it!= end; ++it){\n+    if (occupied_cells.find(*it) == occupied_cells.end()){\n+      m_octoMap->octree.updateNode(*it, false);\n+    }\n+  }\n+\n+  // now mark all occupied cells:\n+  for (KeySet::iterator it = occupied_cells.begin(), end=free_cells.end(); it!= end; it++) {\n+    m_octoMap->octree.updateNode(*it, true);\n+  }\n+\n+  // TODO: eval lazy+updateInner vs. proper insertion\n+  // non-lazy by default (updateInnerOccupancy() too slow for large maps)\n+  //m_octoMap->octree.updateInnerOccupancy();\n+\n+  // prune by default:\n+  m_octoMap->octree.prune();\n+\n+\n+}\n+\n+\n+void OctomapServer::publishAll(const ros::Time& rostime){\n+  ros::WallTime startTime = ros::WallTime::now();\n+  size_t octomapSize = m_octoMap->octree.size();\n+  // TODO: estimate num occ. voxels for size of arrays (reserve)\n+  if (octomapSize <= 1){\n+    ROS_WARN(\"Nothing to publish, octree is empty\");\n+    return;\n+  }\n+\n+  bool publishCollisionMap = (m_latchedTopics || m_cmapPub.getNumSubscribers() > 0);\n+  bool publishCollisionObject = (m_latchedTopics || m_collisionObjectPub.getNumSubscribers() > 0);\n+  bool publishMarkerArray = (m_latchedTopics || m_markerPub.getNumSubscribers() > 0);\n+  bool publishPointCloud = (m_latchedTopics || m_pointCloudPub.getNumSubscribers() > 0);\n+  bool publishOctoMap = (m_latchedTopics || m_binaryMapPub.getNumSubscribers() > 0);\n+  m_publish2DMap = (m_latchedTopics || m_mapPub.getNumSubscribers() > 0);\n+\n+  // init collision object:\n+  arm_navigation_msgs::CollisionObject collisionObject;\n+  collisionObject.header.frame_id = m_worldFrameId;\n+  collisionObject.header.stamp = rostime;\n+  collisionObject.id = \"map\";\n+  arm_navigation_msgs::OrientedBoundingBox collObjBox;\n+  collObjBox.axis.x = collObjBox.axis.y = 0.0;\n+  collObjBox.axis.z = 1.0;\n+  collObjBox.angle = 0.0;\n+\n+  //init collision map:\n+  arm_navigation_msgs::CollisionMap collisionMap;\n+  collisionMap.header.frame_id = m_worldFrameId;\n+  collisionMap.header.stamp = rostime;\n+  arm_navigation_msgs::Shape collObjShape;\n+  collObjShape.type = arm_navigation_msgs::Shape::BOX;\n+  collObjShape.dimensions.resize(3);\n+\n+  geometry_msgs::Pose pose;\n+  pose.orientation = tf::createQuaternionMsgFromYaw(0.0);\n+\n+  // init markers:\n+  visualization_msgs::MarkerArray occupiedNodesVis;\n+  // each array stores all cubes of a different size, one for each depth level:\n+  occupiedNodesVis.markers.resize(m_treeDepth+1);\n+\n+  // init pointcloud:\n+  pcl::PointCloud<pcl::PointXYZ> pclCloud;\n+\n+  // call pre-traversal hook:\n+  handlePreNodeTraversal(rostime);\n+\n+  // now, traverse all leafs in the tree:\n+  for (OcTreeROS::OcTreeType::iterator it = m_octoMap->octree.begin(m_maxTreeDepth),\n+      end = m_octoMap->octree.end(); it != end; ++it)\n+  {\n+\n+    // call general hook:\n+    handleNode(it);\n+\n+    if (m_octoMap->octree.isNodeOccupied(*it)){\n+      double z = it.getZ();\n+      if (z > m_occupancyMinZ && z < m_occupancyMaxZ)\n+      {\n+        double size = it.getSize();\n+        double x = it.getX();\n+        double y = it.getY();\n+\n+        // Ignore speckles in the map:\n+        if (m_filterSpeckles && (it.getDepth() == m_treeDepth +1) && isSpeckleNode(it.getKey())){\n+          ROS_DEBUG(\"Ignoring single speckle at (%f,%f,%f)\", x, y, z);\n+          continue;\n+        } // else: current octree node is no speckle, send it out\n+\n+        handleOccupiedNode(it);\n+\n+\n+        // create collision object:\n+        if (publishCollisionObject){\n+          collObjShape.dimensions[0] = collObjShape.dimensions[1] = collObjShape.dimensions[2] = size;\n+          collisionObject.shapes.push_back(collObjShape);\n+          pose.position.x = x;\n+          pose.position.y = y;\n+          pose.position.z = z;\n+          collisionObject.poses.push_back(pose);\n+        }\n+\n+        if (publishCollisionMap){\n+          collObjBox.extents.x = collObjBox.extents.y = collObjBox.extents.z = size;\n+\n+          collObjBox.center.x = x;\n+          collObjBox.center.y = y;\n+          collObjBox.center.z = z;\n+\n+          collisionMap.boxes.push_back(collObjBox);\n+\n+        }\n+\n+        //create marker:\n+        if (publishMarkerArray){\n+          unsigned idx = it.getDepth();\n+          assert(idx < occupiedNodesVis.markers.size());\n+\n+          geometry_msgs::Point cubeCenter;\n+          cubeCenter.x = x;\n+          cubeCenter.y = y;\n+          cubeCenter.z = z;\n+\n+          occupiedNodesVis.markers[idx].points.push_back(cubeCenter);\n+          if (m_useHeightMap){\n+            double minX, minY, minZ, maxX, maxY, maxZ;\n+            m_octoMap->octree.getMetricMin(minX, minY, minZ);\n+            m_octoMap->octree.getMetricMax(maxX, maxY, maxZ);\n+\n+            double h = (1.0 - std::min(std::max((cubeCenter.z-minZ)/ (maxZ - minZ), 0.0), 1.0)) *m_colorFactor;\n+            occupiedNodesVis.markers[idx].colors.push_back(heightMapColor(h));\n+          }\n+        }\n+\n+        // insert into pointcloud:\n+        if (publishPointCloud)\n+          pclCloud.push_back(pcl::PointXYZ(x, y, z));\n+\n+      }\n+    } else{ // node not occupied => mark as free in 2D map if unknown so far\n+      handleFreeNode(it);\n+    }\n+  }\n+\n+  // call post-traversal hook:\n+  handlePostNodeTraversal(rostime);\n+\n+  // finish MarkerArray:\n+  if (publishMarkerArray){\n+    for (unsigned i= 0; i < occupiedNodesVis.markers.size(); ++i){\n+      double size = m_octoMap->octree.getNodeSize(i);\n+\n+      occupiedNodesVis.markers[i].header.frame_id = m_worldFrameId;\n+      occupiedNodesVis.markers[i].header.stamp = rostime;\n+      occupiedNodesVis.markers[i].ns = \"map\";\n+      occupiedNodesVis.markers[i].id = i;\n+      occupiedNodesVis.markers[i].type = visualization_msgs::Marker::CUBE_LIST;\n+      occupiedNodesVis.markers[i].scale.x = size;\n+      occupiedNodesVis.markers[i].scale.y = size;\n+      occupiedNodesVis.markers[i].scale.z = size;\n+      occupiedNodesVis.markers[i].color = m_color;\n+\n+\n+      if (occupiedNodesVis.markers[i].points.size() > 0)\n+        occupiedNodesVis.markers[i].action = visualization_msgs::Marker::ADD;\n+      else\n+        occupiedNodesVis.markers[i].action = visualization_msgs::Marker::DELETE;\n+    }\n+\n+\n+    m_markerPub.publish(occupiedNodesVis);\n+  }\n+\n+  // finish pointcloud:\n+  if (publishPointCloud){\n+    sensor_msgs::PointCloud2 cloud;\n+    pcl::toROSMsg (pclCloud, cloud);\n+    cloud.header.frame_id = m_worldFrameId;\n+    cloud.header.stamp = rostime;\n+    m_pointCloudPub.publish(cloud);\n+  }\n+\n+  if (publishCollisionObject)\n+    m_collisionObjectPub.publish(collisionObject);\n+\n+  if (publishCollisionMap)\n+    m_cmapPub.publish(collisionMap);\n+\n+  if (publishOctoMap)\n+    publishMap(rostime);\n+\n+  double total_elapsed = (ros::WallTime::now() - startTime).toSec();\n+  ROS_DEBUG(\"Map publishing in OctomapServer took %f sec\", total_elapsed);\n+\n+}\n+\n+\n+bool OctomapServer::serviceCallback(octomap_msgs::GetOctomap::Request  &req,\n+\t\toctomap_msgs::GetOctomap::Response &res)\n+{\n+  ROS_INFO(\"Sending map data on service request\");\n+  res.map.header.frame_id = m_worldFrameId;\n+  res.map.header.stamp = ros::Time::now();\n+  octomap::octomapMapToMsgData(m_octoMap->octree, res.map.data);\n+\n+  return true;\n+}\n+\n+bool OctomapServer::clearBBXSrv(octomap_msgs::BoundingBoxQueryRequest& req, octomap_msgs::BoundingBoxQueryResponse& resp){\n+  OcTreeROS::OcTreeType::leaf_bbx_iterator it, end;\n+  point3d min = pointMsgToOctomap(req.min);\n+  point3d max = pointMsgToOctomap(req.max);\n+\n+  for(OcTreeROS::OcTreeType::leaf_bbx_iterator it = m_octoMap->octree.begin_leafs_bbx(min,max),\n+      end=m_octoMap->octree.end_leafs_bbx(); it!= end; ++it){\n+\n+    it->setLogOdds(octomap::logodds(m_thresMin));\n+    //\t\t\tm_octoMap->octree.updateNode(it.getKey(), -6.0f);\n+  }\n+  // TODO: eval which is faster (setLogOdds+updateInner or updateNode)\n+  m_octoMap->octree.updateInnerOccupancy();\n+\n+  publishAll(ros::Time::now());\n+\n+  return true;\n+}\n+\n+bool OctomapServer::resetSrv(std_srvs::Empty::Request& req, std_srvs::Empty::Response& resp) {\n+  visualization_msgs::MarkerArray occupiedNodesVis;\n+  occupiedNodesVis.markers.resize(m_treeDepth +1);\n+  ros::Time rostime = ros::Time::now();\n+  m_octoMap->octree.clear();\n+\n+  ROS_INFO(\"Cleared octomap\");\n+  publishMap(rostime);\n+  for (unsigned i= 0; i < occupiedNodesVis.markers.size(); ++i){\n+\n+    occupiedNodesVis.markers[i].header.frame_id = m_worldFrameId;\n+    occupiedNodesVis.markers[i].header.stamp = rostime;\n+    occupiedNodesVis.markers[i].ns = \"map\";\n+    occupiedNodesVis.markers[i].id = i;\n+    occupiedNodesVis.markers[i].type = visualization_msgs::Marker::CUBE_LIST;\n+    occupiedNodesVis.markers[i].action = visualization_msgs::Marker::DELETE;\n+  }\n+\n+\n+  m_markerPub.publish(occupiedNodesVis);\n+  return true;\n+}\n+\n+void OctomapServer::publishMap(const ros::Time& rostime) const{\n+\n+  octomap_msgs::OctomapBinary map;\n+  map.header.frame_id = m_worldFrameId;\n+  map.header.stamp = rostime;\n+\n+  octomap::octomapMapToMsgData(m_octoMap->octree, map.data);\n+\n+  m_binaryMapPub.publish(map);\n+}\n+\n+\n+void OctomapServer::filterGroundPlane(const PCLPointCloud& pc, PCLPointCloud& ground, PCLPointCloud& nonground) const{\n+  ground.header = pc.header;\n+  nonground.header = pc.header;\n+\n+  if (pc.size() < 50){\n+    ROS_WARN(\"Pointcloud in OctomapServer too small, skipping ground plane extraction\");\n+    nonground = pc;\n+  } else {\n+    // plane detection for ground plane removal:\n+    pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);\n+    pcl::PointIndices::Ptr inliers (new pcl::PointIndices);\n+\n+    // Create the segmentation object and set up:\n+    pcl::SACSegmentation<pcl::PointXYZ> seg;\n+    seg.setOptimizeCoefficients (true);\n+    // TODO: maybe a filtering based on the surface normals might be more robust / accurate?\n+    seg.setModelType(pcl::SACMODEL_PERPENDICULAR_PLANE);\n+    seg.setMethodType(pcl::SAC_RANSAC);\n+    seg.setMaxIterations(200);\n+    seg.setDistanceThreshold (m_groundFilterDistance);\n+    seg.setAxis(Eigen::Vector3f(0,0,1));\n+    seg.setEpsAngle(m_groundFilterAngle);\n+\n+\n+    PCLPointCloud cloud_filtered(pc);\n+    // Create the filtering object\n+    pcl::ExtractIndices<pcl::PointXYZ> extract;\n+    bool groundPlaneFound = false;\n+\n+    while(cloud_filtered.size() > 10 && !groundPlaneFound){\n+      seg.setInputCloud(cloud_filtered.makeShared());\n+      seg.segment (*inliers, *coefficients);\n+      if (inliers->indices.size () == 0){\n+        ROS_WARN(\"No plane found in cloud.\");\n+\n+        break;\n+      }\n+\n+      extract.setInputCloud(cloud_filtered.makeShared());\n+      extract.setIndices(inliers);\n+\n+      if (std::abs(coefficients->values.at(3)) < m_groundFilterPlaneDistance){\n+        ROS_DEBUG(\"Ground plane found: %zu/%zu inliers. Coeff: %f %f %f %f\", inliers->indices.size(), cloud_filtered.size(),\n+                  coefficients->values.at(0), coefficients->values.at(1), coefficients->values.at(2), coefficients->values.at(3));\n+        extract.setNegative (false);\n+        extract.filter (ground);\n+\n+        // remove ground points from full pointcloud:\n+        // workaround for PCL bug:\n+        if(inliers->indices.size() != cloud_filtered.size()){\n+          extract.setNegative(true);\n+          PCLPointCloud cloud_out;\n+          extract.filter(cloud_out);\n+          nonground += cloud_out;\n+          cloud_filtered = cloud_out;\n+        }\n+\n+        groundPlaneFound = true;\n+      } else{\n+        ROS_DEBUG(\"Horizontal plane (not ground) found: %zu/%zu inliers. Coeff: %f %f %f %f\", inliers->indices.size(), cloud_filtered.size(),\n+                  coefficients->values.at(0), coefficients->values.at(1), coefficients->values.at(2), coefficients->values.at(3));\n+        pcl::PointCloud<pcl::PointXYZ> cloud_out;\n+        extract.setNegative (false);\n+        extract.filter(cloud_out);\n+        nonground +=cloud_out;\n+        // debug\n+        //            pcl::PCDWriter writer;\n+        //            writer.write<pcl::PointXYZ>(\"nonground_plane.pcd\",cloud_out, false);\n+\n+        // remove current plane from scan for next iteration:\n+        // workaround for PCL bug:\n+        if(inliers->indices.size() != cloud_filtered.size()){\n+          extract.setNegative(true);\n+          cloud_out.points.clear();\n+          extract.filter(cloud_out);\n+          cloud_filtered = cloud_out;\n+        } else{\n+          cloud_filtered.points.clear();\n+        }\n+      }\n+\n+    }\n+    // TODO: also do this if overall starting pointcloud too small?\n+    if (!groundPlaneFound){ // no plane found or remaining points too small\n+      ROS_WARN(\"No ground plane found in scan\");\n+\n+      // do a rough fitlering on height to prevent spurious obstacles\n+      pcl::PassThrough<pcl::PointXYZ> second_pass;\n+      second_pass.setFilterFieldName(\"z\");\n+      second_pass.setFilterLimits(-m_groundFilterPlaneDistance, m_groundFilterPlaneDistance);\n+      second_pass.setInputCloud(pc.makeShared());\n+      second_pass.filter(ground);\n+\n+      second_pass.setFilterLimitsNegative (true);\n+      second_pass.filter(nonground);\n+    }\n+\n+    // debug:\n+    //        pcl::PCDWriter writer;\n+    //        if (pc_ground.size() > 0)\n+    //          writer.write<pcl::PointXYZ>(\"ground.pcd\",pc_ground, false);\n+    //        if (pc_nonground.size() > 0)\n+    //          writer.write<pcl::PointXYZ>(\"nonground.pcd\",pc_nonground, false);\n+\n+  }\n+\n+\n+}\n+\n+void OctomapServer::handlePreNodeTraversal(const ros::Time& rostime){\n+  if (m_publish2DMap){\n+    // init projected 2D map:\n+    m_gridmap.header.frame_id = m_worldFrameId;\n+    m_gridmap.header.stamp = rostime;\n+    bool sizeChanged = false;\n+\n+    // TODO: move most of this stuff into c'tor and init map only once (adjust if size changes)\n+    double minX, minY, minZ, maxX, maxY, maxZ;\n+    m_octoMap->octree.getMetricMin(minX, minY, minZ);\n+    m_octoMap->octree.getMetricMax(maxX, maxY, maxZ);\n+\n+    octomap::point3d minPt(minX, minY, minZ);\n+    octomap::point3d maxPt(maxX, maxY, maxZ);\n+    octomap::OcTreeKey minKey, maxKey, curKey;\n+    if (!m_octoMap->octree.genKey(minPt, minKey)){\n+      ROS_ERROR(\"Could not create min OcTree key at %f %f %f\", minPt.x(), minPt.y(), minPt.z());\n+      return;\n+    }\n+\n+    if (!m_octoMap->octree.genKey(maxPt, maxKey)){\n+      ROS_ERROR(\"Could not create max OcTree key at %f %f %f\", maxPt.x(), maxPt.y(), maxPt.z());\n+      return;\n+    }\n+    m_octoMap->octree.genKeyAtDepth(minKey, m_maxTreeDepth, minKey);\n+    m_octoMap->octree.genKeyAtDepth(maxKey, m_maxTreeDepth, maxKey);\n+\n+    ROS_DEBUG(\"MinKey: %d %d %d / MaxKey: %d %d %d\", minKey[0], minKey[1], minKey[2], maxKey[0], maxKey[1], maxKey[2]);\n+\n+    // add padding if requested (= new min/maxPts in x&y):\n+    double halfPaddedX = 0.5*m_minSizeX;\n+    double halfPaddedY = 0.5*m_minSizeY;\n+    minX = std::min(minX, -halfPaddedX);\n+    maxX = std::max(maxX, halfPaddedX);\n+    minY = std::min(minY, -halfPaddedY);\n+    maxY = std::max(maxY, halfPaddedY);\n+    minPt = octomap::point3d(minX, minY, minZ);\n+    maxPt = octomap::point3d(maxX, maxY, maxZ);\n+\n+    OcTreeKey paddedMaxKey;\n+    if (!m_octoMap->octree.genKey(minPt, m_paddedMinKey)){\n+      ROS_ERROR(\"Could not create padded min OcTree key at %f %f %f\", minPt.x(), minPt.y(), minPt.z());\n+      return;\n+    }\n+    if (!m_octoMap->octree.genKey(maxPt, paddedMaxKey)){\n+      ROS_ERROR(\"Could not create padded max OcTree key at %f %f %f\", maxPt.x(), maxPt.y(), maxPt.z());\n+      return;\n+    }\n+    m_octoMap->octree.genKeyAtDepth(m_paddedMinKey, m_maxTreeDepth, m_paddedMinKey);\n+    m_octoMap->octree.genKeyAtDepth(paddedMaxKey, m_maxTreeDepth, paddedMaxKey);\n+\n+    ROS_DEBUG(\"Padded MinKey: %d %d %d / padded MaxKey: %d %d %d\", m_paddedMinKey[0], m_paddedMinKey[1], m_paddedMinKey[2], paddedMaxKey[0], paddedMaxKey[1], paddedMaxKey[2]);\n+    assert(paddedMaxKey[0] >= maxKey[0] && paddedMaxKey[1] >= maxKey[1]);\n+\n+    m_multires2DScale = 1 << (m_treeDepth - m_maxTreeDepth);\n+    unsigned int newWidth = (paddedMaxKey[0] - m_paddedMinKey[0])/m_multires2DScale +1;\n+    unsigned int newHeight = (paddedMaxKey[1] - m_paddedMinKey[1])/m_multires2DScale +1;\n+\n+    if (newWidth != m_gridmap.info.width || newHeight != m_gridmap.info.height)\n+      sizeChanged = true;\n+\n+    m_gridmap.info.width = newWidth;\n+    m_gridmap.info.height = newHeight;\n+    int mapOriginX = minKey[0] - m_paddedMinKey[0];\n+    int mapOriginY = minKey[1] - m_paddedMinKey[1];\n+    assert(mapOriginX >= 0 && mapOriginY >= 0);\n+\n+    // might not exactly be min / max of octree:\n+    octomap::point3d origin;\n+    m_octoMap->octree.genCoords(m_paddedMinKey, m_treeDepth, origin);\n+    double gridRes = m_octoMap->octree.getNodeSize(m_maxTreeDepth);\n+    m_gridmap.info.resolution = gridRes;\n+    m_gridmap.info.origin.position.x = origin.x() - gridRes*0.5;\n+    m_gridmap.info.origin.position.y = origin.y() - gridRes*0.5;\n+    if (m_maxTreeDepth != m_treeDepth){\n+      m_gridmap.info.origin.position.x -= m_res/2.0;\n+      m_gridmap.info.origin.position.y -= m_res/2.0;\n+\n+    }\n+\n+\n+    if (sizeChanged){\n+      ROS_INFO(\"2D grid map size changed to %d x %d\", m_gridmap.info.width, m_gridmap.info.height);\n+      m_gridmap.data.clear();\n+      // init to unknown:\n+      m_gridmap.data.resize(m_gridmap.info.width * m_gridmap.info.height, -1);\n+    }\n+\n+\n+  }\n+\n+}\n+\n+void OctomapServer::handlePostNodeTraversal(const ros::Time& rostime){\n+\n+  if (m_publish2DMap)\n+    m_mapPub.publish(m_gridmap);\n+}\n+\n+void OctomapServer::handleOccupiedNode(const OcTreeROS::OcTreeType::iterator& it){\n+\n+  // update 2D map (occupied always overrides):\n+  if (m_publish2DMap){\n+    if (it.getDepth() == m_maxTreeDepth){\n+      m_gridmap.data[mapIdx(it.getKey())] = 100;\n+    } else{\n+      int intSize = 1 << (m_maxTreeDepth - it.getDepth());\n+      octomap::OcTreeKey minKey=it.getIndexKey();\n+      for(int dx=0; dx < intSize; dx++){\n+        int i = (minKey[0]+dx - m_paddedMinKey[0])/m_multires2DScale;\n+        for(int dy=0; dy < intSize; dy++){\n+          int j = (minKey[1]+dy - m_paddedMinKey[1])/m_multires2DScale;\n+          m_gridmap.data[mapIdx(i,j)] = 100;\n+        }\n+      }\n+    }\n+  }\n+\n+}\n+\n+void OctomapServer::handleFreeNode(const OcTreeROS::OcTreeType::iterator& it){\n+\n+  if (m_publish2DMap){\n+    if (it.getDepth() == m_maxTreeDepth){\n+      unsigned idx = mapIdx(it.getKey());\n+      if (m_gridmap.data[idx] == -1){\n+        m_gridmap.data[idx] = 0;\n+      }\n+    } else{\n+      int intSize = 1 << (m_treeDepth - it.getDepth());\n+      octomap::OcTreeKey minKey=it.getIndexKey();\n+      for(int dx=0; dx < intSize; dx++){\n+        int i = (minKey[0]+dx - m_paddedMinKey[0])/m_multires2DScale;\n+        for(int dy=0; dy < intSize; dy++){\n+          unsigned idx = mapIdx(i, (minKey[1]+dy - m_paddedMinKey[1])/m_multires2DScale);\n+          if (m_gridmap.data[idx] == -1){\n+            m_gridmap.data[idx] = 0;\n+          }\n+        }\n+      }\n+    }\n+  }\n+}\n+\n+\n+\n+bool OctomapServer::isSpeckleNode(const OcTreeKey&nKey) const {\n+  OcTreeKey key;\n+  bool neighborFound = false;\n+  for (key[2] = nKey[2] - 1; !neighborFound && key[2] <= nKey[2] + 1; ++key[2]){\n+    for (key[1] = nKey[1] - 1; !neighborFound && key[1] <= nKey[1] + 1; ++key[1]){\n+      for (key[0] = nKey[0] - 1; !neighborFound && key[0] <= nKey[0] + 1; ++key[0]){\n+        if (key != nKey){\n+          OcTreeNode* node = m_octoMap->octree.search(key);\n+          if (node && m_octoMap->octree.isNodeOccupied(node)){\n+            // we have a neighbor => break!\n+            neighborFound = true;\n+          }\n+        }\n+      }\n+    }\n+  }\n+\n+  return neighborFound;\n+}\n+\n+void OctomapServer::reconfigureCallback(octomap_server::OctomapServerConfig& config, uint32_t level){\n+  if (m_maxTreeDepth != unsigned(config.max_depth)){\n+    m_maxTreeDepth = unsigned(config.max_depth);\n+\n+  publishAll();\n+  }\n+\n+\n+}\n+\n+std_msgs::ColorRGBA OctomapServer::heightMapColor(double h) const {\n+\n+  std_msgs::ColorRGBA color;\n+  color.a = 1.0;\n+  // blend over HSV-values (more colors)\n+\n+  double s = 1.0;\n+  double v = 1.0;\n+\n+  h -= floor(h);\n+  h *= 6;\n+  int i;\n+  double m, n, f;\n+\n+  i = floor(h);\n+  f = h - i;\n+  if (!(i & 1))\n+    f = 1 - f; // if i is even\n+  m = v * (1 - s);\n+  n = v * (1 - s * f);\n+\n+  switch (i) {\n+    case 6:\n+    case 0:\n+      color.r = v; color.g = n; color.b = m;\n+      break;\n+    case 1:\n+      color.r = n; color.g = v; color.b = m;\n+      break;\n+    case 2:\n+      color.r = m; color.g = v; color.b = n;\n+      break;\n+    case 3:\n+      color.r = m; color.g = n; color.b = v;\n+      break;\n+    case 4:\n+      color.r = n; color.g = m; color.b = v;\n+      break;\n+    case 5:\n+      color.r = v; color.g = m; color.b = n;\n+      break;\n+    default:\n+      color.r = 1; color.g = 0.5; color.b = 0.5;\n+      break;\n+  }\n+\n+  return color;\n+}\n+}\n+\n+\n+"
+        },
+        {
+          "sha": "435458b6f72cb5265e2b1b4113cac294e3f26a10",
+          "filename": "octomap_server/src/OctomapServerMultilayer.cpp",
+          "status": "added",
+          "additions": 237,
+          "deletions": 0,
+          "changes": 237,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Fsrc%2FOctomapServerMultilayer.cpp",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Fsrc%2FOctomapServerMultilayer.cpp",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fsrc%2FOctomapServerMultilayer.cpp?ref=34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+          "patch": "@@ -0,0 +1,237 @@\n+/*\n+ * Copyright (c) 2011-2012, A. Hornung, M. Philips\n+ * All rights reserved.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ *\n+ *     * Redistributions of source code must retain the above copyright\n+ *       notice, this list of conditions and the following disclaimer.\n+ *     * Redistributions in binary form must reproduce the above copyright\n+ *       notice, this list of conditions and the following disclaimer in the\n+ *       documentation and/or other materials provided with the distribution.\n+ *     * Neither the name of the University of Freiburg nor the names of its\n+ *       contributors may be used to endorse or promote products derived from\n+ *       this software without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE\n+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+ * POSSIBILITY OF SUCH DAMAGE.\n+ */\n+\n+#include <octomap_server/OctomapServerMultilayer.h>\n+\n+using namespace octomap;\n+\n+namespace octomap_server{\n+\n+\n+\n+OctomapServerMultilayer::OctomapServerMultilayer()\n+: OctomapServer(),\n+  m_haveAttachedObject(false)\n+{\n+\n+  m_attachedObjectsSub = m_nh.subscribe(\"attached_collision_object\", 1, &OctomapServerMultilayer::attachedCallback, this);\n+\n+  // TODO: param maps, limits\n+  // right now 0: base, 1: spine, 2: arms\n+  ProjectedMap m;\n+  m.name = \"projected_base_map\";\n+  m.minZ = 0.0;\n+  m.maxZ = 0.3;\n+  m.z = 0.0;\n+  m_multiGridmap.push_back(m);\n+\n+  m.name = \"projected_spine_map\";\n+  m.minZ = 0.25;\n+  m.maxZ = 1.4;\n+  m.z = 0.6;\n+  m_multiGridmap.push_back(m);\n+\n+  m.name = \"projected_arm_map\";\n+  m.minZ = 0.7;\n+  m.maxZ = 0.9;\n+  m.z = 0.8;\n+  m_multiGridmap.push_back(m);\n+\n+\n+  for (unsigned i = 0; i < m_multiGridmap.size(); ++i){\n+    ros::Publisher* pub = new ros::Publisher(m_nh.advertise<nav_msgs::OccupancyGrid>(m_multiGridmap.at(i).name, 5, m_latchedTopics));\n+    m_multiMapPub.push_back(pub);\n+  }\n+\n+}\n+\n+OctomapServerMultilayer::~OctomapServerMultilayer(){\n+  for (unsigned i = 0; i < m_multiMapPub.size(); ++i){\n+    delete m_multiMapPub[i];\n+  }\n+\n+}\n+\n+void OctomapServerMultilayer::attachedCallback(const arm_navigation_msgs::AttachedCollisionObjectConstPtr& msg){\n+  ROS_DEBUG(\"AttachedCollisionObjects received\");\n+  m_haveAttachedObject = (msg->object.operation.operation == arm_navigation_msgs::CollisionObjectOperation::ATTACH_AND_REMOVE_AS_OBJECT);\n+  if(m_haveAttachedObject){\n+    m_attachedFrame = msg->link_name;\n+    m_attachedMaxOffset = msg->object.poses.back().position.z + msg->object.shapes.back().dimensions[1];\n+    m_attachedMinOffset = msg->object.poses.back().position.z - msg->object.shapes.back().dimensions[1];\n+  }\n+}\n+\n+void OctomapServerMultilayer::handlePreNodeTraversal(const ros::Time& rostime){\n+  // multilayer server always publishes 2D maps:\n+  m_publish2DMap = true;\n+\n+  OctomapServer::handlePreNodeTraversal(rostime);\n+\n+  for (MultilevelGrid::iterator it = m_multiGridmap.begin(); it != m_multiGridmap.end(); ++it){\n+    it->map.header = m_gridmap.header;\n+    it->map.info = m_gridmap.info;\n+    it->map.data.clear();\n+    it->map.data.resize(m_gridmap.data.size(), -1);\n+    it->map.info.origin.position.z = it->z;\n+  }\n+}\n+\n+void OctomapServerMultilayer::handlePostNodeTraversal(const ros::Time& rostime){\n+\n+  // TODO: calc tall / short obs. cells for arm layer, => temp arm layer\n+//  std::vector<int> shortObsCells;\n+//  for(unsigned int i=0; i<arm_map.data.size(); i++){\n+//    if(temp_arm_map.data[i] == 0){\n+//      if(map.data[i] == -1)\n+//        arm_map.data[i] = -1;\n+//    }\n+//    else if(arm_map.data[i] == 0)\n+//      arm_map.data[i] = 0;\n+//    else if(double(arm_map.data[i])/temp_arm_map.data[i] > 0.8)\n+//      arm_map.data[i] = 101;\n+//    else{\n+//      arm_map.data[i] = 100;\n+//      shortObsCells.push_back(i);\n+//    }\n+//  }\n+//\n+//  std::vector<int> tallObsCells;\n+//  tallObsCells.reserve(shortObsCells.size());\n+//  int dxy[8] = {-arm_map.info.width-1, -arm_map.info.width, -arm_map.info.width+1, -1, 1, arm_map.info.width-1, arm_map.info.width, arm_map.info.width+1};\n+//  for(unsigned int i=0; i<shortObsCells.size(); i++){\n+//    for(int j=0; j<8; j++){\n+//      int temp = shortObsCells[i]+dxy[j];\n+//      if(temp<0 || temp>=arm_map.data.size())\n+//        continue;\n+//      if(arm_map.data[temp]==101){\n+//        tallObsCells.push_back(shortObsCells[i]);\n+//        break;\n+//      }\n+//    }\n+//  }\n+//  for(unsigned int i=0; i<tallObsCells.size(); i++)\n+//    arm_map.data[tallObsCells[i]] = 101;\n+\n+\n+\n+  OctomapServer::handlePostNodeTraversal(rostime);\n+\n+  for (unsigned i = 0; i < m_multiMapPub.size(); ++i){\n+    m_multiMapPub[i]->publish(m_multiGridmap.at(i).map);\n+  }\n+\n+}\n+\n+void OctomapServerMultilayer::handleOccupiedNode(const OcTreeROS::OcTreeType::iterator& it){\n+  double z = it.getZ();\n+  double s2 = it.getSize()/2.0;\n+  std::vector<bool> inMapLevel(m_multiGridmap.size(), false);\n+  for (unsigned i = 0; i < m_multiGridmap.size(); ++i){\n+    if (z+s2 >= m_multiGridmap[i].minZ && z-s2 <= m_multiGridmap[i].maxZ){\n+      inMapLevel[i] = true;\n+    }\n+  }\n+\n+\n+  if (it.getDepth() == m_maxTreeDepth){\n+    unsigned idx = mapIdx(it.getKey());\n+    m_gridmap.data[idx] = 100;\n+\n+    for (unsigned i = 0; i < inMapLevel.size(); ++i){\n+      if (inMapLevel[i])\n+        m_multiGridmap[i].map.data[idx] = 100;\n+    }\n+  } else{\n+    int intSize = 1 << (m_maxTreeDepth - it.getDepth());\n+    octomap::OcTreeKey minKey=it.getIndexKey();\n+    for(int dx=0; dx < intSize; dx++){\n+      int i = (minKey[0]+dx - m_paddedMinKey[0])/m_multires2DScale;\n+      for(int dy=0; dy < intSize; dy++){\n+        int j = (minKey[1]+dy - m_paddedMinKey[1])/m_multires2DScale;\n+        unsigned idx = mapIdx(i,j);\n+        m_gridmap.data[idx] = 100;\n+\n+        for (unsigned i = 0; i < inMapLevel.size(); ++i){\n+          if (inMapLevel[i])\n+            m_multiGridmap[i].map.data[idx] = 100;\n+        }\n+\n+      }\n+    }\n+  }\n+\n+}\n+\n+void OctomapServerMultilayer::handleFreeNode(const OcTreeROS::OcTreeType::iterator& it){\n+  double z = it.getZ();\n+  double s2 = it.getSize()/2.0;\n+  std::vector<bool> inMapLevel(m_multiGridmap.size(), false);\n+  for (unsigned i = 0; i < m_multiGridmap.size(); ++i){\n+    if (z+s2 >= m_multiGridmap[i].minZ && z-s2 <= m_multiGridmap[i].maxZ){\n+      inMapLevel[i] = true;\n+    }\n+  }\n+\n+  if (it.getDepth() == m_maxTreeDepth){\n+    unsigned idx = mapIdx(it.getKey());\n+    if (m_gridmap.data[idx] == -1){\n+      m_gridmap.data[idx] = 0;\n+    }\n+\n+    for (unsigned i = 0; i < inMapLevel.size(); ++i){\n+      if (inMapLevel[i] && m_multiGridmap[i].map.data[idx] == -1)\n+        m_multiGridmap[i].map.data[idx] = 0;\n+    }\n+\n+  } else{\n+    int intSize = 1 << (m_treeDepth - it.getDepth());\n+    octomap::OcTreeKey minKey=it.getIndexKey();\n+    for(int dx=0; dx < intSize; dx++){\n+      int i = (minKey[0]+dx - m_paddedMinKey[0])/m_multires2DScale;\n+      for(int dy=0; dy < intSize; dy++){\n+        unsigned idx = mapIdx(i, (minKey[1]+dy - m_paddedMinKey[1])/m_multires2DScale);\n+        if (m_gridmap.data[idx] == -1){\n+          m_gridmap.data[idx] = 0;\n+        }\n+\n+        for (unsigned i = 0; i < inMapLevel.size(); ++i){\n+          if (inMapLevel[i] && m_multiGridmap[i].map.data[idx] == -1)\n+            m_multiGridmap[i].map.data[idx] = 0;\n+        }\n+\n+      }\n+    }\n+  }\n+\n+}\n+}\n+\n+\n+"
+        },
+        {
+          "sha": "1135f492830f2129986711a4e6cda508a75c328b",
+          "filename": "octomap_server/src/TrackingOctomapServer.cpp",
+          "status": "added",
+          "additions": 147,
+          "deletions": 0,
+          "changes": 147,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Fsrc%2FTrackingOctomapServer.cpp",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Fsrc%2FTrackingOctomapServer.cpp",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fsrc%2FTrackingOctomapServer.cpp?ref=34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+          "patch": "@@ -0,0 +1,147 @@\n+/*\n+ * Copyright (c) 2012, D. Kuhner, P. Ruchti, University of Freiburg\n+ * All rights reserved.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ *\n+ *     * Redistributions of source code must retain the above copyright\n+ *       notice, this list of conditions and the following disclaimer.\n+ *     * Redistributions in binary form must reproduce the above copyright\n+ *       notice, this list of conditions and the following disclaimer in the\n+ *       documentation and/or other materials provided with the distribution.\n+ *     * Neither the name of the University of Freiburg nor the names of its\n+ *       contributors may be used to endorse or promote products derived from\n+ *       this software without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE\n+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+ * POSSIBILITY OF SUCH DAMAGE.\n+ */\n+\n+#include <octomap_server/TrackingOctomapServer.h>\n+#include <string>\n+\n+using namespace octomap;\n+\n+namespace octomap_server {\n+\n+TrackingOctomapServer::TrackingOctomapServer(const std::string& filename) :\n+\t    OctomapServer()\n+{\n+  //read tree if necessary\n+  if (filename != \"\") {\n+    if (m_octoMap->octree.readBinary(filename)) {\n+      ROS_INFO(\"Octomap file %s loaded (%zu nodes).\", filename.c_str(), m_octoMap->octree.size());\n+      m_treeDepth = m_octoMap->octree.getTreeDepth();\n+      m_res = m_octoMap->octree.getResolution();\n+      m_gridmap.info.resolution = m_res;\n+\n+      publishAll();\n+    } else {\n+      ROS_ERROR(\"Could not open requested file %s, exiting.\", filename.c_str());\n+      exit(-1);\n+    }\n+  }\n+\n+  ros::NodeHandle private_nh(\"~\");\n+\n+  std::string changeSetTopic = \"changes\";\n+\n+  private_nh.param(\"topic_changes\", changeSetTopic, changeSetTopic);\n+  private_nh.param(\"track_changes\", track_changes, false);\n+  private_nh.param(\"listen_changes\", listen_changes, false);\n+\n+  if (track_changes && listen_changes) {\n+    ROS_WARN(\"OctoMapServer: It might not be useful to publish changes and at the same time listen to them.\"\n+        \"Setting 'track_changes' to false!\");\n+    track_changes = false;\n+  }\n+\n+  if (track_changes) {\n+    ROS_INFO(\"starting server\");\n+    pubChangeSet = private_nh.advertise<sensor_msgs::PointCloud2>(\n+        changeSetTopic, 1);\n+    m_octoMap->octree.enableChangeDetection(true);\n+  }\n+\n+  if (listen_changes) {\n+    ROS_INFO(\"starting client\");\n+    subChangeSet = private_nh.subscribe(changeSetTopic, 1,\n+                                        &TrackingOctomapServer::trackCallback, this);\n+  }\n+}\n+\n+TrackingOctomapServer::~TrackingOctomapServer() {\n+}\n+\n+void TrackingOctomapServer::insertScan(const tf::Point & sensorOrigin, const PCLPointCloud & ground, const PCLPointCloud & nonground) {\n+  OctomapServer::insertScan(sensorOrigin, ground, nonground);\n+\n+  if (track_changes) {\n+    trackChanges();\n+  }\n+}\n+\n+void TrackingOctomapServer::trackChanges() {\n+  KeyBoolMap::const_iterator startPnt = m_octoMap->octree.changedKeysBegin();\n+  KeyBoolMap::const_iterator endPnt = m_octoMap->octree.changedKeysEnd();\n+\n+  pcl::PointCloud<pcl::PointXYZI> changedCells = pcl::PointCloud<pcl::PointXYZI>();\n+\n+  int c = 0;\n+  for (KeyBoolMap::const_iterator iter = startPnt; iter != endPnt; ++iter) {\n+    c++;\n+    OcTreeNode* node = m_octoMap->octree.search(iter->first);\n+\n+    bool occupied = m_octoMap->octree.isNodeOccupied(node);\n+\n+    pcl::PointXYZI pnt;\n+    pnt.x = iter->first.k[0];\n+    pnt.y = iter->first.k[1];\n+    pnt.z = iter->first.k[2];\n+\n+    if (occupied) {\n+      pnt.intensity = 1000;\n+    }\n+    else {\n+      pnt.intensity = -1000;\n+    }\n+\n+    changedCells.push_back(pnt);\n+  }\n+\n+  sensor_msgs::PointCloud2 changed;\n+  pcl::toROSMsg(changedCells, changed);\n+  changed.header.frame_id = \"/talker/changes\";\n+  changed.header.stamp = ros::Time().now();\n+  pubChangeSet.publish(changed);\n+  ROS_DEBUG(\"[server] sending %d changed entries\", (int)changedCells.size());\n+\n+  m_octoMap->octree.resetChangeDetection();\n+  ROS_DEBUG(\"[server] octomap size after updating: %d\", (int)m_octoMap->octree.calcNumNodes());\n+}\n+\n+void TrackingOctomapServer::trackCallback(sensor_msgs::PointCloud2Ptr cloud) {\n+  pcl::PointCloud<pcl::PointXYZI> cells;\n+  pcl::fromROSMsg(*cloud, cells);\n+  ROS_DEBUG(\"[client] size of newly occupied cloud: %i\", (int)cells.points.size());\n+\n+  for (size_t i = 0; i < cells.points.size(); i++) {\n+    pcl::PointXYZI& pnt = cells.points[i];\n+    m_octoMap->octree.updateNode(OcTreeKey(pnt.x, pnt.y, pnt.z), pnt.intensity, false);\n+  }\n+\n+  m_octoMap->octree.updateInnerOccupancy();\n+  ROS_DEBUG(\"[client] octomap size after updating: %d\", (int)m_octoMap->octree.calcNumNodes());\n+}\n+\n+} /* namespace octomap */"
+        },
+        {
+          "sha": "4a001129fb5e16beba562accd1e4d42d34ece25a",
+          "filename": "octomap_server/src/octomap_saver.cpp",
+          "status": "added",
+          "additions": 107,
+          "deletions": 0,
+          "changes": 107,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Fsrc%2Foctomap_saver.cpp",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Fsrc%2Foctomap_saver.cpp",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fsrc%2Foctomap_saver.cpp?ref=34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+          "patch": "@@ -0,0 +1,107 @@\n+/**\n+* octomap_saver: Simple example which requests binary octomaps and stores them to a file.\n+*\n+* @author A. Hornung, University of Freiburg, Copyright (C) 2009.\n+* @see http://octomap.sourceforge.net/\n+* License: BSD\n+*/\n+\n+/*\n+ * Copyright (c) 2010, A. Hornung, University of Freiburg\n+ * All rights reserved.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ *\n+ *     * Redistributions of source code must retain the above copyright\n+ *       notice, this list of conditions and the following disclaimer.\n+ *     * Redistributions in binary form must reproduce the above copyright\n+ *       notice, this list of conditions and the following disclaimer in the\n+ *       documentation and/or other materials provided with the distribution.\n+ *     * Neither the name of the University of Freiburg nor the names of its\n+ *       contributors may be used to endorse or promote products derived from\n+ *       this software without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE\n+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+ * POSSIBILITY OF SUCH DAMAGE.\n+ */\n+\n+#include <ros/ros.h>\n+#include <octomap_msgs/GetOctomap.h>\n+#include <octomap_ros/conversions.h>\n+#include <octomap/octomap.h>\n+#include <fstream>\n+\n+#define USAGE \"\\nUSAGE: octomap_saver <map.bt>\\n\" \\\n+\t\t\"  map.bt: filename of map to be saved\\n\"\n+\n+using namespace std;\n+\n+/**\n+* @brief Map generation node.\n+*/\n+class MapSaver{\n+public:\n+  MapSaver(const std::string& mapname){\n+    ros::NodeHandle n;\n+    const static std::string servname = \"octomap_binary\";\n+    ROS_INFO(\"Requesting the map from %s...\", n.resolveName(servname).c_str());\n+    octomap_msgs::GetOctomap::Request req;\n+    octomap_msgs::GetOctomap::Response resp;\n+    while(n.ok() && !ros::service::call(servname, req, resp))\n+    {\n+      ROS_WARN(\"Request to %s failed; trying again...\", n.resolveName(servname).c_str());\n+      usleep(1000000);\n+    }\n+\n+    if (n.ok()){ // skip when CTRL-C\n+      ROS_INFO(\"Map received, saving to %s\", mapname.c_str());\n+      ofstream mapfile(mapname.c_str(), ios_base::binary);\n+\n+      if (!mapfile.is_open()){\n+        ROS_ERROR(\"Could not open file %s for writing\", mapname.c_str());\n+      } else {\n+        octomap::OcTree octomap(0.1);\n+        octomap::octomapMsgToMap(resp.map, octomap);\n+        octomap.writeBinary(mapname);\n+\n+        ROS_INFO(\"Finished writing %d nodes to file %s (res: %f)\", octomap.size(), mapname.c_str(), octomap.getResolution());\n+\n+        // write out stream directly (old format, no header)\n+        //mapfile.write((char*)&resp.map.data[0], resp.map.data.size());\n+        //mapfile.close();\n+      }\n+    }\n+  }\n+};\n+\n+int main(int argc, char** argv){\n+  ros::init(argc, argv, \"octomap_saver\");\n+  std::string mapFilename(\"\");\n+  if (argc == 2)\n+    mapFilename = std::string(argv[1]);\n+  else{\n+    ROS_ERROR(\"%s\", USAGE);\n+    exit(-1);\n+  }\n+\n+  try{\n+    MapSaver ms(mapFilename);\n+  }catch(std::runtime_error& e){\n+    ROS_ERROR(\"map_saver exception: %s\", e.what());\n+    return -1;\n+  }\n+\n+  return 0;\n+}\n+\n+"
+        },
+        {
+          "sha": "6476e451406f8fe6bbffddea373c0d6aaad21546",
+          "filename": "octomap_server/src/octomap_server_multilayer.cpp",
+          "status": "added",
+          "additions": 77,
+          "deletions": 0,
+          "changes": 77,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Fsrc%2Foctomap_server_multilayer.cpp",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Fsrc%2Foctomap_server_multilayer.cpp",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fsrc%2Foctomap_server_multilayer.cpp?ref=34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+          "patch": "@@ -0,0 +1,77 @@\n+/**\n+* octomap_server: A Tool to serve 3D OctoMaps in ROS (binary and as visualization)\n+* (inspired by the ROS map_saver)\n+* @author A. Hornung, University of Freiburg, Copyright (C) 2009 - 2012.\n+* @see http://octomap.sourceforge.net/\n+* License: BSD\n+*/\n+\n+/*\n+ * Copyright (c) 2009-2012, A. Hornung, University of Freiburg\n+ * All rights reserved.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ *\n+ *     * Redistributions of source code must retain the above copyright\n+ *       notice, this list of conditions and the following disclaimer.\n+ *     * Redistributions in binary form must reproduce the above copyright\n+ *       notice, this list of conditions and the following disclaimer in the\n+ *       documentation and/or other materials provided with the distribution.\n+ *     * Neither the name of the University of Freiburg nor the names of its\n+ *       contributors may be used to endorse or promote products derived from\n+ *       this software without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE\n+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+ * POSSIBILITY OF SUCH DAMAGE.\n+ */\n+\n+\n+#include <ros/ros.h>\n+#include <octomap_server/OctomapServerMultilayer.h>\n+\n+#define USAGE \"\\nUSAGE: octomap_server_multilayer <map.bt>\\n\" \\\n+\t\t\"  map.bt: inital octomap 3D map file to read\\n\"\n+\n+using namespace octomap_server;\n+\n+int main(int argc, char** argv){\n+  ros::init(argc, argv, \"octomap_server_multilayer\");\n+  std::string mapFilename(\"\");\n+\n+  if (argc > 2 || (argc == 2 && std::string(argv[1]) == \"-h\")){\n+    ROS_ERROR(\"%s\", USAGE);\n+    exit(-1);\n+  }\n+\n+\n+  OctomapServerMultilayer server;\n+  ros::spinOnce();\n+\n+  if (argc == 2){\n+    mapFilename = std::string(argv[1]);\n+    if (!server.openFile(mapFilename))\n+      exit(1);\n+  }\n+\n+\n+\n+\n+  try{\n+    ros::spin();\n+  }catch(std::runtime_error& e){\n+    ROS_ERROR(\"octomap_server_multilayer exception: %s\", e.what());\n+    return -1;\n+  }\n+\n+  return 0;\n+}"
+        },
+        {
+          "sha": "3b241a413aedec2cd204aaf74d57ac9ae10d7ada",
+          "filename": "octomap_server/src/octomap_server_node.cpp",
+          "status": "added",
+          "additions": 77,
+          "deletions": 0,
+          "changes": 77,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Fsrc%2Foctomap_server_node.cpp",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Fsrc%2Foctomap_server_node.cpp",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fsrc%2Foctomap_server_node.cpp?ref=34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+          "patch": "@@ -0,0 +1,77 @@\n+/**\n+* octomap_server: A Tool to serve 3D OctoMaps in ROS (binary and as visualization)\n+* (inspired by the ROS map_saver)\n+* @author A. Hornung, University of Freiburg, Copyright (C) 2009 - 2012.\n+* @see http://octomap.sourceforge.net/\n+* License: BSD\n+*/\n+\n+/*\n+ * Copyright (c) 2009-2012, A. Hornung, University of Freiburg\n+ * All rights reserved.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ *\n+ *     * Redistributions of source code must retain the above copyright\n+ *       notice, this list of conditions and the following disclaimer.\n+ *     * Redistributions in binary form must reproduce the above copyright\n+ *       notice, this list of conditions and the following disclaimer in the\n+ *       documentation and/or other materials provided with the distribution.\n+ *     * Neither the name of the University of Freiburg nor the names of its\n+ *       contributors may be used to endorse or promote products derived from\n+ *       this software without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE\n+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+ * POSSIBILITY OF SUCH DAMAGE.\n+ */\n+\n+\n+#include <ros/ros.h>\n+#include <octomap_server/OctomapServer.h>\n+\n+#define USAGE \"\\nUSAGE: octomap_server <map.bt>\\n\" \\\n+\t\t\"  map.bt: inital octomap 3D map file to read\\n\"\n+\n+using namespace octomap_server;\n+\n+int main(int argc, char** argv){\n+  ros::init(argc, argv, \"octomap_server\");\n+  std::string mapFilename(\"\");\n+\n+  if (argc > 2 || (argc == 2 && std::string(argv[1]) == \"-h\")){\n+    ROS_ERROR(\"%s\", USAGE);\n+    exit(-1);\n+  }\n+\n+\n+  OctomapServer server;\n+  ros::spinOnce();\n+\n+  if (argc == 2){\n+    mapFilename = std::string(argv[1]);\n+    if (!server.openFile(mapFilename))\n+      exit(1);\n+  }\n+\n+\n+\n+\n+  try{\n+    ros::spin();\n+  }catch(std::runtime_error& e){\n+    ROS_ERROR(\"octomap_server exception: %s\", e.what());\n+    return -1;\n+  }\n+\n+  return 0;\n+}"
+        },
+        {
+          "sha": "6acce66fb74a7cb91d94c0a56bffe5b356fd1386",
+          "filename": "octomap_server/src/octomap_tracking_server_node.cpp",
+          "status": "added",
+          "additions": 59,
+          "deletions": 0,
+          "changes": 59,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Fsrc%2Foctomap_tracking_server_node.cpp",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/octomap_server%2Fsrc%2Foctomap_tracking_server_node.cpp",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fsrc%2Foctomap_tracking_server_node.cpp?ref=34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+          "patch": "@@ -0,0 +1,59 @@\n+/*\n+ * Copyright (c) 2012, D. Kuhner, P. Ruchti, University of Freiburg\n+ * All rights reserved.\n+ *\n+ * Redistribution and use in source and binary forms, with or without\n+ * modification, are permitted provided that the following conditions are met:\n+ *\n+ *     * Redistributions of source code must retain the above copyright\n+ *       notice, this list of conditions and the following disclaimer.\n+ *     * Redistributions in binary form must reproduce the above copyright\n+ *       notice, this list of conditions and the following disclaimer in the\n+ *       documentation and/or other materials provided with the distribution.\n+ *     * Neither the name of the University of Freiburg nor the names of its\n+ *       contributors may be used to endorse or promote products derived from\n+ *       this software without specific prior written permission.\n+ *\n+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE\n+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+ * POSSIBILITY OF SUCH DAMAGE.\n+ */\n+\n+#include <ros/ros.h>\n+#include <octomap_server/TrackingOctomapServer.h>\n+\n+#define USAGE \"\\nUSAGE: octomap_tracking_server <map.bt>\\n\" \\\n+              \"  map.bt: octomap 3D map file to read\\n\"\n+\n+using namespace octomap_server;\n+\n+int main(int argc, char** argv){\n+  ros::init(argc, argv, \"octomap_tracking_server\");\n+  std::string mapFilename(\"\");\n+\n+  if (argc > 2 || (argc == 2 && std::string(argv[1]) == \"-h\")){\n+\t  ROS_ERROR(\"%s\", USAGE);\n+\t  exit(-1);\n+  }\n+\n+  if (argc == 2)\n+\t  mapFilename = std::string(argv[1]);\n+\n+  try{\n+\t  TrackingOctomapServer ms(mapFilename);\n+\t  ros::spin();\n+  }catch(std::runtime_error& e){\n+\t  ROS_ERROR(\"octomap_server exception: %s\", e.what());\n+\t  return -1;\n+  }\n+\n+  return 0;\n+}"
+        },
+        {
+          "sha": "504dac25dc44191fd6351f5d9ad8590ad6c95ce0",
+          "filename": "stack.xml",
+          "status": "added",
+          "additions": 21,
+          "deletions": 0,
+          "changes": 21,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/stack.xml",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/34e909fc9ec5d165518bdaaf8080b2b10f1a5760/stack.xml",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/stack.xml?ref=34e909fc9ec5d165518bdaaf8080b2b10f1a5760",
+          "patch": "@@ -0,0 +1,21 @@\n+<stack>\n+  <description brief=\"Mapping tools to be used with the OctoMap library\">\n+    The <a href=\"http://octomap.sourceforge.net/\">OctoMap library</a> implements a 3D occupancy grid mapping approach,\n+providing data structures and mapping algorithms based on octrees. This\n+    stack provides mapping tools, most notably octomap_server to build and\n+    distribute 3D maps.\n+  </description>\n+  <author>Maintained by Armin Hornung</author>\n+  <license>BSD</license>  \n+  <review status=\"unreviewed\" notes=\"\"/>\n+  <url>http://ros.org/wiki/octomap_mapping</url>\n+  <depend stack=\"octomap_msgs\" />\n+  <depend stack=\"octomap_ros\" />\n+  <depend stack=\"arm_navigation\" /> <!-- arm_navigation_msgs -->\n+  <depend stack=\"common_msgs\" /> <!-- nav_msgs, sensor_msgs, geometry_msgs, visualization_msgs -->\n+  <depend stack=\"geometry\" /> <!-- tf -->\n+  <depend stack=\"perception_pcl\" /> <!-- pcl, pcl_ros -->\n+  <depend stack=\"ros\" />\n+  <depend stack=\"ros_comm\" /> <!-- std_srvs, std_msgs, roscpp -->\n+\n+</stack>"
+        }
+      ]
+    },
+    {
+      "author": "artivis",
+      "date": "2015-01-13T18:05:37Z",
+      "sha": "b5c1bdcdb9048bccd0b04fcdc651e06bb311fc7b",
+      "message": "publish node center rather than index && prevent from publishing empty cloud",
+      "files_changed": 1,
+      "additions": 23,
+      "deletions": 14,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "789d49cb1cc8178ade6793558a6e926e490a72a2",
+          "filename": "octomap_server/src/TrackingOctomapServer.cpp",
+          "status": "modified",
+          "additions": 23,
+          "deletions": 14,
+          "changes": 37,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/b5c1bdcdb9048bccd0b04fcdc651e06bb311fc7b/octomap_server%2Fsrc%2FTrackingOctomapServer.cpp",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/b5c1bdcdb9048bccd0b04fcdc651e06bb311fc7b/octomap_server%2Fsrc%2FTrackingOctomapServer.cpp",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fsrc%2FTrackingOctomapServer.cpp?ref=b5c1bdcdb9048bccd0b04fcdc651e06bb311fc7b",
+          "patch": "@@ -99,15 +99,17 @@ void TrackingOctomapServer::trackChanges() {\n \n   int c = 0;\n   for (KeyBoolMap::const_iterator iter = startPnt; iter != endPnt; ++iter) {\n-    c++;\n+    ++c;\n     OcTreeNode* node = m_octree->search(iter->first);\n \n     bool occupied = m_octree->isNodeOccupied(node);\n \n+    point3d center = m_octree->keyToCoord(iter->first);\n+\n     pcl::PointXYZI pnt;\n-    pnt.x = iter->first.k[0];\n-    pnt.y = iter->first.k[1];\n-    pnt.z = iter->first.k[2];\n+    pnt.x = center(0);\n+    pnt.y = center(1);\n+    pnt.z = center(2);\n \n     if (occupied) {\n       pnt.intensity = 1000;\n@@ -119,15 +121,22 @@ void TrackingOctomapServer::trackChanges() {\n     changedCells.push_back(pnt);\n   }\n \n-  sensor_msgs::PointCloud2 changed;\n-  pcl::toROSMsg(changedCells, changed);\n-  changed.header.frame_id = \"/talker/changes\";\n-  changed.header.stamp = ros::Time().now();\n-  pubChangeSet.publish(changed);\n-  ROS_DEBUG(\"[server] sending %d changed entries\", (int)changedCells.size());\n-\n-  m_octree->resetChangeDetection();\n-  ROS_DEBUG(\"[server] octomap size after updating: %d\", (int)m_octree->calcNumNodes());\n+  // TODO : could set a threshold different than 0 here\n+  // through ROS param srv\n+  //\n+  // TODO : !!!! rosparam to set up that ptcloud frame\n+  if (c != 0)\n+  {\n+    sensor_msgs::PointCloud2 changed;\n+    pcl::toROSMsg(changedCells, changed);\n+    changed.header.frame_id = \"map\";\n+    changed.header.stamp = ros::Time().now();\n+    pubChangeSet.publish(changed);\n+    ROS_DEBUG(\"[server] sending %d changed entries\", (int)changedCells.size());\n+\n+    m_octree->resetChangeDetection();\n+    ROS_DEBUG(\"[server] octomap size after updating: %d\", (int)m_octree->calcNumNodes());\n+  }\n }\n \n void TrackingOctomapServer::trackCallback(sensor_msgs::PointCloud2Ptr cloud) {\n@@ -137,7 +146,7 @@ void TrackingOctomapServer::trackCallback(sensor_msgs::PointCloud2Ptr cloud) {\n \n   for (size_t i = 0; i < cells.points.size(); i++) {\n     pcl::PointXYZI& pnt = cells.points[i];\n-    m_octree->updateNode(OcTreeKey(pnt.x, pnt.y, pnt.z), pnt.intensity, false);\n+    m_octree->updateNode(m_octree->coordToKey(pnt.x, pnt.y, pnt.z), pnt.intensity, false);\n   }\n \n   m_octree->updateInnerOccupancy();"
+        }
+      ]
+    },
+    {
+      "author": "filipjares",
+      "date": "2013-08-15T11:03:28Z",
+      "sha": "e28156985ac2cba5913b88e1ac12ba28f72e686d",
+      "message": "fix obvious mistake in documentation comment",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "0e7bfbf3f40995a60573b471beb6b51d11cdd39f",
+          "filename": "octomap_server/include/octomap_server/OctomapServer.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/e28156985ac2cba5913b88e1ac12ba28f72e686d/octomap_server%2Finclude%2Foctomap_server%2FOctomapServer.h",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/e28156985ac2cba5913b88e1ac12ba28f72e686d/octomap_server%2Finclude%2Foctomap_server%2FOctomapServer.h",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Finclude%2Foctomap_server%2FOctomapServer.h?ref=e28156985ac2cba5913b88e1ac12ba28f72e686d",
+          "patch": "@@ -143,7 +143,7 @@ class OctomapServer{\n   */\n   bool isSpeckleNode(const octomap::OcTreeKey& key) const;\n \n-  /// hook that is called after traversing all nodes\n+  /// hook that is called before traversing all nodes\n   virtual void handlePreNodeTraversal(const ros::Time& rostime);\n \n   /// hook that is called when traversing all nodes of the updated Octree (does nothing here)"
+        }
+      ]
+    },
+    {
+      "author": "danielmaier",
+      "date": "2012-06-15T13:45:11Z",
+      "sha": "9e0d53b40b9ccf0ef3701c189c54cd1a82a66acb",
+      "message": "bug fix for OctomapServer map projection",
+      "files_changed": 2,
+      "additions": 73,
+      "deletions": 15,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b0717053c22d3cc6d0f7c523f002652639c83997",
+          "filename": "octomap_server/include/octomap_server/OctomapServer.h",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 3,
+          "changes": 7,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/9e0d53b40b9ccf0ef3701c189c54cd1a82a66acb/octomap_server%2Finclude%2Foctomap_server%2FOctomapServer.h",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/9e0d53b40b9ccf0ef3701c189c54cd1a82a66acb/octomap_server%2Finclude%2Foctomap_server%2FOctomapServer.h",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Finclude%2Foctomap_server%2FOctomapServer.h?ref=9e0d53b40b9ccf0ef3701c189c54cd1a82a66acb",
+          "patch": "@@ -110,10 +110,11 @@ class OctomapServer{\n     for (unsigned i=0; i<3; ++i)\n       max[i] = std::max(in[i], max[i]);\n   };\n-  \n+ \n+  /// Test if kez is within update area of map (2D, ignores height)\n   inline bool isInUpdateBBX(const octomap::OcTreeKey& key) const{\n-    return (key[0] >= m_updateBBXMin[0] && key[1] >= m_updateBBXMin[1] && key[2] >= m_updateBBXMin[2]\n-         && key[0] <= m_updateBBXMax[0] && key[1] <= m_updateBBXMax[1] && key[2] <= m_updateBBXMax[2] );\n+    return (key[0] >= m_updateBBXMin[0] && key[1] >= m_updateBBXMin[1]\n+         && key[0] <= m_updateBBXMax[0] && key[1] <= m_updateBBXMax[1]);\n   }\n \n "
+        },
+        {
+          "sha": "75cc65ec47b04a6d43c1b1491c66d761c45726ab",
+          "filename": "octomap_server/src/OctomapServer.cpp",
+          "status": "modified",
+          "additions": 69,
+          "deletions": 12,
+          "changes": 81,
+          "blob_url": "https://github.com/OctoMap/octomap_mapping/blob/9e0d53b40b9ccf0ef3701c189c54cd1a82a66acb/octomap_server%2Fsrc%2FOctomapServer.cpp",
+          "raw_url": "https://github.com/OctoMap/octomap_mapping/raw/9e0d53b40b9ccf0ef3701c189c54cd1a82a66acb/octomap_server%2Fsrc%2FOctomapServer.cpp",
+          "contents_url": "https://api.github.com/repos/OctoMap/octomap_mapping/contents/octomap_server%2Fsrc%2FOctomapServer.cpp?ref=9e0d53b40b9ccf0ef3701c189c54cd1a82a66acb",
+          "patch": "@@ -283,6 +283,18 @@ void OctomapServer::insertCloudCallback(const sensor_msgs::PointCloud2::ConstPtr\n   publishAll(cloud->header.stamp);\n }\n \n+\n+OcTreeKey getIndexKey(const OcTreeKey & key, unsigned short depth ) {\n+   unsigned short int mask = 65535 << (16 - depth);\n+   OcTreeKey result = key;\n+   result[0] &= mask;\n+   result[1] &= mask;\n+   result[2] &= mask;\n+   return result;\n+}\n+\n+\n+\n void OctomapServer::insertScan(const tf::Point& sensorOriginTf, const PCLPointCloud& ground, const PCLPointCloud& nonground){\n   point3d sensorOrigin = pointTfToOctomap(sensorOriginTf);\n \n@@ -370,9 +382,25 @@ void OctomapServer::insertScan(const tf::Point& sensorOriginTf, const PCLPointCl\n   // non-lazy by default (updateInnerOccupancy() too slow for large maps)\n   //m_octoMap->octree.updateInnerOccupancy();\n   octomap::point3d minPt, maxPt;\n+  ROS_DEBUG_STREAM(\"Bounding box keys (before): \" << m_updateBBXMin[0] << \" \" <<m_updateBBXMin[1] << \" \" << m_updateBBXMin[2] << \" / \" <<m_updateBBXMax[0] << \" \"<<m_updateBBXMax[1] << \" \"<< m_updateBBXMax[2]);\n+\n+  // TODO: snap max / min keys to larger voxesl by m_maxTreeDepth \n+//   if (m_maxTreeDepth < 16)\n+//   {\n+//      OcTreeKey tmpMin = getIndexKey(m_updateBBXMin, m_maxTreeDepth); // this should give us the first key at depth m_maxTreeDepth that is smaller or equal to m_updateBBXMin (i.e. lower left in 2D grid coordinates)\n+//      OcTreeKey tmpMax = getIndexKey(m_updateBBXMax, m_maxTreeDepth); // see above, now add something to find upper right\n+//      tmpMax[0]+= m_octoMap->octree.getNodeSize( m_maxTreeDepth ) - 1;\n+//      tmpMax[1]+= m_octoMap->octree.getNodeSize( m_maxTreeDepth ) - 1;\n+//      tmpMax[2]+= m_octoMap->octree.getNodeSize( m_maxTreeDepth ) - 1;\n+//      m_updateBBXMin = tmpMin;\n+//      m_updateBBXMax = tmpMax;\n+//   }\n+\n+  // TODO: we could also limit the bbx to be within the map bounds here (see publishing check)\n   m_octoMap->octree.genCoords(m_updateBBXMin, m_octoMap->octree.getTreeDepth(), minPt);\n   m_octoMap->octree.genCoords(m_updateBBXMax, m_octoMap->octree.getTreeDepth(), maxPt);\n   ROS_DEBUG_STREAM(\"Updated area bounding box: \"<< minPt << \" - \"<<maxPt);\n+  ROS_DEBUG_STREAM(\"Bounding box keys (after): \" << m_updateBBXMin[0] << \" \" <<m_updateBBXMin[1] << \" \" << m_updateBBXMin[2] << \" / \" <<m_updateBBXMax[0] << \" \"<<m_updateBBXMax[1] << \" \"<< m_updateBBXMax[2]);\n \n   if (m_compressMap)\n     m_octoMap->octree.prune();\n@@ -381,6 +409,7 @@ void OctomapServer::insertScan(const tf::Point& sensorOriginTf, const PCLPointCl\n }\n \n \n+\n void OctomapServer::publishAll(const ros::Time& rostime){\n   ros::WallTime startTime = ros::WallTime::now();\n   size_t octomapSize = m_octoMap->octree.size();\n@@ -823,27 +852,55 @@ void OctomapServer::handlePreNodeTraversal(const ros::Time& rostime){\n       m_gridmap.info.origin.position.x -= m_res/2.0;\n       m_gridmap.info.origin.position.y -= m_res/2.0;\n     }\n+    \n+    // workaround for  multires. projection not working properly for inner nodes:\n+    // force re-building complete map\n+    if (m_maxTreeDepth < m_treeDepth)\n+      m_resolutionChanged = true;\n \n-    nav_msgs::OccupancyGrid::_data_type::iterator startIt;\n-    size_t colStart = m_updateBBXMin[0]/m_multires2DScale;\n-    size_t numCols = m_updateBBXMax[0]/m_multires2DScale - colStart;\n-    size_t numRows = (m_updateBBXMax[1] - m_updateBBXMin[1])/m_multires2DScale;\n-    // reset proj. 2D map in bounding box:\n-    for (unsigned int j = m_updateBBXMin[1]/m_multires2DScale; j < numRows; ++j){\n-      startIt = m_gridmap.data.begin() + mapIdx(colStart, j);\n-      std::fill_n(startIt, numCols, -1);\n-    }\n \n     if(m_resolutionChanged){\n       ROS_INFO(\"Map resolution changed, rebuilding complete 2D map\");\n       m_gridmap.data.clear();\n       // init to unknown:\n       m_gridmap.data.resize(m_gridmap.info.width * m_gridmap.info.height, -1);\n \n-    } else if (mapChanged(oldMapInfo, m_gridmap.info)){\n-      ROS_DEBUG(\"2D grid map size changed to %dx%d\", m_gridmap.info.width, m_gridmap.info.height);\n-      adjustMapData(m_gridmap, oldMapInfo);\n+    } else {\n+\n+       if (mapChanged(oldMapInfo, m_gridmap.info)){\n+          ROS_DEBUG(\"2D grid map size changed to %dx%d\", m_gridmap.info.width, m_gridmap.info.height);\n+          adjustMapData(m_gridmap, oldMapInfo);\n+       }\n+       nav_msgs::OccupancyGrid::_data_type::iterator startIt;\n+       size_t mapUpdateBBXMinX = std::max(0, (int(m_updateBBXMin[0]) - int(m_paddedMinKey[0]))/int(m_multires2DScale));\n+       size_t mapUpdateBBXMinY = std::max(0, (int(m_updateBBXMin[1]) - int(m_paddedMinKey[1]))/int(m_multires2DScale));\n+       size_t mapUpdateBBXMaxX = std::min(int(m_gridmap.info.width-1), (int(m_updateBBXMax[0]) - int(m_paddedMinKey[0]))/int(m_multires2DScale));\n+       size_t mapUpdateBBXMaxY = std::min(int(m_gridmap.info.height-1), (int(m_updateBBXMax[1]) - int(m_paddedMinKey[1]))/int(m_multires2DScale));\n+       \n+//        size_t numCols = (m_updateBBXMax[0] - m_paddedMinKey[0])/m_multires2DScale - colStart +1;\n+//        size_t endRow = std::min(m_gridmap.info.height-1, (m_updateBBXMax[1] - m_paddedMinKey[1]) /m_multires2DScale);\n+       \n+       // reset proj. 2D map in bounding box:\n+       //std::cout << mapUpdateBBXMinX << \" \" << mapUpdateBBXMaxX << \" \" << mapUpdateBBXMinY << \" \" << mapUpdateBBXMaxY << std::endl;\n+       //std::cout <<\" map size is \" << m_gridmap.data.size() << std::endl;\n+       for (unsigned int j = mapUpdateBBXMinY; j <= mapUpdateBBXMaxY; ++j){\n+          //startIt = m_gridmap.data.begin() + mapIdx(colStart, j);\n+          //std::fill_n(startIt, numCols, -1);\n+          //std::fill_n(m_gridmap.data.begin() + mapUpdateBBXMinX + m_gridmap.info.width * j, mapUpdateBBXMaxX-mapUpdateBBXMinX, -1);\n+          \n+          \n+          for(unsigned int i = mapUpdateBBXMinX; i <= mapUpdateBBXMaxX; ++i) {\n+             //std::cout << i << \" \" << j << std::endl;\n+             uint idx = m_gridmap.info.width*j+i;\n+             //if ( idx >= m_gridmap.data.size() )\n+//                 ROS_ERROR(\"Index not valid: %d (max index %d for size %d x %d) i: %d j: %d: colStart: %d numCols: %d\", idx, m_gridmap.data.size(), m_gridmap.info.width, m_gridmap.info.height, i, j, colStart, numCols );\n+             m_gridmap.data.at(idx) = -1;\n+          } \n+          \n+       }\n+\n     }\n+       \n \n \n   }"
+        }
+      ]
+    }
+  ]
+}

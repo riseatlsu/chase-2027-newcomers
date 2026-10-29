@@ -1,0 +1,1295 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T04:58:18Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "stack-of-tasks",
+    "repo": "eigenpy"
+  },
+  "data": [
+    {
+      "author": "nim65s",
+      "date": "2018-03-19T17:48:53Z",
+      "sha": "7e4439d11de096df0abdc82957bdd841983ed641",
+      "message": "[Python] compatibility with 2.7 & 3.4",
+      "files_changed": 4,
+      "additions": 54,
+      "deletions": 63,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "980135067791b472bb2f28208c88742b6be14746",
+          "filename": ".travis.yml",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 17,
+          "changes": 29,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/7e4439d11de096df0abdc82957bdd841983ed641/.travis.yml",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/7e4439d11de096df0abdc82957bdd841983ed641/.travis.yml",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/.travis.yml?ref=7e4439d11de096df0abdc82957bdd841983ed641",
+          "patch": "@@ -1,6 +1,7 @@\n-language: generic\n+language: python\n python:\n   - \"2.7\"\n+  - \"3.4\"\n sudo: required\n dist: trusty\n compiler:\n@@ -9,7 +10,7 @@ compiler:\n env:\n   global:\n     - secure: \"SnIBG/xLIHX3CSvUbqqsX8xTVqIqQ7fFS6HWO6KZQVBsT6yugTwYHbyhNiU531JejYJ/I3ZrDhXfYH3qFZiYxnH1sifvwV+fnTtMXpPN7qPZwIymkjcmm6gJF51e0C7VOfUbvKFv0ngwj+ul21rgZSMuoEvxPK0WxtE3/ZSfn9c=\"\n-    - APT_DEPENDENCIES=\"doxygen libeigen3-dev \"\n+    - APT_DEPENDENCIES=\"doxygen libeigen3-dev libboost-test-dev libboost-python-dev libeigen3-dev\"\n     - DEBSIGN_KEYID=5AE5CD75\n     - CC=gcc\n     - DO_COVERAGE_ON_BRANCH=\"master;release\"\n@@ -19,24 +20,18 @@ env:\n     - BUILDTYPE=Release\n     - BUILDTYPE=Debug\n notifications:\n-email:\n-  - pinocchio@laas.fr\n+  email:\n+    - pinocchio-build@laas.fr\n branches:\n-only:\n-  - master\n-  - debian\n-  - devel\n-matrix:\n-allow_failures:\n-  - compiler:\n-before_install: ./travis_custom/custom_before_install\n-install:\n-  - pip install --user coveralls\n-  - pip install --user numpy\n+  only:\n+    - master\n+    - debian\n+    - devel\n+before_install: ./.travis/run before_install\n+install: pip install coveralls numpy\n script:\n   - export CMAKE_ADDITIONAL_OPTIONS=\"-DCMAKE_BUILD_TYPE=${BUILDTYPE}\"\n   - sudo free -m -t\n   - ./.travis/run ../travis_custom/custom_build\n after_failure: ./.travis/run after_failure\n-after_success:\n-  - ./.travis/run after_success\n+after_success: ./.travis/run after_success"
+        },
+        {
+          "sha": "46e3546485f36a313bad37f4a910b03098dba3c8",
+          "filename": "travis_custom/custom_before_install",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 8,
+          "changes": 8,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/2478b5868af975c58899d90e5a1581aa470225f8/travis_custom%2Fcustom_before_install",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/2478b5868af975c58899d90e5a1581aa470225f8/travis_custom%2Fcustom_before_install",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/travis_custom%2Fcustom_before_install?ref=2478b5868af975c58899d90e5a1581aa470225f8",
+          "patch": "@@ -1,8 +0,0 @@\n-#!/bin/bash\n-set -e\n-\n-# Setup environment variables.\n-export APT_DEPENDENCIES=\"doxygen libboost-test-dev libboost-python-dev libeigen3-dev python2.7-dev python-numpy\"\n-\n-# When this script is called the current directory is ./custom_travis\n-. ./.travis/run ../.travis/before_install"
+        },
+        {
+          "sha": "2e63b1ca39e5f1e2c828e9ddbd4bf5a7e4b6da64",
+          "filename": "unittest/python/test_eigenpy.py",
+          "status": "modified",
+          "additions": 34,
+          "deletions": 32,
+          "changes": 66,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/7e4439d11de096df0abdc82957bdd841983ed641/unittest%2Fpython%2Ftest_eigenpy.py",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/7e4439d11de096df0abdc82957bdd841983ed641/unittest%2Fpython%2Ftest_eigenpy.py",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/unittest%2Fpython%2Ftest_eigenpy.py?ref=7e4439d11de096df0abdc82957bdd841983ed641",
+          "patch": "@@ -1,101 +1,103 @@\n+from __future__ import print_function\n+\n import numpy as np\n import matrix as eigenpy\n \n verbose = False\n \n-if verbose: print \"===> From MatrixXd to Py\"\n+if verbose: print(\"===> From MatrixXd to Py\")\n M = eigenpy.naturals(3,3,verbose)\n Mcheck = np.reshape(np.matrix(range(9),np.double),[3,3])\n assert np.array_equal(Mcheck,M)\n \n-if verbose: print \"===> From Matrix3d to Py\"\n+if verbose: print(\"===> From Matrix3d to Py\")\n M33= eigenpy.naturals33(verbose)\n assert np.array_equal(Mcheck,M33)\n \n-if verbose: print \"===> From VectorXd to Py\"\n+if verbose: print(\"===> From VectorXd to Py\")\n v = eigenpy.naturalsX(3,verbose)\n vcheck = np.matrix([range(3),],np.double).T\n assert np.array_equal(vcheck ,v)\n \n-if verbose: print \"===> From Py to Eigen::MatrixXd\"\n-if verbose: print \"===> From Py to Eigen::MatrixXd\"\n-if verbose: print \"===> From Py to Eigen::MatrixXd\"\n+if verbose: print(\"===> From Py to Eigen::MatrixXd\")\n+if verbose: print(\"===> From Py to Eigen::MatrixXd\")\n+if verbose: print(\"===> From Py to Eigen::MatrixXd\")\n Mref = np.reshape(np.matrix(range(64),np.double),[8,8])\n \n-if verbose: print \"===> Matrix 8x8\"\n+if verbose: print(\"===> Matrix 8x8\")\n M = Mref\n assert( np.array_equal(M,eigenpy.reflex(M,verbose)) );\n \n-if verbose: print \"===> Block 0:3x0:3\"\n+if verbose: print(\"===> Block 0:3x0:3\")\n M = Mref[0:3,0:3]\n assert( np.array_equal(M,eigenpy.reflex(M,verbose)) );\n \n-if verbose: print \"===> Block 1:3x1:3\"\n+if verbose: print(\"===> Block 1:3x1:3\")\n M = Mref[1:3,1:3]\n assert( np.array_equal(M,eigenpy.reflex(M,verbose)) );\n \n-if verbose: print \"===> Block 1:5:2x1:5:2\"\n+if verbose: print(\"===> Block 1:5:2x1:5:2\")\n M = Mref[1:5:2,1:5:2]\n assert( np.array_equal(M,eigenpy.reflex(M,verbose)) );\n \n-if verbose: print \"===> Block 1:8:3x1:5\"\n+if verbose: print(\"===> Block 1:8:3x1:5\")\n M = Mref[1:8:3,1:5]\n assert( np.array_equal(M,eigenpy.reflex(M,verbose)) );\n \n-if verbose: print \"===> Block transpose 1:8:3x1:6:2\"\n+if verbose: print(\"===> Block transpose 1:8:3x1:6:2\")\n M = Mref[1:8:3,0:6:2].T\n assert( np.array_equal(M,eigenpy.reflex(M,verbose)) );\n \n-if verbose: print \"===> Block Vector 1x0:6:2\"\n+if verbose: print(\"===> Block Vector 1x0:6:2\")\n M = Mref[1:2,0:6:2]\n assert( np.array_equal(M,eigenpy.reflex(M,verbose)) );\n \n-if verbose: print \"===> Block Vector 1x0:6:2 tanspose\"\n+if verbose: print(\"===> Block Vector 1x0:6:2 tanspose\")\n M = Mref[1:2,0:6:2].T\n assert( np.array_equal(M,eigenpy.reflex(M,verbose)) );\n \n-if verbose: print \"===> Block Vector 0:6:2x1\"\n+if verbose: print(\"===> Block Vector 0:6:2x1\")\n M = Mref[0:6:2,1:2]\n assert( np.array_equal(M,eigenpy.reflex(M,verbose)) );\n \n-if verbose: print \"===> Block Vector 0:6:2x1 tanspose\"\n+if verbose: print(\"===> Block Vector 0:6:2x1 tanspose\")\n M = Mref[0:6:2,1:2].T\n assert( np.array_equal(M,eigenpy.reflex(M,verbose)) );\n \n-if verbose: print \"===> From Py to Eigen::VectorXd\"\n-if verbose: print \"===> From Py to Eigen::VectorXd\"\n-if verbose: print \"===> From Py to Eigen::VectorXd\"\n+if verbose: print(\"===> From Py to Eigen::VectorXd\")\n+if verbose: print(\"===> From Py to Eigen::VectorXd\")\n+if verbose: print(\"===> From Py to Eigen::VectorXd\")\n \n-if verbose: print \"===> Block Vector 0:6:2x1 1 dim\"\n+if verbose: print(\"===> Block Vector 0:6:2x1 1 dim\")\n M = Mref[0:6:2,1].T\n assert( np.array_equal(M.T,eigenpy.reflexV(M,verbose)) );\n \n-if verbose: print \"===> Block Vector 0:6:2x1\"\n+if verbose: print(\"===> Block Vector 0:6:2x1\")\n M = Mref[0:6:2,1:2]\n assert( np.array_equal(M,eigenpy.reflexV(M,verbose)) );\n \n-if verbose: print \"===> Block Vector 0:6:2x1 transpose\"\n+if verbose: print(\"===> Block Vector 0:6:2x1 transpose\")\n M = Mref[0:6:2,1:2].T\n assert( np.array_equal(M.T,eigenpy.reflexV(M,verbose)) );\n \n-if verbose: print \"===> From Py to Eigen::Matrix3d\"\n-if verbose: print \"===> From Py to Eigen::Matrix3d\"\n-if verbose: print \"===> From Py to Eigen::Matrix3d\"\n+if verbose: print(\"===> From Py to Eigen::Matrix3d\")\n+if verbose: print(\"===> From Py to Eigen::Matrix3d\")\n+if verbose: print(\"===> From Py to Eigen::Matrix3d\")\n \n-if verbose: print \"===> Block Vector 0:3x0:6:2 \"\n+if verbose: print(\"===> Block Vector 0:3x0:6:2 \")\n M = Mref[0:3,0:6:2]\n assert( np.array_equal(M,eigenpy.reflex33(M,verbose)) );\n \n-if verbose: print \"===> Block Vector 0:3x0:6:2 T\"\n+if verbose: print(\"===> Block Vector 0:3x0:6:2 T\")\n M = Mref[0:3,0:6].T\n try:\n     assert( np.array_equal(M,eigenpy.reflex33(M,verbose)) );\n-except eigenpy.Exception, e:\n-    if verbose: print \"As expected, got the following /ROW/ error:\", e.message\n+except eigenpy.Exception as e:\n+    if verbose: print(\"As expected, got the following /ROW/ error:\", e.message)\n \n-if verbose: print \"===> From Py to Eigen::Vector3d\"\n-if verbose: print \"===> From Py to Eigen::Vector3d\"\n-if verbose: print \"===> From Py to Eigen::Vector3d\"\n+if verbose: print(\"===> From Py to Eigen::Vector3d\")\n+if verbose: print(\"===> From Py to Eigen::Vector3d\")\n+if verbose: print(\"===> From Py to Eigen::Vector3d\")\n \n M = Mref[0:3,1:2]\n assert( np.array_equal(M,eigenpy.reflex3(M,verbose)) );"
+        },
+        {
+          "sha": "5fd6638f4521b6f52ad3577d92ac56b11efa9783",
+          "filename": "unittest/python/test_geometry.py",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 6,
+          "changes": 14,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/7e4439d11de096df0abdc82957bdd841983ed641/unittest%2Fpython%2Ftest_geometry.py",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/7e4439d11de096df0abdc82957bdd841983ed641/unittest%2Fpython%2Ftest_geometry.py",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/unittest%2Fpython%2Ftest_geometry.py?ref=7e4439d11de096df0abdc82957bdd841983ed641",
+          "patch": "@@ -1,3 +1,5 @@\n+from __future__ import print_function\n+\n from geometry import *\n import numpy as np\n from numpy import cos,sin\n@@ -33,13 +35,13 @@ def isapprox(a,b,epsilon=1e-6):\n assert(isapprox(qR[3],1./np.sqrt(30)))\n try:\n    qR[5]\n-   print \"Error, this message should not appear.\"\n-except Exception,e:\n-  if verbose: print \"As expected, catched exception: \",e.message\n+   print(\"Error, this message should not appear.\")\n+except Exception as e:\n+  if verbose: print(\"As expected, catched exception: \",e.message)\n \n # --- Angle Vector ------------------------------------------------\n r = AngleAxis(.1,np.array([1,0,0],np.double))\n-if verbose: print \"Rx(.1) = \\n\\n\",r.matrix(),\"\\n\"\n+if verbose: print(\"Rx(.1) = \\n\\n\",r.matrix(),\"\\n\")\n assert( isapprox(r.matrix()[2,2],cos(r.angle)))\n assert( isapprox(r.axis,np.matrix(\"1;0;0\")) )\n assert( isapprox(r.angle,0.1) )\n@@ -66,6 +68,6 @@ def isapprox(a,b,epsilon=1e-6):\n assert(q.norm() == res)\n try:\n     testInQuaternion(q)\n-    print \"Error, this message should not appear.\"\n+    print(\"Error, this message should not appear.\")\n except:\n-    if verbose: print \"As expected, catch a Boost::python::ArgError exception.\"\n+    if verbose: print(\"As expected, catch a Boost::python::ArgError exception.\")"
+        }
+      ]
+    },
+    {
+      "author": "github-actions[bot]",
+      "date": "2025-02-03T02:16:09Z",
+      "sha": "75a4048a6955c3cbb844840dcc6e6de5de7922a4",
+      "message": "flake.lock: Update\n\nFlake lock file updates:\n\n• Updated input 'flake-parts':\n    'github:hercules-ci/flake-parts/f2f7418ce0ab4a5309a4596161d154cfc877af66?narHash=sha256-soePLBazJk0qQdDVhdbM98vYdssfs3WFedcq%2BraipRI%3D' (2025-01-01)\n  → 'github:hercules-ci/flake-parts/32ea77a06711b758da0ad9bd6a844c5740a87abd?narHash=sha256-7H9XgNiGLKN1G1CgRh0vUL4AheZSYzPm%2BzmZ7vxbJdo%3D' (2025-02-01)\n• Updated input 'flake-parts/nixpkgs-lib':\n    'https://github.com/NixOS/nixpkgs/archive/e9b51731911566bbf7e4895475a87fe06961de0b.tar.gz?narHash=sha256-CewEm1o2eVAnoqb6Ml%2BQi9Gg/EfNAxbRx1lANGVyoLI%3D' (2025-01-01)\n  → 'https://github.com/NixOS/nixpkgs/archive/072a6db25e947df2f31aab9eccd0ab75d5b2da11.tar.gz?narHash=sha256-vJzFZGaCpnmo7I6i416HaBLpC%2BhvcURh/BQwROcGIp8%3D' (2025-02-01)\n• Updated input 'nixpkgs':\n    'github:NixOS/nixpkgs/88195a94f390381c6afcdaa933c2f6ff93959cb4?narHash=sha256-0q9NGQySwDQc7RhAV2ukfnu7Gxa5/ybJ2ANT8DQrQrs%3D' (2024-12-29)\n  → 'github:NixOS/nixpkgs/3a228057f5b619feb3186e986dbe76278d707b6e?narHash=sha256-xvTo0Aw0%2Bveek7hvEVLzErmJyQkEcRk6PSR4zsRQFEc%3D' (2025-02-01)",
+      "files_changed": 1,
+      "additions": 10,
+      "deletions": 10,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "eab72b826486b98dba64808fb96063a4666c1232",
+          "filename": "flake.lock",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 10,
+          "changes": 20,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/75a4048a6955c3cbb844840dcc6e6de5de7922a4/flake.lock",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/75a4048a6955c3cbb844840dcc6e6de5de7922a4/flake.lock",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/flake.lock?ref=75a4048a6955c3cbb844840dcc6e6de5de7922a4",
+          "patch": "@@ -5,11 +5,11 @@\n         \"nixpkgs-lib\": \"nixpkgs-lib\"\n       },\n       \"locked\": {\n-        \"lastModified\": 1735774679,\n-        \"narHash\": \"sha256-soePLBazJk0qQdDVhdbM98vYdssfs3WFedcq+raipRI=\",\n+        \"lastModified\": 1738453229,\n+        \"narHash\": \"sha256-7H9XgNiGLKN1G1CgRh0vUL4AheZSYzPm+zmZ7vxbJdo=\",\n         \"owner\": \"hercules-ci\",\n         \"repo\": \"flake-parts\",\n-        \"rev\": \"f2f7418ce0ab4a5309a4596161d154cfc877af66\",\n+        \"rev\": \"32ea77a06711b758da0ad9bd6a844c5740a87abd\",\n         \"type\": \"github\"\n       },\n       \"original\": {\n@@ -20,11 +20,11 @@\n     },\n     \"nixpkgs\": {\n       \"locked\": {\n-        \"lastModified\": 1735471104,\n-        \"narHash\": \"sha256-0q9NGQySwDQc7RhAV2ukfnu7Gxa5/ybJ2ANT8DQrQrs=\",\n+        \"lastModified\": 1738410390,\n+        \"narHash\": \"sha256-xvTo0Aw0+veek7hvEVLzErmJyQkEcRk6PSR4zsRQFEc=\",\n         \"owner\": \"NixOS\",\n         \"repo\": \"nixpkgs\",\n-        \"rev\": \"88195a94f390381c6afcdaa933c2f6ff93959cb4\",\n+        \"rev\": \"3a228057f5b619feb3186e986dbe76278d707b6e\",\n         \"type\": \"github\"\n       },\n       \"original\": {\n@@ -36,14 +36,14 @@\n     },\n     \"nixpkgs-lib\": {\n       \"locked\": {\n-        \"lastModified\": 1735774519,\n-        \"narHash\": \"sha256-CewEm1o2eVAnoqb6Ml+Qi9Gg/EfNAxbRx1lANGVyoLI=\",\n+        \"lastModified\": 1738452942,\n+        \"narHash\": \"sha256-vJzFZGaCpnmo7I6i416HaBLpC+hvcURh/BQwROcGIp8=\",\n         \"type\": \"tarball\",\n-        \"url\": \"https://github.com/NixOS/nixpkgs/archive/e9b51731911566bbf7e4895475a87fe06961de0b.tar.gz\"\n+        \"url\": \"https://github.com/NixOS/nixpkgs/archive/072a6db25e947df2f31aab9eccd0ab75d5b2da11.tar.gz\"\n       },\n       \"original\": {\n         \"type\": \"tarball\",\n-        \"url\": \"https://github.com/NixOS/nixpkgs/archive/e9b51731911566bbf7e4895475a87fe06961de0b.tar.gz\"\n+        \"url\": \"https://github.com/NixOS/nixpkgs/archive/072a6db25e947df2f31aab9eccd0ab75d5b2da11.tar.gz\"\n       }\n     },\n     \"root\": {"
+        }
+      ]
+    },
+    {
+      "author": "jorisv",
+      "date": "2023-10-27T07:56:13Z",
+      "sha": "770d1f84d5386642abe3564bb2bbff9d98b3461f",
+      "message": "Update cmake",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "9bd257de40db101805be38e849b7d1d13d29590d",
+          "filename": "cmake",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": null,
+          "raw_url": null,
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/cmake?ref=770d1f84d5386642abe3564bb2bbff9d98b3461f",
+          "patch": "@@ -1 +1 @@\n-Subproject commit 7ccfa44fbe844d7773726ec588dc6eb40f8e8ae5\n+Subproject commit 9bd257de40db101805be38e849b7d1d13d29590d"
+        }
+      ]
+    },
+    {
+      "author": "dependabot[bot]",
+      "date": "2025-06-23T21:26:26Z",
+      "sha": "df4188a12b7aec7968af0885c06ef5bf0c151076",
+      "message": "build(deps): bump cachix/cachix-action from 15 to 16\n\nBumps [cachix/cachix-action](https://github.com/cachix/cachix-action) from 15 to 16.\n- [Release notes](https://github.com/cachix/cachix-action/releases)\n- [Commits](https://github.com/cachix/cachix-action/compare/v15...v16)\n\n---\nupdated-dependencies:\n- dependency-name: cachix/cachix-action\n  dependency-version: '16'\n  dependency-type: direct:production\n  update-type: version-update:semver-major\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "4babeaf88a92de4ac57596d3342c1b408d5b01c9",
+          "filename": ".github/workflows/nix.yml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/df4188a12b7aec7968af0885c06ef5bf0c151076/.github%2Fworkflows%2Fnix.yml",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/df4188a12b7aec7968af0885c06ef5bf0c151076/.github%2Fworkflows%2Fnix.yml",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/.github%2Fworkflows%2Fnix.yml?ref=df4188a12b7aec7968af0885c06ef5bf0c151076",
+          "patch": "@@ -19,7 +19,7 @@ jobs:\n     steps:\n       - uses: actions/checkout@v4\n       - uses: cachix/install-nix-action@v27\n-      - uses: cachix/cachix-action@v15\n+      - uses: cachix/cachix-action@v16\n         with:\n           name: gepetto\n           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'"
+        }
+      ]
+    },
+    {
+      "author": "pre-commit-ci[bot]",
+      "date": "2022-04-11T19:56:03Z",
+      "sha": "d6eab770ea89036ae96ca7ad002a0d863c734acf",
+      "message": "[pre-commit.ci] pre-commit autoupdate\n\nupdates:\n- [github.com/pre-commit/pre-commit-hooks: v4.1.0 → v4.2.0](https://github.com/pre-commit/pre-commit-hooks/compare/v4.1.0...v4.2.0)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "ddeafb6706fbeb4e513f41f6b43f1352c8fa32e0",
+          "filename": ".pre-commit-config.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/d6eab770ea89036ae96ca7ad002a0d863c734acf/.pre-commit-config.yaml",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/d6eab770ea89036ae96ca7ad002a0d863c734acf/.pre-commit-config.yaml",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/.pre-commit-config.yaml?ref=d6eab770ea89036ae96ca7ad002a0d863c734acf",
+          "patch": "@@ -5,7 +5,7 @@ repos:\n     -   id: clang-format\n         args: ['-i', '--style={BasedOnStyle: Google, SortIncludes: false}']\n -   repo: https://github.com/pre-commit/pre-commit-hooks\n-    rev: v4.1.0\n+    rev: v4.2.0\n     hooks:\n     -   id: trailing-whitespace\n -   repo: https://github.com/psf/black"
+        }
+      ]
+    },
+    {
+      "author": "ManifoldFR",
+      "date": "2022-04-19T12:16:58Z",
+      "sha": "c29edd71d2117b03992bda36f1f24c4f2d4a9d86",
+      "message": "unittest: test where subclass modifies input C++ matrix\n\n* test fails, problem in stride ? only first column modified",
+      "files_changed": 2,
+      "additions": 45,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "3c33506aa9fe7d3715a642b4009f27796b0bb437",
+          "filename": "unittest/eigen_ref.cpp",
+          "status": "modified",
+          "additions": 28,
+          "deletions": 0,
+          "changes": 28,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/c29edd71d2117b03992bda36f1f24c4f2d4a9d86/unittest%2Feigen_ref.cpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/c29edd71d2117b03992bda36f1f24c4f2d4a9d86/unittest%2Feigen_ref.cpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/unittest%2Feigen_ref.cpp?ref=c29edd71d2117b03992bda36f1f24c4f2d4a9d86",
+          "patch": "@@ -52,6 +52,27 @@ const Eigen::Ref<const MatType> asConstRef(Eigen::Ref<MatType> mat) {\n   return Eigen::Ref<const MatType>(mat);\n }\n \n+struct modify_block\n+{\n+  MatrixXd J;\n+  modify_block() : J(10, 10) { J.setZero(); }\n+  void modify(int n, int m)\n+  {\n+    call(J.topLeftCorner(n, m));\n+  }\n+  virtual void call(Eigen::Ref<MatrixXd> mat) = 0;\n+};\n+\n+struct modify_wrap : modify_block, bp::wrapper<modify_block>\n+{\n+  modify_wrap() : modify_block() {}\n+  void call(Eigen::Ref<MatrixXd> mat)\n+  {\n+    this->get_override(\"call\")(mat);\n+  }\n+};\n+\n+\n BOOST_PYTHON_MODULE(eigen_ref) {\n   namespace bp = boost::python;\n   eigenpy::enableEigenPy();\n@@ -77,4 +98,11 @@ BOOST_PYTHON_MODULE(eigen_ref) {\n           (Eigen::Ref<MatrixXd>(*)(Eigen::Ref<MatrixXd>))asRef<MatrixXd>);\n   bp::def(\"asConstRef\", (const Eigen::Ref<const MatrixXd> (*)(\n                             Eigen::Ref<MatrixXd>))asConstRef<MatrixXd>);\n+\n+  bp::class_<modify_wrap, boost::noncopyable>(\"modify_block\", bp::init<>())\n+    .def_readonly(\"J\", &modify_block::J)\n+    .def(\"modify\", &modify_block::modify)\n+    .def(\"call\", bp::pure_virtual(&modify_wrap::call))\n+    ;\n+\n }"
+        },
+        {
+          "sha": "f75d7f86ed35a67859baaf96e6bcedccb39bcf58",
+          "filename": "unittest/python/test_eigen_ref.py",
+          "status": "modified",
+          "additions": 17,
+          "deletions": 0,
+          "changes": 17,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/c29edd71d2117b03992bda36f1f24c4f2d4a9d86/unittest%2Fpython%2Ftest_eigen_ref.py",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/c29edd71d2117b03992bda36f1f24c4f2d4a9d86/unittest%2Fpython%2Ftest_eigen_ref.py",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/unittest%2Fpython%2Ftest_eigen_ref.py?ref=c29edd71d2117b03992bda36f1f24c4f2d4a9d86",
+          "patch": "@@ -24,6 +24,23 @@ def test(mat):\n     const_ref = asConstRef(mat)\n     assert np.all(const_ref == mat)\n \n+    class ModifyBlockImpl(modify_block):\n+        def __init__(self):\n+            super().__init__()\n+\n+        def call(self, mat):\n+            mat[:, :] = 1.\n+\n+    modify = ModifyBlockImpl()\n+    print(\"Field J init:\\n{}\".format(modify.J))\n+    modify.modify(2, 3)\n+    print(\"Field J after:\\n{}\".format(modify.J))\n+    Jref = np.zeros((10, 10))\n+    Jref[:2, :3] = 1.\n+    print(\"Should be:\\n{}\".format(Jref))\n+\n+    assert np.array_equal(Jref, modify.J)\n+    \n \n rows = 10\n cols = 30"
+        }
+      ]
+    },
+    {
+      "author": "ahoarau",
+      "date": "2025-12-17T17:04:18Z",
+      "sha": "acae87f5065e43989efd2c669aa5f5726037856f",
+      "message": "limit to boost < 1.90\nthis is a current limitation of jrl V1. Fixed in V2",
+      "files_changed": 1,
+      "additions": 6,
+      "deletions": 6,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "c38a067d50fb520eda747d34ee190299f94703d5",
+          "filename": "pixi.toml",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 6,
+          "changes": 12,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/acae87f5065e43989efd2c669aa5f5726037856f/pixi.toml",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/acae87f5065e43989efd2c669aa5f5726037856f/pixi.toml",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/pixi.toml?ref=acae87f5065e43989efd2c669aa5f5726037856f",
+          "patch": "@@ -15,8 +15,8 @@ cxx-compiler = \">=1.7.0\"\n ninja = \">=1.11\"\n pkg-config = \">=0.29.2\"\n git = \">=2.47.0\"\n-libboost-devel = \">=1.80.0\"\n-libboost-python-devel = \">=1.80.0\"\n+libboost-devel = \">=1.80.0,<1.90.0\"\n+libboost-python-devel = \">=1.80.0,<1.90.0\"\n eigen = \">=3.4.0\"\n numpy = \">=1.22.0\"\n python = \">=3.9.0\"\n@@ -48,8 +48,8 @@ extra-args = [\n pkg-config = \">=0.29.2\"\n \n [package.host-dependencies]\n-libboost-devel = \">=1.80.0\"\n-libboost-python-devel = \">=1.80.0\"\n+libboost-devel = \">=1.80.0,<1.90.0\"\n+libboost-python-devel = \">=1.80.0,<1.90.0\"\n eigen = \">=3.4.0\"\n numpy = \">=1.22.0\"\n scipy = \">=1.10.0\"\n@@ -58,8 +58,8 @@ python = \">=3.9.0\"\n [package.run-dependencies]\n scipy = \">=1.10.0\"\n eigen = \">=3.4.0\"\n-libboost-devel = \">=1.80.0\"\n-libboost-python-devel = \">=1.80.0\"\n+libboost-devel = \">=1.80.0,<1.90.0\"\n+libboost-python-devel = \">=1.80.0,<1.90.0\"\n \n [target.unix.activation]\n scripts = [\"development/scripts/pixi/activation.sh\"]"
+        }
+      ]
+    },
+    {
+      "author": "jcarpent",
+      "date": "2014-10-14T12:21:53Z",
+      "sha": "2eab8e570ba2a198fdfa0208c886b1e39945d39b",
+      "message": "Modify include sequence in order to prevent compilations error",
+      "files_changed": 5,
+      "additions": 6,
+      "deletions": 5,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e3811e5183942b2fcedeb56b262c9b91d82a1fe0",
+          "filename": "src/angle-axis.hpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/2eab8e570ba2a198fdfa0208c886b1e39945d39b/src%2Fangle-axis.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/2eab8e570ba2a198fdfa0208c886b1e39945d39b/src%2Fangle-axis.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/src%2Fangle-axis.hpp?ref=2eab8e570ba2a198fdfa0208c886b1e39945d39b",
+          "patch": "@@ -17,9 +17,10 @@\n #ifndef __eigenpy_angle_axis_hpp__\n #define __eigenpy_angle_axis_hpp__\n \n+#include <boost/python.hpp>\n #include <Eigen/Core>\n #include <Eigen/Geometry>\n-#include <boost/python.hpp>\n+\n #include \"eigenpy/eigenpy.hpp\"\n \n namespace eigenpy"
+        },
+        {
+          "sha": "5b5c546304f164fec6be2f68b4fafb191db490df",
+          "filename": "src/details.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/2eab8e570ba2a198fdfa0208c886b1e39945d39b/src%2Fdetails.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/2eab8e570ba2a198fdfa0208c886b1e39945d39b/src%2Fdetails.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/src%2Fdetails.hpp?ref=2eab8e570ba2a198fdfa0208c886b1e39945d39b",
+          "patch": "@@ -17,8 +17,8 @@\n #ifndef __eigenpy_details_hpp__\n #define __eigenpy_details_hpp__\n \n-#include <Eigen/Core>\n #include <boost/python.hpp>\n+#include <Eigen/Core>\n \n #pragma GCC diagnostic error \"-pedantic\" // Alas only work for g++ 4.8\n #include <numpy/arrayobject.h>"
+        },
+        {
+          "sha": "96702c90b0e8732033e0d685cff815a8a8d328ee",
+          "filename": "src/exception.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/2eab8e570ba2a198fdfa0208c886b1e39945d39b/src%2Fexception.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/2eab8e570ba2a198fdfa0208c886b1e39945d39b/src%2Fexception.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/src%2Fexception.hpp?ref=2eab8e570ba2a198fdfa0208c886b1e39945d39b",
+          "patch": "@@ -14,9 +14,9 @@\n  * with eigenpy.  If not, see <http://www.gnu.org/licenses/>.\n  */\n \n+#include <boost/python.hpp>\n #include <exception>\n #include <string>\n-#include <boost/python.hpp>\n \n #ifndef __eigenpy_Exception_hpp__\n #define __eigenpy_Exception_hpp__"
+        },
+        {
+          "sha": "b137f1df8236182a7873e7e346ecdab361277a6d",
+          "filename": "src/fwd.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/2eab8e570ba2a198fdfa0208c886b1e39945d39b/src%2Ffwd.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/2eab8e570ba2a198fdfa0208c886b1e39945d39b/src%2Ffwd.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/src%2Ffwd.hpp?ref=2eab8e570ba2a198fdfa0208c886b1e39945d39b",
+          "patch": "@@ -17,8 +17,8 @@\n #ifndef __eigenpy_fwd_hpp__\n #define __eigenpy_fwd_hpp__\n \n-#include <Eigen/Core>\n #include <boost/python.hpp>\n+#include <Eigen/Core>\n \n namespace eigenpy\n {"
+        },
+        {
+          "sha": "6d574949f54eff77c7482e27b7ebb549227af72a",
+          "filename": "src/map.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/2eab8e570ba2a198fdfa0208c886b1e39945d39b/src%2Fmap.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/2eab8e570ba2a198fdfa0208c886b1e39945d39b/src%2Fmap.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/src%2Fmap.hpp?ref=2eab8e570ba2a198fdfa0208c886b1e39945d39b",
+          "patch": "@@ -14,8 +14,8 @@\n  * with eigenpy.  If not, see <http://www.gnu.org/licenses/>.\n  */\n \n-#include <Eigen/Core>\n #include <boost/python.hpp>\n+#include <Eigen/Core>\n #include <numpy/arrayobject.h>\n #include <eigenpy/exception.hpp>\n "
+        }
+      ]
+    },
+    {
+      "author": "cmastalli",
+      "date": "2023-07-30T09:42:03Z",
+      "sha": "ac3b7c863f9f0d769c483c6e909415b07d33eabb",
+      "message": "[python] Extended copyable visitor",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "f4426d1805cd96cf3bf11e3eb8dc0fd2d2c7f3b3",
+          "filename": "include/eigenpy/copyable.hpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/ac3b7c863f9f0d769c483c6e909415b07d33eabb/include%2Feigenpy%2Fcopyable.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/ac3b7c863f9f0d769c483c6e909415b07d33eabb/include%2Feigenpy%2Fcopyable.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/include%2Feigenpy%2Fcopyable.hpp?ref=ac3b7c863f9f0d769c483c6e909415b07d33eabb",
+          "patch": "@@ -18,10 +18,13 @@ struct CopyableVisitor : public bp::def_visitor<CopyableVisitor<C> > {\n   template <class PyClass>\n   void visit(PyClass& cl) const {\n     cl.def(\"copy\", &copy, bp::arg(\"self\"), \"Returns a copy of *this.\");\n+    cl.def(\"__copy__\", &copy,bp::arg(\"self\"),\"Returns a copy of *this.\");\n+    cl.def(\"__deepcopy__\", &deepcopy,bp::args(\"self\",\"memo\"),\"Returns a deep copy of *this.\");\n   }\n \n  private:\n   static C copy(const C& self) { return C(self); }\n+  static C deepcopy(const C & self, bp::dict) { return C(self); }\n };\n }  // namespace eigenpy\n "
+        }
+      ]
+    },
+    {
+      "author": "Lucas-Haubert",
+      "date": "2025-07-01T10:11:23Z",
+      "sha": "67e7be27ec7139732a6bd33a783dc3f280e05cdf",
+      "message": "decompositions: Expose classes",
+      "files_changed": 15,
+      "additions": 779,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "1f84821b33c71afdd009bb2b182aa93e85294d82",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/67e7be27ec7139732a6bd33a783dc3f280e05cdf/CMakeLists.txt",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/67e7be27ec7139732a6bd33a783dc3f280e05cdf/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/CMakeLists.txt?ref=67e7be27ec7139732a6bd33a783dc3f280e05cdf",
+          "patch": "@@ -210,6 +210,7 @@ set(${PROJECT_NAME}_DECOMPOSITIONS_SPARSE_ACCELERATE_HEADERS\n set(${PROJECT_NAME}_DECOMPOSITIONS_SPARSE_HEADERS\n     include/eigenpy/decompositions/sparse/LLT.hpp\n     include/eigenpy/decompositions/sparse/LDLT.hpp\n+    include/eigenpy/decompositions/sparse/LU.hpp\n     include/eigenpy/decompositions/sparse/SimplicialCholesky.hpp\n     include/eigenpy/decompositions/sparse/SparseSolverBase.hpp)\n \n@@ -308,7 +309,11 @@ set(${PROJECT_NAME}_DECOMPOSITIONS_SOURCES\n     src/decompositions/eigen-solver.cpp\n     src/decompositions/llt-solver.cpp\n     src/decompositions/ldlt-solver.cpp\n+    src/decompositions/fullpivlu-solver.cpp\n+    src/decompositions/partialpivlu-solver.cpp\n     src/decompositions/minres-solver.cpp\n+    src/decompositions/sparse-lu-solver.cpp\n+    src/decompositions/sparse-qr-solver.cpp\n     src/decompositions/qr-solvers.cpp\n     src/decompositions/eigen-solver.cpp\n     src/decompositions/self-adjoint-eigen-solver.cpp"
+        },
+        {
+          "sha": "e95666db572d721e05462785501c210a43c9d8f1",
+          "filename": "include/eigenpy/decompositions/FullPivLU.hpp",
+          "status": "added",
+          "additions": 194,
+          "deletions": 0,
+          "changes": 194,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/67e7be27ec7139732a6bd33a783dc3f280e05cdf/include%2Feigenpy%2Fdecompositions%2FFullPivLU.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/67e7be27ec7139732a6bd33a783dc3f280e05cdf/include%2Feigenpy%2Fdecompositions%2FFullPivLU.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/include%2Feigenpy%2Fdecompositions%2FFullPivLU.hpp?ref=67e7be27ec7139732a6bd33a783dc3f280e05cdf",
+          "patch": "@@ -0,0 +1,194 @@\n+/*\n+ * Copyright 2020-2025 INRIA\n+ */\n+\n+#ifndef __eigenpy_decompositions_fullpivlu_hpp__\n+#define __eigenpy_decompositions_fullpivlu_hpp__\n+\n+#include <Eigen/LU>\n+#include <Eigen/Core>\n+\n+#include \"eigenpy/eigenpy.hpp\"\n+#include \"eigenpy/utils/scalar-name.hpp\"\n+#include \"eigenpy/eigen/EigenBase.hpp\"\n+\n+namespace eigenpy {\n+\n+template <typename _MatrixType>\n+struct FullPivLUSolverVisitor\n+    : public boost::python::def_visitor<FullPivLUSolverVisitor<_MatrixType>> {\n+  typedef _MatrixType MatrixType;\n+  typedef typename MatrixType::Scalar Scalar;\n+  typedef typename MatrixType::RealScalar RealScalar;\n+  typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1, MatrixType::Options>\n+      VectorXs;\n+  typedef Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic,\n+                        MatrixType::Options>\n+      MatrixXs;\n+  typedef Eigen::FullPivLU<MatrixType> Solver;\n+\n+  template <class PyClass>\n+  void visit(PyClass &cl) const {\n+    cl.def(bp::init<>(bp::arg(\"self\"), \"Default constructor\"))\n+        .def(bp::init<Eigen::DenseIndex, Eigen::DenseIndex>(\n+            bp::args(\"self\", \"rows\", \"cols\"),\n+            \"Default constructor with memory preallocation\"))\n+        .def(bp::init<const MatrixType>(bp::args(\"self\", \"matrix\"),\n+                                        \"Constructor.\"))\n+        .def(bp::init<MatrixType>(\n+            bp::args(\"self\", \"matrix\"),\n+            \"Constructs a LU factorization from a given matrix.\"))\n+\n+        .def(EigenBaseVisitor<Solver>())\n+\n+        .def(\n+            \"compute\",\n+            (Solver & (Solver::*)(const Eigen::EigenBase<MatrixType> &matrix)) &\n+                Solver::compute,\n+            bp::args(\"self\", \"matrix\"),\n+            \"Computes the LU decomposition of the given matrix.\",\n+            bp::return_self<>())\n+\n+        .def(\"determinant\", &Solver::determinant, bp::arg(\"self\"),\n+             \"Returns the determinant of the matrix of which *this is the LU \"\n+             \"decomposition.\")\n+        .def(\"dimensionOfKernel\", &Solver::dimensionOfKernel, bp::arg(\"self\"),\n+             \"Returns the dimension of the kernel of the matrix of which *this \"\n+             \"is the LU decomposition.\")\n+        .def(\n+            \"image\",\n+            +[](const Solver &self, const MatrixType &mat) -> MatrixType {\n+              return self.image(mat);\n+            },\n+            bp::args(\"self\", \"originalMatrix\"),\n+            \"Returns the image of the matrix, also called its column-space. \"\n+            \"The columns of the returned matrix will form a basis of the \"\n+            \"image (column-space).\")\n+        .def(\n+            \"inverse\",\n+            +[](const Solver &self) -> MatrixType { return self.inverse(); },\n+            bp::arg(\"self\"),\n+            \"Returns the inverse of the matrix of which *this is the LU \"\n+            \"decomposition.\")\n+\n+        .def(\"isInjective\", &Solver::isInjective, bp::arg(\"self\"))\n+        .def(\"isInvertible\", &Solver::isInvertible, bp::arg(\"self\"))\n+        .def(\"isSurjective\", &Solver::isSurjective, bp::arg(\"self\"))\n+\n+        .def(\n+            \"kernel\",\n+            +[](const Solver &self) -> MatrixType { return self.kernel(); },\n+            bp::arg(\"self\"),\n+            \"Returns the kernel of the matrix, also called its null-space. \"\n+            \"The columns of the returned matrix will form a basis of the \"\n+            \"kernel.\")\n+\n+        .def(\"matrixLU\", &Solver::matrixLU, bp::arg(\"self\"),\n+             \"Returns the LU decomposition matrix.\",\n+             bp::return_internal_reference<>())\n+\n+        .def(\"maxPivot\", &Solver::maxPivot, bp::arg(\"self\"))\n+        .def(\"nonzeroPivots\", &Solver::nonzeroPivots, bp::arg(\"self\"))\n+\n+        .def(\"permutationP\", &Solver::permutationP, bp::arg(\"self\"),\n+             \"Returns the permutation P.\",\n+             bp::return_value_policy<bp::copy_const_reference>())\n+        .def(\"permutationQ\", &Solver::permutationQ, bp::arg(\"self\"),\n+             \"Returns the permutation Q.\",\n+             bp::return_value_policy<bp::copy_const_reference>())\n+\n+        .def(\"rank\", &Solver::rank, bp::arg(\"self\"))\n+\n+#if EIGEN_VERSION_AT_LEAST(3, 3, 0)\n+        .def(\"rcond\", &Solver::rcond, bp::arg(\"self\"),\n+             \"Returns an estimate of the reciprocal condition number of the \"\n+             \"matrix.\")\n+#endif\n+        .def(\"reconstructedMatrix\", &Solver::reconstructedMatrix,\n+             bp::arg(\"self\"),\n+             \"Returns the matrix represented by the decomposition, i.e., it \"\n+             \"returns the product: P-1LUQ-1. This function is provided for \"\n+             \"debug \"\n+             \"purpose.\")\n+\n+        .def(\"setThreshold\",\n+             (Solver & (Solver::*)(const RealScalar &)) & Solver::setThreshold,\n+             bp::args(\"self\", \"threshold\"),\n+             \"Allows to prescribe a threshold to be used by certain methods, \"\n+             \"such as rank(), who need to determine when pivots are to be \"\n+             \"considered nonzero. This is not used for the LU decomposition \"\n+             \"itself.\\n\"\n+             \"\\n\"\n+             \"When it needs to get the threshold value, Eigen calls \"\n+             \"threshold(). By default, this uses a formula to automatically \"\n+             \"determine a reasonable threshold. Once you have called the \"\n+             \"present method setThreshold(const RealScalar&), your value is \"\n+             \"used instead.\\n\"\n+             \"\\n\"\n+             \"Note: A pivot will be considered nonzero if its absolute value \"\n+             \"is strictly greater than |pivot| ⩽ threshold×|maxpivot| where \"\n+             \"maxpivot is the biggest pivot.\",\n+             bp::return_self<>())\n+        .def(\"setThreshold\",\n+             (Solver & (Solver::*)(Eigen::Default_t)) & Solver::setThreshold,\n+             bp::args(\"self\", \"threshold\"),\n+             \"Allows to come back to the default behavior, letting Eigen use \"\n+             \" its default formula for determining the threshold.\",\n+             bp::return_self<>())\n+\n+        .def(\"solve\", &solve<VectorXs>, bp::args(\"self\", \"b\"),\n+             \"Returns the solution x of A x = b using the current \"\n+             \"decomposition of A.\")\n+        .def(\"solve\", &solve<MatrixXs>, bp::args(\"self\", \"B\"),\n+             \"Returns the solution X of A X = B using the current \"\n+             \"decomposition of A where B is a right hand side matrix.\")\n+\n+        .def(\"threshold\", &Solver::threshold, bp::arg(\"self\"),\n+             \"Returns the threshold that will be used by certain methods such \"\n+             \"as rank().\");\n+  }\n+\n+  static void expose() {\n+    static const std::string classname =\n+        \"FullPivLU\" + scalar_name<Scalar>::shortname();\n+    expose(classname);\n+  }\n+\n+  static void expose(const std::string &name) {\n+    bp::class_<Solver>(\n+        name.c_str(),\n+        \"LU decomposition of a matrix with complete pivoting, and related \"\n+        \"features.\\n\\n\"\n+        \"This class represents a LU decomposition of any matrix, with complete \"\n+        \"pivoting: the matrix A is decomposed as A=P−1LUQ−1 where L is \"\n+        \"unit-lower-triangular, U is upper-triangular, and P and Q are \"\n+        \"permutation matrices. This is a rank-revealing LU decomposition. \"\n+        \"The eigenvalues (diagonal coefficients) of U are sorted in such a \"\n+        \"way that any zeros are at the end.\\n\\n\"\n+        \"This decomposition provides the generic approach to solving systems \"\n+        \"of \"\n+        \"linear equations, computing the rank, invertibility, inverse, kernel, \"\n+        \"and determinant. \\n\\n\"\n+        \"This LU decomposition is very stable and well tested with large \"\n+        \"matrices. \"\n+        \"However there are use cases where the SVD decomposition is inherently \"\n+        \"more \"\n+        \"stable and/or flexible. For example, when computing the kernel of a \"\n+        \"matrix, \"\n+        \"working with the SVD allows to select the smallest singular values of \"\n+        \"the matrix, something that the LU decomposition doesn't see.\",\n+        bp::no_init)\n+        .def(IdVisitor<Solver>())\n+        .def(FullPivLUSolverVisitor());\n+  }\n+\n+ private:\n+  template <typename MatrixOrVector>\n+  static MatrixOrVector solve(const Solver &self, const MatrixOrVector &vec) {\n+    return self.solve(vec);\n+  }\n+};\n+\n+}  // namespace eigenpy\n+\n+#endif  // ifndef __eigenpy_decompositions_fullpivlu_hpp__"
+        },
+        {
+          "sha": "de0f6a4ea804cd94a416d73005e8d43fe5669a67",
+          "filename": "include/eigenpy/decompositions/PartialPivLU.hpp",
+          "status": "added",
+          "additions": 119,
+          "deletions": 0,
+          "changes": 119,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/67e7be27ec7139732a6bd33a783dc3f280e05cdf/include%2Feigenpy%2Fdecompositions%2FPartialPivLU.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/67e7be27ec7139732a6bd33a783dc3f280e05cdf/include%2Feigenpy%2Fdecompositions%2FPartialPivLU.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/include%2Feigenpy%2Fdecompositions%2FPartialPivLU.hpp?ref=67e7be27ec7139732a6bd33a783dc3f280e05cdf",
+          "patch": "@@ -0,0 +1,119 @@\n+/*\n+ * Copyright 2020-2025 INRIA\n+ */\n+\n+#ifndef __eigenpy_decompositions_partialpivlu_hpp__\n+#define __eigenpy_decompositions_partialpivlu_hpp__\n+\n+#include <Eigen/LU>\n+#include <Eigen/Core>\n+\n+#include \"eigenpy/eigenpy.hpp\"\n+#include \"eigenpy/utils/scalar-name.hpp\"\n+#include \"eigenpy/eigen/EigenBase.hpp\"\n+\n+namespace eigenpy {\n+\n+template <typename _MatrixType>\n+struct PartialPivLUSolverVisitor : public boost::python::def_visitor<\n+                                       PartialPivLUSolverVisitor<_MatrixType>> {\n+  typedef _MatrixType MatrixType;\n+  typedef typename MatrixType::Scalar Scalar;\n+  typedef typename MatrixType::RealScalar RealScalar;\n+  typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1, MatrixType::Options>\n+      VectorXs;\n+  typedef Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic,\n+                        MatrixType::Options>\n+      MatrixXs;\n+  typedef Eigen::PartialPivLU<MatrixType> Solver;\n+\n+  template <class PyClass>\n+  void visit(PyClass &cl) const {\n+    cl.def(bp::init<>(bp::arg(\"self\"), \"Default constructor\"))\n+        .def(bp::init<Eigen::DenseIndex>(\n+            bp::args(\"self\", \"size\"),\n+            \"Default constructor with memory preallocation\"))\n+        .def(bp::init<const MatrixType>(bp::args(\"self\", \"matrix\"),\n+                                        \"Constructor.\"))\n+        .def(bp::init<MatrixType>(\n+            bp::args(\"self\", \"matrix\"),\n+            \"Constructs a LU factorization from a given matrix.\"))\n+\n+        .def(EigenBaseVisitor<Solver>())\n+\n+        .def(\"determinant\", &Solver::determinant, bp::arg(\"self\"),\n+             \"Returns the determinant of the matrix of which *this is the LU \"\n+             \"decomposition.\")\n+        .def(\n+            \"inverse\",\n+            +[](const Solver &self) -> MatrixType { return self.inverse(); },\n+            bp::arg(\"self\"),\n+            \"Returns the inverse of the matrix of which *this is the LU \"\n+            \"decomposition.\")\n+        .def(\"matrixLU\", &Solver::matrixLU, bp::arg(\"self\"),\n+             \"Returns the LU decomposition matrix.\",\n+             bp::return_internal_reference<>())\n+        .def(\"permutationP\", &Solver::permutationP, bp::arg(\"self\"),\n+             \"Returns the permutation P.\",\n+             bp::return_value_policy<bp::copy_const_reference>())\n+#if EIGEN_VERSION_AT_LEAST(3, 3, 0)\n+        .def(\"rcond\", &Solver::rcond, bp::arg(\"self\"),\n+             \"Returns an estimate of the reciprocal condition number of the \"\n+             \"matrix.\")\n+#endif\n+        .def(\"reconstructedMatrix\", &Solver::reconstructedMatrix,\n+             bp::arg(\"self\"),\n+             \"Returns the matrix represented by the decomposition, i.e., it \"\n+             \"returns the product: P-1LUQ-1. This function is provided for \"\n+             \"debug \"\n+             \"purpose.\")\n+        .def(\"solve\", &solve<VectorXs>, bp::args(\"self\", \"b\"),\n+             \"Returns the solution x of A x = b using the current \"\n+             \"decomposition of A.\")\n+        .def(\"solve\", &solve<MatrixXs>, bp::args(\"self\", \"B\"),\n+             \"Returns the solution X of A X = B using the current \"\n+             \"decomposition of A where B is a right hand side matrix.\");\n+  }\n+\n+  static void expose() {\n+    static const std::string classname =\n+        \"FullPivLU\" + scalar_name<Scalar>::shortname();\n+    expose(classname);\n+  }\n+\n+  static void expose(const std::string &name) {\n+    bp::class_<Solver>(name.c_str(),\n+                       \"LU decomposition of a matrix with partial pivoting, \"\n+                       \"and related features. \\n\\n\"\n+                       \"This class represents a LU decomposition of a square \"\n+                       \"invertible matrix, \"\n+                       \"with partial pivoting: the matrix A is decomposed as A \"\n+                       \"= PLU where L is \"\n+                       \"unit-lower-triangular, U is upper-triangular, and P is \"\n+                       \"a permutation matrix.\\n\\n\"\n+                       \"Typically, partial pivoting LU decomposition is only \"\n+                       \"considered numerically \"\n+                       \"stable for square invertible matrices. Thus LAPACK's \"\n+                       \"dgesv and dgesvx require \"\n+                       \"the matrix to be square and invertible. The present \"\n+                       \"class does the same. It \"\n+                       \"will assert that the matrix is square, but it won't \"\n+                       \"(actually it can't) check \"\n+                       \"that the matrix is invertible: it is your task to \"\n+                       \"check that you only use this \"\n+                       \"decomposition on invertible matrices.\",\n+                       bp::no_init)\n+        .def(IdVisitor<Solver>())\n+        .def(PartialPivLUSolverVisitor());\n+  }\n+\n+ private:\n+  template <typename MatrixOrVector>\n+  static MatrixOrVector solve(const Solver &self, const MatrixOrVector &vec) {\n+    return self.solve(vec);\n+  }\n+};\n+\n+}  // namespace eigenpy\n+\n+#endif  // ifndef __eigenpy_decompositions_partialpivlu_hpp__"
+        },
+        {
+          "sha": "c25e49586e5dd4b0c1c27373cb298bf8192d74da",
+          "filename": "include/eigenpy/decompositions/sparse/LU.hpp",
+          "status": "added",
+          "additions": 122,
+          "deletions": 0,
+          "changes": 122,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/67e7be27ec7139732a6bd33a783dc3f280e05cdf/include%2Feigenpy%2Fdecompositions%2Fsparse%2FLU.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/67e7be27ec7139732a6bd33a783dc3f280e05cdf/include%2Feigenpy%2Fdecompositions%2Fsparse%2FLU.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/include%2Feigenpy%2Fdecompositions%2Fsparse%2FLU.hpp?ref=67e7be27ec7139732a6bd33a783dc3f280e05cdf",
+          "patch": "@@ -0,0 +1,122 @@\n+/*\n+ * Copyright 2024 INRIA\n+ */\n+\n+#ifndef __eigenpy_decompositions_sparse_lu_hpp__\n+#define __eigenpy_decompositions_sparse_lu_hpp__\n+\n+#include <Eigen/SparseLU>\n+#include <Eigen/Core>\n+\n+#include \"eigenpy/eigenpy.hpp\"\n+#include \"eigenpy/decompositions/sparse/SparseSolverBase.hpp\"\n+#include \"eigenpy/utils/scalar-name.hpp\"\n+\n+namespace eigenpy {\n+\n+template <typename _MatrixType,\n+          typename _Ordering =\n+              Eigen::COLAMDOrdering<typename _MatrixType::StorageIndex>>\n+struct SparseLUVisitor : public boost::python::def_visitor<\n+                             SparseLUVisitor<_MatrixType, _Ordering>> {\n+  typedef SparseLUVisitor<_MatrixType, _Ordering> Visitor;\n+  typedef _MatrixType MatrixType;\n+\n+  typedef Eigen::SparseLU<MatrixType> Solver;\n+  typedef typename MatrixType::Scalar Scalar;\n+  typedef typename MatrixType::RealScalar RealScalar;\n+  typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1, MatrixType::Options>\n+      DenseVectorXs;\n+  typedef Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic,\n+                        MatrixType::Options>\n+      DenseMatrixXs;\n+\n+  template <class PyClass>\n+  void visit(PyClass &cl) const {\n+    cl.def(bp::init<>(bp::arg(\"self\"), \"Default constructor\"))\n+        .def(bp::init<MatrixType>(bp::args(\"self\", \"matrix\"),\n+                                  \"Constructs and performs the LU \"\n+                                  \"factorization from a given matrix.\"))\n+        .def(\"absDeterminant\", &Solver::absDeterminant, bp::arg(\"self\"),\n+             \"Returns the absolute value of the determinant of the matrix of \"\n+             \"which *this is the QR decomposition.\")\n+        .def(\"analyzePattern\", &Solver::analyzePattern, bp::args(\"self\", \"mat\"),\n+             \"Compute the column permutation to minimize the fill-in.\")\n+        .def(\"colsPermutation\", &Solver::colsPermutation, bp::arg(\"self\"),\n+             \"Returns a reference to the column matrix permutation PTc such \"\n+             \"that Pr A PTc = LU.\",\n+             bp::return_value_policy<bp::copy_const_reference>())\n+        .def(\"compute\", &Solver::compute, bp::args(\"self\", \"matrix\"),\n+             \"Compute the symbolic and numeric factorization of the input \"\n+             \"sparse matrix. \"\n+             \"The input matrix should be in column-major storage. \")\n+        .def(\"determinant\", &Solver::determinant, bp::arg(\"self\"),\n+             \"Returns the determinant of the matrix.\")\n+        .def(\"factorize\", &Solver::factorize, bp::args(\"self\", \"matrix\"),\n+             \"Performs a numeric decomposition of a given matrix.\\n\"\n+             \"The given matrix must has the same sparcity than the matrix on \"\n+             \"which the symbolic decomposition has been performed.\")\n+\n+        .def(\"info\", &Solver::info, bp::arg(\"self\"),\n+             \"NumericalIssue if the input contains INF or NaN values or \"\n+             \"overflow occured. Returns Success otherwise.\")\n+\n+        .def(\"isSymmetric\", &Solver::isSymmetric, bp::args(\"self\", \"sym\"),\n+             \"Indicate that the pattern of the input matrix is symmetric. \")\n+        .def(\"lastErrorMessage\", &Solver::lastErrorMessage, bp::arg(\"self\"),\n+             \"Returns a string describing the type of error. \")\n+        .def(\"logAbsDeterminant\", &Solver::logAbsDeterminant, bp::arg(\"self\"),\n+             \"Returns the natural log of the absolute value of the determinant \"\n+             \"of the \"\n+             \"matrix of which *this is the QR decomposition\")\n+\n+        .def(\"rowsPermutation\", &Solver::rowsPermutation, bp::arg(\"self\"),\n+             \"Returns a reference to the row matrix permutation Pr such that \"\n+             \"Pr A PTc = LU\",\n+             bp::return_value_policy<bp::copy_const_reference>())\n+        .def(\"setPivotThreshold\", &Solver::setPivotThreshold,\n+             bp::args(\"self\", \"thresh\"),\n+             \"Set the threshold used for a diagonal entry to be an acceptable \"\n+             \"pivot.\")\n+        .def(\"signDeterminant\", &Solver::signDeterminant, bp::arg(\"self\"),\n+             \"A number representing the sign of the determinant. \")\n+\n+        .def(SparseSolverBaseVisitor<Solver>());\n+  }\n+\n+  static void expose() {\n+    static const std::string classname =\n+        \"SparseLU_\" + scalar_name<Scalar>::shortname();\n+    expose(classname);\n+  }\n+\n+  static void expose(const std::string &name) {\n+    bp::class_<Solver, boost::noncopyable>(\n+        name.c_str(),\n+        \"Sparse supernodal LU factorization for general matrices. \\n\\n\"\n+        \"This class implements the supernodal LU factorization for general \"\n+        \"matrices. \"\n+        \"It uses the main techniques from the sequential SuperLU package \"\n+        \"(http://crd-legacy.lbl.gov/~xiaoye/SuperLU/). It handles \"\n+        \"transparently real \"\n+        \"and complex arithmetic with single and double precision, depending on \"\n+        \"the scalar \"\n+        \"type of your input matrix. The code has been optimized to provide \"\n+        \"BLAS-3 operations \"\n+        \"during supernode-panel updates. It benefits directly from the \"\n+        \"built-in high-performant \"\n+        \"Eigen BLAS routines. Moreover, when the size of a supernode is very \"\n+        \"small, the BLAS \"\n+        \"calls are avoided to enable a better optimization from the compiler. \"\n+        \"For best performance, \"\n+        \"you should compile it with NDEBUG flag to avoid the numerous bounds \"\n+        \"checking on vectors.\",\n+        bp::no_init)\n+        .def(SparseLUVisitor())\n+        .def(IdVisitor<Solver>());\n+  }\n+};\n+\n+}  // namespace eigenpy\n+\n+#endif  // ifndef __eigenpy_decompositions_sparse_lu_hpp__"
+        },
+        {
+          "sha": "0404dafd6c19ac57cf7b2674d49dbdb04e0c6176",
+          "filename": "include/eigenpy/decompositions/sparse/QR.hpp",
+          "status": "added",
+          "additions": 102,
+          "deletions": 0,
+          "changes": 102,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/67e7be27ec7139732a6bd33a783dc3f280e05cdf/include%2Feigenpy%2Fdecompositions%2Fsparse%2FQR.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/67e7be27ec7139732a6bd33a783dc3f280e05cdf/include%2Feigenpy%2Fdecompositions%2Fsparse%2FQR.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/include%2Feigenpy%2Fdecompositions%2Fsparse%2FQR.hpp?ref=67e7be27ec7139732a6bd33a783dc3f280e05cdf",
+          "patch": "@@ -0,0 +1,102 @@\n+/*\n+ * Copyright 2024 INRIA\n+ */\n+\n+#ifndef __eigenpy_decompositions_sparse_qr_hpp__\n+#define __eigenpy_decompositions_sparse_qr_hpp__\n+\n+#include <Eigen/SparseQR>\n+#include <Eigen/Core>\n+\n+#include \"eigenpy/eigenpy.hpp\"\n+#include \"eigenpy/decompositions/sparse/SparseSolverBase.hpp\"\n+#include \"eigenpy/utils/scalar-name.hpp\"\n+\n+namespace eigenpy {\n+\n+template <typename _MatrixType,\n+          typename _Ordering =\n+              Eigen::COLAMDOrdering<typename _MatrixType::StorageIndex>> // TODO: Check ordering\n+struct SparseQRVisitor : public boost::python::def_visitor<\n+                             SparseQRVisitor<_MatrixType, _Ordering>> {\n+  typedef SparseQRVisitor<_MatrixType, _Ordering> Visitor;\n+  typedef _MatrixType MatrixType;\n+  typedef _Ordering Ordering;\n+\n+  typedef Eigen::SparseQR<MatrixType, Ordering> Solver;\n+  typedef typename MatrixType::Scalar Scalar;\n+  typedef typename MatrixType::RealScalar RealScalar;\n+  typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1, MatrixType::Options>\n+      DenseVectorXs;\n+  typedef Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic,\n+                        MatrixType::Options>\n+      DenseMatrixXs;\n+\n+  typedef Eigen::SparseQRMatrixQReturnType<Solver> MatrixQType;\n+\n+  template <class PyClass>\n+  void visit(PyClass &cl) const {\n+    cl.def(bp::init<>(bp::arg(\"self\"), \"Default constructor\"))\n+        .def(bp::init<MatrixType>(bp::args(\"self\", \"mat\"),\n+              \"Construct a QR factorization of the matrix mat.\"))\n+        .def(\"analyzePattern\", &Solver::analyzePattern, bp::args(\"self\", \"mat\"),\n+             \"Compute the column permutation to minimize the fill-in.\")\n+        .def(\"cols\", &Solver::cols, bp::arg(\"self\"),\n+             \"Returns the number of columns of the represented matrix. \")\n+        .def(\"colsPermutation\", &Solver::colsPermutation, bp::arg(\"self\"),\n+             \"Returns a reference to the column matrix permutation PTc such \"\n+             \"that Pr A PTc = LU.\",\n+             bp::return_value_policy<bp::copy_const_reference>())\n+        .def(\"compute\", &Solver::compute, bp::args(\"self\", \"matrix\"),\n+             \"Compute the symbolic and numeric factorization of the input \"\n+             \"sparse matrix. \"\n+             \"The input matrix should be in column-major storage. \")\n+        .def(\"factorize\", &Solver::factorize, bp::args(\"self\", \"matrix\"),\n+             \"Performs a numeric decomposition of a given matrix.\\n\"\n+             \"The given matrix must has the same sparcity than the matrix on \"\n+             \"which the symbolic decomposition has been performed.\")\n+        .def(\"info\", &Solver::info, bp::arg(\"self\"),\n+             \"NumericalIssue if the input contains INF or NaN values or \"\n+             \"overflow occured. Returns Success otherwise.\")\n+        .def(\"lastErrorMessage\", &Solver::lastErrorMessage, bp::arg(\"self\"),\n+             \"Returns a string describing the type of error. \")\n+        .def(\"rank\", &Solver::rank, bp::arg(\"self\"),\n+             \"Returns the number of non linearly dependent columns as determined \"\n+             \"by the pivoting threshold. \")\n+        .def(\"rows\", &Solver::rows, bp::arg(\"self\"),\n+             \"Returns the number of rows of the represented matrix. \")\n+        .def(\"setPivotThreshold\", &Solver::setPivotThreshold,\n+             bp::args(\"self\", \"thresh\"),\n+             \"Set the threshold used for a diagonal entry to be an acceptable \"\n+             \"pivot.\")\n+\n+        .def(SparseSolverBaseVisitor<Solver>());\n+  }\n+\n+  static void expose() {\n+    static const std::string classname =\n+        \"SparseQR_\" + scalar_name<Scalar>::shortname();\n+    expose(classname);\n+  }\n+\n+  static void expose(const std::string &name) {\n+    bp::class_<Solver, boost::noncopyable>(\n+        name.c_str(),\n+        \"Sparse left-looking QR factorization with numerical column pivoting. \"\n+        \"This class implements a left-looking QR decomposition of sparse matrices \"\n+        \"with numerical column pivoting. When a column has a norm less than a given \"\n+        \"tolerance it is implicitly permuted to the end. The QR factorization thus \"\n+        \"obtained is given by A*P = Q*R where R is upper triangular or trapezoidal. \\n\\n\"\n+        \"P is the column permutation which is the product of the fill-reducing and the \"\n+        \"numerical permutations. \\n\\n\"\n+        \"Q is the orthogonal matrix represented as products of Householder reflectors. \\n\\n\"\n+        \"R is the sparse triangular or trapezoidal matrix. The later occurs when A is rank-deficient. \\n\\n\",\n+        bp::no_init)\n+        .def(SparseQRVisitor())\n+        .def(IdVisitor<Solver>());\n+  }\n+};\n+\n+}  // namespace eigenpy\n+\n+#endif  // ifndef __eigenpy_decompositions_sparse_qr_hpp__"
+        },
+        {
+          "sha": "6d0974ced36f0667a15be2a4bc8a1e9b494c1e86",
+          "filename": "src/decompositions/decompositions.cpp",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/67e7be27ec7139732a6bd33a783dc3f280e05cdf/src%2Fdecompositions%2Fdecompositions.cpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/67e7be27ec7139732a6bd33a783dc3f280e05cdf/src%2Fdecompositions%2Fdecompositions.cpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/src%2Fdecompositions%2Fdecompositions.cpp?ref=67e7be27ec7139732a6bd33a783dc3f280e05cdf",
+          "patch": "@@ -12,10 +12,14 @@ void exposeEigenSolver();\n void exposeSelfAdjointEigenSolver();\n void exposeLLTSolver();\n void exposeLDLTSolver();\n+void exposeFullPivLUSolver();\n+void exposePartialPivLUSolver();\n void exposeQRSolvers();\n void exposeMINRESSolver();\n void exposeSimplicialLLTSolver();\n void exposeSimplicialLDLTSolver();\n+void exposeSparseLUSolver();\n+void exposeSparseQRSolver();\n void exposePermutationMatrix();\n \n void exposeDecompositions() {\n@@ -25,6 +29,8 @@ void exposeDecompositions() {\n   exposeSelfAdjointEigenSolver();\n   exposeLLTSolver();\n   exposeLDLTSolver();\n+  exposeFullPivLUSolver();\n+  exposePartialPivLUSolver();\n   exposeQRSolvers();\n   exposeMINRESSolver();\n \n@@ -44,6 +50,8 @@ void exposeDecompositions() {\n   // Expose sparse decompositions\n   exposeSimplicialLLTSolver();\n   exposeSimplicialLDLTSolver();\n+  exposeSparseLUSolver();\n+  exposeSparseQRSolver();\n \n   exposePermutationMatrix();\n "
+        },
+        {
+          "sha": "44fcaa07d1762c1c63fe6b4754a2bd0f3b4de1c6",
+          "filename": "src/decompositions/fullpivlu-solver.cpp",
+          "status": "added",
+          "additions": 12,
+          "deletions": 0,
+          "changes": 12,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/67e7be27ec7139732a6bd33a783dc3f280e05cdf/src%2Fdecompositions%2Ffullpivlu-solver.cpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/67e7be27ec7139732a6bd33a783dc3f280e05cdf/src%2Fdecompositions%2Ffullpivlu-solver.cpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/src%2Fdecompositions%2Ffullpivlu-solver.cpp?ref=67e7be27ec7139732a6bd33a783dc3f280e05cdf",
+          "patch": "@@ -0,0 +1,12 @@\n+/*\n+ * Copyright 2025 INRIA\n+ */\n+\n+#include \"eigenpy/decompositions/FullPivLU.hpp\"\n+\n+namespace eigenpy {\n+void exposeFullPivLUSolver() {\n+  using namespace Eigen;\n+  FullPivLUSolverVisitor<MatrixXd>::expose(\"FullPivLU\");\n+}\n+}  // namespace eigenpy"
+        },
+        {
+          "sha": "c6ee7f9be30df6db02ca91a7a6dfed4551f44897",
+          "filename": "src/decompositions/partialpivlu-solver.cpp",
+          "status": "added",
+          "additions": 12,
+          "deletions": 0,
+          "changes": 12,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/67e7be27ec7139732a6bd33a783dc3f280e05cdf/src%2Fdecompositions%2Fpartialpivlu-solver.cpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/67e7be27ec7139732a6bd33a783dc3f280e05cdf/src%2Fdecompositions%2Fpartialpivlu-solver.cpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/src%2Fdecompositions%2Fpartialpivlu-solver.cpp?ref=67e7be27ec7139732a6bd33a783dc3f280e05cdf",
+          "patch": "@@ -0,0 +1,12 @@\n+/*\n+ * Copyright 2025 INRIA\n+ */\n+\n+#include \"eigenpy/decompositions/PartialPivLU.hpp\"\n+\n+namespace eigenpy {\n+void exposePartialPivLUSolver() {\n+  using namespace Eigen;\n+  PartialPivLUSolverVisitor<MatrixXd>::expose(\"PartialPivLU\");\n+}\n+}  // namespace eigenpy"
+        },
+        {
+          "sha": "2c27a1e887dd91f74b2893efe8303516eb7ccefe",
+          "filename": "src/decompositions/sparse-lu-solver.cpp",
+          "status": "added",
+          "additions": 13,
+          "deletions": 0,
+          "changes": 13,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/67e7be27ec7139732a6bd33a783dc3f280e05cdf/src%2Fdecompositions%2Fsparse-lu-solver.cpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/67e7be27ec7139732a6bd33a783dc3f280e05cdf/src%2Fdecompositions%2Fsparse-lu-solver.cpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/src%2Fdecompositions%2Fsparse-lu-solver.cpp?ref=67e7be27ec7139732a6bd33a783dc3f280e05cdf",
+          "patch": "@@ -0,0 +1,13 @@\n+/*\n+ * Copyright 2024 INRIA\n+ */\n+\n+#include \"eigenpy/decompositions/sparse/LU.hpp\"\n+\n+namespace eigenpy {\n+void exposeSparseLUSolver() {\n+  using namespace Eigen;\n+  typedef SparseMatrix<double, ColMajor> ColMajorSparseMatrix;\n+  SparseLUVisitor<ColMajorSparseMatrix>::expose(\"SparseLU\");\n+}\n+}  // namespace eigenpy"
+        },
+        {
+          "sha": "7e00d36f479227aac08ef73a7ad6fd83bc3abaf5",
+          "filename": "src/decompositions/sparse-qr-solver.cpp",
+          "status": "added",
+          "additions": 13,
+          "deletions": 0,
+          "changes": 13,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/67e7be27ec7139732a6bd33a783dc3f280e05cdf/src%2Fdecompositions%2Fsparse-qr-solver.cpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/67e7be27ec7139732a6bd33a783dc3f280e05cdf/src%2Fdecompositions%2Fsparse-qr-solver.cpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/src%2Fdecompositions%2Fsparse-qr-solver.cpp?ref=67e7be27ec7139732a6bd33a783dc3f280e05cdf",
+          "patch": "@@ -0,0 +1,13 @@\n+/*\n+ * Copyright 2024 INRIA\n+ */\n+\n+#include \"eigenpy/decompositions/sparse/QR.hpp\"\n+\n+namespace eigenpy {\n+void exposeSparseQRSolver() {\n+  using namespace Eigen;\n+  typedef SparseMatrix<double, ColMajor> ColMajorSparseMatrix;\n+  SparseQRVisitor<ColMajorSparseMatrix>::expose(\"SparseQR\");\n+}\n+}  // namespace eigenpy"
+        },
+        {
+          "sha": "141d1cafbf8b3c9652732b2e63e1f3d24ac42462",
+          "filename": "unittest/CMakeLists.txt",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 0,
+          "changes": 10,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/67e7be27ec7139732a6bd33a783dc3f280e05cdf/unittest%2FCMakeLists.txt",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/67e7be27ec7139732a6bd33a783dc3f280e05cdf/unittest%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/unittest%2FCMakeLists.txt?ref=67e7be27ec7139732a6bd33a783dc3f280e05cdf",
+          "patch": "@@ -145,6 +145,12 @@ add_python_eigenpy_lib_unit_test(\"py-LLT\" \"unittest/python/test_LLT.py\")\n \n add_python_eigenpy_lib_unit_test(\"py-LDLT\" \"unittest/python/test_LDLT.py\")\n \n+add_python_eigenpy_lib_unit_test(\"py-FullPivLU\"\n+                                 \"unittest/python/test_FullPivLU.py\")\n+\n+add_python_eigenpy_lib_unit_test(\"py-PartialPivLU\"\n+                                 \"unittest/python/test_PartialPivLU.py\")\n+\n add_python_eigenpy_lib_unit_test(\"py-id\" \"unittest/python/test_id.py\")\n \n add_python_eigenpy_lib_unit_test(\"py-QR\" \"unittest/python/test_QR.py\")\n@@ -182,6 +188,10 @@ if(BUILD_TESTING_SCIPY)\n   add_python_eigenpy_unit_test(\n     \"py-SimplicialLDLT\"\n     \"unittest/python/decompositions/sparse/test_SimplicialLDLT.py\")\n+  add_python_eigenpy_unit_test(\n+    \"py-SparseLU\" \"unittest/python/decompositions/sparse/test_SparseLU.py\")\n+  add_python_eigenpy_unit_test(\n+    \"py-SparseQR\" \"unittest/python/decompositions/sparse/test_SparseQR.py\")\n \n   if(BUILD_WITH_CHOLMOD_SUPPORT)\n     add_python_eigenpy_unit_test("
+        },
+        {
+          "sha": "81fd71e50cf290bdc0ae100a168e0806a03efbb0",
+          "filename": "unittest/python/decompositions/sparse/test_SparseLU.py",
+          "status": "added",
+          "additions": 48,
+          "deletions": 0,
+          "changes": 48,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/67e7be27ec7139732a6bd33a783dc3f280e05cdf/unittest%2Fpython%2Fdecompositions%2Fsparse%2Ftest_SparseLU.py",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/67e7be27ec7139732a6bd33a783dc3f280e05cdf/unittest%2Fpython%2Fdecompositions%2Fsparse%2Ftest_SparseLU.py",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/unittest%2Fpython%2Fdecompositions%2Fsparse%2Ftest_SparseLU.py?ref=67e7be27ec7139732a6bd33a783dc3f280e05cdf",
+          "patch": "@@ -0,0 +1,48 @@\n+import numpy as np\n+import scipy\n+from scipy.sparse import csc_matrix\n+\n+import eigenpy\n+\n+dim = 100\n+rng = np.random.default_rng()\n+\n+A = rng.random((dim, dim))\n+A = (A + A.T) * 0.5 + np.diag(10.0 + rng.random(dim))\n+A = csc_matrix(A)\n+\n+sparselu = eigenpy.SparseLU(A)\n+\n+assert sparselu.info() == eigenpy.ComputationInfo.Success\n+\n+# Solve\n+X = rng.random((dim, 20))\n+B = A.dot(X)\n+X_est = sparselu.solve(B)\n+assert eigenpy.is_approx(X, X_est)\n+assert eigenpy.is_approx(A.dot(X_est), B)\n+\n+X_sparse = scipy.sparse.random(dim, 10)\n+B_sparse = A.dot(X_sparse)\n+B_sparse = B_sparse.tocsc(True)\n+\n+if not B_sparse.has_sorted_indices:\n+    B_sparse.sort_indices()\n+\n+X_est = sparselu.solve(B_sparse)\n+assert eigenpy.is_approx(X_est.toarray(), X_sparse.toarray())\n+assert eigenpy.is_approx(A.dot(X_est.toarray()), B_sparse.toarray())\n+\n+# Others\n+det = sparselu.determinant()\n+sign_det = sparselu.signDeterminant()\n+abs_det = sparselu.absDeterminant()\n+log_abs_det = sparselu.logAbsDeterminant()\n+\n+sparselu.analyzePattern(A)\n+sparselu.factorize(A)\n+\n+cols_permutation = sparselu.colsPermutation()\n+rows_permutation = sparselu.rowsPermutation()\n+\n+sparselu.setPivotThreshold(1e-8)"
+        },
+        {
+          "sha": "eda8ff33f08379fa22f00b55728f4f4ea7d743e4",
+          "filename": "unittest/python/decompositions/sparse/test_SparseQR.py",
+          "status": "added",
+          "additions": 46,
+          "deletions": 0,
+          "changes": 46,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/67e7be27ec7139732a6bd33a783dc3f280e05cdf/unittest%2Fpython%2Fdecompositions%2Fsparse%2Ftest_SparseQR.py",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/67e7be27ec7139732a6bd33a783dc3f280e05cdf/unittest%2Fpython%2Fdecompositions%2Fsparse%2Ftest_SparseQR.py",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/unittest%2Fpython%2Fdecompositions%2Fsparse%2Ftest_SparseQR.py?ref=67e7be27ec7139732a6bd33a783dc3f280e05cdf",
+          "patch": "@@ -0,0 +1,46 @@\n+import numpy as np\n+import scipy\n+from scipy.sparse import csc_matrix\n+\n+import eigenpy\n+\n+dim = 100\n+rng = np.random.default_rng()\n+\n+A = rng.random((dim, dim))\n+A = (A + A.T) * 0.5 + np.diag(10.0 + rng.random(dim))\n+A = csc_matrix(A)\n+\n+sparseqr = eigenpy.SparseQR(A)\n+\n+assert sparseqr.info() == eigenpy.ComputationInfo.Success\n+\n+# Solve\n+X = rng.random((dim, 20))\n+B = A.dot(X)\n+X_est = sparseqr.solve(B)\n+assert eigenpy.is_approx(X, X_est)\n+assert eigenpy.is_approx(A.dot(X_est), B)\n+\n+X_sparse = scipy.sparse.random(dim, 10)\n+B_sparse = A.dot(X_sparse)\n+B_sparse = B_sparse.tocsc(True)\n+\n+if not B_sparse.has_sorted_indices:\n+    B_sparse.sort_indices()\n+\n+X_est = sparseqr.solve(B_sparse)\n+assert eigenpy.is_approx(X_est.toarray(), X_sparse.toarray())\n+assert eigenpy.is_approx(A.dot(X_est.toarray()), B_sparse.toarray())\n+\n+# Others\n+cols = sparseqr.cols()\n+rows = sparseqr.rows()\n+\n+sparseqr.analyzePattern(A)\n+sparseqr.factorize(A)\n+\n+cols_permutation = sparseqr.colsPermutation()\n+rank = sparseqr.rank()\n+\n+sparseqr.setPivotThreshold(1e-8)"
+        },
+        {
+          "sha": "c9dc76c37fd68d64e0c20304e391919e13ed099a",
+          "filename": "unittest/python/test_FullPivLU.py",
+          "status": "added",
+          "additions": 46,
+          "deletions": 0,
+          "changes": 46,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/67e7be27ec7139732a6bd33a783dc3f280e05cdf/unittest%2Fpython%2Ftest_FullPivLU.py",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/67e7be27ec7139732a6bd33a783dc3f280e05cdf/unittest%2Fpython%2Ftest_FullPivLU.py",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/unittest%2Fpython%2Ftest_FullPivLU.py?ref=67e7be27ec7139732a6bd33a783dc3f280e05cdf",
+          "patch": "@@ -0,0 +1,46 @@\n+import numpy as np\n+\n+import eigenpy\n+\n+dim = 100\n+rng = np.random.default_rng()\n+\n+A = rng.random((dim, dim))\n+A = (A + A.T) * 0.5 + np.diag(10.0 + rng.random(dim))\n+\n+fullpivlu = eigenpy.FullPivLU(A)\n+\n+# Solve\n+X = rng.random((dim, 20))\n+B = A.dot(X)\n+X_est = fullpivlu.solve(B)\n+assert eigenpy.is_approx(X, X_est)\n+assert eigenpy.is_approx(A.dot(X_est), B)\n+\n+# Others\n+cols = fullpivlu.cols()\n+rows = fullpivlu.rows()\n+\n+det = fullpivlu.determinant()\n+dim_kernel = fullpivlu.dimensionOfKernel()\n+rank = fullpivlu.rank()\n+rcond = fullpivlu.rcond()\n+max_pivot = fullpivlu.maxPivot()\n+nonzero_pivots = fullpivlu.nonzeroPivots()\n+\n+is_injective = fullpivlu.isInjective()\n+is_invertible = fullpivlu.isInvertible()\n+is_surjective = fullpivlu.isSurjective()\n+\n+LU = fullpivlu.matrixLU()\n+permutationP = fullpivlu.permutationP()\n+permutationQ = fullpivlu.permutationQ()\n+\n+reconstructed_matrix = fullpivlu.reconstructedMatrix()\n+\n+fullpivlu.setThreshold(1e-8)\n+threshold = fullpivlu.threshold()\n+\n+image = fullpivlu.image(A)\n+inverse = fullpivlu.inverse()\n+kernel = fullpivlu.kernel()"
+        },
+        {
+          "sha": "1d0cbbeb069a251c0c0c0f3e0ccf5d21f55673ed",
+          "filename": "unittest/python/test_PartialPivLU.py",
+          "status": "added",
+          "additions": 29,
+          "deletions": 0,
+          "changes": 29,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/67e7be27ec7139732a6bd33a783dc3f280e05cdf/unittest%2Fpython%2Ftest_PartialPivLU.py",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/67e7be27ec7139732a6bd33a783dc3f280e05cdf/unittest%2Fpython%2Ftest_PartialPivLU.py",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/unittest%2Fpython%2Ftest_PartialPivLU.py?ref=67e7be27ec7139732a6bd33a783dc3f280e05cdf",
+          "patch": "@@ -0,0 +1,29 @@\n+import numpy as np\n+\n+import eigenpy\n+\n+dim = 100\n+rng = np.random.default_rng()\n+\n+A = rng.random((dim, dim))\n+A = (A + A.T) * 0.5 + np.diag(10.0 + rng.random(dim))\n+\n+partialpivlu = eigenpy.PartialPivLU(A)\n+\n+# Solve\n+X = rng.random((dim, 20))\n+B = A.dot(X)\n+X_est = partialpivlu.solve(B)\n+assert eigenpy.is_approx(X, X_est)\n+assert eigenpy.is_approx(A.dot(X_est), B)\n+\n+# Others\n+cols = partialpivlu.cols()\n+rows = partialpivlu.rows()\n+\n+det = partialpivlu.determinant()\n+rcond = partialpivlu.rcond()\n+\n+matrixLU = partialpivlu.matrixLU()\n+permutationP = partialpivlu.permutationP()\n+reconstructed_matrix = partialpivlu.reconstructedMatrix()"
+        }
+      ]
+    },
+    {
+      "author": "duburcqa",
+      "date": "2024-03-15T18:58:26Z",
+      "sha": "93993ee50ac0543d26577347446bd44c60e0a730",
+      "message": "Add support of numpy 2.0.0b1",
+      "files_changed": 6,
+      "additions": 46,
+      "deletions": 8,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "18791046bc700c9d931b45ce011a65d3f577d16c",
+          "filename": "CHANGELOG.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/93993ee50ac0543d26577347446bd44c60e0a730/CHANGELOG.md",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/93993ee50ac0543d26577347446bd44c60e0a730/CHANGELOG.md",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/CHANGELOG.md?ref=93993ee50ac0543d26577347446bd44c60e0a730",
+          "patch": "@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).\n \n ### Added\n - Allow use of installed JRL-cmakemodule ([#446](https://github.com/stack-of-tasks/eigenpy/pull/446)\n+- Support of Numpy 2.0.0b1 ([#448](https://github.com/stack-of-tasks/eigenpy/pull/448))\n \n ### Fixed\n - Fix unit test build in C++11 ([#442](https://github.com/stack-of-tasks/eigenpy/pull/442))"
+        },
+        {
+          "sha": "c2c1ba798ab4f95879dbfbfa2e68aef14d7bcb86",
+          "filename": "include/eigenpy/numpy-allocator.hpp",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/93993ee50ac0543d26577347446bd44c60e0a730/include%2Feigenpy%2Fnumpy-allocator.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/93993ee50ac0543d26577347446bd44c60e0a730/include%2Feigenpy%2Fnumpy-allocator.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/include%2Feigenpy%2Fnumpy-allocator.hpp?ref=93993ee50ac0543d26577347446bd44c60e0a730",
+          "patch": "@@ -138,7 +138,11 @@ struct numpy_allocator_impl_matrix<Eigen::Ref<MatType, Options, Stride> > {\n                         outer_stride = reverse_strides ? mat.innerStride()\n                                                        : mat.outerStride();\n \n+#if NPY_ABI_VERSION < 0x02000000\n       const int elsize = call_PyArray_DescrFromType(Scalar_type_code)->elsize;\n+#else\n+      const int elsize = PyDataType_ELSIZE(call_PyArray_DescrFromType(Scalar_type_code));\n+#endif\n       npy_intp strides[2] = {elsize * inner_stride, elsize * outer_stride};\n \n       PyArrayObject *pyArray = (PyArrayObject *)call_PyArray_New(\n@@ -204,7 +208,11 @@ struct numpy_allocator_impl_matrix<\n                         outer_stride = reverse_strides ? mat.innerStride()\n                                                        : mat.outerStride();\n \n+#if NPY_ABI_VERSION < 0x02000000\n       const int elsize = call_PyArray_DescrFromType(Scalar_type_code)->elsize;\n+#else\n+      const int elsize = PyDataType_ELSIZE(call_PyArray_DescrFromType(Scalar_type_code));\n+#endif\n       npy_intp strides[2] = {elsize * inner_stride, elsize * outer_stride};\n \n       PyArrayObject *pyArray = (PyArrayObject *)call_PyArray_New("
+        },
+        {
+          "sha": "e1a4637f88a16a9c38f7be1269b6ac47af1441a1",
+          "filename": "include/eigenpy/numpy.hpp",
+          "status": "modified",
+          "additions": 26,
+          "deletions": 1,
+          "changes": 27,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/93993ee50ac0543d26577347446bd44c60e0a730/include%2Feigenpy%2Fnumpy.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/93993ee50ac0543d26577347446bd44c60e0a730/include%2Feigenpy%2Fnumpy.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/include%2Feigenpy%2Fnumpy.hpp?ref=93993ee50ac0543d26577347446bd44c60e0a730",
+          "patch": "@@ -16,9 +16,34 @@\n #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION\n #endif\n \n+/* Allow compiling against NumPy 1.x and 2.x\n+   see: https://github.com/numpy/numpy/blob/afea8fd66f6bdbde855f5aff0b4e73eb0213c646/doc/source/reference/c-api/array.rst#L1224\n+*/\n+#if NPY_ABI_VERSION < 0x02000000\n+#define PyArray_DescrProto PyArray_Descr\n+#endif\n+\n #include <numpy/ndarrayobject.h>\n #include <numpy/ufuncobject.h>\n \n+#if NPY_ABI_VERSION < 0x02000000\n+    static inline PyArray_ArrFuncs *\n+    PyDataType_GetArrFuncs(PyArray_Descr *descr)\n+    {\n+        return descr->f;\n+    }\n+#endif\n+\n+/* PEP 674 disallow using macros as l-values\n+   see : https://peps.python.org/pep-0674/\n+*/\n+#if PY_VERSION_HEX < 0x030900A4 && !defined(Py_SET_TYPE)\n+static inline void _Py_SET_TYPE(PyObject *o, PyTypeObject *type) {\n+  Py_TYPE(o) = type;\n+}\n+#define Py_SET_TYPE(o, type) _Py_SET_TYPE((PyObject*)(o), type)\n+#endif\n+\n #if defined _WIN32 || defined __CYGWIN__\n #define EIGENPY_GET_PY_ARRAY_TYPE(array) \\\n   call_PyArray_MinScalarType(array)->type_num\n@@ -170,7 +195,7 @@ inline void call_PyArray_InitArrFuncs(PyArray_ArrFuncs* funcs) {\n   PyArray_InitArrFuncs(funcs);\n }\n \n-inline int call_PyArray_RegisterDataType(PyArray_Descr* dtype) {\n+inline int call_PyArray_RegisterDataType(PyArray_DescrProto* dtype) {\n   return PyArray_RegisterDataType(dtype);\n }\n "
+        },
+        {
+          "sha": "b7eb67be6df036fe1679bd98c48a6fef8093e167",
+          "filename": "include/eigenpy/user-type.hpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/93993ee50ac0543d26577347446bd44c60e0a730/include%2Feigenpy%2Fuser-type.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/93993ee50ac0543d26577347446bd44c60e0a730/include%2Feigenpy%2Fuser-type.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/include%2Feigenpy%2Fuser-type.hpp?ref=93993ee50ac0543d26577347446bd44c60e0a730",
+          "patch": "@@ -171,7 +171,7 @@ struct SpecialMethods<T, NPY_USERDEF> {\n     char* srcptr = static_cast<char*>(src);\n \n     PyArrayObject* py_array = static_cast<PyArrayObject*>(array);\n-    PyArray_CopySwapFunc* copyswap = PyArray_DESCR(py_array)->f->copyswap;\n+    PyArray_CopySwapFunc* copyswap = PyDataType_GetArrFuncs(PyArray_DESCR(py_array))->copyswap;\n \n     for (npy_intp i = 0; i < n; i++) {\n       copyswap(dstptr, srcptr, swap, array);\n@@ -189,7 +189,7 @@ struct SpecialMethods<T, NPY_USERDEF> {\n       return (npy_bool)(value != ZeroValue);\n     } else {\n       T tmp_value;\n-      PyArray_DESCR(py_array)->f->copyswap(\n+      PyDataType_GetArrFuncs(PyArray_DESCR(py_array))->copyswap(\n           &tmp_value, ip, PyArray_ISBYTESWAPPED(py_array), array);\n       return (npy_bool)(tmp_value != ZeroValue);\n     }"
+        },
+        {
+          "sha": "3b1a831e9117b15586a0eb456557db45e408c845",
+          "filename": "src/numpy.cpp",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 1,
+          "changes": 6,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/93993ee50ac0543d26577347446bd44c60e0a730/src%2Fnumpy.cpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/93993ee50ac0543d26577347446bd44c60e0a730/src%2Fnumpy.cpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/src%2Fnumpy.cpp?ref=93993ee50ac0543d26577347446bd44c60e0a730",
+          "patch": "@@ -14,7 +14,11 @@ void import_numpy() {\n }\n \n int PyArray_TypeNum(PyTypeObject* type) {\n-  return PyArray_TypeNumFromName(const_cast<char*>(type->tp_name));\n+  PyArray_Descr * descr = PyArray_DescrFromTypeObject(reinterpret_cast<PyObject*>(type));\n+  if (descr == NULL) {\n+      return NPY_NOTYPE;\n+  }\n+  return descr->type_num;\n }\n \n #if defined _WIN32 || defined __CYGWIN__"
+        },
+        {
+          "sha": "1a8ce771c034315c223eb8080f914dd5a29972c7",
+          "filename": "src/register.cpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 4,
+          "changes": 8,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/93993ee50ac0543d26577347446bd44c60e0a730/src%2Fregister.cpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/93993ee50ac0543d26577347446bd44c60e0a730/src%2Fregister.cpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/src%2Fregister.cpp?ref=93993ee50ac0543d26577347446bd44c60e0a730",
+          "patch": "@@ -63,9 +63,9 @@ int Register::registerNewType(\n     throw std::invalid_argument(\"PyType_Ready fails to initialize input type.\");\n   }\n \n-  PyArray_Descr* descr_ptr =\n-      new PyArray_Descr(*call_PyArray_DescrFromType(NPY_OBJECT));\n-  PyArray_Descr& descr = *descr_ptr;\n+  PyArray_DescrProto* descr_ptr = new PyArray_DescrProto();\n+  Py_SET_TYPE(descr_ptr, &PyArrayDescr_Type);\n+  PyArray_DescrProto& descr = *descr_ptr;\n   descr.typeobj = py_type_ptr;\n   descr.kind = 'V';\n   descr.byteorder = '=';\n@@ -98,7 +98,7 @@ int Register::registerNewType(\n   PyArray_Descr* new_descr = call_PyArray_DescrFromType(code);\n \n   if (PyDict_SetItemString(py_type_ptr->tp_dict, \"dtype\",\n-                           (PyObject*)descr_ptr) < 0) {\n+                           (PyObject*)new_descr) < 0) {\n     throw std::invalid_argument(\"PyDict_SetItemString fails.\");\n   }\n "
+        }
+      ]
+    },
+    {
+      "author": "edantec",
+      "date": "2024-08-30T11:51:01Z",
+      "sha": "7c9c10fe088d1e720e3d403b87e99fb754d5776b",
+      "message": "Add bp::dist to std::map converter + unittest",
+      "files_changed": 4,
+      "additions": 190,
+      "deletions": 7,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "c6e1b0e6e73c686180ed25a345b879a83bd26488",
+          "filename": "include/eigenpy/std-map.hpp",
+          "status": "modified",
+          "additions": 146,
+          "deletions": 7,
+          "changes": 153,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/7c9c10fe088d1e720e3d403b87e99fb754d5776b/include%2Feigenpy%2Fstd-map.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/7c9c10fe088d1e720e3d403b87e99fb754d5776b/include%2Feigenpy%2Fstd-map.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/include%2Feigenpy%2Fstd-map.hpp?ref=7c9c10fe088d1e720e3d403b87e99fb754d5776b",
+          "patch": "@@ -7,6 +7,11 @@\n #define __eigenpy_utils_map_hpp__\n \n #include <boost/python/suite/indexing/map_indexing_suite.hpp>\n+#include \"eigenpy/pickle-vector.hpp\"\n+#include <boost/python/stl_iterator.hpp>\n+#include <boost/python/suite/indexing/map_indexing_suite.hpp>\n+#include <boost/python/to_python_converter.hpp>\n+#include <map>\n \n namespace eigenpy {\n namespace details {\n@@ -31,31 +36,165 @@ struct overload_base_get_item_for_std_map\n     typename Container::iterator i = container.get().find(idx);\n     if (i == container.get().end()) {\n       PyErr_SetString(PyExc_KeyError, \"Invalid key\");\n-      bp::throw_error_already_set();\n+      boost::python::throw_error_already_set();\n     }\n \n-    typename bp::to_python_indirect<data_type&,\n-                                    bp::detail::make_reference_holder>\n+    typename boost::python::to_python_indirect<\n+        data_type&, boost::python::detail::make_reference_holder>\n         convert;\n-    return bp::object(bp::handle<>(convert(i->second)));\n+    return boost::python::object(boost::python::handle<>(convert(i->second)));\n   }\n \n   static index_type convert_index(Container& /*container*/, PyObject* i_) {\n-    bp::extract<key_type const&> i(i_);\n+    boost::python::extract<key_type const&> i(i_);\n     if (i.check()) {\n       return i();\n     } else {\n-      bp::extract<key_type> i(i_);\n+      boost::python::extract<key_type> i(i_);\n       if (i.check()) return i();\n     }\n \n     PyErr_SetString(PyExc_TypeError, \"Invalid index type\");\n-    bp::throw_error_already_set();\n+    boost::python::throw_error_already_set();\n     return index_type();\n   }\n };\n \n }  // namespace details\n+\n+///////////////////////////////////////////////////////////////////////////////\n+// The following snippet of code has been taken from the header\n+// https://github.com/loco-3d/crocoddyl/blob/v2.1.0/bindings/python/crocoddyl/utils/map-converter.hpp\n+// The Crocoddyl library is written by Carlos Mastalli, Nicolas Mansard and\n+// Rohan Budhiraja.\n+///////////////////////////////////////////////////////////////////////////////\n+\n+namespace python {\n+\n+namespace bp = boost::python;\n+\n+/**\n+ * @brief Create a pickle interface for the std::map\n+ *\n+ * @param[in] Container  Map type to be pickled\n+ * \\sa Pickle\n+ */\n+template <typename Container>\n+struct PickleMap : public PickleVector<Container> {\n+  static void setstate(bp::object op, bp::tuple tup) {\n+    Container& o = bp::extract<Container&>(op)();\n+    bp::stl_input_iterator<typename Container::value_type> begin(tup[0]), end;\n+    o.insert(begin, end);\n+  }\n+};\n+\n+/// Conversion from dict to map solution proposed in\n+/// https://stackoverflow.com/questions/6116345/boostpython-possible-to-automatically-convert-from-dict-stdmap\n+/// This template encapsulates the conversion machinery.\n+template <typename Container>\n+struct dict_to_map {\n+  static void register_converter() {\n+    bp::converter::registry::push_back(&dict_to_map::convertible,\n+                                       &dict_to_map::construct,\n+                                       bp::type_id<Container>());\n+  }\n+\n+  /// Check if conversion is possible\n+  static void* convertible(PyObject* object) {\n+    // Check if it is a list\n+    if (!PyObject_GetIter(object)) return 0;\n+    return object;\n+  }\n+\n+  /// Perform the conversion\n+  static void construct(PyObject* object,\n+                        bp::converter::rvalue_from_python_stage1_data* data) {\n+    // convert the PyObject pointed to by `object` to a bp::dict\n+    bp::handle<> handle(bp::borrowed(object));  // \"smart ptr\"\n+    bp::dict dict(handle);\n+\n+    // get a pointer to memory into which we construct the map\n+    // this is provided by the Python runtime\n+    typedef bp::converter::rvalue_from_python_storage<Container> storage_type;\n+    void* storage = reinterpret_cast<storage_type*>(data)->storage.bytes;\n+\n+    // placement-new allocate the result\n+    new (storage) Container();\n+\n+    // iterate over the dictionary `dict`, fill up the map `map`\n+    Container& map(*(static_cast<Container*>(storage)));\n+    bp::list keys(dict.keys());\n+    int keycount(static_cast<int>(bp::len(keys)));\n+    for (int i = 0; i < keycount; ++i) {\n+      // get the key\n+      bp::object keyobj(keys[i]);\n+      bp::extract<typename Container::key_type> keyproxy(keyobj);\n+      if (!keyproxy.check()) {\n+        PyErr_SetString(PyExc_KeyError, \"Bad key type\");\n+        bp::throw_error_already_set();\n+      }\n+      typename Container::key_type key = keyproxy();\n+\n+      // get the corresponding value\n+      bp::object valobj(dict[keyobj]);\n+      bp::extract<typename Container::mapped_type> valproxy(valobj);\n+      if (!valproxy.check()) {\n+        PyErr_SetString(PyExc_ValueError, \"Bad value type\");\n+        bp::throw_error_already_set();\n+      }\n+      typename Container::mapped_type val = valproxy();\n+      map[key] = val;\n+    }\n+\n+    // remember the location for later\n+    data->convertible = storage;\n+  }\n+\n+  static bp::dict todict(Container& self) {\n+    bp::dict dict;\n+    typename Container::const_iterator it;\n+    for (it = self.begin(); it != self.end(); ++it) {\n+      dict.setdefault(it->first, it->second);\n+    }\n+    return dict;\n+  }\n+};\n+\n+/**\n+ * @brief Expose an std::map from a type given as template argument.\n+ *\n+ * @param[in] T          Type to expose as std::map<T>.\n+ * @param[in] Compare    Type for the Compare in std::map<T,Compare,Allocator>.\n+ * @param[in] Allocator  Type for the Allocator in\n+ * std::map<T,Compare,Allocator>.\n+ * @param[in] NoProxy    When set to false, the elements will be copied when\n+ * returned to Python.\n+ */\n+template <class Key, class T, class Compare = std::less<Key>,\n+          class Allocator = std::allocator<std::pair<const Key, T> >,\n+          bool NoProxy = false>\n+struct StdMapPythonVisitor\n+    : public bp::map_indexing_suite<\n+          typename std::map<Key, T, Compare, Allocator>, NoProxy>,\n+      public dict_to_map<std::map<Key, T, Compare, Allocator> > {\n+  typedef std::map<Key, T, Compare, Allocator> Container;\n+  typedef dict_to_map<Container> FromPythonDictConverter;\n+\n+  static void expose(const std::string& class_name,\n+                     const std::string& doc_string = \"\") {\n+    namespace bp = bp;\n+\n+    bp::class_<Container>(class_name.c_str(), doc_string.c_str())\n+        .def(StdMapPythonVisitor())\n+        .def(\"todict\", &FromPythonDictConverter::todict, bp::arg(\"self\"),\n+             \"Returns the std::map as a Python dictionary.\")\n+        .def_pickle(PickleMap<Container>());\n+    // Register conversion\n+    FromPythonDictConverter::register_converter();\n+  }\n+};\n+\n+}  // namespace python\n }  // namespace eigenpy\n \n #endif  // ifndef __eigenpy_utils_map_hpp__"
+        },
+        {
+          "sha": "2c1eec31b35a58ef3927ede297b7619d4b60025c",
+          "filename": "unittest/CMakeLists.txt",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/7c9c10fe088d1e720e3d403b87e99fb754d5776b/unittest%2FCMakeLists.txt",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/7c9c10fe088d1e720e3d403b87e99fb754d5776b/unittest%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/unittest%2FCMakeLists.txt?ref=7c9c10fe088d1e720e3d403b87e99fb754d5776b",
+          "patch": "@@ -56,6 +56,7 @@ endif()\n add_lib_unit_test(std_vector)\n add_lib_unit_test(std_array)\n add_lib_unit_test(std_pair)\n+add_lib_unit_test(std_map)\n add_lib_unit_test(user_struct)\n \n if(CMAKE_CXX_STANDARD GREATER 14 AND CMAKE_CXX_STANDARD LESS 98)\n@@ -155,6 +156,8 @@ add_python_eigenpy_lib_unit_test(\"py-std-vector\"\n \n add_python_lib_unit_test(\"py-std-array\" \"unittest/python/test_std_array.py\")\n \n+add_python_lib_unit_test(\"py-std-map\" \"unittest/python/test_std_map.py\")\n+\n add_python_lib_unit_test(\"py-std-pair\" \"unittest/python/test_std_pair.py\")\n \n add_python_lib_unit_test(\"py-user-struct\" \"unittest/python/test_user_struct.py\")"
+        },
+        {
+          "sha": "091027b21b063eb3cfe0e33659a5fc7e96096943",
+          "filename": "unittest/python/test_std_map.py",
+          "status": "added",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/7c9c10fe088d1e720e3d403b87e99fb754d5776b/unittest%2Fpython%2Ftest_std_map.py",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/7c9c10fe088d1e720e3d403b87e99fb754d5776b/unittest%2Fpython%2Ftest_std_map.py",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/unittest%2Fpython%2Ftest_std_map.py?ref=7c9c10fe088d1e720e3d403b87e99fb754d5776b",
+          "patch": "@@ -0,0 +1,6 @@\n+from std_map import copy, std_map_to_dict\n+\n+t = {\"one\": 1.0, \"two\": 2.0}\n+\n+assert std_map_to_dict(t) == t\n+assert std_map_to_dict(copy(t)) == t"
+        },
+        {
+          "sha": "5997e39cc82df6deb68ceb355e3613c2cb122b83",
+          "filename": "unittest/std_map.cpp",
+          "status": "added",
+          "additions": 35,
+          "deletions": 0,
+          "changes": 35,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/7c9c10fe088d1e720e3d403b87e99fb754d5776b/unittest%2Fstd_map.cpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/7c9c10fe088d1e720e3d403b87e99fb754d5776b/unittest%2Fstd_map.cpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/unittest%2Fstd_map.cpp?ref=7c9c10fe088d1e720e3d403b87e99fb754d5776b",
+          "patch": "@@ -0,0 +1,35 @@\n+/// @file\n+/// @copyright Copyright 2023 CNRS INRIA\n+\n+#include <eigenpy/eigenpy.hpp>\n+#include <eigenpy/std-map.hpp>\n+#include <iostream>\n+\n+namespace bp = boost::python;\n+\n+template <typename T1>\n+bp::dict std_map_to_dict(const std::map<std::string, T1>& map) {\n+  bp::dict dictionnary;\n+  for (auto const& x : map) {\n+    dictionnary[x.first] = x.second;\n+  }\n+  return dictionnary;\n+}\n+\n+template <typename T1>\n+std::map<std::string, T1> copy(const std::map<std::string, T1>& map) {\n+  std::map<std::string, T1> out = map;\n+  return out;\n+}\n+\n+BOOST_PYTHON_MODULE(std_map) {\n+  eigenpy::enableEigenPy();\n+\n+  eigenpy::python::StdMapPythonVisitor<\n+      std::string, double, std::less<std::string>,\n+      std::allocator<std::pair<const std::string, double> >,\n+      true>::expose(\"StdMap_Double\");\n+\n+  bp::def(\"std_map_to_dict\", std_map_to_dict<double>);\n+  bp::def(\"copy\", copy<double>);\n+}"
+        }
+      ]
+    },
+    {
+      "author": "wxmerkt",
+      "date": "2019-04-19T08:55:20Z",
+      "sha": "4368332b8fb3bdb6adccf0f84fd4ddb01f3888b9",
+      "message": "Add package.xml for ROS-native release as third-party library",
+      "files_changed": 1,
+      "additions": 24,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "d0dfa15fae7b1ecc48f092246c36405de31285d0",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 24,
+          "deletions": 0,
+          "changes": 24,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/4368332b8fb3bdb6adccf0f84fd4ddb01f3888b9/package.xml",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/4368332b8fb3bdb6adccf0f84fd4ddb01f3888b9/package.xml",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/package.xml?ref=4368332b8fb3bdb6adccf0f84fd4ddb01f3888b9",
+          "patch": "@@ -0,0 +1,24 @@\n+<?xml version=\"1.0\"?>\n+<package format=\"2\">\n+  <name>eigenpy</name>\n+  <version>1.5.1</version>\n+  <description>Bindings between Numpy and Eigen using Boost.Python - wrapped for catkin.</description>\n+  <maintainer email=\"jcarpent@laas.fr\">Justin Carpentier</maintainer>\n+  <maintainer email=\"wolfgang.merkt@ed.ac.uk\">Wolfgang Merkt</maintainer>\n+  <author>Justin Carpentier</author>\n+  <author>Nicolas Mansard</author>\n+  <license>BSD</license>\n+\n+  <url type=\"website\">https://github.com/stack-of-tasks/eigenpy</url>\n+\n+  <build_depend>git</build_depend>\n+  <depend>python</depend>\n+  <depend>python-numpy</depend>\n+  <depend>eigen</depend>\n+  <depend>boost</depend>\n+\n+  <buildtool_depend>cmake</buildtool_depend>\n+  <export>\n+    <build_type>cmake</build_type>\n+  </export>\n+</package>"
+        }
+      ]
+    },
+    {
+      "author": "sloretz",
+      "date": "2024-07-31T00:01:27Z",
+      "sha": "3a84ce5afc9c5fc5e3436aca5d3ca08df72ac0f5",
+      "message": "Use SFINAE to fix 'redefinition of struct' error on armhf\n\nSigned-off-by: Shane Loretz <sloretz@intrinsic.ai>",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "9f333a51da6f9ac6a14f7a9eb213c51f62806fa9",
+          "filename": "include/eigenpy/numpy.hpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 2,
+          "changes": 6,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/3a84ce5afc9c5fc5e3436aca5d3ca08df72ac0f5/include%2Feigenpy%2Fnumpy.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/3a84ce5afc9c5fc5e3436aca5d3ca08df72ac0f5/include%2Feigenpy%2Fnumpy.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/include%2Feigenpy%2Fnumpy.hpp?ref=3a84ce5afc9c5fc5e3436aca5d3ca08df72ac0f5",
+          "patch": "@@ -139,12 +139,14 @@ struct NumpyEquivalentType<unsigned long> {\n // See https://github.com/stack-of-tasks/eigenpy/pull/455\n #if defined __linux__\n \n+#include <type_traits>\n+\n template <>\n-struct NumpyEquivalentType<long long> {\n+struct NumpyEquivalentType<std::enable_if<!std::is_same<int64_t, long long>::value, long long>::type> {\n   enum { type_code = NPY_LONGLONG };\n };\n template <>\n-struct NumpyEquivalentType<unsigned long long> {\n+struct NumpyEquivalentType<std::enable_if<!std::is_same<uint64_t, unsigned long long>::value, unsigned long long>::type> {\n   enum { type_code = NPY_ULONGLONG };\n };\n "
+        }
+      ]
+    },
+    {
+      "author": "stephane-caron",
+      "date": "2024-04-26T15:41:27Z",
+      "sha": "e000d5f17f7d5267e44ab45059028f0207a9148d",
+      "message": "Add Contributing section to the readme\n\nCloses https://github.com/stack-of-tasks/eigenpy/issues/460",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "53d120ce14f8d050e6b34eaa7ef02b3fc0b16f9c",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 1,
+          "changes": 6,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/e000d5f17f7d5267e44ab45059028f0207a9148d/README.md",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/e000d5f17f7d5267e44ab45059028f0207a9148d/README.md",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/README.md?ref=e000d5f17f7d5267e44ab45059028f0207a9148d",
+          "patch": "@@ -18,7 +18,7 @@ EigenPy — Versatile and efficient Python bindings between Numpy and Eigen\n  - full support Eigen::Ref avoiding memory allocation\n  - full support of the Eigen::Tensor module\n  - exposition of the Geometry module of Eigen for easy code prototyping\n- - standard matrix decomposion routines of Eigen such as the Cholesky decomposition, SVD decomposition, QR decomposition, etc.\n+ - standard matrix decomposion routines of Eigen such as the Cholesky decomposition (SVD and QR decompositions [can be added](#contributing))\n  - full support of SWIG objects\n  - full support of runtime declaration of Numpy scalar types\n  - extended API to expose std::vector types\n@@ -74,6 +74,10 @@ and then install **EigenPy** for Python 3.x with:\n brew install eigenpy\n ```\n \n+## Contributing\n+\n+Standard matrix decomposion routines of Eigen such as the SVD and QR decompositions can be readily added to **EigenPy** following the example of the Cholesky decomposition that is already implemented. Feel free to open a PR if you wrap them for your use case.\n+\n ## Credits\n \n The following people have been involved in the development of **EigenPy**:"
+        }
+      ]
+    },
+    {
+      "author": "Joris Vaillant",
+      "date": "2023-10-24T16:14:15Z",
+      "sha": "727fad660afee88ebf3b5ba530936906518f33f1",
+      "message": "[WIP] core: add methods to already defined vector type",
+      "files_changed": 5,
+      "additions": 206,
+      "deletions": 26,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "7644f291695a49f6bb36e17a357a59dd84fd3d00",
+          "filename": "include/eigenpy/registration.hpp",
+          "status": "modified",
+          "additions": 20,
+          "deletions": 0,
+          "changes": 20,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/727fad660afee88ebf3b5ba530936906518f33f1/include%2Feigenpy%2Fregistration.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/727fad660afee88ebf3b5ba530936906518f33f1/include%2Feigenpy%2Fregistration.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/include%2Feigenpy%2Fregistration.hpp?ref=727fad660afee88ebf3b5ba530936906518f33f1",
+          "patch": "@@ -7,6 +7,7 @@\n #define __eigenpy_registration_hpp__\n \n #include \"eigenpy/fwd.hpp\"\n+#include \"eigenpy/registration_class.hpp\"\n \n namespace eigenpy {\n \n@@ -50,6 +51,25 @@ inline bool register_symbolic_link_to_registered_type() {\n \n   return false;\n }\n+\n+/// Same as \\see register_symbolic_link_to_registered_type() but apply \\p\n+/// visitor on \\tparam T if it already exists\n+template <typename T, typename Visitor>\n+inline bool register_symbolic_link_to_registered_type(const Visitor& visitor) {\n+  if (eigenpy::check_registration<T>()) {\n+    const bp::type_info info = bp::type_id<T>();\n+    const bp::converter::registration* reg =\n+        bp::converter::registry::query(info);\n+    bp::handle<> class_obj(reg->get_class_object());\n+    bp::object object(class_obj);\n+    bp::scope().attr(reg->get_class_object()->tp_name) = object;\n+    registration_class<T> cl(object);\n+    cl.def(visitor);\n+    return true;\n+  }\n+\n+  return false;\n+}\n }  // namespace eigenpy\n \n #endif  // ifndef __eigenpy_registration_hpp__"
+        },
+        {
+          "sha": "ebe72d7f77f6d951294826fdcb79ab65c8b3f4b0",
+          "filename": "include/eigenpy/registration_class.hpp",
+          "status": "added",
+          "additions": 129,
+          "deletions": 0,
+          "changes": 129,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/727fad660afee88ebf3b5ba530936906518f33f1/include%2Feigenpy%2Fregistration_class.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/727fad660afee88ebf3b5ba530936906518f33f1/include%2Feigenpy%2Fregistration_class.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/include%2Feigenpy%2Fregistration_class.hpp?ref=727fad660afee88ebf3b5ba530936906518f33f1",
+          "patch": "@@ -0,0 +1,129 @@\n+/*\n+ * Copyright 2023, INRIA\n+ */\n+\n+#ifndef __eigenpy_registration_class_hpp__\n+#define __eigenpy_registration_class_hpp__\n+\n+#include <boost/python/class.hpp>\n+\n+#include \"eigenpy/fwd.hpp\"\n+\n+namespace eigenpy {\n+\n+/*! Copy of the \\see boost::python::class_\n+ * This class allow to add methods to an existing class without registering it\n+ * again.\n+ **/\n+template <class W>\n+class registration_class {\n+ public:\n+  using self = registration_class;\n+\n+  /// \\p object Hold the namespace of the class that will be modified\n+  registration_class(bp::object object) : m_object(object) {}\n+\n+  /// \\see boost::python::class_::def(bp::def_visitor<Derived> const& visitor)\n+  template <class Visitor>\n+  self& def(Visitor const& visitor) {\n+    visitor.visit(*this);\n+    return *this;\n+  }\n+\n+  /// \\see boost::python::class_::def(char const* name, F f)\n+  template <class F>\n+  self& def(char const* name, F f) {\n+    def_impl(bp::detail::unwrap_wrapper((W*)0), name, f,\n+             bp::detail::def_helper<char const*>(0), &f);\n+    return *this;\n+  }\n+\n+  /// \\see boost::python::class_::def(char const* name, A1 a1, A2 const& a2)\n+  template <class A1, class A2>\n+  self& def(char const* name, A1 a1, A2 const& a2) {\n+    def_maybe_overloads(name, a1, a2, &a2);\n+    return *this;\n+  }\n+\n+  /// \\see boost::python::class_::def(char const* name, Fn fn, A1 const& a1, A2\n+  /// const& a2)\n+  template <class Fn, class A1, class A2>\n+  self& def(char const* name, Fn fn, A1 const& a1, A2 const& a2) {\n+    def_impl(bp::detail::unwrap_wrapper((W*)0), name, fn,\n+             bp::detail::def_helper<A1, A2>(a1, a2), &fn);\n+\n+    return *this;\n+  }\n+\n+  /// \\see boost::python::class_::def(char const* name, Fn fn, A1 const& a1, A2\n+  /// const& a2, A3 const& a3)\n+  template <class Fn, class A1, class A2, class A3>\n+  self& def(char const* name, Fn fn, A1 const& a1, A2 const& a2, A3 const& a3) {\n+    def_impl(bp::detail::unwrap_wrapper((W*)0), name, fn,\n+             bp::detail::def_helper<A1, A2, A3>(a1, a2, a3), &fn);\n+\n+    return *this;\n+  }\n+\n+ private:\n+  /// \\see boost::python::class_::def_impl(T*, char const* name, Fn fn, Helper\n+  /// const& helper, ...)\n+  template <class T, class Fn, class Helper>\n+  inline void def_impl(T*, char const* name, Fn fn, Helper const& helper, ...) {\n+    bp::objects::add_to_namespace(\n+        m_object, name,\n+        make_function(fn, helper.policies(), helper.keywords(),\n+                      bp::detail::get_signature(fn, (T*)0)),\n+        helper.doc());\n+\n+    def_default(name, fn, helper,\n+                boost::mpl::bool_<Helper::has_default_implementation>());\n+  }\n+\n+  /// \\see boost::python::class_::def_default(char const* name, Fn, Helper\n+  /// const& helper, boost::mpl::bool_<true>)\n+  template <class Fn, class Helper>\n+  inline void def_default(char const* name, Fn, Helper const& helper,\n+                          boost::mpl::bool_<true>) {\n+    bp::detail::error::virtual_function_default<\n+        W, Fn>::must_be_derived_class_member(helper.default_implementation());\n+\n+    bp::objects::add_to_namespace(\n+        m_object, name,\n+        make_function(helper.default_implementation(), helper.policies(),\n+                      helper.keywords()));\n+  }\n+\n+  /// \\see boost::python::class_::def_default(char const*, Fn, Helper const&,\n+  /// boost::mpl::bool_<false>)\n+  template <class Fn, class Helper>\n+  inline void def_default(char const*, Fn, Helper const&,\n+                          boost::mpl::bool_<false>) {}\n+\n+  /// \\see boost::python::class_::def_maybe_overloads(char const* name, SigT\n+  /// sig,OverloadsT const& overloads,bp::detail::overloads_base const*)\n+  template <class OverloadsT, class SigT>\n+  void def_maybe_overloads(char const* name, SigT sig,\n+                           OverloadsT const& overloads,\n+                           bp::detail::overloads_base const*)\n+\n+  {\n+    bp::detail::define_with_defaults(name, overloads, *this,\n+                                     bp::detail::get_signature(sig));\n+  }\n+\n+  /// \\see boost::python::class_::def_maybe_overloads(char const* name, Fn fn,\n+  /// A1 const& a1, ...)\n+  template <class Fn, class A1>\n+  void def_maybe_overloads(char const* name, Fn fn, A1 const& a1, ...) {\n+    def_impl(bp::detail::unwrap_wrapper((W*)0), name, fn,\n+             bp::detail::def_helper<A1>(a1), &fn);\n+  }\n+\n+ private:\n+  bp::object m_object;\n+};\n+\n+}  // namespace eigenpy\n+\n+#endif  // ifndef __eigenpy_registration_class_hpp__"
+        },
+        {
+          "sha": "e5a1894a77baca4f8b1e5bffcc833a53d8f6c3e3",
+          "filename": "include/eigenpy/std-vector.hpp",
+          "status": "modified",
+          "additions": 39,
+          "deletions": 26,
+          "changes": 65,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/727fad660afee88ebf3b5ba530936906518f33f1/include%2Feigenpy%2Fstd-vector.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/727fad660afee88ebf3b5ba530936906518f33f1/include%2Feigenpy%2Fstd-vector.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/include%2Feigenpy%2Fstd-vector.hpp?ref=727fad660afee88ebf3b5ba530936906518f33f1",
+          "patch": "@@ -360,14 +360,40 @@ struct EmptyPythonVisitor\n   void visit(classT &) const {}\n };\n \n+/// \\brief Add standard method to a std::vector.\n+template <typename Container, bool NoProxy = false>\n+struct add_std_method_to_std_vector\n+    : public boost::python::def_visitor<\n+          add_std_method_to_std_vector<Container> > {\n+  typedef typename Container::value_type value_type;\n+  typedef typename Container::value_type data_type;\n+  typedef size_t index_type;\n+\n+  typedef StdContainerFromPythonList<Container, NoProxy>\n+      FromPythonListConverter;\n+\n+  template <class Class>\n+  void visit(Class &cl) const {\n+    details::overload_base_get_item_for_std_vector<Container> get_item_visitor;\n+    cl.def(\"tolist\", &FromPythonListConverter::tolist, bp::arg(\"self\"),\n+           \"Returns the std::vector as a Python list.\")\n+        .def(get_item_visitor)\n+        .def(\"reserve\", &Container::reserve,\n+             (bp::arg(\"self\"), bp::arg(\"new_cap\")),\n+             \"Increase the capacity of the vector to a value that's greater \"\n+             \"or equal to new_cap.\")\n+        .def(CopyableVisitor<Container>());\n+  }\n+};\n+\n ///\n /// \\brief Expose an std::vector from a type given as template argument.\n ///\n /// \\tparam T Type to expose as std::vector<T>.\n /// \\tparam Allocator Type for the Allocator in std::vector<T,Allocator>.\n-/// \\tparam NoProxy When set to false, the elements will be copied when returned\n-/// to Python. \\tparam EnableFromPythonListConverter Enables the conversion from\n-/// a Python list to a std::vector<T,Allocator>\n+/// \\tparam NoProxy When set to false, the elements will be copied when\n+/// returned to Python. \\tparam EnableFromPythonListConverter Enables the\n+/// conversion from a Python list to a std::vector<T,Allocator>\n ///\n /// \\sa StdAlignedVectorPythonVisitor\n ///\n@@ -388,18 +414,15 @@ struct StdVectorPythonVisitor\n     expose(class_name, doc_string, EmptyPythonVisitor());\n   }\n \n-  template <typename VisitorDerived>\n-  static void expose(\n-      const std::string &class_name,\n-      const boost::python::def_visitor<VisitorDerived> &visitor) {\n+  template <typename Visitor>\n+  static void expose(const std::string &class_name, const Visitor &visitor) {\n     expose(class_name, \"\", visitor);\n   }\n \n-  template <typename VisitorDerived>\n-  static void expose(\n-      const std::string &class_name, const std::string &doc_string,\n-      const boost::python::def_visitor<VisitorDerived> &visitor) {\n-    if (!register_symbolic_link_to_registered_type<vector_type>()) {\n+  template <typename Visitor>\n+  static void expose(const std::string &class_name,\n+                     const std::string &doc_string, const Visitor &visitor) {\n+    if (!register_symbolic_link_to_registered_type<vector_type>(visitor)) {\n       bp::class_<vector_type> cl(class_name.c_str(), doc_string.c_str());\n       cl.def(StdVectorPythonVisitor())\n \n@@ -409,20 +432,11 @@ struct StdVectorPythonVisitor\n           .def(bp::init<const vector_type &>(bp::args(\"self\", \"other\"),\n                                              \"Copy constructor\"))\n \n-          .def(\"tolist\", &FromPythonListConverter::tolist, bp::arg(\"self\"),\n-               \"Returns the std::vector as a Python list.\")\n           .def(visitor)\n-          .def(\"reserve\", &vector_type::reserve,\n-               (bp::arg(\"self\"), bp::arg(\"new_cap\")),\n-               \"Increase the capacity of the vector to a value that's greater \"\n-               \"or equal to new_cap.\")\n-          .def_pickle(PickleVector<vector_type>())\n-          .def(CopyableVisitor<vector_type>());\n-\n-      // Register conversion\n-      if (EnableFromPythonListConverter)\n-        FromPythonListConverter::register_converter();\n+          .def_pickle(PickleVector<vector_type>());\n     }\n+    // Register conversion\n+    FromPythonListConverter::register_converter();\n   }\n };\n \n@@ -437,8 +451,7 @@ void exposeStdVectorEigenSpecificType(const char *name) {\n   std::string full_name = \"StdVec_\";\n   full_name += name;\n   StdVectorPythonVisitor<VecMatType, false>::expose(\n-      full_name.c_str(),\n-      details::overload_base_get_item_for_std_vector<VecMatType>());\n+      full_name.c_str(), add_std_method_to_std_vector<VecMatType, false>());\n }\n \n }  // namespace eigenpy"
+        },
+        {
+          "sha": "532b7df80fa499ae0df794d6e2338bfebcb20fbe",
+          "filename": "unittest/python/test_std_vector.py",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 0,
+          "changes": 10,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/727fad660afee88ebf3b5ba530936906518f33f1/unittest%2Fpython%2Ftest_std_vector.py",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/727fad660afee88ebf3b5ba530936906518f33f1/unittest%2Fpython%2Ftest_std_vector.py",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/unittest%2Fpython%2Ftest_std_vector.py?ref=727fad660afee88ebf3b5ba530936906518f33f1",
+          "patch": "@@ -14,6 +14,7 @@\n l3.append(np.eye(2))\n l4 = [np.random.randn(3, 3).T for _ in range(3)]\n l4[-1] = l4[-1].T\n+l5 = [np.random.randn(2, 2).T for _ in range(3)]\n \n \n def checkAllValues(li1, li2):\n@@ -83,3 +84,12 @@ def checkZero(l):\n # vector.setZero(l4)\n # pprint.pprint(list(l4))\n # checkZero(l4)\n+\n+# TODO fail\n+l5_copy = std_vector.StdVec_Mat2d(l5)\n+\n+# test l5 == l5_copy == l5_py\n+l5_py = l5_copy.tolist()\n+# Test l5[0] is zero\n+l5[0].setZero()\n+# TODO test"
+        },
+        {
+          "sha": "225eae1eb5d4905ea17ea32a35cf24d785d3bb2a",
+          "filename": "unittest/std_vector.cpp",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/727fad660afee88ebf3b5ba530936906518f33f1/unittest%2Fstd_vector.cpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/727fad660afee88ebf3b5ba530936906518f33f1/unittest%2Fstd_vector.cpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/unittest%2Fstd_vector.cpp?ref=727fad660afee88ebf3b5ba530936906518f33f1",
+          "patch": "@@ -49,4 +49,12 @@ BOOST_PYTHON_MODULE(std_vector) {\n   typedef Eigen::Ref<Eigen::MatrixXd> RefXd;\n   StdVectorPythonVisitor<std::vector<RefXd>, true>::expose(\"StdVec_MatRef\");\n   bp::def(\"setZero\", setZero<Eigen::MatrixXd>, \"Sets the coeffs to 0.\");\n+\n+  // Test matrix modification\n+  // Mat2d don't have tolist, reserve, mutable __getitem__ and from list\n+  // conversion exposeStdVectorEigenSpecificType must add those methods to Mat2d\n+  bp::class_<std::vector<Eigen::Matrix2d> >(\"StdVec_Mat2d\")\n+      .def(boost::python::vector_indexing_suite<\n+           std::vector<Eigen::Matrix2d> >());\n+  exposeStdVectorEigenSpecificType<Eigen::Matrix3d>(\"Mat2d\");\n }"
+        }
+      ]
+    },
+    {
+      "author": "fabinsch",
+      "date": "2022-12-02T15:41:05Z",
+      "sha": "cabded606d976b0f6fee53c75486e28d02593cfc",
+      "message": "update cmake module",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "277d1bd8a5491e6235413bd716756249c3922232",
+          "filename": "cmake",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": null,
+          "raw_url": null,
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/cmake?ref=cabded606d976b0f6fee53c75486e28d02593cfc",
+          "patch": "@@ -1 +1 @@\n-Subproject commit c1439c9894173c80e44173fd6af17232f20fa2dd\n+Subproject commit 277d1bd8a5491e6235413bd716756249c3922232"
+        }
+      ]
+    },
+    {
+      "author": "acmiyaguchi",
+      "date": "2022-09-18T10:46:19Z",
+      "sha": "629b3a1d3a2bd61102c869f5f4f31fd61efc267e",
+      "message": "Modify stride assertion in `numpy-map.hpp` to be valid for empty vector (#321)\n\n* Set stride assert to be less than INT_MAX\r\n\r\n* Remove extra print calls and flush on print\r\n\r\n* Revert \"Remove extra print calls and flush on print\"\r\n\r\nThis reverts commit cc7db3d0fa393611df5f69f7d77f59f803bdff5d.\r\n\r\n* core: fix assert\r\n\r\nCo-authored-by: Justin Carpentier <justin.carpentier@inria.fr>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "51af11b1ca14eeb76eedacb5f258af76bbae2de3",
+          "filename": "include/eigenpy/numpy-map.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 2,
+          "changes": 3,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/629b3a1d3a2bd61102c869f5f4f31fd61efc267e/include%2Feigenpy%2Fnumpy-map.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/629b3a1d3a2bd61102c869f5f4f31fd61efc267e/include%2Feigenpy%2Fnumpy-map.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/include%2Feigenpy%2Fnumpy-map.hpp?ref=629b3a1d3a2bd61102c869f5f4f31fd61efc267e",
+          "patch": "@@ -157,8 +157,7 @@ struct NumpyMapTraits<MatType, InputScalar, AlignmentValue, Stride, true> {\n     else\n       rowMajor = (PyArray_DIMS(pyArray)[0] > PyArray_DIMS(pyArray)[1]) ? 0 : 1;\n \n-    assert((PyArray_DIMS(pyArray)[rowMajor] < INT_MAX) &&\n-           (PyArray_STRIDE(pyArray, rowMajor)));\n+    assert(PyArray_DIMS(pyArray)[rowMajor] < INT_MAX);\n     const int R = (int)PyArray_DIMS(pyArray)[rowMajor];\n     const long int itemsize = PyArray_ITEMSIZE(pyArray);\n     const int stride = (int)PyArray_STRIDE(pyArray, rowMajor) / (int)itemsize;"
+        }
+      ]
+    },
+    {
+      "author": "proyan",
+      "date": "2021-07-20T10:27:01Z",
+      "sha": "8e83e0d7eea03e894ea4fa11c270f0e8204aefc7",
+      "message": "user-type.hpp: add doc for setitem and getitem + minor changes",
+      "files_changed": 1,
+      "additions": 30,
+      "deletions": 17,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "fc293da90208312935eb6a85b6e59d95aaf97744",
+          "filename": "include/eigenpy/user-type.hpp",
+          "status": "modified",
+          "additions": 30,
+          "deletions": 17,
+          "changes": 47,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/8e83e0d7eea03e894ea4fa11c270f0e8204aefc7/include%2Feigenpy%2Fuser-type.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/8e83e0d7eea03e894ea4fa11c270f0e8204aefc7/include%2Feigenpy%2Fuser-type.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/include%2Feigenpy%2Fuser-type.hpp?ref=8e83e0d7eea03e894ea4fa11c270f0e8204aefc7",
+          "patch": "@@ -61,26 +61,39 @@ namespace eigenpy\n           std::swap(t1,t2);\n         }\n       }\n-      \n+\n+      ///\n+      /// \\brief Get a python object from an array\n+      ///        It returns a standard Python object from\n+      ///        a single element of the array object arr pointed to by data.\n+      /// \\param[in] data Pointer to the first element of the C++ data stream\n+      /// \\param[in] arr  Pointer to the first element of the Python object data stream\n+      ///\n+      /// \\returns PyObject corresponding to the python datastream.\n+      ///\n       inline static PyObject * getitem(void * ip, void * ap)\n       {\n-//        std::cout << \"getitem\" << std::endl;\n+//      std::cout << \"getitem\" << std::endl;\n         PyArrayObject * py_array = static_cast<PyArrayObject *>(ap);\n-        if((py_array==NULL) || PyArray_ISBEHAVED_RO(py_array))\n-        {\n-          T * elt_ptr = static_cast<T*>(ip);\n-          bp::object m(boost::ref(*elt_ptr));\n-          Py_INCREF(m.ptr());\n-          return m.ptr();\n-        }\n-        else\n-        {\n-          T * elt_ptr = static_cast<T*>(ip);\n-          bp::object m(boost::ref(*elt_ptr));\n-          Py_INCREF(m.ptr());\n-          return m.ptr();\n-        }\n+        T * elt_ptr = static_cast<T*>(ip);\n+        bp::object m(boost::ref(*elt_ptr));\n+        Py_INCREF(m.ptr());\n+        return m.ptr();\n       }\n+\n+      ///\n+      /// \\brief Set a python object in an array.\n+      ///        It sets the Python object \"item\" into the array, arr, at the position\n+      ///        pointed to by data. This function deals with “misbehaved” arrays.\n+      ///        If successful, a zero is returned, otherwise, a negative one is returned\n+      ///        (and a Python error set).\n+      \n+      /// \\param[in] src_obj  Pointer to the location of the python object\n+      /// \\param[in] dest_ptr Pointer to the location in the array where the source object should be saved.\n+      /// \\param[in] array Pointer to the location of the array\n+      ///\n+      /// \\returns int Success(0) or Failure(-1)\n+      ///\n       \n       inline static int setitem(PyObject * src_obj, void * dest_ptr, void * array)\n       {\n@@ -189,7 +202,7 @@ namespace eigenpy\n //      {\n //      }\n \n-    };\n+    };  //     struct SpecialMethods<T,NPY_USERDEF>\n   \n   } // namespace internal\n "
+        }
+      ]
+    },
+    {
+      "author": "gabrielebndn",
+      "date": "2019-12-19T12:24:51Z",
+      "sha": "69ac54cc022e6f97a5088c5c51a5005f0aee2077",
+      "message": "Deprecate BUILD_UNIT_TESTS (#142)\n\n* Default BUILD_TESTING to OFF\r\n\r\n* Deprecate BUILD_UNIT_TESTS and remove its usage\r\n\r\n* Revert \"Default BUILD_TESTING to OFF\"\r\n\r\nThis reverts commit 102bf6fb30ce77bfe195b296482406b4b6a81b41.\r\n\r\n* [BUILD_UNIT_TESTS] Better deprecation message",
+      "files_changed": 2,
+      "additions": 11,
+      "deletions": 11,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "a8f16eec664ee6abf2de60f8de683ec3b1228ca1",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 6,
+          "changes": 12,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/69ac54cc022e6f97a5088c5c51a5005f0aee2077/CMakeLists.txt",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/69ac54cc022e6f97a5088c5c51a5005f0aee2077/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/CMakeLists.txt?ref=69ac54cc022e6f97a5088c5c51a5005f0aee2077",
+          "patch": "@@ -45,13 +45,13 @@ ENDIF(WIN32)\n # --- OPTIONS  ---------------------------------------\n # ----------------------------------------------------\n OPTION(INSTALL_DOCUMENTATION \"Generate and install the documentation\" FALSE)\n-OPTION(BUILD_UNIT_TESTS \"Build the unitary tests\" OFF)\n \n-IF(BUILD_UNIT_TESTS)\n-  SET(BUILD_TESTING ON)\n-ELSE(BUILD_UNIT_TESTS)\n-  SET(BUILD_TESTING OFF) \n-ENDIF(BUILD_UNIT_TESTS)\n+IF(DEFINED BUILD_UNIT_TESTS)\n+  MESSAGE(AUTHOR_WARNING \"BUILD_UNIT_TESTS is deprecated. Use BUILD_TESTING instead.\\\n+    If you are manually building Pinocchio from source in an existing build folder,\\\n+    we suggest that you delete your build folder and make a new one.\")\n+  SET(BUILD_TESTING ${BUILD_UNIT_TESTS})\n+ENDIF(DEFINED BUILD_UNIT_TESTS)\n \n FINDPYTHON()\n FIND_NUMPY()"
+        },
+        {
+          "sha": "2c6942d738d1ef1f8582b85e5b728308ca60cad3",
+          "filename": "unittest/CMakeLists.txt",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 5,
+          "changes": 10,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/69ac54cc022e6f97a5088c5c51a5005f0aee2077/unittest%2FCMakeLists.txt",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/69ac54cc022e6f97a5088c5c51a5005f0aee2077/unittest%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/unittest%2FCMakeLists.txt?ref=69ac54cc022e6f97a5088c5c51a5005f0aee2077",
+          "patch": "@@ -6,11 +6,11 @@\n MACRO(ADD_LIB_UNIT_TEST test PKGS)\n   CREATE_CTEST_BUILD_TESTS_TARGET()\n \n-  IF(BUILD_UNIT_TESTS)\n+  IF(BUILD_TESTING)\n     ADD_LIBRARY(${test} SHARED ${test})\n-  ELSE(BUILD_UNIT_TESTS)\n+  ELSE(BUILD_TESTING)\n     ADD_LIBRARY(${test} SHARED EXCLUDE_FROM_ALL ${test})\n-  ENDIF(BUILD_UNIT_TESTS)\n+  ENDIF(BUILD_TESTING)\n \n   FOREACH(PKG ${PKGS})\n     PKG_CONFIG_USE_DEPENDENCY(${test} ${PKG})\n@@ -24,9 +24,9 @@ MACRO(ADD_LIB_UNIT_TEST test PKGS)\n   ADD_TEST(NAME ${test} COMMAND ${PYTHON_EXECUTABLE} -c \"import ${test}\")\n \n   ADD_DEPENDENCIES(build_tests ${test})\n-  IF(NOT BUILD_UNIT_TESTS)\n+  IF(NOT BUILD_TESTING)\n     SET_TESTS_PROPERTIES(${test} PROPERTIES DEPENDS ctest_build_tests)\n-  ENDIF(NOT BUILD_UNIT_TESTS)\n+  ENDIF(NOT BUILD_TESTING)\n ENDMACRO(ADD_LIB_UNIT_TEST)\n \n ADD_LIB_UNIT_TEST(matrix \"eigen3\")"
+        }
+      ]
+    },
+    {
+      "author": "gleichdick",
+      "date": "2020-04-17T10:27:15Z",
+      "sha": "8ab8f57c380e9ea6f35f2ced31d70e0067cd7308",
+      "message": "Fix LLT with current eigen master\n\nReturn type of LLT::rankUpdate was changed from LLT (value) to LLT& (reference)",
+      "files_changed": 1,
+      "additions": 6,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "ba8c2f2b721a8febfce0820c68e3968e1eaa9e39",
+          "filename": "include/eigenpy/decompositions/LLT.hpp",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 1,
+          "changes": 7,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/8ab8f57c380e9ea6f35f2ced31d70e0067cd7308/include%2Feigenpy%2Fdecompositions%2FLLT.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/8ab8f57c380e9ea6f35f2ced31d70e0067cd7308/include%2Feigenpy%2Fdecompositions%2FLLT.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/include%2Feigenpy%2Fdecompositions%2FLLT.hpp?ref=8ab8f57c380e9ea6f35f2ced31d70e0067cd7308",
+          "patch": "@@ -44,9 +44,14 @@ namespace eigenpy\n       .def(\"matrixLLT\",&Solver::matrixLLT,bp::arg(\"self\"),\n            \"Returns the LLT decomposition matrix.\",\n            bp::return_internal_reference<>())\n-      \n+\n+#if EIGEN_VERSION_AT_LEAST(3,3,90)\n+      .def(\"rankUpdate\",(Solver& (Solver::*)(const VectorType &, const RealScalar &))&Solver::template rankUpdate<VectorType>,\n+           bp::args(\"self\",\"vector\",\"sigma\"), bp::return_self<>())\n+#else\n       .def(\"rankUpdate\",(Solver (Solver::*)(const VectorType &, const RealScalar &))&Solver::template rankUpdate<VectorType>,\n            bp::args(\"self\",\"vector\",\"sigma\"))\n+#endif\n       \n #if EIGEN_VERSION_AT_LEAST(3,3,0)\n       .def(\"adjoint\",&Solver::adjoint,bp::arg(\"self\"),"
+        }
+      ]
+    },
+    {
+      "author": "seanyen",
+      "date": "2019-07-17T07:29:08Z",
+      "sha": "fa2a7fbca0da3145391267dadc2d7ea937e04dd1",
+      "message": "Fix windows/MSVC build.",
+      "files_changed": 4,
+      "additions": 14,
+      "deletions": 11,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "5bd79e5279aa2a3ceece8d4c8e4e325e2bbf0e8d",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/fa2a7fbca0da3145391267dadc2d7ea937e04dd1/CMakeLists.txt",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/fa2a7fbca0da3145391267dadc2d7ea937e04dd1/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/CMakeLists.txt?ref=fa2a7fbca0da3145391267dadc2d7ea937e04dd1",
+          "patch": "@@ -109,6 +109,8 @@ SET(${PROJECT_NAME}_HEADERS\n INCLUDE_DIRECTORIES(${${PROJECT_NAME}_BINARY_DIR}/include)\n INCLUDE_DIRECTORIES(${${PROJECT_NAME}_SOURCE_DIR}/include)\n \n+LINK_DIRECTORIES(${PYTHON_LIBRARY_DIRS})\n+\n # ----------------------------------------------------\n # --- TARGETS ----------------------------------------\n # ----------------------------------------------------\n@@ -130,6 +132,7 @@ ADD_LIBRARY(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES} ${${PROJECT_NAME}_\n SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES OUTPUT_NAME \"${PROJECT_NAME}${PYTHON_SOABI}\")\n \n TARGET_LINK_BOOST_PYTHON(${PROJECT_NAME})\n+SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE) \n PKG_CONFIG_USE_DEPENDENCY(${PROJECT_NAME} eigen3)\n INSTALL(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)\n "
+        },
+        {
+          "sha": "92df398aa6839859b3797cfb2a66d00198b3b214",
+          "filename": "include/eigenpy/details.hpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 4,
+          "changes": 8,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/fa2a7fbca0da3145391267dadc2d7ea937e04dd1/include%2Feigenpy%2Fdetails.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/fa2a7fbca0da3145391267dadc2d7ea937e04dd1/include%2Feigenpy%2Fdetails.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/include%2Feigenpy%2Fdetails.hpp?ref=fa2a7fbca0da3145391267dadc2d7ea937e04dd1",
+          "patch": "@@ -300,7 +300,7 @@ namespace eigenpy\n       // Check if the Scalar type of the obj_ptr is compatible with the Scalar type of MatType\n       if ((PyArray_ObjectType(reinterpret_cast<PyObject *>(obj_ptr), 0)) == NPY_INT)\n       {\n-        if(not FromTypeToType<int,typename MatType::Scalar>::value)\n+        if(!FromTypeToType<int,typename MatType::Scalar>::value)\n         {\n #ifndef NDEBUG\n           std::cerr << \"The Python matrix scalar type (int) cannot be converted into the scalar type of the Eigen matrix. Loss of arithmetic precision\" << std::endl;\n@@ -310,7 +310,7 @@ namespace eigenpy\n       }\n       else if ((PyArray_ObjectType(reinterpret_cast<PyObject *>(obj_ptr), 0)) == NPY_LONG)\n       {\n-        if(not FromTypeToType<long,typename MatType::Scalar>::value)\n+        if(!FromTypeToType<long,typename MatType::Scalar>::value)\n         {\n #ifndef NDEBUG\n           std::cerr << \"The Python matrix scalar type (long) cannot be converted into the scalar type of the Eigen matrix. Loss of arithmetic precision\" << std::endl;\n@@ -320,7 +320,7 @@ namespace eigenpy\n       }\n       else if ((PyArray_ObjectType(reinterpret_cast<PyObject *>(obj_ptr), 0)) == NPY_FLOAT)\n       {\n-        if(not FromTypeToType<float,typename MatType::Scalar>::value)\n+        if(!FromTypeToType<float,typename MatType::Scalar>::value)\n         {\n #ifndef NDEBUG\n           std::cerr << \"The Python matrix scalar type (float) cannot be converted into the scalar type of the Eigen matrix. Loss of arithmetic precision\" << std::endl;\n@@ -330,7 +330,7 @@ namespace eigenpy\n       }\n       else if ((PyArray_ObjectType(reinterpret_cast<PyObject *>(obj_ptr), 0)) == NPY_DOUBLE)\n       {\n-        if(not FromTypeToType<double,typename MatType::Scalar>::value)\n+        if(!FromTypeToType<double,typename MatType::Scalar>::value)\n         {\n #ifndef NDEBUG\n           std::cerr << \"The Python matrix scalar (double) type cannot be converted into the scalar type of the Eigen matrix. Loss of arithmetic precision.\" << std::endl;"
+        },
+        {
+          "sha": "24158cd2d5a9831964e97cde7ed5ea1639a47d06",
+          "filename": "include/eigenpy/expose.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/fa2a7fbca0da3145391267dadc2d7ea937e04dd1/include%2Feigenpy%2Fexpose.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/fa2a7fbca0da3145391267dadc2d7ea937e04dd1/include%2Feigenpy%2Fexpose.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/include%2Feigenpy%2Fexpose.hpp?ref=fa2a7fbca0da3145391267dadc2d7ea937e04dd1",
+          "patch": "@@ -27,7 +27,7 @@ namespace eigenpy\n   template<typename T>\n   inline void expose()\n   {\n-    if(not register_symbolic_link_to_registered_type<T>())\n+    if(!register_symbolic_link_to_registered_type<T>())\n       internal::call_expose<T>::run();\n   }\n }"
+        },
+        {
+          "sha": "1f05bd676e5c4d4f5ddd0b67e3465589a31dfe99",
+          "filename": "include/eigenpy/ref.hpp",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 6,
+          "changes": 12,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/fa2a7fbca0da3145391267dadc2d7ea937e04dd1/include%2Feigenpy%2Fref.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/fa2a7fbca0da3145391267dadc2d7ea937e04dd1/include%2Feigenpy%2Fref.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/include%2Feigenpy%2Fref.hpp?ref=fa2a7fbca0da3145391267dadc2d7ea937e04dd1",
+          "patch": "@@ -11,19 +11,19 @@\n \n // For old Eigen versions, EIGEN_DEVICE_FUNC is not defined.\n // We must define it just in the scope of this file.\n-#if not EIGEN_VERSION_AT_LEAST(3,2,90)\n+#if !EIGEN_VERSION_AT_LEAST(3,2,90)\n #define EIGEN_DEVICE_FUNC\n #endif\n \n namespace eigenpy\n {\n \n-  template<typename PlainObjectType>\n-  struct Ref : Eigen::Ref<PlainObjectType,EIGENPY_DEFAULT_ALIGNMENT_VALUE,typename StrideType<PlainObjectType>::type>\n+  template<typename PlainObjectTypeT>\n+  struct Ref : Eigen::Ref<PlainObjectTypeT,EIGENPY_DEFAULT_ALIGNMENT_VALUE,typename StrideType<PlainObjectTypeT>::type>\n   {\n   public:\n-    typedef Eigen::Ref<PlainObjectType,EIGENPY_DEFAULT_ALIGNMENT_VALUE,typename StrideType<PlainObjectType>::type> Base;\n-    \n+    typedef Eigen::Ref<PlainObjectTypeT,EIGENPY_DEFAULT_ALIGNMENT_VALUE,typename eigenpy::template StrideType<PlainObjectTypeT>::type> Base;\n+\n   private:\n     typedef Eigen::internal::traits<Base> Traits;\n     template<typename Derived>\n@@ -83,7 +83,7 @@ namespace eigenpy\n   }; // struct Ref<PlainObjectType>\n }\n \n-#if not EIGEN_VERSION_AT_LEAST(3,2,90)\n+#if !EIGEN_VERSION_AT_LEAST(3,2,90)\n #undef EIGEN_DEVICE_FUNC\n #endif\n "
+        }
+      ]
+    },
+    {
+      "author": "rhaschke",
+      "date": "2019-11-08T07:32:23Z",
+      "sha": "65ade259193c85c79701530bae70f80bc3af05d8",
+      "message": "eigenpyConfig.cmake: find absolute library paths for all required libs\n\nAs cmake expects absolute library paths, while pkgconfig provides lib names only (together with\nLIBRARY_DIRS), one needs to find the full library path.\n\nThis fixes 7854c0f.",
+      "files_changed": 1,
+      "additions": 9,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "d39ef7d88eb67f8fe91df06cc4b2cff4b79413ac",
+          "filename": "eigenpyConfig.cmake",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 1,
+          "changes": 10,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/65ade259193c85c79701530bae70f80bc3af05d8/eigenpyConfig.cmake",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/65ade259193c85c79701530bae70f80bc3af05d8/eigenpyConfig.cmake",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/eigenpyConfig.cmake?ref=65ade259193c85c79701530bae70f80bc3af05d8",
+          "patch": "@@ -2,5 +2,13 @@ cmake_minimum_required(VERSION 2.8.3)\n \n message(STATUS \"Loading eigenpy from PkgConfig\")\n \n-find_package(PkgConfig)\n+find_package(PkgConfig REQUIRED)\n pkg_check_modules(eigenpy REQUIRED eigenpy)\n+\n+# find absolute library paths for all eigenpy_LIBRARIES\n+set(libs ${eigenpy_LIBRARIES})\n+set(eigenpy_LIBRARIES \"\")\n+foreach(lib ${libs})\n+  find_library(abs_lib_${lib} ${lib} HINTS ${eigenpy_LIBRARY_DIRS})\n+  list(APPEND eigenpy_LIBRARIES \"${abs_lib_${lib}}\")\n+endforeach()"
+        }
+      ]
+    },
+    {
+      "author": "jmirabel",
+      "date": "2018-10-18T08:26:20Z",
+      "sha": "ec96947b1d8e56b6c242907880df4582cce65a5b",
+      "message": "[CMake] Synchronize module",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "b47ff3fd66e5f4cbca8eb5a7c078c735689f3ba8",
+          "filename": "cmake",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": null,
+          "raw_url": null,
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/cmake?ref=ec96947b1d8e56b6c242907880df4582cce65a5b",
+          "patch": "@@ -1 +1 @@\n-Subproject commit 52d25e05c3b5dfd70c79b3e75787fdc78c6f695e\n+Subproject commit b47ff3fd66e5f4cbca8eb5a7c078c735689f3ba8"
+        }
+      ]
+    },
+    {
+      "author": "Carlos Mastalli",
+      "date": "2019-07-25T14:52:43Z",
+      "sha": "e48d99f013d1258e32a5822f823eeb4734bf042a",
+      "message": "[cleanup] Removed debugging messages (#82)",
+      "files_changed": 1,
+      "additions": 0,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b3841a7e197c4db08826274f370eeb84cb259bc4",
+          "filename": "include/eigenpy/details.hpp",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 2,
+          "changes": 2,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/e48d99f013d1258e32a5822f823eeb4734bf042a/include%2Feigenpy%2Fdetails.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/e48d99f013d1258e32a5822f823eeb4734bf042a/include%2Feigenpy%2Fdetails.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/include%2Feigenpy%2Fdetails.hpp?ref=e48d99f013d1258e32a5822f823eeb4734bf042a",
+          "patch": "@@ -433,15 +433,13 @@ namespace eigenpy\n     /// \\brief Determine if pyObj can be converted into a MatType object\n     static void* convertible(PyArrayObject* pyObj)\n     {\n-      std::cout << \"call: EigenFromPy< Eigen::MatrixBase<MatType> >::convertible\" << std::endl;\n       return EigenFromPyDerived::convertible(pyObj);\n     }\n     \n     /// \\brief Allocate memory and copy pyObj in the new storage\n     static void construct(PyObject* pyObj,\n                           bp::converter::rvalue_from_python_stage1_data* memory)\n     {\n-      std::cout << \"call: EigenFromPy< Eigen::MatrixBase<MatType> >::construct\" << std::endl;\n       EigenFromPyDerived::construct(pyObj,memory);\n     }\n     "
+        }
+      ]
+    },
+    {
+      "author": "Guilhem Saurel",
+      "date": "2019-02-08T09:31:03Z",
+      "sha": "ec1b53bda4a0baac3a11cb79cf97bb3c661188b6",
+      "message": "sync submodule, fix #50",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "d128cc2965a7878dc38acf8f4395e1899aa505cb",
+          "filename": "cmake",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": null,
+          "raw_url": null,
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/cmake?ref=ec1b53bda4a0baac3a11cb79cf97bb3c661188b6",
+          "patch": "@@ -1 +1 @@\n-Subproject commit b47ff3fd66e5f4cbca8eb5a7c078c735689f3ba8\n+Subproject commit d128cc2965a7878dc38acf8f4395e1899aa505cb"
+        }
+      ]
+    },
+    {
+      "author": "jviereck",
+      "date": "2017-12-01T20:10:05Z",
+      "sha": "41db0e86d522b00ac21ecec943eb746e71a3d842",
+      "message": "Need to initialize submodules before compiling.",
+      "files_changed": 1,
+      "additions": 8,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "f6895133c3fb70d1d91295057dc013151c9dd510",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/41db0e86d522b00ac21ecec943eb746e71a3d842/README.md",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/41db0e86d522b00ac21ecec943eb746e71a3d842/README.md",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/README.md?ref=41db0e86d522b00ac21ecec943eb746e71a3d842",
+          "patch": "@@ -4,6 +4,14 @@ eigenpy\n Setup\n -----\n \n+Before compiling this package, make sure to have initialized all git\n+submodules of this repo. To initialize the submodules when cloning the\n+repo, use:\n+\n+```bash\n+git clone --recursive <git_url>\n+```\n+\n To compile this package, it is recommended to create a separate build\n directory:\n "
+        }
+      ]
+    },
+    {
+      "author": "olivier-stasse",
+      "date": "2017-01-05T09:17:35Z",
+      "sha": "39ec133eea945e20823324ef6f1d1846e9427cf8",
+      "message": "Makes eigenpy compliant with NUMPY 1.8 (on Ubuntu 14.04 LTS)",
+      "files_changed": 3,
+      "additions": 14,
+      "deletions": 9,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "05f1308f47d30d422992ab3bd469346c2f8452d5",
+          "filename": "src/details.hpp",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 4,
+          "changes": 12,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/39ec133eea945e20823324ef6f1d1846e9427cf8/src%2Fdetails.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/39ec133eea945e20823324ef6f1d1846e9427cf8/src%2Fdetails.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/src%2Fdetails.hpp?ref=39ec133eea945e20823324ef6f1d1846e9427cf8",
+          "patch": "@@ -137,11 +137,12 @@ namespace eigenpy\n     EigenFromPy()\n     {\n       bp::converter::registry::push_back\n-\t(&convertible,&construct,bp::type_id<MatType>());\n+\t(reinterpret_cast<void *(*)(_object *)>(&convertible),\n+\t &construct,bp::type_id<MatType>());\n     }\n  \n     // Determine if obj_ptr can be converted in a Eigenvec\n-    static void* convertible(PyObject* obj_ptr)\n+    static void* convertible(PyArrayObject* obj_ptr)\n     {\n       typedef typename MatType::Scalar T;\n \n@@ -162,15 +163,18 @@ namespace eigenpy\n \t    return 0;\n \t  }\n \n-      if ((PyArray_ObjectType(obj_ptr, 0)) != NumpyEquivalentType<T>::type_code)\n+      if ((PyArray_ObjectType(reinterpret_cast<PyObject *>(obj_ptr), 0)) != NumpyEquivalentType<T>::type_code)\n \t{\n #ifndef NDEBUG\n \t  std::cerr << \"The internal type as no Eigen equivalent.\" << std::endl;\n #endif\n \t  return 0;\n \t}\n-\n+#ifdef NPY_1_8_API_VERSION\n+      if (!(PyArray_FLAGS(obj_ptr)))\n+#else\n       if (!(PyArray_FLAGS(obj_ptr) & NPY_ALIGNED))\n+#endif\n \t{\n #ifndef NDEBUG\n \t  std::cerr << \"NPY non-aligned matrices are not implemented.\" << std::endl;"
+        },
+        {
+          "sha": "f601a7c318b6c5193cc709b0e99f17301eba0734",
+          "filename": "src/fwd.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/39ec133eea945e20823324ef6f1d1846e9427cf8/src%2Ffwd.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/39ec133eea945e20823324ef6f1d1846e9427cf8/src%2Ffwd.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/src%2Ffwd.hpp?ref=39ec133eea945e20823324ef6f1d1846e9427cf8",
+          "patch": "@@ -19,6 +19,7 @@\n \n #include <boost/python.hpp>\n #include <Eigen/Core>\n+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION\n \n namespace eigenpy\n {"
+        },
+        {
+          "sha": "0c0b633d48d3b181957bd165ec91ff44426f428a",
+          "filename": "src/map.hpp",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 5,
+          "changes": 10,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/39ec133eea945e20823324ef6f1d1846e9427cf8/src%2Fmap.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/39ec133eea945e20823324ef6f1d1846e9427cf8/src%2Fmap.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/src%2Fmap.hpp?ref=39ec133eea945e20823324ef6f1d1846e9427cf8",
+          "patch": "@@ -60,9 +60,9 @@ namespace eigenpy\n \n       const int R = (int)PyArray_DIMS(pyArray)[0];\n       const int C = (int)PyArray_DIMS(pyArray)[1];\n-      const int itemsize = PyArray_ITEMSIZE(pyArray);\n-      const int stride1 = (int)PyArray_STRIDE(pyArray, 0) / itemsize;\n-      const int stride2 = (int)PyArray_STRIDE(pyArray, 1) / itemsize;\n+      const long int itemsize = PyArray_ITEMSIZE(pyArray);\n+      const int stride1 = (int)PyArray_STRIDE(pyArray, 0) / (int)itemsize;\n+      const int stride2 = (int)PyArray_STRIDE(pyArray, 1) / (int)itemsize;\n       \n       if( (MatType::RowsAtCompileTime!=R)\n \t  && (MatType::RowsAtCompileTime!=Eigen::Dynamic) )\n@@ -94,8 +94,8 @@ namespace eigenpy\n       assert( (PyArray_DIMS(pyArray)[rowMajor]< INT_MAX)\n \t      && (PyArray_STRIDE(pyArray, rowMajor) ));\n       const int R = (int)PyArray_DIMS(pyArray)[rowMajor];\n-      const int itemsize = PyArray_ITEMSIZE(pyArray);\n-      const int stride = (int) PyArray_STRIDE(pyArray, rowMajor) / itemsize;;\n+      const long int itemsize = PyArray_ITEMSIZE(pyArray);\n+      const int stride = (int) PyArray_STRIDE(pyArray, rowMajor) / (int) itemsize;;\n \n       if( (MatType::MaxSizeAtCompileTime!=R)\n \t      && (MatType::MaxSizeAtCompileTime!=Eigen::Dynamic) )"
+        }
+      ]
+    },
+    {
+      "author": "aelkhour",
+      "date": "2016-07-07T13:05:06Z",
+      "sha": "2aeb383825a6d67e13dd9e4afbc6f02759985070",
+      "message": "Add Scalar template argument to UnalignedEquivalent struct.\n\n* It allows creating unaligned equivalent of Eigen matrix using a\n  different scalar type. This can be useful when matrix types use\n  single precision floats, whereas Numpy matrix types use double\n  precision floats by default.\n* Default template argument value is Matrix D scalar type to preserve\n  backward-compatibility.",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "1fe3dd1d496bacaf63e2277b484443077d4c9f82",
+          "filename": "src/fwd.hpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/2aeb383825a6d67e13dd9e4afbc6f02759985070/src%2Ffwd.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/2aeb383825a6d67e13dd9e4afbc6f02759985070/src%2Ffwd.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/src%2Ffwd.hpp?ref=2aeb383825a6d67e13dd9e4afbc6f02759985070",
+          "patch": "@@ -22,11 +22,11 @@\n \n namespace eigenpy\n {\n-  template<typename D>\n+  template<typename D, typename Scalar = typename D::Scalar>\n   struct UnalignedEquivalent\n   {\n     typedef Eigen::MatrixBase<D> MatType;\n-    typedef Eigen::Matrix<typename D::Scalar,\n+    typedef Eigen::Matrix<Scalar,\n              D::RowsAtCompileTime,\n              D::ColsAtCompileTime,\n #ifndef EIGENPY_ALIGNED"
+        }
+      ]
+    },
+    {
+      "author": "nmansard",
+      "date": "2014-07-07T19:58:09Z",
+      "sha": "df670c2b3d2736f75e1df5e236d2ad80cdb9a8e4",
+      "message": "IVIGIT.",
+      "files_changed": 6,
+      "additions": 339,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b7e3c24c32f7a6cb4afed96278925250254fcd6b",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 41,
+          "deletions": 0,
+          "changes": 41,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/df670c2b3d2736f75e1df5e236d2ad80cdb9a8e4/CMakeLists.txt",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/df670c2b3d2736f75e1df5e236d2ad80cdb9a8e4/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/CMakeLists.txt?ref=df670c2b3d2736f75e1df5e236d2ad80cdb9a8e4",
+          "patch": "@@ -0,0 +1,41 @@\n+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)\n+IF(NOT CMAKE_BUILD_TYPE)\n+  SET(CMAKE_BUILD_TYPE \"DEBUG\")\n+ENDIF()\n+\n+IF(NOT BOOST_NUMPY_DIR)\n+  SET(BOOST_NUMPY_DIR \".\")\n+ENDIF()\n+\n+FIND_PACKAGE(Boost 1.45.0)\n+IF(Boost_FOUND)\n+  INCLUDE_DIRECTORIES(\"${Boost_INCLUDE_DIRS}\" \"/usr/include/python2.7\" \"/usr/include/eigen3\" \"Boost.NumPy\")\n+  LINK_DIRECTORIES(${BOOST_NUMPY_DIR})\n+\n+  SET(Boost_USE_STATIC_LIBS OFF)\n+  SET(Boost_USE_MULTITHREADED ON)\n+  SET(Boost_USE_STATIC_RUNTIME OFF)\n+  FIND_PACKAGE(Boost 1.45.0 COMPONENTS python)\n+\n+  ADD_LIBRARY(simple SHARED src/simple.cpp)\n+  TARGET_LINK_LIBRARIES(simple ${Boost_LIBRARIES})\n+\n+  ADD_LIBRARY(mystring SHARED src/mystring.cpp)\n+  TARGET_LINK_LIBRARIES(mystring ${Boost_LIBRARIES})\n+\n+  ADD_LIBRARY(bnpy SHARED src/bnpy.cpp)\n+  TARGET_LINK_LIBRARIES(bnpy ${Boost_LIBRARIES})\n+\n+  ADD_LIBRARY(eigen SHARED src/eigen.cpp)\n+  TARGET_LINK_LIBRARIES(eigen ${Boost_LIBRARIES} libboost_numpy.so)\n+\n+ELSEIF(NOT Boost_FOUND)\n+  MESSAGE(FATAL_ERROR \"Unable to find correct Boost version. Did you set BOOST_ROOT?\")\n+ENDIF()\n+\n+\n+IF(CMAKE_COMPILER_IS_GNUCXX)\n+  ADD_DEFINITIONS(\"-Wall\")\n+ELSE()\n+  MESSAGE(FATAL_ERROR \"CMakeLists.txt has not been tested/written for your compiler.\")\n+ENDIF()"
+        },
+        {
+          "sha": "c27daac85257cf28d7d01039182f9231c25ddd58",
+          "filename": "python/unittest.py",
+          "status": "added",
+          "additions": 40,
+          "deletions": 0,
+          "changes": 40,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/df670c2b3d2736f75e1df5e236d2ad80cdb9a8e4/python%2Funittest.py",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/df670c2b3d2736f75e1df5e236d2ad80cdb9a8e4/python%2Funittest.py",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/python%2Funittest.py?ref=df670c2b3d2736f75e1df5e236d2ad80cdb9a8e4",
+          "patch": "@@ -0,0 +1,40 @@\n+#!/usr/bin/python\n+\n+import numpy as np\n+\n+import libsimple\n+\n+print libsimple.char()\n+print libsimple.str()\n+try:\n+    a = libsimple.eigenvec()\n+    print a\n+except:\n+    print \"Error when calling simple eigenvec\"\n+\n+import libmystring\n+print libmystring.hello()\n+print libmystring.size(\"toto+5\")\n+\n+import libeigen\n+print libeigen.test()\n+a = np.matrix([11,2,3,4,5]).T\n+\n+b = np.array([11,2,3,4,5])\n+#b = np.array([[15,],[1,],[1,],[1,],[1,],])\n+#b = np.array([ [[10,2],[3,4]],[[10,2],[3,4]] ])\n+\n+print \"matrix ===> \"\n+libeigen.test2(a)\n+print \"array ===> \"\n+libeigen.test2(b)\n+\n+\n+\n+'''\n+import libbnpy\n+a=libbnpy.array()\n+print a.__class__\n+b=libbnpy.matrix()\n+print b.__class__\n+'''"
+        },
+        {
+          "sha": "ed3716d199e4ba340c7dc7f47c85f9a1b002124b",
+          "filename": "src/bnpy.cpp",
+          "status": "added",
+          "additions": 34,
+          "deletions": 0,
+          "changes": 34,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/df670c2b3d2736f75e1df5e236d2ad80cdb9a8e4/src%2Fbnpy.cpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/df670c2b3d2736f75e1df5e236d2ad80cdb9a8e4/src%2Fbnpy.cpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/src%2Fbnpy.cpp?ref=df670c2b3d2736f75e1df5e236d2ad80cdb9a8e4",
+          "patch": "@@ -0,0 +1,34 @@\n+/* Simple test using the boost::numpy interface: return an array and a matrix. */\n+\n+#include <boost/python.hpp>\n+#include \"boost/numpy.hpp\"\n+\n+namespace bp = boost::python;\n+namespace bn = boost::numpy;\n+\n+/* Return an dim-1 array with 5 elements. */\n+bn::ndarray array() {\n+  std::vector<double> v(5);\n+  v[0] = 56;\n+  Py_intptr_t shape[1] = { v.size() };\n+  bn::ndarray result = bn::zeros(1, shape, bn::dtype::get_builtin<double>());\n+  std::copy(v.begin(), v.end(), reinterpret_cast<double*>(result.get_data()));\n+  return result;\n+}\n+\n+/* Return a dim-1 matrix with five elements. */\n+boost::python::object matrix() {\n+  std::vector<double> v(5);\n+  v[0] = 56;\n+  Py_intptr_t shape[1] = { v.size() };\n+  bn::matrix t(bn::zeros(1, shape, bn::dtype::get_builtin<double>()));\n+  std::copy(v.begin(), v.end(), reinterpret_cast<double*>(t.get_data()));\n+\n+  return t;\n+}\n+\n+BOOST_PYTHON_MODULE(libbnpy) {\n+    bn::initialize();\n+    bp::def(\"array\", array);\n+    bp::def(\"matrix\", matrix);\n+}"
+        },
+        {
+          "sha": "9efe84ae4ff6bc05b91623bd6739cf3c30327856",
+          "filename": "src/eigen.cpp",
+          "status": "added",
+          "additions": 107,
+          "deletions": 0,
+          "changes": 107,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/df670c2b3d2736f75e1df5e236d2ad80cdb9a8e4/src%2Feigen.cpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/df670c2b3d2736f75e1df5e236d2ad80cdb9a8e4/src%2Feigen.cpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/src%2Feigen.cpp?ref=df670c2b3d2736f75e1df5e236d2ad80cdb9a8e4",
+          "patch": "@@ -0,0 +1,107 @@\n+#include <Eigen/Core>\n+#include <boost/python.hpp>\n+#include <boost/numpy.hpp>\n+\n+\n+namespace boopy\n+{\n+  namespace bpn = boost::numpy;\n+  namespace bp = boost::python;\n+\t\n+  struct Eigenvec_to_python_matrix\n+  {\n+    static PyObject* convert(Eigen::VectorXd const& v)\n+    {\n+      Py_intptr_t shape[1] = { v.size() };\n+      bpn::matrix result(bpn::zeros(1, shape, bpn::dtype::get_builtin<double>()));\n+      std::copy(v.data(), v.data()+v.size(), reinterpret_cast<double*>(result.get_data()));\n+      return bp::incref(result.ptr());\n+    }\n+  };\n+  \n+  struct Eigenvec_from_python_array\n+  {\n+    Eigenvec_from_python_array()\n+    {\n+      bp::converter::registry\n+\t::push_back(&convertible,\n+\t\t    &construct,\n+\t\t    bp::type_id<Eigen::VectorXd>());\n+    }\n+ \n+    // Determine if obj_ptr can be converted in a Eigenvec\n+    static void* convertible(PyObject* obj_ptr)\n+    {\n+\n+      try {\n+\tbp::object obj(bp::handle<>(bp::borrowed(obj_ptr)));\n+\tstd::auto_ptr<bpn::ndarray> \n+\t  array(new bpn::ndarray(bpn::from_object(obj,\n+\t\t\t\t\t\t  bpn::dtype::get_builtin<double>(),\n+\t\t\t\t\t\t  bpn::ndarray::V_CONTIGUOUS)));\n+\n+\tif( (array->get_nd()==1)\n+\t    || ( (array->get_nd()==2) && (array->get_shape()[1]==1) ))\n+\t  return array.release();\n+\telse\n+\t  return 0;\n+      } catch (bp::error_already_set & err) {\n+\tbp::handle_exception();\n+\treturn 0;\n+      }\n+    }\n+ \n+    // Convert obj_ptr into a Eigenvec\n+    static void construct(PyObject* ,\n+\t\t\t  bp::converter::rvalue_from_python_stage1_data* memory)\n+    {\n+      // Recover the pointer created in <convertible>\n+      std::auto_ptr<bpn::ndarray> \n+\tarray(reinterpret_cast<bpn::ndarray*>(memory->convertible));\n+      const int nrow = array->get_shape()[0];\n+      std::cout << \"nrow = \" << nrow << std::endl;\n+\n+      // Get the memory where to create the vector\n+      void* storage\n+\t= ((bp::converter::rvalue_from_python_storage<Eigen::VectorXd>*)memory)\n+\t->storage.bytes;\n+\n+      // Create the vector\n+      Eigen::VectorXd & res = * new (storage) Eigen::VectorXd(nrow);\n+ \n+      // Copy the data\n+      double * data = (double*)array->get_data();\n+      for(int i=0;i<nrow;++i) \n+\tres[i] = data[i];\n+\n+      // Stash the memory chunk pointer for later use by boost.python\n+      memory->convertible = storage;\n+    }\n+  };\n+}\n+\n+Eigen::VectorXd test()\n+{\n+  Eigen::VectorXd v = Eigen::VectorXd::Random(5);\n+  std::cout << v.transpose() << std::endl;\n+  return v;\n+}\n+\n+void test2( Eigen::VectorXd v )\n+{\n+  std::cout << \"test2: dim = \" << v.size() << \" ||| v[0] = \" << v[0] << std::endl;\n+}\n+\n+BOOST_PYTHON_MODULE(libeigen)\n+{\n+  namespace bpn = boost::numpy;\n+  namespace bp = boost::python;\n+\n+  bpn::initialize();\n+  bp::to_python_converter<Eigen::VectorXd,\n+\t\t\t  boopy::Eigenvec_to_python_matrix>();\n+  boopy::Eigenvec_from_python_array();\n+\n+  bp::def(\"test\", test);\n+  bp::def(\"test2\", test2);\n+}"
+        },
+        {
+          "sha": "e5eab149f589d45b12a7f17d7136e42b6891f307",
+          "filename": "src/mystring.cpp",
+          "status": "added",
+          "additions": 83,
+          "deletions": 0,
+          "changes": 83,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/df670c2b3d2736f75e1df5e236d2ad80cdb9a8e4/src%2Fmystring.cpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/df670c2b3d2736f75e1df5e236d2ad80cdb9a8e4/src%2Fmystring.cpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/src%2Fmystring.cpp?ref=df670c2b3d2736f75e1df5e236d2ad80cdb9a8e4",
+          "patch": "@@ -0,0 +1,83 @@\n+/* Tutorial with boost::python. Using the converter to access a home-made\n+ * string class and bind it to the python strings. */\n+\n+#include <boost/python/module.hpp>\n+#include <boost/python/def.hpp>\n+#include <boost/python/to_python_converter.hpp>\n+\n+namespace homemadestring\n+{\n+\n+  /* This is the home-made string class. */\n+  class custom_string\n+  {\n+  public:\n+    custom_string() {}\n+    custom_string(std::string const& value) : value_(value) {}\n+    std::string const& value() const { return value_; }\n+  private:\n+    std::string value_;\n+  };\n+\n+  /* Two simple functions with this class */\n+  custom_string hello() { return custom_string(\"Hello world.\"); }\n+  std::size_t size(custom_string const& s) { return s.value().size(); }\n+\n+\n+  /* From c to python converter */\n+  struct custom_string_to_python_str\n+  {\n+    static PyObject* convert(custom_string const& s)\n+    {\n+      return boost::python::incref(boost::python::object(s.value()).ptr());\n+    }\n+  };\n+\n+  struct custom_string_from_python_str\n+  {\n+    custom_string_from_python_str()\n+    {\n+      boost::python::converter::registry\n+\t::push_back(&convertible,\n+\t\t    &construct,\n+\t\t    boost::python::type_id<custom_string>());\n+    }\n+\n+    static void* convertible(PyObject* obj_ptr)\n+    {\n+      if (!PyString_Check(obj_ptr)) return 0;\n+      return obj_ptr;\n+    }\n+\n+    static void \n+    construct(PyObject* obj_ptr,\n+\t      boost::python::converter::rvalue_from_python_stage1_data* data)\n+    {\n+      const char* value = PyString_AsString(obj_ptr);\n+      if (value == 0) boost::python::throw_error_already_set();\n+      void* storage =\n+\t((boost::python::converter::rvalue_from_python_storage<custom_string>*)data)\n+\t->storage.bytes;\n+      new (storage) custom_string(value);\n+      data->convertible = storage;\n+    }\n+  };\n+\n+  void init_module()\n+  {\n+    using namespace boost::python;\n+\n+    boost::python::to_python_converter<custom_string,\n+\t\t\t\t       custom_string_to_python_str>();\n+    custom_string_from_python_str();\n+\n+    def(\"hello\", hello);\n+    def(\"size\", size);\n+  }\n+\n+} // namespace homemagestring\n+\n+BOOST_PYTHON_MODULE(libmystring)\n+{\n+  homemadestring::init_module();\n+}"
+        },
+        {
+          "sha": "85b631a3b248ba67647e91a079f09261cbc2a13d",
+          "filename": "src/simple.cpp",
+          "status": "added",
+          "additions": 34,
+          "deletions": 0,
+          "changes": 34,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/df670c2b3d2736f75e1df5e236d2ad80cdb9a8e4/src%2Fsimple.cpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/df670c2b3d2736f75e1df5e236d2ad80cdb9a8e4/src%2Fsimple.cpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/src%2Fsimple.cpp?ref=df670c2b3d2736f75e1df5e236d2ad80cdb9a8e4",
+          "patch": "@@ -0,0 +1,34 @@\n+/* Simple test with boost::python.\n+ * Declare and bind three function, returning char*, string, and Eigen::Vector. The last\n+ * function raises and error at runtime due to inadequate binding.\n+ */\n+\n+#include <boost/python.hpp>\n+#include <string>\n+#include <Eigen/Core>\n+\n+\n+char const* testchar()\n+{\n+  return \"Yay char!\";\n+}\n+\n+std::string teststr()\n+{\n+  return \"Yay str!\";\n+}\n+\n+Eigen::VectorXd testeigenvec()\n+{\n+  Eigen::VectorXd v(5);\n+  return v;\n+}\n+\n+\n+BOOST_PYTHON_MODULE(libsimple)\n+{\n+  using namespace boost::python;\n+  def(\"char\", testchar);\n+  def(\"str\", teststr);\n+  def(\"eigenvec\",testeigenvec);\n+}"
+        }
+      ]
+    },
+    {
+      "author": "fvalenza",
+      "date": "2015-07-22T11:57:43Z",
+      "sha": "b58b5ce9e0f9c5c53bc20bedd47df0913d898943",
+      "message": "Merge pull request #5 from jcarpent/topic/gcc-bug\n\n[Bug fix] Remove the pragma line leading to error with gcc 4.8",
+      "files_changed": 1,
+      "additions": 0,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "ce9ba1bc4cc0190f16809465cb4bdd8b7dd19ab7",
+          "filename": "src/details.hpp",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 1,
+          "changes": 1,
+          "blob_url": "https://github.com/stack-of-tasks/eigenpy/blob/b58b5ce9e0f9c5c53bc20bedd47df0913d898943/src%2Fdetails.hpp",
+          "raw_url": "https://github.com/stack-of-tasks/eigenpy/raw/b58b5ce9e0f9c5c53bc20bedd47df0913d898943/src%2Fdetails.hpp",
+          "contents_url": "https://api.github.com/repos/stack-of-tasks/eigenpy/contents/src%2Fdetails.hpp?ref=b58b5ce9e0f9c5c53bc20bedd47df0913d898943",
+          "patch": "@@ -20,7 +20,6 @@\n #include <boost/python.hpp>\n #include <Eigen/Core>\n \n-#pragma GCC diagnostic error \"-pedantic\" // Alas only work for g++ 4.8\n #include <numpy/arrayobject.h>\n #include <iostream>\n "
+        }
+      ]
+    }
+  ]
+}

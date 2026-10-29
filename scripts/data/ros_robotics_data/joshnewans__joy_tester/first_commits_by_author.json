@@ -1,0 +1,177 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T05:13:13Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "joshnewans",
+    "repo": "joy_tester"
+  },
+  "data": [
+    {
+      "author": "Josh Newans",
+      "date": "2024-11-16T02:46:14Z",
+      "sha": "dc574bc89f1d06e7a129dbb3524af55531187df0",
+      "message": "Trying to fix shutdown issues and flake8 errors",
+      "files_changed": 1,
+      "additions": 22,
+      "deletions": 11,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "24712536e2a0b839e65c37615da878d675a28cd9",
+          "filename": "joy_tester/test_joy.py",
+          "status": "modified",
+          "additions": 22,
+          "deletions": 11,
+          "changes": 33,
+          "blob_url": "https://github.com/joshnewans/joy_tester/blob/dc574bc89f1d06e7a129dbb3524af55531187df0/joy_tester%2Ftest_joy.py",
+          "raw_url": "https://github.com/joshnewans/joy_tester/raw/dc574bc89f1d06e7a129dbb3524af55531187df0/joy_tester%2Ftest_joy.py",
+          "contents_url": "https://api.github.com/repos/joshnewans/joy_tester/contents/joy_tester%2Ftest_joy.py?ref=dc574bc89f1d06e7a129dbb3524af55531187df0",
+          "patch": "@@ -13,11 +13,13 @@\n # limitations under the License.\n \n \n+from tkinter import Canvas, Tk\n+\n import rclpy\n+from rclpy.executors import ExternalShutdownException\n from rclpy.node import Node\n-from sensor_msgs.msg import Joy\n \n-from tkinter import Tk, Canvas\n+from sensor_msgs.msg import Joy\n \n \n class JoyButton:\n@@ -30,13 +32,13 @@ def __init__(self, parent_canvas, left_space, v_space, height, i):\n                                                          t,\n                                                          lf + height,\n                                                          t + height,\n-                                                         width=2, fill=\"white\")\n+                                                         width=2, fill='white')\n \n     def update_value(self, value):\n         if (value > 0):\n-            self.parent_canvas.itemconfigure(self.circle_obj, fill=\"#FF0000\")\n+            self.parent_canvas.itemconfigure(self.circle_obj, fill='#FF0000')\n         else:\n-            self.parent_canvas.itemconfigure(self.circle_obj, fill=\"#FFFFFF\")\n+            self.parent_canvas.itemconfigure(self.circle_obj, fill='#FFFFFF')\n \n \n class JoyAxis:\n@@ -56,12 +58,12 @@ def __init__(self, parent_canvas, left_space, v_space, height, width, i):\n                                                             t,\n                                                             lf + width,\n                                                             t + height,\n-                                                            width=0, fill=\"green\")\n+                                                            width=0, fill='green')\n         self.outline_obj = self.parent_canvas.create_rectangle(lf,\n                                                                t,\n                                                                lf + width,\n                                                                t + height,\n-                                                               width=2, outline=\"black\")\n+                                                               width=2, outline='black')\n \n         self.val_txt = self.parent_canvas.create_text(left_space+60 + width + 30,\n                                                       t+height/2,\n@@ -93,8 +95,8 @@ def __init__(self):\n         self.tk = Tk()\n \n         self.canvas = Canvas(self.tk, width=800, height=480)\n-        self.tk.title(\"Joystick Test\")\n-        self.tk.geometry(\"800x480+0+0\")\n+        self.tk.title('Joystick Test')\n+        self.tk.geometry('800x480+0+0')\n         self.canvas.pack(anchor='nw')\n \n         self.tk.update()\n@@ -134,6 +136,15 @@ def joy_callback(self, joy_msg):\n def main(args=None):\n     rclpy.init(args=args)\n     joy_tester = JoyTester()\n-    rclpy.spin(joy_tester)\n+\n+    try:\n+        rclpy.spin(joy_tester)\n+    except KeyboardInterrupt:\n+        print('Received keyboard interrupt!')\n+    except ExternalShutdownException:\n+        print('Received external shutdown request!')\n+\n+    print('Exiting...')\n+\n     joy_tester.destroy_node()\n-    rclpy.shutdown()\n+    rclpy.try_shutdown()"
+        }
+      ]
+    },
+    {
+      "author": "joshnewans",
+      "date": "2022-11-04T10:13:32Z",
+      "sha": "e7004b483b7a05870a33dc168c221c5f05aba779",
+      "message": "Initial commit",
+      "files_changed": 11,
+      "additions": 275,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "eeb8a6ec40875917aba8a4d6a6a335d2011e6253",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/joshnewans/joy_tester/blob/e7004b483b7a05870a33dc168c221c5f05aba779/.gitignore",
+          "raw_url": "https://github.com/joshnewans/joy_tester/raw/e7004b483b7a05870a33dc168c221c5f05aba779/.gitignore",
+          "contents_url": "https://api.github.com/repos/joshnewans/joy_tester/contents/.gitignore?ref=e7004b483b7a05870a33dc168c221c5f05aba779",
+          "patch": "@@ -0,0 +1 @@\n+**/__pycache__"
+        },
+        {
+          "sha": "7f179d1bb4f353e901808e4d476de9eb8acc8098",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 20,
+          "deletions": 0,
+          "changes": 20,
+          "blob_url": "https://github.com/joshnewans/joy_tester/blob/e7004b483b7a05870a33dc168c221c5f05aba779/README.md",
+          "raw_url": "https://github.com/joshnewans/joy_tester/raw/e7004b483b7a05870a33dc168c221c5f05aba779/README.md",
+          "contents_url": "https://api.github.com/repos/joshnewans/joy_tester/contents/README.md?ref=e7004b483b7a05870a33dc168c221c5f05aba779",
+          "patch": "@@ -0,0 +1,20 @@\n+# joy_tester\n+\n+This is a very simple GUI program for testing joysticks in ROS.\n+More specifically, it displays the messages of a `sensor_msgs/Joy` topic in a more user-friendly format.\n+\n+## Usage\n+\n+```\n+ros2 run joy_tester test_joy\n+```\n+\n+By default it subscribes to the `/joy` topic, but this can be remapped as with any other ROS node (e.g. with `--ros-args -r joy:=other_joy`).\n+\n+Particularly helpful (compared to a `topic echo`) is that it displays the axis/button numbers which saves time and errors in counting them manually.\n+\n+## To Do\n+- Clean up the code, particularly GUI element placement (was a very rough first go)\n+- Add functionality for sending `sensor_msgs/JoyFeedback` (e.g. LED, rumble) back to controllers\n+- Some way to assist in calibration?\n+"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "joy_tester/__init__.py",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/joshnewans/joy_tester/blob/e7004b483b7a05870a33dc168c221c5f05aba779/joy_tester%2F__init__.py",
+          "raw_url": "https://github.com/joshnewans/joy_tester/raw/e7004b483b7a05870a33dc168c221c5f05aba779/joy_tester%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/joshnewans/joy_tester/contents/joy_tester%2F__init__.py?ref=e7004b483b7a05870a33dc168c221c5f05aba779"
+        },
+        {
+          "sha": "dfcfc29fbea15a83e633dc159dabb42b189e23fd",
+          "filename": "joy_tester/test_joy.py",
+          "status": "added",
+          "additions": 133,
+          "deletions": 0,
+          "changes": 133,
+          "blob_url": "https://github.com/joshnewans/joy_tester/blob/e7004b483b7a05870a33dc168c221c5f05aba779/joy_tester%2Ftest_joy.py",
+          "raw_url": "https://github.com/joshnewans/joy_tester/raw/e7004b483b7a05870a33dc168c221c5f05aba779/joy_tester%2Ftest_joy.py",
+          "contents_url": "https://api.github.com/repos/joshnewans/joy_tester/contents/joy_tester%2Ftest_joy.py?ref=e7004b483b7a05870a33dc168c221c5f05aba779",
+          "patch": "@@ -0,0 +1,133 @@\n+import rclpy\n+from rclpy.node import Node\n+from sensor_msgs.msg import Joy\n+\n+from tkinter import *\n+\n+\n+class JoyButton:\n+    def __init__(self, parent_canvas, left_space, v_space, height, i):\n+        self.parent_canvas = parent_canvas\n+        l = left_space + 15\n+        t = v_space + (height + v_space)*i\n+        self.parent_canvas.create_text(left_space, t+height/2, text=str(i))\n+        \n+        self.circle_obj = self.parent_canvas.create_oval(l, \n+                                                t, \n+                                                l + height, \n+                                                t + height, \n+                                                width=2, fill=\"white\")\n+\n+    def update_value(self, value):\n+        if (value > 0):\n+            self.parent_canvas.itemconfigure(self.circle_obj, fill=\"#FF0000\")\n+        else:\n+            self.parent_canvas.itemconfigure(self.circle_obj, fill=\"#FFFFFF\")\n+\n+\n+\n+class JoyAxis:\n+    def __init__(self, parent_canvas, left_space, v_space, height, width, i):\n+        self.parent_canvas = parent_canvas\n+        self.left_space = left_space\n+        self.v_space = v_space\n+        self.height = height\n+        self.width = width\n+        self.i = i\n+\n+        l = left_space + 60\n+        t = v_space + (height + v_space)*i\n+        self.parent_canvas.create_text(left_space+50, t+height/2, text=str(i))\n+        \n+        self.fill_obj = self.parent_canvas.create_rectangle(l, \n+                                                t, \n+                                                l + width, \n+                                                t + height, \n+                                                width=0, fill=\"green\")\n+        self.outline_obj = self.parent_canvas.create_rectangle(l, \n+                                                t, \n+                                                l + width, \n+                                                t + height, \n+                                                width=2, outline=\"black\")\n+\n+        self.val_txt = self.parent_canvas.create_text(left_space+60 + width + 30, t+height/2, text=str(i))\n+\n+    def update_value(self, value):\n+        l = self.left_space + 60\n+        t = self.v_space + (self.height + self.v_space)*self.i\n+\n+        ww = self.width * (value + 1)/2\n+\n+        self.parent_canvas.coords(self.fill_obj, l, t, l+ww, t+self.height)\n+        self.parent_canvas.itemconfigure(self.val_txt, text=str(f'{value:.3f}'))\n+\n+\n+\n+class JoyTester(Node):\n+\n+    def __init__(self):\n+        super().__init__('test_joy')\n+        self.get_logger().info('Testing Joystick...')\n+\n+        self.subscription = self.create_subscription(Joy, 'joy', self.joy_callback, 5)\n+        self.subscription  # prevent unused variable warning\n+\n+        self.buttons = []\n+        self.axes = []\n+        self.initialised = False\n+\n+        self.tk = Tk()\n+        \n+        self.canvas = Canvas(self.tk, width=800, height=480)\n+        self.tk.title(\"Joystick Test\")\n+        self.tk.geometry(\"800x480+0+0\")\n+        self.canvas.pack(anchor='nw')\n+\n+        self.tk.update()\n+        \n+\n+\n+\n+    def joy_callback(self, joy_msg):\n+\n+\n+        left_space = 10\n+        height = 25\n+        width = 80\n+        v_space = 5\n+\n+        # Handle first receive\n+\n+        if not self.initialised:\n+            for i in range(len(joy_msg.buttons)):\n+                self.buttons.append(JoyButton(self.canvas, left_space, v_space, height, i))\n+\n+            for i in range(len(joy_msg.axes)):\n+                self.axes.append(JoyAxis(self.canvas, left_space, v_space, height, width, i))\n+\n+            self.initialised = True\n+\n+        # Update Values\n+\n+        for i in range(len(joy_msg.buttons)):\n+            self.buttons[i].update_value(joy_msg.buttons[i])\n+\n+        for i in range(len(joy_msg.axes)):\n+            self.axes[i].update_value(joy_msg.axes[i])\n+\n+\n+        # Redraw\n+        self.tk.update()\n+\n+        return\n+\n+\n+\n+\n+def main(args=None):\n+    \n+    rclpy.init(args=args)\n+    joy_tester = JoyTester()\n+    rclpy.spin(joy_tester)\n+    joy_tester.destroy_node()\n+    rclpy.shutdown()\n\\ No newline at end of file"
+        },
+        {
+          "sha": "c9dd625423e187fcc5eddd5a9a128d0c840319d7",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 19,
+          "deletions": 0,
+          "changes": 19,
+          "blob_url": "https://github.com/joshnewans/joy_tester/blob/e7004b483b7a05870a33dc168c221c5f05aba779/package.xml",
+          "raw_url": "https://github.com/joshnewans/joy_tester/raw/e7004b483b7a05870a33dc168c221c5f05aba779/package.xml",
+          "contents_url": "https://api.github.com/repos/joshnewans/joy_tester/contents/package.xml?ref=e7004b483b7a05870a33dc168c221c5f05aba779",
+          "patch": "@@ -0,0 +1,19 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n+  <name>joy_tester</name>\n+  <version>0.0.0</version>\n+  <description>Simple GUI tool for testing joysticks/gamepads</description>\n+  <maintainer email=\"josh.newans@gmail.com\">Josh Newans</maintainer>\n+  <license>Apache License 2.0</license>\n+\n+  <test_depend>ament_copyright</test_depend>\n+  <test_depend>ament_flake8</test_depend>\n+  <test_depend>ament_pep257</test_depend>\n+  <test_depend>python3-pytest</test_depend>\n+  <depend>python3-tk</depend>\n+\n+  <export>\n+    <build_type>ament_python</build_type>\n+  </export>\n+</package>"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "resource/joy_tester",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/joshnewans/joy_tester/blob/e7004b483b7a05870a33dc168c221c5f05aba779/resource%2Fjoy_tester",
+          "raw_url": "https://github.com/joshnewans/joy_tester/raw/e7004b483b7a05870a33dc168c221c5f05aba779/resource%2Fjoy_tester",
+          "contents_url": "https://api.github.com/repos/joshnewans/joy_tester/contents/resource%2Fjoy_tester?ref=e7004b483b7a05870a33dc168c221c5f05aba779"
+        },
+        {
+          "sha": "08dea0e3c141ca828866e79e5e42c301ab8ef621",
+          "filename": "setup.cfg",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/joshnewans/joy_tester/blob/e7004b483b7a05870a33dc168c221c5f05aba779/setup.cfg",
+          "raw_url": "https://github.com/joshnewans/joy_tester/raw/e7004b483b7a05870a33dc168c221c5f05aba779/setup.cfg",
+          "contents_url": "https://api.github.com/repos/joshnewans/joy_tester/contents/setup.cfg?ref=e7004b483b7a05870a33dc168c221c5f05aba779",
+          "patch": "@@ -0,0 +1,4 @@\n+[develop]\n+script_dir=$base/lib/joy_tester\n+[install]\n+install_scripts=$base/lib/joy_tester"
+        },
+        {
+          "sha": "8e27ee0ce659bf63ce4ca3d98a83f2f2d513c209",
+          "filename": "setup.py",
+          "status": "added",
+          "additions": 27,
+          "deletions": 0,
+          "changes": 27,
+          "blob_url": "https://github.com/joshnewans/joy_tester/blob/e7004b483b7a05870a33dc168c221c5f05aba779/setup.py",
+          "raw_url": "https://github.com/joshnewans/joy_tester/raw/e7004b483b7a05870a33dc168c221c5f05aba779/setup.py",
+          "contents_url": "https://api.github.com/repos/joshnewans/joy_tester/contents/setup.py?ref=e7004b483b7a05870a33dc168c221c5f05aba779",
+          "patch": "@@ -0,0 +1,27 @@\n+from setuptools import setup\n+\n+package_name = 'joy_tester'\n+\n+setup(\n+    name=package_name,\n+    version='0.0.0',\n+    packages=[package_name],\n+    data_files=[\n+        ('share/ament_index/resource_index/packages',\n+            ['resource/' + package_name]),\n+        ('share/' + package_name, ['package.xml']),\n+    ],\n+    install_requires=['setuptools'],\n+    zip_safe=True,\n+    maintainer='Josh Newans',\n+    maintainer_email='josh.newans@gmail.com',\n+    description='Simple GUI tool for testing joysticks/gamepads',\n+    license='Apache License 2.0',\n+    tests_require=['pytest'],\n+    entry_points={\n+        'console_scripts': [\n+            'test_joy = joy_tester.test_joy:main',\n+        ],\n+        \n+    },\n+)"
+        },
+        {
+          "sha": "cc8ff03f79abb8eb061827a24f2a331e052c5c37",
+          "filename": "test/test_copyright.py",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/joshnewans/joy_tester/blob/e7004b483b7a05870a33dc168c221c5f05aba779/test%2Ftest_copyright.py",
+          "raw_url": "https://github.com/joshnewans/joy_tester/raw/e7004b483b7a05870a33dc168c221c5f05aba779/test%2Ftest_copyright.py",
+          "contents_url": "https://api.github.com/repos/joshnewans/joy_tester/contents/test%2Ftest_copyright.py?ref=e7004b483b7a05870a33dc168c221c5f05aba779",
+          "patch": "@@ -0,0 +1,23 @@\n+# Copyright 2015 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_copyright.main import main\n+import pytest\n+\n+\n+@pytest.mark.copyright\n+@pytest.mark.linter\n+def test_copyright():\n+    rc = main(argv=['.', 'test'])\n+    assert rc == 0, 'Found errors'"
+        },
+        {
+          "sha": "27ee1078ff077cc3a0fec75b7d023101a68164d1",
+          "filename": "test/test_flake8.py",
+          "status": "added",
+          "additions": 25,
+          "deletions": 0,
+          "changes": 25,
+          "blob_url": "https://github.com/joshnewans/joy_tester/blob/e7004b483b7a05870a33dc168c221c5f05aba779/test%2Ftest_flake8.py",
+          "raw_url": "https://github.com/joshnewans/joy_tester/raw/e7004b483b7a05870a33dc168c221c5f05aba779/test%2Ftest_flake8.py",
+          "contents_url": "https://api.github.com/repos/joshnewans/joy_tester/contents/test%2Ftest_flake8.py?ref=e7004b483b7a05870a33dc168c221c5f05aba779",
+          "patch": "@@ -0,0 +1,25 @@\n+# Copyright 2017 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_flake8.main import main_with_errors\n+import pytest\n+\n+\n+@pytest.mark.flake8\n+@pytest.mark.linter\n+def test_flake8():\n+    rc, errors = main_with_errors(argv=[])\n+    assert rc == 0, \\\n+        'Found %d code style errors / warnings:\\n' % len(errors) + \\\n+        '\\n'.join(errors)"
+        },
+        {
+          "sha": "b234a3840f4c5bd38f043638c8622b8f240e1185",
+          "filename": "test/test_pep257.py",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/joshnewans/joy_tester/blob/e7004b483b7a05870a33dc168c221c5f05aba779/test%2Ftest_pep257.py",
+          "raw_url": "https://github.com/joshnewans/joy_tester/raw/e7004b483b7a05870a33dc168c221c5f05aba779/test%2Ftest_pep257.py",
+          "contents_url": "https://api.github.com/repos/joshnewans/joy_tester/contents/test%2Ftest_pep257.py?ref=e7004b483b7a05870a33dc168c221c5f05aba779",
+          "patch": "@@ -0,0 +1,23 @@\n+# Copyright 2015 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_pep257.main import main\n+import pytest\n+\n+\n+@pytest.mark.linter\n+@pytest.mark.pep257\n+def test_pep257():\n+    rc = main(argv=['.', 'test'])\n+    assert rc == 0, 'Found code style errors / warnings'"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,694 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T04:44:27Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "flynneva",
+    "repo": "bno055"
+  },
+  "data": [
+    {
+      "author": "flynneva",
+      "date": "2019-08-05T00:34:55Z",
+      "sha": "a4fe541bedbc241d8b8c06051bb23ffcb1dd56e5",
+      "message": "first commit",
+      "files_changed": 6,
+      "additions": 346,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "21972d23206ab8ab0878c5618cb1437e3fc3015d",
+          "filename": "bno055.py",
+          "status": "added",
+          "additions": 223,
+          "deletions": 0,
+          "changes": 223,
+          "blob_url": "https://github.com/flynneva/bno055/blob/a4fe541bedbc241d8b8c06051bb23ffcb1dd56e5/bno055.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/a4fe541bedbc241d8b8c06051bb23ffcb1dd56e5/bno055.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/bno055.py?ref=a4fe541bedbc241d8b8c06051bb23ffcb1dd56e5",
+          "patch": "@@ -0,0 +1,223 @@\n+#!/usr/bin/env python3\n+import rclpy\n+from sensor_msgs.msg import Imu\n+from rclpy.qos import qos_profile_default\n+\n+import sys\n+import serial\n+from time import time\n+import binascii\n+import struct\n+\n+#TODO: put these constant in a seperate file\n+# BOSCH BNO055 IMU Registers map and other information\n+# Page 0 registers\n+CHIP_ID = 0x00\n+PAGE_ID = 0x07\n+ACCEL_DATA = 0x08\n+MAG_DATA = 0x0e\n+GYRO_DATA = 0x14\n+FUSED_EULER = 0x1a\n+FUSED_QUAT = 0x20\n+LIA_DATA = 0x28\n+GRAVITY_DATA = 0x2e\n+TEMP_DATA = 0x34\n+CALIB_STAT = 0x35\n+SYS_STATUS = 0x39\n+SYS_ERR = 0x3a\n+UNIT_SEL = 0x3b\n+OPER_MODE = 0x3d\n+PWR_MODE = 0x3e\n+SYS_TRIGGER = 0x3f\n+TEMP_SOURCE = 0x440\n+AXIS_MAP_CONFIG = 0x41\n+AXIS_MAP_SIGN = 0x42\n+\n+ACC_OFFSET = 0x55\n+MAG_OFFSET = 0x5b\n+GYR_OFFSET = 0x61\n+ACC_RADIUS = 0x68\n+MAG_RADIUS = 0x69\n+\n+# Page 1 registers\n+ACC_CONFIG = 0x08\n+MAG_CONFIG = 0x09\n+GYR_CONFIG0 = 0x0a\n+GYR_CONFIG1 = 0x0b\n+\n+#  Operation modes\n+OPER_MODE_CONFIG = 0x00\n+OPER_MODE_ACCONLY = 0x01\n+OPER_MODE_MAGONLY = 0x02\n+OPER_MODE_GYROONLY = 0x03\n+OPER_MODE_ACCMAG = 0x04\n+OPER_MODE_ACCGYRO = 0x05\n+OPER_MODE_MAGGYRO = 0x06\n+OPER_MODE_AMG = 0x07\n+OPER_MODE_IMU = 0x08\n+OPER_MODE_COMPASS = 0x09\n+OPER_MODE_M4G = 0x0a\n+OPER_MODE_NDOF_FMC_OFF = 0x0b\n+OPER_MODE_NDOF = 0x0C\n+\n+#  Power modes\n+PWR_MODE_NORMAL = 0x00\n+PWR_MODE_LOW = 0x01\n+PWR_MODE_SUSPEND  = 0x02\n+\n+# Communication constants\n+BNO055_ID = 0xa0\n+START_BYTE_WR = 0xaa\n+START_BYTE_RESP = 0xbb\n+READ = 0x01\n+WRITE = 0x00\n+\n+def main(args=None):\n+    rclpy.init(args=args)\n+    node = rclpy.create_node('bno055')\n+    pub_imu = node.create_publisher(Imu, 'imu', qos_profile_default)\n+\n+    # Initialize ROS msgs\n+    imu_msg = Imu()\n+\n+    # Initialize counters and constants\n+    seq = 0\n+    acc_fact = 1000.0\n+    mag_fact = 16.0\n+    gyr_fact = 900.0\n+\n+#-----------------\n+    def open_serial(port, baudrate, timeout_):\n+        node.get_logger().info('Opening serial port: \"%s\"...' % port)\n+        try:\n+            usb_con = serial.Serial(port, baudrate, timeout=timeout_)\n+            return usb_con\n+        except serial.serialutil.SerialException:\n+            node.get_logger().info(\"IMU not found at port \" + port + \". Check to make sure your device is connected.\")\n+            sys.exit(0)\n+   \n+#------------------------\n+    def configure(usb_con):\n+        node.get_logger().info(\"Configuring device...\")\n+        data = receive(usb_con, CHIP_ID, 1)\n+        node.get_logger().info('device sent: \"%s\"' % data)\n+        if data == 0 or data[0] != BNO055_ID:\n+            node.get_logger().warn(\"Device ID is incorrect...shutting down.\")\n+            sys.exit(0)\n+\n+        # IMU connected, configure it\n+         # IMU Configuration\n+        if not(write(usb_con, OPER_MODE, 1, OPER_MODE_CONFIG)):\n+            node.get_logger().warn(\"Unable to set IMU into config mode.\")\n+\n+        if not(write(usb_con, PWR_MODE, 1, PWR_MODE_NORMAL)):\n+            node.get_logger().warn(\"Unable to set IMU normal power mode.\")\n+\n+        if not(write(usb_con, PAGE_ID, 1, 0x00)):\n+            node.get_logger().warn(\"Unable to set IMU register page 0.\")\n+\n+        if not(write(usb_con, SYS_TRIGGER, 1, 0x00)):\n+            node.get_logger().warn(\"Unable to start IMU.\")\n+\n+        if not(write(usb_con, UNIT_SEL, 1, 0x83)):\n+            node.get_logger().warn(\"Unable to set IMU units.\")\n+\n+        if not(write(usb_con, AXIS_MAP_CONFIG, 1, 0x24)):\n+            node.get_logger().warn(\"Unable to remap IMU axis.\")\n+\n+        if not(write(usb_con, AXIS_MAP_SIGN, 1, 0x06)):\n+            node.get_logger().warn(\"Unable to set IMU axis signs.\")\n+\n+        if not(write(usb_con, OPER_MODE, 1, OPER_MODE_NDOF)):\n+            node.get_logger().warn(\"Unable to set IMU operation mode into operation mode.\")\n+\n+        node.get_logger().info(\"Bosch BNO055 IMU configuration complete.\")\n+        return 1 \n+#-----------------------\n+    # Read data from IMU\n+    def receive(usb_con, reg_addr, length):\n+        buf_out = bytearray()\n+        buf_out.append(START_BYTE_WR)\n+        buf_out.append(READ)\n+        buf_out.append(reg_addr)\n+        buf_out.append(length)\n+\n+        try:\n+            usb_con.write(buf_out)\n+            buf_in = bytearray(usb_con.read(2 + length))\n+            #print(\"Reading, wr: \", binascii.hexlify(buf_out), \"  re: \", binascii.hexlify(buf_in))\n+        except:\n+            return 0\n+\n+        # Check if response is correct\n+        if (buf_in.__len__() != (2 + length)) or (buf_in[0] != START_BYTE_RESP):\n+            #node.get_logger().warn(\"Incorrect Bosh IMU device response.\")\n+            return 0\n+        buf_in.pop(0)\n+        buf_in.pop(0)\n+        return buf_in\n+#-----------------------------\n+    def write(usb_con, reg_addr, length, data):\n+        buf_out = bytearray()\n+        buf_out.append(START_BYTE_WR)\n+        buf_out.append(WRITE)\n+        buf_out.append(reg_addr)\n+        buf_out.append(length)\n+        buf_out.append(data)\n+\n+        try:\n+            usb_con.write(buf_out)\n+            buf_in = bytearray(usb_con.read(2))\n+            # print(\"Writing, wr: \", binascii.hexlify(buf_out), \"  re: \", binascii.hexlify(buf_in))\n+        except:\n+            return False\n+\n+        if (buf_in.__len__() != 2) or (buf_in[1] != 0x01):\n+            #rospy.logerr(\"Incorrect Bosh IMU device response.\")\n+            return False\n+        return True\n+#--------------------------------------------\n+\n+    # callback to read data from sensor\n+    def read_data():\n+        # read from sensor\n+        buf = receive(usb_con, ACCEL_DATA, 45)\n+        # Publish raw data\n+        #imu_msg.header.stamp = node.get_clock().now()\n+        imu_msg.header.frame_id = 'bno055'\n+        #imu_msg.header.seq = seq\n+        try:\n+            imu_msg.orientation_covariance[0] = -1\n+            imu_msg.linear_acceleration.x = float(struct.unpack('h', struct.pack('BB', buf[0], buf[1]))[0]) / acc_fact\n+            imu_msg.linear_acceleration.y = float(struct.unpack('h', struct.pack('BB', buf[2], buf[3]))[0]) / acc_fact\n+            imu_msg.linear_acceleration.z = float(struct.unpack('h', struct.pack('BB', buf[4], buf[5]))[0]) / acc_fact\n+            imu_msg.linear_acceleration_covariance[0] = -1\n+            imu_msg.angular_velocity.x = float(struct.unpack('h', struct.pack('BB', buf[12], buf[13]))[0]) / gyr_fact\n+            imu_msg.angular_velocity.y = float(struct.unpack('h', struct.pack('BB', buf[14], buf[15]))[0]) / gyr_fact\n+            imu_msg.angular_velocity.z = float(struct.unpack('h', struct.pack('BB', buf[16], buf[17]))[0]) / gyr_fact\n+            imu_msg.angular_velocity_covariance[0] = -1\n+            #node.get_logger().info('Publishing imu message')\n+            pub_imu.publish(imu_msg)\n+        except:\n+            # something went wrong...keep going to the next message\n+            node.get_logger().warn('oops')\n+    \n+    # try to connect\n+    usb_con = open_serial('/dev/ttyUSB0', 115200, 0.02)\n+    # configure imu\n+    if (configure(usb_con)):\n+        # successfully configured\n+        frequency = float(1 / 100)\n+        timer = node.create_timer(frequency, read_data)\n+\n+    rclpy.spin(node)\n+    # clean shutdown\n+    shutdown()\n+\n+def shutdown():\n+    node.destroy_timer(timer)\n+    node.destroy_node()\n+    rclpy.shutdown()\n+\n+if __name__ == '__main__':\n+    main()"
+        },
+        {
+          "sha": "b9500db8c3f1d7b705a8b1405b7f67195200c7f1",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/flynneva/bno055/blob/a4fe541bedbc241d8b8c06051bb23ffcb1dd56e5/package.xml",
+          "raw_url": "https://github.com/flynneva/bno055/raw/a4fe541bedbc241d8b8c06051bb23ffcb1dd56e5/package.xml",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/package.xml?ref=a4fe541bedbc241d8b8c06051bb23ffcb1dd56e5",
+          "patch": "@@ -0,0 +1,23 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n+  <name>bno055</name>\n+  <version>0.0.0</version>\n+  <description>TODO: Package description</description>\n+  <maintainer email=\"evanflynn.msu@gmail.com\">flynneva</maintainer>\n+  <license>BSD</license>\n+\n+  <exec_depend>rclpy</exec_depend>\n+  <exec_depend>std_msgs</exec_depend>\n+ \n+  <!-- These test dependencies are optional\n+  Their purpose is to make sure that the code passes the linters -->\n+  <test_depend>ament_copyright</test_depend>\n+  <test_depend>ament_flake8</test_depend>\n+  <test_depend>ament_pep257</test_depend>\n+  <test_depend>python3-pytest</test_depend>\n+ \n+  <export>\n+    <build_type>ament_python</build_type>\n+  </export>\n+</package>"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "params/__init__.py",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/flynneva/bno055/blob/a4fe541bedbc241d8b8c06051bb23ffcb1dd56e5/params%2F__init__.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/a4fe541bedbc241d8b8c06051bb23ffcb1dd56e5/params%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/params%2F__init__.py?ref=a4fe541bedbc241d8b8c06051bb23ffcb1dd56e5"
+        },
+        {
+          "sha": "e78c772742f1fe22f349922a9d4435c0adee004d",
+          "filename": "params/bno055_params.py",
+          "status": "added",
+          "additions": 63,
+          "deletions": 0,
+          "changes": 63,
+          "blob_url": "https://github.com/flynneva/bno055/blob/a4fe541bedbc241d8b8c06051bb23ffcb1dd56e5/params%2Fbno055_params.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/a4fe541bedbc241d8b8c06051bb23ffcb1dd56e5/params%2Fbno055_params.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/params%2Fbno055_params.py?ref=a4fe541bedbc241d8b8c06051bb23ffcb1dd56e5",
+          "patch": "@@ -0,0 +1,63 @@\n+# BOSCH BNO055 IMU Registers map and other information\n+# Page 0 registers\n+CHIP_ID = 0x00\n+PAGE_ID = 0x07\n+ACCEL_DATA = 0x08\n+MAG_DATA = 0x0e\n+GYRO_DATA = 0x14\n+FUSED_EULER = 0x1a\n+FUSED_QUAT = 0x20\n+LIA_DATA = 0x28\n+GRAVITY_DATA = 0x2e\n+TEMP_DATA = 0x34\n+CALIB_STAT = 0x35\n+SYS_STATUS = 0x39\n+SYS_ERR = 0x3a\n+UNIT_SEL = 0x3b\n+OPER_MODE = 0x3d\n+PWR_MODE = 0x3e\n+SYS_TRIGGER = 0x3f\n+TEMP_SOURCE = 0x440\n+AXIS_MAP_CONFIG = 0x41\n+AXIS_MAP_SIGN = 0x42\n+\n+ACC_OFFSET = 0x55\n+MAG_OFFSET = 0x5b\n+GYR_OFFSET = 0x61\n+ACC_RADIUS = 0x68\n+MAG_RADIUS = 0x69\n+\n+# Page 1 registers\n+ACC_CONFIG = 0x08\n+MAG_CONFIG = 0x09\n+GYR_CONFIG0 = 0x0a\n+GYR_CONFIG1 = 0x0b\n+\n+# Operation modes\n+OPER_MODE_CONFIG = 0x00\n+OPER_MODE_ACCONLY = 0x01\n+OPER_MODE_MAGONLY = 0x02\n+OPER_MODE_GYROONLY = 0x03\n+OPER_MODE_ACCMAG = 0x04\n+OPER_MODE_ACCGYRO = 0x05\n+OPER_MODE_MAGGYRO = 0x06\n+OPER_MODE_AMG = 0x07\n+OPER_MODE_IMU = 0x08\n+OPER_MODE_COMPASS = 0x09\n+OPER_MODE_M4G = 0x0a\n+OPER_MODE_NDOF_FMC_OFF = 0x0b\n+OPER_MODE_NDOF = 0x0C\n+\n+# Power modes\n+PWR_MODE_NORMAL = 0x00\n+PWR_MODE_LOW = 0x01\n+PWR_MODE_SUSPEND  = 0x02\n+\n+# Communication constants\n+BNO055_ID = 0xa0\n+START_BYTE_WR = 0xaa\n+START_BYTE_RESP = 0xbb\n+READ = 0x01\n+WRITE = 0x00\n+\n+def configs():"
+        },
+        {
+          "sha": "9d4515c87333a39060b9e0656d480aefe5cc27e0",
+          "filename": "setup.cfg",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/flynneva/bno055/blob/a4fe541bedbc241d8b8c06051bb23ffcb1dd56e5/setup.cfg",
+          "raw_url": "https://github.com/flynneva/bno055/raw/a4fe541bedbc241d8b8c06051bb23ffcb1dd56e5/setup.cfg",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/setup.cfg?ref=a4fe541bedbc241d8b8c06051bb23ffcb1dd56e5",
+          "patch": "@@ -0,0 +1,4 @@\n+[develop]\n+script-dir=$base/lib/bno055\n+[install]\n+install-scripts=$base/lib/bno055"
+        },
+        {
+          "sha": "482a6f4ad1375540241dd93d0eb7974c0107f5dd",
+          "filename": "setup.py",
+          "status": "added",
+          "additions": 33,
+          "deletions": 0,
+          "changes": 33,
+          "blob_url": "https://github.com/flynneva/bno055/blob/a4fe541bedbc241d8b8c06051bb23ffcb1dd56e5/setup.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/a4fe541bedbc241d8b8c06051bb23ffcb1dd56e5/setup.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/setup.py?ref=a4fe541bedbc241d8b8c06051bb23ffcb1dd56e5",
+          "patch": "@@ -0,0 +1,33 @@\n+from setuptools import setup\n+ \n+package_name = 'bno055'\n+ \n+setup(\n+    name=package_name,\n+    version='0.0.0',\n+    packages=[],\n+    py_modules=[\n+        package_name,\n+    ],\n+    install_requires=['setuptools'],\n+    zip_safe=True,\n+    author='flynneva',\n+    author_email=\"evanflynn.msu@gmail.com\",\n+    maintainer='flynneva',\n+    maintainer_email=\"evanflynn.msu@gmail.com\",\n+    keywords=['ROS', 'ROS2'],\n+    classifiers=[\n+        'Intended Audience :: Developers',\n+        'License :: OSI Approved :: BSD',\n+        'Programming Language :: Python',\n+        'Topic :: Software Development',\n+    ],\n+    description='Bosch BNO055 IMU driver for ROS2',\n+    license='BSD',\n+    tests_require=['pytest'],\n+    entry_points={\n+        'console_scripts': [\n+            'bno055 = bno055:main',\n+        ],\n+    },\n+)"
+        }
+      ]
+    },
+    {
+      "author": "Combinatrix",
+      "date": "2023-12-02T16:50:16Z",
+      "sha": "b20cd4e027c5f07db1248d8f7008ddb97cbb471d",
+      "message": "Added Gravity publisher (#64)\n\n* Added Gravity publisher\r\n\r\n* Updated Readme to introduce Gravity publisher",
+      "files_changed": 7,
+      "additions": 21,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "085a4f9521edd52487edc81d0bd50adb3c32a85f",
+          "filename": "AUTHORS",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/flynneva/bno055/blob/b20cd4e027c5f07db1248d8f7008ddb97cbb471d/AUTHORS",
+          "raw_url": "https://github.com/flynneva/bno055/raw/b20cd4e027c5f07db1248d8f7008ddb97cbb471d/AUTHORS",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/AUTHORS?ref=b20cd4e027c5f07db1248d8f7008ddb97cbb471d",
+          "patch": "@@ -1,3 +1,4 @@\n Michal Drweiga\n Evan Flynn\n Manfred Novotny\n+Pascal Voser"
+        },
+        {
+          "sha": "7d2148ecf55925f17fbdf8c4c401c334383469d9",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/flynneva/bno055/blob/b20cd4e027c5f07db1248d8f7008ddb97cbb471d/README.md",
+          "raw_url": "https://github.com/flynneva/bno055/raw/b20cd4e027c5f07db1248d8f7008ddb97cbb471d/README.md",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/README.md?ref=b20cd4e027c5f07db1248d8f7008ddb97cbb471d",
+          "patch": "@@ -79,6 +79,7 @@ ROS topics published by this ROS2 Node:\n   - **bno055/imu_raw** [(sensor_msgs/Imu)](http://docs.ros.org/api/sensor_msgs/html/msg/Imu.html)\n   - **bno055/temp** [(sensor_msgs/Temperature)](http://docs.ros.org/api/sensor_msgs/html/msg/Temperature.html); The sensor's ambient temperature\n   - **bno055/mag** [(sensor_msgs/MagneticField)](http://docs.ros.org/api/sensor_msgs/html/msg/MagneticField.html)\n+  - **bno055/grav** [(geometry_msgs/Vector3)](http://docs.ros.org/en/api/geometry_msgs/html/msg/Vector3.html)\n   - **bno055/calib_status** [(std_msgs/String)](http://docs.ros.org/en/api/std_msgs/html/msg/String.html) : \n   Sensor Calibration Status as JSON string - e.g. `{\"sys\": 3, \"gyro\": 3, \"accel\": 0, \"mag\": 3}`\n   "
+        },
+        {
+          "sha": "947fdaf9af657a5ed5d5bb0aba352284fd73722d",
+          "filename": "bno055/params/NodeParameters.py",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/flynneva/bno055/blob/b20cd4e027c5f07db1248d8f7008ddb97cbb471d/bno055%2Fparams%2FNodeParameters.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/b20cd4e027c5f07db1248d8f7008ddb97cbb471d/bno055%2Fparams%2FNodeParameters.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/bno055%2Fparams%2FNodeParameters.py?ref=b20cd4e027c5f07db1248d8f7008ddb97cbb471d",
+          "patch": "@@ -81,6 +81,8 @@ def __init__(self, node: Node):\n         node.declare_parameter('mag_factor', value=16000000.0)\n         # scaling factor for gyroscope\n         node.declare_parameter('gyr_factor', value=900.0)\n+        # scaling factor for gyroscope\n+        node.declare_parameter('grav_factor', value=100.0)\n         # determines whether to use default offsets or not\n         node.declare_parameter('set_offsets', value=False)\n         # +/- 2000 units (at max 2G) (1 unit = 1 mg = 1 LSB = 0.01 m/s2)\n@@ -155,6 +157,9 @@ def __init__(self, node: Node):\n             self.gyr_factor = node.get_parameter('gyr_factor')\n             node.get_logger().info('\\tgyr_factor:\\t\\t\"%s\"' % self.gyr_factor.value)\n \n+            self.grav_factor = node.get_parameter('grav_factor')\n+            node.get_logger().info('\\tgrav_factor:\\t\\t\"%s\"' % self.grav_factor.value)\n+\n             self.set_offsets = node.get_parameter('set_offsets')\n             node.get_logger().info('\\tset_offsets:\\t\\t\"%s\"' % self.set_offsets.value)\n "
+        },
+        {
+          "sha": "3add21fa4fe5c4aa8fbe91415526d4c767285d61",
+          "filename": "bno055/params/bno055_params.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/flynneva/bno055/blob/b20cd4e027c5f07db1248d8f7008ddb97cbb471d/bno055%2Fparams%2Fbno055_params.yaml",
+          "raw_url": "https://github.com/flynneva/bno055/raw/b20cd4e027c5f07db1248d8f7008ddb97cbb471d/bno055%2Fparams%2Fbno055_params.yaml",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/bno055%2Fparams%2Fbno055_params.yaml?ref=b20cd4e027c5f07db1248d8f7008ddb97cbb471d",
+          "patch": "@@ -42,6 +42,7 @@ bno055:\n     acc_factor: 100.0\n     mag_factor: 16000000.0\n     gyr_factor: 900.0\n+    grav_factor: 100.0\n     set_offsets: false # set to true to use offsets below\n     offset_acc: [0xFFEC, 0x00A5, 0xFFE8]\n     offset_mag: [0xFFB4, 0xFE9E, 0x027D]"
+        },
+        {
+          "sha": "745425bb92392e3c258eaf1c789a800bfca6d844",
+          "filename": "bno055/params/bno055_params_i2c.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/flynneva/bno055/blob/b20cd4e027c5f07db1248d8f7008ddb97cbb471d/bno055%2Fparams%2Fbno055_params_i2c.yaml",
+          "raw_url": "https://github.com/flynneva/bno055/raw/b20cd4e027c5f07db1248d8f7008ddb97cbb471d/bno055%2Fparams%2Fbno055_params_i2c.yaml",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/bno055%2Fparams%2Fbno055_params_i2c.yaml?ref=b20cd4e027c5f07db1248d8f7008ddb97cbb471d",
+          "patch": "@@ -41,6 +41,7 @@ bno055:\n     acc_factor: 100.0\n     mag_factor: 16000000.0\n     gyr_factor: 900.0\n+    grav_factor: 100.0\n     set_offsets: false # set to true to use offsets below\n     offset_acc: [0xFFEC, 0x00A5, 0xFFE8]\n     offset_mag: [0xFFB4, 0xFE9E, 0x027D]"
+        },
+        {
+          "sha": "353bb318a62d86a74ef9847904b218f064d5dbce",
+          "filename": "bno055/params/bno055_params_test.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/flynneva/bno055/blob/b20cd4e027c5f07db1248d8f7008ddb97cbb471d/bno055%2Fparams%2Fbno055_params_test.yaml",
+          "raw_url": "https://github.com/flynneva/bno055/raw/b20cd4e027c5f07db1248d8f7008ddb97cbb471d/bno055%2Fparams%2Fbno055_params_test.yaml",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/bno055%2Fparams%2Fbno055_params_test.yaml?ref=b20cd4e027c5f07db1248d8f7008ddb97cbb471d",
+          "patch": "@@ -41,6 +41,7 @@ bno055:\n     acc_factor: 100.0\n     mag_factor: 16000000.0\n     gyr_factor: 900.0\n+    grav_factor: 100.0\n     set_offsets: false # set to true to use offsets below\n     offset_acc: [0xFFEC, 0x00A5, 0xFFE8]\n     offset_mag: [0xFFB4, 0xFE9E, 0x027D]"
+        },
+        {
+          "sha": "10f1cf3717e06c18dd4f0a6d12486b658aeea4b0",
+          "filename": "bno055/sensor/SensorService.py",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 1,
+          "changes": 12,
+          "blob_url": "https://github.com/flynneva/bno055/blob/b20cd4e027c5f07db1248d8f7008ddb97cbb471d/bno055%2Fsensor%2FSensorService.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/b20cd4e027c5f07db1248d8f7008ddb97cbb471d/bno055%2Fsensor%2FSensorService.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/bno055%2Fsensor%2FSensorService.py?ref=b20cd4e027c5f07db1248d8f7008ddb97cbb471d",
+          "patch": "@@ -35,7 +35,7 @@\n from bno055.connectors.Connector import Connector\n from bno055.params.NodeParameters import NodeParameters\n \n-from geometry_msgs.msg import Quaternion\n+from geometry_msgs.msg import Quaternion, Vector3\n from rclpy.node import Node\n from rclpy.qos import QoSProfile\n from sensor_msgs.msg import Imu, MagneticField, Temperature\n@@ -58,6 +58,7 @@ def __init__(self, node: Node, connector: Connector, param: NodeParameters):\n         self.pub_imu_raw = node.create_publisher(Imu, prefix + 'imu_raw', QoSProf)\n         self.pub_imu = node.create_publisher(Imu, prefix + 'imu', QoSProf)\n         self.pub_mag = node.create_publisher(MagneticField, prefix + 'mag', QoSProf)\n+        self.pub_grav = node.create_publisher(Vector3, prefix + 'grav', QoSProf)\n         self.pub_temp = node.create_publisher(Temperature, prefix + 'temp', QoSProf)\n         self.pub_calib_status = node.create_publisher(String, prefix + 'calib_status', QoSProf)\n         self.srv = self.node.create_service(Trigger, prefix + 'calibration_request', self.calibration_request_callback)\n@@ -142,6 +143,7 @@ def get_sensor_data(self):\n         imu_raw_msg = Imu()\n         imu_msg = Imu()\n         mag_msg = MagneticField()\n+        grav_msg = Vector3()\n         temp_msg = Temperature()\n \n         # read from sensor\n@@ -238,6 +240,14 @@ def get_sensor_data(self):\n         ]\n         self.pub_mag.publish(mag_msg)\n \n+        grav_msg.x = \\\n+            self.unpackBytesToFloat(buf[38], buf[39]) / self.param.grav_factor.value\n+        grav_msg.y = \\\n+            self.unpackBytesToFloat(buf[40], buf[41]) / self.param.grav_factor.value\n+        grav_msg.z = \\\n+            self.unpackBytesToFloat(buf[42], buf[43]) / self.param.grav_factor.value\n+        self.pub_grav.publish(grav_msg)\n+\n         # Publish temperature\n         temp_msg.header.stamp = self.node.get_clock().now().to_msg()\n         temp_msg.header.frame_id = self.param.frame_id.value"
+        }
+      ]
+    },
+    {
+      "author": "vintheruler1",
+      "date": "2023-04-06T21:31:35Z",
+      "sha": "0b33f84e5d7c1eb69ca94f439bee35100eaa4b8a",
+      "message": "Spelling/Grammar (#62)",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "a26ed38af73eb1451b6882a8add95d22fa7bd4f5",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/flynneva/bno055/blob/0b33f84e5d7c1eb69ca94f439bee35100eaa4b8a/README.md",
+          "raw_url": "https://github.com/flynneva/bno055/raw/0b33f84e5d7c1eb69ca94f439bee35100eaa4b8a/README.md",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/README.md?ref=0b33f84e5d7c1eb69ca94f439bee35100eaa4b8a",
+          "patch": "@@ -142,11 +142,11 @@ Run launch file:\n \n ### Performing flake8 Linting\n \n-To perform code linting with [flake8](https://gitlab.com/pycqa/flake8) just perform:\n+To perform code linting with [flake8](https://gitlab.com/pycqa/flake8), just perform:\n \n     cd ~/ros2_ws/src/bno055\n     ament_flake8\n \n See [www.flake8rules.com](https://www.flake8rules.com/) for more detailed information about flake8 rules.\n \n-**Note:** we take advantage of [flake8's noqa mechanisim](https://flake8.pycqa.org/en/3.1.1/user/ignoring-errors.html) to selectively ignore some errors. Just search for `# noqa:` in the source code to find them.\n+**Note:** We take advantage of [flake8's noqa mechanisim](https://flake8.pycqa.org/en/3.1.1/user/ignoring-errors.html) to selectively ignore some errors. Just search for `# noqa:` in the source code to find them."
+        }
+      ]
+    },
+    {
+      "author": "emilnovak",
+      "date": "2023-03-21T04:09:26Z",
+      "sha": "01abe0371017f28fb2dabb0b6bc6ddd30270dac2",
+      "message": "Fix uart write answer reading (#57)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "356e36ea5b9a94ef6beae842a1d35fa5544fbaf1",
+          "filename": "bno055/connectors/uart.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/flynneva/bno055/blob/01abe0371017f28fb2dabb0b6bc6ddd30270dac2/bno055%2Fconnectors%2Fuart.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/01abe0371017f28fb2dabb0b6bc6ddd30270dac2/bno055%2Fconnectors%2Fuart.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/bno055%2Fconnectors%2Fuart.py?ref=01abe0371017f28fb2dabb0b6bc6ddd30270dac2",
+          "patch": "@@ -150,7 +150,7 @@ def write(self, reg_addr, length, data: bytes):\n \n         try:\n             self.serialConnection.write(buf_out)\n-            buf_in = bytearray(self.serialConnection.read())\n+            buf_in = bytearray(self.serialConnection.read(2))\n         except Exception:  # noqa: B902\n             return False\n "
+        }
+      ]
+    },
+    {
+      "author": "asymingt",
+      "date": "2023-01-14T02:52:17Z",
+      "sha": "b96c8d1529267317a571907749ce4e136958ce84",
+      "message": "Add I2C implementation (#52)\n\n* Add I2C implementation\r\n* Updates after review\r\n* Revert one file change\r\n* Add newline\r\n* Revert to UART as default\r\n* Fix typo\r\n* nit",
+      "files_changed": 10,
+      "additions": 287,
+      "deletions": 111,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "cd905b12816c36e80737b66bc71e7ebd1c85194f",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/flynneva/bno055/blob/b96c8d1529267317a571907749ce4e136958ce84/README.md",
+          "raw_url": "https://github.com/flynneva/bno055/raw/b96c8d1529267317a571907749ce4e136958ce84/README.md",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/README.md?ref=b96c8d1529267317a571907749ce4e136958ce84",
+          "patch": "@@ -42,7 +42,14 @@ ros2 run bno055 bno055 --ros-args --params-file ./src/bno055/bno055/params/bno05\n - **uart_port**: The UART port to use; default='/dev/ttyUSB0'\n - **uart_baudrate**: The baud rate to use; default=115200\n - **uart_timeout**: The timeout for UART transmissions in seconds to use; default=0.1\n+\n+### I2C Connection\n+\n+- **connection_type=i2c**: Defines I2C as sensor connection type; default='uart'\n+- **i2c_bus**: The integer I2C bus number to use; default=0\n+- **i2c_address**: The hexadecimal I2C address to use; default=0x28\n   \n+\n ### Sensor Configuration\n \n - **frame_id**: coordinate frame id of sensor default='bno055'"
+        },
+        {
+          "sha": "743a21cb58f4a73e7291621881f044b575ff5f74",
+          "filename": "bno055/bno055.py",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 2,
+          "changes": 5,
+          "blob_url": "https://github.com/flynneva/bno055/blob/b96c8d1529267317a571907749ce4e136958ce84/bno055%2Fbno055.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/b96c8d1529267317a571907749ce4e136958ce84/bno055%2Fbno055.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/bno055%2Fbno055.py?ref=b96c8d1529267317a571907749ce4e136958ce84",
+          "patch": "@@ -66,8 +66,9 @@ def setup(self):\n                              self.param.uart_port.value,\n                              self.param.uart_timeout.value)\n         elif self.param.connection_type.value == I2C.CONNECTIONTYPE_I2C:\n-            # TODO implement IC2 integration\n-            raise NotImplementedError('I2C not yet implemented')\n+            connector = I2C(self,\n+                            self.param.i2c_bus.value,\n+                            self.param.i2c_addr.value)\n         else:\n             raise NotImplementedError('Unsupported connection type: '\n                                       + str(self.param.connection_type.value))"
+        },
+        {
+          "sha": "dbfd6bd3631352f8c8eeeea23b8987e236356756",
+          "filename": "bno055/connectors/Connector.py",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 89,
+          "changes": 92,
+          "blob_url": "https://github.com/flynneva/bno055/blob/b96c8d1529267317a571907749ce4e136958ce84/bno055%2Fconnectors%2FConnector.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/b96c8d1529267317a571907749ce4e136958ce84/bno055%2Fconnectors%2FConnector.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/bno055%2Fconnectors%2FConnector.py?ref=b96c8d1529267317a571907749ce4e136958ce84",
+          "patch": "@@ -27,8 +27,7 @@\n # POSSIBILITY OF SUCH DAMAGE.\n \n \n-from bno055 import registers\n-from bno055.error_handling.exceptions import BusOverRunException, TransmissionException\n+\n from rclpy.node import Node\n \n \n@@ -43,92 +42,7 @@ def __init__(self, node: Node):\n         self.node = node\n \n     def receive(self, reg_addr, length):\n-        \"\"\"\n-        Receives data packages of requested length from the sensor.\n-\n-        :param reg_addr: The register address\n-        :param length: The length of the data package to receive\n-        :return: The received payload message\n-        :raises TransmissionException in case of any error\n-        \"\"\"\n-        buf_out = bytearray()\n-        buf_out.append(registers.COM_START_BYTE_WR)\n-        buf_out.append(registers.COM_READ)\n-        buf_out.append(reg_addr)\n-        buf_out.append(length)\n-\n-        try:\n-            self.write(buf_out)\n-            buf_in = bytearray(self.read(2 + length))\n-            # print(\"Reading, wr: \", binascii.hexlify(buf_out), \"  re: \", binascii.hexlify(buf_in))\n-        except Exception as e:  # noqa: B902\n-            # re-raise as IOError\n-            raise TransmissionException('Transmission error: %s' % e)\n-\n-        # Check for valid response length (the smallest (error) message has at least 2 bytes):\n-        if buf_in.__len__() < 2:\n-            raise TransmissionException('Unexpected length of READ-request response: %s'\n-                                        % buf_in.__len__())\n-\n-        # Check for READ result (success or failure):\n-        if buf_in[0] == registers.COM_START_BYTE_ERROR_RESP:\n-            # Error 0x07 (BUS_OVER_RUN_ERROR) can be \"normal\" if data fusion is not yet ready\n-            if buf_in[1] == 7:\n-                # see #5\n-                raise BusOverRunException('Data fusion not ready, resend read request')\n-            else:\n-                raise TransmissionException('READ-request failed with error code %s'\n-                                            % hex(buf_in[1]))\n-        # Check for correct READ response header:\n-        if buf_in[0] != registers.COM_START_BYTE_RESP:\n-            raise TransmissionException('Wrong READ-request response header %s' % hex(buf_in[0]))\n-\n-        if (buf_in.__len__()-2) != buf_in[1]:\n-            raise TransmissionException('Payload length mismatch detected: '\n-                                        + '  received=%s, awaited=%s'\n-                                        % (buf_in.__len__()-2, buf_in[1]))\n-\n-        # Check for correct READ-request response length\n-        if buf_in.__len__() != (2 + length):\n-            raise TransmissionException('Incorrect READ-request response length: %s'\n-                                        % (2 + length))\n+        return self.read(reg_addr, length)\n \n-        # remove the 0xBB:\n-        buf_in.pop(0)\n-        # remove the length information:\n-        buf_in.pop(0)\n-\n-        # Return the received payload:\n-        return buf_in\n-\n-    # -----------------------------\n     def transmit(self, reg_addr, length, data: bytes):\n-        \"\"\"\n-        Transmit data packages to the sensor.\n-\n-        :param reg_addr: The register address\n-        :param length: The data length\n-        :param data: data to transmit\n-        :return:\n-        \"\"\"\n-        buf_out = bytearray()\n-        buf_out.append(registers.COM_START_BYTE_WR)\n-        buf_out.append(registers.COM_WRITE)\n-        buf_out.append(reg_addr)\n-        buf_out.append(length)\n-        # Append payload data to the written:\n-        buf_out += data\n-\n-        # print(\"Writing: \", binascii.hexlify(buf_out))\n-\n-        try:\n-            self.write(buf_out)\n-            buf_in = bytearray(self.read(2))\n-            # print(\"Writing, wr: \", binascii.hexlify(buf_out), \"  re: \", binascii.hexlify(buf_in))\n-        except Exception:  # noqa: B902\n-            return False\n-\n-        if (buf_in.__len__() != 2) or (buf_in[1] != 0x01):\n-            # rospy.logerr(\"Incorrect Bosh IMU device response.\")\n-            return False\n-        return True\n+        return self.write(reg_addr, length, data)"
+        },
+        {
+          "sha": "8ef894f79f26f2f9c18d634872df3b4a404a4ddd",
+          "filename": "bno055/connectors/i2c.py",
+          "status": "modified",
+          "additions": 33,
+          "deletions": 8,
+          "changes": 41,
+          "blob_url": "https://github.com/flynneva/bno055/blob/b96c8d1529267317a571907749ce4e136958ce84/bno055%2Fconnectors%2Fi2c.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/b96c8d1529267317a571907749ce4e136958ce84/bno055%2Fconnectors%2Fi2c.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/bno055%2Fconnectors%2Fi2c.py?ref=b96c8d1529267317a571907749ce4e136958ce84",
+          "patch": "@@ -27,22 +27,47 @@\n # POSSIBILITY OF SUCH DAMAGE.\n \n \n-from bno055.connectors.Connector import Connector\n+from smbus import SMBus\n+\n from rclpy.node import Node\n \n+from bno055 import registers\n+from bno055.connectors.Connector import Connector\n+from bno055.error_handling.exceptions import TransmissionException\n+\n \n class I2C(Connector):\n     CONNECTIONTYPE_I2C = 'i2c'\n \n-    def __init__(self, node: Node):\n-        # Initialize parent\n+    def __init__(self, node: Node, i2c_bus=0, i2c_addr=registers.BNO055_ADDRESS_A):\n         super().__init__(node)\n+        self.bus = SMBus(i2c_bus)\n+        self.address = i2c_addr\n \n     def connect(self):\n-        raise NotImplementedError('I2C not yet implemented')\n+        returned_id = self.bus.read_byte_data(self.address, registers.BNO055_CHIP_ID_ADDR)\n+        if returned_id != registers.BNO055_ID:\n+            raise TransmissionException('Could not get BNO055 chip ID via I2C')\n \n-    def read(self, numberOfBytes):\n-        raise NotImplementedError('I2C not yet implemented')\n+    def read(self, reg_addr, length):\n+        buffer = bytearray()\n+        bytes_left_to_read = length\n+        while bytes_left_to_read > 0:\n+            read_len = min(bytes_left_to_read, 32)\n+            read_off = length - bytes_left_to_read\n+            response = self.bus.read_i2c_block_data(\n+                self.address, reg_addr + read_off, read_len)\n+            buffer += bytearray(response)\n+            bytes_left_to_read -= read_len\n+        return buffer\n \n-    def write(self, data: bytearray):\n-        raise NotImplementedError('I2C not yet implemented')\n+    def write(self, reg_addr, length, data: bytes):\n+        bytes_left_to_write = length\n+        while bytes_left_to_write > 0:\n+            write_len = min(bytes_left_to_write, 32)\n+            write_off = length - bytes_left_to_write\n+            datablock = list(data[write_off : write_off + write_len])\n+            self.bus.write_i2c_block_data(\n+                self.address, reg_addr + write_off, datablock)\n+            bytes_left_to_write -= write_len\n+        return True"
+        },
+        {
+          "sha": "9a6965da5d69499ff93123784f2aade83068d0d1",
+          "filename": "bno055/connectors/uart.py",
+          "status": "modified",
+          "additions": 81,
+          "deletions": 6,
+          "changes": 87,
+          "blob_url": "https://github.com/flynneva/bno055/blob/b96c8d1529267317a571907749ce4e136958ce84/bno055%2Fconnectors%2Fuart.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/b96c8d1529267317a571907749ce4e136958ce84/bno055%2Fconnectors%2Fuart.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/bno055%2Fconnectors%2Fuart.py?ref=b96c8d1529267317a571907749ce4e136958ce84",
+          "patch": "@@ -30,10 +30,13 @@\n # Connector for UART integration of the BNO-055\n # See also https://pyserial.readthedocs.io/en/latest/pyserial_api.html\n import sys\n+import serial\n \n-from bno055.connectors.Connector import Connector\n from rclpy.node import Node\n-import serial\n+\n+from bno055 import registers\n+from bno055.error_handling.exceptions import BusOverRunException, TransmissionException\n+from bno055.connectors.Connector import Connector\n \n \n class UART(Connector):\n@@ -61,8 +64,80 @@ def connect(self):\n             self.node.get_logger().info('Check to make sure your device is connected')\n             sys.exit(1)\n \n-    def read(self, numberOfBytes):\n-        return self.serialConnection.read(numberOfBytes)\n+    def read(self, reg_addr, length):\n+        buf_out = bytearray()\n+        buf_out.append(registers.COM_START_BYTE_WR)\n+        buf_out.append(registers.COM_READ)\n+        buf_out.append(reg_addr)\n+        buf_out.append(length)\n+\n+        try:\n+            self.serialConnection.write(buf_out)\n+            buf_in = bytearray(self.serialConnection.read(2 + length))\n+        except Exception as e:  # noqa: B902\n+            raise TransmissionException('Transmission error: %s' % e)\n+\n+        # Check for valid response length (the smallest (error) message has at least 2 bytes):\n+        if buf_in.__len__() < 2:\n+            raise TransmissionException('Unexpected length of READ-request response: %s'\n+                                        % buf_in.__len__())\n+\n+        \n+        # Check for READ result (success or failure):\n+        if buf_in[0] == registers.COM_START_BYTE_ERROR_RESP:\n+            # Error 0x07 (BUS_OVER_RUN_ERROR) can be \"normal\" if data fusion is not yet ready\n+            if buf_in[1] == 7:\n+                # see #5\n+                raise BusOverRunException('Data fusion not ready, resend read request')\n+            else:\n+                raise TransmissionException('READ-request failed with error code %s'\n+                                            % hex(buf_in[1]))\n+        \n+        # Check for correct READ response header:\n+        if buf_in[0] != registers.COM_START_BYTE_RESP:\n+            raise TransmissionException('Wrong READ-request response header %s' % hex(buf_in[0]))\n+\n+        if (buf_in.__len__()-2) != buf_in[1]:\n+            raise TransmissionException('Payload length mismatch detected: '\n+                                        + '  received=%s, awaited=%s'\n+                                        % (buf_in.__len__()-2, buf_in[1]))\n+\n+        # Check for correct READ-request response length\n+        if buf_in.__len__() != (2 + length):\n+            raise TransmissionException('Incorrect READ-request response length: %s'\n+                                        % (2 + length))\n+\n+        # remove the 0xBB:\n+        buf_in.pop(0)\n+\n+        # remove the length information:\n+        buf_in.pop(0)\n+\n+        # Return the received payload:\n+        return buf_in\n+\n+    def write(self, reg_addr, length, data: bytes):\n+        \"\"\"\n+        Transmit data packages to the sensor.\n+        :param reg_addr: The register address\n+        :param length: The data length\n+        :param data: data to transmit\n+        :return:\n+        \"\"\"\n+        buf_out = bytearray()\n+        buf_out.append(registers.COM_START_BYTE_WR)\n+        buf_out.append(registers.COM_WRITE)\n+        buf_out.append(reg_addr)\n+        buf_out.append(length)\n+        buf_out += data\n+\n+        try:\n+            self.serialConnection.write(buf_out)\n+            buf_in = bytearray(self.serialConnection.read())\n+        except Exception:  # noqa: B902\n+            return False\n+\n+        if (buf_in.__len__() != 2) or (buf_in[1] != 0x01):\n+            return False\n+        return True\n \n-    def write(self, data: bytearray):\n-        self.serialConnection.write(data)"
+        },
+        {
+          "sha": "770d64d9a92ae2e96203f9434903ddc3f822d263",
+          "filename": "bno055/params/NodeParameters.py",
+          "status": "modified",
+          "additions": 21,
+          "deletions": 6,
+          "changes": 27,
+          "blob_url": "https://github.com/flynneva/bno055/blob/b96c8d1529267317a571907749ce4e136958ce84/bno055%2Fparams%2FNodeParameters.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/b96c8d1529267317a571907749ce4e136958ce84/bno055%2Fparams%2FNodeParameters.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/bno055%2Fparams%2FNodeParameters.py?ref=b96c8d1529267317a571907749ce4e136958ce84",
+          "patch": "@@ -28,6 +28,7 @@\n \n \n from bno055.connectors.uart import UART\n+from bno055.connectors.i2c import I2C\n from bno055 import registers\n from rclpy.node import Node\n \n@@ -54,6 +55,10 @@ def __init__(self, node: Node):\n         node.declare_parameter(name='ros_topic_prefix', value='bno055/')\n         # The type of the sensor connection. Either \"uart\" or \"i2c\":\n         node.declare_parameter(name='connection_type', value=UART.CONNECTIONTYPE_UART)\n+        # I2C bus number\n+        node.declare_parameter('i2c_bus', value=0)\n+        # I2C address\n+        node.declare_parameter('i2c_addr', value=0x28)\n         # UART port\n         node.declare_parameter('uart_port', value='/dev/ttyUSB0')\n         # UART Baud Rate\n@@ -104,14 +109,24 @@ def __init__(self, node: Node):\n             self.connection_type = node.get_parameter('connection_type')\n             node.get_logger().info('\\tconnection_type:\\t\"%s\"' % self.connection_type.value)\n \n-            self.uart_port = node.get_parameter('uart_port')\n-            node.get_logger().info('\\tuart_port:\\t\\t\"%s\"' % self.uart_port.value)\n+            if self.connection_type == I2C.CONNECTIONTYPE_I2C:\n \n-            self.uart_baudrate = node.get_parameter('uart_baudrate')\n-            node.get_logger().info('\\tuart_baudrate:\\t\\t\"%s\"' % self.uart_baudrate.value)\n+                self.i2c_bus = node.get_parameter('i2c_bus')\n+                node.get_logger().info('\\ti2c_bus:\\t\\t\"%s\"' % self.i2c_bus.value)\n \n-            self.uart_timeout = node.get_parameter('uart_timeout')\n-            node.get_logger().info('\\tuart_timeout:\\t\\t\"%s\"' % self.uart_timeout.value)\n+                self.i2c_addr = node.get_parameter('i2c_addr')\n+                node.get_logger().info('\\ti2c_addr:\\t\\t\"%s\"' % self.i2c_addr.value)\n+\n+            elif self.connection_type == UART.CONNECTIONTYPE_UART:\n+\n+                self.uart_port = node.get_parameter('uart_port')\n+                node.get_logger().info('\\tuart_port:\\t\\t\"%s\"' % self.uart_port.value)\n+\n+                self.uart_baudrate = node.get_parameter('uart_baudrate')\n+                node.get_logger().info('\\tuart_baudrate:\\t\\t\"%s\"' % self.uart_baudrate.value)\n+\n+                self.uart_timeout = node.get_parameter('uart_timeout')\n+                node.get_logger().info('\\tuart_timeout:\\t\\t\"%s\"' % self.uart_timeout.value)\n \n             self.frame_id = node.get_parameter('frame_id')\n             node.get_logger().info('\\tframe_id:\\t\\t\"%s\"' % self.frame_id.value)"
+        },
+        {
+          "sha": "98eb0c0302ca01da083bab2c45cefdde72d760d8",
+          "filename": "bno055/params/bno055_params.yaml",
+          "status": "modified",
+          "additions": 29,
+          "deletions": 0,
+          "changes": 29,
+          "blob_url": "https://github.com/flynneva/bno055/blob/b96c8d1529267317a571907749ce4e136958ce84/bno055%2Fparams%2Fbno055_params.yaml",
+          "raw_url": "https://github.com/flynneva/bno055/raw/b96c8d1529267317a571907749ce4e136958ce84/bno055%2Fparams%2Fbno055_params.yaml",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/bno055%2Fparams%2Fbno055_params.yaml?ref=b96c8d1529267317a571907749ce4e136958ce84",
+          "patch": "@@ -1,3 +1,32 @@\n+# Copyright 2021 AUTHORS\n+#\n+# Redistribution and use in source and binary forms, with or without\n+# modification, are permitted provided that the following conditions are met:\n+#\n+#    * Redistributions of source code must retain the above copyright\n+#      notice, this list of conditions and the following disclaimer.\n+#\n+#    * Redistributions in binary form must reproduce the above copyright\n+#      notice, this list of conditions and the following disclaimer in the\n+#      documentation and/or other materials provided with the distribution.\n+#\n+#    * Neither the name of the AUTHORS nor the names of its\n+#      contributors may be used to endorse or promote products derived from\n+#      this software without specific prior written permission.\n+#\n+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE\n+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+# POSSIBILITY OF SUCH DAMAGE.\n+\n+# Example parameters for a UART connection to the BNO055 motion sensor.\n bno055:\n   ros__parameters:\n     ros_topic_prefix: \"bno055/\""
+        },
+        {
+          "sha": "ea2cb9167e8cbc2f6a67737a86d188db0521606d",
+          "filename": "bno055/params/bno055_params_i2c.yaml",
+          "status": "added",
+          "additions": 54,
+          "deletions": 0,
+          "changes": 54,
+          "blob_url": "https://github.com/flynneva/bno055/blob/b96c8d1529267317a571907749ce4e136958ce84/bno055%2Fparams%2Fbno055_params_i2c.yaml",
+          "raw_url": "https://github.com/flynneva/bno055/raw/b96c8d1529267317a571907749ce4e136958ce84/bno055%2Fparams%2Fbno055_params_i2c.yaml",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/bno055%2Fparams%2Fbno055_params_i2c.yaml?ref=b96c8d1529267317a571907749ce4e136958ce84",
+          "patch": "@@ -0,0 +1,54 @@\n+# Copyright 2021 AUTHORS\n+#\n+# Redistribution and use in source and binary forms, with or without\n+# modification, are permitted provided that the following conditions are met:\n+#\n+#    * Redistributions of source code must retain the above copyright\n+#      notice, this list of conditions and the following disclaimer.\n+#\n+#    * Redistributions in binary form must reproduce the above copyright\n+#      notice, this list of conditions and the following disclaimer in the\n+#      documentation and/or other materials provided with the distribution.\n+#\n+#    * Neither the name of the AUTHORS nor the names of its\n+#      contributors may be used to endorse or promote products derived from\n+#      this software without specific prior written permission.\n+#\n+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE\n+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+# POSSIBILITY OF SUCH DAMAGE.\n+\n+# Example parameters for an I2C connection to the BNO055 motion sensor.\n+bno055:\n+  ros__parameters:\n+    ros_topic_prefix: \"bno055/\"\n+    connection_type: \"i2c\"\n+    i2c_bus: 0\n+    i2c_addr: 0x28\n+    data_query_frequency: 100\n+    calib_status_frequency: 0.1\n+    frame_id: \"bno055\"\n+    operation_mode: 0x0C\n+    placement_axis_remap: \"P2\"\n+    acc_factor: 100.0\n+    mag_factor: 16000000.0\n+    gyr_factor: 900.0\n+    set_offsets: false # set to true to use offsets below\n+    offset_acc: [0xFFEC, 0x00A5, 0xFFE8]\n+    offset_mag: [0xFFB4, 0xFE9E, 0x027D]\n+    offset_gyr: [0x0002, 0xFFFF, 0xFFFF]\n+    ## Sensor standard deviation [x,y,z]\n+    ## Used to calculate covariance matrices\n+    ## defaults are used if parameters below are not provided\n+    # variance_acc: [0.0, 0.0, 0.0] # [m/s^2]\n+    # variance_angular_vel: [0.0, 0.0, 0.0] # [rad/s]\n+    # variance_orientation: [0.0, 0.0, 0.0] # [rad]\n+    # variance_mag: [0.0, 0.0, 0.0] # [Tesla]"
+        },
+        {
+          "sha": "1f00e20a5577913853d3cf0444c0fb9201253911",
+          "filename": "bno055/params/bno055_params_test.yaml",
+          "status": "modified",
+          "additions": 28,
+          "deletions": 0,
+          "changes": 28,
+          "blob_url": "https://github.com/flynneva/bno055/blob/b96c8d1529267317a571907749ce4e136958ce84/bno055%2Fparams%2Fbno055_params_test.yaml",
+          "raw_url": "https://github.com/flynneva/bno055/raw/b96c8d1529267317a571907749ce4e136958ce84/bno055%2Fparams%2Fbno055_params_test.yaml",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/bno055%2Fparams%2Fbno055_params_test.yaml?ref=b96c8d1529267317a571907749ce4e136958ce84",
+          "patch": "@@ -1,3 +1,31 @@\n+# Copyright 2021 AUTHORS\n+#\n+# Redistribution and use in source and binary forms, with or without\n+# modification, are permitted provided that the following conditions are met:\n+#\n+#    * Redistributions of source code must retain the above copyright\n+#      notice, this list of conditions and the following disclaimer.\n+#\n+#    * Redistributions in binary form must reproduce the above copyright\n+#      notice, this list of conditions and the following disclaimer in the\n+#      documentation and/or other materials provided with the distribution.\n+#\n+#    * Neither the name of the AUTHORS nor the names of its\n+#      contributors may be used to endorse or promote products derived from\n+#      this software without specific prior written permission.\n+#\n+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE\n+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+# POSSIBILITY OF SUCH DAMAGE.\n+\n bno055:\n   ros__parameters:\n     ros_topic_prefix: \"bno055/\""
+        },
+        {
+          "sha": "3c5bad46f6a4098c2a921d6e270d2740e332d4d4",
+          "filename": "launch/bno055.launch.py",
+          "status": "modified",
+          "additions": 28,
+          "deletions": 0,
+          "changes": 28,
+          "blob_url": "https://github.com/flynneva/bno055/blob/b96c8d1529267317a571907749ce4e136958ce84/launch%2Fbno055.launch.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/b96c8d1529267317a571907749ce4e136958ce84/launch%2Fbno055.launch.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/launch%2Fbno055.launch.py?ref=b96c8d1529267317a571907749ce4e136958ce84",
+          "patch": "@@ -1,3 +1,31 @@\n+# Copyright 2021 AUTHORS\n+#\n+# Redistribution and use in source and binary forms, with or without\n+# modification, are permitted provided that the following conditions are met:\n+#\n+#    * Redistributions of source code must retain the above copyright\n+#      notice, this list of conditions and the following disclaimer.\n+#\n+#    * Redistributions in binary form must reproduce the above copyright\n+#      notice, this list of conditions and the following disclaimer in the\n+#      documentation and/or other materials provided with the distribution.\n+#\n+#    * Neither the name of the AUTHORS nor the names of its\n+#      contributors may be used to endorse or promote products derived from\n+#      this software without specific prior written permission.\n+#\n+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE\n+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR\n+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF\n+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+# POSSIBILITY OF SUCH DAMAGE.\n+ \n import os\n from ament_index_python.packages import get_package_share_directory\n from launch import LaunchDescription"
+        }
+      ]
+    },
+    {
+      "author": "gulerburak",
+      "date": "2023-03-21T04:08:01Z",
+      "sha": "112bfc2e65d91131ce6de1e1a8bc0d0f3d9433e7",
+      "message": "fix build error on foxy that caused by typo (#59)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "07747555991ccba8cd01855e70b0203bc3cd02fb",
+          "filename": "setup.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/flynneva/bno055/blob/112bfc2e65d91131ce6de1e1a8bc0d0f3d9433e7/setup.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/112bfc2e65d91131ce6de1e1a8bc0d0f3d9433e7/setup.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/setup.py?ref=112bfc2e65d91131ce6de1e1a8bc0d0f3d9433e7",
+          "patch": "@@ -7,7 +7,7 @@\n \n setup(\n     name=package_name,\n-    version='0.4.1.',\n+    version='0.4.1',\n     # find sub-packages automatically in order to allow sub-modules, etc. to be imported:\n     # packages=[package_name],\n     packages=find_packages(exclude=['test']),"
+        }
+      ]
+    },
+    {
+      "author": "evan-flynn-apexai",
+      "date": "2022-11-13T00:35:48Z",
+      "sha": "6d846bd3997116f8172a432b0134ace2a99b3738",
+      "message": "Fix invalid log string variable expansion\n\nSigned-off-by: Evan Flynn <evan.flynn@apex.ai>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "97dd69a396dc207c42df503d30ea010c3c67c11d",
+          "filename": "bno055/sensor/SensorService.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/flynneva/bno055/blob/6d846bd3997116f8172a432b0134ace2a99b3738/bno055%2Fsensor%2FSensorService.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/6d846bd3997116f8172a432b0134ace2a99b3738/bno055%2Fsensor%2FSensorService.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/bno055%2Fsensor%2FSensorService.py?ref=6d846bd3997116f8172a432b0134ace2a99b3738",
+          "patch": "@@ -129,7 +129,7 @@ def configure(self):\n \n         # Set Device mode\n         device_mode = self.param.operation_mode.value\n-        self.node.get_logger().info(f\"Setting device_mode to {device_mode=}\")\n+        self.node.get_logger().info(f\"Setting device_mode to {device_mode}\")\n \n         if not (self.con.transmit(registers.BNO055_OPR_MODE_ADDR, 1, bytes([device_mode]))):\n             self.node.get_logger().warn('Unable to set IMU operation mode into operation mode.')"
+        }
+      ]
+    },
+    {
+      "author": "sjev",
+      "date": "2022-10-25T16:16:35Z",
+      "sha": "a2b3e0908ae62c4ca59ac749778397f013915c91",
+      "message": "add device mode setting",
+      "files_changed": 3,
+      "additions": 32,
+      "deletions": 5,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e09219b4ce412cf39cfe2fa3c4252da0fe3c698c",
+          "filename": "bno055/params/bno055_params_test.yaml",
+          "status": "added",
+          "additions": 26,
+          "deletions": 0,
+          "changes": 26,
+          "blob_url": "https://github.com/flynneva/bno055/blob/a2b3e0908ae62c4ca59ac749778397f013915c91/bno055%2Fparams%2Fbno055_params_test.yaml",
+          "raw_url": "https://github.com/flynneva/bno055/raw/a2b3e0908ae62c4ca59ac749778397f013915c91/bno055%2Fparams%2Fbno055_params_test.yaml",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/bno055%2Fparams%2Fbno055_params_test.yaml?ref=a2b3e0908ae62c4ca59ac749778397f013915c91",
+          "patch": "@@ -0,0 +1,26 @@\n+bno055:\n+  ros__parameters:\n+    ros_topic_prefix: \"bno055/\"\n+    connection_type: \"uart\"\n+    uart_port: \"/dev/ttyUSB0\"\n+    uart_baudrate: 115200\n+    uart_timeout: 0.1\n+    data_query_frequency: 10\n+    calib_status_frequency: 0.1\n+    frame_id: \"bno055\"\n+    operation_mode: 0x08\n+    placement_axis_remap: \"P1\"\n+    acc_factor: 100.0\n+    mag_factor: 16000000.0\n+    gyr_factor: 900.0\n+    set_offsets: false # set to true to use offsets below\n+    offset_acc: [0xFFEC, 0x00A5, 0xFFE8]\n+    offset_mag: [0xFFB4, 0xFE9E, 0x027D]\n+    offset_gyr: [0x0002, 0xFFFF, 0xFFFF]\n+    ## Sensor standard deviation [x,y,z]\n+    ## Used to calculate covariance matrices\n+    ## defaults are used if parameters below are not provided\n+    # variance_acc: [0.0, 0.0, 0.0] # [m/s^2]\n+    # variance_angular_vel: [0.0, 0.0, 0.0] # [rad/s]\n+    # variance_orientation: [0.0, 0.0, 0.0] # [rad]\n+    # variance_mag: [0.0, 0.0, 0.0] # [Tesla]"
+        },
+        {
+          "sha": "66617b3d28f59be53bbd5cf67f74555d41295678",
+          "filename": "bno055/sensor/SensorService.py",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 4,
+          "changes": 9,
+          "blob_url": "https://github.com/flynneva/bno055/blob/a2b3e0908ae62c4ca59ac749778397f013915c91/bno055%2Fsensor%2FSensorService.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/a2b3e0908ae62c4ca59ac749778397f013915c91/bno055%2Fsensor%2FSensorService.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/bno055%2Fsensor%2FSensorService.py?ref=a2b3e0908ae62c4ca59ac749778397f013915c91",
+          "patch": "@@ -127,10 +127,11 @@ def configure(self):\n                 self.node.get_logger().warn('setting offsets failed')\n \n \n-        # Set Device to NDOF mode\n-        # data fusion for gyroscope, acceleration sensor and magnetometer enabled\n-        # absolute orientation\n-        if not (self.con.transmit(registers.BNO055_OPR_MODE_ADDR, 1, bytes([registers.OPERATION_MODE_NDOF]))):\n+        # Set Device mode\n+        device_mode = self.param.operation_mode.value\n+        self.node.get_logger().info(f\"Setting device_mode to {device_mode=}\")\n+\n+        if not (self.con.transmit(registers.BNO055_OPR_MODE_ADDR, 1, bytes([device_mode]))):\n             self.node.get_logger().warn('Unable to set IMU operation mode into operation mode.')\n \n         self.node.get_logger().info('Bosch BNO055 IMU configuration complete.')"
+        },
+        {
+          "sha": "60810f686bc9f4ebc6736985123a0b9f0426c53c",
+          "filename": "setup.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/flynneva/bno055/blob/a2b3e0908ae62c4ca59ac749778397f013915c91/setup.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/a2b3e0908ae62c4ca59ac749778397f013915c91/setup.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/setup.py?ref=a2b3e0908ae62c4ca59ac749778397f013915c91",
+          "patch": "@@ -7,7 +7,7 @@\n \n setup(\n     name=package_name,\n-    version='0.3.0',\n+    version='0.3.1',\n     # find sub-packages automatically in order to allow sub-modules, etc. to be imported:\n     # packages=[package_name],\n     packages=find_packages(exclude=['test']),"
+        }
+      ]
+    },
+    {
+      "author": "Towflos",
+      "date": "2022-02-02T11:29:22Z",
+      "sha": "62ef65bce9ca7a1f7a628c2af4cecadf07d01b2f",
+      "message": "mag radius and acc radius added as parameter",
+      "files_changed": 2,
+      "additions": 12,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "f7dac0c71c30aaa41426f6c3c054024499f42163",
+          "filename": "bno055/params/NodeParameters.py",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/flynneva/bno055/blob/62ef65bce9ca7a1f7a628c2af4cecadf07d01b2f/bno055%2Fparams%2FNodeParameters.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/62ef65bce9ca7a1f7a628c2af4cecadf07d01b2f/bno055%2Fparams%2FNodeParameters.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/bno055%2Fparams%2FNodeParameters.py?ref=62ef65bce9ca7a1f7a628c2af4cecadf07d01b2f",
+          "patch": "@@ -84,6 +84,10 @@ def __init__(self, node: Node):\n         node.declare_parameter('offset_mag', value=registers.DEFAULT_OFFSET_MAG)\n         # +/- 2000 units up to 32000 (dps range dependent)               (1 unit = 1/16 dps)\n         node.declare_parameter('offset_gyr', value=registers.DEFAULT_OFFSET_GYR)\n+        # +/-1000 units\n+        node.declare_parameter('radius_acc', value=0)\n+        #  +/-960 units\n+        node.declare_parameter('radius_mag', value=0)\n         # Sensor standard deviation squared (^2) defaults [x, y, z]\n         node.declare_parameter('variance_acc', value=registers.DEFAULT_VARIANCE_ACC)\n         node.declare_parameter('variance_angular_vel', value=registers.DEFAULT_VARIANCE_ANGULAR_VEL)"
+        },
+        {
+          "sha": "0308eb165a9ed794fd7810dc11885781aa3724e9",
+          "filename": "bno055/sensor/SensorService.py",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 1,
+          "changes": 9,
+          "blob_url": "https://github.com/flynneva/bno055/blob/62ef65bce9ca7a1f7a628c2af4cecadf07d01b2f/bno055%2Fsensor%2FSensorService.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/62ef65bce9ca7a1f7a628c2af4cecadf07d01b2f/bno055%2Fsensor%2FSensorService.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/bno055%2Fsensor%2FSensorService.py?ref=62ef65bce9ca7a1f7a628c2af4cecadf07d01b2f",
+          "patch": "@@ -302,7 +302,7 @@ def get_calib_offsets(self):\n                 gyro_offset_read_y,\n                 gyro_offset_read_z))\n \n-    def set_calib_offsets(self, acc_offset, mag_offset, gyr_offset):\n+    def set_calib_offsets(self, acc_offset, mag_offset, gyr_offset, mag_radius, acc_radius):\n         \"\"\"\n         Write calibration data (define as 16 bit signed hex).\n \n@@ -324,19 +324,26 @@ def set_calib_offsets(self, acc_offset, mag_offset, gyr_offset):\n             self.con.transmit(registers.ACCEL_OFFSET_Z_LSB_ADDR, 1, bytes([acc_offset[2] & 0xFF]))\n             self.con.transmit(registers.ACCEL_OFFSET_Z_MSB_ADDR, 1, bytes([(acc_offset[2] >> 8) & 0xFF]))\n \n+            self.con.transmit(registers.ACCEL_RADIUS_LSB_ADDR, 1, bytes([acc_radius & 0xFF]))\n+            self.con.transmit(registers.ACCEL_RADIUS_MSB_ADDR, 1, bytes([(acc_radius >> 8) & 0xFF]))\n+\n             self.con.transmit(registers.MAG_OFFSET_X_LSB_ADDR, 1, bytes([mag_offset[0] & 0xFF]))\n             self.con.transmit(registers.MAG_OFFSET_X_MSB_ADDR, 1, bytes([(mag_offset[0] >> 8) & 0xFF]))\n             self.con.transmit(registers.MAG_OFFSET_Y_LSB_ADDR, 1, bytes([mag_offset[1] & 0xFF]))\n             self.con.transmit(registers.MAG_OFFSET_Y_MSB_ADDR, 1, bytes([(mag_offset[1] >> 8) & 0xFF]))\n             self.con.transmit(registers.MAG_OFFSET_Z_LSB_ADDR, 1, bytes([mag_offset[2] & 0xFF]))\n             self.con.transmit(registers.MAG_OFFSET_Z_MSB_ADDR, 1, bytes([(mag_offset[2] >> 8) & 0xFF]))\n \n+            self.con.transmit(registers.MAG_RADIUS_LSB_ADDR, 1, bytes([mag_radius & 0xFF]))\n+            self.con.transmit(registers.MAG_RADIUS_MSB_ADDR, 1, bytes([(mag_radius >> 8) & 0xFF]))\n+\n             self.con.transmit(registers.GYRO_OFFSET_X_LSB_ADDR, 1, bytes([gyr_offset[0] & 0xFF]))\n             self.con.transmit(registers.GYRO_OFFSET_X_MSB_ADDR, 1, bytes([(gyr_offset[0] >> 8) & 0xFF]))\n             self.con.transmit(registers.GYRO_OFFSET_Y_LSB_ADDR, 1, bytes([gyr_offset[1] & 0xFF]))\n             self.con.transmit(registers.GYRO_OFFSET_Y_MSB_ADDR, 1, bytes([(gyr_offset[1] >> 8) & 0xFF]))\n             self.con.transmit(registers.GYRO_OFFSET_Z_LSB_ADDR, 1, bytes([gyr_offset[2] & 0xFF]))\n             self.con.transmit(registers.GYRO_OFFSET_Z_MSB_ADDR, 1, bytes([(gyr_offset[2] >> 8) & 0xFF]))\n+\n             return True\n         except Exception:  # noqa: B902\n             return False"
+        }
+      ]
+    },
+    {
+      "author": "deepinbubblegum",
+      "date": "2022-02-01T08:41:10Z",
+      "sha": "ffc04964b11b05999889cc0c7f61aa4e25622bc4",
+      "message": "add launch file",
+      "files_changed": 2,
+      "additions": 23,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "8460d582a571bf3e447fa75b7064cc2a29e28deb",
+          "filename": "launch/bno055.launch.py",
+          "status": "added",
+          "additions": 19,
+          "deletions": 0,
+          "changes": 19,
+          "blob_url": "https://github.com/flynneva/bno055/blob/ffc04964b11b05999889cc0c7f61aa4e25622bc4/launch%2Fbno055.launch.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/ffc04964b11b05999889cc0c7f61aa4e25622bc4/launch%2Fbno055.launch.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/launch%2Fbno055.launch.py?ref=ffc04964b11b05999889cc0c7f61aa4e25622bc4",
+          "patch": "@@ -0,0 +1,19 @@\n+import os\n+from ament_index_python.packages import get_package_share_directory\n+from launch import LaunchDescription\n+from launch_ros.actions import Node\n+def generate_launch_description():\n+    ld = LaunchDescription()\n+    config = os.path.join(\n+        get_package_share_directory('bno055'),\n+        'config',\n+        'bno055_params.yaml'\n+        )\n+        \n+    node=Node(\n+        package = 'bno055',\n+        executable = 'bno055',\n+        parameters = [config]\n+    )\n+    ld.add_action(node)\n+    return ld\n\\ No newline at end of file"
+        },
+        {
+          "sha": "252a7f23c53351c19dff2b4fc8f0ae6f44e3b548",
+          "filename": "setup.py",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/flynneva/bno055/blob/ffc04964b11b05999889cc0c7f61aa4e25622bc4/setup.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/ffc04964b11b05999889cc0c7f61aa4e25622bc4/setup.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/setup.py?ref=ffc04964b11b05999889cc0c7f61aa4e25622bc4",
+          "patch": "@@ -1,3 +1,5 @@\n+import os\n+from glob import glob\n from setuptools import find_packages\n from setuptools import setup\n \n@@ -16,6 +18,8 @@\n         ('share/ament_index/resource_index/packages',\n          ['resource/' + package_name]),\n         ('share/' + package_name, ['package.xml']),\n+        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),\n+        (os.path.join('share', package_name, 'config'), glob('bno055/params/*.yaml'))\n     ],\n     install_requires=['setuptools'],\n     zip_safe=True,"
+        }
+      ]
+    },
+    {
+      "author": "billymccafferty",
+      "date": "2021-12-07T03:33:16Z",
+      "sha": "2d131ae44af15db2cdd3d239229da02cf13ce89c",
+      "message": "Resolved covariance params and simplified sleep invocation",
+      "files_changed": 2,
+      "additions": 49,
+      "deletions": 46,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "ca228dac5da59a6c61598f9d31136f077c40f5b2",
+          "filename": "bno055/params/bno055_params.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/flynneva/bno055/blob/2d131ae44af15db2cdd3d239229da02cf13ce89c/bno055%2Fparams%2Fbno055_params.yaml",
+          "raw_url": "https://github.com/flynneva/bno055/raw/2d131ae44af15db2cdd3d239229da02cf13ce89c/bno055%2Fparams%2Fbno055_params.yaml",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/bno055%2Fparams%2Fbno055_params.yaml?ref=2d131ae44af15db2cdd3d239229da02cf13ce89c",
+          "patch": "@@ -2,7 +2,7 @@ bno055:\n   ros__parameters:\n     ros_topic_prefix: \"bno055/\"\n     connection_type: \"uart\"\n-    uart_port: \"/dev/ttyUSB0\"\n+    uart_port: \"/dev/ttyAMA0\"\n     uart_baudrate: 115200\n     uart_timeout: 0.1\n     data_query_frequency: 100"
+        },
+        {
+          "sha": "c54192c469d3e7a98af5cb2b5684c555164492e8",
+          "filename": "bno055/sensor/SensorService.py",
+          "status": "modified",
+          "additions": 48,
+          "deletions": 45,
+          "changes": 93,
+          "blob_url": "https://github.com/flynneva/bno055/blob/2d131ae44af15db2cdd3d239229da02cf13ce89c/bno055%2Fsensor%2FSensorService.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/2d131ae44af15db2cdd3d239229da02cf13ce89c/bno055%2Fsensor%2FSensorService.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/bno055%2Fsensor%2FSensorService.py?ref=2d131ae44af15db2cdd3d239229da02cf13ce89c",
+          "patch": "@@ -29,7 +29,7 @@\n from math import sqrt\n import struct\n import sys\n-from time import time\n+from time import sleep\n \n from bno055 import registers\n from bno055.connectors.Connector import Connector\n@@ -147,31 +147,31 @@ def get_sensor_data(self):\n \n         # TODO: make this an option to publish?\n         imu_raw_msg.orientation_covariance = [\n-            self.param.variance_orientation, 0 , 0,\n-            0, self.param.variance_orientation, 0,\n-            0, 0, self.param.variance_orientation\n+            self.param.variance_orientation.value[0], 0.0, 0.0,\n+            0.0, self.param.variance_orientation.value[1], 0.0,\n+            0.0, 0.0, self.param.variance_orientation.value[2]\n         ]\n-        imu_raw_msg.linear_acceleration.x = float(\n-            struct.unpack('h', struct.pack('BB', buf[0], buf[1]))[0]) / self.param.acc_factor.value\n-        imu_raw_msg.linear_acceleration.y = float(\n-            struct.unpack('h', struct.pack('BB', buf[2], buf[3]))[0]) / self.param.acc_factor.value\n-        imu_raw_msg.linear_acceleration.z = float(\n-            struct.unpack('h', struct.pack('BB', buf[4], buf[5]))[0]) / self.param.acc_factor.value\n+        imu_raw_msg.linear_acceleration.x = \\\n+            self.unpackBytesToFloat(buf[0], buf[1]) / self.param.acc_factor.value\n+        imu_raw_msg.linear_acceleration.y = \\\n+            self.unpackBytesToFloat(buf[2], buf[3]) / self.param.acc_factor.value\n+        imu_raw_msg.linear_acceleration.z = \\\n+            self.unpackBytesToFloat(buf[4], buf[5]) / self.param.acc_factor.value\n         imu_raw_msg.linear_acceleration_covariance = [\n-            self.param.variance_acc, 0, 0,\n-            0, self.param.variance_acc, 0,\n-            0, 0, self.param.variance_acc\n+            self.param.variance_acc.value[0], 0.0, 0.0,\n+            0.0, self.param.variance_acc.value[1], 0.0,\n+            0.0, 0.0, self.param.variance_acc.value[2]\n         ]\n-        imu_raw_msg.angular_velocity.x = float(\n-            struct.unpack('h', struct.pack('BB', buf[12], buf[13]))[0]) / self.param.gyr_factor.value\n-        imu_raw_msg.angular_velocity.y = float(\n-            struct.unpack('h', struct.pack('BB', buf[14], buf[15]))[0]) / self.param.gyr_factor.value\n-        imu_raw_msg.angular_velocity.z = float(\n-            struct.unpack('h', struct.pack('BB', buf[16], buf[17]))[0]) / self.param.gyr_factor.value\n+        imu_raw_msg.angular_velocity.x = \\\n+            self.unpackBytesToFloat(buf[12], buf[13]) / self.param.gyr_factor.value\n+        imu_raw_msg.angular_velocity.y = \\\n+            self.unpackBytesToFloat(buf[14], buf[15]) / self.param.gyr_factor.value\n+        imu_raw_msg.angular_velocity.z = \\\n+            self.unpackBytesToFloat(buf[16], buf[17]) / self.param.gyr_factor.value\n         imu_raw_msg.angular_velocity_covariance = [\n-            self.param.variance_angular_vel, 0, 0,\n-            0, self.param.variance_angular_vel, 0,\n-            0, 0, self.param.variance_angular_vel\n+            self.param.variance_angular_vel.value[0], 0.0, 0.0,\n+            0.0, self.param.variance_angular_vel.value[1], 0.0,\n+            0.0, 0.0, self.param.variance_angular_vel.value[2]\n         ]\n         # node.get_logger().info('Publishing imu message')\n         self.pub_imu_raw.publish(imu_raw_msg)\n@@ -183,10 +183,10 @@ def get_sensor_data(self):\n \n         q = Quaternion()\n         # imu_msg.header.seq = seq\n-        q.w = float(struct.unpack('h', struct.pack('BB', buf[24], buf[25]))[0])\n-        q.x = float(struct.unpack('h', struct.pack('BB', buf[26], buf[27]))[0])\n-        q.y = float(struct.unpack('h', struct.pack('BB', buf[28], buf[29]))[0])\n-        q.z = float(struct.unpack('h', struct.pack('BB', buf[30], buf[31]))[0])\n+        q.w = self.unpackBytesToFloat(buf[24], buf[25])\n+        q.x = self.unpackBytesToFloat(buf[26], buf[27])\n+        q.y = self.unpackBytesToFloat(buf[28], buf[29])\n+        q.z = self.unpackBytesToFloat(buf[30], buf[31])\n         # TODO(flynneva): replace with standard normalize() function\n         # normalize\n         norm = sqrt(q.x*q.x + q.y*q.y + q.z*q.z + q.w*q.w)\n@@ -197,19 +197,19 @@ def get_sensor_data(self):\n \n         imu_msg.orientation_covariance = imu_raw_msg.orientation_covariance\n \n-        imu_msg.linear_acceleration.x = float(\n-            struct.unpack('h', struct.pack('BB', buf[32], buf[33]))[0]) / self.param.acc_factor.value\n-        imu_msg.linear_acceleration.y = float(\n-            struct.unpack('h', struct.pack('BB', buf[34], buf[35]))[0]) / self.param.acc_factor.value\n-        imu_msg.linear_acceleration.z = float(\n-            struct.unpack('h', struct.pack('BB', buf[36], buf[37]))[0]) / self.param.acc_factor.value\n+        imu_msg.linear_acceleration.x = \\\n+            self.unpackBytesToFloat(buf[32], buf[33]) / self.param.acc_factor.value\n+        imu_msg.linear_acceleration.y = \\\n+            self.unpackBytesToFloat(buf[34], buf[35]) / self.param.acc_factor.value\n+        imu_msg.linear_acceleration.z = \\\n+            self.unpackBytesToFloat( buf[36], buf[37]) / self.param.acc_factor.value\n         imu_msg.linear_acceleration_covariance = imu_raw_msg.linear_acceleration_covariance\n-        imu_msg.angular_velocity.x = float(\n-            struct.unpack('h', struct.pack('BB', buf[12], buf[13]))[0]) / self.param.gyr_factor.value\n-        imu_msg.angular_velocity.y = float(\n-            struct.unpack('h', struct.pack('BB', buf[14], buf[15]))[0]) / self.param.gyr_factor.value\n-        imu_msg.angular_velocity.z = float(\n-            struct.unpack('h', struct.pack('BB', buf[16], buf[17]))[0]) / self.param.gyr_factor.value\n+        imu_msg.angular_velocity.x = \\\n+            self.unpackBytesToFloat(buf[12], buf[13]) / self.param.gyr_factor.value\n+        imu_msg.angular_velocity.y = \\\n+            self.unpackBytesToFloat(buf[14], buf[15]) / self.param.gyr_factor.value\n+        imu_msg.angular_velocity.z = \\\n+            self.unpackBytesToFloat(buf[16], buf[17]) / self.param.gyr_factor.value\n         imu_msg.angular_velocity_covariance = imu_raw_msg.angular_velocity_covariance\n         self.pub_imu.publish(imu_msg)\n \n@@ -218,15 +218,15 @@ def get_sensor_data(self):\n         mag_msg.header.frame_id = self.param.frame_id.value\n         # mag_msg.header.seq = seq\n         mag_msg.magnetic_field.x = \\\n-            float(struct.unpack('h', struct.pack('BB', buf[6], buf[7]))[0]) / self.param.mag_factor.value\n+            self.unpackBytesToFloat(buf[6], buf[7]) / self.param.mag_factor.value\n         mag_msg.magnetic_field.y = \\\n-            float(struct.unpack('h', struct.pack('BB', buf[8], buf[9]))[0]) / self.param.mag_factor.value\n+            self.unpackBytesToFloat(buf[8], buf[9]) / self.param.mag_factor.value\n         mag_msg.magnetic_field.z = \\\n-            float(struct.unpack('h', struct.pack('BB', buf[10], buf[11]))[0]) / self.param.mag_factor.value\n+            self.unpackBytesToFloat(buf[10], buf[11]) / self.param.mag_factor.value\n         mag_msg.magnetic_field_covariance = [\n-            self.param.variance_mag, 0, 0,\n-            0, self.param.variance_mag, 0,\n-            0, 0, self.param.variance_mag\n+            self.param.variance_mag.value[0], 0.0, 0.0,\n+            0.0, self.param.variance_mag.value[1], 0.0,\n+            0.0, 0.0, self.param.variance_mag.value[2]\n         ]\n         self.pub_mag.publish(mag_msg)\n \n@@ -312,7 +312,7 @@ def set_calib_offsets(self, acc_offset, mag_offset, gyr_offset):\n         # Must switch to config mode to write out\n         if not (self.con.transmit(registers.BNO055_OPR_MODE_ADDR, 1, bytes([registers.OPERATION_MODE_CONFIG]))):\n             self.node.get_logger().error('Unable to set IMU into config mode')\n-        time.sleep(0.025)\n+        sleep(0.025)\n \n         # Seems to only work when writing 1 register at a time\n         try:\n@@ -339,3 +339,6 @@ def set_calib_offsets(self, acc_offset, mag_offset, gyr_offset):\n             return True\n         except Exception:  # noqa: B902\n             return False\n+\n+    def unpackBytesToFloat(self, start, end):\n+        return float(struct.unpack('h', struct.pack('BB', start, end))[0])"
+        }
+      ]
+    },
+    {
+      "author": "whatis777",
+      "date": "2021-01-04T19:06:55Z",
+      "sha": "a7be4e3cf8036de1706c5ef089dc97f6c8a56d96",
+      "message": "extracting UART-specific code, W.I.P.",
+      "files_changed": 9,
+      "additions": 215,
+      "deletions": 173,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "75ef85ffcb959f1e6451b70b2cf4f917624e5589",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/flynneva/bno055/blob/a7be4e3cf8036de1706c5ef089dc97f6c8a56d96/.gitignore",
+          "raw_url": "https://github.com/flynneva/bno055/raw/a7be4e3cf8036de1706c5ef089dc97f6c8a56d96/.gitignore",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/.gitignore?ref=a7be4e3cf8036de1706c5ef089dc97f6c8a56d96",
+          "patch": "@@ -0,0 +1,2 @@\n+/bno055.iml\n+/venv"
+        },
+        {
+          "sha": "4b453558911303471d0e7321386b2f0ecedb3565",
+          "filename": "Bno055Constants.py",
+          "status": "added",
+          "additions": 72,
+          "deletions": 0,
+          "changes": 72,
+          "blob_url": "https://github.com/flynneva/bno055/blob/a7be4e3cf8036de1706c5ef089dc97f6c8a56d96/Bno055Constants.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/a7be4e3cf8036de1706c5ef089dc97f6c8a56d96/Bno055Constants.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/Bno055Constants.py?ref=a7be4e3cf8036de1706c5ef089dc97f6c8a56d96",
+          "patch": "@@ -0,0 +1,72 @@\n+\n+# BOSCH BNO055 IMU Registers map and other information\n+# Page 0 registers\n+CHIP_ID = 0x00\n+PAGE_ID = 0x07\n+ACCEL_DATA = 0x08\n+MAG_DATA = 0x0e\n+GYRO_DATA = 0x14\n+FUSED_EULER = 0x1a\n+FUSED_QUAT = 0x20\n+LIA_DATA = 0x28\n+GRAVITY_DATA = 0x2e\n+TEMP_DATA = 0x34\n+CALIB_STAT = 0x35\n+SYS_STATUS = 0x39\n+SYS_ERR = 0x3a\n+UNIT_SEL = 0x3b\n+OPER_MODE = 0x3d\n+PWR_MODE = 0x3e\n+SYS_TRIGGER = 0x3f\n+TEMP_SOURCE = 0x440\n+AXIS_MAP_CONFIG = 0x41\n+AXIS_MAP_SIGN = 0x42\n+\n+ACC_OFFSET = 0x55\n+MAG_OFFSET = 0x5b\n+GYR_OFFSET = 0x61\n+ACC_RADIUS = 0x68\n+MAG_RADIUS = 0x69\n+\n+# Page 1 registers\n+ACC_CONFIG = 0x08\n+MAG_CONFIG = 0x09\n+GYR_CONFIG0 = 0x0a\n+GYR_CONFIG1 = 0x0b\n+\n+#  Operation modes\n+OPER_MODE_CONFIG = 0x00\n+OPER_MODE_ACCONLY = 0x01\n+OPER_MODE_MAGONLY = 0x02\n+OPER_MODE_GYROONLY = 0x03\n+OPER_MODE_ACCMAG = 0x04\n+OPER_MODE_ACCGYRO = 0x05\n+OPER_MODE_MAGGYRO = 0x06\n+OPER_MODE_AMG = 0x07\n+OPER_MODE_IMU = 0x08\n+OPER_MODE_COMPASS = 0x09\n+OPER_MODE_M4G = 0x0a\n+OPER_MODE_NDOF_FMC_OFF = 0x0b\n+OPER_MODE_NDOF = 0x0C\n+\n+#  Power modes\n+PWR_MODE_NORMAL = 0x00\n+PWR_MODE_LOW = 0x01\n+PWR_MODE_SUSPEND  = 0x02\n+\n+# Communication constants\n+BNO055_ID = 0xa0\n+START_BYTE_WR = 0xaa\n+START_BYTE_RESP = 0xbb\n+READ = 0x01\n+WRITE = 0x00\n+\n+# Default calibration values (taken from desk test approximation.) [x y z]\n+# Signed hex 16 bit representation\n+\n+# +/- 2000 units (at max 2G)    (1 unit = 1 mg = 1 LSB = 0.01 m/s2)\n+ACC_OFFSET_DEFAULT = [0xFFEC, 0x00A5, 0xFFE8]\n+# +/- 6400 units                (1 unit = 1/16 uT)\n+MAG_OFFSET_DEFAULT = [0xFFB4, 0xFE9E, 0x027D]\n+# +/- 2000 units up to 32000 (dps range dependent)               (1 unit = 1/16 dps)\n+GYR_OFFSET_DEFAULT = [0x0002, 0xFFFF, 0xFFFF]"
+        },
+        {
+          "sha": "c8fce39b778e065a768a30910ecd4d2107f23570",
+          "filename": "bno055.py",
+          "status": "modified",
+          "additions": 91,
+          "deletions": 170,
+          "changes": 261,
+          "blob_url": "https://github.com/flynneva/bno055/blob/a7be4e3cf8036de1706c5ef089dc97f6c8a56d96/bno055.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/a7be4e3cf8036de1706c5ef089dc97f6c8a56d96/bno055.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/bno055.py?ref=a7be4e3cf8036de1706c5ef089dc97f6c8a56d96",
+          "patch": "@@ -39,87 +39,20 @@\n #from rclpy.parameter import Parameter\n \n import sys\n-import serial\n from time import time\n import binascii\n import struct\n \n-#TODO: put these constant in a seperate file\n-# BOSCH BNO055 IMU Registers map and other information\n-# Page 0 registers\n-CHIP_ID = 0x00\n-PAGE_ID = 0x07\n-ACCEL_DATA = 0x08\n-MAG_DATA = 0x0e\n-GYRO_DATA = 0x14\n-FUSED_EULER = 0x1a\n-FUSED_QUAT = 0x20\n-LIA_DATA = 0x28\n-GRAVITY_DATA = 0x2e\n-TEMP_DATA = 0x34\n-CALIB_STAT = 0x35\n-SYS_STATUS = 0x39\n-SYS_ERR = 0x3a\n-UNIT_SEL = 0x3b\n-OPER_MODE = 0x3d\n-PWR_MODE = 0x3e\n-SYS_TRIGGER = 0x3f\n-TEMP_SOURCE = 0x440\n-AXIS_MAP_CONFIG = 0x41\n-AXIS_MAP_SIGN = 0x42\n-\n-ACC_OFFSET = 0x55\n-MAG_OFFSET = 0x5b\n-GYR_OFFSET = 0x61\n-ACC_RADIUS = 0x68\n-MAG_RADIUS = 0x69\n-\n-# Page 1 registers\n-ACC_CONFIG = 0x08\n-MAG_CONFIG = 0x09\n-GYR_CONFIG0 = 0x0a\n-GYR_CONFIG1 = 0x0b\n-\n-#  Operation modes\n-OPER_MODE_CONFIG = 0x00\n-OPER_MODE_ACCONLY = 0x01\n-OPER_MODE_MAGONLY = 0x02\n-OPER_MODE_GYROONLY = 0x03\n-OPER_MODE_ACCMAG = 0x04\n-OPER_MODE_ACCGYRO = 0x05\n-OPER_MODE_MAGGYRO = 0x06\n-OPER_MODE_AMG = 0x07\n-OPER_MODE_IMU = 0x08\n-OPER_MODE_COMPASS = 0x09\n-OPER_MODE_M4G = 0x0a\n-OPER_MODE_NDOF_FMC_OFF = 0x0b\n-OPER_MODE_NDOF = 0x0C\n-\n-#  Power modes\n-PWR_MODE_NORMAL = 0x00\n-PWR_MODE_LOW = 0x01\n-PWR_MODE_SUSPEND  = 0x02\n-\n-# Communication constants\n-BNO055_ID = 0xa0\n-START_BYTE_WR = 0xaa\n-START_BYTE_RESP = 0xbb\n-READ = 0x01\n-WRITE = 0x00\n-\n-# Default calibration values (taken from desk test approximation.) [x y z]\n-# Signed hex 16 bit representation\n-\n-# +/- 2000 units (at max 2G)    (1 unit = 1 mg = 1 LSB = 0.01 m/s2)\n-ACC_OFFSET_DEFAULT = [0xFFEC, 0x00A5, 0xFFE8]\n-# +/- 6400 units                (1 unit = 1/16 uT)\n-MAG_OFFSET_DEFAULT = [0xFFB4, 0xFE9E, 0x027D]\n-# +/- 2000 units up to 32000 (dps range dependent)               (1 unit = 1/16 dps)\n-GYR_OFFSET_DEFAULT = [0x0002, 0xFFFF, 0xFFFF]\n+import Bno055Constants\n+from connectors import Connector, UARTConnector, I2CConnector\n+\n+CONNECTIONTYPE_UART = \"uart\"\n+CONNECTIONTYPE_I2C = \"i2c\"\n \n def main(args=None):\n     rclpy.init()\n     node = rclpy.create_node('bno055')\n+\n     pub_imu_raw = node.create_publisher(Imu, 'imu_raw', QoSProfile(depth=10))\n     pub_imu = node.create_publisher(Imu, 'imu', QoSProfile(depth=10))\n     pub_mag = node.create_publisher(MagneticField, 'mag', QoSProfile(depth=10))\n@@ -137,23 +70,27 @@ def main(args=None):\n     mag_fact = 16.0\n     gyr_fact = 900.0\n \n-    baudrate = 115200\n-\n     try:\n         # first, declare parameters that will be set\n+        node.declare_parameter('connectionType')\n+        node.declare_parameter('port')\n+        node.declare_parameter('baudrate')\n         node.declare_parameter('frame_id')\n         node.declare_parameter('frequency')\n-        node.declare_parameter('port')\n         node.declare_parameter('operation_mode')\n         node.declare_parameter('acc_offset')\n         node.declare_parameter('mag_offset')\n         node.declare_parameter('gyr_offset')\n         # then get the parameters\n         node.get_logger().info('Parameters set to:')\n+        connection_type = node.get_parameter('connection_type')\n+        node.get_logger().info('    bno055/connection_type:    \"%s\"' % connection_type.value)\n         frame_id = node.get_parameter('frame_id')\n         node.get_logger().info('    bno055/frame_id:    \"%s\"' % frame_id.value)\n         port = node.get_parameter('port')\n         node.get_logger().info('    bno055/port:        \"%s\"' % port.value)\n+        baudrate = node.get_parameter('baudrate')\n+        node.get_logger().info('    bno055/baudrate:        \"%s\"' % baudrate.value)\n         frequency = node.get_parameter('frequency')\n         node.get_logger().info('    bno055/frequency:   \"%s\"' % frequency.value)\n         operation_mode = node.get_parameter('operation_mode')\n@@ -165,79 +102,55 @@ def main(args=None):\n         gyr_offset = node.get_parameter('gyr_offset')\n         node.get_logger().info('    bno055/gyr_offset:    \"%s\"' % gyr_offset.value)\n     except Exception as e:\n-         node.get_logger().warn('Could not get parameters...setting variables to default')\n-         node.get_logger().warn('Error: \"%s\"' % e)       \n-#        node.set_parameters( [\n-#            Parameter('frame_id', Parameter.Type.STRING, 'bno055'),\n-#            Parameter('port', Parameter.Type.STRING, '/dev/ttyUSB0'),\n-#            Parameter('frequency', Parameter.Type.DOUBLE, 100.0),\n-#            Parameter('baudrate', Parameter.Type.INTEGER, 115200) ])\n-#\n-#        node.get_logger().warn('Could not get parameters...setting variables to default')\n-#        node.get_logger().warn('Error: \"%s\"' % e)       \n-#        node.get_logger().info('Parameters set to:')\n-#        frame_id = node.get_parameter('frame_id')\n-#        node.get_logger().info('    bno055/frame_id:    \"%s\"' % frame_id.value)\n-#        port = node.get_parameter('port')\n-#        node.get_logger().info('    bno055/port:        \"%s\"' % port.value)\n-#        frequency = node.get_parameter('frequency')\n-#        node.get_logger().info('    bno055/frequency:   \"%s\"' % frequency.value)\n-#        baudrate = node.get_parameter('baudrate')\n-#        node.get_logger().info('    bno055/baudrate:    \"%s\"' % baudrate.value)\n-#-----------------\n-    def open_serial(port, baudrate, timeout_):\n-        node.get_logger().info('Opening serial port: \"%s\"...' % port)\n-        try:\n-            usb_con = serial.Serial(port, baudrate, timeout=timeout_)\n-            return usb_con\n-        except serial.serialutil.SerialException:\n-            node.get_logger().info(\"IMU not found at port \" + port + \". Check to make sure your device is connected.\")\n-            sys.exit(0)\n-   \n-#------------------------\n-    def configure(usb_con):\n+        node.get_logger().warn('Could not get parameters...setting variables to default')\n+        node.get_logger().warn('Error: \"%s\"' % e)\n+\n+\n+    # ------------------------\n+    def configure():\n         node.get_logger().info(\"Configuring device...\")\n-        data = receive(usb_con, CHIP_ID, 1)\n+        data = connector.receive(Bno055Constants.CHIP_ID, 1)\n         #node.get_logger().info('device sent: \"%s\"' % data)\n-        if data == 0 or data[0] != BNO055_ID:\n+        if data == 0 or data[0] != Bno055Constants.BNO055_ID:\n             node.get_logger().warn(\"Device ID is incorrect...shutting down.\")\n-            sys.exit(0)\n+            sys.exit(1)\n \n         # IMU connected, configure it\n         # IMU Configuration\n-        if not(write(usb_con, OPER_MODE, 1, OPER_MODE_CONFIG)):\n+        if not(connector.write(Bno055Constants.OPER_MODE, 1, Bno055Constants.OPER_MODE_CONFIG)):\n             node.get_logger().warn(\"Unable to set IMU into config mode.\")\n \n-        if not(write(usb_con, PWR_MODE, 1, PWR_MODE_NORMAL)):\n+        if not(connector.write(Bno055Constants.PWR_MODE, 1, Bno055Constants.PWR_MODE_NORMAL)):\n             node.get_logger().warn(\"Unable to set IMU normal power mode.\")\n \n-        if not(write(usb_con, PAGE_ID, 1, 0x00)):\n+        if not(connector.write(Bno055Constants.PAGE_ID, 1, 0x00)):\n             node.get_logger().warn(\"Unable to set IMU register page 0.\")\n \n-        if not(write(usb_con, SYS_TRIGGER, 1, 0x00)):\n+        if not(connector.write(Bno055Constants.SYS_TRIGGER, 1, 0x00)):\n             node.get_logger().warn(\"Unable to start IMU.\")\n \n-        if not(write(usb_con, UNIT_SEL, 1, 0x83)):\n+        if not(connector.write(Bno055Constants.UNIT_SEL, 1, 0x83)):\n             node.get_logger().warn(\"Unable to set IMU units.\")\n \n-        if not(write(usb_con, AXIS_MAP_CONFIG, 1, 0x24)):\n+        if not(connector.write(Bno055Constants.AXIS_MAP_CONFIG, 1, 0x24)):\n             node.get_logger().warn(\"Unable to remap IMU axis.\")\n \n-        if not(write(usb_con, AXIS_MAP_SIGN, 1, 0x06)):\n+        if not(connector.write(Bno055Constants.AXIS_MAP_SIGN, 1, 0x06)):\n             node.get_logger().warn(\"Unable to set IMU axis signs.\")\n \n-        if not(write(usb_con, OPER_MODE, 1, OPER_MODE_NDOF)):\n+        if not(connector.write(Bno055Constants.OPER_MODE, 1, Bno055Constants.OPER_MODE_NDOF)):\n             node.get_logger().warn(\"Unable to set IMU operation mode into operation mode.\")\n \n         node.get_logger().info(\"Bosch BNO055 IMU configuration complete.\")\n-        return 1 \n-#-----------------------\n-#TODO: might want to seperate this into its own seperate class for ROS2?\n+        return 1\n+\n+    # -----------------------\n+    #TODO: might want to seperate this into its own seperate class for ROS2?\n     # Read data from serial connection\n     def receive(usb_con, reg_addr, length):\n         buf_out = bytearray()\n-        buf_out.append(START_BYTE_WR)\n-        buf_out.append(READ)\n+        buf_out.append(Bno055Constants.START_BYTE_WR)\n+        buf_out.append(Bno055Constants.READ)\n         buf_out.append(reg_addr)\n         buf_out.append(length)\n \n@@ -249,17 +162,18 @@ def receive(usb_con, reg_addr, length):\n             return 0\n \n         # Check if response is correct\n-        if (buf_in.__len__() != (2 + length)) or (buf_in[0] != START_BYTE_RESP):\n+        if (buf_in.__len__() != (2 + length)) or (buf_in[0] != Bno055Constants.START_BYTE_RESP):\n             #node.get_logger().warn(\"Incorrect device response.\")\n             return 0\n         buf_in.pop(0)\n         buf_in.pop(0)\n         return buf_in\n-#-----------------------------\n+\n+    # -----------------------------\n     def write(usb_con, reg_addr, length, data):\n         buf_out = bytearray()\n-        buf_out.append(START_BYTE_WR)\n-        buf_out.append(WRITE)\n+        buf_out.append(Bno055Constants.START_BYTE_WR)\n+        buf_out.append(Bno055Constants.WRITE)\n         buf_out.append(reg_addr)\n         buf_out.append(length)\n         buf_out.append(data)\n@@ -275,80 +189,80 @@ def write(usb_con, reg_addr, length, data):\n             #rospy.logerr(\"Incorrect Bosh IMU device response.\")\n             return False\n         return True\n-#--------------------------------------------\n+    # --------------------------------------------\n     # Read calibration status for sys/gyro/acc/mag and display to screen (JK) (0 = bad, 3 = best)\n     def get_calib_status (ser):\n-        calib_status = receive(ser, CALIB_STAT, 1)\n+        calib_status = receive(ser, Bno055Constants.CALIB_STAT, 1)\n         try:\n             sys = (calib_status[0] >> 6) & 0x03\n             gyro = (calib_status[0] >> 4) & 0x03;\n             accel = (calib_status[0] >> 2) & 0x03;\n-            mag = calib_status[0] & 0x03; \n+            mag = calib_status[0] & 0x03;\n             rospy.loginfo('Sys: %d, Gyro: %d, Accel: %d, Mag: %d', sys, gyro, accel, mag)\n         except:\n             rospy.loginfo('No calibration data received')\n-#--------------------------------------------\n-# Read all calibration offsets and print to screen (JK)\n+    # --------------------------------------------\n+    # Read all calibration offsets and print to screen (JK)\n     def get_calib_offsets (ser):\n         try:\n-            accel_offset_read = receive(ser, ACC_OFFSET, 6)\n+            accel_offset_read = receive(ser, Bno055Constants.ACC_OFFSET, 6)\n             accel_offset_read_x = (accel_offset_read[1] << 8) | accel_offset_read[0]   # Combine MSB and LSB registers into one decimal\n             accel_offset_read_y = (accel_offset_read[3] << 8) | accel_offset_read[2]   # Combine MSB and LSB registers into one decimal\n             accel_offset_read_z = (accel_offset_read[5] << 8) | accel_offset_read[4]   # Combine MSB and LSB registers into one decimal\n \n-            mag_offset_read = receive(ser, MAG_OFFSET, 6)\n+            mag_offset_read = receive(ser, Bno055Constants.MAG_OFFSET, 6)\n             mag_offset_read_x = (mag_offset_read[1] << 8) | mag_offset_read[0]   # Combine MSB and LSB registers into one decimal\n             mag_offset_read_y = (mag_offset_read[3] << 8) | mag_offset_read[2]   # Combine MSB and LSB registers into one decimal\n             mag_offset_read_z = (mag_offset_read[5] << 8) | mag_offset_read[4]   # Combine MSB and LSB registers into one decimal\n \n-            gyro_offset_read = receive(ser, GYR_OFFSET, 6)\n+            gyro_offset_read = receive(ser, Bno055Constants.GYR_OFFSET, 6)\n             gyro_offset_read_x = (gyro_offset_read[1] << 8) | gyro_offset_read[0]   # Combine MSB and LSB registers into one decimal\n             gyro_offset_read_y = (gyro_offset_read[3] << 8) | gyro_offset_read[2]   # Combine MSB and LSB registers into one decimal\n             gyro_offset_read_z = (gyro_offset_read[5] << 8) | gyro_offset_read[4]   # Combine MSB and LSB registers into one decimal\n \n             rospy.loginfo('Accel offsets (x y z): %d %d %d, Mag offsets (x y z): %d %d %d, Gyro offsets (x y z): %d %d %d', accel_offset_read_x, accel_offset_read_y, accel_offset_read_z, mag_offset_read_x, mag_offset_read_y, mag_offset_read_z, gyro_offset_read_x, gyro_offset_read_y, gyro_offset_read_z)\n         except:\n             rospy.loginfo('Calibration data cant be read')\n-#--------------------------------------------\n+    # --------------------------------------------\n     # Write out calibration values (define as 16 bit signed hex)\n     def set_calib_offsets (ser, acc_offset, mag_offset, gyr_offset):\n         # Must switch to config mode to write out\n-        if not(write(ser, OPER_MODE, 1, OPER_MODE_CONFIG)):\n-           rospy.logerr(\"Unable to set IMU into config mode.\")\n+        if not(write(ser, Bno055Constants.OPER_MODE, 1, Bno055Constants.OPER_MODE_CONFIG)):\n+            rospy.logerr(\"Unable to set IMU into config mode.\")\n         time.sleep(0.025)\n \n         # Seems to only work when writing 1 register at a time\n         try:\n-            write(ser, ACC_OFFSET, 1, acc_offset[0] & 0xFF)                # ACC X LSB\n-            write(ser, ACC_OFFSET+1, 1, (acc_offset[0] >> 8) & 0xFF)       # ACC X MSB\n-            write(ser, ACC_OFFSET+2, 1, acc_offset[1] & 0xFF)               \n-            write(ser, ACC_OFFSET+3, 1, (acc_offset[1] >> 8) & 0xFF)       \n-            write(ser, ACC_OFFSET+4, 1, acc_offset[2] & 0xFF)               \n-            write(ser, ACC_OFFSET+5, 1, (acc_offset[2] >> 8) & 0xFF)     \n-\n-            write(ser, MAG_OFFSET, 1, mag_offset[0] & 0xFF)               \n-            write(ser, MAG_OFFSET+1, 1, (mag_offset[0] >> 8) & 0xFF)     \n-            write(ser, MAG_OFFSET+2, 1, mag_offset[1] & 0xFF)               \n-            write(ser, MAG_OFFSET+3, 1, (mag_offset[1] >> 8) & 0xFF)       \n-            write(ser, MAG_OFFSET+4, 1, mag_offset[2] & 0xFF)               \n-            write(ser, MAG_OFFSET+5, 1, (mag_offset[2] >> 8) & 0xFF)       \n-\n-            write(ser, GYR_OFFSET, 1, gyr_offset[0] & 0xFF)                \n-            write(ser, GYR_OFFSET+1, 1, (gyr_offset[0] >> 8) & 0xFF)       \n-            write(ser, GYR_OFFSET+2, 1, gyr_offset[1] & 0xFF)               \n-            write(ser, GYR_OFFSET+3, 1, (gyr_offset[1] >> 8) & 0xFF)       \n-            write(ser, GYR_OFFSET+4, 1, gyr_offset[2] & 0xFF)               \n-            write(ser, GYR_OFFSET+5, 1, (gyr_offset[2] >> 8) & 0xFF)            \n+            write(ser, Bno055Constants.ACC_OFFSET, 1, acc_offset[0] & 0xFF)                # ACC X LSB\n+            write(ser, Bno055Constants.ACC_OFFSET+1, 1, (acc_offset[0] >> 8) & 0xFF)       # ACC X MSB\n+            write(ser, Bno055Constants.ACC_OFFSET+2, 1, acc_offset[1] & 0xFF)\n+            write(ser, Bno055Constants.ACC_OFFSET+3, 1, (acc_offset[1] >> 8) & 0xFF)\n+            write(ser, Bno055Constants.ACC_OFFSET+4, 1, acc_offset[2] & 0xFF)\n+            write(ser, Bno055Constants.ACC_OFFSET+5, 1, (acc_offset[2] >> 8) & 0xFF)\n+\n+            write(ser, Bno055Constants.MAG_OFFSET, 1, mag_offset[0] & 0xFF)\n+            write(ser, Bno055Constants.MAG_OFFSET+1, 1, (mag_offset[0] >> 8) & 0xFF)\n+            write(ser, Bno055Constants.MAG_OFFSET+2, 1, mag_offset[1] & 0xFF)\n+            write(ser, Bno055Constants.MAG_OFFSET+3, 1, (mag_offset[1] >> 8) & 0xFF)\n+            write(ser, Bno055Constants.MAG_OFFSET+4, 1, mag_offset[2] & 0xFF)\n+            write(ser, Bno055Constants.MAG_OFFSET+5, 1, (mag_offset[2] >> 8) & 0xFF)\n+\n+            write(ser, Bno055Constants.GYR_OFFSET, 1, gyr_offset[0] & 0xFF)\n+            write(ser, Bno055Constants.GYR_OFFSET+1, 1, (gyr_offset[0] >> 8) & 0xFF)\n+            write(ser, Bno055Constants.GYR_OFFSET+2, 1, gyr_offset[1] & 0xFF)\n+            write(ser, Bno055Constants.GYR_OFFSET+3, 1, (gyr_offset[1] >> 8) & 0xFF)\n+            write(ser, Bno055Constants.GYR_OFFSET+4, 1, gyr_offset[2] & 0xFF)\n+            write(ser, Bno055Constants.GYR_OFFSET+5, 1, (gyr_offset[2] >> 8) & 0xFF)\n \n             return True\n-     \n+\n         except:\n             return False\n-#--------------------------------------------\n+    # --------------------------------------------\n     # callback to read data from sensor\n     def read_data():\n         # read from sensor\n-        buf = receive(usb_con, ACCEL_DATA, 45)\n+        buf = receive(usb_con, Bno055Constants.ACCEL_DATA, 45)\n         # Publish raw data\n         # TODO: convert rcl Clock time to ros time?\n         #imu_raw_msg.header.stamp = node.get_clock().now()\n@@ -408,16 +322,23 @@ def read_data():\n                 # something went wrong...keep going to the next message\n                 node.get_logger().warn('oops..something went wrong')\n                 node.get_logger().warn('Error: \"%s\"' % e)\n-   \n-    \n-    # try to connect\n-    usb_con = open_serial(port.value, baudrate, 0.02)\n+\n+    # Get connector according to configured sensor connection type:\n+    if connection_type is CONNECTIONTYPE_UART:\n+        connector = UARTConnector(node, baudrate.value, port.value, 0.02)\n+    elif connection_type is CONNECTIONTYPE_I2C:\n+        node.get_logger().error('I2C not yet supported')\n+        sys.exit(1)\n+\n+    # Connect to BNO055 device:\n+    connector.connect()\n+\n     # configure imu\n-    if (configure(usb_con)):\n-        # successfully configured\n-        # TODO: this should be a parameter, given in Hz\n-        f = 1.0 / float(frequency.value)\n-        timer = node.create_timer(f, read_data)\n+    configure()\n+\n+    # start regular sensor transmissions:\n+    f = 1.0 / float(frequency.value)\n+    timer = node.create_timer(f, read_data)\n \n     rclpy.spin(node)\n     # clean shutdown"
+        },
+        {
+          "sha": "f239403501c6f217edfae06787709bbd39b14b64",
+          "filename": "connectors/Connector.py",
+          "status": "added",
+          "additions": 12,
+          "deletions": 0,
+          "changes": 12,
+          "blob_url": "https://github.com/flynneva/bno055/blob/a7be4e3cf8036de1706c5ef089dc97f6c8a56d96/connectors%2FConnector.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/a7be4e3cf8036de1706c5ef089dc97f6c8a56d96/connectors%2FConnector.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/connectors%2FConnector.py?ref=a7be4e3cf8036de1706c5ef089dc97f6c8a56d96",
+          "patch": "@@ -0,0 +1,12 @@\n+from rclpy.node import Node\n+\n+\n+class Connector:\n+\n+    def __init__(self, node: Node):\n+        self.node = node\n+\n+    def connect(self):\n+        pass\n+\n+"
+        },
+        {
+          "sha": "2c4738fecad24b838f0f209bfe0bba9cdefb5ac6",
+          "filename": "connectors/I2CConnector.py",
+          "status": "added",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/flynneva/bno055/blob/a7be4e3cf8036de1706c5ef089dc97f6c8a56d96/connectors%2FI2CConnector.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/a7be4e3cf8036de1706c5ef089dc97f6c8a56d96/connectors%2FI2CConnector.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/connectors%2FI2CConnector.py?ref=a7be4e3cf8036de1706c5ef089dc97f6c8a56d96",
+          "patch": "@@ -0,0 +1,5 @@\n+from connectors import Connector\n+\n+\n+class I2CConnector(Connector):\n+    pass"
+        },
+        {
+          "sha": "fbf26aeb228d646459876effba53e421434ceb64",
+          "filename": "connectors/UARTConnector.py",
+          "status": "added",
+          "additions": 26,
+          "deletions": 0,
+          "changes": 26,
+          "blob_url": "https://github.com/flynneva/bno055/blob/a7be4e3cf8036de1706c5ef089dc97f6c8a56d96/connectors%2FUARTConnector.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/a7be4e3cf8036de1706c5ef089dc97f6c8a56d96/connectors%2FUARTConnector.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/connectors%2FUARTConnector.py?ref=a7be4e3cf8036de1706c5ef089dc97f6c8a56d96",
+          "patch": "@@ -0,0 +1,26 @@\n+from connectors import Connector\n+import serial\n+import sys\n+\n+\n+class UARTConnector(Connector):\n+\n+    def __init__(self, node: Node, baudrate, port, timeout):\n+        self.node = node\n+        self.baudrate = baudrate\n+        self.port = port\n+        self.timeout = timeout\n+\n+    def connect(self):\n+        self.node.get_logger().info('Opening serial port: \"%s\"...' % self.port)\n+        #usb_con = open_serial(port, baudrate, 0.02)\n+\n+        try:\n+            self.conn = serial.Serial(self.port, self.baudrate, self.timeout_)\n+        except serial.serialutil.SerialException:\n+            self.node.get_logger().info(\"Unable to connect to IMU at port \" + self.port + \". Check to make sure your device is connected.\")\n+            sys.exit(1)\n+\n+    def read(self, register, numBytes=1):\n+\n+"
+        },
+        {
+          "sha": "ed11cae8b6ce1e20e7e3648035df7858fbec1f47",
+          "filename": "connectors/__init__.py",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/flynneva/bno055/blob/a7be4e3cf8036de1706c5ef089dc97f6c8a56d96/connectors%2F__init__.py",
+          "raw_url": "https://github.com/flynneva/bno055/raw/a7be4e3cf8036de1706c5ef089dc97f6c8a56d96/connectors%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/connectors%2F__init__.py?ref=a7be4e3cf8036de1706c5ef089dc97f6c8a56d96",
+          "patch": "@@ -0,0 +1 @@\n+# this file marks this directory as a python module that can be imported\n\\ No newline at end of file"
+        },
+        {
+          "sha": "e6b4db3bad9255adfd6c36cff197e1cb5cf705d8",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/flynneva/bno055/blob/a7be4e3cf8036de1706c5ef089dc97f6c8a56d96/package.xml",
+          "raw_url": "https://github.com/flynneva/bno055/raw/a7be4e3cf8036de1706c5ef089dc97f6c8a56d96/package.xml",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/package.xml?ref=a7be4e3cf8036de1706c5ef089dc97f6c8a56d96",
+          "patch": "@@ -3,7 +3,7 @@\n <package format=\"3\">\n   <name>bno055</name>\n   <version>0.0.0</version>\n-  <description>TODO: Package description</description>\n+  <description>Driver for BNO055</description>\n   <maintainer email=\"evanflynn.msu@gmail.com\">flynneva</maintainer>\n   <license>BSD</license>\n "
+        },
+        {
+          "sha": "c1bf0b722eaf6a2f246f480647b6efb250fe76c9",
+          "filename": "params/bno055_params.yaml",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 2,
+          "changes": 7,
+          "blob_url": "https://github.com/flynneva/bno055/blob/a7be4e3cf8036de1706c5ef089dc97f6c8a56d96/params%2Fbno055_params.yaml",
+          "raw_url": "https://github.com/flynneva/bno055/raw/a7be4e3cf8036de1706c5ef089dc97f6c8a56d96/params%2Fbno055_params.yaml",
+          "contents_url": "https://api.github.com/repos/flynneva/bno055/contents/params%2Fbno055_params.yaml?ref=a7be4e3cf8036de1706c5ef089dc97f6c8a56d96",
+          "patch": "@@ -1,8 +1,11 @@\n bno055:\n   ros__parameters:\n+    connection_type: \"uart\"      # The type of the sensor connection. Either \"uart\" or \"i2c\"\n+    port: \"/dev/ttyUSB0\"        # UART port\n+    baudrate: 115200            # UART baud rate\n+    # TODO add I2C configuration parameters\n+    frequency: 100              # Node timer frequency in Hz\n     frame_id: \"bno055\"          # tf frame id\n-    port: \"/dev/ttyUSB0\"        # path to device \n-    frequency: 100              # Hz\n     operation_mode: 0x0C        # sensor operation mode\n     # +/- 2000 units (at max 2G)    (1 unit = 1 mg = 1 LSB = 0.01 m/s2)\n     acc_offset: [0xFFEC, 0x00A5, 0xFFE8]"
+        }
+      ]
+    }
+  ]
+}

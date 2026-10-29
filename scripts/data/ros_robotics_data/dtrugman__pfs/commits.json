@@ -1,0 +1,1279 @@
+{
+  "_meta": {
+    "fetched_at": "2026-05-06T20:04:20Z",
+    "source": "github_rest",
+    "endpoint": "/repos/{owner}/{repo}/commits",
+    "owner": "dtrugman",
+    "repo": "pfs",
+    "per_page": 100
+  },
+  "data": [
+    {
+      "sha": "d74e705882a8d9a6aca731f37e5527dbd6010639",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2026-04-09T22:58:13Z",
+      "message": "Add optional filter to get_processes() and get_tasks()\n\nMirrors the filter pattern already used throughout the net API.\nDefines task::task_filter as std::function<filter::action(const task&)>\nin task.hpp and threads it through procfs::get_processes() and\ntask::get_tasks(). Both default to nullptr (no filtering), so existing\ncallers are unaffected. Adds test_procfs.cpp with five live tests\ncovering the unfiltered, drop-all, and keep-self cases."
+    },
+    {
+      "sha": "f8616ac16b79c5d4ea8744f787ce7e421ca2e7e3",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2026-04-09T20:37:11Z",
+      "message": "Inherit parent project warning flags\n\nSee issue #78.\n\nWhen integrating pfs as a dependency, pfs' compilation flags, which are\nnot private for the pfs target only, change the behaviour for the entire\nproject.\n\nThis commit changes the flags to be defined only when PFS is the\ntop-most project, and inherit the parent flags when it isn't."
+    },
+    {
+      "sha": "a0226cf04dc9ac69314d1c67f092ce188d90f5ac",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2026-04-09T22:48:24Z",
+      "message": "Add comments to magic constants missing context\n\nROOT_KERNEL_TASK_ID = 2: note that PID 2 is kthreadd, parent of all\nkernel threads. HEADER_LINES = 2 in get_dev(): note that /proc/net/dev\nhas two header rows (title + column names), distinguishing it from all\nother net files which have one. All other named constants in the parsers\nalready carry sufficient context."
+    },
+    {
+      "sha": "cfd2e5be88a00848b2e9a14cc1afa5b0c2061513",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2026-04-09T22:44:27Z",
+      "message": "Handle '-' instances count in /proc/modules parser\n\nSome modules (e.g. shiftfs) report '-' for the instance count in\n/proc/modules. The parser only handled '-' for the dependencies field,\ncausing a parser_error when stot() received a non-numeric value.\n\nTreat '-' instances as 0 and add a test case covering this format."
+    },
+    {
+      "sha": "285fcc3d8e10723e7795a7e0013e5ca887e65492",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2026-04-09T22:41:18Z",
+      "message": "Rename file_parser to kv_file_parser, add CONTRIBUTING.md\n\nRenames the file_parser<T> base class and its header to kv_file_parser\nto make the key-value format immediately clear at the call site. Updates\nall three subclasses (task_status_parser, task_io_parser, proc_stat_parser)\nand their headers accordingly.\n\nCONTRIBUTING.md documents the two parser patterns (kv_file_parser<T> for\nkey-value files, parse_file_lines for tabular files) with step-by-step\ninstructions, error handling conventions, and a license/copyright notice\nmodelled on the DCO 1.1."
+    },
+    {
+      "sha": "863476229a81cc671e60d7f8d65334159f23ef09",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2026-04-09T21:07:25Z",
+      "message": "Fix mem class double close after copy/move c'tor"
+    },
+    {
+      "sha": "2721fa2f6f296943fe0ffb1ae0b17814a09ad6f2",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2026-04-09T21:15:45Z",
+      "message": "Fix undefined behaviour in ensure_dir_terminator on empty string\n\n`std::string::back()` is undefined behavior on an empty string.\nGuard the call by checking the string is not empty before calling\nback()."
+    },
+    {
+      "sha": "8ad910d1d61dbb0f7ce7f5aacadd8ccaf2887c9c",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2026-04-09T22:13:14Z",
+      "message": "Remove duplicate to_number"
+    },
+    {
+      "sha": "5320eab5dce099930e616f800a4becbf284ece04",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2026-04-09T22:10:51Z",
+      "message": "Add script to generate coverage html"
+    },
+    {
+      "sha": "9ceb6819e1d0c87803aa888764c5bf2a477680ca",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2026-04-09T21:24:11Z",
+      "message": "Fix npos wrap in get_stat() comm field parsing\n\n`find_last_of(')')` returns `npos` when no closing parenthesis is found,\ncausing `npos - 1` to wrap to `SIZE_MAX - 1` and the subsequent seek to\nland in garbage. Detect this and the `close_paren == 0` case early and\nthrow a precise \"Corrupted stat - Malformed comm field\" error. Also use\n`close_paren` directly in the seek calculation instead of re-deriving the\noffset from `st.comm.size()` after reassignment."
+    },
+    {
+      "sha": "5e467114332b980666ded4aa198b32ef0de40a77",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2026-04-09T21:36:28Z",
+      "message": "Add O_CLOEXEC to all open() calls\n\nFile descriptors opened without O_CLOEXEC are inherited by child processes\nafter fork+exec. In a multithreaded program, a thread can fork+exec a child\nwhile another thread has a pfs fd open, leaking it to the child."
+    },
+    {
+      "sha": "62ffb9fe5086e0ec2aafba0e71b1b77f997f611a",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2026-04-09T21:39:14Z",
+      "message": "Remove unused variable"
+    },
+    {
+      "sha": "a5fcb82da79a3dd002efe24d38a31604fd47b52d",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2026-04-09T22:21:21Z",
+      "message": "Expand README note on task lifetime and enumeration races\n\nThe existing \"Accessing inexisting tasks\" section explained that\nget_task() doesn't validate existence, but didn't cover why. Expands\nthe note to explain the enumeration race: eager validation would break\nthe get_processes()/get_tasks() snapshot pattern if any task dies\nmid-iteration. Documents the correct pattern of catching\nstd::system_error from individual getters."
+    },
+    {
+      "sha": "d7145dc10717d66a7a26575504ff3094668deb6d",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2026-04-09T20:39:42Z",
+      "message": "Use recommended Docker JSON/exec form"
+    },
+    {
+      "sha": "7697fe19a2cfb32d5c902ba02675310886a68fcd",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2026-02-21T13:25:53Z",
+      "message": "Automatic version bump to v0.13.1"
+    },
+    {
+      "sha": "1856e1c9c7df8899f98e3154c13d4f712b210b02",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2026-02-21T13:07:36Z",
+      "message": "Refactor tag script\n\n- Avoid using global scope to pass $file\n- Split out package xml editing into a separate method\n- Fix sed command when replacing multi-digit versions"
+    },
+    {
+      "sha": "c0ea0e43f929d5c19d9a65c91b54bbe338d53475",
+      "author": "Tim Clephas",
+      "author_login": "Timple",
+      "date": "2026-02-09T13:05:45Z",
+      "message": "List cmake as build_depend"
+    },
+    {
+      "sha": "23c3cd56586ae481b31a6c475bcc8e96daeb627c",
+      "author": "Tim Clephas",
+      "author_login": "Timple",
+      "date": "2026-02-09T13:00:05Z",
+      "message": "Fix version"
+    },
+    {
+      "sha": "c28b727f6ace5d53395375c12ab7660a0402af9e",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2025-12-06T01:32:22Z",
+      "message": "Bump version to 0.13.0"
+    },
+    {
+      "sha": "67280102dfed0625f15f5fc479c5b7f2e85e9270",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2025-12-06T12:42:11Z",
+      "message": "Add parser for /task/[pid]/syscall\n\nBased on @attilavi's contribution."
+    },
+    {
+      "sha": "b76a25141f3223cb64993ff79bce2143e96a612d",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2025-12-06T01:31:53Z",
+      "message": "Cosmetic changes to block stat parser"
+    },
+    {
+      "sha": "63aa2f23e373bcf9690a0571bd256ded28a1093f",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2025-12-06T01:31:17Z",
+      "message": "Fix bug: Block stat not zero initialized"
+    },
+    {
+      "sha": "2fd74ff1745190b88eb967da81dcdbb6832d2b3c",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2025-12-06T01:07:29Z",
+      "message": "Remove non-c++11 compatible code"
+    },
+    {
+      "sha": "ecdb3db6dc58a2819a8a0860c297925c77b961c2",
+      "author": "thisptr-hub",
+      "author_login": "thisptr-hub",
+      "date": "2025-09-23T07:13:10Z",
+      "message": "use checked access for block stats"
+    },
+    {
+      "sha": "a516352066214f4e1eab48fe86dd460e67d28e62",
+      "author": "thisptr-hub",
+      "author_login": "thisptr-hub",
+      "date": "2025-09-22T13:35:39Z",
+      "message": "don't fail if block stats contain [MIN_COUNT, COUNT) elements"
+    },
+    {
+      "sha": "49ab01feb5eaedeb18b2d20ebb381b631a0c32b3",
+      "author": "thisptr-hub",
+      "author_login": "thisptr-hub",
+      "date": "2025-09-22T13:24:44Z",
+      "message": "address PR comments"
+    },
+    {
+      "sha": "09a4dfd3980e78dc47e5f762f1a7d511710d1d43",
+      "author": "thisptr-hub",
+      "author_login": "thisptr-hub",
+      "date": "2025-07-31T15:29:34Z",
+      "message": "support cgroups pathnames with colons"
+    },
+    {
+      "sha": "fbaef1801daf27dd855fc75c590d9ae6bc8a2909",
+      "author": "Patrick Roncagliolo",
+      "author_login": "roncapat",
+      "date": "2025-10-17T08:42:07Z",
+      "message": "Update PFS version minor number to 12\n\nAs per https://github.com/dtrugman/pfs/releases/tag/v0.12.0"
+    },
+    {
+      "sha": "33a1d423715d71c1f4f6a5d8d67195b69b4fcec7",
+      "author": "Alfredo Tupone",
+      "author_login": "atupone",
+      "date": "2025-11-30T08:46:50Z",
+      "message": "Update minimum CMake version to 3.10"
+    },
+    {
+      "sha": "c047aea794b9dd7ab70c0c8a89ffa20702eeb291",
+      "author": "Alfredo Tupone",
+      "author_login": "atupone",
+      "date": "2025-11-30T08:46:27Z",
+      "message": "Update minimum CMake version to 3.10"
+    },
+    {
+      "sha": "7fdc89e624365ddf763bb99a2bfe38af3e85f1b5",
+      "author": "Alfredo Tupone",
+      "author_login": "atupone",
+      "date": "2025-11-30T08:44:55Z",
+      "message": "Update minimum CMake version to 3.10"
+    },
+    {
+      "sha": "a4d3916b90867815ee9881bd2b380da98f5e87c3",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2025-05-24T15:02:33Z",
+      "message": "Use uint64_t for maps and smaps for better support on 32-bit systems"
+    },
+    {
+      "sha": "fae236732ba723e96e2386de6749f41c7d6df3ff",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2025-05-24T14:48:16Z",
+      "message": "Use ino64_t instead of ino_t to avoid issues on 32-bit machines"
+    },
+    {
+      "sha": "11c466c9cd4cc7dda07a7c51ba9e1852c75b59ea",
+      "author": "Federico Sauter",
+      "author_login": "federico-sauter",
+      "date": "2025-04-23T09:42:32Z",
+      "message": "Upgrade the block stats to 64-bit counters"
+    },
+    {
+      "sha": "b2276980b6855686225df1441fd401a95b37f8bb",
+      "author": "Federico Sauter",
+      "author_login": "federico-sauter",
+      "date": "2025-04-23T09:46:44Z",
+      "message": "Add bug case to the automated test case"
+    },
+    {
+      "sha": "be7da6898dc419c7af4423c3a3db4ee02836e175",
+      "author": "Federico Sauter",
+      "author_login": "federico-sauter",
+      "date": "2025-04-23T09:41:56Z",
+      "message": "Cleanup: Remove unused includes"
+    },
+    {
+      "sha": "1e9dba9534570ff43c26502c021b3fcb445d1e7a",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2025-05-24T14:22:05Z",
+      "message": "Use a helper method to parse vm flags as well"
+    },
+    {
+      "sha": "aed4efb4551613a75cd2e6a790b90697a9f958eb",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2025-05-24T14:21:44Z",
+      "message": "Use simpler logic to detect smaps header"
+    },
+    {
+      "sha": "8b4b1c3a5b59f8e7366e9ddcdb34f9d52314273c",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2025-05-24T14:11:51Z",
+      "message": "Rename some components from mem_map to smaps"
+    },
+    {
+      "sha": "85eba2b5349235a0c0ede4385f136f8516d6ac22",
+      "author": "Federico Sauter",
+      "author_login": "federico-sauter",
+      "date": "2025-03-07T10:42:35Z",
+      "message": "Implement a parser for /proc/smaps\n\nReads and parses all attributes except VmFlags, which\nis returned as is."
+    },
+    {
+      "sha": "d10aa285b57c05c9f52b18f294d5ce3f922883c1",
+      "author": "Federico Sauter",
+      "author_login": "federico-sauter",
+      "date": "2025-03-10T11:39:26Z",
+      "message": "Refactor: Extract utils::parse_memory_size()"
+    },
+    {
+      "sha": "826a30e9d70fa71c54192b237881de32b6cb47df",
+      "author": "Federico Sauter",
+      "author_login": "federico-sauter",
+      "date": "2025-03-06T13:55:28Z",
+      "message": "Cleanup: Remove unused includes"
+    },
+    {
+      "sha": "6c69d44a01ce898ec96c83103be2fca4d69677ba",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2025-03-05T22:46:34Z",
+      "message": "Support qmux socket paths"
+    },
+    {
+      "sha": "961e00d633570f4cb300ad837855b96077f4945e",
+      "author": "thisptr-hub",
+      "author_login": "thisptr-hub",
+      "date": "2025-03-05T13:35:02Z",
+      "message": "add function to read task audit session id"
+    },
+    {
+      "sha": "28256ed765c3f2690583c8dcb5e7e6b5c4e46445",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2025-03-05T23:03:33Z",
+      "message": "Avoid static const variables in types.hpp"
+    },
+    {
+      "sha": "436f9c39fd4c27fd0defabac985d9edfdccc30b6",
+      "author": "thisptr-hub",
+      "author_login": "thisptr-hub",
+      "date": "2025-03-05T10:29:06Z",
+      "message": "fix: no member named 'inserter'"
+    },
+    {
+      "sha": "c4dfe385dc43bba1dc9d944de6306034b093a0b1",
+      "author": "David Delassus",
+      "author_login": "linkdd",
+      "date": "2025-01-03T13:46:58Z",
+      "message": "fix: arithmetic between different enumeration types"
+    },
+    {
+      "sha": "0d835d15cee81d77f2534ea90f263bbcf7b8af39",
+      "author": "Rein Appeldoorn",
+      "author_login": "reinzor",
+      "date": "2024-12-24T07:55:54Z",
+      "message": "fix(package.xml): install ROS package xml file\n\nRequired follow up of #47 so that the package can be used\nfrom an install space."
+    },
+    {
+      "sha": "9e2b9e6e7c61800da68a7b848955eba16b3b0ca8",
+      "author": "loganfin",
+      "author_login": "loganfin",
+      "date": "2024-12-30T04:37:37Z",
+      "message": "Implement buddyinfo suggestions"
+    },
+    {
+      "sha": "2709212ac92d16c2ceadae2f83dcaffd480c88bf",
+      "author": "logafinl",
+      "author_login": "loganfin",
+      "date": "2024-12-02T21:28:12Z",
+      "message": "Account for variable columns in /proc/buddyinfo"
+    },
+    {
+      "sha": "4f7185e97a6622f90f8534db4dbdb6009f86f524",
+      "author": "Ramon Wijnands",
+      "author_login": "Rayman",
+      "date": "2024-11-25T09:23:40Z",
+      "message": "Update package.xml version"
+    },
+    {
+      "sha": "f0108fd792dbad09671e9e7e47b3ab4f71592392",
+      "author": "Ramon Wijnands",
+      "author_login": "Rayman",
+      "date": "2024-10-29T13:23:40Z",
+      "message": "Add `package.xml` for ROS2\n\nThis allows the package to be used in a ROS2 workspace (compiled with\ncolcon)."
+    },
+    {
+      "sha": "a16e95ff0bf6bf4438dfe187fc00c838db5f07b5",
+      "author": "Arie Karchmar",
+      "author_login": "ari-kar",
+      "date": "2024-07-07T15:34:15Z",
+      "message": "Remove explicit --std=c++11 compile-option"
+    },
+    {
+      "sha": "b87122db5892635c927e2261a83ae17b411167da",
+      "author": "Arie Karchmar",
+      "author_login": "ari-kar",
+      "date": "2024-07-07T15:34:15Z",
+      "message": "Allow skipping path resolution in task::get_exe()"
+    },
+    {
+      "sha": "a4c9f1e09b5f6411a781c548ec079bb23fd6273b",
+      "author": "Arie Karchmar",
+      "author_login": "ari-kar",
+      "date": "2024-07-07T15:34:15Z",
+      "message": "Fix proc_stat unit test"
+    },
+    {
+      "sha": "feeb3e00dcc0d569d73b18a0d6fea445088c0917",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2024-05-19T09:44:05Z",
+      "message": "Add alpine3 docker for testing and missing include"
+    },
+    {
+      "sha": "1423d0b12faf0e8efad24ff852417b78a909cd41",
+      "author": "Felix Janda",
+      "author_login": "doughdemon",
+      "date": "2024-04-24T14:13:10Z",
+      "message": "src/mem.cpp: replace the deprecated preadv64 by preadv\n\nThis fixes a compilation error with musl libc."
+    },
+    {
+      "sha": "967c1d5a91399cf0e971de95752e0df9beead640",
+      "author": "Felix Janda",
+      "author_login": "doughdemon",
+      "date": "2024-04-24T14:12:22Z",
+      "message": "test/test_utils.hpp: include <sys/types.h> for dev_t\n\nThis fixes a compilation error with musl libc."
+    },
+    {
+      "sha": "6d0446e3386b7b9f704142e90a247e18cd419535",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2024-05-19T08:23:38Z",
+      "message": "Sample handles task enum exceptions better"
+    },
+    {
+      "sha": "3571af39f4cbf2a13088e78ada26077ed35992ef",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2024-05-18T22:13:51Z",
+      "message": "Remove unused include"
+    },
+    {
+      "sha": "b73c554e6e43815d866db2b51a3d86fbef270425",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2024-05-18T22:13:20Z",
+      "message": "Adjust task stat members to newest kernels"
+    },
+    {
+      "sha": "fd003bfbdae8c06fce2c997c240742382cbcb63a",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2024-04-14T20:28:04Z",
+      "message": "Automatic version bump to v0.9.0"
+    },
+    {
+      "sha": "5f68a664c5c72324c6d3fccd3077152e7736e522",
+      "author": "Russ",
+      "author_login": "russkel",
+      "date": "2024-03-26T03:07:38Z",
+      "message": "fix: set target_include_directory"
+    },
+    {
+      "sha": "bb0be73114f46ea7c273f12c5317bb30818a424d",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2024-04-09T13:03:35Z",
+      "message": "Update find_package README section"
+    },
+    {
+      "sha": "a8e21581ef01f75b064c823ae636e2a3b76b8b82",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2024-04-09T12:47:24Z",
+      "message": "Add find_package test when pfs is not installed"
+    },
+    {
+      "sha": "110eeba27830d45a8c84e264d55fd24c2456f7cc",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2024-04-09T12:46:27Z",
+      "message": "Fix find_package test code"
+    },
+    {
+      "sha": "e5d834199878464cb144957c3a6adedd055152ae",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2024-04-09T10:44:59Z",
+      "message": "Fix README example"
+    },
+    {
+      "sha": "dae18f145a1583bdfbb0069ce84e71d82f54e7c4",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2024-04-09T10:44:21Z",
+      "message": "Add a dummy pkg to test cmake config"
+    },
+    {
+      "sha": "a6714295d78e6e7189e79f2ea2562250294e3308",
+      "author": "Chen Benjamin",
+      "author_login": "chenBenjamin97",
+      "date": "2024-03-10T17:17:26Z",
+      "message": "Device number parsing: Handle decimal/hexadecimal representations\n\nThe device number (major:minor) is being represented in different bases across different sources:\n- procfs `maps`: hexadecimal\n- procfs `mountinfo`: decimal\n- sysfs `block/dev`: decimal\n\nThis commit handles parsing of these different representations.\n\nChanges:\n- Explicitly setting the wanted base for each parsing flow\n- Added UT case to cover the new functionality"
+    },
+    {
+      "sha": "d299549fde610e1dcf8a9ad70ab83d21ef522fac",
+      "author": "Robin Sommer",
+      "author_login": "rsmmr",
+      "date": "2024-02-22T09:01:17Z",
+      "message": "Fix `PACKAGE_CONFIG` naming.\n\nUse `PROJECT_NAME` instead of `CMAKE_PROJECT_NAME` so that `pfs` can\nused as a submodule from a different top-level project."
+    },
+    {
+      "sha": "de5206e16ad60a04821a1a23e74b2b26e58cbc74",
+      "author": "Ory Davidov",
+      "author_login": "Davidovory03",
+      "date": "2024-01-10T09:49:21Z",
+      "message": "Add Parser for /proc/net/arp"
+    },
+    {
+      "sha": "e88658865eddfe01e72511f88199a7d5e5a45280",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2024-01-04T22:41:36Z",
+      "message": "Automatic version bump to v0.8.0"
+    },
+    {
+      "sha": "4e1276eb27ea953ed580f0f4c96925d2ab7b9d76",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2024-01-02T21:50:51Z",
+      "message": "Use an enum for the filter return type"
+    },
+    {
+      "sha": "9b869779758d7ec4cfc6b4957112f022c01cda3b",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2024-01-02T21:35:33Z",
+      "message": "Fix compilation issue with newer compilers"
+    },
+    {
+      "sha": "920bb13d7d57a7ce6cbe7175f46eaef4284de30c",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2024-01-02T21:35:16Z",
+      "message": "Add debian12 Dockerfile"
+    },
+    {
+      "sha": "3bea225460e9f4ef3228cae7fcbfe5ed72f8e3ff",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2024-01-01T22:24:46Z",
+      "message": "Update README"
+    },
+    {
+      "sha": "a114d62896e52e4a1b2047b3bd8795430a3da418",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2023-12-14T21:26:46Z",
+      "message": "Add netstat sample application"
+    },
+    {
+      "sha": "98a2456cded0fc03458d4a7366a091b8e9e5ea6a",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2023-12-28T00:11:47Z",
+      "message": "Merge parse lines implementations"
+    },
+    {
+      "sha": "7c92408b9627e04cace5d984b72b01b68693ae1e",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2023-12-27T23:48:06Z",
+      "message": "Split parsers/generic.hpp\n\n- Move parse lines into lines.hpp\n- Move to_number into number.hpp\n- Move to_sequence into proc_stat.cpp"
+    },
+    {
+      "sha": "31903ac293955495356ca9d48cb0a6880399acc8",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2023-12-27T23:32:01Z",
+      "message": "Net interface supports filters"
+    },
+    {
+      "sha": "3a7ab240ee095ff4b73826d539607367c6045169",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2023-12-27T23:30:00Z",
+      "message": "Add get_fds_inodes() to task class"
+    },
+    {
+      "sha": "ddf97df693f11d0d90de921587dc2c5c4220856c",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2023-12-26T21:51:11Z",
+      "message": "Fix net for tasks with a separate net namespace"
+    },
+    {
+      "sha": "371cc5145804ba4ece4bd6a42f6fea5c03b35885",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2023-12-26T21:44:45Z",
+      "message": "Minor formatting"
+    },
+    {
+      "sha": "1016989b28ae27644d673f6b8552613677d834a1",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2023-12-14T22:05:21Z",
+      "message": "Add block queue rotational parsing"
+    },
+    {
+      "sha": "0e9ab6e3bd501132929d18610a1282bbecf9afa7",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2023-10-19T22:09:40Z",
+      "message": "Rename test file to not overlap with source ones"
+    },
+    {
+      "sha": "36ac4dde2c48f81d1308cf671777e3ba7ece276d",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2023-10-19T21:49:35Z",
+      "message": "Add coverage compilation flag"
+    },
+    {
+      "sha": "86f826093eb079af19cd1efe4e57b79efafa1b04",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2023-10-17T21:32:55Z",
+      "message": "Split parsers header"
+    },
+    {
+      "sha": "8cdbcaccba96f58356f06d2094516398d0cee3a9",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2023-10-16T23:27:58Z",
+      "message": "Rename route -> net_route and wrap with try..catch"
+    },
+    {
+      "sha": "23b55714214090b5dfb808f9843adb0fbb1942c1",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2023-10-16T23:21:39Z",
+      "message": "Add block parsing unittest"
+    },
+    {
+      "sha": "8f567baa04ef91a0507e77aeab8d9186ec8d82bb",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2023-10-14T22:16:30Z",
+      "message": "Add basic block parsing\n\nParse three files:\n- size\n- dev\n- stat"
+    },
+    {
+      "sha": "5a820b9a90e81e11be9a81994b79072b01d5fdcd",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2023-07-28T23:04:06Z",
+      "message": "Add sysfs with first block object"
+    },
+    {
+      "sha": "ba01a986859d3a6f0b72616367f112f5e50456bb",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2023-10-16T22:28:31Z",
+      "message": "Move to_number to common parsers"
+    },
+    {
+      "sha": "3d6c4098792bb38a569a0950f566917d33bd2d4d",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2023-07-28T22:54:23Z",
+      "message": "Set version with sysfs support to v0.7.0"
+    },
+    {
+      "sha": "a42150d421302bde6f144aa294206b91c6d55ea9",
+      "author": "Joey Shao",
+      "author_login": "joeyshao-wbyt",
+      "date": "2023-11-10T00:19:58Z",
+      "message": "Fix review comments"
+    },
+    {
+      "sha": "8e89702cbd1b5627269eb6a143dffa5e18a53203",
+      "author": "Joey Shao",
+      "author_login": "joeyshao-wbyt",
+      "date": "2023-11-08T00:51:30Z",
+      "message": "fix comm field in /proc/pid/stat\n\nAlthough in man page:\n    https://man7.org/linux/man-pages/man5/proc.5.html\nThe comm field has a description: `Strings longer than\nTASK_COMM_LEN (16) characters (including the\nterminating null byte) are silently truncated.`\nHowever, if you check the kernel code in fs/proc/array.c,\nyou will find that the description is only valid in the\n`__get_task_comm(tcomm, sizeof(tcomm), p);` branch of\n`proc_task_name` function. The actual maximum length\nis 64 instead. Hence the change and the added tests."
+    },
+    {
+      "sha": "572624fe37092c5d0e6c39b73612e099962db8e7",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2023-08-02T21:06:02Z",
+      "message": "Automatic version bump to v0.6.1"
+    },
+    {
+      "sha": "c84d49f996c782693010b7d3e20c692b58869dba",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2023-08-02T21:02:56Z",
+      "message": "Fix comments for pull-request #31"
+    },
+    {
+      "sha": "e0634e8d310f2c01b6e537de691a95e44b4c5078",
+      "author": "Connor Baker",
+      "author_login": null,
+      "date": "2023-07-10T01:37:08Z",
+      "message": "cmake: support find_package(pfs)"
+    },
+    {
+      "sha": "5e7d1512cd2dcc67309c8b9626d2949b7b5fd5b1",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2022-11-04T23:11:04Z",
+      "message": "Automatic version bump to v0.6.0"
+    },
+    {
+      "sha": "1f0c5f81c16721eba54e08f5b5b80cced6f90edc",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2022-11-04T22:59:38Z",
+      "message": "Add auto-tagging script to fix version bump discrepancies"
+    },
+    {
+      "sha": "7740f7d841e6fdee790ed2fd6efba6f72ee8d5d5",
+      "author": "Lior Sharon",
+      "author_login": "lyshar",
+      "date": "2022-10-05T12:39:34Z",
+      "message": "Add Parser for /proc/net/route"
+    },
+    {
+      "sha": "8a7245ab7ee8f867f02a3fecdd3222af6087607e",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2022-09-18T23:57:25Z",
+      "message": "Add docker images for easier compilation and evaluation\n\nCreate a number of Docker spec files that allow users to develop, test\nand evaluate pfs on a range of Linux distros with minimal fuss."
+    },
+    {
+      "sha": "b263c5c5eb996309a9e293e912d16ff1ffb81cf1",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2022-09-19T23:16:31Z",
+      "message": "Adjust to compilation as CMake sub-directory\n\n**NOTE:** This change breaks backward compatibility, by changing the\nCMake configuration options.\n\nAvoid possible option collisions when using pfs as sub-directory.\nSome options are supposed to be inherited from the project and are common\nCMake flags, like the `CMAKE_BUILD_TYPE` or `BUILD_SHARED_LIBS`.\nWhereas other flags are not supposed to be shared, and hence should are\nto be prefixed with the project name.\n\nUsing `pfs_` for the prefix, rather than `PFS_` because CMake\nautomatically generates some library specific variables (Check that out\nby looking at `CMakeCache.txt`) and uses the project name (`pfs`) as the\nprefix.\nThis choice has been also observed in protobuf's CMake code."
+    },
+    {
+      "sha": "23d29f8f1d2fddb71326a1caf08fb81b3312356a",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2022-09-19T23:26:35Z",
+      "message": "Minor README clarifications"
+    },
+    {
+      "sha": "f68a2fa8ea36c783bdd760371411fcb495aa3150",
+      "author": "Zachary H. Jones",
+      "author_login": "bigzachattack",
+      "date": "2022-09-19T17:56:23Z",
+      "message": "Minor improvements and cleaned up styling to keep code consistent"
+    },
+    {
+      "sha": "b4a6aed67ba046e6420c37e87a4871444060c2cf",
+      "author": "Zachary H. Jones",
+      "author_login": "bigzachattack",
+      "date": "2022-09-18T04:43:13Z",
+      "message": "Removed semi-colon after function definition."
+    },
+    {
+      "sha": "645b35b2bb74635f8e7e08d2eef28f3f6a8b16e7",
+      "author": "Zachary H. Jones",
+      "author_login": "bigzachattack",
+      "date": "2022-09-18T04:26:27Z",
+      "message": "Add parser for /proc/net/dev"
+    },
+    {
+      "sha": "2840bb0cadf7bbac203aa643dc87051a9492d7df",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2022-04-17T23:47:12Z",
+      "message": "Update Catch to 2.13.9 to resolve issue #26"
+    },
+    {
+      "sha": "ce1c0c0a3ef059fb530b91d3519afd1fc6167547",
+      "author": "Kfir Shtober",
+      "author_login": null,
+      "date": "2022-01-18T19:51:43Z",
+      "message": "Fix readme CMake flags"
+    },
+    {
+      "sha": "d33e2dcdd5bc614ee43bacd63a86b34b2220bbfe",
+      "author": "Kfir Shtober",
+      "author_login": null,
+      "date": "2022-01-18T19:07:49Z",
+      "message": "Update readme file\n\nUpdating the readme file to contain the new CMake configuration flags\nfor optional tests & samples build."
+    },
+    {
+      "sha": "d2cbaefe2bf86a2fcd397a69d275eb3676d5e903",
+      "author": "Kfir Shtober",
+      "author_login": null,
+      "date": "2022-01-18T19:35:05Z",
+      "message": "Revert ctest usage"
+    },
+    {
+      "sha": "50aa7451ae7045f16b04cd13928c682f62c5df60",
+      "author": "bram",
+      "author_login": "bram",
+      "date": "2022-01-17T18:25:48Z",
+      "message": "Make building samples and tests optional."
+    },
+    {
+      "sha": "0f081c220f0535f287c074fe71a65bbb37501e45",
+      "author": "ozelikov",
+      "author_login": null,
+      "date": "2021-12-19T13:17:45Z",
+      "message": "Add parser for proc/<pid>/uid_map and gid_map"
+    },
+    {
+      "sha": "f2800b10e1a19589d4eb1d5b9f6541a05cfaae6d",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-11-24T22:23:57Z",
+      "message": "Version bump to 0.4.5"
+    },
+    {
+      "sha": "c2f9d81382eb83123bf0625586cf988a95fc62b1",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-11-24T22:17:37Z",
+      "message": "Add task io parsing unittest"
+    },
+    {
+      "sha": "839a96cec2f6bd90081082c02970503ddaaa63b1",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-11-24T22:03:57Z",
+      "message": "Cosmetic: Split private methods from constants"
+    },
+    {
+      "sha": "430da845935f78cb27a4c619807720fa8e09e266",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-11-24T22:01:57Z",
+      "message": "Change 'io_stat' to 'io_stats' for consistency\n\nWe already have a 'mem_stats' type for the /proc/[pid]/statm file.\nWe should be consistent in regard to singular/plural names."
+    },
+    {
+      "sha": "64c71232270c5272a2631cac6ba9deb989a6829a",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-11-24T21:58:00Z",
+      "message": "Canonicalize parser names"
+    },
+    {
+      "sha": "28f9d5dcf204d4644986c071a218378d77e544f2",
+      "author": "Roman Karlstetter",
+      "author_login": "roman-karlstetter-ifta",
+      "date": "2021-11-23T10:24:58Z",
+      "message": "Improve exception msg in file_parser if open fails\n\nAlso supply file path to exception message."
+    },
+    {
+      "sha": "1f147e844fc10365dcbf1f03e97573d453ee2494",
+      "author": "Roman Karlstetter",
+      "author_login": "roman-karlstetter-ifta",
+      "date": "2021-11-23T08:24:53Z",
+      "message": "Add io_stat info to sample output"
+    },
+    {
+      "sha": "739a400b5fefd16e5a535f4c825673369339dd22",
+      "author": "Roman Karlstetter",
+      "author_login": "roman-karlstetter-ifta",
+      "date": "2021-11-22T13:51:38Z",
+      "message": "Add function to get IO statistics\n\nRead from /proc/[pid]/io, as explained by\nhttps://man7.org/linux/man-pages/man5/proc.5.html\n\ntypedef file_parser::valueparser is now public so that it can be reused in parser\ngenerator."
+    },
+    {
+      "sha": "3d9d464b7e8040341e1631f33cd7bde928a95889",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-10-28T09:09:44Z",
+      "message": "Version bump to 0.4.4"
+    },
+    {
+      "sha": "d4a0ece7bfa8a0337ad11d78aded3dfea29c67f2",
+      "author": "Kfir Shtober",
+      "author_login": "kfiros",
+      "date": "2021-10-09T19:27:15Z",
+      "message": "Fix wrong member types in the proc_stat struct\n\nIt appears that `ctxt` and `processes` members of the proc_stat\nstruct might exceed the size of unsigned int, fixing this bug\nby using unsigned long long instead."
+    },
+    {
+      "sha": "9b1d255823b4fe274bf8140d799a1b566f06066e",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-08-02T19:01:28Z",
+      "message": "Version bump to 0.4.3"
+    },
+    {
+      "sha": "120ef98e73366fa79994176f23a8f788159d618a",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-08-02T19:00:58Z",
+      "message": "Fix task status ns_xxxx delim"
+    },
+    {
+      "sha": "9013eef7f2045a2def53eaf4ea88b9af6c1a0344",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-08-02T17:28:41Z",
+      "message": "Version bump to 0.4.2"
+    },
+    {
+      "sha": "4510002e70d523fdb776696b54749d6d95ce333c",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-08-02T17:12:19Z",
+      "message": "Fix task status ns_xxxx type and parsing\n\nWhen running inside containers, these include multiple values,\none for every namespace.\n\nWe should parse a list out of this value."
+    },
+    {
+      "sha": "8983a33897011667ff5e664f76b3282de90fe4a4",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-08-02T17:19:51Z",
+      "message": "Set initial value for seccomp mode"
+    },
+    {
+      "sha": "a659563a2d79c4495c1013b51139e1f257abb267",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-07-27T20:22:30Z",
+      "message": "Version bump to 0.4.1"
+    },
+    {
+      "sha": "faa4ec93c8491bbd7184cb2f72d1e8177b14190b",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-07-27T16:20:51Z",
+      "message": "Add option to disable address sanitizer"
+    },
+    {
+      "sha": "cbb27edba151a5e793913106a4805af53805e03f",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-07-27T16:07:49Z",
+      "message": "Allow thread specific access\n\nAllow users of the library access both process-global and\nthread-specific parameters.\nSee README for more information."
+    },
+    {
+      "sha": "ec43e9acba41fe70f8ea6970e6a21fa429118033",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-07-27T06:41:30Z",
+      "message": "Fix includes so that loff_t is known by users"
+    },
+    {
+      "sha": "c092b8f7d4b47f64c28b396728fa541a03163342",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-07-27T06:51:26Z",
+      "message": "Fix net socket iteration example"
+    },
+    {
+      "sha": "7135b47b24790a50640593dca8de36d3125753df",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-07-02T19:44:14Z",
+      "message": "Add task cgroup parser"
+    },
+    {
+      "sha": "77acf9cf6efeefdb6aeb7d5423dbd89edeb97958",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-07-02T15:37:12Z",
+      "message": "Add cgroup controllers parser"
+    },
+    {
+      "sha": "5586e04045a6000acc8624028e9e924229a7e0eb",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-07-02T19:43:02Z",
+      "message": "Formatting"
+    },
+    {
+      "sha": "3f40b680b05f64c5a54069adca1ea75a67d7ab2d",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-06-26T09:07:11Z",
+      "message": "Fix mem API to support entire 32bit address space"
+    },
+    {
+      "sha": "93625a51ba7e4443ffb62a8237c6f1eccdf471f3",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-06-05T12:53:53Z",
+      "message": "Fix unittest compilation for 32bit"
+    },
+    {
+      "sha": "6457506c233d1374b8776ae161b50c3ed3898ceb",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-06-25T10:36:01Z",
+      "message": "Move status delim into parser"
+    },
+    {
+      "sha": "f4e54bcffeee80ab3a9eee9134260bb7bfcc8956",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-06-25T10:34:54Z",
+      "message": "Move proc stat delim and remap into parser"
+    },
+    {
+      "sha": "30c6fbae66a1b15d3f812b45e2b904329785cbc6",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-06-04T17:37:01Z",
+      "message": "Add build type flag to README"
+    },
+    {
+      "sha": "f3129a5a368c38d9c2890e0770714ae0de4a3d4c",
+      "author": "Kfir Shtober",
+      "author_login": "kfiros",
+      "date": "2021-06-06T08:35:52Z",
+      "message": "Remove a duplicated function declaration\n\nRemoving parse_maps_line() duplicated declaration in parsers.hpp."
+    },
+    {
+      "sha": "6301d1b0d09bdc7639d31d5c3ec47a0146de74a1",
+      "author": "Kfir Shtober",
+      "author_login": "kfiros",
+      "date": "2021-06-06T08:28:49Z",
+      "message": "Add get_stat() API to parse /proc/stat\n\nAdding get_stat() API as part of the procfs API to parse\n/proc/stat."
+    },
+    {
+      "sha": "a083f5c2927ffd108ed74d1039a1b9e15fd853cd",
+      "author": "Kfir Shtober",
+      "author_login": "kfiros",
+      "date": "2021-06-06T08:28:40Z",
+      "message": "Modify file_parser to get a remap function\n\nSupporting a key remapping when parsing a key-value text file.\nBy assisting a remap function we can relate different\nkeys in the same manner."
+    },
+    {
+      "sha": "b1a8fbe925d74a59a98090065ec31593c19aad13",
+      "author": "Kfir Shtober",
+      "author_login": "kfiros",
+      "date": "2021-06-05T09:55:19Z",
+      "message": "Modify file_parser to get a delimiter\n\nSupporting a user input delimiter when parsing file lines."
+    },
+    {
+      "sha": "d352dd87c58d4a0fa5f571c228f907954bb2db62",
+      "author": "Kfir Shtober",
+      "author_login": "kfiros",
+      "date": "2021-06-06T12:11:05Z",
+      "message": "Use steady_clock::duration instead of double in uptime\n\nUpgrade the uptime struct to hold steady_clock::duration instead\nof doubles for time values."
+    },
+    {
+      "sha": "458db6cbdb278fe2160c5e0b58bbc54c1837ef48",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-05-31T12:19:30Z",
+      "message": "Refactor namespace inode resolution\n\n- Allow resolution of a single namespace inode.\n- Use stat for resolution (instead of readlinkat) to avoid string\n  parsing and optimize access."
+    },
+    {
+      "sha": "dc1b1c9303cea5d78f748783f3f365d2be50b9ea",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-05-25T18:33:51Z",
+      "message": "Refactor dir iteration methods\n\nInstead of having multiple implementations that iterate over all the\nfiles in a directory for different purposes, create a single unified\nversion that is generic enough to satisfy all of them."
+    },
+    {
+      "sha": "c599166485a84224bed585491563e21dbd7cfe22",
+      "author": "Kfir Shtober",
+      "author_login": "kfiros",
+      "date": "2021-05-24T09:27:20Z",
+      "message": "Add count_fds() API as part of the task API\n\nThe current get_fds() API allows obtaining the process's number\nof opened file descriptors, however, it forces saving extra temporary\ninformation. The new count_fds() API could be useful in case of\nprocesses with a large number of fds (ex: massive fd leakage)."
+    },
+    {
+      "sha": "d121c307cf1a66772746c80b9608dc9822b8755f",
+      "author": "Kfir Shtober",
+      "author_login": "kfiros",
+      "date": "2021-05-19T14:38:35Z",
+      "message": "Fix type parsing issue on 32bit systems\n\nino_t has different width on 32/64 bit systems. This commit\nfix it in task.cpp."
+    },
+    {
+      "sha": "7890c41e7edfac571d74071a86e328fed9d02dc1",
+      "author": "Kfir Shtober",
+      "author_login": "kfiros",
+      "date": "2021-05-19T13:37:32Z",
+      "message": "Add an API to extract /proc/uptime\n\nAdding an API to export data about the system running\nand idle uptime, by parsing /proc/uptime."
+    },
+    {
+      "sha": "0e038c489b9eef1df4d2fec43435c18428a89ab9",
+      "author": "Kfir Shtober",
+      "author_login": "kfiros",
+      "date": "2021-05-19T11:35:59Z",
+      "message": "Add a missing header file to types.hpp\n\nAdding the missing header file <sys/types.h> to types.hpp."
+    },
+    {
+      "sha": "041c0f8351bd5dfa4988dd2a3562656cdbe32fe7",
+      "author": "Kfir Shtober",
+      "author_login": "kfiros",
+      "date": "2021-05-19T11:35:06Z",
+      "message": "Set cmake project()\n\nSet the name of the project to 'pfs' in the top-level CMakeLists.txt\nfile. It suppresses the warning when using cmake."
+    },
+    {
+      "sha": "81b65be6f39b1b782752ca20ddbf89cf6a03b8cc",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-03-06T14:26:34Z",
+      "message": "Version bump to 0.3.0"
+    },
+    {
+      "sha": "d8dfe8a44c270e3e8d4fa427ba7e6f2b9080daa6",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-03-05T13:03:59Z",
+      "message": "Refactor sample application\n\nSplit sample into sub files and add a new category of sample\napplications: Re-implementation of known tools using the library.\n\nAlso fix formatting and logging headers to support inclusion from\nmultiple compilation units."
+    },
+    {
+      "sha": "c797da00b0212b3c893f9e99e32f0b0940d0c454",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-03-04T05:50:45Z",
+      "message": "Fix test category"
+    },
+    {
+      "sha": "3b3e2a9191d287b9082c9e53a04576fcd74bfe22",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-03-04T05:31:56Z",
+      "message": "Add MIN_COUNT tests for parsers"
+    },
+    {
+      "sha": "3796f976ec83f61d9605d30dc9758db0b0723bd6",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-03-04T05:26:49Z",
+      "message": "Fix MIN_COUNT value for unix_socket parser\n\nFormer values allowed an extra value to go missing and was susceptible\nto segmentation faults.\nAdded a unittest to cover that as well."
+    },
+    {
+      "sha": "cd12876e9ca143ab66273b710c83ff24666a8b02",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-03-04T05:16:20Z",
+      "message": "Add netlink parsing"
+    },
+    {
+      "sha": "04ba18d0abb21b649e3482c7487470353ba45ed5",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-02-26T22:51:26Z",
+      "message": "Fix readfile bug when file is empty\n\nWe're looking at buffer.back() without checking the buffer is not empty\nbeforehand."
+    },
+    {
+      "sha": "9538e4307dd8a337c776813055ecd0542bf9baf5",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-02-26T22:51:10Z",
+      "message": "By default, compile as Debug with ASAN"
+    },
+    {
+      "sha": "1cb1849bf214cf07ec049af43b3cc05b6b0b0811",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-02-26T07:34:57Z",
+      "message": "Add fd wrapper class\n\nInstead of returning only the textual target of an fd link,\nwrap it using a class that provides more functionality.\nThis is a great way to prepare for smarter stitching against sockets\n(for example).\n\nAdd sample code that shows how to stitch task fds against network or\nunix sockets from the net API."
+    },
+    {
+      "sha": "5b30f4f95a674ee801295bb875a6cc2a069aaa37",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-02-26T17:48:02Z",
+      "message": "Rename type {,task}stat[us]"
+    },
+    {
+      "sha": "49e0edef290cd59baf26badf251ae5474b6904ac",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-02-26T15:44:00Z",
+      "message": "Rename enum {,net}state"
+    },
+    {
+      "sha": "da6a4c1bb79304ebd036cb328ed9cadc7685941a",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-02-26T15:36:42Z",
+      "message": "Rename socket types"
+    },
+    {
+      "sha": "8d518dddc36c5dc7c8eed12bf87398e4901617e2",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-02-26T11:44:31Z",
+      "message": "Return vectors instead of sets for most APIs\n\nExcept for the process enumeration API, where it feels native to return\na container sorted by the PIDs, most other APIs should probably retain\nthe order in the file, instead of sorting the values.\n\nThis required a change in the parser implementation, since we cannot use\n`emplace` with `std::vector`. So now, instead of creating and returning\nthe container, we accept an inserted and let the caller decide which\ncontainer to use and how to fill it.\n\nAdded a unittest to verify that the new version of parse_lines moves the\nobjects."
+    },
+    {
+      "sha": "02f704a7c98cd2aa5ea4903b3ac9f9f8b7b7c7ab",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-02-26T15:44:21Z",
+      "message": "Use type instead of current as prefix for members"
+    },
+    {
+      "sha": "cda723232f3c4ae3ea826e5c1e42aff330b29746",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-02-26T15:28:23Z",
+      "message": "Standardize enum style"
+    },
+    {
+      "sha": "05ecf92775af05ec22a019d2267ced1012a29498",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-03-06T14:26:13Z",
+      "message": "Version bump to 0.2.0"
+    },
+    {
+      "sha": "008ce76d335f269b2c10301b3360ecd0337e454b",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-02-22T21:43:55Z",
+      "message": "Fix maps parsing when pathname is not a single token\n\nThis is expected when:\n- File was deleted: ' (deleted)' is appended at the end\n- File path contains spaces"
+    },
+    {
+      "sha": "b291587c9f146d3f174ecb59533bce895f04f88a",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-02-22T21:14:01Z",
+      "message": "Add task memory reading\n\nAdd API for direct access to a tasks' memory through the mem file"
+    },
+    {
+      "sha": "069189fad6b837c7d625ad05859558a1e8300426",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-02-22T17:35:01Z",
+      "message": "Issue #1: Support building with clang"
+    },
+    {
+      "sha": "d0d36aa9bbb276e71d9e5d1794f7221b4f08b132",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-02-22T08:16:25Z",
+      "message": "Improve status parsing\n\n- Avoid copying parsers map when creating parser\n- Support selective parsing of specific fields\n- Assign default values to all status struct members\n- Add unit-tests"
+    },
+    {
+      "sha": "a126de4daf9dcffd225225bcd0d1d7dc33da21f7",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-02-22T08:14:00Z",
+      "message": "Fix status memory size parsing"
+    },
+    {
+      "sha": "6479e8c98d7f6f03ecffcaa75055ce78292d94c8",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-02-21T19:58:44Z",
+      "message": "Add GitHub build & test action"
+    },
+    {
+      "sha": "2e34ed378bdd2dd402e23b1797de5d35357d566c",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-02-12T17:20:01Z",
+      "message": "Add README"
+    },
+    {
+      "sha": "75bdd32a401923c3f69a959c21f3e985d8421e0b",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-02-05T22:55:34Z",
+      "message": "Add network info parsing"
+    },
+    {
+      "sha": "032164842fe238fb1fe44a80ceac41e99d438dbd",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-02-05T18:29:48Z",
+      "message": "Add per-task info parsing"
+    },
+    {
+      "sha": "6ff3382d7ff8cfeb49fb781bc58bfe50fc0ad755",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-02-05T15:16:02Z",
+      "message": "Basic infra and system-wide info parsing\n\nBuild project structure, include CMake files, .gitignore, catch test\nframework, general utilities and more.\n\nParse files with system-wide information located directly under the root\nprocfs directory."
+    },
+    {
+      "sha": "7f455d476993830aa1a7def073327d29729ce9e3",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-02-05T13:52:32Z",
+      "message": "Add clang formatter"
+    },
+    {
+      "sha": "9ab52a5c3c032806987a7112c415aaa4d81ae949",
+      "author": "Daniel Trugman",
+      "author_login": "dtrugman",
+      "date": "2021-02-05T12:46:10Z",
+      "message": "Initial commit: Add license file"
+    }
+  ]
+}

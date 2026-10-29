@@ -1,0 +1,227 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T05:41:07Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ika-rwth-aachen",
+    "repo": "message_tf_frame_transformer"
+  },
+  "data": [
+    {
+      "author": "lreiher",
+      "date": "2023-03-16T12:00:01Z",
+      "sha": "e6709fbdb53434f2cfa38c24aa42f4fb821960d5",
+      "message": "create basic package structure",
+      "files_changed": 7,
+      "additions": 407,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "7a51a03b3ded0a52486c3a3b25e1fb0c36dc6fc5",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 231,
+          "deletions": 0,
+          "changes": 231,
+          "blob_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/blob/e6709fbdb53434f2cfa38c24aa42f4fb821960d5/CMakeLists.txt",
+          "raw_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/raw/e6709fbdb53434f2cfa38c24aa42f4fb821960d5/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ika-rwth-aachen/message_tf_frame_transformer/contents/CMakeLists.txt?ref=e6709fbdb53434f2cfa38c24aa42f4fb821960d5",
+          "patch": "@@ -0,0 +1,231 @@\n+cmake_minimum_required(VERSION 3.12.0 FATAL_ERROR)\n+project(generic_transform)\n+\n+find_package(ros_environment REQUIRED QUIET)\n+set(ROS_VERSION $ENV{ROS_VERSION})\n+\n+## Compile as C++17\n+add_compile_options(-std=c++17)\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  add_compile_options(-Wall -Wextra -Wpedantic)\n+endif()\n+\n+# === ROS2 (AMENT) =============================================================\n+if(${ROS_VERSION} EQUAL 2)\n+\n+# === ROS1 (CATKIN) ============================================================\n+elseif(${ROS_VERSION} EQUAL 1)\n+\n+  ## Find catkin macros and libraries\n+  ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)\n+  ## is used, also find other catkin packages\n+  find_package(catkin REQUIRED COMPONENTS\n+    nodelet\n+    roscpp\n+    tf2\n+    topic_tools\n+  )\n+\n+  ## System dependencies are found with CMake's conventions\n+  # find_package(Boost REQUIRED)\n+\n+  ## Uncomment this if the package has a setup.py. This macro ensures\n+  ## modules and global scripts declared therein get installed\n+  ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html\n+  # catkin_python_setup()\n+\n+  ################################################\n+  ## Declare ROS messages, services and actions ##\n+  ################################################\n+\n+  ## To declare and build messages, services or actions from within this\n+  ## package, follow these steps:\n+  ## * Let MSG_DEP_SET be the set of packages whose message types you use in\n+  ##   your messages/services/actions (e.g. std_msgs, actionlib_msgs, ...).\n+  ## * In the file package.xml:\n+  ##   * add a build_depend tag for \"message_generation\"\n+  ##   * add a build_depend and a exec_depend tag for each package in MSG_DEP_SET\n+  ##   * If MSG_DEP_SET isn't empty the following dependency has been pulled in\n+  ##     but can be declared for certainty nonetheless:\n+  ##     * add a exec_depend tag for \"message_runtime\"\n+  ## * In this file (CMakeLists.txt):\n+  ##   * add \"message_generation\" and every package in MSG_DEP_SET to\n+  ##     find_package(catkin REQUIRED COMPONENTS ...)\n+  ##   * add \"message_runtime\" and every package in MSG_DEP_SET to\n+  ##     catkin_package(CATKIN_DEPENDS ...)\n+  ##   * uncomment the add_*_files sections below as needed\n+  ##     and list every .msg/.srv/.action file to be processed\n+  ##   * uncomment the generate_messages entry below\n+  ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)\n+\n+  ## Generate messages in the 'msg' folder\n+  # add_message_files(\n+  #   FILES\n+  #   Message1.msg\n+  #   Message2.msg\n+  # )\n+\n+  ## Generate services in the 'srv' folder\n+  # add_service_files(\n+  #   FILES\n+  #   Service1.srv\n+  #   Service2.srv\n+  # )\n+\n+  ## Generate actions in the 'action' folder\n+  # add_action_files(\n+  #   FILES\n+  #   Action1.action\n+  #   Action2.action\n+  # )\n+\n+  ## Generate added messages and services with any dependencies listed here\n+  # generate_messages(\n+  #   DEPENDENCIES\n+  #   std_msgs\n+  # )\n+\n+  ################################################\n+  ## Declare ROS dynamic reconfigure parameters ##\n+  ################################################\n+\n+  ## To declare and build dynamic reconfigure parameters within this\n+  ## package, follow these steps:\n+  ## * In the file package.xml:\n+  ##   * add a build_depend and a exec_depend tag for \"dynamic_reconfigure\"\n+  ## * In this file (CMakeLists.txt):\n+  ##   * add \"dynamic_reconfigure\" to\n+  ##     find_package(catkin REQUIRED COMPONENTS ...)\n+  ##   * uncomment the \"generate_dynamic_reconfigure_options\" section below\n+  ##     and list every .cfg file to be processed\n+\n+  ## Generate dynamic reconfigure parameters in the 'cfg' folder\n+  # generate_dynamic_reconfigure_options(\n+  #   cfg/params.cfg\n+  # )\n+\n+  ###################################\n+  ## catkin specific configuration ##\n+  ###################################\n+  ## The catkin_package macro generates cmake config files for your package\n+  ## Declare things to be passed to dependent projects\n+  ## INCLUDE_DIRS: uncomment this if your package contains header files\n+  ## LIBRARIES: libraries you create in this project that dependent projects also need\n+  ## CATKIN_DEPENDS: catkin_packages dependent projects also need\n+  ## DEPENDS: system dependencies of this project that dependent projects also need\n+  catkin_package(\n+    INCLUDE_DIRS include\n+    LIBRARIES ${PROJECT_NAME}\n+    CATKIN_DEPENDS\n+      nodelet\n+      roscpp\n+      tf2\n+      topic_tools\n+    # DEPENDS\n+  )\n+\n+  ###########\n+  ## Build ##\n+  ###########\n+\n+  ## Specify additional locations of header files\n+  ## Your package locations should be listed before other locations\n+  include_directories(\n+    include\n+    ${catkin_INCLUDE_DIRS}\n+  )\n+\n+  ## Declare a C++ library\n+  add_library(${PROJECT_NAME}\n+    src/GenericTransform.cpp\n+  )\n+\n+  ## Add cmake target dependencies of the library\n+  ## as an example, code may need to be generated before libraries\n+  ## either from message generation or dynamic reconfigure\n+  # add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})\n+\n+  ## Declare a C++ executable\n+  ## With catkin_make all packages are built within a single CMake context\n+  ## The recommended prefix ensures that target names across packages don't collide\n+  # add_executable(${PROJECT_NAME}_node src/hx_testmanager_node.cpp)\n+\n+  ## Rename C++ executable without prefix\n+  ## The above recommended prefix causes long target names, the following renames the\n+  ## target back to the shorter version for ease of user use\n+  ## e.g. \"rosrun someones_pkg node\" instead of \"rosrun someones_pkg someones_pkg_node\"\n+  # set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX \"\")\n+\n+  ## Add cmake target dependencies of the executable\n+  ## same as for the library above\n+  add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})\n+\n+  ## Specify libraries to link a library or executable target against\n+  target_link_libraries(${PROJECT_NAME}\n+    ${catkin_LIBRARIES}\n+  )\n+\n+  #############\n+  ## Install ##\n+  #############\n+\n+  # all install targets should use catkin DESTINATION variables\n+  # See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html\n+\n+  ## Mark executable scripts (Python etc.) for installation\n+  ## in contrast to setup.py, you can choose the destination\n+  # install(PROGRAMS\n+  #   scripts/my_python_script\n+  #   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n+  # )\n+\n+  ## Mark executables and/or libraries for installation\n+  install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}\n+    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n+  )\n+\n+  ## Mark cpp header files for installation\n+  install(DIRECTORY include/${PROJECT_NAME}/\n+    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}\n+  #   FILES_MATCHING PATTERN \"*.h\"\n+  #   PATTERN \".svn\" EXCLUDE\n+  )\n+\n+  ## Mark other files for installation (e.g. launch and bag files, etc.)\n+  install(FILES\n+    nodelet_plugins.xml\n+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}\n+  )\n+  install(DIRECTORY\n+    launch\n+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}\n+    PATTERN \"*ros2*\" EXCLUDE\n+  )\n+  install(DIRECTORY\n+    config\n+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}\n+    PATTERN \"*ros2*\" EXCLUDE\n+  )\n+\n+  #############\n+  ## Testing ##\n+  #############\n+\n+  ## Add gtest based cpp test target and link libraries\n+  # catkin_add_gtest(${PROJECT_NAME}-test test/test_hx_testmanager.cpp)\n+  #if(CATKIN_ENABLE_TESTING)\n+  #  find_package(rostest REQUIRED)\n+  #  add_rostest_gtest(test_ika_dogm test/ika_dogm.test test/UnitTest.cpp)\n+  #  catkin_add_gtest(test_ika_dogm test/UnitTest.cpp)\n+  #  target_link_libraries(test_ika_dogm ${catkin_LIBRARIES} ${PROJECT_NAME}_dogm_creation)\n+  #endif()\n+  # if(TARGET ${PROJECT_NAME}-test)\n+  #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})\n+  # endif()\n+\n+  ## Add folders to be run by python nosetests\n+  # catkin_add_nosetests(test)\n+\n+endif()"
+        },
+        {
+          "sha": "e97dd8e9af9a06b3c4cc1f6ef43c6849fb97faa6",
+          "filename": "config/params.yaml",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/blob/e6709fbdb53434f2cfa38c24aa42f4fb821960d5/config%2Fparams.yaml",
+          "raw_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/raw/e6709fbdb53434f2cfa38c24aa42f4fb821960d5/config%2Fparams.yaml",
+          "contents_url": "https://api.github.com/repos/ika-rwth-aachen/message_tf_frame_transformer/contents/config%2Fparams.yaml?ref=e6709fbdb53434f2cfa38c24aa42f4fb821960d5",
+          "patch": "@@ -0,0 +1 @@\n+frame_id: base_link\n\\ No newline at end of file"
+        },
+        {
+          "sha": "2db048c6de23f83c530dc452e66c119ad23a3f13",
+          "filename": "include/generic_transform/GenericTransform.h",
+          "status": "added",
+          "additions": 60,
+          "deletions": 0,
+          "changes": 60,
+          "blob_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/blob/e6709fbdb53434f2cfa38c24aa42f4fb821960d5/include%2Fgeneric_transform%2FGenericTransform.h",
+          "raw_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/raw/e6709fbdb53434f2cfa38c24aa42f4fb821960d5/include%2Fgeneric_transform%2FGenericTransform.h",
+          "contents_url": "https://api.github.com/repos/ika-rwth-aachen/message_tf_frame_transformer/contents/include%2Fgeneric_transform%2FGenericTransform.h?ref=e6709fbdb53434f2cfa38c24aa42f4fb821960d5",
+          "patch": "@@ -0,0 +1,60 @@\n+/*\n+==============================================================================\n+MIT License\n+\n+Copyright 2023 Institute for Automotive Engineering of RWTH Aachen University.\n+\n+Permission is hereby granted, free of charge, to any person obtaining a copy\n+of this software and associated documentation files (the \"Software\"), to deal\n+in the Software without restriction, including without limitation the rights\n+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n+copies of the Software, and to permit persons to whom the Software is\n+furnished to do so, subject to the following conditions:\n+\n+The above copyright notice and this permission notice shall be included in all\n+copies or substantial portions of the Software.\n+\n+THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n+SOFTWARE.\n+==============================================================================\n+*/\n+\n+\n+#pragma once\n+\n+#include <string>\n+\n+#include <nodelet/nodelet.h>\n+#include <ros/ros.h>\n+#include <topic_tools/shape_shifter.h>\n+\n+\n+namespace generic_transform {\n+\n+class GenericTransform : public nodelet::Nodelet {\n+\n+ protected:\n+\n+  virtual void onInit() override;\n+\n+  void loadParameters();\n+\n+  void setup();\n+\n+  void transform(const topic_tools::ShapeShifter::ConstPtr& generic_msg);\n+\n+ protected:\n+\n+  static const std::string kInputTopic;\n+\n+  static const std::string kOutputTopic;\n+\n+  ros::NodeHandle private_node_handle_;\n+};\n+\n+}  // namespace generic_transform"
+        },
+        {
+          "sha": "80cd3a394af9e5787411d8f86d9d68519c80c316",
+          "filename": "launch/standalone.launch",
+          "status": "added",
+          "additions": 9,
+          "deletions": 0,
+          "changes": 9,
+          "blob_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/blob/e6709fbdb53434f2cfa38c24aa42f4fb821960d5/launch%2Fstandalone.launch",
+          "raw_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/raw/e6709fbdb53434f2cfa38c24aa42f4fb821960d5/launch%2Fstandalone.launch",
+          "contents_url": "https://api.github.com/repos/ika-rwth-aachen/message_tf_frame_transformer/contents/launch%2Fstandalone.launch?ref=e6709fbdb53434f2cfa38c24aa42f4fb821960d5",
+          "patch": "@@ -0,0 +1,9 @@\n+<launch>\n+\n+  <arg name=\"params_file\" default=\"$(find generic_transform)/config/params.yaml\" />\n+\n+  <node pkg=\"nodelet\" type=\"nodelet\" name=\"$(anon generic_transform)\" args=\"standalone generic_transform/GenericTransform\" output=\"screen\">\n+    <rosparam command=\"load\" file=\"$(arg params_file)\" />\n+  </node>\n+\n+</launch>"
+        },
+        {
+          "sha": "f85bc458fe9986251dc39d19b1842e347f1cc48d",
+          "filename": "nodelet_plugins.xml",
+          "status": "added",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/blob/e6709fbdb53434f2cfa38c24aa42f4fb821960d5/nodelet_plugins.xml",
+          "raw_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/raw/e6709fbdb53434f2cfa38c24aa42f4fb821960d5/nodelet_plugins.xml",
+          "contents_url": "https://api.github.com/repos/ika-rwth-aachen/message_tf_frame_transformer/contents/nodelet_plugins.xml?ref=e6709fbdb53434f2cfa38c24aa42f4fb821960d5",
+          "patch": "@@ -0,0 +1,7 @@\n+<library path=\"lib/libgeneric_transform\">\n+  <class name=\"generic_transform/GenericTransform\" type=\"generic_transform::GenericTransform\" base_class_type=\"nodelet::Nodelet\">\n+    <description>\n+      generic_transform nodelet\n+    </description>\n+  </class>\n+</library>"
+        },
+        {
+          "sha": "f865de4bfac3e892b33e27bcde49d2da54977520",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 32,
+          "deletions": 0,
+          "changes": 32,
+          "blob_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/blob/e6709fbdb53434f2cfa38c24aa42f4fb821960d5/package.xml",
+          "raw_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/raw/e6709fbdb53434f2cfa38c24aa42f4fb821960d5/package.xml",
+          "contents_url": "https://api.github.com/repos/ika-rwth-aachen/message_tf_frame_transformer/contents/package.xml?ref=e6709fbdb53434f2cfa38c24aa42f4fb821960d5",
+          "patch": "@@ -0,0 +1,32 @@\n+<?xml version=\"1.0\"?>\n+<package format=\"3\">\n+\n+  <name>generic_transform</name>\n+  <version>1.0.0</version>\n+  <description>Transforms messages of arbitrary type to a different frame using tf2::doTransform</description>\n+\n+  <maintainer email=\"lennart.reiher@rwth-aachen.de\">Lennart Reiher</maintainer>\n+  <author email=\"lennart.reiher@rwth-aachen.de\">Lennart Reiher</author>\n+\n+  <license>MIT</license>\n+\n+  <depend>ros_environment</depend>\n+  <depend>tf2</depend>\n+\n+  <!-- ROS2 -->\n+  <!-- <buildtool_depend condition=\"$ROS_VERSION == 2\">ament_cmake</buildtool_depend>\n+  <depend condition=\"$ROS_VERSION == 2\">rclcpp</depend> -->\n+\n+  <!-- ROS1 -->\n+  <buildtool_depend condition=\"$ROS_VERSION == 1\">catkin</buildtool_depend>\n+  <depend condition=\"$ROS_VERSION == 1\">nodelet</depend>\n+  <depend condition=\"$ROS_VERSION == 1\">roscpp</depend>\n+  <depend condition=\"$ROS_VERSION == 1\">topic_tools</depend>\n+\n+  <export>\n+    <!-- <build_type condition=\"$ROS_VERSION == 2\">ament_cmake</build_type> -->\n+    <build_type condition=\"$ROS_VERSION == 1\">catkin</build_type>\n+    <nodelet condition=\"$ROS_VERSION == 1\" plugin=\"${prefix}/nodelet_plugins.xml\" />\n+  </export>\n+\n+</package>"
+        },
+        {
+          "sha": "36eeb2efe8fe0c0642d831285a8bc8a1b256e69e",
+          "filename": "src/GenericTransform.cpp",
+          "status": "added",
+          "additions": 67,
+          "deletions": 0,
+          "changes": 67,
+          "blob_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/blob/e6709fbdb53434f2cfa38c24aa42f4fb821960d5/src%2FGenericTransform.cpp",
+          "raw_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/raw/e6709fbdb53434f2cfa38c24aa42f4fb821960d5/src%2FGenericTransform.cpp",
+          "contents_url": "https://api.github.com/repos/ika-rwth-aachen/message_tf_frame_transformer/contents/src%2FGenericTransform.cpp?ref=e6709fbdb53434f2cfa38c24aa42f4fb821960d5",
+          "patch": "@@ -0,0 +1,67 @@\n+/*\n+==============================================================================\n+MIT License\n+\n+Copyright 2023 Institute for Automotive Engineering of RWTH Aachen University.\n+\n+Permission is hereby granted, free of charge, to any person obtaining a copy\n+of this software and associated documentation files (the \"Software\"), to deal\n+in the Software without restriction, including without limitation the rights\n+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n+copies of the Software, and to permit persons to whom the Software is\n+furnished to do so, subject to the following conditions:\n+\n+The above copyright notice and this permission notice shall be included in all\n+copies or substantial portions of the Software.\n+\n+THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n+SOFTWARE.\n+==============================================================================\n+*/\n+\n+\n+#include <generic_transform/GenericTransform.h>\n+#include <pluginlib/class_list_macros.h>\n+\n+\n+PLUGINLIB_EXPORT_CLASS(generic_transform::GenericTransform, nodelet::Nodelet)\n+\n+\n+namespace generic_transform {\n+\n+\n+const std::string GenericTransform::kInputTopic = \"~/input\";\n+\n+const std::string GenericTransform::kOutputTopic = \"~/transformed\";\n+\n+\n+void GenericTransform::onInit() {\n+\n+  private_node_handle_ = this->getMTPrivateNodeHandle();\n+\n+  loadParameters();\n+  setup();\n+}\n+\n+\n+void GenericTransform::loadParameters() {\n+\n+}\n+\n+\n+void GenericTransform::setup() {\n+\n+}\n+\n+\n+void GenericTransform::transform(const topic_tools::ShapeShifter::ConstPtr& generic_msg) {\n+\n+}\n+\n+\n+}  // namespace generic_transform"
+        }
+      ]
+    },
+    {
+      "author": "lukaszanger",
+      "date": "2025-06-23T08:17:10Z",
+      "sha": "134312f5ff722422cd4410a2860d86f4e92e2435",
+      "message": "Add perception_interfaces and planning_interfaces",
+      "files_changed": 6,
+      "additions": 83,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "62ac40693f6c3a2e5a4076a3a3cd8dc5fa3d635f",
+          "filename": ".github/workflows/docker-ros.yml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/blob/134312f5ff722422cd4410a2860d86f4e92e2435/.github%2Fworkflows%2Fdocker-ros.yml",
+          "raw_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/raw/134312f5ff722422cd4410a2860d86f4e92e2435/.github%2Fworkflows%2Fdocker-ros.yml",
+          "contents_url": "https://api.github.com/repos/ika-rwth-aachen/message_tf_frame_transformer/contents/.github%2Fworkflows%2Fdocker-ros.yml?ref=134312f5ff722422cd4410a2860d86f4e92e2435",
+          "patch": "@@ -22,6 +22,7 @@ jobs:\n         with:\n           image-tag: ros2\n           base-image: rwthika/ros2:latest\n+          rmw-implementation: rmw_zenoh_cpp\n           command: ros2 run message_tf_frame_transformer message_tf_frame_transformer\n           platform: amd64,arm64\n           target: run"
+        },
+        {
+          "sha": "ed7be280e0b1afa6b13de2abf395b3804af90d60",
+          "filename": ".repos",
+          "status": "added",
+          "additions": 9,
+          "deletions": 0,
+          "changes": 9,
+          "blob_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/blob/134312f5ff722422cd4410a2860d86f4e92e2435/.repos",
+          "raw_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/raw/134312f5ff722422cd4410a2860d86f4e92e2435/.repos",
+          "contents_url": "https://api.github.com/repos/ika-rwth-aachen/message_tf_frame_transformer/contents/.repos?ref=134312f5ff722422cd4410a2860d86f4e92e2435",
+          "patch": "@@ -0,0 +1,9 @@\n+repositories:\n+  perception_interfaces:\n+    type: git\n+    url: https://github.com/ika-rwth-aachen/perception_interfaces.git\n+    version: main\n+  planning_interfaces:\n+    type: git\n+    url: https://github.com/ika-rwth-aachen/planning_interfaces.git\n+    version: main\n\\ No newline at end of file"
+        },
+        {
+          "sha": "3b9c39f746646a9c7653950100f34a5e98665172",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 36,
+          "deletions": 0,
+          "changes": 36,
+          "blob_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/blob/134312f5ff722422cd4410a2860d86f4e92e2435/CMakeLists.txt",
+          "raw_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/raw/134312f5ff722422cd4410a2860d86f4e92e2435/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ika-rwth-aachen/message_tf_frame_transformer/contents/CMakeLists.txt?ref=134312f5ff722422cd4410a2860d86f4e92e2435",
+          "patch": "@@ -16,12 +16,21 @@ if(${ROS_VERSION} EQUAL 2)\n   find_package(ament_cmake REQUIRED)\n \n   find_package(geometry_msgs REQUIRED)\n+  find_package(perception_msgs REQUIRED)\n+  find_package(perception_msgs_utils REQUIRED)\n   find_package(rclcpp REQUIRED)\n+  find_package(route_planning_msgs REQUIRED)\n+  find_package(route_planning_msgs_utils REQUIRED)\n   find_package(sensor_msgs REQUIRED)\n   find_package(tf2 REQUIRED)\n   find_package(tf2_geometry_msgs REQUIRED)\n+  find_package(tf2_perception_msgs REQUIRED)\n   find_package(tf2_ros REQUIRED)\n+  find_package(tf2_route_planning_msgs REQUIRED)\n   find_package(tf2_sensor_msgs REQUIRED)\n+  find_package(tf2_trajectory_planning_msgs REQUIRED)\n+  find_package(trajectory_planning_msgs REQUIRED)\n+  find_package(trajectory_planning_msgs_utils REQUIRED)\n \n   add_executable(${PROJECT_NAME} src/MessageTfFrameTransformer.ros2.cpp)\n \n@@ -31,12 +40,21 @@ if(${ROS_VERSION} EQUAL 2)\n \n   ament_target_dependencies(${PROJECT_NAME}\n     geometry_msgs\n+    perception_msgs\n+    perception_msgs_utils\n     rclcpp\n+    route_planning_msgs\n+    route_planning_msgs_utils\n     sensor_msgs\n     tf2\n     tf2_geometry_msgs\n+    tf2_perception_msgs\n     tf2_ros\n+    tf2_route_planning_msgs\n     tf2_sensor_msgs\n+    tf2_trajectory_planning_msgs\n+    trajectory_planning_msgs\n+    trajectory_planning_msgs_utils\n   )\n \n   install(TARGETS\n@@ -72,13 +90,22 @@ elseif(${ROS_VERSION} EQUAL 1)\n   ## is used, also find other catkin packages\n   find_package(catkin REQUIRED COMPONENTS\n     geometry_msgs\n+    perception_msgs\n+    perception_msgs_utils\n     nodelet\n     roscpp\n+    route_planning_msgs\n+    route_planning_msgs_utils\n     tf2\n     tf2_geometry_msgs\n+    tf2_perception_msgs\n     tf2_ros\n+    tf2_route_planning_msgs\n     tf2_sensor_msgs\n+    tf2_trajectory_planning_msgs\n     topic_tools\n+    trajectory_planning_msgs\n+    trajectory_planning_msgs_utils\n   )\n \n   ## System dependencies are found with CMake's conventions\n@@ -174,12 +201,21 @@ elseif(${ROS_VERSION} EQUAL 1)\n     CATKIN_DEPENDS\n       geometry_msgs\n       nodelet\n+      perception_msgs\n+      perception_msgs_utils\n       roscpp\n+      route_planning_msgs\n+      route_planning_msgs_utils\n       tf2\n       tf2_geometry_msgs\n+      tf2_perception_msgs\n       tf2_ros\n+      tf2_route_planning_msgs\n       tf2_sensor_msgs\n+      tf2_trajectory_planning_msgs\n       topic_tools\n+      trajectory_planning_msgs\n+      trajectory_planning_msgs_utils\n     # DEPENDS\n   )\n "
+        },
+        {
+          "sha": "75abc20ced9320fecdad7e0c3a6d0fca83f0e55e",
+          "filename": "include/message_tf_frame_transformer/message_types.ros2.hpp",
+          "status": "modified",
+          "additions": 16,
+          "deletions": 0,
+          "changes": 16,
+          "blob_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/blob/134312f5ff722422cd4410a2860d86f4e92e2435/include%2Fmessage_tf_frame_transformer%2Fmessage_types.ros2.hpp",
+          "raw_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/raw/134312f5ff722422cd4410a2860d86f4e92e2435/include%2Fmessage_tf_frame_transformer%2Fmessage_types.ros2.hpp",
+          "contents_url": "https://api.github.com/repos/ika-rwth-aachen/message_tf_frame_transformer/contents/include%2Fmessage_tf_frame_transformer%2Fmessage_types.ros2.hpp?ref=134312f5ff722422cd4410a2860d86f4e92e2435",
+          "patch": "@@ -9,5 +9,21 @@\n #include <geometry_msgs/msg/vector3_stamped.hpp>\n #include <geometry_msgs/msg/wrench_stamped.hpp>\n \n+#include <tf2_perception_msgs/tf2_perception_msgs.hpp>\n+#include <perception_msgs/msg/ego_data.hpp>\n+#include <perception_msgs/msg/object.hpp>\n+#include <perception_msgs/msg/object_list.hpp>\n+#include <perception_msgs/msg/object_state.hpp>\n+\n+#include <tf2_route_planning_msgs/tf2_route_planning_msgs.hpp>\n+#include <route_planning_msgs/msg/lane_boundary.hpp>\n+#include <route_planning_msgs/msg/lane_element.hpp>\n+#include <route_planning_msgs/msg/regulatory_element.hpp>\n+#include <route_planning_msgs/msg/route.hpp>\n+#include <route_planning_msgs/msg/route_element.hpp>\n+\n #include <tf2_sensor_msgs/tf2_sensor_msgs.hpp>\n #include <sensor_msgs/msg/point_cloud2.hpp>\n+\n+#include <tf2_trajectory_planning_msgs/tf2_trajectory_planning_msgs.hpp>\n+#include <trajectory_planning_msgs/msg/trajectory.hpp>\n\\ No newline at end of file"
+        },
+        {
+          "sha": "47c2cb3a4961d1befb7f3e6f2bdfea12d75dd741",
+          "filename": "include/message_tf_frame_transformer/message_types.ros2.macro",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 0,
+          "changes": 13,
+          "blob_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/blob/134312f5ff722422cd4410a2860d86f4e92e2435/include%2Fmessage_tf_frame_transformer%2Fmessage_types.ros2.macro",
+          "raw_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/raw/134312f5ff722422cd4410a2860d86f4e92e2435/include%2Fmessage_tf_frame_transformer%2Fmessage_types.ros2.macro",
+          "contents_url": "https://api.github.com/repos/ika-rwth-aachen/message_tf_frame_transformer/contents/include%2Fmessage_tf_frame_transformer%2Fmessage_types.ros2.macro?ref=134312f5ff722422cd4410a2860d86f4e92e2435",
+          "patch": "@@ -28,4 +28,17 @@ MESSAGE_TYPE(geometry_msgs::msg::Vector3Stamped, geometry_msgs/msg/Vector3Stampe\n MESSAGE_TYPE(geometry_msgs::msg::Wrench, geometry_msgs/msg/Wrench)\n MESSAGE_TYPE(geometry_msgs::msg::WrenchStamped, geometry_msgs/msg/WrenchStamped)\n \n+MESSAGE_TYPE(perception_msgs::msg::EgoData, perception_msgs/msg/EgoData)\n+MESSAGE_TYPE(perception_msgs::msg::Object, perception_msgs/msg/Object)\n+MESSAGE_TYPE(perception_msgs::msg::ObjectList, perception_msgs/msg/ObjectList)\n+MESSAGE_TYPE(perception_msgs::msg::ObjectState, perception_msgs/msg/ObjectState)\n+\n+MESSAGE_TYPE(route_planning_msgs::msg::LaneBoundary, route_planning_msgs/msg/LaneBoundary)\n+MESSAGE_TYPE(route_planning_msgs::msg::LaneElement, route_planning_msgs/msg/LaneElement)\n+MESSAGE_TYPE(route_planning_msgs::msg::RegulatoryElement, route_planning_msgs/msg/RegulatoryElement)\n+MESSAGE_TYPE(route_planning_msgs::msg::Route, route_planning_msgs/msg/Route)\n+MESSAGE_TYPE(route_planning_msgs::msg::RouteElement, route_planning_msgs/msg/RouteElement)\n+\n MESSAGE_TYPE(sensor_msgs::msg::PointCloud2, sensor_msgs/msg/PointCloud2)\n+\n+MESSAGE_TYPE(trajectory_planning_msgs::msg::Trajectory, trajectory_planning_msgs/msg/Trajectory)\n\\ No newline at end of file"
+        },
+        {
+          "sha": "ff0a865d355f4c9e665c68ed614f4f561716e6bb",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/blob/134312f5ff722422cd4410a2860d86f4e92e2435/package.xml",
+          "raw_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/raw/134312f5ff722422cd4410a2860d86f4e92e2435/package.xml",
+          "contents_url": "https://api.github.com/repos/ika-rwth-aachen/message_tf_frame_transformer/contents/package.xml?ref=134312f5ff722422cd4410a2860d86f4e92e2435",
+          "patch": "@@ -11,12 +11,20 @@\n   <license>MIT</license>\n \n   <depend>geometry_msgs</depend>\n+  <depend>perception_msgs_utils</depend>\n+  <depend>perception_msgs</depend>\n   <depend>ros_environment</depend>\n+  <depend>route_planning_msgs_utils</depend>\n+  <depend>route_planning_msgs</depend>\n   <depend>sensor_msgs</depend>\n   <depend>tf2_geometry_msgs</depend>\n+  <depend>tf2_perception_msgs</depend>\n   <depend>tf2_ros</depend>\n+  <depend>tf2_route_planning_msgs</depend>\n   <depend>tf2_sensor_msgs</depend>\n+  <depend>tf2_trajectory_planning_msgs</depend>\n   <depend>tf2</depend>\n+  <depend>trajectory_planning_msgs</depend>\n \n   <!-- ROS2 -->\n   <buildtool_depend condition=\"$ROS_VERSION == 2\">ament_cmake</buildtool_depend>"
+        }
+      ]
+    },
+    {
+      "author": "clalancette",
+      "date": "2024-03-18T14:16:34Z",
+      "sha": "e9f4e3f84f6e11a0daaa9485de55f5ed3d3420fa",
+      "message": "Fix a compile error with modern rclcpp.\n\nIn particular, the constref shared_ptr callback\nsignature must also have a 'const' on the type.\n\nSigned-off-by: Chris Lalancette <clalancette@gmail.com>",
+      "files_changed": 2,
+      "additions": 3,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "9119171e53be8e46a428f55f36bd91227d18d68f",
+          "filename": "include/message_tf_frame_transformer/MessageTfFrameTransformer.ros2.hpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/blob/e9f4e3f84f6e11a0daaa9485de55f5ed3d3420fa/include%2Fmessage_tf_frame_transformer%2FMessageTfFrameTransformer.ros2.hpp",
+          "raw_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/raw/e9f4e3f84f6e11a0daaa9485de55f5ed3d3420fa/include%2Fmessage_tf_frame_transformer%2FMessageTfFrameTransformer.ros2.hpp",
+          "contents_url": "https://api.github.com/repos/ika-rwth-aachen/message_tf_frame_transformer/contents/include%2Fmessage_tf_frame_transformer%2FMessageTfFrameTransformer.ros2.hpp?ref=e9f4e3f84f6e11a0daaa9485de55f5ed3d3420fa",
+          "patch": "@@ -66,7 +66,7 @@ class MessageTfFrameTransformer : public rclcpp::Node {\n \n   void detectMessageType();\n \n-  void transformGeneric(const std::shared_ptr<rclcpp::SerializedMessage>& serialized_msg);\n+  void transformGeneric(const std::shared_ptr<const rclcpp::SerializedMessage>& serialized_msg);\n \n   template <typename T>\n   void transform(const T& msg);\n@@ -98,7 +98,7 @@ class MessageTfFrameTransformer : public rclcpp::Node {\n   rclcpp::TimerBase::SharedPtr detect_message_type_timer_;\n \n   rclcpp::GenericSubscription::SharedPtr subscriber_;\n-  \n+\n   rclcpp::PublisherBase::SharedPtr publisher_;\n \n   std::string msg_type_;"
+        },
+        {
+          "sha": "894b0ce6dc8df03fcdea40bda3fb552bfd330b2c",
+          "filename": "src/MessageTfFrameTransformer.ros2.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/blob/e9f4e3f84f6e11a0daaa9485de55f5ed3d3420fa/src%2FMessageTfFrameTransformer.ros2.cpp",
+          "raw_url": "https://github.com/ika-rwth-aachen/message_tf_frame_transformer/raw/e9f4e3f84f6e11a0daaa9485de55f5ed3d3420fa/src%2FMessageTfFrameTransformer.ros2.cpp",
+          "contents_url": "https://api.github.com/repos/ika-rwth-aachen/message_tf_frame_transformer/contents/src%2FMessageTfFrameTransformer.ros2.cpp?ref=e9f4e3f84f6e11a0daaa9485de55f5ed3d3420fa",
+          "patch": "@@ -138,7 +138,7 @@ void MessageTfFrameTransformer::detectMessageType() {\n }\n \n \n-void MessageTfFrameTransformer::transformGeneric(const std::shared_ptr<rclcpp::SerializedMessage>& serialized_msg) {\n+void MessageTfFrameTransformer::transformGeneric(const std::shared_ptr<const rclcpp::SerializedMessage>& serialized_msg) {\n \n   if (false) {}\n #define MESSAGE_TYPE(TYPE, NAME)                                               \\"
+        }
+      ]
+    }
+  ]
+}

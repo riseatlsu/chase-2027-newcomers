@@ -1,0 +1,191 @@
+{
+  "_meta": {
+    "fetched_at": "2026-09-21T19:26:15Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "moveit",
+    "repo": "py_binding_tools"
+  },
+  "data": [
+    {
+      "author": "rhaschke",
+      "date": "2024-03-05T11:07:59Z",
+      "sha": "460000d4b15125fd38a432eb412f66bcf14b8cf7",
+      "message": "Initial commit\n\nderived from MoveIt's py_bindings_tools",
+      "files_changed": 9,
+      "additions": 633,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "a8fc8790ab2b7db152a682fdd6ee641b531e7346",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 47,
+          "deletions": 0,
+          "changes": 47,
+          "blob_url": "https://github.com/moveit/py_binding_tools/blob/460000d4b15125fd38a432eb412f66bcf14b8cf7/CMakeLists.txt",
+          "raw_url": "https://github.com/moveit/py_binding_tools/raw/460000d4b15125fd38a432eb412f66bcf14b8cf7/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/moveit/py_binding_tools/contents/CMakeLists.txt?ref=460000d4b15125fd38a432eb412f66bcf14b8cf7",
+          "patch": "@@ -0,0 +1,47 @@\n+cmake_minimum_required(VERSION 3.0.2)\n+project(py_binding_tools)\n+\n+find_package(catkin REQUIRED\n+COMPONENTS\n+\tgeometry_msgs\n+\tpybind11_catkin\n+\troscpp\n+)\n+\n+# catkin_python_setup()\n+\n+catkin_package(\n+  INCLUDE_DIRS include\n+  LIBRARIES ${PROJECT_NAME}\n+  CATKIN_DEPENDS geometry_msgs roscpp\n+)\n+\n+include_directories(include ${catkin_INCLUDE_DIRS})\n+\n+add_library(${PROJECT_NAME}\n+  src/ros_msg_typecasters.cpp\n+  src/roscpp_initializer.cpp\n+)\n+add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})\n+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${PYTHON_LIBRARIES})\n+\n+install(\n+  TARGETS ${PROJECT_NAME}\n+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n+  RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION}\n+)\n+\n+install(DIRECTORY include/${PROJECT_NAME}/\n+   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}\n+)\n+\n+#catkin_lint cannot detect target declarations in functions, here in pybind11_add_module\n+#catkin_lint: ignore undefined_target\n+\n+pybind_add_module(${PROJECT_NAME}_module src/${PROJECT_NAME}.cpp)\n+set_target_properties(${PROJECT_NAME}_module PROPERTIES OUTPUT_NAME ${PROJECT_NAME})\n+target_link_libraries(${PROJECT_NAME}_module PRIVATE ${PROJECT_NAME})\n+\n+install(TARGETS ${PROJECT_NAME}_module\n+  LIBRARY DESTINATION ${CATKIN_GLOBAL_PYTHON_DESTINATION})"
+        },
+        {
+          "sha": "a80de8cd0285a87ddf74a6cdbfaa26455c100a98",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 34,
+          "deletions": 0,
+          "changes": 34,
+          "blob_url": "https://github.com/moveit/py_binding_tools/blob/460000d4b15125fd38a432eb412f66bcf14b8cf7/README.md",
+          "raw_url": "https://github.com/moveit/py_binding_tools/raw/460000d4b15125fd38a432eb412f66bcf14b8cf7/README.md",
+          "contents_url": "https://api.github.com/repos/moveit/py_binding_tools/contents/README.md?ref=460000d4b15125fd38a432eb412f66bcf14b8cf7",
+          "patch": "@@ -0,0 +1,34 @@\n+## Python binding tools for C++\n+\n+This package provides some tools to facilitate the generation of python bindings for C++ code, based on [pybind11](https://github.com/pybind/pybind11).\n+\n+### Automatic type conversion for ROS message types\n+\n+Conversion between native C++ and python types is performed via ROS message serialization and deserialization, which is implemented via C++ templates. It suffices to include:\n+\n+```cpp\n+#include <py_binding_tools/ros_msg_typecasters.h>\n+```\n+\n+The `PoseStamped` message from the `geometry_msgs` package also accepts a single string as an argument.\n+In this case, the string is interpreted as the `header.frame_id` field of the message and the pose becomes the identity transform. To use this extension, include the following header instead:\n+\n+```cpp\n+#include <py_binding_tools/geometry_msg_typecasters.h>\n+```\n+\n+### C++ ROS initialization\n+\n+C++ and Python use their own ROS implementations (`rospy` and `roscpp`).\n+Thus, it is necessary to initialize ROS in the C++ domain additionally to the Python domain before calling any ROS-related functions from wrapped C++ functions or classes.\n+To this end, the package provides the python function `roscpp_init()` and the C++ class `ROScppInitializer`. The latter is intended to be used as a base class for your python wrapper classes:\n+\n+```cpp\n+class FooWrapper : protected ROScppInitializer, public Foo {\n+\t// ...\n+};\n+```\n+\n+to ensure that the ROS infrastructure is initialized before usage in the wrapped C++ class. Ensure to list `ROScppInitializer` as the _first_ base class, if ROS functionality is required in the constructor already!\n+\n+`ROScppInitializer` registers an anonymous C++ ROS node named `python_wrapper_xxx`. If you need a specific node name or if you want to pass remappings, use the manual initialization function `roscpp_init(name=\"\", remappings={}, options=0)` instead, which effectively calls `ros::init` with the given arguments. Note, that an empty name will map to the above-mentioned node name `python_wrapper_xxx`.\n\\ No newline at end of file"
+        },
+        {
+          "sha": "6523185366f06e98f96177c3bba78ed920c8007d",
+          "filename": "include/py_binding_tools/geometry_msg_typecasters.h",
+          "status": "added",
+          "additions": 65,
+          "deletions": 0,
+          "changes": 65,
+          "blob_url": "https://github.com/moveit/py_binding_tools/blob/460000d4b15125fd38a432eb412f66bcf14b8cf7/include%2Fpy_binding_tools%2Fgeometry_msg_typecasters.h",
+          "raw_url": "https://github.com/moveit/py_binding_tools/raw/460000d4b15125fd38a432eb412f66bcf14b8cf7/include%2Fpy_binding_tools%2Fgeometry_msg_typecasters.h",
+          "contents_url": "https://api.github.com/repos/moveit/py_binding_tools/contents/include%2Fpy_binding_tools%2Fgeometry_msg_typecasters.h?ref=460000d4b15125fd38a432eb412f66bcf14b8cf7",
+          "patch": "@@ -0,0 +1,65 @@\n+/*********************************************************************\n+ * Software License Agreement (BSD License)\n+ *\n+ *  Copyright (c) 2021, Robert Haschke\n+ *  All rights reserved.\n+ *\n+ *  Redistribution and use in source and binary forms, with or without\n+ *  modification, are permitted provided that the following conditions\n+ *  are met:\n+ *\n+ *   * Redistributions of source code must retain the above copyright\n+ *     notice, this list of conditions and the following disclaimer.\n+ *   * Redistributions in binary form must reproduce the above\n+ *     copyright notice, this list of conditions and the following\n+ *     disclaimer in the documentation and/or other materials provided\n+ *     with the distribution.\n+ *   * The name of Robert Haschke may not be used to endorse or promote\n+ *     products derived from this software without specific prior\n+ *     written permission.\n+ *\n+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n+ *  \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS\n+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\n+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,\n+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,\n+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\n+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN\n+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+ *  POSSIBILITY OF SUCH DAMAGE.\n+ *********************************************************************/\n+\n+/* Author: Robert Haschke */\n+\n+#pragma once\n+\n+#include \"ros_msg_typecasters.h\"\n+#include <geometry_msgs/PoseStamped.h>\n+\n+namespace pybind11\n+{\n+namespace detail\n+{\n+/** Convienency type caster, also allowing to initialize PoseStamped from a string */\n+template <>\n+struct type_caster<geometry_msgs::PoseStamped> : RosMsgTypeCaster<geometry_msgs::PoseStamped>\n+{\n+  // Python -> C++\n+  bool load(handle src, bool convert)\n+  {\n+    type_caster<std::string> str_caster;\n+    if (convert && str_caster.load(src, false))\n+    {  // string creates identity pose with given frame\n+      value.header.frame_id = static_cast<std::string&>(str_caster);\n+      value.pose.orientation.w = 1.0;\n+      return true;\n+    }\n+    return RosMsgTypeCaster<geometry_msgs::PoseStamped>::load(src, convert);\n+  }\n+};\n+\n+}  // namespace detail\n+}  // namespace pybind11"
+        },
+        {
+          "sha": "510fa7bca539c7609b1729a1cddc47efb78c360b",
+          "filename": "include/py_binding_tools/ros_msg_typecasters.h",
+          "status": "added",
+          "additions": 147,
+          "deletions": 0,
+          "changes": 147,
+          "blob_url": "https://github.com/moveit/py_binding_tools/blob/460000d4b15125fd38a432eb412f66bcf14b8cf7/include%2Fpy_binding_tools%2Fros_msg_typecasters.h",
+          "raw_url": "https://github.com/moveit/py_binding_tools/raw/460000d4b15125fd38a432eb412f66bcf14b8cf7/include%2Fpy_binding_tools%2Fros_msg_typecasters.h",
+          "contents_url": "https://api.github.com/repos/moveit/py_binding_tools/contents/include%2Fpy_binding_tools%2Fros_msg_typecasters.h?ref=460000d4b15125fd38a432eb412f66bcf14b8cf7",
+          "patch": "@@ -0,0 +1,147 @@\n+/*********************************************************************\n+ * Software License Agreement (BSD License)\n+ *\n+ *  Copyright (c) 2021, Robert Haschke\n+ *  All rights reserved.\n+ *\n+ *  Redistribution and use in source and binary forms, with or without\n+ *  modification, are permitted provided that the following conditions\n+ *  are met:\n+ *\n+ *   * Redistributions of source code must retain the above copyright\n+ *     notice, this list of conditions and the following disclaimer.\n+ *   * Redistributions in binary form must reproduce the above\n+ *     copyright notice, this list of conditions and the following\n+ *     disclaimer in the documentation and/or other materials provided\n+ *     with the distribution.\n+ *   * The name of Robert Haschke may not be used to endorse or promote\n+ *     products derived from this software without specific prior\n+ *     written permission.\n+ *\n+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n+ *  \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS\n+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\n+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,\n+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,\n+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\n+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN\n+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+ *  POSSIBILITY OF SUCH DAMAGE.\n+ *********************************************************************/\n+\n+/* Author: Robert Haschke */\n+\n+#pragma once\n+\n+#include <pybind11/pybind11.h>\n+#include <ros/duration.h>\n+#include <ros/serialization.h>\n+\n+/** Provide pybind11 type converters for ROS types */\n+\n+namespace py_binding_tools\n+{\n+PYBIND11_EXPORT pybind11::object createMessage(const std::string& ros_msg_name);\n+PYBIND11_EXPORT bool convertible(const pybind11::handle& h, const char* ros_msg_name);\n+\n+/** Throws genpy.DeserializationError exception.\n+ *\n+ * This is a convenience method to support the old behaviour of returning\n+ * an empty ByteString.\n+ */\n+PYBIND11_EXPORT void throwDeserializationError [[noreturn]] ();\n+\n+} // namespace py_binding_tools\n+\n+namespace pybind11\n+{\n+namespace detail\n+{\n+/// Convert ros::Duration / ros::WallDuration into a float\n+template <typename T>\n+struct DurationCaster\n+{\n+  // C++ -> Python\n+  static handle cast(T&& src, return_value_policy /* policy */, handle /* parent */)\n+  {\n+    return PyFloat_FromDouble(src.toSec());\n+  }\n+\n+  // Python -> C++\n+  bool load(handle src, bool convert)\n+  {\n+    if (hasattr(src, \"to_sec\"))\n+    {\n+      value = T(src.attr(\"to_sec\")().cast<double>());\n+    }\n+    else if (convert)\n+    {\n+      value = T(src.cast<double>());\n+    }\n+    else\n+      return false;\n+    return true;\n+  }\n+\n+  PYBIND11_TYPE_CASTER(T, _(\"Duration\"));\n+};\n+\n+template <>\n+struct type_caster<ros::Duration> : DurationCaster<ros::Duration>\n+{\n+};\n+\n+template <>\n+struct type_caster<ros::WallDuration> : DurationCaster<ros::WallDuration>\n+{\n+};\n+\n+/// Base class for type conversion (C++ <-> python) of ROS message types\n+template <typename T>\n+struct RosMsgTypeCaster\n+{\n+  // C++ -> Python\n+  static handle cast(const T& src, return_value_policy /* policy */, handle /* parent */)\n+  {\n+    // serialize src into (python) buffer\n+    std::size_t size = ros::serialization::serializationLength(src);\n+    object pbuffer = reinterpret_steal<object>(PyBytes_FromStringAndSize(nullptr, size));\n+    ros::serialization::OStream stream(reinterpret_cast<uint8_t*>(PyBytes_AsString(pbuffer.ptr())), size);\n+    ros::serialization::serialize(stream, src);\n+    // deserialize python type from buffer\n+    object msg = py_binding_tools::createMessage(ros::message_traits::DataType<T>::value());\n+    msg.attr(\"deserialize\")(pbuffer);\n+    return msg.release();\n+  }\n+\n+  // Python -> C++\n+  bool load(handle src, bool /*convert*/)\n+  {\n+    if (!py_binding_tools::convertible(src, ros::message_traits::DataType<T>::value()))\n+      return false;\n+    // serialize src into (python) buffer\n+    object pstream = module::import(\"io\").attr(\"BytesIO\")();\n+    src.attr(\"serialize\")(pstream);\n+    object pbuffer = pstream.attr(\"getvalue\")();\n+    // deserialize C++ type from buffer\n+    char* cbuffer = nullptr;\n+    Py_ssize_t size;\n+    PyBytes_AsStringAndSize(pbuffer.ptr(), &cbuffer, &size);\n+    ros::serialization::IStream cstream(const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(cbuffer)), size);\n+    ros::serialization::deserialize(cstream, value);\n+    return true;\n+  }\n+\n+  PYBIND11_TYPE_CASTER(T, _<T>());\n+};\n+\n+template <typename T>\n+struct type_caster<T, enable_if_t<ros::message_traits::IsMessage<T>::value>> : RosMsgTypeCaster<T>\n+{\n+};\n+\n+}  // namespace detail\n+}  // namespace pybind11"
+        },
+        {
+          "sha": "624288683732950cc0a634d694c7a096e34916ce",
+          "filename": "include/py_binding_tools/roscpp_initializer.h",
+          "status": "added",
+          "additions": 58,
+          "deletions": 0,
+          "changes": 58,
+          "blob_url": "https://github.com/moveit/py_binding_tools/blob/460000d4b15125fd38a432eb412f66bcf14b8cf7/include%2Fpy_binding_tools%2Froscpp_initializer.h",
+          "raw_url": "https://github.com/moveit/py_binding_tools/raw/460000d4b15125fd38a432eb412f66bcf14b8cf7/include%2Fpy_binding_tools%2Froscpp_initializer.h",
+          "contents_url": "https://api.github.com/repos/moveit/py_binding_tools/contents/include%2Fpy_binding_tools%2Froscpp_initializer.h?ref=460000d4b15125fd38a432eb412f66bcf14b8cf7",
+          "patch": "@@ -0,0 +1,58 @@\n+/*********************************************************************\n+ * Software License Agreement (BSD License)\n+ *\n+ *  Copyright (c) 2020, Bielefeld University\n+ *  All rights reserved.\n+ *\n+ *  Redistribution and use in source and binary forms, with or without\n+ *  modification, are permitted provided that the following conditions\n+ *  are met:\n+ *\n+ *   * Redistributions of source code must retain the above copyright\n+ *     notice, this list of conditions and the following disclaimer.\n+ *   * Redistributions in binary form must reproduce the above\n+ *     copyright notice, this list of conditions and the following\n+ *     disclaimer in the documentation and/or other materials provided\n+ *     with the distribution.\n+ *   * Neither the name of Bielefeld University nor the names of its\n+ *     contributors may be used to endorse or promote products derived\n+ *     from this software without specific prior written permission.\n+ *\n+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n+ *  \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS\n+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\n+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,\n+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,\n+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\n+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN\n+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+ *  POSSIBILITY OF SUCH DAMAGE.\n+ *********************************************************************/\n+#pragma once\n+\n+#include <ros/init.h>\n+\n+namespace py_binding_tools\n+{\n+/** The constructor of this class ensures that ros::init() has been called.\n+ *\n+ *  Thread safety and multiple initialization is properly handled.\n+ *  The default node name is \"python_wrapper\".\n+ *  If you like to have a custom name, use the roscpp_init() function before. */\n+class ROScppInitializer\n+{\n+public:\n+  ROScppInitializer();\n+  ~ROScppInitializer();\n+};\n+\n+void roscpp_init(const std::string& node_name,\n+                 const std::map<std::string, std::string>& remappings,\n+                 uint32_t options);\n+\n+void roscpp_shutdown();\n+\n+}  // namespace py_binding_tools"
+        },
+        {
+          "sha": "bd91ff348e3f54782ece442737c38c9a0d916bbd",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 21,
+          "deletions": 0,
+          "changes": 21,
+          "blob_url": "https://github.com/moveit/py_binding_tools/blob/460000d4b15125fd38a432eb412f66bcf14b8cf7/package.xml",
+          "raw_url": "https://github.com/moveit/py_binding_tools/raw/460000d4b15125fd38a432eb412f66bcf14b8cf7/package.xml",
+          "contents_url": "https://api.github.com/repos/moveit/py_binding_tools/contents/package.xml?ref=460000d4b15125fd38a432eb412f66bcf14b8cf7",
+          "patch": "@@ -0,0 +1,21 @@\n+<?xml version=\"1.0\"?>\n+<package format=\"2\">\n+  <name>py_binding_tools</name>\n+  <version>0.0.0</version>\n+  <description>Python binding tools for C++</description>\n+\n+  <author email=\"rhaschke@techfak.uni-bielefeld.de\">Robert Haschke</author>\n+  <maintainer email=\"rhaschke@techfak.uni-bielefeld.de\">Robert Haschke</maintainer>\n+\n+  <license>BSD</license>\n+\n+  <url type=\"website\">http://wiki.ros.org/py_binding_tools</url>\n+\n+  <buildtool_depend>catkin</buildtool_depend>\n+  <build_depend>pybind11_catkin</build_depend>\n+  <depend>geometry_msgs</depend>\n+  <depend>roscpp</depend>\n+\n+  <export>\n+  </export>\n+</package>"
+        },
+        {
+          "sha": "ea3edf8774b95824eb2ebd3d74d055f460d97314",
+          "filename": "src/py_binding_tools.cpp",
+          "status": "added",
+          "additions": 56,
+          "deletions": 0,
+          "changes": 56,
+          "blob_url": "https://github.com/moveit/py_binding_tools/blob/460000d4b15125fd38a432eb412f66bcf14b8cf7/src%2Fpy_binding_tools.cpp",
+          "raw_url": "https://github.com/moveit/py_binding_tools/raw/460000d4b15125fd38a432eb412f66bcf14b8cf7/src%2Fpy_binding_tools.cpp",
+          "contents_url": "https://api.github.com/repos/moveit/py_binding_tools/contents/src%2Fpy_binding_tools.cpp?ref=460000d4b15125fd38a432eb412f66bcf14b8cf7",
+          "patch": "@@ -0,0 +1,56 @@\n+/*********************************************************************\n+ * Software License Agreement (BSD License)\n+ *\n+ *  Copyright (c) 2020, Bielefeld University\n+ *  All rights reserved.\n+ *\n+ *  Redistribution and use in source and binary forms, with or without\n+ *  modification, are permitted provided that the following conditions\n+ *  are met:\n+ *\n+ *   * Redistributions of source code must retain the above copyright\n+ *     notice, this list of conditions and the following disclaimer.\n+ *   * Redistributions in binary form must reproduce the above\n+ *     copyright notice, this list of conditions and the following\n+ *     disclaimer in the documentation and/or other materials provided\n+ *     with the distribution.\n+ *   * Neither the name of Bielefeld University nor the names of its\n+ *     contributors may be used to endorse or promote products derived\n+ *     from this software without specific prior written permission.\n+ *\n+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n+ *  \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS\n+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\n+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,\n+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,\n+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\n+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN\n+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+ *  POSSIBILITY OF SUCH DAMAGE.\n+ *********************************************************************/\n+\n+#include <pybind11/pybind11.h>\n+#include <pybind11/stl.h>\n+#include <ros/init.h>\n+#include <py_binding_tools/roscpp_initializer.h>\n+\n+namespace py = pybind11;\n+using namespace py_binding_tools;\n+\n+PYBIND11_MODULE(py_binding_tools, m)\n+{\n+  m.doc() = \"C++ Python binding tools\";\n+\n+  py::enum_<ros::InitOption>(m, \"InitOption\")\n+      .value(\"AnonymousName\", ros::init_options::AnonymousName)\n+      .value(\"NoRosout\", ros::init_options::NoRosout);\n+\n+  m.def(\"roscpp_init\", &roscpp_init, \"Initialize C++ ROS\",\n+        py::arg(\"node_name\") = \"\",\n+        py::arg(\"remappings\") = std::map<std::string, std::string>(),\n+        py::arg(\"options\") = 0);\n+  m.def(\"roscpp_shutdown\", &roscpp_shutdown, \"Shutdown C++ ROS\");\n+}"
+        },
+        {
+          "sha": "7e8a27260851b7be6de48051e5321b761bc39e84",
+          "filename": "src/ros_msg_typecasters.cpp",
+          "status": "added",
+          "additions": 73,
+          "deletions": 0,
+          "changes": 73,
+          "blob_url": "https://github.com/moveit/py_binding_tools/blob/460000d4b15125fd38a432eb412f66bcf14b8cf7/src%2Fros_msg_typecasters.cpp",
+          "raw_url": "https://github.com/moveit/py_binding_tools/raw/460000d4b15125fd38a432eb412f66bcf14b8cf7/src%2Fros_msg_typecasters.cpp",
+          "contents_url": "https://api.github.com/repos/moveit/py_binding_tools/contents/src%2Fros_msg_typecasters.cpp?ref=460000d4b15125fd38a432eb412f66bcf14b8cf7",
+          "patch": "@@ -0,0 +1,73 @@\n+/*********************************************************************\n+ * Software License Agreement (BSD License)\n+ *\n+ *  Copyright (c) 2021, Robert Haschke\n+ *  All rights reserved.\n+ *\n+ *  Redistribution and use in source and binary forms, with or without\n+ *  modification, are permitted provided that the following conditions\n+ *  are met:\n+ *\n+ *   * Redistributions of source code must retain the above copyright\n+ *     notice, this list of conditions and the following disclaimer.\n+ *   * Redistributions in binary form must reproduce the above\n+ *     copyright notice, this list of conditions and the following\n+ *     disclaimer in the documentation and/or other materials provided\n+ *     with the distribution.\n+ *   * The name of Robert Haschke may not be used to endorse or promote\n+ *     products derived from this software without specific prior\n+ *     written permission.\n+ *\n+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n+ *  \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS\n+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\n+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,\n+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,\n+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\n+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN\n+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+ *  POSSIBILITY OF SUCH DAMAGE.\n+ *********************************************************************/\n+\n+/* Author: Robert Haschke */\n+\n+#include <py_binding_tools/ros_msg_typecasters.h>\n+\n+namespace py = pybind11;\n+namespace py_binding_tools\n+{\n+py::object createMessage(const std::string& ros_msg_name)\n+{\n+  // find delimiting '/' in ros msg name\n+  std::size_t pos = ros_msg_name.find('/');\n+  // import module\n+  py::module m = py::module::import((ros_msg_name.substr(0, pos) + \".msg\").c_str());\n+  // retrieve type instance\n+  py::object cls = m.attr(ros_msg_name.substr(pos + 1).c_str());\n+  // create message instance\n+  return cls();\n+}\n+\n+bool convertible(const pybind11::handle& h, const char* ros_msg_name)\n+{\n+  try\n+  {\n+    PyObject* o = h.attr(\"_type\").ptr();\n+    return py::cast<std::string>(o) == ros_msg_name;\n+  }\n+  catch (const std::exception& e)\n+  {\n+    return false;\n+  }\n+}\n+\n+void throwDeserializationError()\n+{\n+  py::object e = py::module::import(\"genpy\").attr(\"DeserializationError\")();\n+  PyErr_SetObject(e.get_type().ptr(), e.ptr());\n+  throw py::error_already_set();\n+}\n+}  // namespace py_binding_tools"
+        },
+        {
+          "sha": "b769c5471fc93ebc4259ab30e9c133a2e7c5c268",
+          "filename": "src/roscpp_initializer.cpp",
+          "status": "added",
+          "additions": 132,
+          "deletions": 0,
+          "changes": 132,
+          "blob_url": "https://github.com/moveit/py_binding_tools/blob/460000d4b15125fd38a432eb412f66bcf14b8cf7/src%2Froscpp_initializer.cpp",
+          "raw_url": "https://github.com/moveit/py_binding_tools/raw/460000d4b15125fd38a432eb412f66bcf14b8cf7/src%2Froscpp_initializer.cpp",
+          "contents_url": "https://api.github.com/repos/moveit/py_binding_tools/contents/src%2Froscpp_initializer.cpp?ref=460000d4b15125fd38a432eb412f66bcf14b8cf7",
+          "patch": "@@ -0,0 +1,132 @@\n+/*********************************************************************\n+ * Software License Agreement (BSD License)\n+ *\n+ *  Copyright (c) 2020, Bielefeld University\n+ *  All rights reserved.\n+ *\n+ *  Redistribution and use in source and binary forms, with or without\n+ *  modification, are permitted provided that the following conditions\n+ *  are met:\n+ *\n+ *   * Redistributions of source code must retain the above copyright\n+ *     notice, this list of conditions and the following disclaimer.\n+ *   * Redistributions in binary form must reproduce the above\n+ *     copyright notice, this list of conditions and the following\n+ *     disclaimer in the documentation and/or other materials provided\n+ *     with the distribution.\n+ *   * Neither the name of Bielefeld University nor the names of its\n+ *     contributors may be used to endorse or promote products derived\n+ *     from this software without specific prior written permission.\n+ *\n+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n+ *  \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS\n+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\n+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,\n+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,\n+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\n+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN\n+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+ *  POSSIBILITY OF SUCH DAMAGE.\n+ *********************************************************************/\n+\n+#include <memory>\n+#include <mutex>\n+\n+#include <py_binding_tools/roscpp_initializer.h>\n+#include <ros/init.h>\n+#include <ros/spinner.h>\n+#include <ros/this_node.h>\n+\n+namespace py_binding_tools\n+{\n+namespace\n+{\n+/// singleton class to initialize ROS C++ (once) from Python\n+struct InitProxy\n+{\n+  static void init(const std::string &node_name = \"\",\n+                   const std::map<std::string, std::string> &remappings = std::map<std::string, std::string>(),\n+                   uint32_t options = 0);\n+  static void reset(bool shutdown);\n+\n+  InitProxy(std::string node_name, const std::map<std::string, std::string>& remappings, uint32_t options)\n+  {\n+    if (node_name.empty())\n+    {\n+      node_name = \"python_wrapper\";\n+      options |= ros::init_options::AnonymousName;\n+    }\n+    usage = 0;\n+    if (!ros::isInitialized())\n+      ros::init(remappings, node_name, options | ros::init_options::NoSigintHandler);\n+    else\n+      ROS_WARN_STREAM(\"ros::init was already called by other means. node name: \" << ros::this_node::getName());\n+    spinner = std::make_unique<ros::AsyncSpinner>(1);\n+    spinner->start();\n+  }\n+  ~InitProxy()\n+  {\n+    spinner->stop();\n+    spinner.reset();\n+    if (ros::isInitialized() && !ros::isShuttingDown())\n+      ros::shutdown();\n+  }\n+\n+  static std::mutex mutex_;\n+  static std::unique_ptr<InitProxy> singleton_instance_;\n+  unsigned int usage;\n+  std::unique_ptr<ros::AsyncSpinner> spinner;\n+};\n+std::mutex InitProxy::mutex_;\n+std::unique_ptr<InitProxy> InitProxy::singleton_instance_;\n+}  // namespace\n+\n+void InitProxy::init(const std::string& node_name, const std::map<std::string, std::string>& remappings,\n+                     uint32_t options)\n+{\n+  std::unique_lock<std::mutex> lock(mutex_);\n+  if (!singleton_instance_)\n+    singleton_instance_ = std::make_unique<InitProxy>(node_name, remappings, options);\n+  else if (!node_name.empty())\n+    ROS_WARN(\"ROS C++ was initialized before with name '%s'.%s\", ros::this_node::getName().c_str(),\n+              remappings.empty() ? \"\" : \" Ignoring additional remappings.\");\n+  ++singleton_instance_->usage;\n+}\n+\n+void InitProxy::reset(bool shutdown)\n+{\n+  std::unique_lock<std::mutex> lock(mutex_);\n+  if (!singleton_instance_ || singleton_instance_->usage == 0)\n+    ROS_ERROR(\"Called roscpp_shutdown() without a matching call to roscpp_init()!\");\n+  else if (--singleton_instance_->usage == 0 && shutdown)\n+  {\n+    // shutdown silences any ROS logging\n+    ROS_WARN(\"It's not recommended to call roscpp_shutdown().\");\n+    singleton_instance_.reset();\n+  }\n+}\n+\n+ROScppInitializer::ROScppInitializer()\n+{\n+  InitProxy::init();\n+}\n+ROScppInitializer::~ROScppInitializer()\n+{\n+  InitProxy::reset(false);\n+}\n+\n+void roscpp_init(const std::string& node_name, const std::map<std::string, std::string>& remappings, uint32_t options)\n+{\n+  InitProxy::init(node_name, remappings, options);\n+}\n+\n+void roscpp_shutdown()\n+{\n+  // This might shutdown ROS C++, which will stop ROS logging!\n+  InitProxy::reset(true);\n+}\n+\n+}  // namespace py_binding_tools"
+        }
+      ]
+    },
+    {
+      "author": "Tobias-Fischer",
+      "date": "2026-07-14T10:03:27Z",
+      "sha": "0355ae9b9e831c01f3b73f6343586b1aaacd71fd",
+      "message": "Rename module -> module_ for C++20 compatibility (#11)",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b85fd21cb3f30490b007885bb4fb47ce7946432f",
+          "filename": "include/py_binding_tools/ros_msg_typecasters.h",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/moveit/py_binding_tools/blob/0355ae9b9e831c01f3b73f6343586b1aaacd71fd/include%2Fpy_binding_tools%2Fros_msg_typecasters.h",
+          "raw_url": "https://github.com/moveit/py_binding_tools/raw/0355ae9b9e831c01f3b73f6343586b1aaacd71fd/include%2Fpy_binding_tools%2Fros_msg_typecasters.h",
+          "contents_url": "https://api.github.com/repos/moveit/py_binding_tools/contents/include%2Fpy_binding_tools%2Fros_msg_typecasters.h?ref=0355ae9b9e831c01f3b73f6343586b1aaacd71fd",
+          "patch": "@@ -102,7 +102,7 @@ struct type_caster<rclcpp::Time>\n   // convert from rclcpp::Time to rclpy::Time\n   static handle cast(const rclcpp::Time& src, return_value_policy /* policy */, handle /* parent */)\n   {\n-    object Time = module::import(\"rclpy.time\").attr(\"Time\");\n+    object Time = module_::import(\"rclpy.time\").attr(\"Time\");\n     object ClockType = Time().attr(\"clock_type\").attr(\"__class__\");\n \n     return Time(arg(\"nanoseconds\") = src.nanoseconds(),\n@@ -131,7 +131,7 @@ struct RosMsgTypeCaster\n     object cls = py_binding_tools::createMessageClass(rosidl_generator_traits::name<T>());\n \n     // deserialize into python object\n-    module rclpy = module::import(\"rclpy.serialization\");\n+    module_ rclpy = module_::import(\"rclpy.serialization\");\n     object msg = rclpy.attr(\"deserialize_message\")(buf, cls);\n \n     return msg.release();\n@@ -145,7 +145,7 @@ struct RosMsgTypeCaster\n       return false;\n \n     // serialize src into python buffer\n-    module rclpy = module::import(\"rclpy.serialization\");\n+    module_ rclpy = module_::import(\"rclpy.serialization\");\n     bytes buf = rclpy.attr(\"serialize_message\")(src);\n \n     // deserialize into C++ object"
+        }
+      ]
+    },
+    {
+      "author": "mosfet80",
+      "date": "2025-11-27T10:35:17Z",
+      "sha": "8893f94ccf61e4bd9fcbaa716a72a38f793343c7",
+      "message": "Removed deprecated pybind_vendor (#9)",
+      "files_changed": 2,
+      "additions": 1,
+      "deletions": 2,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "aee2f26a5ec6ba2ed888a7c1919306e0b26d3e4f",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 1,
+          "changes": 1,
+          "blob_url": "https://github.com/moveit/py_binding_tools/blob/8893f94ccf61e4bd9fcbaa716a72a38f793343c7/CMakeLists.txt",
+          "raw_url": "https://github.com/moveit/py_binding_tools/raw/8893f94ccf61e4bd9fcbaa716a72a38f793343c7/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/moveit/py_binding_tools/contents/CMakeLists.txt?ref=8893f94ccf61e4bd9fcbaa716a72a38f793343c7",
+          "patch": "@@ -6,7 +6,6 @@ find_package(ament_cmake_python REQUIRED)\n find_package(rclcpp REQUIRED)\n find_package(geometry_msgs REQUIRED)\n find_package(Python3 REQUIRED COMPONENTS Interpreter Development)\n-find_package(pybind11_vendor REQUIRED)\n find_package(pybind11 REQUIRED)\n \n add_library(${PROJECT_NAME} SHARED"
+        },
+        {
+          "sha": "1cb347d7f7e5a91a714b33040c4952490e121a7d",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/moveit/py_binding_tools/blob/8893f94ccf61e4bd9fcbaa716a72a38f793343c7/package.xml",
+          "raw_url": "https://github.com/moveit/py_binding_tools/raw/8893f94ccf61e4bd9fcbaa716a72a38f793343c7/package.xml",
+          "contents_url": "https://api.github.com/repos/moveit/py_binding_tools/contents/package.xml?ref=8893f94ccf61e4bd9fcbaa716a72a38f793343c7",
+          "patch": "@@ -14,7 +14,7 @@\n   <buildtool_depend>ament_cmake</buildtool_depend>\n   <buildtool_depend>ament_cmake_python</buildtool_depend>\n \n-  <depend>pybind11_vendor</depend>\n+  <depend>pybind11-dev</depend>\n   <depend>geometry_msgs</depend>\n   <depend>rclcpp</depend>\n "
+        }
+      ]
+    }
+  ]
+}

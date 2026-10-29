@@ -1,0 +1,251 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T05:10:29Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "HebiRobotics",
+    "repo": "hebi_msgs"
+  },
+  "data": [
+    {
+      "author": "hr1799",
+      "date": "2023-06-06T14:21:07Z",
+      "sha": "401b2a295c52faedc29198496e65e21aa9801bc7",
+      "message": "HEBI messages package (made for ROS 2)",
+      "files_changed": 16,
+      "additions": 158,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "131bacacd21524ab6992b1a594ed7de40d493bb4",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 58,
+          "deletions": 0,
+          "changes": 58,
+          "blob_url": "https://github.com/HebiRobotics/hebi_msgs/blob/401b2a295c52faedc29198496e65e21aa9801bc7/CMakeLists.txt",
+          "raw_url": "https://github.com/HebiRobotics/hebi_msgs/raw/401b2a295c52faedc29198496e65e21aa9801bc7/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/HebiRobotics/hebi_msgs/contents/CMakeLists.txt?ref=401b2a295c52faedc29198496e65e21aa9801bc7",
+          "patch": "@@ -0,0 +1,58 @@\n+cmake_minimum_required(VERSION 3.5)\n+project(hebi_msgs)\n+\n+if(NOT CMAKE_CXX_STANDARD)\n+  set(CMAKE_CXX_STANDARD 14)\n+endif()\n+set(CMAKE_CXX_STANDARD_REQUIRED ON)\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  add_compile_options(-Wall -Wextra -Wpedantic)\n+endif()\n+\n+# find dependencies\n+find_package(ament_cmake REQUIRED)\n+find_package(Eigen3)\n+find_package(geometry_msgs REQUIRED)\n+\n+find_package(rosidl_default_generators REQUIRED)\n+rosidl_generate_interfaces(${PROJECT_NAME}\n+  \"msg/EndPath.msg\"\n+  \"msg/FlipperVelocityCommand.msg\"\n+  \"msg/OffsetPlayback.msg\"\n+  \"msg/Playback.msg\"\n+  \"msg/SaveWaypoint.msg\"\n+  \"msg/StartPath.msg\"\n+  \"msg/TargetWaypoints.msg\"\n+  \"msg/TreadedBaseState.msg\"\n+\n+  \"srv/SetCommandLifetime.srv\"\n+  \"srv/SetFeedbackFrequency.srv\"\n+  \"srv/SetGains.srv\"\n+  \"srv/SetIKSeed.srv\"\n+\n+  \"action/ArmMotion.action\"\n+  \"action/BaseMotion.action\"\n+\n+  DEPENDENCIES\n+  geometry_msgs\n+)\n+\n+install(DIRECTORY\n+  action\n+  msg\n+  srv\n+  DESTINATION share/${PROJECT_NAME})\n+\n+if(BUILD_TESTING)\n+  find_package(ament_lint_auto REQUIRED)\n+  # the following line skips the linter which checks for copyrights\n+  # comment the line when a copyright and license is added to all source files\n+  set(ament_cmake_copyright_FOUND TRUE)\n+  # the following line skips cpplint (only works in a git repo)\n+  # comment the line when this package is in a git repo and when\n+  # a copyright and license is added to all source files\n+  set(ament_cmake_cpplint_FOUND TRUE)\n+  ament_lint_auto_find_test_dependencies()\n+endif()\n+\n+ament_package()"
+        },
+        {
+          "sha": "bd5c9a71e9bf0a2e9a3c4c52aee123f193fcbc73",
+          "filename": "action/ArmMotion.action",
+          "status": "added",
+          "additions": 16,
+          "deletions": 0,
+          "changes": 16,
+          "blob_url": "https://github.com/HebiRobotics/hebi_msgs/blob/401b2a295c52faedc29198496e65e21aa9801bc7/action%2FArmMotion.action",
+          "raw_url": "https://github.com/HebiRobotics/hebi_msgs/raw/401b2a295c52faedc29198496e65e21aa9801bc7/action%2FArmMotion.action",
+          "contents_url": "https://api.github.com/repos/HebiRobotics/hebi_msgs/contents/action%2FArmMotion.action?ref=401b2a295c52faedc29198496e65e21aa9801bc7",
+          "patch": "@@ -0,0 +1,16 @@\n+# Goal position:\n+float64[] x\n+float64[] y\n+float64[] z\n+float64[] tipx\n+float64[] tipy\n+float64[] tipz\n+\n+# Optionally, set a color when doing the move; otherwise, clear the color.\n+bool set_color\n+uint8 r\n+uint8 g\n+uint8 b\n+---\n+---\n+float64 percent_complete"
+        },
+        {
+          "sha": "1fbfd6cc880e8bef02d10811d7418999587cec62",
+          "filename": "action/BaseMotion.action",
+          "status": "added",
+          "additions": 14,
+          "deletions": 0,
+          "changes": 14,
+          "blob_url": "https://github.com/HebiRobotics/hebi_msgs/blob/401b2a295c52faedc29198496e65e21aa9801bc7/action%2FBaseMotion.action",
+          "raw_url": "https://github.com/HebiRobotics/hebi_msgs/raw/401b2a295c52faedc29198496e65e21aa9801bc7/action%2FBaseMotion.action",
+          "contents_url": "https://api.github.com/repos/HebiRobotics/hebi_msgs/contents/action%2FBaseMotion.action?ref=401b2a295c52faedc29198496e65e21aa9801bc7",
+          "patch": "@@ -0,0 +1,14 @@\n+# Goal position (relative to start)\n+float64 x\n+float64 y\n+float64 theta\n+\n+# Optionally, set a color when doing the move; otherwise, clear the color.\n+bool set_color\n+uint8 r\n+uint8 g\n+uint8 b\n+---\n+bool success\n+---\n+float64 percent_complete"
+        },
+        {
+          "sha": "8d5962b78058c51b085d36ce5f841c4ab0b51b44",
+          "filename": "msg/EndPath.msg",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/HebiRobotics/hebi_msgs/blob/401b2a295c52faedc29198496e65e21aa9801bc7/msg%2FEndPath.msg",
+          "raw_url": "https://github.com/HebiRobotics/hebi_msgs/raw/401b2a295c52faedc29198496e65e21aa9801bc7/msg%2FEndPath.msg",
+          "contents_url": "https://api.github.com/repos/HebiRobotics/hebi_msgs/contents/msg%2FEndPath.msg?ref=401b2a295c52faedc29198496e65e21aa9801bc7",
+          "patch": "@@ -0,0 +1,2 @@\n+string name\n+"
+        },
+        {
+          "sha": "18c5ab2dd68afc2b5084d6c97717fe18ec4bc4e8",
+          "filename": "msg/FlipperVelocityCommand.msg",
+          "status": "added",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/HebiRobotics/hebi_msgs/blob/401b2a295c52faedc29198496e65e21aa9801bc7/msg%2FFlipperVelocityCommand.msg",
+          "raw_url": "https://github.com/HebiRobotics/hebi_msgs/raw/401b2a295c52faedc29198496e65e21aa9801bc7/msg%2FFlipperVelocityCommand.msg",
+          "contents_url": "https://api.github.com/repos/HebiRobotics/hebi_msgs/contents/msg%2FFlipperVelocityCommand.msg?ref=401b2a295c52faedc29198496e65e21aa9801bc7",
+          "patch": "@@ -0,0 +1,5 @@\n+# All values in m/s\n+float64 front_left\n+float64 front_right\n+float64 back_left\n+float64 back_right\n\\ No newline at end of file"
+        },
+        {
+          "sha": "152b9eb6e55b7688406434b1b4ae705a0c60e6c1",
+          "filename": "msg/OffsetPlayback.msg",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/HebiRobotics/hebi_msgs/blob/401b2a295c52faedc29198496e65e21aa9801bc7/msg%2FOffsetPlayback.msg",
+          "raw_url": "https://github.com/HebiRobotics/hebi_msgs/raw/401b2a295c52faedc29198496e65e21aa9801bc7/msg%2FOffsetPlayback.msg",
+          "contents_url": "https://api.github.com/repos/HebiRobotics/hebi_msgs/contents/msg%2FOffsetPlayback.msg?ref=401b2a295c52faedc29198496e65e21aa9801bc7",
+          "patch": "@@ -0,0 +1,2 @@\n+geometry_msgs/Point offset\n+"
+        },
+        {
+          "sha": "5a998528ac6ab4417bfe55e263c71a5c39740e7e",
+          "filename": "msg/Playback.msg",
+          "status": "added",
+          "additions": 12,
+          "deletions": 0,
+          "changes": 12,
+          "blob_url": "https://github.com/HebiRobotics/hebi_msgs/blob/401b2a295c52faedc29198496e65e21aa9801bc7/msg%2FPlayback.msg",
+          "raw_url": "https://github.com/HebiRobotics/hebi_msgs/raw/401b2a295c52faedc29198496e65e21aa9801bc7/msg%2FPlayback.msg",
+          "contents_url": "https://api.github.com/repos/HebiRobotics/hebi_msgs/contents/msg%2FPlayback.msg?ref=401b2a295c52faedc29198496e65e21aa9801bc7",
+          "patch": "@@ -0,0 +1,12 @@\n+# The name of the waypoint or path\n+string name\n+# If string not given, can playback by index instead\n+int16 index\n+\n+# Playback modes\n+int16 GO_TO_WAYPOINT = 0 # Go to a named or numbered waypoint\n+int16 GO_TO_PATH_START = 1 # Go to the start point of the path\n+int16 PLAY_PATH = 2 # Play path at offset & reset offset\n+int16 NUM_MODES = 3 # Total number of available modes; this is an invalid mode selection!\n+# Select playback mode\n+int16 mode"
+        },
+        {
+          "sha": "ac4c27dc2a1886c5561a41daafc9803720496d35",
+          "filename": "msg/SaveWaypoint.msg",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/HebiRobotics/hebi_msgs/blob/401b2a295c52faedc29198496e65e21aa9801bc7/msg%2FSaveWaypoint.msg",
+          "raw_url": "https://github.com/HebiRobotics/hebi_msgs/raw/401b2a295c52faedc29198496e65e21aa9801bc7/msg%2FSaveWaypoint.msg",
+          "contents_url": "https://api.github.com/repos/HebiRobotics/hebi_msgs/contents/msg%2FSaveWaypoint.msg?ref=401b2a295c52faedc29198496e65e21aa9801bc7",
+          "patch": "@@ -0,0 +1 @@\n+string name\n\\ No newline at end of file"
+        },
+        {
+          "sha": "ac4c27dc2a1886c5561a41daafc9803720496d35",
+          "filename": "msg/StartPath.msg",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/HebiRobotics/hebi_msgs/blob/401b2a295c52faedc29198496e65e21aa9801bc7/msg%2FStartPath.msg",
+          "raw_url": "https://github.com/HebiRobotics/hebi_msgs/raw/401b2a295c52faedc29198496e65e21aa9801bc7/msg%2FStartPath.msg",
+          "contents_url": "https://api.github.com/repos/HebiRobotics/hebi_msgs/contents/msg%2FStartPath.msg?ref=401b2a295c52faedc29198496e65e21aa9801bc7",
+          "patch": "@@ -0,0 +1 @@\n+string name\n\\ No newline at end of file"
+        },
+        {
+          "sha": "73f7faa01536a1cfcd8620644102481c08da1535",
+          "filename": "msg/TargetWaypoints.msg",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/HebiRobotics/hebi_msgs/blob/401b2a295c52faedc29198496e65e21aa9801bc7/msg%2FTargetWaypoints.msg",
+          "raw_url": "https://github.com/HebiRobotics/hebi_msgs/raw/401b2a295c52faedc29198496e65e21aa9801bc7/msg%2FTargetWaypoints.msg",
+          "contents_url": "https://api.github.com/repos/HebiRobotics/hebi_msgs/contents/msg%2FTargetWaypoints.msg?ref=401b2a295c52faedc29198496e65e21aa9801bc7",
+          "patch": "@@ -0,0 +1,2 @@\n+geometry_msgs/Point[] waypoints_vector\n+"
+        },
+        {
+          "sha": "4e60a90c6f9b4d5d49ddab21b2fb2d91b8552667",
+          "filename": "msg/TreadedBaseState.msg",
+          "status": "added",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/HebiRobotics/hebi_msgs/blob/401b2a295c52faedc29198496e65e21aa9801bc7/msg%2FTreadedBaseState.msg",
+          "raw_url": "https://github.com/HebiRobotics/hebi_msgs/raw/401b2a295c52faedc29198496e65e21aa9801bc7/msg%2FTreadedBaseState.msg",
+          "contents_url": "https://api.github.com/repos/HebiRobotics/hebi_msgs/contents/msg%2FTreadedBaseState.msg?ref=401b2a295c52faedc29198496e65e21aa9801bc7",
+          "patch": "@@ -0,0 +1,8 @@\n+string message\n+# are the flippers locked together for command purposes\n+bool flippers_locked\n+# are the flippers currently aligned\n+bool flippers_aligned\n+bool flipper_trajectory_active\n+bool base_trajectory_active\n+bool mstop_pressed\n\\ No newline at end of file"
+        },
+        {
+          "sha": "f03aed3489807f0dbf871e6988ab7122300290d2",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 27,
+          "deletions": 0,
+          "changes": 27,
+          "blob_url": "https://github.com/HebiRobotics/hebi_msgs/blob/401b2a295c52faedc29198496e65e21aa9801bc7/package.xml",
+          "raw_url": "https://github.com/HebiRobotics/hebi_msgs/raw/401b2a295c52faedc29198496e65e21aa9801bc7/package.xml",
+          "contents_url": "https://api.github.com/repos/HebiRobotics/hebi_msgs/contents/package.xml?ref=401b2a295c52faedc29198496e65e21aa9801bc7",
+          "patch": "@@ -0,0 +1,27 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n+  <name>hebi_msgs</name>\n+  <version>1.0.0</version>\n+  <description>HEBI messages</description>\n+  <maintainer email=\"hariharan@hebirobotics.com\">Hariharan Ravichandran</maintainer>\n+  <license>MIT</license>\n+\n+  <author email=\"hariharan@hebirobotics.com\">Hariharan Ravichandran</author>\n+\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+\n+  <build_depend>eigen</build_depend>\n+\n+  <depend>geometry_msgs</depend>\n+  <buildtool_depend>rosidl_default_generators</buildtool_depend>\n+  <exec_depend>rosidl_default_runtime</exec_depend>\n+  <member_of_group>rosidl_interface_packages</member_of_group>\n+\n+  <test_depend>ament_lint_auto</test_depend>\n+  <test_depend>ament_lint_common</test_depend>\n+\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n+</package>"
+        },
+        {
+          "sha": "aa5a9c5a118b67c5dbff9d388fb3b8b6106e5c70",
+          "filename": "srv/SetCommandLifetime.srv",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/HebiRobotics/hebi_msgs/blob/401b2a295c52faedc29198496e65e21aa9801bc7/srv%2FSetCommandLifetime.srv",
+          "raw_url": "https://github.com/HebiRobotics/hebi_msgs/raw/401b2a295c52faedc29198496e65e21aa9801bc7/srv%2FSetCommandLifetime.srv",
+          "contents_url": "https://api.github.com/repos/HebiRobotics/hebi_msgs/contents/srv%2FSetCommandLifetime.srv?ref=401b2a295c52faedc29198496e65e21aa9801bc7",
+          "patch": "@@ -0,0 +1,2 @@\n+builtin_interfaces/Duration lifetime\n+---"
+        },
+        {
+          "sha": "1da0c6c4225576291483b1bb5bce83f288b0a6d1",
+          "filename": "srv/SetFeedbackFrequency.srv",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/HebiRobotics/hebi_msgs/blob/401b2a295c52faedc29198496e65e21aa9801bc7/srv%2FSetFeedbackFrequency.srv",
+          "raw_url": "https://github.com/HebiRobotics/hebi_msgs/raw/401b2a295c52faedc29198496e65e21aa9801bc7/srv%2FSetFeedbackFrequency.srv",
+          "contents_url": "https://api.github.com/repos/HebiRobotics/hebi_msgs/contents/srv%2FSetFeedbackFrequency.srv?ref=401b2a295c52faedc29198496e65e21aa9801bc7",
+          "patch": "@@ -0,0 +1,2 @@\n+float64 frequency_hz\n+---"
+        },
+        {
+          "sha": "cbe5e5972cde28e51cc5f161dbc5942fbf392457",
+          "filename": "srv/SetGains.srv",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/HebiRobotics/hebi_msgs/blob/401b2a295c52faedc29198496e65e21aa9801bc7/srv%2FSetGains.srv",
+          "raw_url": "https://github.com/HebiRobotics/hebi_msgs/raw/401b2a295c52faedc29198496e65e21aa9801bc7/srv%2FSetGains.srv",
+          "contents_url": "https://api.github.com/repos/HebiRobotics/hebi_msgs/contents/srv%2FSetGains.srv?ref=401b2a295c52faedc29198496e65e21aa9801bc7",
+          "patch": "@@ -0,0 +1,4 @@\n+string gains_package\n+string gains_file\n+---\n+"
+        },
+        {
+          "sha": "334f7ba66fc0df1eea7a1ed968864e6f2128e42a",
+          "filename": "srv/SetIKSeed.srv",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/HebiRobotics/hebi_msgs/blob/401b2a295c52faedc29198496e65e21aa9801bc7/srv%2FSetIKSeed.srv",
+          "raw_url": "https://github.com/HebiRobotics/hebi_msgs/raw/401b2a295c52faedc29198496e65e21aa9801bc7/srv%2FSetIKSeed.srv",
+          "contents_url": "https://api.github.com/repos/HebiRobotics/hebi_msgs/contents/srv%2FSetIKSeed.srv?ref=401b2a295c52faedc29198496e65e21aa9801bc7",
+          "patch": "@@ -0,0 +1,2 @@\n+float64[] seed\n+---"
+        }
+      ]
+    },
+    {
+      "author": "GogiPuttar",
+      "date": "2024-06-24T16:35:31Z",
+      "sha": "19029e344315015f49f07799fa88f6ddf6cd6b59",
+      "message": "Added new message type for hybrid motion-force control of arm",
+      "files_changed": 2,
+      "additions": 7,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "40de0d8049b1d7a7918136d8c47dc22fc78af4e0",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/HebiRobotics/hebi_msgs/blob/19029e344315015f49f07799fa88f6ddf6cd6b59/CMakeLists.txt",
+          "raw_url": "https://github.com/HebiRobotics/hebi_msgs/raw/19029e344315015f49f07799fa88f6ddf6cd6b59/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/HebiRobotics/hebi_msgs/contents/CMakeLists.txt?ref=19029e344315015f49f07799fa88f6ddf6cd6b59",
+          "patch": "@@ -22,6 +22,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}\n \n   \"msg/TreadedBaseState.msg\"\n   \"msg/FlipperVelocityCommand.msg\"\n+  \"msg/ArmHybridControl.msg\"\n \n   DEPENDENCIES\n   geometry_msgs"
+        },
+        {
+          "sha": "a18ad3571ea60fb047a8b8de7abaa44e6377700f",
+          "filename": "msg/ArmHybridControl.msg",
+          "status": "added",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/HebiRobotics/hebi_msgs/blob/19029e344315015f49f07799fa88f6ddf6cd6b59/msg%2FArmHybridControl.msg",
+          "raw_url": "https://github.com/HebiRobotics/hebi_msgs/raw/19029e344315015f49f07799fa88f6ddf6cd6b59/msg%2FArmHybridControl.msg",
+          "contents_url": "https://api.github.com/repos/HebiRobotics/hebi_msgs/contents/msg%2FArmHybridControl.msg?ref=19029e344315015f49f07799fa88f6ddf6cd6b59",
+          "patch": "@@ -0,0 +1,6 @@\n+# ArmHybridControl.msg\n+# For hybrid motion-force control of arm\n+# Axes with zero wrench elements will use pose control, while axes with non-zero wrench elements will use force control.\n+geometry_msgs/Pose pose # pose values of force control axes are irrelevant\n+geometry_msgs/Twist twist # currently not utilized\n+geometry_msgs/Wrench wrench # non-zero and zero for force control and position control, respectively\n\\ No newline at end of file"
+        }
+      ]
+    }
+  ]
+}

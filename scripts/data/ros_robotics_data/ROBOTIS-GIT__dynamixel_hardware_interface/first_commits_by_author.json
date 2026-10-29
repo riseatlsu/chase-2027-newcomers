@@ -1,0 +1,215 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T04:56:14Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ROBOTIS-GIT",
+    "repo": "dynamixel_hardware_interface"
+  },
+  "data": [
+    {
+      "author": "sunghowoo",
+      "date": "2024-08-26T06:53:04Z",
+      "sha": "60e0f8d2a43b8f7404324b110de34b71589701d1",
+      "message": "modified gripper model config",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 5,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "f922f9d93b34f012cd59a62a83be4dd26785a46b",
+          "filename": "dynamixel_hardware_interface/param/dxl_model/rh_p12_rn.model",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 5,
+          "changes": 10,
+          "blob_url": "https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface/blob/60e0f8d2a43b8f7404324b110de34b71589701d1/dynamixel_hardware_interface%2Fparam%2Fdxl_model%2Frh_p12_rn.model",
+          "raw_url": "https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface/raw/60e0f8d2a43b8f7404324b110de34b71589701d1/dynamixel_hardware_interface%2Fparam%2Fdxl_model%2Frh_p12_rn.model",
+          "contents_url": "https://api.github.com/repos/ROBOTIS-GIT/dynamixel_hardware_interface/contents/dynamixel_hardware_interface%2Fparam%2Fdxl_model%2Frh_p12_rn.model?ref=60e0f8d2a43b8f7404324b110de34b71589701d1",
+          "patch": "@@ -1,10 +1,10 @@\n [type info]\n name\tvalue\n-value_of_zero_radian_position\t370\n-value_of_max_radian_position\t0\n-value_of_min_radian_position\t740\n-min_radian\t-54.5\n-max_radian\t54.5\n+value_of_zero_radian_position\t0\n+value_of_max_radian_position\t740\n+value_of_min_radian_position\t0\n+min_radian\t0.0\n+max_radian\t1.099\n \n [control table]\n Address\tSize\tData Name"
+        }
+      ]
+    },
+    {
+      "author": "yun-goon",
+      "date": "2025-02-17T07:16:11Z",
+      "sha": "c83f82de5539b20cfa29f0a135ac688433df3546",
+      "message": "Added ci, lint\n\nSigned-off-by: Wonho Yun <ywh@robotis.com>",
+      "files_changed": 2,
+      "additions": 58,
+      "deletions": 14,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "fb2fe51e756eb135b3a864e77946fb894e9d7499",
+          "filename": ".github/workflows/ros-ci.yml",
+          "status": "modified",
+          "additions": 26,
+          "deletions": 14,
+          "changes": 40,
+          "blob_url": "https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface/blob/c83f82de5539b20cfa29f0a135ac688433df3546/.github%2Fworkflows%2Fros-ci.yml",
+          "raw_url": "https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface/raw/c83f82de5539b20cfa29f0a135ac688433df3546/.github%2Fworkflows%2Fros-ci.yml",
+          "contents_url": "https://api.github.com/repos/ROBOTIS-GIT/dynamixel_hardware_interface/contents/.github%2Fworkflows%2Fros-ci.yml?ref=c83f82de5539b20cfa29f0a135ac688433df3546",
+          "patch": "@@ -1,45 +1,57 @@\n-name: ros-ci\n+# The name of the workflow\n+name: CI\n \n-# Controls when the action will run. Triggers the workflow on push or pull request\n+# Specifies the events that trigger the workflow\n on:\n   push:\n-    branches: [ humble ]\n+    branches: [ main, humble ]\n   pull_request:\n-    branches: [ humble ]\n+    branches: [ main, humble ]\n \n-# A workflow run is made up of one or more jobs that can run sequentially or in parallel\n+# Defines a set of jobs to be run as part of the workflow\n jobs:\n-  humble:\n+  # The name of the job\n+  ROS_CI:\n     runs-on: ubuntu-22.04\n     strategy:\n       fail-fast: false\n       matrix:\n         ros_distribution:\n           - humble\n+          # - jazzy\n+          # - rolling\n         include:\n+          # ROS 2 Humble Hawksbill\n           - docker_image: ubuntu:jammy\n             ros_distribution: humble\n             ros_version: 2\n-          #   # Rolling\n-          # - docker_image: ubuntu:jammy\n+          # ROS 2 Jazzy Jalisco\n+          # - docker_image: ubuntu:noble\n+          #   ros_distribution: jazzy\n+          #   ros_version: 2\n+          # ROS 2 Rolling Ridley\n+          # - docker_image: ubuntu:noble\n           #   ros_distribution: rolling\n           #   ros_version: 2\n     container:\n       image: ${{ matrix.docker_image }}\n     steps:\n-      - name: Setup directories\n+      - name: Setup workspace\n         run: mkdir -p ros_ws/src\n-      - name: checkout\n-        uses: actions/checkout@v3\n+\n+      - name: Checkout code\n+        uses: actions/checkout@v4\n         with:\n           path: ros_ws/src\n+\n       - name: Setup ROS environment\n-        uses: ros-tooling/setup-ros@0.7.1\n+        uses: ros-tooling/setup-ros@v0.7\n         with:\n           required-ros-distributions: ${{ matrix.ros_distribution }}\n+\n       - name: Build and Test\n-        uses: ros-tooling/action-ros-ci@0.3.5\n+        uses: ros-tooling/action-ros-ci@v0.3\n         with:\n-          package-name: dynamixel_hardware_interface\n           target-ros2-distro: ${{ matrix.ros_distribution }}\n           vcs-repo-file-url: \"https://raw.githubusercontent.com/ROBOTIS-GIT/dynamixel_hardware_interface/main/dynamixel_hardware_interface_ci.repos\"\n+          package-name: dynamixel_hardware_interface"
+        },
+        {
+          "sha": "c6eb5be18e2c5bc2e91cfec4753432b4b6a2080c",
+          "filename": ".github/workflows/ros-lint.yml",
+          "status": "added",
+          "additions": 32,
+          "deletions": 0,
+          "changes": 32,
+          "blob_url": "https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface/blob/c83f82de5539b20cfa29f0a135ac688433df3546/.github%2Fworkflows%2Fros-lint.yml",
+          "raw_url": "https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface/raw/c83f82de5539b20cfa29f0a135ac688433df3546/.github%2Fworkflows%2Fros-lint.yml",
+          "contents_url": "https://api.github.com/repos/ROBOTIS-GIT/dynamixel_hardware_interface/contents/.github%2Fworkflows%2Fros-lint.yml?ref=c83f82de5539b20cfa29f0a135ac688433df3546",
+          "patch": "@@ -0,0 +1,32 @@\n+# The name of the workflow\n+name: Lint\n+\n+# Specifies the events that trigger the workflow\n+on:\n+  pull_request:\n+\n+# Defines a set of jobs to be run as part of the workflow\n+jobs:\n+  ament_lint:\n+    runs-on: ubuntu-latest\n+    container:\n+      image: rostooling/setup-ros-docker:ubuntu-noble-ros-rolling-ros-base-latest\n+    strategy:\n+      fail-fast: false\n+      matrix:\n+        linter: [cppcheck, cpplint, uncrustify, flake8, pep257, lint_cmake, xmllint, copyright]\n+    steps:\n+      - name: Checkout code\n+        uses: actions/checkout@v4\n+\n+      - name: Setup ROS environment\n+        uses: ros-tooling/setup-ros@v0.7\n+\n+      - name: Run Linter\n+        env:\n+          AMENT_CPPCHECK_ALLOW_SLOW_VERSIONS: 1\n+        uses: ros-tooling/action-ros-lint@master\n+        with:\n+          linter: ${{ matrix.linter }}\n+          distribution: rolling\n+          package-name: \"*\""
+        }
+      ]
+    },
+    {
+      "author": "Woojin-Crive",
+      "date": "2024-12-12T11:04:08Z",
+      "sha": "5ae50d9a49c362c50dfa7eaa41cb50fc4843b91b",
+      "message": "Support 'Goal Current' control for OpenMANIPULATOR-Y:\n- Added new models: xh540_w150 and xc330_t288.\n- Introduced torque constant parameter in relevant functions.",
+      "files_changed": 5,
+      "additions": 26,
+      "deletions": 11,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "a7dc825eec923247ffca3cde1408ec78a41488c9",
+          "filename": "include/dynamixel_hardware_interface/dynamixel/dynamixel_info.hpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface/blob/5ae50d9a49c362c50dfa7eaa41cb50fc4843b91b/include%2Fdynamixel_hardware_interface%2Fdynamixel%2Fdynamixel_info.hpp",
+          "raw_url": "https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface/raw/5ae50d9a49c362c50dfa7eaa41cb50fc4843b91b/include%2Fdynamixel_hardware_interface%2Fdynamixel%2Fdynamixel_info.hpp",
+          "contents_url": "https://api.github.com/repos/ROBOTIS-GIT/dynamixel_hardware_interface/contents/include%2Fdynamixel_hardware_interface%2Fdynamixel%2Fdynamixel_info.hpp?ref=5ae50d9a49c362c50dfa7eaa41cb50fc4843b91b",
+          "patch": "@@ -78,7 +78,8 @@ class DynamixelInfo\n     int32_t & value_of_max_radian_position,\n     int32_t & value_of_min_radian_position,\n     double & min_radian,\n-    double & max_radian);\n+    double & max_radian,\n+    double & torque_constant);\n   int32_t ConvertRadianToValue(uint8_t id, double radian);\n   double ConvertValueToRadian(uint8_t id, int32_t value);\n   inline int16_t ConvertEffortToCurrent(uint8_t id, double effort)"
+        },
+        {
+          "sha": "5fc691aabb3821a0d6497cd941ff07bd5e356ef7",
+          "filename": "include/dynamixel_hardware_interface/dynamixel_hardware_interface.hpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface/blob/5ae50d9a49c362c50dfa7eaa41cb50fc4843b91b/include%2Fdynamixel_hardware_interface%2Fdynamixel_hardware_interface.hpp",
+          "raw_url": "https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface/raw/5ae50d9a49c362c50dfa7eaa41cb50fc4843b91b/include%2Fdynamixel_hardware_interface%2Fdynamixel_hardware_interface.hpp",
+          "contents_url": "https://api.github.com/repos/ROBOTIS-GIT/dynamixel_hardware_interface/contents/include%2Fdynamixel_hardware_interface%2Fdynamixel_hardware_interface.hpp?ref=5ae50d9a49c362c50dfa7eaa41cb50fc4843b91b",
+          "patch": "@@ -47,6 +47,10 @@\n #define PRESENT_VELOCITY_INDEX 1\n #define PRESENT_EFFORT_INDEX 2\n \n+#define GOAL_POSITION_INDEX 0\n+// #define GOAL_VELOCITY_INDEX 1  // TODO: to be implemented\n+#define GOAL_CURRENT_INDEX 1\n+\n namespace dynamixel_hardware_interface\n {\n "
+        },
+        {
+          "sha": "70bc683256abd5a5424e9a432f5f69d96c6adaf0",
+          "filename": "src/dynamixel/dynamixel.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface/blob/5ae50d9a49c362c50dfa7eaa41cb50fc4843b91b/src%2Fdynamixel%2Fdynamixel.cpp",
+          "raw_url": "https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface/raw/5ae50d9a49c362c50dfa7eaa41cb50fc4843b91b/src%2Fdynamixel%2Fdynamixel.cpp",
+          "contents_url": "https://api.github.com/repos/ROBOTIS-GIT/dynamixel_hardware_interface/contents/src%2Fdynamixel%2Fdynamixel.cpp?ref=5ae50d9a49c362c50dfa7eaa41cb50fc4843b91b",
+          "patch": "@@ -840,7 +840,7 @@ DxlError Dynamixel::GetDxlValueFromSyncRead()\n           dxl_info_.ConvertValueRPMToVelocityRPS(ID, static_cast<int32_t>(dxl_getdata));\n       } else if (indirect_info_read_[ID].item_name.at(item_index) == \"Present Current\") {\n         *it_read_data.item_data_ptr_vec.at(item_index) =\n-          static_cast<int16_t>(dxl_getdata);\n+         dxl_info_.ConvertCurrentToEffort(ID, static_cast<int16_t>(dxl_getdata));\n       } else {\n         *it_read_data.item_data_ptr_vec.at(item_index) =\n           static_cast<double>(dxl_getdata);\n@@ -962,7 +962,7 @@ DxlError Dynamixel::GetDxlValueFromBulkRead()\n           dxl_info_.ConvertValueRPMToVelocityRPS(ID, static_cast<int32_t>(dxl_getdata));\n       } else if (indirect_info_read_[ID].item_name.at(item_index) == \"Present Current\") {\n         *it_read_data.item_data_ptr_vec.at(item_index) =\n-          static_cast<int16_t>(dxl_getdata);\n+         dxl_info_.ConvertCurrentToEffort(ID, static_cast<int16_t>(dxl_getdata));\n       } else {\n         *it_read_data.item_data_ptr_vec.at(item_index) =\n           static_cast<double>(dxl_getdata);"
+        },
+        {
+          "sha": "c2526325a41a583bbbe4e2796b86e30013a7f2b5",
+          "filename": "src/dynamixel/dynamixel_info.cpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "changes": 4,
+          "blob_url": "https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface/blob/5ae50d9a49c362c50dfa7eaa41cb50fc4843b91b/src%2Fdynamixel%2Fdynamixel_info.cpp",
+          "raw_url": "https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface/raw/5ae50d9a49c362c50dfa7eaa41cb50fc4843b91b/src%2Fdynamixel%2Fdynamixel_info.cpp",
+          "contents_url": "https://api.github.com/repos/ROBOTIS-GIT/dynamixel_hardware_interface/contents/src%2Fdynamixel%2Fdynamixel_info.cpp?ref=5ae50d9a49c362c50dfa7eaa41cb50fc4843b91b",
+          "patch": "@@ -149,13 +149,15 @@ bool DynamixelInfo::GetDxlTypeInfo(\n   int32_t & value_of_max_radian_position,\n   int32_t & value_of_min_radian_position,\n   double & min_radian,\n-  double & max_radian)\n+  double & max_radian,\n+  double & torque_constant)\n {\n   value_of_zero_radian_position = dxl_info_[id].value_of_zero_radian_position;\n   value_of_max_radian_position = dxl_info_[id].value_of_max_radian_position;\n   value_of_min_radian_position = dxl_info_[id].value_of_min_radian_position;\n   min_radian = dxl_info_[id].min_radian;\n   max_radian = dxl_info_[id].max_radian;\n+  torque_constant = dxl_info_[id].torque_constant;\n   return true;\n }\n "
+        },
+        {
+          "sha": "ebf971e6b38171a0717a3378bca7e0d691ea7193",
+          "filename": "src/dynamixel_hardware_interface.cpp",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 7,
+          "changes": 22,
+          "blob_url": "https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface/blob/5ae50d9a49c362c50dfa7eaa41cb50fc4843b91b/src%2Fdynamixel_hardware_interface.cpp",
+          "raw_url": "https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface/raw/5ae50d9a49c362c50dfa7eaa41cb50fc4843b91b/src%2Fdynamixel_hardware_interface.cpp",
+          "contents_url": "https://api.github.com/repos/ROBOTIS-GIT/dynamixel_hardware_interface/contents/src%2Fdynamixel_hardware_interface.cpp?ref=5ae50d9a49c362c50dfa7eaa41cb50fc4843b91b",
+          "patch": "@@ -712,13 +712,13 @@ bool DynamixelHardware::InitDxlWriteItems()\n       if (gpio.command_interfaces.size()) {\n         uint8_t id = static_cast<uint8_t>(stoi(gpio.parameters.at(\"ID\")));\n         for (auto it : gpio.command_interfaces) {\n-          HandlerVarType temp_write;\n-          temp_write.id = id;\n-          temp_write.name = gpio.name;\n+        HandlerVarType temp_write;\n+        temp_write.id = id;\n+        temp_write.name = gpio.name;\n \n           temp_write.interface_name_vec.push_back(it.name);\n-          temp_write.value_ptr_vec.push_back(std::make_shared<double>(0.0));\n-          hdl_trans_commands_.push_back(temp_write);\n+        temp_write.value_ptr_vec.push_back(std::make_shared<double>(0.0));\n+        hdl_trans_commands_.push_back(temp_write);\n         }\n       }\n     }\n@@ -853,14 +853,22 @@ void DynamixelHardware::CalcJointToTransmission()\n     double value = 0.0;\n     for (size_t j = 0; j < num_of_joints_; j++) {\n       value += joint_to_transmission_matrix_[i][j] *\n-        (*hdl_joint_commands_.at(j).value_ptr_vec.at(0));\n+        (*hdl_joint_commands_.at(j).value_ptr_vec.at(GOAL_POSITION_INDEX));\n     }\n \n     if (hdl_trans_commands_.at(i).name == conversion_dxl_name_) {\n       value = prismaticToRevolute(value);\n     }\n+    *hdl_trans_commands_.at(i).value_ptr_vec.at(GOAL_POSITION_INDEX) = value;\n+  }\n \n-    *hdl_trans_commands_.at(i).value_ptr_vec.at(0) = value;\n+  for (size_t i = 0; i < num_of_transmissions_; i++) {\n+    double value = 0.0;\n+    for (size_t j = 0; j < num_of_joints_; j++) {\n+      value += joint_to_transmission_matrix_[i][j] *\n+        (*hdl_joint_commands_.at(j).value_ptr_vec.at(GOAL_CURRENT_INDEX));\n+    }\n+    *hdl_trans_commands_.at(i).value_ptr_vec.at(GOAL_CURRENT_INDEX) = value;\n   }\n }\n "
+        }
+      ]
+    },
+    {
+      "author": "robotpilot",
+      "date": "2024-12-11T11:18:12Z",
+      "sha": "09b6e35a541fb9de54252f70c9a31008ad35856b",
+      "message": "Updated package.xml for license",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "46b40aa8811535b0c9b317a535d31da762ea2deb",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface/blob/09b6e35a541fb9de54252f70c9a31008ad35856b/package.xml",
+          "raw_url": "https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface/raw/09b6e35a541fb9de54252f70c9a31008ad35856b/package.xml",
+          "contents_url": "https://api.github.com/repos/ROBOTIS-GIT/dynamixel_hardware_interface/contents/package.xml?ref=09b6e35a541fb9de54252f70c9a31008ad35856b",
+          "patch": "@@ -6,7 +6,7 @@\n     ROS2 package for dynamixel_hardware_interface\n   </description>\n   <maintainer email=\"pyo@robotis.com\">Pyo</maintainer>\n-  <license>ROBOTIS</license>\n+  <license>Apache-2.0</license>\n   <author email=\"hjkim@robotis.com\">Hye-Jong KIM</author>\n   <author email=\"wsh@robotis.com\">Sungho Woo</author>\n "
+        }
+      ]
+    },
+    {
+      "author": "GyuH13",
+      "date": "2025-06-19T23:53:50Z",
+      "sha": "eb407cb6358ce42debcd53fada51bc58fe497ef3",
+      "message": "add rosdep ci\n\nSigned-off-by: Hyungyu Kim <kimhg@robotis.com>",
+      "files_changed": 1,
+      "additions": 17,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "026afced637a3f26f9d59202c21c85a42e005fd5",
+          "filename": ".github/workflows/ros-ci.yml",
+          "status": "modified",
+          "additions": 17,
+          "deletions": 0,
+          "changes": 17,
+          "blob_url": "https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface/blob/eb407cb6358ce42debcd53fada51bc58fe497ef3/.github%2Fworkflows%2Fros-ci.yml",
+          "raw_url": "https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface/raw/eb407cb6358ce42debcd53fada51bc58fe497ef3/.github%2Fworkflows%2Fros-ci.yml",
+          "contents_url": "https://api.github.com/repos/ROBOTIS-GIT/dynamixel_hardware_interface/contents/.github%2Fworkflows%2Fros-ci.yml?ref=eb407cb6358ce42debcd53fada51bc58fe497ef3",
+          "patch": "@@ -49,6 +49,23 @@ jobs:\n         with:\n           required-ros-distributions: ${{ matrix.ros_distribution }}\n \n+      - name: Check and Install ROS dependencies\n+        shell: bash\n+        run: |\n+          set -e\n+          source /opt/ros/${{ matrix.ros_distribution }}/setup.bash\n+          echo \"--- Updating rosdep definitions ---\"\n+          rosdep update\n+          echo \"--- Installing system dependencies for ROS 2 ${{ matrix.ros_distribution }} ---\"\n+          rosdep install --from-paths ros_ws/src --ignore-src -y -r --rosdistro ${{ matrix.ros_distribution }}\n+          echo \"--- Performing rosdep check for ROS 2 ${{ matrix.ros_distribution }} ---\"\n+          if rosdep check --from-paths ros_ws/src --ignore-src --rosdistro ${{ matrix.ros_distribution }}; then\n+            echo \"--- rosdep check passed ---\"\n+          else\n+            echo \"--- rosdep check failed: Missing system dependencies or unresolvable keys. ---\"\n+            exit 1\n+          fi\n+\n       - name: Build and Test\n         uses: ros-tooling/action-ros-ci@v0.3\n         with:"
+        }
+      ]
+    },
+    {
+      "author": "HPaper",
+      "date": "2024-08-21T04:59:49Z",
+      "sha": "d2069a31f5295cd2fcdaed2d16e257eca7d8b6fc",
+      "message": "Initial commit",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "4e3fdf86fa7fe4708e44ecbb8fb529dbc3c7b182",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface/blob/d2069a31f5295cd2fcdaed2d16e257eca7d8b6fc/README.md",
+          "raw_url": "https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface/raw/d2069a31f5295cd2fcdaed2d16e257eca7d8b6fc/README.md",
+          "contents_url": "https://api.github.com/repos/ROBOTIS-GIT/dynamixel_hardware_interface/contents/README.md?ref=d2069a31f5295cd2fcdaed2d16e257eca7d8b6fc",
+          "patch": "@@ -0,0 +1,2 @@\n+# dynamixel_hardware_interfaces\n+ROS 2 package providing a hardware interface for controlling Dynamixel motors via the ros2_control framework. This repository includes the dynamixel_hardware_interface plugin for seamless integration with ROS 2, along with the dynamixel_interfaces package containing custom message definitions used by the interface"
+        }
+      ]
+    }
+  ]
+}

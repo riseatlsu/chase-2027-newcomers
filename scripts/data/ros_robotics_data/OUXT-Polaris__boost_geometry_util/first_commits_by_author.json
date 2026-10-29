@@ -1,0 +1,191 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T04:44:34Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "OUXT-Polaris",
+    "repo": "boost_geometry_util"
+  },
+  "data": [
+    {
+      "author": "github-actions[bot]",
+      "date": "2023-06-14T12:19:29Z",
+      "sha": "084bcbbd933bdd6eb202d90965cd3bbf78180982",
+      "message": "Merge pull request #15 from OUXT-Polaris/workflow/sync\n\n[Bot] Update workflow",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "bacafe0db941a09637af43c34f490642b3ad2687",
+          "filename": ".github/workflows/BuildTest.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/OUXT-Polaris/boost_geometry_util/blob/084bcbbd933bdd6eb202d90965cd3bbf78180982/.github%2Fworkflows%2FBuildTest.yaml",
+          "raw_url": "https://github.com/OUXT-Polaris/boost_geometry_util/raw/084bcbbd933bdd6eb202d90965cd3bbf78180982/.github%2Fworkflows%2FBuildTest.yaml",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/boost_geometry_util/contents/.github%2Fworkflows%2FBuildTest.yaml?ref=084bcbbd933bdd6eb202d90965cd3bbf78180982",
+          "patch": "@@ -113,7 +113,7 @@ jobs:\n     needs: build\n     steps:\n       - name: merge PR\n-        if : ${{ github.event_name == 'pull_request' }} && ${{ github.actor != 'wam-v-tan' }}\n+        if : ${{ (github.event_name == 'pull_request') && (github.actor == 'wam-v-tan') }}\n         env:\n           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n         run: gh pr merge ${{ github.event.pull_request.html_url }} --merge"
+        }
+      ]
+    },
+    {
+      "author": "wam-v-tan",
+      "date": "2022-06-20T07:08:26Z",
+      "sha": "3fa977c28cd9d513dd8dc5a62f77378bdf828e7a",
+      "message": "Setup workflow",
+      "files_changed": 3,
+      "additions": 142,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "cbe258e2ab77ba29962f2a1a498311255248f320",
+          "filename": ".github/workflows/BuildTest.yaml",
+          "status": "added",
+          "additions": 55,
+          "deletions": 0,
+          "changes": 55,
+          "blob_url": "https://github.com/OUXT-Polaris/boost_geometry_util/blob/3fa977c28cd9d513dd8dc5a62f77378bdf828e7a/.github%2Fworkflows%2FBuildTest.yaml",
+          "raw_url": "https://github.com/OUXT-Polaris/boost_geometry_util/raw/3fa977c28cd9d513dd8dc5a62f77378bdf828e7a/.github%2Fworkflows%2FBuildTest.yaml",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/boost_geometry_util/contents/.github%2Fworkflows%2FBuildTest.yaml?ref=3fa977c28cd9d513dd8dc5a62f77378bdf828e7a",
+          "patch": "@@ -0,0 +1,55 @@\n+name: BuildTest\n+\n+on:\n+  schedule:\n+    - cron: 0 0 * * *\n+  pull_request:\n+  workflow_dispatch:\n+\n+jobs:\n+  build_and_test:\n+    name: Build\n+    runs-on: ubuntu-20.04\n+    strategy:\n+      fail-fast: false\n+      matrix:\n+        rosdistro : [foxy,galactic]\n+    steps:\n+      - uses: actions/checkout@v2-beta\n+      - name: Check dependency-${{ matrix.rosdistro }}.repos existence\n+        id: check_rosdistro_repos_files\n+        uses: andstor/file-existence-action@v1\n+        with:\n+          files: dependency-${{ matrix.rosdistro }}.repos\n+          allow_failure: false\n+      - name: Check dependency.repos existence\n+        id: check_repos_files\n+        uses: andstor/file-existence-action@v1\n+        with:\n+          files: dependency.repos\n+          allow_failure: false\n+      - name: Run OUXT-Polaris/ros2-ci@master with dependency-${{ matrix.rosdistro }}.repos\n+        uses: OUXT-Polaris/ros2-ci@master\n+        if: steps.check_rosdistro_repos_files.outputs.files_exists == 'true'\n+        with:\n+          ros2-distro: ${{ matrix.rosdistro }}\n+          repos-filepath: dependency-${{ matrix.rosdistro }}.repos\n+      - name: Run OUXT-Polaris/ros2-ci@master with dependency.repos\n+        uses: OUXT-Polaris/ros2-ci@master\n+        if: steps.check_rosdistro_repos_files.outputs.files_exists == 'false' && steps.check_repos_files.outputs.files_exists == 'true'\n+        with:\n+          ros2-distro: ${{ matrix.rosdistro }}\n+          repos-filepath: dependency.repos\n+      - name: Run OUXT-Polaris/ros2-ci@master without repos\n+        uses: OUXT-Polaris/ros2-ci@master\n+        if: steps.check_rosdistro_repos_files.outputs.files_exists == 'false' && steps.check_repos_files.outputs.files_exists == 'false'\n+        with:\n+          ros2-distro: ${{ matrix.rosdistro }}\n+      - name: Notify Slack\n+        uses: 8398a7/action-slack@v2\n+        if: failure()\n+        with:\n+          status: ${{ job.status }}\n+        env:\n+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "39b4218b3d9e9e922f237f2d87df13db17c745ed",
+          "filename": ".github/workflows/Release.yaml",
+          "status": "added",
+          "additions": 68,
+          "deletions": 0,
+          "changes": 68,
+          "blob_url": "https://github.com/OUXT-Polaris/boost_geometry_util/blob/3fa977c28cd9d513dd8dc5a62f77378bdf828e7a/.github%2Fworkflows%2FRelease.yaml",
+          "raw_url": "https://github.com/OUXT-Polaris/boost_geometry_util/raw/3fa977c28cd9d513dd8dc5a62f77378bdf828e7a/.github%2Fworkflows%2FRelease.yaml",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/boost_geometry_util/contents/.github%2Fworkflows%2FRelease.yaml?ref=3fa977c28cd9d513dd8dc5a62f77378bdf828e7a",
+          "patch": "@@ -0,0 +1,68 @@\n+# This file is automatically deployed from https://github.com/at-wat/.rospkg-assets.\n+# Please don't directly edit; update at-wat/.rospkg-assets instead.\n+\n+name: Release\n+on:\n+  issues:\n+    types: [opened, edited]\n+\n+jobs:\n+  release:\n+    runs-on: ubuntu-latest\n+    if: startsWith(github.event.issue.title, 'Release ')\n+    steps:\n+      - name: checkout\n+        uses: actions/checkout@v2\n+      - name: create release\n+        id: create_release\n+        uses: at-wat/catkin-release-action@v1\n+        with:\n+          issue_title: ${{ github.event.issue.title }}\n+          git_user: wam-v-tan\n+          git_email: ouxt.share@gmail.com\n+          github_token: ${{ secrets.GITHUB_TOKEN }}\n+      - name: open pull-request\n+        uses: repo-sync/pull-request@v2\n+        id: create_pull_request\n+        with:\n+          source_branch: ${{ steps.create_release.outputs.created_branch }}\n+          destination_branch: ${{ github.event.repository.default_branch }}\n+          pr_title: Release ${{ steps.create_release.outputs.version}}\n+          pr_body: close \\#${{ github.event.issue.number }}\n+          pr_assignee: wam-v-tan\n+          github_token: ${{ secrets.WAMV_TAN_BOT_SECRET }}\n+      - name: Enable Pull Request Automerge\n+        uses: peter-evans/enable-pull-request-automerge@v1\n+        with:\n+          token: ${{ secrets.WAMV_TAN_BOT_SECRET }}\n+          pull-request-number: ${{ steps.create_pull_request.outputs.pr_number }}\n+          merge-method: squash\n+      - name: create GitHub release\n+        uses: actions/create-release@v1\n+        continue-on-error: true\n+        env:\n+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n+        with:\n+          tag_name: ${{ steps.create_release.outputs.version}}\n+          release_name: Release ${{ steps.create_release.outputs.version}}\n+      - name: bloom release\n+        if: github.event.label.name == 'bloom'\n+        id: bloom\n+        uses: at-wat/bloom-release-action@v0\n+        with:\n+          ros_distro: foxy galactic rolling\n+          github_token_bloom: ${{ secrets.WAMV_TAN_BOT_SECRET }}\n+          github_user: wam-v-tan\n+          git_user: wam-v-tan\n+          git_email: ouxt.share@gmail.com\n+          release_repository_push_url: https://github.com/${{ github.repository }}-release.git\n+          tag_and_release: true\n+          open_pr: true\n+      - name: Notify Slack\n+        uses: 8398a7/action-slack@v2\n+        if: failure()\n+        with:\n+          status: ${{ job.status }}\n+        env:\n+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "68115b27ef1ced1ba18b80442bc8eff311876488",
+          "filename": ".github/workflows/UpdateWorkflowStatus.yaml",
+          "status": "added",
+          "additions": 19,
+          "deletions": 0,
+          "changes": 19,
+          "blob_url": "https://github.com/OUXT-Polaris/boost_geometry_util/blob/3fa977c28cd9d513dd8dc5a62f77378bdf828e7a/.github%2Fworkflows%2FUpdateWorkflowStatus.yaml",
+          "raw_url": "https://github.com/OUXT-Polaris/boost_geometry_util/raw/3fa977c28cd9d513dd8dc5a62f77378bdf828e7a/.github%2Fworkflows%2FUpdateWorkflowStatus.yaml",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/boost_geometry_util/contents/.github%2Fworkflows%2FUpdateWorkflowStatus.yaml?ref=3fa977c28cd9d513dd8dc5a62f77378bdf828e7a",
+          "patch": "@@ -0,0 +1,19 @@\n+name: UpdateDashboard\n+on:\n+  pull_request:\n+    paths-ignore:\n+    - \".github/workflows/UpdateWorkflowStatus.yaml\"\n+  workflow_dispatch:\n+\n+jobs:\n+  build:\n+    name: UpdateDashboard\n+    runs-on: ubuntu-latest\n+    steps:\n+      - uses: benc-uk/workflow-dispatch@v1\n+        with:\n+          # You should create a personal access token and store it in your repository\n+          token: ${{ secrets.WAMV_TAN_BOT_SECRET }}\n+          repo: OUXT-Polaris/ouxt_automation\n+          workflow: document\n+          ref: master\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "hakuturu583",
+      "date": "2022-06-17T13:24:06Z",
+      "sha": "e44ae1a94502ac33765d37943e296cddf6c132e7",
+      "message": "initial commit\n\nSigned-off-by: Masaya Kataoka <ms.kataoka@gmail.com>",
+      "files_changed": 8,
+      "additions": 269,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "82011cb1c13ea34d91eb5a3b7698e838f3366a34",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 32,
+          "deletions": 0,
+          "changes": 32,
+          "blob_url": "https://github.com/OUXT-Polaris/boost_geometry_util/blob/e44ae1a94502ac33765d37943e296cddf6c132e7/CMakeLists.txt",
+          "raw_url": "https://github.com/OUXT-Polaris/boost_geometry_util/raw/e44ae1a94502ac33765d37943e296cddf6c132e7/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/boost_geometry_util/contents/CMakeLists.txt?ref=e44ae1a94502ac33765d37943e296cddf6c132e7",
+          "patch": "@@ -0,0 +1,32 @@\n+cmake_minimum_required(VERSION 3.8)\n+project(boost_geometry_util)\n+\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  add_compile_options(-Wall -Wextra -Wpedantic)\n+endif()\n+\n+# find dependencies\n+find_package(ament_cmake_auto REQUIRED)\n+find_package(rclcpp REQUIRED)\n+\n+ament_auto_find_build_dependencies()\n+\n+ament_auto_add_library(boost_geometry_util SHARED\n+  src/geometries/box.cpp\n+  src/geometries/point.cpp\n+)\n+\n+install(\n+  DIRECTORY \"include/\"\n+  DESTINATION include\n+)\n+\n+if(BUILD_TESTING)\n+  find_package(ament_lint_auto REQUIRED)\n+  ament_lint_auto_find_test_dependencies()\n+  find_package(ament_cmake_gtest REQUIRED)\n+  ament_add_gtest(test_boost_geometry_util test/src/test.cpp)\n+  target_link_libraries(test_boost_geometry_util boost_geometry_util)\n+endif()\n+\n+ament_auto_package()"
+        },
+        {
+          "sha": "0acb8b98b8223c1c5fe1ffc6fe2af81040b41668",
+          "filename": "include/boost_geometry_util/geometries/box.hpp",
+          "status": "added",
+          "additions": 35,
+          "deletions": 0,
+          "changes": 35,
+          "blob_url": "https://github.com/OUXT-Polaris/boost_geometry_util/blob/e44ae1a94502ac33765d37943e296cddf6c132e7/include%2Fboost_geometry_util%2Fgeometries%2Fbox.hpp",
+          "raw_url": "https://github.com/OUXT-Polaris/boost_geometry_util/raw/e44ae1a94502ac33765d37943e296cddf6c132e7/include%2Fboost_geometry_util%2Fgeometries%2Fbox.hpp",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/boost_geometry_util/contents/include%2Fboost_geometry_util%2Fgeometries%2Fbox.hpp?ref=e44ae1a94502ac33765d37943e296cddf6c132e7",
+          "patch": "@@ -0,0 +1,35 @@\n+// Copyright (c) 2022 OUXT Polaris\n+//\n+// Licensed under the Apache License, Version 2.0 (the \"License\");\n+// you may not use this file except in compliance with the License.\n+// You may obtain a copy of the License at\n+//\n+//     http://www.apache.org/licenses/LICENSE-2.0\n+//\n+// Unless required by applicable law or agreed to in writing, software\n+// distributed under the License is distributed on an \"AS IS\" BASIS,\n+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+// See the License for the specific language governing permissions and\n+// limitations under the License.\n+\n+#ifndef BOOST_GEOMETRY_UTIL__GEOMETRIES__BOX_HPP_\n+#define BOOST_GEOMETRY_UTIL__GEOMETRIES__BOX_HPP_\n+\n+#include <boost/geometry/geometries/box.hpp>\n+#include <boost/geometry/geometries/register/box.hpp>\n+#include <boost_geometry_util/geometries/point.hpp>\n+\n+namespace boost_geometry_utils\n+{\n+class Box2D\n+{\n+public:\n+  explicit Box2D(const Point2D & min_corner, const Point2D & max_corner);\n+  Point2D min_corner;\n+  Point2D max_corner;\n+};\n+}  // namespace boost_geometry_utils\n+\n+BOOST_GEOMETRY_REGISTER_BOX(\n+  boost_geometry_utils::Box2D, boost_geometry_utils::Point2D, min_corner, max_corner)\n+#endif  // BOOST_GEOMETRY_UTIL__GEOMETRIES__BOX_HPP_"
+        },
+        {
+          "sha": "bece9e49a809e5f56132c9f69331c2d946fb8c33",
+          "filename": "include/boost_geometry_util/geometries/geometries.hpp",
+          "status": "added",
+          "additions": 21,
+          "deletions": 0,
+          "changes": 21,
+          "blob_url": "https://github.com/OUXT-Polaris/boost_geometry_util/blob/e44ae1a94502ac33765d37943e296cddf6c132e7/include%2Fboost_geometry_util%2Fgeometries%2Fgeometries.hpp",
+          "raw_url": "https://github.com/OUXT-Polaris/boost_geometry_util/raw/e44ae1a94502ac33765d37943e296cddf6c132e7/include%2Fboost_geometry_util%2Fgeometries%2Fgeometries.hpp",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/boost_geometry_util/contents/include%2Fboost_geometry_util%2Fgeometries%2Fgeometries.hpp?ref=e44ae1a94502ac33765d37943e296cddf6c132e7",
+          "patch": "@@ -0,0 +1,21 @@\n+// Copyright (c) 2022 OUXT Polaris\n+//\n+// Licensed under the Apache License, Version 2.0 (the \"License\");\n+// you may not use this file except in compliance with the License.\n+// You may obtain a copy of the License at\n+//\n+//     http://www.apache.org/licenses/LICENSE-2.0\n+//\n+// Unless required by applicable law or agreed to in writing, software\n+// distributed under the License is distributed on an \"AS IS\" BASIS,\n+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+// See the License for the specific language governing permissions and\n+// limitations under the License.\n+\n+#ifndef BOOST_GEOMETRY_UTIL__GEOMETRIES__GEOMETRIES_HPP_\n+#define BOOST_GEOMETRY_UTIL__GEOMETRIES__GEOMETRIES_HPP_\n+\n+#include <boost_geometry_util/geometries/box.hpp>\n+#include <boost_geometry_util/geometries/point.hpp>\n+\n+#endif  // BOOST_GEOMETRY_UTIL__GEOMETRIES__GEOMETRIES_HPP_"
+        },
+        {
+          "sha": "99045a109e99edfb34da0f3bd23d46a031770dd2",
+          "filename": "include/boost_geometry_util/geometries/point.hpp",
+          "status": "added",
+          "additions": 37,
+          "deletions": 0,
+          "changes": 37,
+          "blob_url": "https://github.com/OUXT-Polaris/boost_geometry_util/blob/e44ae1a94502ac33765d37943e296cddf6c132e7/include%2Fboost_geometry_util%2Fgeometries%2Fpoint.hpp",
+          "raw_url": "https://github.com/OUXT-Polaris/boost_geometry_util/raw/e44ae1a94502ac33765d37943e296cddf6c132e7/include%2Fboost_geometry_util%2Fgeometries%2Fpoint.hpp",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/boost_geometry_util/contents/include%2Fboost_geometry_util%2Fgeometries%2Fpoint.hpp?ref=e44ae1a94502ac33765d37943e296cddf6c132e7",
+          "patch": "@@ -0,0 +1,37 @@\n+// Copyright (c) 2022 OUXT Polaris\n+//\n+// Licensed under the Apache License, Version 2.0 (the \"License\");\n+// you may not use this file except in compliance with the License.\n+// You may obtain a copy of the License at\n+//\n+//     http://www.apache.org/licenses/LICENSE-2.0\n+//\n+// Unless required by applicable law or agreed to in writing, software\n+// distributed under the License is distributed on an \"AS IS\" BASIS,\n+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+// See the License for the specific language governing permissions and\n+// limitations under the License.\n+\n+#ifndef BOOST_GEOMETRY_UTIL__GEOMETRIES__POINT_HPP_\n+#define BOOST_GEOMETRY_UTIL__GEOMETRIES__POINT_HPP_\n+\n+#include <boost/geometry/geometries/point_xy.hpp>\n+#include <boost/geometry/geometries/register/point.hpp>\n+#include <geometry_msgs/msg/point.hpp>\n+\n+namespace boost_geometry_utils\n+{\n+class Point2D\n+{\n+public:\n+  explicit Point2D(const geometry_msgs::msg::Point & point);\n+  explicit Point2D(double x, double y);\n+  double x;\n+  double y;\n+};\n+}  // namespace boost_geometry_utils\n+\n+BOOST_GEOMETRY_REGISTER_POINT_2D(geometry_msgs::msg::Point, double, cs::cartesian, x, y)\n+BOOST_GEOMETRY_REGISTER_POINT_2D(boost_geometry_utils::Point2D, double, cs::cartesian, x, y)\n+\n+#endif  // BOOST_GEOMETRY_UTIL__GEOMETRIES__POINT_HPP_"
+        },
+        {
+          "sha": "beadf0e4571ecdb73e4075585fd24cc640ebfd8a",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/OUXT-Polaris/boost_geometry_util/blob/e44ae1a94502ac33765d37943e296cddf6c132e7/package.xml",
+          "raw_url": "https://github.com/OUXT-Polaris/boost_geometry_util/raw/e44ae1a94502ac33765d37943e296cddf6c132e7/package.xml",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/boost_geometry_util/contents/package.xml?ref=e44ae1a94502ac33765d37943e296cddf6c132e7",
+          "patch": "@@ -0,0 +1,23 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n+  <name>boost_geometry_util</name>\n+  <version>0.0.0</version>\n+  <description>Utility library for boost geometry</description>\n+  <maintainer email=\"ms.kataoka@gmail.com\">masaya</maintainer>\n+  <license>Apache License 2.0</license>\n+\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+  <buildtool_depend>ament_cmake_auto</buildtool_depend>\n+\n+  <depend>rclcpp</depend>\n+  <depend>boost</depend>\n+  <depend>geometry_msgs</depend>\n+\n+  <test_depend>ament_lint_auto</test_depend>\n+  <test_depend>ouxt_common</test_depend>\n+\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n+</package>"
+        },
+        {
+          "sha": "4aca9140db9116cdd217dd9acf86101e04caf30b",
+          "filename": "src/geometries/box.cpp",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/OUXT-Polaris/boost_geometry_util/blob/e44ae1a94502ac33765d37943e296cddf6c132e7/src%2Fgeometries%2Fbox.cpp",
+          "raw_url": "https://github.com/OUXT-Polaris/boost_geometry_util/raw/e44ae1a94502ac33765d37943e296cddf6c132e7/src%2Fgeometries%2Fbox.cpp",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/boost_geometry_util/contents/src%2Fgeometries%2Fbox.cpp?ref=e44ae1a94502ac33765d37943e296cddf6c132e7",
+          "patch": "@@ -0,0 +1,23 @@\n+// Copyright (c) 2022 OUXT Polaris\n+//\n+// Licensed under the Apache License, Version 2.0 (the \"License\");\n+// you may not use this file except in compliance with the License.\n+// You may obtain a copy of the License at\n+//\n+//     http://www.apache.org/licenses/LICENSE-2.0\n+//\n+// Unless required by applicable law or agreed to in writing, software\n+// distributed under the License is distributed on an \"AS IS\" BASIS,\n+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+// See the License for the specific language governing permissions and\n+// limitations under the License.\n+\n+#include <boost_geometry_util/geometries/box.hpp>\n+\n+namespace boost_geometry_utils\n+{\n+Box2D::Box2D(const Point2D & min_corner, const Point2D & max_corner)\n+: min_corner(min_corner), max_corner(max_corner)\n+{\n+}\n+}  // namespace boost_geometry_utils"
+        },
+        {
+          "sha": "56b398e6a0beee07370b96f1679d7e89b9920b44",
+          "filename": "src/geometries/point.cpp",
+          "status": "added",
+          "additions": 22,
+          "deletions": 0,
+          "changes": 22,
+          "blob_url": "https://github.com/OUXT-Polaris/boost_geometry_util/blob/e44ae1a94502ac33765d37943e296cddf6c132e7/src%2Fgeometries%2Fpoint.cpp",
+          "raw_url": "https://github.com/OUXT-Polaris/boost_geometry_util/raw/e44ae1a94502ac33765d37943e296cddf6c132e7/src%2Fgeometries%2Fpoint.cpp",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/boost_geometry_util/contents/src%2Fgeometries%2Fpoint.cpp?ref=e44ae1a94502ac33765d37943e296cddf6c132e7",
+          "patch": "@@ -0,0 +1,22 @@\n+// Copyright (c) 2022 OUXT Polaris\n+//\n+// Licensed under the Apache License, Version 2.0 (the \"License\");\n+// you may not use this file except in compliance with the License.\n+// You may obtain a copy of the License at\n+//\n+//     http://www.apache.org/licenses/LICENSE-2.0\n+//\n+// Unless required by applicable law or agreed to in writing, software\n+// distributed under the License is distributed on an \"AS IS\" BASIS,\n+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+// See the License for the specific language governing permissions and\n+// limitations under the License.\n+\n+#include <boost_geometry_util/geometries/point.hpp>\n+\n+namespace boost_geometry_utils\n+{\n+Point2D::Point2D(const geometry_msgs::msg::Point & point) : x(point.x), y(point.y) {}\n+\n+Point2D::Point2D(double x, double y) : x(x), y(y) {}\n+}  // namespace boost_geometry_utils"
+        },
+        {
+          "sha": "406a0c319a9009564b89441a05da552c32ddc928",
+          "filename": "test/src/test.cpp",
+          "status": "added",
+          "additions": 76,
+          "deletions": 0,
+          "changes": 76,
+          "blob_url": "https://github.com/OUXT-Polaris/boost_geometry_util/blob/e44ae1a94502ac33765d37943e296cddf6c132e7/test%2Fsrc%2Ftest.cpp",
+          "raw_url": "https://github.com/OUXT-Polaris/boost_geometry_util/raw/e44ae1a94502ac33765d37943e296cddf6c132e7/test%2Fsrc%2Ftest.cpp",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/boost_geometry_util/contents/test%2Fsrc%2Ftest.cpp?ref=e44ae1a94502ac33765d37943e296cddf6c132e7",
+          "patch": "@@ -0,0 +1,76 @@\n+// Copyright (c) 2022 OUXT Polaris\n+//\n+// Licensed under the Apache License, Version 2.0 (the \"License\");\n+// you may not use this file except in compliance with the License.\n+// You may obtain a copy of the License at\n+//\n+//     http://www.apache.org/licenses/LICENSE-2.0\n+//\n+// Unless required by applicable law or agreed to in writing, software\n+// distributed under the License is distributed on an \"AS IS\" BASIS,\n+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+// See the License for the specific language governing permissions and\n+// limitations under the License.\n+\n+// headers in Google Test\n+#include <gtest/gtest.h>\n+\n+#include <boost/geometry/algorithms/disjoint.hpp>\n+#include <boost/geometry/geometries/box.hpp>\n+#include <boost/geometry/geometries/point_xy.hpp>\n+#include <boost_geometry_util/geometries/geometries.hpp>\n+\n+namespace bg = boost::geometry;\n+\n+#define EXPECT_POINT2D_EQ(POINT, X, Y)                 \\\n+  EXPECT_DOUBLE_EQ(boost::geometry::get<0>(POINT), X); \\\n+  EXPECT_DOUBLE_EQ(boost::geometry::get<1>(POINT), Y);\n+\n+#define EXPECT_BOX2D_EQ(BOX, MIN_CORNER_X, MIN_CORNER_Y, MAX_CORNER_X, MAX_CORNER_Y) \\\n+  EXPECT_POINT2D_EQ(BOX.min_corner, MIN_CORNER_X, MIN_CORNER_Y);                     \\\n+  EXPECT_POINT2D_EQ(BOX.max_corner, MAX_CORNER_X, MAX_CORNER_Y);\n+\n+TEST(TestSuite, Point2D)\n+{\n+  const auto point = boost_geometry_utils::Point2D(3, 5);\n+  EXPECT_POINT2D_EQ(point, 3, 5);\n+  geometry_msgs::msg::Point ros_point;\n+  {\n+    ros_point.x = 1.0;\n+    ros_point.y = 2.0;\n+    ros_point.z = 0.3;\n+  };\n+  EXPECT_POINT2D_EQ(ros_point, 1, 2);\n+}\n+\n+TEST(TestSuite, Box)\n+{\n+  const auto b0 = boost_geometry_utils::Box2D(\n+    boost_geometry_utils::Point2D(0, 0), boost_geometry_utils::Point2D(3, 3));\n+  const auto b1 = boost_geometry_utils::Box2D(\n+    boost_geometry_utils::Point2D(4, 4), boost_geometry_utils::Point2D(7, 7));\n+  EXPECT_BOX2D_EQ(b0, 0, 0, 3, 3);\n+  EXPECT_BOX2D_EQ(b1, 4, 4, 7, 7);\n+}\n+\n+TEST(TestSuite, Disjoint)\n+{\n+  const auto b0 = boost_geometry_utils::Box2D(\n+    boost_geometry_utils::Point2D(0, 0), boost_geometry_utils::Point2D(3, 3));\n+  const auto b1 = boost_geometry_utils::Box2D(\n+    boost_geometry_utils::Point2D(4, 4), boost_geometry_utils::Point2D(7, 7));\n+  EXPECT_TRUE(bg::disjoint(b0, b1));\n+  const auto b2 = boost_geometry_utils::Box2D(\n+    boost_geometry_utils::Point2D(2, 2), boost_geometry_utils::Point2D(5, 5));\n+  EXPECT_FALSE(bg::disjoint(b0, b2));\n+  const auto p0 = boost_geometry_utils::Point2D(4, 4);\n+  EXPECT_TRUE(bg::disjoint(b0, p0));\n+  const auto p1 = boost_geometry_utils::Point2D(2, 2);\n+  EXPECT_FALSE(bg::disjoint(b0, p1));\n+}\n+\n+int main(int argc, char ** argv)\n+{\n+  testing::InitGoogleTest(&argc, argv);\n+  return RUN_ALL_TESTS();\n+}"
+        }
+      ]
+    }
+  ]
+}

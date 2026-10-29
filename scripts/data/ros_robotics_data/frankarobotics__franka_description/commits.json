@@ -1,0 +1,1706 @@
+{
+  "_meta": {
+    "fetched_at": "2026-09-21T18:43:13Z",
+    "source": "github_rest",
+    "endpoint": "/repos/{owner}/{repo}/commits",
+    "owner": "frankarobotics",
+    "repo": "franka_description",
+    "per_page": 100
+  },
+  "data": [
+    {
+      "sha": "7aeeddc449edf8d62b594f9e36a81da53e7796f9",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-08-17T08:29:44Z",
+      "message": "chore: bump version for release 2.9.0"
+    },
+    {
+      "sha": "c2dca9cf38e590da61a4523e6011a00319ba58f9",
+      "author": "Kamal Mohy El Dine",
+      "author_login": "kmohyeldine",
+      "date": "2026-08-11T14:49:00Z",
+      "message": "Merge branch 'fix/cobot-pump-moveit-tip-link'"
+    },
+    {
+      "sha": "5063b9cd5c2acb5a139ae9c79b04a59d90b3bd6c",
+      "author": "Kamal Mohy El Dine",
+      "author_login": "kmohyeldine",
+      "date": "2026-08-06T09:43:41Z",
+      "message": "fix: tip the MoveIt planning chain at the cobot pump's tcp\n\nThe arm group's chain tipped at hand_tcp for the franka hand and at link8 for\neverything else, so the two supported end effectors disagreed about what a pose\ngoal means. With a pump mounted, a goal named the flange while the pump's own\ntcp frame, 105 mm further along z, was present in the URDF but unreachable as a\nplanning target. Planning to the tool is the reason that frame exists.\n\nResolve the tip from the mounted end effector instead, keeping the flange for\nids that declare no tcp of their own and for hand:=false, so no unknown ee_id\ncan name a link the URDF lacks.\n\nAdd regression tests pinning the chain tip to the tcp link the URDF places for\nthe mounted end effector, and pinning the flange when nothing is mounted. The\nfirst fails on the ten cobot pump variants before this change.\n\nVerified by generating every arm, end effector, prefix and hand combination (61\nSRDFs) before and after: byte-identical except the ten cobot pump variants that\ncarry a hand, whose only changed line is the chain tip. Loading the result\nthrough MoveIt's own parser gives a valid seven joint chain whose ready-pose tip\nsits 105 mm below the previous one.\n\nMIGRATION: pose goals for ee_id:=cobot_pump shift by 105 mm along the flange z\naxis. Setups that added that offset themselves must drop it.\n\nSigned-off-by: Kamal Mohy El Dine <kamal.mohy@franka.de>"
+    },
+    {
+      "sha": "b0f44df3ac2b66f35b0c6539edac39118b818f66",
+      "author": "Kamal Mohy El Dine",
+      "author_login": "kmohyeldine",
+      "date": "2026-08-10T08:10:44Z",
+      "message": "Merge branch 'chore/github-backlog-housekeeping' into 'main'\n\nHousekeeping: port the accepted GitHub community contributions and fix the tcp offset default\n\nSee merge request frankadev/MOCTRL/franka_description!122"
+    },
+    {
+      "sha": "7d38551c31c29f4fd28c3e956ce66dc222e7f658",
+      "author": "Kamal Mohy El Dine",
+      "author_login": "kmohyeldine",
+      "date": "2026-08-05T16:15:06Z",
+      "message": "fix: apply no_prefix to the end effector as well as the arm\n\nfranka_arm dropped the prefix from its link names under no_prefix but\nfranka_robot still attached the end effector to <robot_type>_link8 and let\nthe end effector prefix itself, so the two halves of the robot stopped\nreferring to each other: every no_prefix description carrying an end\neffector named a parent link the urdf did not define and was rejected by\nthe urdf parser, while the srdf, which does honour no_prefix, named end\neffector links the urdf did not have.\n\nfranka_hand already declared a no_prefix parameter it never read, so this\nwires up what was intended rather than introducing a new concept.\n\nThe macro's own default was the quoted string 'false', which is truthy in\npython; it has to be a real boolean now that it decides the link prefix,\notherwise direct callers of the macro would silently lose it.\n\nOn main 20 of the 116 generated urdf variants fail check_urdf, all of them\nno_prefix combined with an end effector. All 116 pass here, and the only\ngenerated output that changes is those 20 previously unloadable ones.\n\nSigned-off-by: Kamal Mohy El Dine <kamal.mohy@franka.de>"
+    },
+    {
+      "sha": "6f9da89efc7d48a227bc74735648a770f029df85",
+      "author": "Kamal Mohy El Dine",
+      "author_login": "kmohyeldine",
+      "date": "2026-08-05T15:14:31Z",
+      "message": "docu: changelog entry for the portable bash shebang\n\nSigned-off-by: Kamal Mohy El Dine <kamal.mohy@franka.de>"
+    },
+    {
+      "sha": "5de87360970a8b68685e823c385803f27435d090",
+      "author": "Kamal Mohy El Dine",
+      "author_login": "kmohyeldine",
+      "date": "2026-08-05T15:14:08Z",
+      "message": "docu: changelog entry for the cobot pump SRDF collision rules\n\nSigned-off-by: Kamal Mohy El Dine <kamal.mohy@franka.de>"
+    },
+    {
+      "sha": "74992c34f1ccd57f1c12db110a6766a9ffcb239f",
+      "author": "Kamal Mohy El Dine",
+      "author_login": "kmohyeldine",
+      "date": "2026-08-05T15:02:33Z",
+      "message": "docu: state that the fer model is not supported\n\nThe tooling still offers fer as an accepted robot_model in create_urdf.py and in\nthe visualization launch arguments, with nothing anywhere saying it is\nunsupported. Users reasonably read that as a maintained model and report defects\nin its data, which we do not intend to fix.\n\nRecord the support status in the README together with the two concrete\ninconsistencies that prompt those reports: one inertia tensor is not physically\nrealisable, and the link masses do not sum to the product manual total. Point\nreaders at fr3/fp3, which are equivalent kinematically and dynamically.\n\nThe model itself is untouched and still generates.\n\nContext: https://github.com/frankarobotics/franka_description/issues/23\n\nSigned-off-by: Kamal Mohy El Dine <kamal.mohy@franka.de>"
+    },
+    {
+      "sha": "8ca0106e0ecb2fceb19a8582cf0f1b9fbd76dfc3",
+      "author": "Kamal Mohy El Dine",
+      "author_login": "kmohyeldine",
+      "date": "2026-08-05T14:52:15Z",
+      "message": "fix: default the tcp offset to the mounted end effector's own value\n\nThe tcp offset is a property of the end effector, but it was specified in two\nplaces that disagreed with it. The franka_robot macro declared tcp_xyz:='0 0 0',\nwhile every robot entry point declared '0 0 0.1034'. The offset therefore\nsurvived only because the entry point passed it back down, and two defects\nfollowed from that.\n\nCalling the franka_robot macro directly without tcp_xyz - which downstream\npackages and user xacros do - silently produced hand_tcp coincident with the\nmounting frame, reported as issue #31 on GitHub. Separately, the entry points\nhardcoded the franka hand's 0.1034 for every end effector, so a robot built with\nee_id:=cobot_pump placed the pump tcp 1.6 mm short of the 0 0 0.105 the pump\nitself declares.\n\nMake an unspecified tcp_xyz resolve to the end effector's own offset, and drop\nthe hardcoded value from the entry points so the resolution is what decides. An\nexplicitly passed tcp_xyz still wins everywhere.\n\nAdd regression tests pinning the resolved offset to what the end effector\nproduces standalone, exercised through both the entry points and a direct macro\ncall, plus one asserting an explicit override still takes precedence. All three\nfail before this change.\n\nVerified by generating every robot, end effector, self-collision, prefix and\noverride combination (50 descriptions) before and after: output is\nbyte-identical except for the ten cobot pump variants, which gain the corrected\noffset. check_urdf passes on all of them.\n\nReported in https://github.com/frankarobotics/franka_description/issues/31\n\nSigned-off-by: Kamal Mohy El Dine <kamal.mohy@franka.de>"
+    },
+    {
+      "sha": "b4a7068ebc5442a355d9f7b09430343672d338bd",
+      "author": "Kamal Mohy El Dine",
+      "author_login": "kmohyeldine",
+      "date": "2026-08-05T14:40:22Z",
+      "message": "fix: build the dev container when the host UID/GID already exists\n\nscripts/create_urdf.sh and scripts/visualize_franka.sh pass --build-arg\nUSER_UID=$(id -u) --build-arg USER_GID=$(id -g). The base image\nosrf/ros:jazzy-desktop already contains an \"ubuntu\" user and group at 1000:1000,\nso groupadd aborts with \"GID '1000' already exists\" for any host account holding\na colliding id, which on a stock Ubuntu install is the first user. Both helper\nscripts then fail before doing any work.\n\nCreate the group and user only when the id is still free, and refer to the\naccount as UID:GID afterwards so the rest of the file does not depend on the\nname it ended up with. Docker resolves HOME from /etc/passwd for a numeric USER,\nso ~/.bashrc still lands in the right home directory either way.\n\nVerified against osrf/ros:jazzy-desktop for 1000:1000, 1000:100 and 1001:1001:\nall three now build, /workspaces is writable, XDG_RUNTIME_DIR is correct and\nxacro is on PATH. Before the change the first two failed in groupadd.\n\nPorted from the community contributions\nhttps://github.com/frankarobotics/franka_description/pull/9 (approach) and\nhttps://github.com/frankarobotics/franka_description/pull/29 (login shell),\nreported in https://github.com/frankarobotics/franka_description/issues/28\n\nCo-authored-by: Uli Köhler <ukoehler@techoverflow.net>\nCo-authored-by: Arnaud TANGUY <arn.tanguy@gmail.com>\nSigned-off-by: Kamal Mohy El Dine <kamal.mohy@franka.de>"
+    },
+    {
+      "sha": "f7bf26b9d196710bc562e60c205d7fde9e14b6fd",
+      "author": "Arnaud TANGUY",
+      "author_login": "arntanguy",
+      "date": "2026-03-06T17:17:53Z",
+      "message": "fix: bash shebang\n\n/bin/bash is not present on every system that can otherwise run these scripts\n(NixOS and FreeBSD being the common cases). Resolving bash through PATH keeps\nthem usable there without changing behaviour anywhere else.\n\nSubmitted upstream as\nhttps://github.com/frankarobotics/franka_description/pull/27\n\nSigned-off-by: Kamal Mohy El Dine <kamal.mohy@franka.de>"
+    },
+    {
+      "sha": "0eba0fc43f315b8c9fba248c491624a6f8fb0098",
+      "author": "Rafael Papallas",
+      "author_login": "rpapallas",
+      "date": "2026-03-23T13:09:46Z",
+      "message": "Added avoid collision when pump is used as ee.\n\nThe arm SRDF only emitted end-effector disable_collisions rules for the\nfranka_hand, so a robot configured with ee_id:=cobot_pump produced an SRDF in\nwhich the pump link sits in permanent collision with link7 and link8. MoveIt\nconsequently rejects every state of such a robot as colliding.\n\nSubmitted upstream as\nhttps://github.com/frankarobotics/franka_description/pull/30\n\nSigned-off-by: Kamal Mohy El Dine <kamal.mohy@franka.de>"
+    },
+    {
+      "sha": "fbcfdbc0b16cf8bbf947b44d0baa5c730ede676e",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2026-07-08T08:13:19Z",
+      "message": "Merge branch 'PRCUN-6156-remove-gazebo-flags-from-ros2control' into 'main'\n\nrefactor: Remove gazebo tags/macros/args from franka_description\n\nSee merge request frankadev/MOCTRL/franka_description!112"
+    },
+    {
+      "sha": "8ba4a61b0dcf1f725689122f5e2629f9fc7eb45f",
+      "author": "kuhn_an",
+      "author_login": "AndreasKuhner",
+      "date": "2026-06-24T14:55:51Z",
+      "message": "refactor: Remove gazebo tags/macros/args from franka_description\n\nMake the description package simulator-agnostic. All gazebo SDF and\ntransmission machinery, the gazebo world anchor, and the gazebo-specific\nself-collision suppression are removed; the gazebo:=false argument and the\ngazebo_ros export are dropped throughout robots, end_effectors and the URDF\ngeneration workflow.\n\nSelf-collision geometry is now gated by the include_self_collision_geometry\ncapability flag instead of a gazebo toggle. The removed gazebo content is\nrelocated to franka_gazebo, which owns the simulator-specific blocks.\n\nThe removal of the public gazebo xacro argument is recorded in a CHANGELOG\nUNRELEASED migration note: consumers that passed gazebo:=true must now use\nthe franka_gazebo bringup entry points; the old argument is inert.\n\nBehavior-preserving: URDF expansions are byte-identical to before."
+    },
+    {
+      "sha": "02afaae282d4a8e10d7d2f781b23b3515c303ce5",
+      "author": "Guillermo Gomez Pena",
+      "author_login": "gomezgu",
+      "date": "2026-07-07T15:54:46Z",
+      "message": "Merge branch 'release-2-8-1' into 'main'\n\nchore: bump version for release\n\nSee merge request frankadev/MOCTRL/franka_description!116"
+    },
+    {
+      "sha": "2a7aa6208b8f4afc7c2eacff6790c4274ea32d30",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2026-07-07T14:54:41Z",
+      "message": "chore: bump version for release"
+    },
+    {
+      "sha": "2f2c9653deaf71920bfd3e1dd9bf08cc5d593677",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-07-02T13:58:25Z",
+      "message": "Merge branch 'fix/correct_head_mountint_point' into 'main'\n\nfix: shift correct mounting point half the height of the zed camera\n\nSee merge request frankadev/MOCTRL/franka_description!115"
+    },
+    {
+      "sha": "15d4056592429f7ca2a12bbe90f98cf7323872d8",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-07-02T13:58:25Z",
+      "message": "fix: shift correct mounting point half the height of the zed camera"
+    },
+    {
+      "sha": "b69bfe535304f74098fd16117100d01bd8e1c513",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-06-29T14:20:38Z",
+      "message": "Merge branch 'fix/correct_material_for_tmr' into 'main'\n\nfix: add material name to tmr collada for isaac import\n\nSee merge request frankadev/MOCTRL/franka_description!114"
+    },
+    {
+      "sha": "4318eab8f40a029a222657a174f4c376c33d14bb",
+      "author": "francando",
+      "author_login": null,
+      "date": "2026-06-29T13:49:42Z",
+      "message": "fix: add material name to tmr collada for isaac import"
+    },
+    {
+      "sha": "99bd83dbdd8a2f03200c20a846ac4c87c7d524fd",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2026-06-29T08:42:27Z",
+      "message": "Merge branch 'fix-missed-modified-prefix-in-tmr' into 'main'\n\nfix: define modified_prefix in tmrv0_2 description for mobile_teleop\n\nSee merge request frankadev/MOCTRL/franka_description!113"
+    },
+    {
+      "sha": "b1628535685eaca151bad4c7f336117909084a8f",
+      "author": "kuhn_an",
+      "author_login": "AndreasKuhner",
+      "date": "2026-06-26T14:12:16Z",
+      "message": "fix: define modified_prefix in tmrv0_2 description for mobile_teleop\n\nThe shared bringup franka_arm.urdf.xacro passes arm_prefix=\"${modified_prefix}\"\nto the franka_arm_ros2_control macro, but tmrv0_2.urdf.xacro was the only\nrobot description not defining the file-scope modified_prefix property. As a\nresult mobile_teleop.launch.py (robot_type: tmrv0_2) failed with\n'name 'modified_prefix' is not defined'.\n\nAdd the arm_prefix arg plus prefix/modified_prefix properties to match the\nestablished arm-description pattern; the mobile base links are intentionally\nleft unprefixed."
+    },
+    {
+      "sha": "4143b50061f8c98fd1dc06b64dc34433301f735a",
+      "author": "kuhn_an",
+      "author_login": "AndreasKuhner",
+      "date": "2026-06-23T13:06:00Z",
+      "message": "chore: Bump version for release"
+    },
+    {
+      "sha": "44d9ba03bdb1d5130db628d2846a836f9a03cc3f",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2026-06-18T13:39:33Z",
+      "message": "Merge branch 'PRCUN-6141-move-ros2-control-content' into 'main'\n\nrefactor: Moving ros2_control related parts to franka_ros2\n\nSee merge request frankadev/MOCTRL/franka_description!109"
+    },
+    {
+      "sha": "1f95d855267f346929fcaf0ebb58dbb59b9bd53e",
+      "author": "kuhn_an",
+      "author_login": "AndreasKuhner",
+      "date": "2026-06-08T09:17:57Z",
+      "message": "refactor: Moving ros2_control related parts to franka_ros2"
+    },
+    {
+      "sha": "89f48854a5f4a72de205a7433119a71e3fbf5d24",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2026-06-16T09:26:22Z",
+      "message": "Merge branch 'PRCUN-6504-consistent-mounting-angles' into 'main'\n\nrefactor: Reverted mounting angles back to original CAD values\n\nSee merge request frankadev/MOCTRL/franka_description!110"
+    },
+    {
+      "sha": "bd0de0093dc1b23b26a0b980c9b2c6c577ced199",
+      "author": "kuhn_an",
+      "author_login": "AndreasKuhner",
+      "date": "2026-06-16T08:39:01Z",
+      "message": "refactor: Reverted mounting angles back to original CAD values"
+    },
+    {
+      "sha": "30dc1f9c2d9678c116dab5068a15e30763c22291",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2026-06-09T14:27:10Z",
+      "message": "Merge branch 'PRCUN-6427-force-measurement-state-interface' into 'main'\n\nfeat: Added force measurement state interface to franka arm ros2 control xacro\n\nSee merge request frankadev/MOCTRL/franka_description!108"
+    },
+    {
+      "sha": "4e7e23394c57be769f3e0c8f6aa32ec0e990e0d7",
+      "author": "kuhn_an",
+      "author_login": "AndreasKuhner",
+      "date": "2026-06-03T14:53:14Z",
+      "message": "feat: Added force measurement state interface to franka arm ros2 control xacro"
+    },
+    {
+      "sha": "37c4be2ce36ae6d354339509a3d324063fc99968",
+      "author": "Thomas Heinrich",
+      "author_login": "ThHeinrich",
+      "date": "2026-05-30T15:53:25Z",
+      "message": "[git-lab migration] post-migration updates (Jenkinsfiles, submodule URLs)"
+    },
+    {
+      "sha": "10ea609b39d662936b6b2fcd3d77d826578415dc",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-05-08T12:55:42Z",
+      "message": "fix: publish build info together with the artifacts"
+    },
+    {
+      "sha": "c54d18737c65cede0805e45728bd6d2d5bb41610",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-05-08T10:08:54Z",
+      "message": "Pull request #107: fix: publish artifacts to artifactory before upstream pipelines until they are stable\n\nMerge in MOCTRL/franka_description from fix/artifacts_publishing to main\n\n* commit 'eede1106ad5f4cfd15ae3d060661c96669968857':\n  fix: publish artifacts to artifactory before upstream pipelines until they are stable"
+    },
+    {
+      "sha": "eede1106ad5f4cfd15ae3d060661c96669968857",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-05-05T15:46:08Z",
+      "message": "fix: publish artifacts to artifactory before upstream pipelines until they are stable"
+    },
+    {
+      "sha": "2fd6aaa8c5e3bbfe857b8fb19978694cdc41e6ea",
+      "author": "mohy_ka",
+      "author_login": "kmohyeldine",
+      "date": "2026-05-04T13:47:01Z",
+      "message": "fix: trigger workflow on X.Y.Z tags instead of v* prefix"
+    },
+    {
+      "sha": "ec8789e18df38c1d08a694ee61ebc9b9495e22dc",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2026-05-04T09:04:23Z",
+      "message": "bump release 2.7.0"
+    },
+    {
+      "sha": "fc94bf01a7001e1b28216f0b17df48a98256fe9b",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-04-30T16:12:12Z",
+      "message": "fix: let's publish artifacts from main"
+    },
+    {
+      "sha": "58b1ed6e65eedc9221d720d5380f63619c46033c",
+      "author": "mohy_ka",
+      "author_login": "kmohyeldine",
+      "date": "2026-04-14T09:13:23Z",
+      "message": "feat: add GitHub Actions workflow for URDF generation and release\n\nAdd workflow triggered on tag push (v*) that:\n- Generates URDFs for fr3_duo, mobile_fr3_duo_v0_2, and fr3v2_1\n- Generates without gazebo, ros2_control, or end-effector\n- Validates each URDF with check_urdf and XML parsing\n- Creates a GitHub release with URDF files attached\n\nCo-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
+    },
+    {
+      "sha": "fcb43ec6ac75d7cce798c847759166d0ee2885b9",
+      "author": "Marius Winkelmeier",
+      "author_login": "winkma",
+      "date": "2026-04-23T09:38:55Z",
+      "message": "Pull request #96: PRCUN-5983 mobile fr 3 duo move it integration\n\nMerge in MOCTRL/franka_description from PRCUN-5983-mobile-fr-3-duo-move-it-integration to main\n\n* commit '62e62777000f3371ccf5e29d607b1a1712d3fa4d':\n  fix: extend test skip for unavailable franka_gazebo_bringup package to all robot_types\n  feat: add srdf for mobile fr3 duo fix: pass is_async and thread_priority to tmrv0_2.xacro"
+    },
+    {
+      "sha": "62e62777000f3371ccf5e29d607b1a1712d3fa4d",
+      "author": "Marius Winkelmeier",
+      "author_login": "winkma",
+      "date": "2026-04-15T15:46:14Z",
+      "message": "fix: extend test skip for unavailable franka_gazebo_bringup package to all robot_types"
+    },
+    {
+      "sha": "f40cff6d40f50cdb469f5531c91dc2e680196439",
+      "author": "Marius Winkelmeier",
+      "author_login": "winkma",
+      "date": "2026-04-09T08:21:22Z",
+      "message": "feat: add srdf for mobile fr3 duo\nfix: pass is_async and thread_priority to tmrv0_2.xacro"
+    },
+    {
+      "sha": "6a444ed6153d5db39af3ad2125627d1cc35ca9cf",
+      "author": "Guillermo Gomez Pena",
+      "author_login": "gomezgu",
+      "date": "2026-04-13T10:38:10Z",
+      "message": "Pull request #104: feat: ros2 control file added for fr3 duo\n\nMerge in MOCTRL/franka_description from PRCUN-6234-gazebo-sim-with-fr3-duo to main\n\n* commit '0d86d9190ab6e7fa072bb3d5bbd529a57ae34b36':\n  feat: ros2 control file added for fr3 duo"
+    },
+    {
+      "sha": "0d86d9190ab6e7fa072bb3d5bbd529a57ae34b36",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2026-04-07T16:43:01Z",
+      "message": "feat: ros2 control file added for fr3 duo"
+    },
+    {
+      "sha": "5d851994f41e58cbd399091f3286a6f6980d23d1",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2026-03-30T11:07:09Z",
+      "message": "Pull request #102: feat: Added Jenkinsfile for building franka_description on Jenkins\n\nMerge in MOCTRL/franka_description from PRCUN-6197-franka-description-on-jenkins to main\n\n* commit 'ea27fe9eea6f6643d41e287690138d0c00261aee':\n  feat: Added Jenkinsfile for building franka_description on Jenkins"
+    },
+    {
+      "sha": "ea27fe9eea6f6643d41e287690138d0c00261aee",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2026-03-23T10:28:58Z",
+      "message": "feat: Added Jenkinsfile for building franka_description on Jenkins"
+    },
+    {
+      "sha": "9f3cdb39cc4daf64fd0f1928750ee4813afa42a5",
+      "author": "Guillermo Gomez Pena",
+      "author_login": "gomezgu",
+      "date": "2026-03-25T10:30:35Z",
+      "message": "Pull request #103: fix: tmr inertials updated\n\nMerge in MOCTRL/franka_description from PRCUN-6192-update-tmr-inertials to main\n\n* commit '9f1bbfe9a0f1b345d037f4c6a8378cbd06681ca6':\n  fix: tmr inertials updated"
+    },
+    {
+      "sha": "9f1bbfe9a0f1b345d037f4c6a8378cbd06681ca6",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2026-03-19T15:20:37Z",
+      "message": "fix: tmr inertials updated"
+    },
+    {
+      "sha": "d9b22466bb6e75254fdcea08526f0662d971bc27",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2026-03-25T09:05:23Z",
+      "message": "Pull request #101: chore: Including franka_description in the FCI docu\n\nMerge in MOCTRL/franka_description from PRCUN-6159-docu-maintenance to main\n\n* commit 'a9f93bdd9a41c1570b5bdfc3a1e11f7ff6cd18f4':\n  chore: Including franka_description in the FCI docu"
+    },
+    {
+      "sha": "a9f93bdd9a41c1570b5bdfc3a1e11f7ff6cd18f4",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2026-03-20T14:03:06Z",
+      "message": "chore: Including franka_description in the FCI docu"
+    },
+    {
+      "sha": "3394b655bb8f6fe840f5e299f74b8826de672a58",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-03-11T14:42:16Z",
+      "message": "fix: formatting"
+    },
+    {
+      "sha": "9c181a5914236b6e490472f89657f0746af67e86",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-03-11T14:06:18Z",
+      "message": "Pull request #100: fix: adding tests for gazebo revealed bug in fr3_duo\n\nMerge in MOCTRL/franka_description from fix/gazebo_flag_tests to main\n\n* commit '2eb09cf64f19a0f51554fd2025be34670c97c898':\n  fix: adding tests for gazebo revealed bug in fr3_duo"
+    },
+    {
+      "sha": "2eb09cf64f19a0f51554fd2025be34670c97c898",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-03-11T13:28:26Z",
+      "message": "fix: adding tests for gazebo revealed bug in fr3_duo"
+    },
+    {
+      "sha": "f9d524808287aa6ea84ca31fc4be7b68352c7e88",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2026-03-11T13:54:01Z",
+      "message": "Pull request #98: fix: Adapted the fr3_duo srdf to match the new URDF structure\n\nMerge in MOCTRL/franka_description from PRCUN-5173-spine-action-server to main\n\n* commit '5a0f3728b0f282206ebbbfb84dd062d370c43df3':\n  fix: Adapted the fr3_duo srdf to match the new URDF structure"
+    },
+    {
+      "sha": "5a0f3728b0f282206ebbbfb84dd062d370c43df3",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2026-03-11T10:24:21Z",
+      "message": "fix: Adapted the fr3_duo srdf to match the new URDF structure"
+    },
+    {
+      "sha": "08989b38dc651e4fa3f7ae66607a87a44e9af522",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-03-11T13:26:37Z",
+      "message": "Pull request #99: Feat/refactor franka arm configs\n\nMerge in MOCTRL/franka_description from feat/refactor_franka_arm_configs to main\n\n* commit 'a10f0a0815006cccd74cd12eb68f7bb642e38435':\n  chore: changelog updated\n  fix: mfr3duo arm_prefixes index\n  refactor: configs"
+    },
+    {
+      "sha": "a10f0a0815006cccd74cd12eb68f7bb642e38435",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-03-11T13:16:58Z",
+      "message": "chore: changelog updated"
+    },
+    {
+      "sha": "e44de08ca80d9567f3bdab6b2583b8183e7d50e8",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-03-11T12:48:57Z",
+      "message": "fix: mfr3duo arm_prefixes index"
+    },
+    {
+      "sha": "97a377c60afa3f50ceac2545cb2a0910c44814ee",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-03-11T12:48:57Z",
+      "message": "refactor: configs"
+    },
+    {
+      "sha": "46055771a1237ee499298bc5218a84c66fa81086",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-03-11T12:46:17Z",
+      "message": "Pull request #97: feat: improved urdf tests\n\nMerge in MOCTRL/franka_description from feat/improved_urdf_tests to main\n\n* commit 'e4e4c0bad1d24030a515c5c06c62c59b5ab02f18':\n  fix: missing fr3_duo\n  feat: improved urdf tests"
+    },
+    {
+      "sha": "e4e4c0bad1d24030a515c5c06c62c59b5ab02f18",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-03-11T10:11:09Z",
+      "message": "fix: missing fr3_duo"
+    },
+    {
+      "sha": "e535e5d6e94f28350a254412e3f73070f2081f8f",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-03-11T09:57:05Z",
+      "message": "feat: improved urdf tests"
+    },
+    {
+      "sha": "bab731a19dd9681a92fdb92914fe3880e4740c50",
+      "author": "Marius Winkelmeier",
+      "author_login": "winkma",
+      "date": "2026-03-09T09:47:28Z",
+      "message": "Pull request #95: fix: mobile_fr3_duo.urdf.xacro forwards is_async and thead_priority to ros2_control parts\n\nMerge in MOCTRL/franka_description from fix-mobile-fr3-duo-async-control-example to main\n\n* commit '2bffa5115b146e81ab97d9e7d05b92ef60a7cab2':\n  fix: mobile_fr3_duo.urdf.xacro forwards is_async and thead_priority to ros2_control parts"
+    },
+    {
+      "sha": "2bffa5115b146e81ab97d9e7d05b92ef60a7cab2",
+      "author": "Marius Winkelmeier",
+      "author_login": "winkma",
+      "date": "2026-03-06T15:54:01Z",
+      "message": "fix: mobile_fr3_duo.urdf.xacro forwards is_async and thead_priority to ros2_control parts"
+    },
+    {
+      "sha": "3f4bb790ec8980452db65e029559e7721c4ba426",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2026-03-06T15:45:58Z",
+      "message": "Pull request #94: refactor: Moved the origin of the fr3_duo_mount to 0 0 0 + moved kinematics/inertials out\n\nMerge in MOCTRL/franka_description from adapt-mounting-frames to main\n\n* commit '3a170c1d6f50c346c523768b304706c25b4d88d8':\n  refactor: Moved the origin of the fr3_duo_mount to 0 0 0 + moved kinematics/inertials out"
+    },
+    {
+      "sha": "3a170c1d6f50c346c523768b304706c25b4d88d8",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2026-03-06T07:26:41Z",
+      "message": "refactor: Moved the origin of the fr3_duo_mount to 0 0 0 + moved kinematics/inertials out"
+    },
+    {
+      "sha": "d855869792d5de5fbb51f890342f72d640c3e183",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2026-03-05T16:34:00Z",
+      "message": "Pull request #92: refactor: Moved head, mount and spine to accessories\n\nMerge in MOCTRL/franka_description from PRCUN-6057-update-mount-frame-jazzy to main\n\n* commit '5edd901e3485b062ee942c13f6ff7d4f5cbaf520':\n  refactor: Moved head, mount and spine to accessories"
+    },
+    {
+      "sha": "5edd901e3485b062ee942c13f6ff7d4f5cbaf520",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2026-03-03T14:48:34Z",
+      "message": "refactor: Moved head, mount and spine to accessories"
+    },
+    {
+      "sha": "72baf5bf4e88eaec27f0eb61be1b20a001abf2ab",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-03-02T14:39:18Z",
+      "message": "bump release 2.6.0"
+    },
+    {
+      "sha": "1cb1b26b18b783fdf69ee69cd6a64b9c4d2a0d82",
+      "author": "Jakob Schlichting",
+      "author_login": null,
+      "date": "2026-02-26T15:34:56Z",
+      "message": "Pull request #88: Arm_prefixes in SRDF\n\nMerge in MOCTRL/franka_description from BFFTRAC-2630-franka-ros-2-command-interfaces-are-not-found-once-arm-prefix-is-used to jazzy\n\n* commit 'fecb64d221d321c7ffd2ede12c329e1a955e18e9':\n  fix: properly handle arm_prefixes in srdf"
+    },
+    {
+      "sha": "fecb64d221d321c7ffd2ede12c329e1a955e18e9",
+      "author": "schl_ja",
+      "author_login": null,
+      "date": "2026-02-25T14:17:17Z",
+      "message": "fix: properly handle arm_prefixes in srdf"
+    },
+    {
+      "sha": "582bee945fd447c466090a6f3d85688c3b20e0fb",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-02-25T13:10:09Z",
+      "message": "Pull request #87: feat/PRCUN-2856-accelerometer-jazzy\n\nMerge in MOCTRL/franka_description from feat/PRCUN-2856-accelerometer-jazzy to jazzy\n\n* commit 'd2e4b147a457435a4bd8c4f15b622ec558fad169':\n  feat: fr3v2 accelerometers frames"
+    },
+    {
+      "sha": "d2e4b147a457435a4bd8c4f15b622ec558fad169",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-02-25T13:08:48Z",
+      "message": "feat: fr3v2 accelerometers frames\n\nfeat: fr3v1 variant\n\nchangelog updated\n\nfix: restored kinematics, changed fr3v1 accel frames\n\nchangelog fix"
+    },
+    {
+      "sha": "eeb9f26219fc0d58b995fc034cb0d27c230b5571",
+      "author": "Guillermo Gomez Pena",
+      "author_login": "gomezgu",
+      "date": "2026-02-23T17:20:49Z",
+      "message": "Pull request #85: PRCUN-5966 simulate mobile fr3 duo with gazebo in jazzy\n\nMerge in MOCTRL/franka_description from PRCUN-5966-simulate-mobile-fr3-duo-with-gazebo-in-jazzy to main\n\n* commit '1b6476d139c337820a0ffc6a02592495966f14e8':\n  fix: less than seven joints active for real hardware\n  revert lidar changes\n  update the lidar mounting angle and flip the left and right camera mounting\n  feat: head description added\n  feat: xacro for mobile fr3 duo\n  feat: adaptations for gazebo"
+    },
+    {
+      "sha": "1b6476d139c337820a0ffc6a02592495966f14e8",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2026-02-23T11:35:37Z",
+      "message": "fix: less than seven joints active for real hardware"
+    },
+    {
+      "sha": "45b5ba23831e5b9a2c66e7a519eb25d23184fdfe",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2026-02-19T14:53:48Z",
+      "message": "revert lidar changes"
+    },
+    {
+      "sha": "4d3da077a9810c1949825e4defbd8c798c4dd863",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2026-02-19T14:02:24Z",
+      "message": "update the lidar mounting angle and flip the left and right camera mounting"
+    },
+    {
+      "sha": "9ac440a18c4b5a3eb171aaf350015579322a641d",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2026-02-17T18:04:29Z",
+      "message": "feat: head description added"
+    },
+    {
+      "sha": "b6b659853580aa8455fd83ed3276a983f0acdfd9",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2026-02-17T15:31:16Z",
+      "message": "feat: xacro for mobile fr3 duo"
+    },
+    {
+      "sha": "2b84eb27e9b5dcffc5fb2ef1268a5c01816860f9",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2026-02-12T22:47:51Z",
+      "message": "feat: adaptations for gazebo"
+    },
+    {
+      "sha": "99901fde1377bf2b2413a04e7ca8f6fcac1ef6e7",
+      "author": "Marius Winkelmeier",
+      "author_login": "winkma",
+      "date": "2026-02-17T13:28:28Z",
+      "message": "bump: bump version"
+    },
+    {
+      "sha": "79441d6c70be1a64d0f73cba0a3f66c5472c89c5",
+      "author": "Guillermo Gomez Pena",
+      "author_login": "gomezgu",
+      "date": "2026-02-12T11:50:43Z",
+      "message": "Pull request #83: fix: adaptations for async control\n\nMerge in MOCTRL/franka_description from fix/adaptations_for_async_control to main\n\n* commit '4c80df6461d9bb5222466c7043a9b72f011fdd75':\n  fix: adaptations for async control"
+    },
+    {
+      "sha": "4c80df6461d9bb5222466c7043a9b72f011fdd75",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2026-02-06T10:14:18Z",
+      "message": "fix: adaptations for async control"
+    },
+    {
+      "sha": "a50ec8a51c824848368344ecd5bb312b570c6190",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-01-29T16:25:55Z",
+      "message": "Pull request #81: fix: use quotes for spaced paths\n\nMerge in MOCTRL/franka_description from fix/create_urdf_quotes to main\n\n* commit '43bd0ba598291eec744afa8d4920343f4e13a147':\n  fix: use quotes for spaced paths"
+    },
+    {
+      "sha": "43bd0ba598291eec744afa8d4920343f4e13a147",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-01-28T15:02:57Z",
+      "message": "fix: use quotes for spaced paths"
+    },
+    {
+      "sha": "f51938376c03c5302d75882f8b678819f80e73b5",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2026-01-28T12:57:18Z",
+      "message": "update changelog"
+    },
+    {
+      "sha": "796e9a00788945552b0d7ad395b6638d666e5f3d",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2026-01-28T11:21:54Z",
+      "message": "add: motor inertia and gear ratios to urdf"
+    },
+    {
+      "sha": "2fd2ff5862d2eb374012d6967c33bfba856b6039",
+      "author": "Andreas Gaßner",
+      "author_login": "AndreasJosefGassner",
+      "date": "2026-01-27T11:36:41Z",
+      "message": "Pull request #78: chore: replace lidar with mounting point and add imu mounting point\n\nMerge in MOCTRL/franka_description from feat/tmr_add_imu_lidar_mounting_points to jazzy\n\n* commit 'e4948e3257d91d9e2f78808945cdafd6d9dea8ee':\n  chore: replace lidar with mounting point and add imu mounting point"
+    },
+    {
+      "sha": "e4948e3257d91d9e2f78808945cdafd6d9dea8ee",
+      "author": "Andreas Gassner",
+      "author_login": "AndreasJosefGassner",
+      "date": "2026-01-27T07:08:35Z",
+      "message": "chore: replace lidar with mounting point and add imu mounting point"
+    },
+    {
+      "sha": "1aa4fd30e6e274cbf5e986a5af8004df32bad284",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-01-27T10:00:57Z",
+      "message": "Pull request #76: bump for release 2.4.0\n\nMerge in MOCTRL/franka_description from feat/release_240 to jazzy\n\n* commit 'a9fec3a24b5e56abdfdbad82ad3878fd857712b9':\n  bump for release 2.4.0"
+    },
+    {
+      "sha": "a9fec3a24b5e56abdfdbad82ad3878fd857712b9",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-01-26T12:29:16Z",
+      "message": "bump for release 2.4.0"
+    },
+    {
+      "sha": "494d1d474844c167d72ccd604633545c9067eea2",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-01-26T10:42:22Z",
+      "message": "Pull request #74: [JAZZY] fix: removed further dependencies on olvx\n\nMerge in MOCTRL/franka_description from fix/olvx_descriptions_module_removal to jazzy\n\n* commit '41e255a86d88d889ad23d2f1e9064b9c28964164':\n  keep 2.3.2\n  fix: removed further dependencies on olvx"
+    },
+    {
+      "sha": "41e255a86d88d889ad23d2f1e9064b9c28964164",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-01-23T14:15:50Z",
+      "message": "keep 2.3.2"
+    },
+    {
+      "sha": "39ed27601d03f6037ba2d9c007c4f386aaa2b782",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-01-23T13:17:39Z",
+      "message": "fix: removed further dependencies on olvx"
+    },
+    {
+      "sha": "e274c583ca87ff17ed7ea89ed5ce28fc6f15f81d",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-01-22T15:49:03Z",
+      "message": "Pull request #69: Feat/self collision jazzy\n\nMerge in MOCTRL/franka_description from feat/self_collision_jazzy to jazzy\n\n* commit '6950c76fcd91ad1a9a87788fc11f8a1cd9616604':\n  Updated Changelog\n  updated CHANGELOG for proper versioning\n  delted command interface integration\n  bug fixed for other arm_prefixes\n  fixed the srdf to support different prefixes\n  slightly polished\n  Added fr3_duo srdf and enabled arm_prefixes for urdf"
+    },
+    {
+      "sha": "6950c76fcd91ad1a9a87788fc11f8a1cd9616604",
+      "author": "schl_ja",
+      "author_login": null,
+      "date": "2026-01-22T15:40:06Z",
+      "message": "Updated Changelog"
+    },
+    {
+      "sha": "fde731cf63591d2884857958c7df6dddebdfda7d",
+      "author": "schl_ja",
+      "author_login": null,
+      "date": "2026-01-22T10:25:33Z",
+      "message": "updated CHANGELOG for proper versioning"
+    },
+    {
+      "sha": "b347837c36870f08f9bff656f990bd991e3a73c1",
+      "author": "schl_ja",
+      "author_login": null,
+      "date": "2026-01-20T14:51:49Z",
+      "message": "delted command interface integration"
+    },
+    {
+      "sha": "60e4617ce1dda11b36f86e80b019b67ff8089bca",
+      "author": "schl_ja",
+      "author_login": null,
+      "date": "2026-01-08T16:14:46Z",
+      "message": "bug fixed for other arm_prefixes"
+    },
+    {
+      "sha": "27dca8a406ae48996e0460f3263192e82f51cc03",
+      "author": "schl_ja",
+      "author_login": null,
+      "date": "2026-01-08T15:41:38Z",
+      "message": "fixed the srdf to support different prefixes"
+    },
+    {
+      "sha": "23c712f3f156282e34756af40f36c80f3dc6d10a",
+      "author": "schl_ja",
+      "author_login": null,
+      "date": "2026-01-08T15:31:52Z",
+      "message": "slightly polished"
+    },
+    {
+      "sha": "2d16f8259b23ccc157309defbf1d9884e577d04f",
+      "author": "schl_ja",
+      "author_login": null,
+      "date": "2026-01-08T15:03:47Z",
+      "message": "Added fr3_duo srdf and enabled arm_prefixes for urdf"
+    },
+    {
+      "sha": "ea6623cebe3a4f5a814000afcaea8b79a6dd77cd",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-01-22T13:15:43Z",
+      "message": "bump version 2.3.2"
+    },
+    {
+      "sha": "3eca092f3a4d53ed35577f6f2a7f0d6021a4577e",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-01-22T12:38:40Z",
+      "message": "Pull request #72: TMR 0.2: support in franka_description.\n\nMerge in MOCTRL/franka_description from feat/PRCUN-5623 to main\n\n* commit '64121c668e406d15cad4133aab98c2dc2f4ae880':\n  feat: generating dummy srdf for robots without it feat: renamed robot_arms into robot, moved tmr into robots fix: updated paths for tmr chore: changelog updated"
+    },
+    {
+      "sha": "64121c668e406d15cad4133aab98c2dc2f4ae880",
+      "author": "Andrea Franceschetti",
+      "author_login": "francando",
+      "date": "2026-01-20T15:57:13Z",
+      "message": "feat: generating dummy srdf for robots without it\nfeat: renamed robot_arms into robot, moved tmr into robots\nfix: updated paths for tmr\nchore: changelog updated"
+    },
+    {
+      "sha": "2b4c24c8f0ea17a9ad0ea6e115bd8aae47ab6d60",
+      "author": "Guillermo Gomez Pena",
+      "author_login": "gomezgu",
+      "date": "2026-01-16T10:39:21Z",
+      "message": "Pull request #70: feat: mobile_fr3_duo added to franka description\n\nMerge in MOCTRL/franka_description from PRCUN-4404-mobile-fr3-duo-v02 to jazzy\n\n* commit '7ba871fe9725da7603e2ffe04dbf6f078fb91530':\n  bump version 2.3.1\n  refactor: version added to mobile fr3 duo\n  feat: mobile_fr3_duo added to franka description"
+    },
+    {
+      "sha": "7ba871fe9725da7603e2ffe04dbf6f078fb91530",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2026-01-16T10:35:48Z",
+      "message": "bump version 2.3.1"
+    },
+    {
+      "sha": "11647c4f42687b1104554b3a02ae106088bf4cd1",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2026-01-15T11:28:23Z",
+      "message": "refactor: version added to mobile fr3 duo"
+    },
+    {
+      "sha": "2e7555a8f489a208cce8c41326c4390aa1a41b3f",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2026-01-13T17:03:09Z",
+      "message": "feat: mobile_fr3_duo added to franka description"
+    },
+    {
+      "sha": "db87170943044a40f0db8848b0f6c9dc934b937a",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2025-12-19T11:35:58Z",
+      "message": "Pull request #67: PRCUN5484 dual arm\n\nMerge in MOCTRL/franka_description from PRCUN5484-dual-arm to jazzy\n\n* commit 'b1070c593851811ffcedc191a5fc87f6d89ebae9':\n  update package version to 2.3.0\n  docs: update changelog\n  feat: adds thread priority for async hardware interface\n  feat: pass async feature\n  wip: Dual arm setup"
+    },
+    {
+      "sha": "b1070c593851811ffcedc191a5fc87f6d89ebae9",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2025-12-19T11:32:02Z",
+      "message": "update package version to 2.3.0"
+    },
+    {
+      "sha": "4e11b762a549e1ee3bf18c234851aa7d36ced0ac",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2025-12-19T11:31:14Z",
+      "message": "docs: update changelog"
+    },
+    {
+      "sha": "c9684304d1949e2f1e855114d4112c555bab2061",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2025-12-12T12:49:17Z",
+      "message": "feat: adds thread priority for async hardware interface"
+    },
+    {
+      "sha": "499f6a61339c4fc13159bb878921024b5b5c46bf",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2025-12-09T16:06:22Z",
+      "message": "feat: pass async feature"
+    },
+    {
+      "sha": "ecabc396cb33d68caba70dc972ceddebbfa9f437",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2025-11-27T07:36:32Z",
+      "message": "wip: Dual arm setup"
+    },
+    {
+      "sha": "5193c7b357d4253f4aca1f4dafb43649b2a11734",
+      "author": "Guillermo Gomez Pena",
+      "author_login": "gomezgu",
+      "date": "2025-12-08T07:58:41Z",
+      "message": "Pull request #65: Jazzy tmr\n\nMerge in MOCTRL/franka_description from jazzy_tmr to jazzy\n\n* commit '5a6ace8eb498663f57c1278a0fb17ae0613374c2': (29 commits)\n  feat: new meshes for the lidars\n  feat: new meshes for the tmr\n  feat: mounting points added to tmr\n  feat: robot_id replaced by robot_type\n  chore: changelog updated\n  feat: arm_id changed to robot_id\n  fix: joint names modified for ros2 control\n  fix: collision meshes added to the wheels\n  refactor: new convention for versioning\n  fix: new lidars inertials\n  feat: reduced kinematic version for tmr v02 added\n  chore: tmr v02 files renamed\n  feat: correct inertials added\n  feat: ros2 control for tmr v02\n  feat: tmr v02 added to franka description\n  refactor: tmr branch working with jazzy\n  fix: dockerfile dependencies for tmr added\n  FIX: IMU was not included in the xacro file\n  fix: tmr inertials updated\n  fix: lidars inertials updated\n  ..."
+    },
+    {
+      "sha": "5a6ace8eb498663f57c1278a0fb17ae0613374c2",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-12-05T15:10:05Z",
+      "message": "feat: new meshes for the lidars"
+    },
+    {
+      "sha": "db7b297622f7f1e33a533c98788cc7e4a404d48b",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-12-05T14:24:53Z",
+      "message": "feat: new meshes for the tmr"
+    },
+    {
+      "sha": "94fae2ce5350801c3a730f35c4796038a8ffc87c",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-12-05T14:23:02Z",
+      "message": "feat: mounting points added to tmr"
+    },
+    {
+      "sha": "5415ac97ee91af78893e9b7717ddcd5db7a39b5e",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-12-05T13:17:21Z",
+      "message": "feat: robot_id replaced by robot_type"
+    },
+    {
+      "sha": "98b871ace68bc7034df9bdf85ab59a0f502cb90d",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-12-04T17:10:03Z",
+      "message": "chore: changelog updated"
+    },
+    {
+      "sha": "e9547aebb2d4b8ac3b885ebb6eb5b37fbe6914f6",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-12-04T15:12:23Z",
+      "message": "feat: arm_id changed to robot_id"
+    },
+    {
+      "sha": "987775e8587394bfc9c97bb1bd304b987f0f70eb",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-11-24T20:40:34Z",
+      "message": "fix: joint names modified for ros2 control"
+    },
+    {
+      "sha": "b5085884b896778d81a56be9a5732cab2832799b",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-11-14T14:13:14Z",
+      "message": "fix: collision meshes added to the wheels"
+    },
+    {
+      "sha": "670a470c7b68a9d7b172ff923e58e7c4509fc462",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-11-14T14:00:09Z",
+      "message": "refactor: new convention for versioning"
+    },
+    {
+      "sha": "9c4df658582c7cf68f83da20c0b51f2deac7aeb2",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-11-14T13:34:18Z",
+      "message": "fix: new lidars inertials"
+    },
+    {
+      "sha": "808be0cebba62072e746c3b9999b6ce7692dfccf",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-11-14T13:06:18Z",
+      "message": "feat: reduced kinematic version for tmr v02 added"
+    },
+    {
+      "sha": "d1242223858bdc819ff851d27ebe59231cea7202",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-11-13T11:26:52Z",
+      "message": "chore: tmr v02 files renamed"
+    },
+    {
+      "sha": "214f897c3627676b13a5a564d495c4589d908446",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-11-13T10:28:14Z",
+      "message": "feat: correct inertials added"
+    },
+    {
+      "sha": "4a9132ac1bd189c28c5673ca532919a5ab96a23c",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-11-12T17:33:12Z",
+      "message": "feat: ros2 control for tmr v02"
+    },
+    {
+      "sha": "b7fc91ffd7d504e82675b06c6e28b3bb80914e34",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-11-12T15:56:10Z",
+      "message": "feat: tmr v02 added to franka description"
+    },
+    {
+      "sha": "b1bcc1519997ac63b017c28a5618c36bc6e2cc1d",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-11-12T09:03:19Z",
+      "message": "refactor: tmr branch working with jazzy"
+    },
+    {
+      "sha": "b2f204f72258c1f6c73bf16eb70ca7d648f2050a",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-05-07T09:21:19Z",
+      "message": "fix: dockerfile dependencies for tmr added"
+    },
+    {
+      "sha": "9fe644f29f46719d3a7aa93ca74257c29191ba36",
+      "author": "Ignacio Perez",
+      "author_login": "ignacio-franka",
+      "date": "2025-03-31T07:57:54Z",
+      "message": "FIX: IMU was not included in the xacro file"
+    },
+    {
+      "sha": "903800092284cd586ccffbbb77e3a573afbe8de9",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-02-27T15:44:01Z",
+      "message": "fix: tmr inertials updated"
+    },
+    {
+      "sha": "969616d031677449a4c463ff225c33ef29fcb30d",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-02-27T15:20:23Z",
+      "message": "fix: lidars inertials updated"
+    },
+    {
+      "sha": "f1751101e3a89d3ca040b7052f9795f9bec96ab0",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2025-02-25T18:46:47Z",
+      "message": "fix: Fixed a wrong path for visualizing the sensors"
+    },
+    {
+      "sha": "dc0f73f2e75e78d6869fb94f458a86885aeb1f81",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-02-19T09:58:24Z",
+      "message": "feat: torso visuals added"
+    },
+    {
+      "sha": "f33f1d439927b4e92f762f89af1b2ff1dbbeb42e",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-02-19T09:10:37Z",
+      "message": "fix: collision meshes origin updated"
+    },
+    {
+      "sha": "ffeae1d49862314209ae57929fabfabbeb75ca0c",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-02-18T16:53:05Z",
+      "message": "fix: update offset values for the torso"
+    },
+    {
+      "sha": "5190838e878c837635f731f45e68e2b72e6ed44c",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-02-17T21:02:21Z",
+      "message": "refactor: tmr related files are placed in dedicated folders"
+    },
+    {
+      "sha": "6da4b30579ff403dcc266641d314f3db06d59728",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-02-17T20:55:41Z",
+      "message": "feat: torso added to the description"
+    },
+    {
+      "sha": "83e2f3ccdfd796b9b196312b38288f2c47024766",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2025-02-11T16:01:08Z",
+      "message": "feat: Added the tmr description"
+    },
+    {
+      "sha": "648987f4f4d616dd52426f4bf34f65216238371e",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2025-02-11T14:48:44Z",
+      "message": "fix: Getting the multi robot arm to work"
+    },
+    {
+      "sha": "d851e1877cc95561dd8055f3a0fb695efa8be9f6",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2025-02-03T11:59:50Z",
+      "message": "feat: Added additional Cartesian/elbow based command interfaces to the ros2_control URDF"
+    },
+    {
+      "sha": "68a3288ac16e5b2149777b3c241e5743ac8e06ce",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2025-11-10T13:45:07Z",
+      "message": "update changelog bump version"
+    },
+    {
+      "sha": "586302aab944b5ef24fbc1447b3bec101ef355e3",
+      "author": "Marius Winkelmeier",
+      "author_login": "winkma",
+      "date": "2025-11-04T09:59:50Z",
+      "message": "Pull request #59: PRCUN-5432: Updated fr3 duo jazzy\n\nMerge in MOCTRL/franka_description from updated_fr3_duo_jazzy to jazzy\n\n* commit '1b6fa236e3df49632e58620b3ddc40ada05ea2e7':\n  feat: mount and cover belong to the same link feat: updated inertials\n  updated model materials\n  * Refactor FR3 Duo Robot Configuration"
+    },
+    {
+      "sha": "1b6fa236e3df49632e58620b3ddc40ada05ea2e7",
+      "author": "Marius Winkelmeier",
+      "author_login": "winkma",
+      "date": "2025-10-31T16:08:13Z",
+      "message": "feat: mount and cover belong to the same link\nfeat: updated inertials"
+    },
+    {
+      "sha": "1bda71e15b433bc355fa19bb0391dd7b6618a723",
+      "author": "Marian Körber",
+      "author_login": "Majanao",
+      "date": "2025-10-29T16:14:10Z",
+      "message": "updated model materials"
+    },
+    {
+      "sha": "f4fa7e5aa00908b9ef244ca6edeea861cf40c9fb",
+      "author": "Marian Körber",
+      "author_login": "Majanao",
+      "date": "2025-10-28T09:00:15Z",
+      "message": "* Refactor FR3 Duo Robot Configuration\n\n    - Removed the cover kinematics argument from fr3_duo.urdf.xacro as it is no longer needed.\n    - Updated inertials.yaml for fr3_duo_cover and fr3_duo_mount to indicate that values need to be corrected.\n    - Deleted the kinematics.yaml file for fr3_duo_cover since it is no longer in use.\n    - Removed fr3_duo_fixed_structure.urdf.xacro as it is obsolete.\n    - Adjusted kinematic parameters in fr3_duo_mount's kinematics.yaml for both left and right configurations to new values."
+    },
+    {
+      "sha": "ba3487436333216ef8ffca95fd9c218851a6ba8f",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2025-10-31T09:12:46Z",
+      "message": "Pull request #55: release 5.9.0 prepare release\n\nMerge in MOCTRL/franka_description from jazzy-prepare-for-release-5.9.0 to jazzy\n\n* commit '8c84b7437a3a3fa8f16b8a5d9211258e26af02a5':\n  chore: Adapted changelog (added 2.0.0 content)\n  release 5.9.0 prepare release"
+    },
+    {
+      "sha": "8c84b7437a3a3fa8f16b8a5d9211258e26af02a5",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2025-10-31T09:11:29Z",
+      "message": "chore: Adapted changelog (added 2.0.0 content)"
+    },
+    {
+      "sha": "98be53813d9d38c6d82122683d97fb6044b61634",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2025-10-24T12:57:31Z",
+      "message": "release 5.9.0 prepare release"
+    },
+    {
+      "sha": "a9550d57ad7b1026a82454a981c996d37a0d041d",
+      "author": "Marius Winkelmeier",
+      "author_login": "winkma",
+      "date": "2025-10-13T13:42:30Z",
+      "message": "Pull request #54: feat: added new robot variant fr3v2.1\n\nMerge in MOCTRL/franka_description from PRCUN-5146-new-dynamic-model-identification-for-fr-3-v-2-1-jazzy to jazzy\n\n* commit '8b71e0d5154b1548bee3cc2f9e41dd2538a8ce16':\n  feat: added new robot variant fr3v2.1"
+    },
+    {
+      "sha": "8b71e0d5154b1548bee3cc2f9e41dd2538a8ce16",
+      "author": "Marius Winkelmeier",
+      "author_login": "winkma",
+      "date": "2025-10-07T16:12:36Z",
+      "message": "feat: added new robot variant fr3v2.1"
+    },
+    {
+      "sha": "f1170aab08a1048372126414b5132af5f75029f7",
+      "author": "Guillermo Gomez Pena",
+      "author_login": "gomezgu",
+      "date": "2025-10-10T12:11:37Z",
+      "message": "Pull request #50: Update jazzy\n\nMerge in MOCTRL/franka_description from update-jazzy to jazzy\n\n* commit '41e2fe26c06f545bcefd936fbe87e9e902152b93':\n  fix: group definition checking for right tcp\n  add: fp3 joint limits\n  prepare for release 1.1.0\n  feat: Extend the joint limits, add position-based velocity limits tags\n  feat: added accelerometer frames to urdfs"
+    },
+    {
+      "sha": "41e2fe26c06f545bcefd936fbe87e9e902152b93",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-10-06T12:34:05Z",
+      "message": "fix: group definition checking for right tcp"
+    },
+    {
+      "sha": "d1f0c986c52ea05e468f2e812dd4fdf4562a4510",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2025-10-06T11:36:06Z",
+      "message": "add: fp3 joint limits"
+    },
+    {
+      "sha": "19f1b8646a2ff2e5ff9a73d209492ff817ea2397",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2025-09-24T14:52:00Z",
+      "message": "prepare for release 1.1.0"
+    },
+    {
+      "sha": "919c533741cb816684bb178f4904d771f45a1798",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2025-09-23T15:05:44Z",
+      "message": "feat: Extend the joint limits, add position-based velocity limits tags"
+    },
+    {
+      "sha": "e9e3c6cd7d46fe520f99047c30d27e9449093cd9",
+      "author": "Marius Winkelmeier",
+      "author_login": "winkma",
+      "date": "2025-08-11T13:15:37Z",
+      "message": "feat: added accelerometer frames to urdfs"
+    },
+    {
+      "sha": "fac4949828c8b627ccb8593628212f59a8f46d00",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2025-08-26T07:44:22Z",
+      "message": "Merge pull request #22 from WHongLin/jazzy\n\nrefactor: migrate to jazzy"
+    },
+    {
+      "sha": "8e604320326104c3ad8f500fa04854274c312528",
+      "author": "honglin",
+      "author_login": null,
+      "date": "2025-08-24T08:27:40Z",
+      "message": "refactor: migrate to jazzy"
+    },
+    {
+      "sha": "4b8948e061c2ef8b2ea15d658cf35981c683f864",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-08-01T12:54:40Z",
+      "message": "1.0.2"
+    },
+    {
+      "sha": "cda590982cea749ec4816498c05f06dba336f8a0",
+      "author": "Guillermo Gomez Pena",
+      "author_login": "gomezgu",
+      "date": "2025-08-01T12:39:30Z",
+      "message": "Pull request #43: fix: ee_with_one_link takes the correct arguments\n\nMerge in MOCTRL/franka_description from fix/cobot-pump-visualization to main\n\n* commit '27deab86e3df1ff8e093a7c5b6c0edae8739bc39':\n  fix: remove redundant argument\n  fix: ee_with_one_link takes the correct arguments"
+    },
+    {
+      "sha": "27deab86e3df1ff8e093a7c5b6c0edae8739bc39",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-08-01T11:40:18Z",
+      "message": "fix: remove redundant argument"
+    },
+    {
+      "sha": "9dfc11294b32d481c31c2501655d7333505ba43d",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-07-30T13:13:29Z",
+      "message": "fix: ee_with_one_link takes the correct arguments"
+    },
+    {
+      "sha": "93f83ae4f9de7ceac2300e73812dad452d052002",
+      "author": "Guillermo Gomez Pena",
+      "author_login": "gomezgu",
+      "date": "2025-08-01T11:31:33Z",
+      "message": "Pull request #44: fix: gazebo can be used with prefixes\n\nMerge in MOCTRL/franka_description from fix/gazebo-using-prefixes to main\n\n* commit '6af373c97b1dd7c2e4c135c2b82dcf0877ed6099':\n  fix: gazebo can be used with prefixes"
+    },
+    {
+      "sha": "6af373c97b1dd7c2e4c135c2b82dcf0877ed6099",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-07-30T14:17:27Z",
+      "message": "fix: gazebo can be used with prefixes"
+    },
+    {
+      "sha": "566ba44abc48be2fca16050c406562e22f85793b",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-07-09T12:05:47Z",
+      "message": "1.0.1"
+    },
+    {
+      "sha": "616ac771fbc3931013c588aa552061163ba98eef",
+      "author": "Guillermo Gomez Pena",
+      "author_login": "gomezgu",
+      "date": "2025-07-03T12:08:53Z",
+      "message": "Pull request #41: fix: cover and mount replaced by new designs\n\nMerge in MOCTRL/franka_description from PRCUN-4039-new-meshes-for-the-cover to main\n\n* commit 'be8347725c07cb3567a1ca431fe1475f246120a2':\n  fix: cover and mount replaced by new designs"
+    },
+    {
+      "sha": "be8347725c07cb3567a1ca431fe1475f246120a2",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-07-02T15:02:11Z",
+      "message": "fix: cover and mount replaced by new designs"
+    },
+    {
+      "sha": "5f8d0c790508dd7fe3142ad6c2303edf1cee6e5a",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-06-26T12:51:11Z",
+      "message": "1.0.0"
+    },
+    {
+      "sha": "589ba7036a17a4e2e79a469ee16dc293207b0c75",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2025-06-26T12:36:33Z",
+      "message": "Pull request #40: fix/ik-bug-gripper-launching\n\nMerge in MOCTRL/franka_description from fix/ik-bug-gripper to main\n\n* commit '467e282f23c46ae4b2abf6771647aa5ac9366b22':\n  fix: urdf xacros include end-effector parameters\n  fix/ik-bug-gripper-launching"
+    },
+    {
+      "sha": "467e282f23c46ae4b2abf6771647aa5ac9366b22",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-06-26T10:48:28Z",
+      "message": "fix: urdf xacros include end-effector parameters"
+    },
+    {
+      "sha": "c3a6cf30a9c0ef1e014fda28a5d5c8f6a6c88bd2",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2025-06-25T15:54:15Z",
+      "message": "fix/ik-bug-gripper-launching"
+    },
+    {
+      "sha": "a72e2061021648371d0c9e93de11bf33ca83b6f7",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2025-06-20T14:32:01Z",
+      "message": "bumped version add the changelog"
+    },
+    {
+      "sha": "38be1b0953687e33da8050c79371945291e4af8e",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2025-06-20T14:24:27Z",
+      "message": "Pull request #39: fix: syntax error\n\nMerge in MOCTRL/franka_description from fix/syntax-error to main\n\n* commit '5fd84b003f7339f383f40b609089f064de8785ee':\n  fix: syntax error"
+    },
+    {
+      "sha": "5fd84b003f7339f383f40b609089f064de8785ee",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2025-06-20T13:54:47Z",
+      "message": "fix: syntax error"
+    },
+    {
+      "sha": "39f8c0bcea9bc48ae5334edcb2aa2a504f2d2c85",
+      "author": "Marius Winkelmeier",
+      "author_login": "winkma",
+      "date": "2025-04-11T08:45:04Z",
+      "message": "Pull request #35: feat: identify fr3v2 interials\n\nMerge in MOCTRL/franka_description from PRCUN-3152-identification-dynamic-model-for-fr3v2 to main\n\n* commit 'b29e4f293bd6dbf0d305daceaf8307680df001b6':\n  feat: identify fr3v2 interials"
+    },
+    {
+      "sha": "b29e4f293bd6dbf0d305daceaf8307680df001b6",
+      "author": "Marius Winkelmeier",
+      "author_login": "winkma",
+      "date": "2025-04-04T13:36:14Z",
+      "message": "feat: identify fr3v2 interials"
+    },
+    {
+      "sha": "dfcd5c7618a5685aeba43069ef698260de943b02",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2025-04-02T08:15:09Z",
+      "message": "Pull request #29: feat: Added additional Cartesian/elbow based command interfaces to the ros2_control URDF\n\nMerge in MOCTRL/franka_description from PRCUN-3716-add-command-interfaces to main\n\n* commit '982ffc1a245e3eb034d8ecb48c29087896fa1f35':\n  feat: Added additional Cartesian/elbow based command interfaces to the ros2_control URDF"
+    },
+    {
+      "sha": "982ffc1a245e3eb034d8ecb48c29087896fa1f35",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2025-02-03T11:59:50Z",
+      "message": "feat: Added additional Cartesian/elbow based command interfaces to the ros2_control URDF"
+    },
+    {
+      "sha": "35b789ceec2cbfee49cc2c0c0154f4356ffecf5a",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-03-17T18:10:42Z",
+      "message": "fix: multi arm removed"
+    },
+    {
+      "sha": "e95a814cff738bedd6b90893aeeb361f4fdf6302",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-03-10T15:27:02Z",
+      "message": "feat: fr3 duo description for multiple controller managers"
+    },
+    {
+      "sha": "c216a985142c8e527ff4f4df2fef6ac87273e52e",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-03-05T16:50:43Z",
+      "message": "feat: fr3 duo added to franka description"
+    },
+    {
+      "sha": "14e081a550ea88bfb63ae97d7ef7f3d7286d7baf",
+      "author": "Simone Silenzi",
+      "author_login": "ssilenzi",
+      "date": "2025-03-07T10:02:52Z",
+      "message": "0.5.0"
+    },
+    {
+      "sha": "24d6d0d3aea3794921bf7daf1fddf2bbe9c6338e",
+      "author": "Simone Silenzi",
+      "author_login": "ssilenzi",
+      "date": "2025-03-06T14:24:40Z",
+      "message": "feat: add fr3v2"
+    },
+    {
+      "sha": "7365887381eea01ba7ab50142ea9636f54b7d307",
+      "author": "Simone Silenzi",
+      "author_login": "ssilenzi",
+      "date": "2025-03-05T19:12:32Z",
+      "message": "feat: new collision meshes"
+    },
+    {
+      "sha": "903a0875dad27a4835acdf356faafd5eb14341f2",
+      "author": "Marius Winkelmeier",
+      "author_login": "winkma",
+      "date": "2025-02-24T17:58:05Z",
+      "message": "feat: add srdfs for arms and hand"
+    },
+    {
+      "sha": "b299b39d9692bfae795184df32a98ce7778d56af",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2025-03-21T15:19:46Z",
+      "message": "Merge pull request #11 from jcarpinelli-bdai/main\n\nChanges parameter location in xacro:macro from 'arg' to 'property'"
+    },
+    {
+      "sha": "8a5522798a4843cb8f82cf6844233309c6be7d77",
+      "author": "Joseph Carpinelli",
+      "author_login": "jcarpinelli-bdai",
+      "date": "2025-03-21T14:25:24Z",
+      "message": "Changes XACRO arguments to parameters for simpler macro invocations"
+    },
+    {
+      "sha": "7d008caa70105ae72159b9d3a9378d5790e01781",
+      "author": "Guillermo Gomez Pena",
+      "author_login": "gomezgu",
+      "date": "2025-03-05T14:09:42Z",
+      "message": "Pull request #28: fix: franka hand inertials fixed\n\nMerge in MOCTRL/franka_description from PRCUN-3682-fix-hand-inertials to main\n\n* commit '0b5034bc35fafce1436f0bd072270ef1a894f4a0':\n  fix: franka hand inertials fixed"
+    },
+    {
+      "sha": "0b5034bc35fafce1436f0bd072270ef1a894f4a0",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2025-03-03T17:18:22Z",
+      "message": "fix: franka hand inertials fixed"
+    },
+    {
+      "sha": "f4337ce7d2343489974f68767a74f8142c8277cf",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2025-02-25T16:49:04Z",
+      "message": "Pull request #26: feat: Added namespace to single robot control\n\nMerge in MOCTRL/franka_description from feat/robot_prefix to main\n\n* commit 'fd5360a39d91e0f8d83d0537c09d9df4b606d797':\n  feat: Added namespace to single robot control"
+    },
+    {
+      "sha": "fd5360a39d91e0f8d83d0537c09d9df4b606d797",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2025-02-20T20:02:12Z",
+      "message": "feat: Added namespace to single robot control"
+    },
+    {
+      "sha": "677ae3d56de5c645ee92b637f388c690c069c550",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2024-12-13T10:10:21Z",
+      "message": "0.4.0"
+    },
+    {
+      "sha": "744bdc05f1711c89970c68eb98bf585382e571f8",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2024-12-12T13:46:42Z",
+      "message": "fix: parameterized multi arm urdf xacro"
+    },
+    {
+      "sha": "9f0ec0357d3c7385ed933302c050f16b1515da8c",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2024-12-11T16:52:48Z",
+      "message": "fix: creating urdf with cobot pump"
+    },
+    {
+      "sha": "da6cc2b614a12ce772811ac159475bfb64857630",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2024-12-11T16:39:15Z",
+      "message": "fix: convert xacro to urdf fixed"
+    },
+    {
+      "sha": "bf3271bf63848e4674c481984b428f3a79d60c82",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2024-12-11T14:12:33Z",
+      "message": "chore: changelog and readme updated"
+    },
+    {
+      "sha": "6938d149d58b99a0c8470245562f46280ba688dc",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2024-12-11T13:28:38Z",
+      "message": "fix: formatting"
+    },
+    {
+      "sha": "d91cc7c6ec4d5651a2c0b5866e986d2d1bae8e49",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2024-12-11T10:26:58Z",
+      "message": "fix: underscore removed from arm prefix"
+    },
+    {
+      "sha": "0bf4ad52dcca1ea2d577f09c771170c9b937e715",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2024-11-28T13:50:36Z",
+      "message": "remove: velocity interface for multi arm"
+    },
+    {
+      "sha": "140626a44ba5ff58b25eb93e93093be1658aece4",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2024-11-20T13:55:03Z",
+      "message": "fix: Fixed a wrong parameter name\nfeat: Adapted the URDFs to use the 'multi arm' hardware interface in case of multi arm setups"
+    },
+    {
+      "sha": "66b51b59beee4bb17fc0da40f62e7c01eb00f65c",
+      "author": "Guillermo Gomez",
+      "author_login": "gomezgu",
+      "date": "2024-09-27T13:48:38Z",
+      "message": "fix: end effectors can be used for dual arm setups"
+    },
+    {
+      "sha": "8fed11163d87f1e31cd100aca38b1a121c275860",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2024-09-10T15:05:38Z",
+      "message": "feat: Adding the .xacro definition for dual arm setups"
+    },
+    {
+      "sha": "8a3e6db53895a9c7ef50322d23d1b802ab3a01fe",
+      "author": "Simone Silenzi",
+      "author_login": "ssilenzi",
+      "date": "2024-11-20T09:47:41Z",
+      "message": "fix: scripts create_urdf.sh and visualize_franka.sh need the correct user id\n\n* commit '2525a2ebf556dc8326f1479d4c47755df64db271':\n  fix: correct same problem on visualize_franka.sh\n  fix: script create_urdf.sh needs the correct user id"
+    },
+    {
+      "sha": "d9841cfbb3e80cc51dbd0d2f04bdae636ec53bb1",
+      "author": "Noyan Sahin",
+      "author_login": "noyansahin-franka",
+      "date": "2024-08-13T14:36:18Z",
+      "message": "Use phong instead of lambert shading"
+    },
+    {
+      "sha": "b029149045fc0a0262c6e95d2f86f1704b95e62b",
+      "author": "Moritz Martens",
+      "author_login": "snetramo-franka",
+      "date": "2024-07-22T07:32:13Z",
+      "message": "CHG: undo changes to CHANGELOG and package which will be done automatically"
+    },
+    {
+      "sha": "a707a2e05f3b0d168684b28cc451205d3f7d1361",
+      "author": "Guillermo Gomez Pena",
+      "author_login": "gomezgu",
+      "date": "2024-07-12T10:31:08Z",
+      "message": "fix: robot model does not need to be specified for ee urdf"
+    },
+    {
+      "sha": "e7cc4dc2b0f926a24445f7496b9bd1c24ecf2037",
+      "author": "Noyan Sahin",
+      "author_login": "noyansahin-franka",
+      "date": "2024-07-09T13:15:01Z",
+      "message": "Update package.xml version"
+    },
+    {
+      "sha": "032e7ee892eee227bf80899a0cefe4d07d9808bb",
+      "author": "Noyan Sahin",
+      "author_login": "noyansahin-franka",
+      "date": "2024-07-02T14:38:43Z",
+      "message": "Add option to omit arm_id prefix for link, visual, joint elements"
+    },
+    {
+      "sha": "0efd5889fc5927b9a07385723543ba4d116916b4",
+      "author": "Noyan Sahin",
+      "author_login": "noyansahin-franka",
+      "date": "2024-07-02T14:38:14Z",
+      "message": "Fix fer xacro not closing the franka_robot tag"
+    },
+    {
+      "sha": "b836c1ef29bd79a774fdc80efb37d217011a965e",
+      "author": "Noyan Sahin",
+      "author_login": "noyansahin-franka",
+      "date": "2024-07-02T14:35:43Z",
+      "message": "Remove arm_id parameter from toplevel robot xacros\n\narm_id was specified in the toplevel robot xacros as a left-over\nfrom when we didn't have individual arm xacros. Now that we do,\nhaving the arm_id parameter in the toplevel robot xacros is\nredundant and can be removed."
+    },
+    {
+      "sha": "6743e0924a87a8fe702bd3769d55204f1f719faa",
+      "author": "Guillermo Gomez Pena",
+      "author_login": "gomezgu",
+      "date": "2024-07-04T12:54:23Z",
+      "message": "fix: comments for franka hand arguments"
+    },
+    {
+      "sha": "8dd233c04ccad044d63f535d2e3f1fe1b50863ce",
+      "author": "Jack Smith",
+      "author_login": null,
+      "date": "2024-11-27T13:24:41Z",
+      "message": "0.3.0"
+    },
+    {
+      "sha": "062ca391ccea2519cef07863edbf6890bb171210",
+      "author": "Jack Smith",
+      "author_login": null,
+      "date": "2024-11-27T13:02:19Z",
+      "message": "Update CHANGELOG.rst with changes since Release 0.2.0\n       revert previosu tgas and incorrect revision"
+    },
+    {
+      "sha": "d722358a418126296a7ad0d79a53c2ba7f6da46c",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2024-06-27T12:33:02Z",
+      "message": "fix: formatting python"
+    },
+    {
+      "sha": "84f7af5ee271b9e44cbca6cf759a4f5f3f24c486",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2024-06-24T15:02:32Z",
+      "message": "fix: gazebo ros2 plugin name"
+    },
+    {
+      "sha": "b594cd6e1ea5f750d3b232022a37cb7a53a2f7a5",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2024-06-20T12:32:33Z",
+      "message": "add: franka_ign_ros2_control plugin for gazebo"
+    },
+    {
+      "sha": "126353b51dd06e724a8ee31adfb525639d0218ea",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2024-06-18T14:30:38Z",
+      "message": "add: gazebo simulation joint friction and gazebo effort interface param"
+    },
+    {
+      "sha": "dcda424d6f8b38cfea0178830c9e05da4a1671ff",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2024-06-17T12:41:31Z",
+      "message": "feat: support gazebo simulation in ros2"
+    },
+    {
+      "sha": "14c5d6373404f20cd24e0f6d5f5ddd959588fe04",
+      "author": "Marius Winkelmeier",
+      "author_login": "winkma",
+      "date": "2024-06-07T14:59:11Z",
+      "message": "feat: changed minor principal moment of inertia to satisfy triangle inequality"
+    },
+    {
+      "sha": "e3278521f5639639196c5330cefd6c962bd3550b",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2024-06-07T08:10:46Z",
+      "message": "feat: Preparing changes for Gazebo"
+    },
+    {
+      "sha": "068f0b8ffe9665d0cd4a5e45274c663864c598c5",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2024-06-07T08:10:46Z",
+      "message": "feat: Preparing changes for Gazebo"
+    },
+    {
+      "sha": "4bb824f21dc553767b3bd2fafa363f8dc57a522d",
+      "author": "Guillermo Gomez Pena",
+      "author_login": "gomezgu",
+      "date": "2024-06-05T13:01:23Z",
+      "message": "fix: rpy values added"
+    },
+    {
+      "sha": "de0dc86219272db8c0ab6be706940a38ddce73b4",
+      "author": "Guillermo Gomez Pena",
+      "author_login": "gomezgu",
+      "date": "2024-05-31T15:21:52Z",
+      "message": "fix: link0 inertials added"
+    },
+    {
+      "sha": "d4baed21e1ba88e4192e7aa3ba89d35b425b53ac",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2024-05-21T14:17:23Z",
+      "message": "fix: Fix further formatting issues"
+    },
+    {
+      "sha": "c0230a6cc8443288276aa65eb610173b16a67d82",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2024-05-21T13:36:53Z",
+      "message": "chore: Updating the year of the copyright"
+    },
+    {
+      "sha": "f33f664f30687c4a8e15a32a023ca21311af2e35",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2024-05-21T11:55:24Z",
+      "message": "fix: Formatted the python code"
+    },
+    {
+      "sha": "483300197eb9375706a928a3fe6794faaa67b834",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2024-05-21T08:43:08Z",
+      "message": "0.2.0"
+    },
+    {
+      "sha": "48f694d2039b9877dbbd98ee85ad384edfa7d28a",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2024-05-21T08:41:52Z",
+      "message": "chore: Preparing the release"
+    },
+    {
+      "sha": "5eccac5040c7c0ae14d4231b2e5c00ad73ea8ffd",
+      "author": "Guillermo Gomez Pena",
+      "author_login": "gomezgu",
+      "date": "2024-05-17T08:04:44Z",
+      "message": "Merge pull request #10 in KBEERCU/franka_description from introduce-hand-argument to main\n\n* commit 'd5e8927aae7a100909753bb747799c663a2f4afd':\n  feat: end-effector can be deactivated with an argument"
+    },
+    {
+      "sha": "d5e8927aae7a100909753bb747799c663a2f4afd",
+      "author": "Guillermo Gomez Pena",
+      "author_login": "gomezgu",
+      "date": "2024-05-15T08:43:15Z",
+      "message": "feat: end-effector can be deactivated with an argument"
+    },
+    {
+      "sha": "7c6d1cfab492788cb4d8e238044a4559a64ec7e4",
+      "author": "Guillermo Gomez Pena",
+      "author_login": "gomezgu",
+      "date": "2024-05-07T16:24:07Z",
+      "message": "Merge pull request #9 in KBEERCU/franka_description from include-end-effector-folder to main\n\n* commit 'b51da21a28af2cd27c028e61cbf328458e8a90f0':\n  feat: add dedicated folder for end-effectors"
+    },
+    {
+      "sha": "b51da21a28af2cd27c028e61cbf328458e8a90f0",
+      "author": "Guillermo Gomez Pena",
+      "author_login": "gomezgu",
+      "date": "2024-01-26T17:08:14Z",
+      "message": "feat: add dedicated folder for end-effectors"
+    },
+    {
+      "sha": "b4e24f930a6659ba515d1b11af93d9c5309941de",
+      "author": "Guillermo Gomez Pena",
+      "author_login": "gomezgu",
+      "date": "2024-01-26T16:10:05Z",
+      "message": "Merge pull request #8 in KBEERCU/franka_description from fix/license to main\n\n* commit '81ebc100718dd6bab654adc0cf181ad2405ec6fc':\n  fix: license name in readme"
+    },
+    {
+      "sha": "3aa78af4828b0aea42a8f189d8637c946bb14611",
+      "author": "Guillermo Gomez Pena",
+      "author_login": "gomezgu",
+      "date": "2024-01-26T13:53:25Z",
+      "message": "fix: license name in readme"
+    },
+    {
+      "sha": "8d1652c6bfd4263199f283da932fa622a3672bec",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2024-04-22T12:06:50Z",
+      "message": "0.1.10"
+    },
+    {
+      "sha": "7b9f77417235bf07398c18e09e1e2a30263ddafe",
+      "author": "Andreas Kuhner",
+      "author_login": "AndreasKuhner",
+      "date": "2024-04-22T12:03:46Z",
+      "message": "bump: Added changelog"
+    },
+    {
+      "sha": "cba5ae5b687d26b7e756c0e930dc84c79ec704e0",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2024-01-26T11:01:56Z",
+      "message": "Merge pull request #7 in KBEERCU/franka_description from fix/typos to main\n\n* commit '3add82340cf33f6ea23d6031efded761c3b56301':\n  fix: typos"
+    },
+    {
+      "sha": "3add82340cf33f6ea23d6031efded761c3b56301",
+      "author": "Baris Yazici",
+      "author_login": "BarisYazici",
+      "date": "2024-01-26T09:58:55Z",
+      "message": "fix: typos"
+    },
+    {
+      "sha": "1ddff9ba71abb199fb349ffcc3155e86cfdb094e",
+      "author": "Enrico Sartori",
+      "author_login": "FE-EnricoSartori",
+      "date": "2023-12-18T16:25:20Z",
+      "message": "Publish franka_description"
+    }
+  ]
+}

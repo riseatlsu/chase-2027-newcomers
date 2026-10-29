@@ -1,0 +1,913 @@
+{
+  "_meta": {
+    "fetched_at": "2026-09-24T14:51:25Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ouster-lidar",
+    "repo": "ouster-ros",
+    "refreshed_at": "2026-09-24T14:51:25Z",
+    "refresh_note": "incrementally added 1 author(s) missing from a prior stale cache"
+  },
+  "data": [
+    {
+      "author": "TobinHall",
+      "date": "2023-04-12T21:02:22Z",
+      "sha": "4d6476e078ca3d2254131e62efeb1e126816cca1",
+      "message": "ROS1 - Adding latched topic transport config/metadata (#81)\n\n* Replace the use of metadata service with latched topic metadata transport\r\n* Refactor code and remove metadata service requests from dependent nodes\r\n* Make metadata parameter optional +\r\nUpdate README.md to reflect the new changes\r\n* *  SW-4745: update the ros 1 driver to the sdk release 20230403 (#93)\r\n    * Update to the latest release\r\n    * fix issue when picking minimum time\r\n    * fix readme link to foxy\r\n    * Implement proper check of overflow\r\n    * Document change and increase driver version number\r\n    * Display success message only on success for multicast mode\r\n    * Update ouster_sdk and remove unused method\r\n    * Remove the time delay in sensor_mtp.launch\r\n    * format change log message\r\n\r\n---------\r\n\r\nCo-authored-by: Ussama Naal <ussama.naal@ouster.io>\r\nCo-authored-by: Ussama Naal <606033+Samahu@users.noreply.github.com>",
+      "files_changed": 15,
+      "additions": 127,
+      "deletions": 94,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "f2add736723dd39e4b9d9c47113f3c9a479975e6",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/4d6476e078ca3d2254131e62efeb1e126816cca1/CHANGELOG.rst",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/4d6476e078ca3d2254131e62efeb1e126816cca1/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/CHANGELOG.rst?ref=4d6476e078ca3d2254131e62efeb1e126816cca1",
+          "patch": "@@ -17,6 +17,9 @@ ouster_ros(1)\n * add frame_id to image topics\n * fixed a potential issue of time values within generated point clouds that could result in a value\n   overflow\n+* added a new ``/ouster/metadata`` topic that is consumed by os_cloud and os_image nodelets and\n+  save it to the bag file on record\n+* make specifying metadata file optinal as of package version 8.1\n \n ouster_ros(2)\n -------------"
+        },
+        {
+          "sha": "14214a1d248da89c484d726e363e578293884a75",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 9,
+          "changes": 24,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/4d6476e078ca3d2254131e62efeb1e126816cca1/README.md",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/4d6476e078ca3d2254131e62efeb1e126816cca1/README.md",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/README.md?ref=4d6476e078ca3d2254131e62efeb1e126816cca1",
+          "patch": "@@ -18,8 +18,8 @@\n - [Usage](#usage)\n   - [Launching Nodes](#launching-nodes)\n     - [Sensor Mode](#sensor-mode)\n-    - [Replay Mode](#replay-mode)\n     - [Recording Mode](#recording-mode)\n+    - [Replay Mode](#replay-mode)\n     - [Multicast Mode (experimental)](#multicast-mode-experimental)\n   - [Invoking Services](#invoking-services)\n     - [GetMetadata](#getmetadata)\n@@ -102,19 +102,25 @@ roslaunch ouster_ros sensor.launch      \\\n     metadata:=<json file name>              # metadata is optional\n ```\n \n-#### Replay Mode\n-```bash\n-roslaunch ouster_ros replay.launch      \\\n-    metadata:=<json file name>          \\\n-    bag_file:=<path to rosbag file>\n-```\n-\n #### Recording Mode\n+> Note\n+> As of package version 8.1, specifiying metadata file is optional since the introduction of the\n+> metadata topic\n ```bash\n roslaunch ouster_ros record.launch      \\\n     sensor_hostname:=<sensor host name> \\\n-    metadata:=<json file name>          \\\n     bag_file:=<optional bag file name>\n+    metadata:=<json file name>          # optional\n+```\n+#### Replay Mode\n+> Note\n+> As of package version 8.1, specifiying metadata file is optional if the bag file being replayed\n+> already contains the metadata topic\n+\n+```bash\n+roslaunch ouster_ros replay.launch      \\\n+    bag_file:=<path to rosbag file>     \\\n+    metadata:=<json file name>          # optional\n ```\n \n #### Multicast Mode (experimental)"
+        },
+        {
+          "sha": "15d56470e586f35c1161d43e8e552c41f15e17d3",
+          "filename": "include/ouster_ros/os_client_base_nodelet.h",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 4,
+          "changes": 12,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/4d6476e078ca3d2254131e62efeb1e126816cca1/include%2Fouster_ros%2Fos_client_base_nodelet.h",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/4d6476e078ca3d2254131e62efeb1e126816cca1/include%2Fouster_ros%2Fos_client_base_nodelet.h",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/include%2Fouster_ros%2Fos_client_base_nodelet.h?ref=4d6476e078ca3d2254131e62efeb1e126816cca1",
+          "patch": "@@ -16,19 +16,23 @@ namespace nodelets_os {\n \n class OusterClientBase : public nodelet::Nodelet {\n    protected:\n-    virtual void onInit() override;\n-\n-   protected:\n-    bool is_arg_set(const std::string& arg) {\n+    bool is_arg_set(const std::string& arg) const {\n         return arg.find_first_not_of(' ') != std::string::npos;\n     }\n \n     void display_lidar_info(const ouster::sensor::sensor_info& info);\n \n+    void create_get_metadata_service(ros::NodeHandle& nh);\n+\n+    void create_metadata_publisher(ros::NodeHandle& nh);\n+\n+    void publish_metadata();\n+\n    protected:\n     ouster::sensor::sensor_info info;\n     ros::ServiceServer get_metadata_srv;\n     std::string cached_metadata;\n+    ros::Publisher metadata_pub;\n };\n \n }  // namespace nodelets_os\n\\ No newline at end of file"
+        },
+        {
+          "sha": "9d2fccfd83fd0ed218ae4e1cbd2ff02d533f58e1",
+          "filename": "launch/common.launch",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 2,
+          "changes": 2,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/4d6476e078ca3d2254131e62efeb1e126816cca1/launch%2Fcommon.launch",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/4d6476e078ca3d2254131e62efeb1e126816cca1/launch%2Fcommon.launch",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/launch%2Fcommon.launch?ref=4d6476e078ca3d2254131e62efeb1e126816cca1",
+          "patch": "@@ -9,7 +9,6 @@\n   <group ns=\"$(arg ouster_ns)\">\n     <node pkg=\"nodelet\" type=\"nodelet\" name=\"os_cloud_node\"\n       output=\"screen\" required=\"true\"\n-      launch-prefix=\"bash -c 'sleep 4; $0 $@' \"\n       args=\"load nodelets_os/OusterCloud os_nodelet_mgr\">\n       <param name=\"~/tf_prefix\" type=\"str\" value=\"$(arg tf_prefix)\"/>\n       <param name=\"~/timestamp_mode\" type=\"str\" value=\"$(arg timestamp_mode)\"/>\n@@ -19,7 +18,6 @@\n   <group ns=\"$(arg ouster_ns)\">\n     <node pkg=\"nodelet\" type=\"nodelet\" name=\"img_node\"\n       output=\"screen\" required=\"true\"\n-      launch-prefix=\"bash -c 'sleep 4; $0 $@' \"\n       args=\"load nodelets_os/OusterImage os_nodelet_mgr\">\n     </node>\n   </group>"
+        },
+        {
+          "sha": "ee7f590f6135c02716d97e86e3d1ffa316dbd8d7",
+          "filename": "launch/record.launch",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 9,
+          "changes": 22,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/4d6476e078ca3d2254131e62efeb1e126816cca1/launch%2Frecord.launch",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/4d6476e078ca3d2254131e62efeb1e126816cca1/launch%2Frecord.launch",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/launch%2Frecord.launch?ref=4d6476e078ca3d2254131e62efeb1e126816cca1",
+          "patch": "@@ -25,7 +25,7 @@\n     TIME_FROM_PTP_1588,\n     TIME_FROM_ROS_TIME\n     }\"/>\n-  <arg name=\"metadata\" doc=\"path to write metadata file when receiving sensor data\"/>\n+  <arg name=\"metadata\" default=\"\" doc=\"path to write metadata file when receiving sensor data\"/>\n   <arg name=\"bag_file\" default=\"\" doc=\"file name to use for the recorded bag file\"/>\n   <arg name=\"viz\" default=\"true\" doc=\"whether to run a rviz\"/>\n   <arg name=\"rviz_config\" default=\"$(find ouster_ros)/config/viz.rviz\" doc=\"optional rviz config file\"/>\n@@ -41,7 +41,7 @@\n   <group ns=\"$(arg ouster_ns)\">\n     <node pkg=\"nodelet\" type=\"nodelet\" name=\"os_node\"\n       output=\"screen\" required=\"true\"\n-      launch-prefix=\"bash -c 'sleep 3; $0 $@' \"\n+      launch-prefix=\"bash -c 'sleep 1; $0 $@' \"\n       args=\"load nodelets_os/OusterSensor os_nodelet_mgr\">\n       <param name=\"~/sensor_hostname\" type=\"str\" value=\"$(arg sensor_hostname)\"/>\n       <param name=\"~/udp_dest\" type=\"str\" value=\"$(arg udp_dest)\"/>\n@@ -63,14 +63,18 @@\n   </include>\n \n   <arg name=\"_use_bag_file_name\" value=\"$(eval not (bag_file == ''))\"/>\n-  <arg name=\"_topics_to_record\" value=\"/$(arg ouster_ns)/imu_packets /$(arg ouster_ns)/lidar_packets\"/>\n+  <arg name=\"_topics_to_record\" value=\"\n+    /$(arg ouster_ns)/imu_packets\n+    /$(arg ouster_ns)/lidar_packets\n+    /$(arg ouster_ns)/metadata\n+  \"/>\n \n-  <node if=\"$(arg _use_bag_file_name)\" pkg=\"rosbag\" type=\"record\" name=\"rosbag_record_sensor\"\n-       output=\"screen\" required=\"true\"\n-       args=\"record -O $(arg bag_file) $(arg _topics_to_record)\"/>\n+  <node if=\"$(arg _use_bag_file_name)\" pkg=\"rosbag\" type=\"record\"\n+    name=\"rosbag_record_sensor\" output=\"screen\" required=\"true\"\n+    args=\"record -O $(arg bag_file) $(arg _topics_to_record)\"/>\n \n-  <node unless=\"$(arg _use_bag_file_name)\" pkg=\"rosbag\" type=\"record\" name=\"rosbag_record_sensor\"\n-       output=\"screen\" required=\"true\"\n-       args=\"record $(arg _topics_to_record)\"/>\n+  <node unless=\"$(arg _use_bag_file_name)\" pkg=\"rosbag\" type=\"record\"\n+    name=\"rosbag_record_sensor\" output=\"screen\" required=\"true\"\n+    args=\"record $(arg _topics_to_record)\"/>\n \n </launch>"
+        },
+        {
+          "sha": "6120cd6b9f370ad7b38920e0cebc5339cabcec99",
+          "filename": "launch/replay.launch",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 3,
+          "changes": 8,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/4d6476e078ca3d2254131e62efeb1e126816cca1/launch%2Freplay.launch",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/4d6476e078ca3d2254131e62efeb1e126816cca1/launch%2Freplay.launch",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/launch%2Freplay.launch?ref=4d6476e078ca3d2254131e62efeb1e126816cca1",
+          "patch": "@@ -1,7 +1,7 @@\n <launch>\n \n   <arg name=\"ouster_ns\" default=\"ouster\" doc=\"Override the default namespace of all ouster nodes\"/>\n-  <arg name=\"metadata\" doc=\"path to read metadata file when replaying sensor data\"/>\n+  <arg name=\"metadata\" default =\"\" doc=\"path to read metadata file when replaying sensor data\"/>\n   <arg name=\"bag_file\" default=\"\" doc=\"file name to use for the recorded bag file\"/>\n   <arg name=\"timestamp_mode\" default=\" \" doc=\"A parameter that allows you to override the timestamp measurements;\n     possible values: {\n@@ -18,9 +18,11 @@\n       args=\"manager\"/>\n   </group>\n \n+  <arg name=\"_use_metadata_file\" value=\"$(eval not (metadata == ''))\"/>\n+\n   <group ns=\"$(arg ouster_ns)\">\n-    <node pkg=\"nodelet\" type=\"nodelet\" name=\"os_node\"\n-      output=\"screen\" required=\"true\"\n+    <node if=\"$(arg _use_metadata_file)\" pkg=\"nodelet\" type=\"nodelet\"\n+      name=\"os_node\" output=\"screen\" required=\"true\"\n       launch-prefix=\"bash -c 'sleep 3; $0 $@' \"\n       args=\"load nodelets_os/OusterReplay os_nodelet_mgr\">\n       <param name=\"~/metadata\" value=\"$(arg metadata)\"/>"
+        },
+        {
+          "sha": "4c8af3ad40591df3e6430956f392a17aca8fa918",
+          "filename": "launch/sensor.launch",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 1,
+          "changes": 1,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/4d6476e078ca3d2254131e62efeb1e126816cca1/launch%2Fsensor.launch",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/4d6476e078ca3d2254131e62efeb1e126816cca1/launch%2Fsensor.launch",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/launch%2Fsensor.launch?ref=4d6476e078ca3d2254131e62efeb1e126816cca1",
+          "patch": "@@ -40,7 +40,6 @@\n   <group ns=\"$(arg ouster_ns)\">\n     <node pkg=\"nodelet\" type=\"nodelet\" name=\"os_node\"\n       output=\"screen\" required=\"true\"\n-      launch-prefix=\"bash -c 'sleep 3; $0 $@' \"\n       args=\"load nodelets_os/OusterSensor os_nodelet_mgr\">\n       <param name=\"~/sensor_hostname\" type=\"str\" value=\"$(arg sensor_hostname)\"/>\n       <param name=\"~/udp_dest\" type=\"str\" value=\"$(arg udp_dest)\"/>"
+        },
+        {
+          "sha": "8a0cb711313a385ccb21b792d1f31dce1be8d996",
+          "filename": "launch/sensor_mtp.launch",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 1,
+          "changes": 1,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/4d6476e078ca3d2254131e62efeb1e126816cca1/launch%2Fsensor_mtp.launch",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/4d6476e078ca3d2254131e62efeb1e126816cca1/launch%2Fsensor_mtp.launch",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/launch%2Fsensor_mtp.launch?ref=4d6476e078ca3d2254131e62efeb1e126816cca1",
+          "patch": "@@ -44,7 +44,6 @@\n   <group ns=\"$(arg ouster_ns)\">\n     <node pkg=\"nodelet\" type=\"nodelet\" name=\"os_node\"\n       output=\"screen\" required=\"true\"\n-      launch-prefix=\"bash -c 'sleep 3; $0 $@' \"\n       args=\"load nodelets_os/OusterSensor os_nodelet_mgr\">\n       <param name=\"~/sensor_hostname\" type=\"str\" value=\"$(arg sensor_hostname)\"/>\n       <param name=\"~/udp_dest\" type=\"str\" value=\"$(arg udp_dest)\"/>"
+        },
+        {
+          "sha": "7abb31075e629e17de77f4b89aec905aed58be2a",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/4d6476e078ca3d2254131e62efeb1e126816cca1/package.xml",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/4d6476e078ca3d2254131e62efeb1e126816cca1/package.xml",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/package.xml?ref=4d6476e078ca3d2254131e62efeb1e126816cca1",
+          "patch": "@@ -1,7 +1,7 @@\n <?xml version=\"1.0\"?>\n <package format=\"3\">\n   <name>ouster_ros</name>\n-  <version>0.8.0</version>\n+  <version>0.8.1</version>\n   <description>Ouster ROS driver</description>\n   <maintainer email=\"oss@ouster.io\">ouster developers</maintainer>\n   <license file=\"LICENSE\">BSD</license>"
+        },
+        {
+          "sha": "ebfe4b13e880dd87274363c2c38c2e0019576902",
+          "filename": "src/os_client_base_nodelet.cpp",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 2,
+          "changes": 14,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/4d6476e078ca3d2254131e62efeb1e126816cca1/src%2Fos_client_base_nodelet.cpp",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/4d6476e078ca3d2254131e62efeb1e126816cca1/src%2Fos_client_base_nodelet.cpp",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/src%2Fos_client_base_nodelet.cpp?ref=4d6476e078ca3d2254131e62efeb1e126816cca1",
+          "patch": "@@ -9,6 +9,7 @@\n #include \"ouster_ros/os_client_base_nodelet.h\"\n \n #include <ouster/impl/build.h>\n+#include <std_msgs/String.h>\n \n #include \"ouster_ros/GetMetadata.h\"\n \n@@ -17,8 +18,7 @@ using ouster_ros::GetMetadata;\n \n namespace nodelets_os {\n \n-void OusterClientBase::onInit() {\n-    auto& nh = getNodeHandle();\n+void OusterClientBase::create_get_metadata_service(ros::NodeHandle& nh) {\n     get_metadata_srv =\n         nh.advertiseService<GetMetadata::Request, GetMetadata::Response>(\n             \"get_metadata\",\n@@ -30,6 +30,16 @@ void OusterClientBase::onInit() {\n     NODELET_INFO(\"get_metadata service created\");\n }\n \n+void OusterClientBase::create_metadata_publisher(ros::NodeHandle& nh) {\n+    metadata_pub = nh.advertise<std_msgs::String>(\"metadata\", 1, true);\n+}\n+\n+void OusterClientBase::publish_metadata() {\n+    std_msgs::String metadata_msg;\n+    metadata_msg.data = cached_metadata;\n+    metadata_pub.publish(metadata_msg);\n+}\n+\n void OusterClientBase::display_lidar_info(const sensor::sensor_info& info) {\n     auto lidar_profile = info.format.udp_profile_lidar;\n     NODELET_INFO_STREAM("
+        },
+        {
+          "sha": "c2d126d71b2353d6cf8927586835ecb8b72bda3d",
+          "filename": "src/os_cloud_nodelet.cpp",
+          "status": "modified",
+          "additions": 24,
+          "deletions": 25,
+          "changes": 49,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/4d6476e078ca3d2254131e62efeb1e126816cca1/src%2Fos_cloud_nodelet.cpp",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/4d6476e078ca3d2254131e62efeb1e126816cca1/src%2Fos_cloud_nodelet.cpp",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/src%2Fos_cloud_nodelet.cpp?ref=4d6476e078ca3d2254131e62efeb1e126816cca1",
+          "patch": "@@ -16,6 +16,7 @@\n #include <pluginlib/class_list_macros.h>\n #include <ros/console.h>\n #include <ros/ros.h>\n+#include <std_msgs/String.h>\n #include <sensor_msgs/Imu.h>\n #include <sensor_msgs/PointCloud2.h>\n #include <tf2_ros/transform_broadcaster.h>\n@@ -26,7 +27,6 @@\n #include <memory>\n #include <cassert>\n \n-#include \"ouster_ros/GetMetadata.h\"\n #include \"ouster_ros/PacketMsg.h\"\n \n namespace sensor = ouster::sensor;\n@@ -74,23 +74,14 @@ uint64_t ulround(T value) {\n namespace nodelets_os {\n class OusterCloud : public nodelet::Nodelet {\n    private:\n-    bool is_arg_set(const std::string& arg) {\n+    bool is_arg_set(const std::string& arg) const {\n         return arg.find_first_not_of(' ') != std::string::npos;\n     }\n \n     virtual void onInit() override {\n         parse_parameters();\n-        auto& nh = getNodeHandle();\n-        auto metadata = get_metadata(nh);\n-        info = sensor::parse_metadata(metadata);\n-        n_returns = compute_n_returns(info.format);\n-        scan_col_ts_spacing_ns = compute_scan_col_ts_spacing_ns(info.mode);\n-        create_lidarscan_objects();\n-        compute_scan_ts = [this](const auto& ts_v) {\n-            return compute_scan_ts_0(ts_v);\n-        };\n-        create_publishers(nh);\n-        create_subscribers(nh);\n+        create_metadata_subscriber(getNodeHandle());\n+        NODELET_INFO(\"OusterCloud: nodelet created!\");\n     }\n \n     void parse_parameters() {\n@@ -105,18 +96,25 @@ class OusterCloud : public nodelet::Nodelet {\n         use_ros_time = timestamp_mode_arg == \"TIME_FROM_ROS_TIME\";\n     }\n \n-    std::string get_metadata(ros::NodeHandle& nh) {\n-        ouster_ros::GetMetadata request;\n-        auto client = nh.serviceClient<ouster_ros::GetMetadata>(\"get_metadata\");\n-        client.waitForExistence();\n-        if (!client.call(request)) {\n-            auto error_msg = \"OusterCloud: Calling get_metadata service failed\";\n-            NODELET_ERROR_STREAM(error_msg);\n-            throw std::runtime_error(error_msg);\n-        }\n+    void create_metadata_subscriber(ros::NodeHandle& nh) {\n+        metadata_sub = nh.subscribe<std_msgs::String>(\n+            \"metadata\", 1, &OusterCloud::metadata_handler, this);\n+    }\n \n-        NODELET_INFO(\"OusterCloud: retrieved sensor metadata!\");\n-        return request.response.metadata;\n+    void metadata_handler(const std_msgs::String::ConstPtr& metadata_msg) {\n+        // TODO: handle sensor reconfigurtion\n+        NODELET_INFO(\"OusterCloud: retrieved new sensor metadata!\");\n+        auto metadata = metadata_msg->data;\n+        info = sensor::parse_metadata(metadata);\n+        n_returns = compute_n_returns(info.format);\n+        scan_col_ts_spacing_ns = compute_scan_col_ts_spacing_ns(info.mode);\n+        create_lidarscan_objects();\n+        compute_scan_ts = [this](const auto& ts_v) {\n+            return compute_scan_ts_0(ts_v);\n+        };\n+        auto& nh = getNodeHandle();\n+        create_publishers(nh);\n+        create_subscribers(nh);\n     }\n \n     static int compute_n_returns(const sensor::data_format& format) {\n@@ -301,7 +299,7 @@ class OusterCloud : public nodelet::Nodelet {\n         auto scan_ts = compute_scan_ts(ls.timestamp());\n         convert_scan_to_pointcloud_publish(scan_ts, frame_ts);\n         // set time for next point cloud msg\n-        frame_ts = extrapolate_frame_ts(packet_buf, packet_receive_time); \n+        frame_ts = extrapolate_frame_ts(packet_buf, packet_receive_time);\n     }\n \n     void imu_handler(const PacketMsg::ConstPtr& packet) {\n@@ -326,6 +324,7 @@ class OusterCloud : public nodelet::Nodelet {\n     }\n \n    private:\n+    ros::Subscriber metadata_sub;\n     ros::Subscriber lidar_packet_sub;\n     std::vector<ros::Publisher> lidar_pubs;\n     ros::Subscriber imu_packet_sub;"
+        },
+        {
+          "sha": "14cd826ce45c2a91bce9c20e89ce34ee14886ea5",
+          "filename": "src/os_image_nodelet.cpp",
+          "status": "modified",
+          "additions": 23,
+          "deletions": 20,
+          "changes": 43,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/4d6476e078ca3d2254131e62efeb1e126816cca1/src%2Fos_image_nodelet.cpp",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/4d6476e078ca3d2254131e62efeb1e126816cca1/src%2Fos_image_nodelet.cpp",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/src%2Fos_image_nodelet.cpp?ref=4d6476e078ca3d2254131e62efeb1e126816cca1",
+          "patch": "@@ -22,6 +22,7 @@\n #include <pcl_conversions/pcl_conversions.h>\n #include <pluginlib/class_list_macros.h>\n #include <ros/ros.h>\n+#include <std_msgs/String.h>\n #include <sensor_msgs/Image.h>\n #include <sensor_msgs/PointCloud2.h>\n #include <sensor_msgs/image_encodings.h>\n@@ -33,7 +34,6 @@\n #include <vector>\n \n #include \"ouster/image_processing.h\"\n-#include \"ouster_ros/GetMetadata.h\"\n \n namespace sensor = ouster::sensor;\n namespace viz = ouster::viz;\n@@ -46,28 +46,26 @@ namespace nodelets_os {\n class OusterImage : public nodelet::Nodelet {\n    private:\n     virtual void onInit() override {\n+        create_metadata_subscriber(getNodeHandle());\n+        NODELET_INFO(\"OusterImage: nodelet created!\");\n+    }\n+\n+    void create_metadata_subscriber(ros::NodeHandle& nh) {\n+        metadata_sub = nh.subscribe<std_msgs::String>(\n+            \"metadata\", 1, &OusterImage::metadata_handler, this);\n+    }\n+\n+    void metadata_handler(const std_msgs::String::ConstPtr& metadata_msg) {\n+        // TODO: handle sensor reconfigurtion\n+        NODELET_INFO(\"OusterImage: retrieved new sensor metadata!\");\n         auto& nh = getNodeHandle();\n-        auto metadata = get_metadata(nh);\n+        auto metadata = metadata_msg->data;\n         info = sensor::parse_metadata(metadata);\n         auto n_returns = compute_n_returns();\n         create_publishers(nh, n_returns);\n         create_subscribers(nh, n_returns);\n     }\n \n-    std::string get_metadata(ros::NodeHandle& nh) {\n-        ouster_ros::GetMetadata request;\n-        auto client = nh.serviceClient<ouster_ros::GetMetadata>(\"get_metadata\");\n-        client.waitForExistence();\n-        if (!client.call(request)) {\n-            auto error_msg = \"OusterImage: Calling get_metadata service failed\";\n-            NODELET_ERROR_STREAM(error_msg);\n-            throw std::runtime_error(error_msg);\n-        }\n-\n-        NODELET_INFO(\"OusterImage: retrieved sensor metadata!\");\n-        return request.response.metadata;\n-    }\n-\n     void create_cloud_object() {\n         uint32_t H = info.format.pixels_per_column;\n         uint32_t W = info.format.columns_per_frame;\n@@ -125,10 +123,14 @@ class OusterImage : public nodelet::Nodelet {\n         uint32_t H = info.format.pixels_per_column;\n         uint32_t W = info.format.columns_per_frame;\n \n-        auto range_image = make_image_msg(H, W, m->header.stamp, m->header.frame_id);\n-        auto signal_image = make_image_msg(H, W, m->header.stamp, m->header.frame_id);\n-        auto reflec_image = make_image_msg(H, W, m->header.stamp, m->header.frame_id);\n-        auto nearir_image = make_image_msg(H, W, m->header.stamp, m->header.frame_id);\n+        auto range_image =\n+            make_image_msg(H, W, m->header.stamp, m->header.frame_id);\n+        auto signal_image =\n+            make_image_msg(H, W, m->header.stamp, m->header.frame_id);\n+        auto reflec_image =\n+            make_image_msg(H, W, m->header.stamp, m->header.frame_id);\n+        auto nearir_image =\n+            make_image_msg(H, W, m->header.stamp, m->header.frame_id);\n \n         ouster::img_t<float> nearir_image_eigen(H, W);\n         ouster::img_t<float> signal_image_eigen(H, W);\n@@ -203,6 +205,7 @@ class OusterImage : public nodelet::Nodelet {\n     }\n \n    private:\n+    ros::Subscriber metadata_sub;\n     ros::Publisher nearir_image_pub;\n     std::vector<ros::Publisher> range_image_pubs;\n     std::vector<ros::Publisher> signal_image_pubs;"
+        },
+        {
+          "sha": "465f4dc43a27cb59d70f1e496646c925612486a9",
+          "filename": "src/os_replay_nodelet.cpp",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 4,
+          "changes": 15,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/4d6476e078ca3d2254131e62efeb1e126816cca1/src%2Fos_replay_nodelet.cpp",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/4d6476e078ca3d2254131e62efeb1e126816cca1/src%2Fos_replay_nodelet.cpp",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/src%2Fos_replay_nodelet.cpp?ref=4d6476e078ca3d2254131e62efeb1e126816cca1",
+          "patch": "@@ -20,15 +20,24 @@ namespace nodelets_os {\n class OusterReplay : public OusterClientBase {\n    private:\n     virtual void onInit() override {\n+        NODELET_INFO(\"Running in replay mode\");\n+        auto meta_file = get_meta_file();\n+        create_metadata_publisher(getNodeHandle());\n+        read_metadata(meta_file);\n+        publish_metadata();\n+    }\n+\n+    std::string get_meta_file() const {\n         auto& pnh = getPrivateNodeHandle();\n         auto meta_file = pnh.param(\"metadata\", std::string{});\n         if (!is_arg_set(meta_file)) {\n             NODELET_ERROR(\"Must specify metadata file in replay mode\");\n             throw std::runtime_error(\"metadata no specificed\");\n         }\n+        return meta_file;\n+    }\n \n-        NODELET_INFO(\"Running in replay mode\");\n-\n+    void read_metadata(const std::string meta_file) {\n         // populate info for config service\n         try {\n             std::ifstream in_file(meta_file);\n@@ -41,8 +50,6 @@ class OusterReplay : public OusterClientBase {\n             cached_metadata.clear();\n             NODELET_ERROR(\"Error when running in replay mode: %s\", e.what());\n         }\n-\n-        OusterClientBase::onInit();\n     }\n };\n "
+        },
+        {
+          "sha": "81f99794f0c91e48fedb1b0ae1d819e64ecc519a",
+          "filename": "src/os_ros.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/4d6476e078ca3d2254131e62efeb1e126816cca1/src%2Fos_ros.cpp",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/4d6476e078ca3d2254131e62efeb1e126816cca1/src%2Fos_ros.cpp",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/src%2Fos_ros.cpp?ref=4d6476e078ca3d2254131e62efeb1e126816cca1",
+          "patch": "@@ -221,7 +221,7 @@ void copy_scan_to_cloud(ouster_ros::Cloud& cloud, const ouster::LidarScan& ls,\n #endif\n     for (auto u = 0; u < ls.h; u++) {\n         for (auto v = 0; v < ls.w; v++) {\n-            const auto col_ts = timestamp[v]; \n+            const auto col_ts = timestamp[v];\n             const auto ts = col_ts > scan_ts ? col_ts - scan_ts : 0UL;\n             const auto idx = u * ls.w + v;\n             const auto xyz = points.row(idx);"
+        },
+        {
+          "sha": "efb89d5fc25475745263b03eb200130f16d60b92",
+          "filename": "src/os_sensor_nodelet.cpp",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 12,
+          "changes": 23,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/4d6476e078ca3d2254131e62efeb1e126816cca1/src%2Fos_sensor_nodelet.cpp",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/4d6476e078ca3d2254131e62efeb1e126816cca1/src%2Fos_sensor_nodelet.cpp",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/src%2Fos_sensor_nodelet.cpp?ref=4d6476e078ca3d2254131e62efeb1e126816cca1",
+          "patch": "@@ -41,12 +41,15 @@ class OusterSensor : public OusterClientBase {\n         std::tie(config, flags) = create_sensor_config_rosparams(pnh);\n         configure_sensor(sensor_hostname, config, flags);\n         sensor_client = create_sensor_client(sensor_hostname, config);\n+        auto& nh = getNodeHandle();\n+        create_metadata_publisher(nh);\n         update_config_and_metadata(*sensor_client);\n+        publish_metadata();\n         save_metadata(pnh);\n-        OusterClientBase::onInit();\n-        create_get_config_service();\n-        create_set_config_service();\n-        start_connection_loop();\n+        create_get_metadata_service(nh);\n+        create_get_config_service(nh);\n+        create_set_config_service(nh);\n+        start_connection_loop(nh);\n     }\n \n     std::string get_sensor_hostname(ros::NodeHandle& nh) {\n@@ -110,8 +113,7 @@ class OusterSensor : public OusterClientBase {\n         }\n     }\n \n-    void create_get_config_service() {\n-        auto& nh = getNodeHandle();\n+    void create_get_config_service(ros::NodeHandle& nh) {\n         get_config_srv =\n             nh.advertiseService<GetConfig::Request, GetConfig::Response>(\n                 \"get_config\",\n@@ -123,8 +125,7 @@ class OusterSensor : public OusterClientBase {\n         NODELET_INFO(\"get_config service created\");\n     }\n \n-    void create_set_config_service() {\n-        auto& nh = getNodeHandle();\n+    void create_set_config_service(ros::NodeHandle& nh) {\n         set_config_srv =\n             nh.advertiseService<SetConfig::Request, SetConfig::Response>(\n                 \"set_config\", [this](SetConfig::Request& request,\n@@ -317,8 +318,7 @@ class OusterSensor : public OusterClientBase {\n             !mtp_main) {\n             if (!get_config(hostname, config, true)) {\n                 NODELET_ERROR(\"Error getting active config\");\n-            }\n-            else {\n+            } else {\n                 NODELET_INFO(\"Retrived active config of sensor\");\n             }\n             return;\n@@ -413,8 +413,7 @@ class OusterSensor : public OusterClientBase {\n         imu_packet_pub = nh.advertise<PacketMsg>(\"imu_packets\", 100);\n     }\n \n-    void start_connection_loop() {\n-        auto& nh = getNodeHandle();\n+    void start_connection_loop(ros::NodeHandle& nh) {\n         allocate_buffers();\n         create_publishers(nh);\n         timer_ = nh.createTimer("
+        }
+      ]
+    },
+    {
+      "author": "Samahu",
+      "date": "2022-08-31T14:36:32Z",
+      "sha": "b2cec0ac5b56d39fcdd8da91a3cf4704daeed015",
+      "message": "Merge pull request #425 from ouster-lidar/fw24-ros-fix\n\nRemove non-existing targets in ouster_ros",
+      "files_changed": 1,
+      "additions": 15,
+      "deletions": 19,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "c89ea1fcf14b934601472041d9020a4d5f52e34d",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 19,
+          "changes": 34,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/b2cec0ac5b56d39fcdd8da91a3cf4704daeed015/CMakeLists.txt",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/b2cec0ac5b56d39fcdd8da91a3cf4704daeed015/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/CMakeLists.txt?ref=b2cec0ac5b56d39fcdd8da91a3cf4704daeed015",
+          "patch": "@@ -51,16 +51,7 @@ catkin_package(\n     sensor_msgs\n     geometry_msgs\n   DEPENDS\n-    EIGEN3)\n-\n-catkin_package(\n-  LIBRARIES nodelet_os_cloud\n-  CATKIN_DEPENDS nodelet roscpp std_msgs\n-)\n-\n-catkin_package(\n-  LIBRARIES nodelet_os_image\n-  CATKIN_DEPENDS nodelet roscpp std_msgs\n+    EIGEN3\n )\n \n # ==== Libraries ====\n@@ -104,20 +95,25 @@ install(\n     nodelets_os\n   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})\n+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n+)\n+\n install(\n   DIRECTORY ${_ouster_ros_INCLUDE_DIRS}\n-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})\n+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}\n+)\n+\n install(\n   FILES\n     ../LICENSE\n     ../LICENSE-bin\n-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})\n-install(\n-    DIRECTORY\n-      launch/\n-    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)\n+    nodelets_os.xml\n+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}\n+)\n+\n install(\n   DIRECTORY\n-    config/\n-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config)\n+    launch\n+    config\n+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}\n+)"
+        }
+      ]
+    },
+    {
+      "author": "alexchua0108",
+      "date": "2025-08-12T14:46:59Z",
+      "sha": "d151197a3025e25afbe4c55256a358b4b64d4922",
+      "message": "build(cmake): update linking for macOS (Anaconda) compatibility (#481)",
+      "files_changed": 1,
+      "additions": 31,
+      "deletions": 8,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "00a796cea939a6d73352d4f13fe8c658468241c6",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 31,
+          "deletions": 8,
+          "changes": 39,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/d151197a3025e25afbe4c55256a358b4b64d4922/CMakeLists.txt",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/d151197a3025e25afbe4c55256a358b4b64d4922/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/CMakeLists.txt?ref=d151197a3025e25afbe4c55256a358b4b64d4922",
+          "patch": "@@ -98,17 +98,35 @@ if (BUILD_PCAP)\n endif()\n \n add_library(ouster_ros src/os_ros.cpp)\n-target_link_libraries(ouster_ros\n-  PUBLIC ${catkin_LIBRARIES} ouster_build pcl_common\n-  PRIVATE -Wl,--whole-archive ${OUSTER_TARGET_LINKS} -Wl,--no-whole-archive)\n-add_dependencies(ouster_ros ${PROJECT_NAME}_gencpp)\n+if(APPLE)\n+  target_link_libraries(ouster_ros\n+    PUBLIC ${catkin_LIBRARIES} ouster_build pcl_common\n+    PRIVATE ${OUSTER_TARGET_LINKS})\n+else()\n+  target_link_libraries(ouster_ros\n+    PUBLIC ${catkin_LIBRARIES} ouster_build pcl_common\n+    PRIVATE -Wl,--whole-archive ${OUSTER_TARGET_LINKS} -Wl,--no-whole-archive)\n+endif()\n+\n+  add_dependencies(ouster_ros ${PROJECT_NAME}_gencpp)\n \n # ==== Executables ====\n add_library(${PROJECT_NAME}_nodelets ${NODELET_SRC})\n-target_link_libraries(\n-  ${PROJECT_NAME}_nodelets ouster_ros\n-  ${catkin_LIBRARIES}\n-  ${OpenCV_LIBRARIES})\n+if(APPLE)\n+  target_link_libraries(\n+    ${PROJECT_NAME}_nodelets\n+    ouster_ros\n+    ${OUSTER_TARGET_LINKS}  # Add this to ensure ouster_client is linked\n+    ${catkin_LIBRARIES}\n+    ${OpenCV_LIBRARIES})\n+else()\n+  target_link_libraries(\n+    ${PROJECT_NAME}_nodelets\n+    ouster_ros\n+    -Wl,--whole-archive ${OUSTER_TARGET_LINKS} -Wl,--no-whole-archive\n+    ${catkin_LIBRARIES}\n+    ${OpenCV_LIBRARIES})\n+endif()\n add_dependencies(${PROJECT_NAME}_nodelets ${PROJECT_NAME}_gencpp)\n \n # ==== Test ====\n@@ -121,8 +139,13 @@ if(CATKIN_ENABLE_TESTING)\n     tests/point_transform_test.cpp\n     tests/point_cloud_compose_test.cpp\n   )\n+  if(APPLE)\n+  target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES}\n+    ouster_build pcl_common ${OUSTER_TARGET_LINKS})\n+  else()\n   target_link_libraries(${PROJECT_NAME}_test ${catkin_LIBRARIES}\n     ouster_build pcl_common -Wl,--whole-archive ${OUSTER_TARGET_LINKS} -Wl,--no-whole-archive)\n+  endif()\n endif()\n \n # ==== Install ===="
+        }
+      ]
+    },
+    {
+      "author": "tombrodie",
+      "date": "2024-12-16T22:12:34Z",
+      "sha": "04699773b52e9b517d431e1aeaa70ddd0a102eb5",
+      "message": "Check sensor connection thread validity before joining (#411)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "87b83b915bd59340a4aa24eaa18067457f2c0291",
+          "filename": "src/os_sensor_nodelet.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/04699773b52e9b517d431e1aeaa70ddd0a102eb5/src%2Fos_sensor_nodelet.cpp",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/04699773b52e9b517d431e1aeaa70ddd0a102eb5/src%2Fos_sensor_nodelet.cpp",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/src%2Fos_sensor_nodelet.cpp?ref=04699773b52e9b517d431e1aeaa70ddd0a102eb5",
+          "patch": "@@ -644,7 +644,7 @@ void OusterSensor::start_sensor_connection_thread() {\n \n void OusterSensor::stop_sensor_connection_thread() {\n     NODELET_DEBUG(\"sensor_connection_thread stopping.\");\n-    if (sensor_connection_thread->joinable()) {\n+    if ((sensor_connection_thread != nullptr) && sensor_connection_thread->joinable()) {\n         sensor_connection_active = false;\n         sensor_connection_thread->join();\n     }"
+        }
+      ]
+    },
+    {
+      "author": "nkhedekar",
+      "date": "2024-11-20T01:00:39Z",
+      "sha": "c6f66d2c439aa27a6018a09a5e5b02fa222b52db",
+      "message": "Make the bag_file arg of replay.launch optional (#404)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "a970b916519ab459b0043166cfeb7bc28204de62",
+          "filename": "launch/replay.launch",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/c6f66d2c439aa27a6018a09a5e5b02fa222b52db/launch%2Freplay.launch",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/c6f66d2c439aa27a6018a09a5e5b02fa222b52db/launch%2Freplay.launch",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/launch%2Freplay.launch?ref=c6f66d2c439aa27a6018a09a5e5b02fa222b52db",
+          "patch": "@@ -15,7 +15,7 @@\n \n   <arg name=\"ouster_ns\" default=\"ouster\" doc=\"Override the default namespace of all ouster nodes\"/>\n   <arg name=\"metadata\" default=\"\" doc=\"path to read metadata file when replaying sensor data\"/>\n-  <arg name=\"bag_file\" doc=\"file name to use for the recorded bag file\"/>\n+  <arg name=\"bag_file\" default=\"\" doc=\"file name to use for the recorded bag file\"/>\n   <arg name=\"timestamp_mode\" default=\"TIME_FROM_INTERNAL_OSC\"\n     doc=\"A parameter that allows you to override the timestamp measurements; possible values: {\n     TIME_FROM_INTERNAL_OSC,"
+        }
+      ]
+    },
+    {
+      "author": "ovaag",
+      "date": "2023-11-19T18:43:47Z",
+      "sha": "9bb8e3f4eb4767989f6ac4395c50d61b62b94ce7",
+      "message": "Cmakelists: Fix install directories (#258)\n\n* Fix install directories\r\n\r\n---------\r\n\r\nCo-authored-by: Ussama Naal <606033+Samahu@users.noreply.github.com>",
+      "files_changed": 3,
+      "additions": 14,
+      "deletions": 5,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "b22bb9272309bedf38ddb02fbfd224fefda08493",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/9bb8e3f4eb4767989f6ac4395c50d61b62b94ce7/CHANGELOG.rst",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/9bb8e3f4eb4767989f6ac4395c50d61b62b94ce7/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/CHANGELOG.rst?ref=9bb8e3f4eb4767989f6ac4395c50d61b62b94ce7",
+          "patch": "@@ -8,7 +8,7 @@ Changelog\n * added the ability to customize the published point clouds(s) to velodyne point cloud format and\n   other common pcl point types.\n * ouster_image_nodelet can operate independently from ouster_cloud_nodelet.\n-\n+* install ouster-ros and ouster_client include directories in separate folders.\n \n ouster_ros v0.10.0\n ==================\n@@ -80,7 +80,7 @@ ouster_ros(1)\n * added a no-bond option to the ``sensor.launch`` file\n * reduce the publish rate of imu tf transforms\n * implemented a new node named ``os_driver`` which combines the functionality of ``os_sensor``,\n-  ``os_cloud`` and ``os_image`` into a single node. The new node can be launch via the new \n+  ``os_cloud`` and ``os_image`` into a single node. The new node can be launch via the new\n   ``driver.launch`` file.\n * introduced a new topic ``/ouster/scan`` which publishes ``sensor_msgs::LaserScan`` messages, the\n   user can pick which beam to be used for the message through the ``scan_ring`` launch argument."
+        },
+        {
+          "sha": "682048e7a28fbf237e2df1b4685940336dec1f5b",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 1,
+          "changes": 11,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/9bb8e3f4eb4767989f6ac4395c50d61b62b94ce7/CMakeLists.txt",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/9bb8e3f4eb4767989f6ac4395c50d61b62b94ce7/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/CMakeLists.txt?ref=9bb8e3f4eb4767989f6ac4395c50d61b62b94ce7",
+          "patch": "@@ -112,10 +112,19 @@ install(\n )\n \n install(\n-  DIRECTORY ${_ouster_ros_INCLUDE_DIRS}\n+  DIRECTORY include/ouster_ros/\n   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}\n )\n \n+install(\n+  DIRECTORY ouster-sdk/ouster_client/include/ouster/\n+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}/../ouster\n+)\n+\n+install(\n+  DIRECTORY ouster-sdk/ouster_client/include/optional-lite/nonstd/\n+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}/../ouster/nonstd/\n+)\n install(\n   FILES\n     LICENSE"
+        },
+        {
+          "sha": "ee3f8425be5dbb7ae1bbb296efa01ef2ba9a95d6",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/9bb8e3f4eb4767989f6ac4395c50d61b62b94ce7/package.xml",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/9bb8e3f4eb4767989f6ac4395c50d61b62b94ce7/package.xml",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/package.xml?ref=9bb8e3f4eb4767989f6ac4395c50d61b62b94ce7",
+          "patch": "@@ -1,7 +1,7 @@\n <?xml version=\"1.0\"?>\n <package format=\"3\">\n   <name>ouster_ros</name>\n-  <version>0.11.0</version>\n+  <version>0.12.0</version>\n   <description>Ouster ROS driver</description>\n   <maintainer email=\"oss@ouster.io\">ouster developers</maintainer>\n   <license file=\"LICENSE\">BSD</license>\n@@ -24,7 +24,7 @@\n   <build_depend>libpcl-all-dev</build_depend>\n   <build_depend>curl</build_depend>\n   <build_depend>spdlog</build_depend>\n-  \n+\n   <exec_depend>nodelet</exec_depend>\n   <exec_depend>libjsoncpp</exec_depend>\n   <exec_depend>message_runtime</exec_depend>"
+        }
+      ]
+    },
+    {
+      "author": "solosuper",
+      "date": "2024-05-13T15:57:44Z",
+      "sha": "2c30d0c1a493da385c1580e9fd51a9ad727c4ec7",
+      "message": "Fix typo in README (#328)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "97789ce5519fb07d948a2e560778d5e8c0ee7505",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/2c30d0c1a493da385c1580e9fd51a9ad727c4ec7/README.md",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/2c30d0c1a493da385c1580e9fd51a9ad727c4ec7/README.md",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/README.md?ref=2c30d0c1a493da385c1580e9fd51a9ad727c4ec7",
+          "patch": "@@ -104,7 +104,7 @@ Specifying `Release` as the build type is important to have a reasonable perform\n \n ## Usage\n ### Launching Nodes\n-The package supports three modes of interaction, you can connect to a _live senosr_, _replay_ a\n+The package supports three modes of interaction, you can connect to a _live sensor_, _replay_ a\n recorded bag or _record_ a new bag file using the corresponding launch files. Recently, we have\n added a new mode that supports multicast. The commands are listed below:\n "
+        }
+      ]
+    },
+    {
+      "author": "PhilippSchmaelzle",
+      "date": "2023-08-24T15:49:01Z",
+      "sha": "db68f4eb45d1ca2f87e0268dffe2682c88fa11da",
+      "message": "The timestamp of each point in the destaggered point cloud has to be destaggered as well (#199)",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "10fe847a83bc9baadc40fe38f9e23c8dbc9430e0",
+          "filename": "src/os_ros.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/db68f4eb45d1ca2f87e0268dffe2682c88fa11da/src%2Fos_ros.cpp",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/db68f4eb45d1ca2f87e0268dffe2682c88fa11da/src%2Fos_ros.cpp",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/src%2Fos_ros.cpp?ref=db68f4eb45d1ca2f87e0268dffe2682c88fa11da",
+          "patch": "@@ -216,7 +216,8 @@ void copy_scan_to_cloud_destaggered(\n #endif\n     for (auto u = 0; u < ls.h; u++) {\n         for (auto v = 0; v < ls.w; v++) {\n-            const auto col_ts = timestamp[v];\n+            const auto ts_src_idx = (v + ls.w - pixel_shift_by_row[u]) % ls.w;\n+            const auto col_ts = timestamp[ts_src_idx];\n             const auto ts = col_ts > scan_ts ? col_ts - scan_ts : 0UL;\n             const auto src_idx =\n                 u * ls.w + (v + ls.w - pixel_shift_by_row[u]) % ls.w;"
+        }
+      ]
+    },
+    {
+      "author": "louis-wiesmann",
+      "date": "2023-08-10T18:21:22Z",
+      "sha": "b4cca332f0d56b35dc506b71655ee33c8fe09168",
+      "message": "add tf prefix to point_cloud_frame (#189)\n\nCo-authored-by: Louis <louis.wiesmann@igg.uni-bonn.de>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "7213b55349d339d7656742493851b806eb14a2f7",
+          "filename": "src/os_transforms_broadcaster.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/b4cca332f0d56b35dc506b71655ee33c8fe09168/src%2Fos_transforms_broadcaster.h",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/b4cca332f0d56b35dc506b71655ee33c8fe09168/src%2Fos_transforms_broadcaster.h",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/src%2Fos_transforms_broadcaster.h?ref=b4cca332f0d56b35dc506b71655ee33c8fe09168",
+          "patch": "@@ -68,6 +68,7 @@ class OusterTransformsBroadcaster {\n             sensor_frame = tf_prefix + sensor_frame;\n             lidar_frame = tf_prefix + lidar_frame;\n             imu_frame = tf_prefix + imu_frame;\n+            point_cloud_frame = tf_prefix + point_cloud_frame;\n         }\n     }\n "
+        }
+      ]
+    },
+    {
+      "author": "ShepelIlya",
+      "date": "2023-01-28T14:34:31Z",
+      "sha": "d6ab0b4f7e17c0c39bc7d3c8d8f4d53f4d10ac34",
+      "message": "Initial commit",
+      "files_changed": 3,
+      "additions": 18,
+      "deletions": 4,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "45402f7ed053f258d45588c49664b43d790792e6",
+          "filename": "launch/sensor.launch",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "changes": 4,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/d6ab0b4f7e17c0c39bc7d3c8d8f4d53f4d10ac34/launch%2Fsensor.launch",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/d6ab0b4f7e17c0c39bc7d3c8d8f4d53f4d10ac34/launch%2Fsensor.launch",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/launch%2Fsensor.launch?ref=d6ab0b4f7e17c0c39bc7d3c8d8f4d53f4d10ac34",
+          "patch": "@@ -2,7 +2,8 @@\n \n   <arg name=\"ouster_ns\" default=\"ouster\" doc=\"Override the default namespace of all ouster nodes\"/>\n   <arg name=\"sensor_hostname\" doc=\"hostname or IP in dotted decimal form of the sensor\"/>\n-  <arg name=\"udp_dest\" default=\" \" doc=\"hostname or IP where the sensor will send data packets\"/>\n+  <arg name=\"udp_dest\" default=\" \" doc=\"hostname or IP where the sensor will send UDP data packets\"/>\n+  <arg name=\"mtp_group\" default=\" \" doc=\"multicast group IP where the sensor will send data packets\"/>\n   <arg name=\"lidar_port\" default=\"0\" doc=\"port to which the sensor should send lidar data\"/>\n   <arg name=\"imu_port\" default=\"0\" doc=\"port to which the sensor should send imu data\"/>\n   <arg name=\"udp_profile_lidar\" default=\" \" doc=\"lidar packet profile; possible values: {\n@@ -44,6 +45,7 @@\n       args=\"load nodelets_os/OusterSensor os_nodelet_mgr\">\n       <param name=\"~/sensor_hostname\" type=\"str\" value=\"$(arg sensor_hostname)\"/>\n       <param name=\"~/udp_dest\" type=\"str\" value=\"$(arg udp_dest)\"/>\n+      <param name=\"~/mtp_group\" type=\"str\" value=\"$(arg mtp_group)\"/>\n       <param name=\"~/lidar_port\" type=\"int\" value=\"$(arg lidar_port)\"/>\n       <param name=\"~/imu_port\" type=\"int\" value=\"$(arg imu_port)\"/>\n       <param name=\"~/udp_profile_lidar\" type=\"str\" value=\"$(arg udp_profile_lidar)\"/>"
+        },
+        {
+          "sha": "b5b5315a1a1bc4281607d14799493df95dfc9eb0",
+          "filename": "ouster-sdk",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": null,
+          "raw_url": null,
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/ouster-sdk?ref=d6ab0b4f7e17c0c39bc7d3c8d8f4d53f4d10ac34",
+          "patch": "@@ -1 +1 @@\n-Subproject commit 202c536b358b537b3620964cea3919a24699a7dc\n+Subproject commit b5b5315a1a1bc4281607d14799493df95dfc9eb0"
+        },
+        {
+          "sha": "0baf90f5b32573867ae2c5a809ffd68930740b5a",
+          "filename": "src/os_sensor_nodelet.cpp",
+          "status": "modified",
+          "additions": 14,
+          "deletions": 2,
+          "changes": 16,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/d6ab0b4f7e17c0c39bc7d3c8d8f4d53f4d10ac34/src%2Fos_sensor_nodelet.cpp",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/d6ab0b4f7e17c0c39bc7d3c8d8f4d53f4d10ac34/src%2Fos_sensor_nodelet.cpp",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/src%2Fos_sensor_nodelet.cpp?ref=d6ab0b4f7e17c0c39bc7d3c8d8f4d53f4d10ac34",
+          "patch": "@@ -160,16 +160,22 @@ class OusterSensor : public OusterClientBase {\n         int lidar_port =\n             config.udp_port_lidar ? config.udp_port_lidar.value() : 0;\n         int imu_port = config.udp_port_imu ? config.udp_port_imu.value() : 0;\n+        auto udp_dest = config.udp_dest ? config.udp_dest.value() : \"\";\n \n         std::shared_ptr<sensor::client> cli;\n-        if (lidar_port != 0 && imu_port != 0) {\n+        if (config.mtp_group) {\n+            auto mtp_group = config.mtp_group.value();\n+            // use the full init_client to recieve data via multicast \n+            cli = sensor::init_client(hostname, mtp_group, udp_dest,\n+                                      sensor::MODE_UNSPEC, sensor::TIME_FROM_UNSPEC,\n+                                      lidar_port, imu_port);\n+        } else if (lidar_port != 0 && imu_port != 0) {\n             // use no-config version of init_client to bind to pre-configured\n             // ports\n             cli = sensor::init_client(hostname, lidar_port, imu_port);\n         } else {\n             // use the full init_client to generate and assign random ports to\n             // sensor\n-            auto udp_dest = config.udp_dest ? config.udp_dest.value() : \"\";\n             cli = sensor::init_client(hostname, udp_dest, sensor::MODE_UNSPEC,\n                                       sensor::TIME_FROM_UNSPEC, lidar_port,\n                                       imu_port);\n@@ -187,6 +193,7 @@ class OusterSensor : public OusterClientBase {\n     std::pair<sensor::sensor_config, u_int8_t> create_sensor_config_rosparams(\n         ros::NodeHandle& nh) {\n         auto udp_dest = nh.param(\"udp_dest\", std::string{});\n+        auto mtp_group = nh.param(\"mtp_group\", std::string{});\n         auto lidar_port = nh.param(\"lidar_port\", 0);\n         auto imu_port = nh.param(\"imu_port\", 0);\n         auto lidar_mode_arg = nh.param(\"lidar_mode\", std::string{});\n@@ -287,6 +294,11 @@ class OusterSensor : public OusterClientBase {\n             config_flags |= ouster::sensor::CONFIG_UDP_DEST_AUTO;\n         }\n \n+        if (is_arg_set(mtp_group)) {\n+            NODELET_INFO(\"Will recieve data from %s\", mtp_group.c_str());\n+            config.mtp_group = mtp_group;\n+        }\n+\n         return std::make_pair(config, config_flags);\n     }\n "
+        }
+      ]
+    },
+    {
+      "author": "mortenfyhn",
+      "date": "2021-02-01T16:08:54Z",
+      "sha": "79fbacd1e6cabb0f5c563df8ba60900696971215",
+      "message": "Clean up dependencies\n\n* GLEW and GLFW3 were not declared. This breaks the build if you try to use rosdep.\n* Some were declared as build_depend and exec_depends but not build_export_depend. Changed these to simply \"depend\", as that covers all three.\n* Eigen dependency used wrong rosdep keyword, changed from \"libeigen3\" to \"eigen\".\n    * (Check `rosdep resolve libeigen3` vs. `rosdep resolve eigen`.)\n* Added a missing exec_depend on topic_tools.",
+      "files_changed": 1,
+      "additions": 13,
+      "deletions": 13,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "661a56fead5c9fc54171d91e4ac9d3975401d1a9",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 13,
+          "changes": 26,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/79fbacd1e6cabb0f5c563df8ba60900696971215/package.xml",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/79fbacd1e6cabb0f5c563df8ba60900696971215/package.xml",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/package.xml?ref=79fbacd1e6cabb0f5c563df8ba60900696971215",
+          "patch": "@@ -7,27 +7,27 @@\n   <license>BSD</license>\n   <buildtool_depend>catkin</buildtool_depend>\n \n-  <build_depend>libjsoncpp</build_depend>\n-  <build_depend>libeigen3</build_depend>\n-  <build_depend>roscpp</build_depend>\n+  <depend>roscpp</depend>\n+  <depend>std_msgs</depend>\n+  <depend>sensor_msgs</depend>\n+  <depend>geometry_msgs</depend>\n+  <depend>pcl_ros</depend>\n+\n+  <build_depend>libjsoncpp-dev</build_depend>\n+  <build_depend>eigen</build_depend>\n   <build_depend>message_generation</build_depend>\n-  <build_depend>std_msgs</build_depend>\n-  <build_depend>sensor_msgs</build_depend>\n-  <build_depend>geometry_msgs</build_depend>\n-  <build_depend>pcl_ros</build_depend>\n   <build_depend>pcl_conversions</build_depend>\n   <build_depend>tf2</build_depend>\n   <build_depend>tf2_ros</build_depend>\n   <build_depend>tf2_geometry_msgs</build_depend>\n-  \n+  <build_depend>libglew-dev</build_depend>\n+  <build_depend>libglfw3-dev</build_depend>\n+  <build_depend>libtclap-dev</build_depend>\n+\n   <exec_depend>libjsoncpp</exec_depend>\n-  <exec_depend>roscpp</exec_depend>\n   <exec_depend>message_runtime</exec_depend>\n-  <exec_depend>std_msgs</exec_depend>\n-  <exec_depend>sensor_msgs</exec_depend>\n-  <exec_depend>geometry_msgs</exec_depend>\n-  <exec_depend>pcl_ros</exec_depend>\n   <exec_depend>pcl_conversions</exec_depend>\n+  <exec_depend>topic_tools</exec_depend>\n \n   <export></export>\n </package>"
+        }
+      ]
+    },
+    {
+      "author": "kairenw",
+      "date": "2021-04-20T03:42:43Z",
+      "sha": "ca05ba3ad1e4cb0781b1d53dc933926360974e3f",
+      "message": "Merge pull request #219 from scoutdi/fix-dependencies\n\nclean up dependencies",
+      "files_changed": 1,
+      "additions": 13,
+      "deletions": 13,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "661a56fead5c9fc54171d91e4ac9d3975401d1a9",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 13,
+          "changes": 26,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/ca05ba3ad1e4cb0781b1d53dc933926360974e3f/package.xml",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/ca05ba3ad1e4cb0781b1d53dc933926360974e3f/package.xml",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/package.xml?ref=ca05ba3ad1e4cb0781b1d53dc933926360974e3f",
+          "patch": "@@ -7,27 +7,27 @@\n   <license>BSD</license>\n   <buildtool_depend>catkin</buildtool_depend>\n \n-  <build_depend>libjsoncpp</build_depend>\n-  <build_depend>libeigen3</build_depend>\n-  <build_depend>roscpp</build_depend>\n+  <depend>roscpp</depend>\n+  <depend>std_msgs</depend>\n+  <depend>sensor_msgs</depend>\n+  <depend>geometry_msgs</depend>\n+  <depend>pcl_ros</depend>\n+\n+  <build_depend>libjsoncpp-dev</build_depend>\n+  <build_depend>eigen</build_depend>\n   <build_depend>message_generation</build_depend>\n-  <build_depend>std_msgs</build_depend>\n-  <build_depend>sensor_msgs</build_depend>\n-  <build_depend>geometry_msgs</build_depend>\n-  <build_depend>pcl_ros</build_depend>\n   <build_depend>pcl_conversions</build_depend>\n   <build_depend>tf2</build_depend>\n   <build_depend>tf2_ros</build_depend>\n   <build_depend>tf2_geometry_msgs</build_depend>\n-  \n+  <build_depend>libglew-dev</build_depend>\n+  <build_depend>libglfw3-dev</build_depend>\n+  <build_depend>libtclap-dev</build_depend>\n+\n   <exec_depend>libjsoncpp</exec_depend>\n-  <exec_depend>roscpp</exec_depend>\n   <exec_depend>message_runtime</exec_depend>\n-  <exec_depend>std_msgs</exec_depend>\n-  <exec_depend>sensor_msgs</exec_depend>\n-  <exec_depend>geometry_msgs</exec_depend>\n-  <exec_depend>pcl_ros</exec_depend>\n   <exec_depend>pcl_conversions</exec_depend>\n+  <exec_depend>topic_tools</exec_depend>\n \n   <export></export>\n </package>"
+        }
+      ]
+    },
+    {
+      "author": "Dima Garbuzov",
+      "date": "2018-05-08T03:45:15Z",
+      "sha": "04177a5a46e5b2560c52069e1ecd59ab14bce76c",
+      "message": "OS1 example client and ROS node",
+      "files_changed": 10,
+      "additions": 611,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "567609b1234a9b8806c5a05da6c866e480aa148d",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/04177a5a46e5b2560c52069e1ecd59ab14bce76c/.gitignore",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/04177a5a46e5b2560c52069e1ecd59ab14bce76c/.gitignore",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/.gitignore?ref=04177a5a46e5b2560c52069e1ecd59ab14bce76c",
+          "patch": "@@ -0,0 +1 @@\n+build/"
+        },
+        {
+          "sha": "d047b468ac8071b551557383aba8bad740904747",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 35,
+          "deletions": 0,
+          "changes": 35,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/04177a5a46e5b2560c52069e1ecd59ab14bce76c/CMakeLists.txt",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/04177a5a46e5b2560c52069e1ecd59ab14bce76c/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/CMakeLists.txt?ref=04177a5a46e5b2560c52069e1ecd59ab14bce76c",
+          "patch": "@@ -0,0 +1,35 @@\n+cmake_minimum_required(VERSION 2.8.3)\n+project(ouster_ros)\n+\n+add_compile_options(-std=c++11 -Wall)\n+\n+find_package(catkin REQUIRED COMPONENTS\n+  message_generation\n+  std_msgs\n+  sensor_msgs\n+  pcl_ros\n+  pcl_conversions\n+  roscpp\n+  ouster_client\n+)\n+\n+add_message_files(DIRECTORY msg FILES PacketMsg.msg)\n+generate_messages(DEPENDENCIES std_msgs sensor_msgs)\n+\n+include_directories(\n+  include\n+  ${catkin_INCLUDE_DIRS}\n+)\n+\n+catkin_package(\n+  INCLUDE_DIRS include\n+  LIBRARIES ouster_ros\n+  CATKIN_DEPENDS pcl_ros pcl_conversions roscpp message_runtime std_msgs sensor_msgs\n+)\n+\n+add_library(ouster_ros STATIC src/os1_ros.cpp)\n+target_link_libraries(ouster_ros ${catkin_LIBRARIES})\n+add_dependencies(ouster_ros ${PROJECT_NAME}_gencpp)\n+\n+add_executable(os1_node src/os1_node.cpp)\n+target_link_libraries(os1_node ouster_ros ${catkin_LIBRARIES})"
+        },
+        {
+          "sha": "fa8c87c9d1d9a54d66369f4941d522c29731c4ff",
+          "filename": "include/ouster_ros/os1_ros.h",
+          "status": "added",
+          "additions": 112,
+          "deletions": 0,
+          "changes": 112,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/04177a5a46e5b2560c52069e1ecd59ab14bce76c/include%2Fouster_ros%2Fos1_ros.h",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/04177a5a46e5b2560c52069e1ecd59ab14bce76c/include%2Fouster_ros%2Fos1_ros.h",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/include%2Fouster_ros%2Fos1_ros.h?ref=04177a5a46e5b2560c52069e1ecd59ab14bce76c",
+          "patch": "@@ -0,0 +1,112 @@\n+/**\n+ * Higher-level functions to read data from the OS1 as ROS messages\n+ */\n+\n+#pragma once\n+\n+#include <chrono>\n+#include <functional>\n+#include <string>\n+\n+#include <pcl/common/common.h>\n+#include <pcl/point_cloud.h>\n+#include <sensor_msgs/Imu.h>\n+#include <sensor_msgs/PointCloud2.h>\n+\n+#include \"ouster_ros/PacketMsg.h\"\n+#include \"ouster/os1.h\"\n+#include \"ouster_ros/point_os1.h\"\n+\n+namespace ouster_ros {\n+namespace OS1 {\n+\n+using CloudOS1 = pcl::PointCloud<PointOS1>;\n+using ns = std::chrono::nanoseconds;\n+\n+/**\n+ * Read an imu packet into a ROS message. Blocks for up to a second if no data\n+ * is available.\n+ * @param cli the OS1 client\n+ * @param pm the destination packet message\n+ * @return whether reading was successful\n+ */\n+bool read_imu_packet(const ouster::OS1::client& cli, PacketMsg& pm);\n+\n+/**\n+ * Read a lidar packet into a ROS message. Blocks for up to a second if no data\n+ * is available.\n+ * @param cli the OS1 client\n+ * @param pm the destination packet message\n+ * @return whether reading was successful\n+ */\n+bool read_lidar_packet(const ouster::OS1::client& cli, PacketMsg& pm);\n+\n+/**\n+ * Read a timestamp from an imu packet message\n+ * @param cli the OS1 client\n+ * @param pm packet message populated by read_imu_packet\n+ * @returns timestamp in nanoseconds\n+ */\n+ns timestamp_of_imu_packet(const PacketMsg& pm);\n+\n+/**\n+ * Read a timestamp from a lidar packet message\n+ * @param pm packet message populated by read_lidar_packet\n+ * @returns timestamp in nanoseconds\n+ */\n+ns timestamp_of_lidar_packet(const PacketMsg& pm);\n+\n+/**\n+ * Parse an imu packet message into a ROS imu message\n+ * @param pm packet message populated by read_imu_packet\n+ * @returns ROS sensor message with fields populated from the OS1 packet\n+ */\n+sensor_msgs::Imu packet_to_imu_msg(const PacketMsg& pm);\n+\n+/**\n+ * Accumulate points from a lidar packet message into a PCL point cloud. All\n+ * points are timestamped relative to scan_start_ts as a fraction of\n+ * scan_duration, a float usually [0.0, 1.0)\n+ * @param scan_start_ts the timestamp of the beginning of the batch\n+ * @param scan_duration length of a scan used to compute point timestamps\n+ * @param pm packet message populated by read_lidar_packet\n+ * @param cloud PCL point cloud of PointOS1s to accumulate\n+ */\n+void add_packet_to_cloud(ns scan_start_ts, ns scan_duration,\n+                         const PacketMsg& pm, CloudOS1& cloud);\n+\n+/**\n+ * Serialize a PCL point cloud to a ROS message\n+ * @param cloud the PCL point cloud to convert\n+ * @param timestamp the timestamp to give the resulting ROS message\n+ * @param frame the frame to set in the resulting ROS message\n+ * @returns a ROS message containing the point cloud. Can be deserialized with\n+ * fromROSMsg in pcl_conversions\n+ */\n+sensor_msgs::PointCloud2 cloud_to_cloud_msg(const CloudOS1& cloud, ns timestamp,\n+                                            const std::string& frame = \"os1\");\n+/**\n+ * Loop reading from the OS1 client and invoking callbacks with packet messages.\n+ * Returns when ROS exits. Also runs the ROS event loop via ros::spinOnce().\n+ * @param cli the OS1 client\n+ * @param lidar_handler callback invoked with messages populated by\n+ * read_lidar_packet\n+ * @param imu_handler callback invoked with messages populated by\n+ * read_imu_packet\n+ */\n+void spin(const ouster::OS1::client& cli,\n+          const std::function<void(const PacketMsg& pm)>& lidar_handler,\n+          const std::function<void(const PacketMsg& pm)>& imu_handler);\n+\n+/**\n+ * Construct a function that will batch packets into a PCL point cloud for the\n+ * given duration, then invoke f with the complete cloud.\n+ * @param scan_dur duration to batch packets in nanoseconds\n+ * @param f a callback taking a PCL pointcloud to invoke on a complete batch\n+ * @returns a function that batches packet messages populated by\n+ * read_lidar_packet and invokes f on the result\n+ */\n+std::function<void(const PacketMsg&)> batch_packets(\n+    ns scan_dur, const std::function<void(ns, const CloudOS1&)>& f);\n+}\n+}"
+        },
+        {
+          "sha": "5a501fd3d523dffacdafa5de36a178339cdb88c5",
+          "filename": "include/ouster_ros/point_os1.h",
+          "status": "added",
+          "additions": 28,
+          "deletions": 0,
+          "changes": 28,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/04177a5a46e5b2560c52069e1ecd59ab14bce76c/include%2Fouster_ros%2Fpoint_os1.h",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/04177a5a46e5b2560c52069e1ecd59ab14bce76c/include%2Fouster_ros%2Fpoint_os1.h",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/include%2Fouster_ros%2Fpoint_os1.h?ref=04177a5a46e5b2560c52069e1ecd59ab14bce76c",
+          "patch": "@@ -0,0 +1,28 @@\n+#pragma once\n+#define PCL_NO_PRECOMPILE\n+#include <pcl/point_types.h>\n+\n+namespace ouster_ros {\n+namespace OS1 {\n+\n+struct EIGEN_ALIGN16 PointOS1 {\n+    PCL_ADD_POINT4D;\n+    float t;\n+    uint16_t reflectivity;\n+    uint16_t intensity;\n+    uint8_t ring;\n+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW\n+};\n+}\n+}\n+\n+POINT_CLOUD_REGISTER_POINT_STRUCT(ouster_ros::OS1::PointOS1,\n+    (float, x, x)\n+    (float, y, y)\n+    (float, z, z)\n+    (float, t, t)\n+    (uint16_t, reflectivity, reflectivity)\n+    (uint16_t, intensity, intensity)\n+    (uint8_t, ring, ring)\n+)\n+"
+        },
+        {
+          "sha": "4f38f54fdd0303800be66b0f4eca6d3035f8323b",
+          "filename": "msg/PacketMsg.msg",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/04177a5a46e5b2560c52069e1ecd59ab14bce76c/msg%2FPacketMsg.msg",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/04177a5a46e5b2560c52069e1ecd59ab14bce76c/msg%2FPacketMsg.msg",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/msg%2FPacketMsg.msg?ref=04177a5a46e5b2560c52069e1ecd59ab14bce76c",
+          "patch": "@@ -0,0 +1 @@\n+uint8[] buf"
+        },
+        {
+          "sha": "f1cb7580e2b1b21a5d9db36b8c8b7529d0820fad",
+          "filename": "os1.launch",
+          "status": "added",
+          "additions": 21,
+          "deletions": 0,
+          "changes": 21,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/04177a5a46e5b2560c52069e1ecd59ab14bce76c/os1.launch",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/04177a5a46e5b2560c52069e1ecd59ab14bce76c/os1.launch",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/os1.launch?ref=04177a5a46e5b2560c52069e1ecd59ab14bce76c",
+          "patch": "@@ -0,0 +1,21 @@\n+<launch>\n+\n+  <arg name=\"scan_dur_ns\" default=\"100000000\" doc=\"nanoseconds to batch lidar packets before publishing a cloud\"/>\n+  <arg name=\"os1_hostname\" default=\"localhost\" doc=\"hostname or IP in dotted decimal form of the sensor\"/>\n+  <arg name=\"os1_udp_dest\" default=\"192.168.1.1\" doc=\"hostname or IP where the sensor will send data packets\"/>\n+  <arg name=\"os1_lidar_port\" default=\"7502\" doc=\"port to which the sensor should send lidar data\"/>\n+  <arg name=\"os1_imu_port\" default=\"7503\" doc=\"port to which the sensor should send imu data\"/>\n+  <arg name=\"replay\" default=\"false\" doc=\"when true, the node will listen on ~/lidar_packets and ~/imu_packets for data instead of attempting to connect to a sensor\"/>\n+\n+  <group ns=\"/os1_node\">\n+    <param name=\"scan_dur_ns\" value=\"$(arg scan_dur_ns)\"/>\n+    <param name=\"os1_hostname\" value=\"$(arg os1_hostname)\"/>\n+    <param name=\"os1_udp_dest\" value=\"$(arg os1_udp_dest)\"/>\n+    <param name=\"os1_lidar_port\" value=\"$(arg os1_lidar_port)\"/>\n+    <param name=\"os1_imu_port\" value=\"$(arg os1_imu_port)\"/>\n+    <param name=\"replay\" value=\"$(arg replay)\"/>\n+  </group>\n+\n+  <node pkg=\"ouster_ros\" type=\"os1_node\" name=\"os1_node\" output=\"screen\" required=\"true\"/>\n+\n+</launch>"
+        },
+        {
+          "sha": "73a590240da86aaeeba5aa4283d48c7a428f1fa1",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 26,
+          "deletions": 0,
+          "changes": 26,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/04177a5a46e5b2560c52069e1ecd59ab14bce76c/package.xml",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/04177a5a46e5b2560c52069e1ecd59ab14bce76c/package.xml",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/package.xml?ref=04177a5a46e5b2560c52069e1ecd59ab14bce76c",
+          "patch": "@@ -0,0 +1,26 @@\n+<?xml version=\"1.0\"?>\n+<package format=\"2\">\n+  <name>ouster_ros</name>\n+  <version>0.1.0</version>\n+  <description>OS1 example ROS client</description>\n+  <maintainer email=\"oss@ouster.io\">ouster developers</maintainer>\n+  <license>BSD</license>\n+  <buildtool_depend>catkin</buildtool_depend>\n+\n+  <build_depend>roscpp</build_depend>\n+  <build_depend>message_generation</build_depend>\n+  <build_depend>std_msgs</build_depend>\n+  <build_depend>sensor_msgs</build_depend>\n+  <build_depend>pcl_ros</build_depend>\n+  <build_depend>pcl_conversions</build_depend>\n+  <build_depend>ouster_client</build_depend>\n+\n+  <exec_depend>roscpp</exec_depend>\n+  <exec_depend>message_runtime</exec_depend>\n+  <exec_depend>std_msgs</exec_depend>\n+  <exec_depend>sensor_msgs</exec_depend>\n+  <exec_depend>pcl_ros</exec_depend>\n+  <exec_depend>pcl_conversions</exec_depend>\n+\n+  <export></export>\n+</package>"
+        },
+        {
+          "sha": "77064013b32569ce6b17686293de8fdc96a6aae3",
+          "filename": "src/os1_node.cpp",
+          "status": "added",
+          "additions": 88,
+          "deletions": 0,
+          "changes": 88,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/04177a5a46e5b2560c52069e1ecd59ab14bce76c/src%2Fos1_node.cpp",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/04177a5a46e5b2560c52069e1ecd59ab14bce76c/src%2Fos1_node.cpp",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/src%2Fos1_node.cpp?ref=04177a5a46e5b2560c52069e1ecd59ab14bce76c",
+          "patch": "@@ -0,0 +1,88 @@\n+/**\n+ * Example node to publish OS1 output on ROS topics\n+ *\n+ * Additionally, this node can be used to record and replay raw sesnor output\n+ * by publishing and listening to PacketMsg topics\n+ *\n+ * ROS Parameters\n+ * scan_dur_ns: nanoseconds to batch lidar packets before publishing a cloud\n+ * os1_hostname: hostname or IP in dotted decimal form of the sensor\n+ * os1_udp_dest: hostname or IP where the sensor will send data packets\n+ * os1_lidar_port: port to which the sensor should send lidar data\n+ * os1_imu_port: port to which the sensor should send imu data\n+ * replay_mode: when true, the node will listen on ~/lidar_packets and\n+ *   ~/imu_packets for data instead of attempting to connect to a sensor\n+ */\n+\n+#include <chrono>\n+#include <functional>\n+#include <iostream>\n+#include <string>\n+#include <utility>\n+#include <vector>\n+\n+#include <pcl_conversions/pcl_conversions.h>\n+#include <ros/console.h>\n+#include <ros/ros.h>\n+#include <sensor_msgs/Imu.h>\n+#include <sensor_msgs/PointCloud2.h>\n+\n+#include \"ouster_ros/PacketMsg.h\"\n+#include \"ouster_ros/os1_ros.h\"\n+\n+using ns = std::chrono::nanoseconds;\n+using PacketMsg = ouster_ros::PacketMsg;\n+\n+int main(int argc, char** argv) {\n+    ros::init(argc, argv, \"ouster_driver\");\n+    ros::NodeHandle nh(\"~\");\n+\n+    auto scan_dur = ns(nh.param(\"scan_dur_ns\", 100000000));\n+    auto os1_hostname = nh.param(\"os1_hostname\", std::string(\"localhost\"));\n+    auto os1_udp_dest = nh.param(\"os1_udp_dest\", std::string(\"192.168.1.1\"));\n+    auto os1_lidar_port = nh.param(\"os1_lidar_port\", -1);\n+    auto os1_imu_port = nh.param(\"os1_imu_port\", -1);\n+    auto replay_mode = nh.param(\"replay\", true);\n+\n+    auto lidar_pub = nh.advertise<sensor_msgs::PointCloud2>(\"points\", 10);\n+    auto imu_pub = nh.advertise<sensor_msgs::Imu>(\"imu\", 10);\n+\n+    auto lidar_handler = ouster_ros::OS1::batch_packets(\n+        scan_dur, [&](ns scan_ts, const ouster_ros::OS1::CloudOS1& cloud) {\n+            lidar_pub.publish(\n+                ouster_ros::OS1::cloud_to_cloud_msg(cloud, scan_ts));\n+        });\n+\n+    auto imu_handler = [&](const PacketMsg& p) {\n+        imu_pub.publish(ouster_ros::OS1::packet_to_imu_msg(p));\n+    };\n+\n+    if (replay_mode) {\n+        auto lidar_packet_sub = nh.subscribe<PacketMsg, const PacketMsg&>(\n+            \"lidar_packets\", 500, lidar_handler);\n+        auto imu_packet_sub = nh.subscribe<PacketMsg, const PacketMsg&>(\n+            \"imu_packets\", 500, imu_handler);\n+        ros::spin();\n+    } else {\n+        auto lidar_packet_pub = nh.advertise<PacketMsg>(\"lidar_packets\", 500);\n+        auto imu_packet_pub = nh.advertise<PacketMsg>(\"imu_packets\", 500);\n+\n+        auto cli = ouster::OS1::init_client(os1_hostname, os1_udp_dest,\n+                                            os1_lidar_port, os1_imu_port);\n+        if (!cli) {\n+            ROS_ERROR(\"Failed to initialize sensor at: %s\", os1_hostname.c_str());\n+            return 1;\n+        }\n+\n+        ouster_ros::OS1::spin(*cli,\n+                              [&](const PacketMsg& pm) {\n+                                  lidar_packet_pub.publish(pm);\n+                                  lidar_handler(pm);\n+                              },\n+                              [&](const PacketMsg& pm) {\n+                                  imu_packet_pub.publish(pm);\n+                                  imu_handler(pm);\n+                              });\n+    }\n+    return 0;\n+}"
+        },
+        {
+          "sha": "926691a291a8873d741130bbb5e0c23cd47c619f",
+          "filename": "src/os1_ros.cpp",
+          "status": "added",
+          "additions": 156,
+          "deletions": 0,
+          "changes": 156,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/04177a5a46e5b2560c52069e1ecd59ab14bce76c/src%2Fos1_ros.cpp",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/04177a5a46e5b2560c52069e1ecd59ab14bce76c/src%2Fos1_ros.cpp",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/src%2Fos1_ros.cpp?ref=04177a5a46e5b2560c52069e1ecd59ab14bce76c",
+          "patch": "@@ -0,0 +1,156 @@\n+#include <pcl_conversions/pcl_conversions.h>\n+\n+#include \"ouster/os1.h\"\n+#include \"ouster/os1_packet.h\"\n+#include \"ouster_ros/os1_ros.h\"\n+\n+namespace ouster_ros {\n+namespace OS1 {\n+\n+using namespace ouster::OS1;\n+\n+ns timestamp_of_imu_packet(const PacketMsg& pm) {\n+    return ns(imu_gyro_ts(pm.buf.data()));\n+}\n+\n+ns timestamp_of_lidar_packet(const PacketMsg& pm) {\n+    return ns(col_timestamp(nth_col(0, pm.buf.data())));\n+}\n+\n+bool read_imu_packet(const client& cli, PacketMsg& m) {\n+    m.buf.resize(imu_packet_bytes + 1);\n+    return read_imu_packet(cli, m.buf.data());\n+}\n+\n+bool read_lidar_packet(const client& cli, PacketMsg& m) {\n+    m.buf.resize(lidar_packet_bytes + 1);\n+    return read_lidar_packet(cli, m.buf.data());\n+}\n+\n+sensor_msgs::Imu packet_to_imu_msg(const PacketMsg& p) {\n+    sensor_msgs::Imu m;\n+    const uint8_t* buf = p.buf.data();\n+\n+    m.header.stamp.fromNSec(imu_gyro_ts(buf));\n+    m.header.frame_id = \"os1_imu\";\n+\n+    m.orientation.x = 0;\n+    m.orientation.y = 0;\n+    m.orientation.z = 0;\n+    m.orientation.w = 0;\n+\n+    m.linear_acceleration.x = imu_la_x(buf);\n+    m.linear_acceleration.y = imu_la_y(buf);\n+    m.linear_acceleration.z = imu_la_z(buf);\n+\n+    m.angular_velocity.x = imu_av_x(buf) * M_PI / 180.0;\n+    m.angular_velocity.y = imu_av_y(buf) * M_PI / 180.0;\n+    m.angular_velocity.z = imu_av_z(buf) * M_PI / 180.0;\n+\n+    for (int i = 0; i < 9; i++) {\n+        m.orientation_covariance[i] = -1;\n+        m.angular_velocity_covariance[i] = 0;\n+        m.linear_acceleration_covariance[i] = 0;\n+    }\n+    for (int i = 0; i < 9; i += 4) {\n+        m.linear_acceleration_covariance[i] = 0.01;\n+        m.angular_velocity_covariance[i] = 6e-4;\n+    }\n+\n+    return m;\n+}\n+\n+sensor_msgs::PointCloud2 cloud_to_cloud_msg(const CloudOS1& cloud, ns timestamp,\n+                                            const std::string& frame) {\n+    sensor_msgs::PointCloud2 msg;\n+    pcl::toROSMsg(cloud, msg);\n+    msg.header.frame_id = frame;\n+    msg.header.stamp.fromNSec(timestamp.count());\n+    return msg;\n+}\n+\n+static PointOS1 nth_point(int ind, const uint8_t* col_buf) {\n+    float h_angle_0 = col_h_angle(col_buf);\n+    auto tte = trig_table[ind];\n+    const uint8_t* px_buf = nth_px(ind, col_buf);\n+    float r = px_range(px_buf) / 1000.0;\n+    float h_angle = tte.h_offs + h_angle_0;\n+\n+    PointOS1 point;\n+    point.reflectivity = px_reflectivity(px_buf);\n+    point.intensity = px_signal_photons(px_buf);\n+    point.x = -r * tte.cos_v_angle * cosf(h_angle);\n+    point.y = r * tte.cos_v_angle * sinf(h_angle);\n+    point.z = r * tte.sin_v_angle;\n+    point.ring = ind;\n+\n+    return point;\n+}\n+\n+void add_packet_to_cloud(ns scan_start_ts, ns scan_duration,\n+                         const PacketMsg& pm, CloudOS1& cloud) {\n+    const uint8_t* buf = pm.buf.data();\n+    for (int icol = 0; icol < columns_per_buffer; icol++) {\n+        const uint8_t* col_buf = nth_col(icol, buf);\n+        float ts = (col_timestamp(col_buf) - scan_start_ts.count()) /\n+                   (float)scan_duration.count();\n+\n+        for (int ipx = 0; ipx < pixels_per_column; ipx++) {\n+            auto p = nth_point(ipx, col_buf);\n+            p.t = ts;\n+            cloud.push_back(p);\n+        }\n+    }\n+}\n+\n+void spin(const client& cli,\n+          const std::function<void(const PacketMsg& pm)>& lidar_handler,\n+          const std::function<void(const PacketMsg& pm)>& imu_handler) {\n+    PacketMsg lidar_packet, imu_packet;\n+    lidar_packet.buf.resize(lidar_packet_bytes + 1);\n+    imu_packet.buf.resize(imu_packet_bytes + 1);\n+\n+    while (ros::ok()) {\n+        auto state = poll_client(cli);\n+        if (state & ERROR) {\n+            ROS_ERROR(\"spin: poll_client returned error\");\n+            return;\n+        }\n+        if (state & LIDAR_DATA) {\n+            if (read_lidar_packet(cli, lidar_packet.buf.data()))\n+                lidar_handler(lidar_packet);\n+        }\n+        if (state & IMU_DATA) {\n+            if (read_imu_packet(cli, imu_packet.buf.data()))\n+                imu_handler(imu_packet);\n+        }\n+        ros::spinOnce();\n+    }\n+}\n+\n+static ns nearest_scan_dur(ns scan_dur, ns ts) {\n+    return ns((ts.count() / scan_dur.count()) * scan_dur.count());\n+};\n+\n+std::function<void(const PacketMsg&)> batch_packets(\n+    ns scan_dur, const std::function<void(ns, const CloudOS1&)>& f) {\n+    auto cloud = std::make_shared<OS1::CloudOS1>();\n+    auto scan_ts = ns(-1L);\n+\n+    return [=](const PacketMsg& pm) mutable {\n+        ns packet_ts = OS1::timestamp_of_lidar_packet(pm);\n+        if (scan_ts.count() == -1L)\n+            scan_ts = nearest_scan_dur(scan_dur, packet_ts);\n+\n+        OS1::add_packet_to_cloud(scan_ts, scan_dur, pm, *cloud);\n+\n+        if (packet_ts - scan_ts >= scan_dur) {\n+            f(scan_ts, *cloud);\n+\n+            cloud->clear();\n+            scan_ts = ns(-1L);\n+        }\n+    };\n+}\n+}\n+}"
+        },
+        {
+          "sha": "4786feba0d8ecc64ca05c10061ded45872b5788b",
+          "filename": "viz.rviz",
+          "status": "added",
+          "additions": 143,
+          "deletions": 0,
+          "changes": 143,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/04177a5a46e5b2560c52069e1ecd59ab14bce76c/viz.rviz",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/04177a5a46e5b2560c52069e1ecd59ab14bce76c/viz.rviz",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/viz.rviz?ref=04177a5a46e5b2560c52069e1ecd59ab14bce76c",
+          "patch": "@@ -0,0 +1,143 @@\n+Panels:\n+  - Class: rviz/Displays\n+    Help Height: 263\n+    Name: Displays\n+    Property Tree Widget:\n+      Expanded:\n+        - /Global Options1\n+        - /Status1\n+        - /PointCloud21\n+      Splitter Ratio: 0.5\n+    Tree Height: 585\n+  - Class: rviz/Selection\n+    Name: Selection\n+  - Class: rviz/Tool Properties\n+    Expanded:\n+      - /2D Pose Estimate1\n+      - /2D Nav Goal1\n+      - /Publish Point1\n+    Name: Tool Properties\n+    Splitter Ratio: 0.588679016\n+  - Class: rviz/Views\n+    Expanded:\n+      - /Current View1\n+    Name: Views\n+    Splitter Ratio: 0.5\n+  - Class: rviz/Time\n+    Experimental: false\n+    Name: Time\n+    SyncMode: 0\n+    SyncSource: PointCloud2\n+Visualization Manager:\n+  Class: \"\"\n+  Displays:\n+    - Alpha: 0.5\n+      Cell Size: 1\n+      Class: rviz/Grid\n+      Color: 160; 160; 164\n+      Enabled: true\n+      Line Style:\n+        Line Width: 0.0299999993\n+        Value: Lines\n+      Name: Grid\n+      Normal Cell Count: 0\n+      Offset:\n+        X: 0\n+        Y: 0\n+        Z: 0\n+      Plane: XY\n+      Plane Cell Count: 10\n+      Reference Frame: <Fixed Frame>\n+      Value: true\n+    - Alpha: 1\n+      Autocompute Intensity Bounds: true\n+      Autocompute Value Bounds:\n+        Max Value: 10\n+        Min Value: -10\n+        Value: true\n+      Axis: Z\n+      Channel Name: intensity\n+      Class: rviz/PointCloud2\n+      Color: 255; 255; 255\n+      Color Transformer: Intensity\n+      Decay Time: 0\n+      Enabled: true\n+      Invert Rainbow: false\n+      Max Color: 255; 255; 255\n+      Max Intensity: 1153\n+      Min Color: 0; 0; 0\n+      Min Intensity: 4\n+      Name: PointCloud2\n+      Position Transformer: XYZ\n+      Queue Size: 10\n+      Selectable: true\n+      Size (Pixels): 3\n+      Size (m): 0.00999999978\n+      Style: Points\n+      Topic: /os1_node/points\n+      Unreliable: false\n+      Use Fixed Frame: true\n+      Use rainbow: true\n+      Value: true\n+  Enabled: true\n+  Global Options:\n+    Background Color: 48; 48; 48\n+    Fixed Frame: os1\n+    Frame Rate: 30\n+  Name: root\n+  Tools:\n+    - Class: rviz/Interact\n+      Hide Inactive Objects: true\n+    - Class: rviz/MoveCamera\n+    - Class: rviz/Select\n+    - Class: rviz/FocusCamera\n+    - Class: rviz/Measure\n+    - Class: rviz/SetInitialPose\n+      Topic: /initialpose\n+    - Class: rviz/SetGoal\n+      Topic: /move_base_simple/goal\n+    - Class: rviz/PublishPoint\n+      Single click: true\n+      Topic: /clicked_point\n+  Value: true\n+  Views:\n+    Current:\n+      Class: rviz/Orbit\n+      Distance: 44.8919868\n+      Enable Stereo Rendering:\n+        Stereo Eye Separation: 0.0599999987\n+        Stereo Focal Distance: 1\n+        Swap Stereo Eyes: false\n+        Value: false\n+      Focal Point:\n+        X: 0\n+        Y: 0\n+        Z: 0\n+      Focal Shape Fixed Size: true\n+      Focal Shape Size: 0.0500000007\n+      Invert Z Axis: false\n+      Name: Current View\n+      Near Clip Distance: 0.00999999978\n+      Pitch: 0.565398574\n+      Target Frame: <Fixed Frame>\n+      Value: Orbit (rviz)\n+      Yaw: 0.725398004\n+    Saved: ~\n+Window Geometry:\n+  Displays:\n+    collapsed: false\n+  Height: 1051\n+  Hide Left Dock: false\n+  Hide Right Dock: false\n+  QMainWindow State: 000000ff00000000fd00000004000000000000016a00000391fc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000006400fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000002800000391000000dd00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000010f00000391fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000002800000391000000b000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000007800000003efc0100000002fb0000000800540069006d00650100000000000007800000030000fffffffb0000000800540069006d00650100000000000004500000000000000000000004fb0000039100000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000\n+  Selection:\n+    collapsed: false\n+  Time:\n+    collapsed: false\n+  Tool Properties:\n+    collapsed: false\n+  Views:\n+    collapsed: false\n+  Width: 1920\n+  X: 0\n+  Y: 0"
+        }
+      ]
+    },
+    {
+      "author": "dmitrig",
+      "date": "2021-03-16T00:44:24Z",
+      "sha": "6dce293fa3256e386a21fa0a406f8c6bde227596",
+      "message": "Sample visualizer updates and bugfixes (#230)\n\n* Update reflectivity visualization for the upcoming 2.1 firmware\r\nrelease\r\n* Fix a bug causing the viewport to be sized incorrectly on retina\r\ndisplays\r\n* Some code reorganization in the sample visualizer library",
+      "files_changed": 1,
+      "additions": 6,
+      "deletions": 11,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "1fc4eeb95f1646e45a78c7f13ae0b4330ec62317",
+          "filename": "src/img_node.cpp",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 11,
+          "changes": 17,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/6dce293fa3256e386a21fa0a406f8c6bde227596/src%2Fimg_node.cpp",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/6dce293fa3256e386a21fa0a406f8c6bde227596/src%2Fimg_node.cpp",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/src%2Fimg_node.cpp?ref=6dce293fa3256e386a21fa0a406f8c6bde227596",
+          "patch": "@@ -22,9 +22,8 @@\n #include <thread>\n #include <vector>\n \n-#include \"ouster/autoexposure.h\"\n-#include \"ouster/beam_uniformity.h\"\n #include \"ouster/client.h\"\n+#include \"ouster/image_processing.h\"\n #include \"ouster/types.h\"\n #include \"ouster_ros/OSConfigSrv.h\"\n #include \"ouster_ros/ros.h\"\n@@ -103,10 +102,8 @@ int main(int argc, char** argv) {\n                                     (8 * sizeof(*intensity_image.data.data())));\n         intensity_image.header.stamp = m->header.stamp;\n \n-        using im_t = Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic,\n-                                  Eigen::RowMajor>;\n-        im_t ambient_image_eigen(H, W);\n-        im_t intensity_image_eigen(H, W);\n+        ouster::img_t<double> ambient_image_eigen(H, W);\n+        ouster::img_t<double> intensity_image_eigen(H, W);\n \n         for (size_t u = 0; u < H; u++) {\n             for (size_t v = 0; v < W; v++) {\n@@ -129,11 +126,9 @@ int main(int argc, char** argv) {\n             }\n         }\n \n-        ambient_buc.correct(ambient_image_eigen);\n-        ambient_ae(\n-            Eigen::Map<Eigen::ArrayXd>(ambient_image_eigen.data(), W * H));\n-        intensity_ae(\n-            Eigen::Map<Eigen::ArrayXd>(intensity_image_eigen.data(), W * H));\n+        ambient_buc(ambient_image_eigen);\n+        ambient_ae(ambient_image_eigen);\n+        intensity_ae(intensity_image_eigen);\n         ambient_image_eigen = ambient_image_eigen.sqrt();\n         intensity_image_eigen = intensity_image_eigen.sqrt();\n         for (size_t u = 0; u < H; u++) {"
+        }
+      ]
+    },
+    {
+      "author": "Krishtof-Korda",
+      "date": "2019-09-11T03:08:47Z",
+      "sha": "2e5dfc09bb7966901c8c86748edde968240c1a0d",
+      "message": "Ez/readme improvement (#113)\n\nChange OS-1 to OS1 throughout and clean up links\r\n\r\nSubmitted on behalf of @Emily-Zhang",
+      "files_changed": 1,
+      "additions": 53,
+      "deletions": 31,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "17822f01b7421fcc8a30a91e26eab0d6526920d1",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 53,
+          "deletions": 31,
+          "changes": 84,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/2e5dfc09bb7966901c8c86748edde968240c1a0d/README.md",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/2e5dfc09bb7966901c8c86748edde968240c1a0d/README.md",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/README.md?ref=2e5dfc09bb7966901c8c86748edde968240c1a0d",
+          "patch": "@@ -1,35 +1,45 @@\n-# OS-1 Example ROS Node\n+# OS1 Example ROS Node\n \n ## Contents\n-* `ouster_ros/` contains sample code for publishing OS-1 data as standard ROS\n-  topics\n-* Tested with ROS Kinetic on Ubuntu 16.04\n+* `ouster_ros/` contains sample code for publishing OS1 data as standard\n+ ROS topics\n+\n+## Operating System Support\n+* The visualizer has been tested on [ROS Kinetic](http://wiki.ros.org/kinetic/Installation/Ubuntu) on Ubuntu 16.04\n+    * additionally requires `ros-kinetic-pcl-ros`, `ros-kinetic-tf2-geometry-msgs`\n+      and, optionally, `ros-kinetic-rviz` for visualization using ROS\n+* The visualizer has been tested on [ROS Melodic](http://wiki.ros.org/melodic/Installation/Ubuntu) on Ubuntu 18.04\n+    * additionally requires `ros-melodic-pcl-ros`, `ros-melodic-tf2-geometry-msgs`\n+      and, optionally, `ros-melodic-rviz` for visualization using ROS\n \n ## Building the Sample ROS Node\n-* Supports Ubuntu 16.04 with ROS Kinetic (for ouster_ros)\n-* ROS installation instructions can be found\n-  [here](http://wiki.ros.org/kinetic/Installation/Ubuntu)\n-* Additionally requires `ros-kinetic-pcl-ros`, `ros-kinetic-tf2-geometry-msgs`\n-  and, optionally, `ros-kinetic-rviz` for visualization using ROS\n-* Be sure to source the ROS setup script before building. For example:`source\n-  /opt/ros/kinetic/setup.bash`\n+* In the following instruction steps, `/path/to/ouster_example` is where you've cloned the repository \n+* Run the following command `export CMAKE_PREFIX_PATH=/path/to/ouster_example`\n+* Be sure to source the ROS setup script before building. For example:\n+`source /opt/ros/[kinetic_or_melodic]/setup.bash`\n * Build with `mkdir -p myworkspace/src && cd myworkspace && ln -s\n   /path/to/ouster_example ./src/ && catkin_make -DCMAKE_BUILD_TYPE=Release`\n \n ## Running the Sample ROS Nodes\n-* Make sure to set up the ROS environment with `source\n-  /path/to/myworkspace/devel/setup.bash` in a new terminal for each command\n-  below\n-* To publish ROS topics from a running sensor:\n-    - Run `roslaunch ouster_ros os1.launch os1_hostname:=<os1_hostname>\n-     os1_udp_dest:=<udp_data_dest_ip> lidar_mode:=<lidar_mode>` where\n-     `<os1_hostname>` can be the hostname or IP of the OS-1 device,\n-     `<udp_data_dest_ip>` is the IP to which the sensor should send data, and\n-     `<lidar_mode>` is one of 512x10, 512x20, 1024x10, 1024x20, or 2048x10\n-    - To record raw sensor output, run `rosbag record /os1_node/imu_packets\n-     /os1_node/lidar_packets` in another terminal\n-* To publish ROS topics from recorded data:\n-    - Run `roslaunch ouster_ros os1.launch replay:=true\n+* Make sure the OS1 is connected to the network and has obtained a DHCP lease. See section 3.1 in the accompanying [software user guide](https://www.ouster.io/downloads) for more details\n+* In each new terminal for each command below:\n+    - Make sure to source ROS environment with `source\n+  /path/to/myworkspace/devel/setup.bash` where `/path/to/myworkspace` is where the path to the workspace directory that was created \n+  when building the ROS nodes\n+* To publish ROS topics from a running sensor from within the `ouster_ros` directory:\n+    - Run `roslaunch os1.launch os1_hostname:=<os1_hostname>\n+     os1_udp_dest:=<udp_data_dest_ip> lidar_mode:=<lidar_mode> viz:=<viz>`where:\n+        - `<os1_hostname>` can be the hostname (os1-991xxxxxxxxx) or IP of the OS1\n+        - `<udp_data_dest_ip>` is the IP to which the sensor should send data\n+        - `<lidar_mode>` is one of `512x10`, `512x20`, `1024x10`, `1024x20`, or `2048x10`\n+        - `<viz>` is either `true` or `false`. If true, a window should open and start \n+          displaying data after a few seconds\n+* To record raw sensor output\n+    - In another terminal instance, run `rosbag record /os1_node/imu_packets\n+     /os1_node/lidar_packets`\n+    - This will save a .bag file of recorded data in that directory\n+* To publish ROS topics from recorded data from withint the `ouster_ros` directory:\n+    - Run `roslaunch os1.launch replay:=true\n       os1_hostname:=<os1_hostname>`\n     - In a second terminal run `rosbag play --clock <bagfile>`\n     - Note: `os1_node` reads and writes metadata to `${ROS_HOME}` to enable\n@@ -40,17 +50,29 @@\n       1024x10. This can be overridden with the `lidar_mode`\n       parameter. Visualizer output will only be correct if the same `lidar_mode`\n       parameter is used for both recording and replay\n-* To display sensor output using the provided visualizer:\n-    - To visualize the published OS-1 point cloud data using the provided\n-      visualizer, add `viz:=true` to either of the `roslaunch` commands above\n-    - A window should open and start displaying data after a few seconds. This\n-      should work with a running sensor or replayed data\n-    - See the [README.md](../ouster_viz/README.md) in the `ouster_viz` directory\n-      for details on keyboard and mouse controls\n * To display sensor output using ROS tools (rviz):\n     - Follow the instructions above for running the example ROS code with a\n       sensor or recorded data\n     - To visualize output using rviz, run `rviz -d /path/to/ouster_ros/viz.rviz`\n       in another terminal\n     - To view lidar intensity/noise/range images, add `image:=true` to either of\n       the `roslaunch` commands above\n+\n+## Key bindings\n+| key | what it does |\n+| ----| ------------ |\n+| `o` | Increase point size |\n+| `p` | Decrease point size |\n+| `m` | Cycle point cloud coloring by z-height / intensity / z-height plus intensity / range |\n+| `c` | Cycle color scheme for range image |\n+| `shift c` | Cycle color scheme for point cloud |\n+| `v` | Toggle color cycling in range image |\n+| `n` | Display ambient image from the sensor|\n+| `r` | Reset camera position\n+| `0` (zero) | Toggle parallel projection and reset camera |\n+| `d` | Cycle through fraction of the window height used for displaying range and intensity image\n+\n+## Mouse control\n+* Click and drag rotates the view\n+* Middle click and drag pans the view\n+* Scroll adjusts how far away the camera is from the vehicle "
+        }
+      ]
+    },
+    {
+      "author": "standmit",
+      "date": "2019-08-14T15:16:16Z",
+      "sha": "e6aff8b3051e3a4484f3adfbf7dcf844d25fa1d3",
+      "message": "timestamp mode configurable",
+      "files_changed": 2,
+      "additions": 13,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "c6c361a87a025bba10a652b93e924a4bcfae9244",
+          "filename": "os1.launch",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/e6aff8b3051e3a4484f3adfbf7dcf844d25fa1d3/os1.launch",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/e6aff8b3051e3a4484f3adfbf7dcf844d25fa1d3/os1.launch",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/os1.launch?ref=e6aff8b3051e3a4484f3adfbf7dcf844d25fa1d3",
+          "patch": "@@ -6,12 +6,14 @@\n   <arg name=\"os1_imu_port\" default=\"7503\" doc=\"port to which the sensor should send imu data\"/>\n   <arg name=\"replay\" default=\"false\" doc=\"do not connect to a sensor; expect /os1_node/{lidar,imu}_packets from replay\"/>\n   <arg name=\"lidar_mode\" default=\"\" doc=\"resolution and rate: either 512x10, 512x20, 1024x10, 1024x20, or 2048x10\"/>\n+  <arg name=\"timestamp_mode\" default=\"\" doc=\"method used to timestamp measurements: TIME_FROM_INTERNAL_OSC, TIME_FROM_SYNC_PULSE_IN, TIME_FROM_PTP_1588\"/>\n   <arg name=\"metadata\" default=\"\" doc=\"override default metadata file for replays\"/>\n   <arg name=\"viz\" default=\"false\" doc=\"whether to run a simple visualizer\"/>\n   <arg name=\"image\" default=\"false\" doc=\"publish range/intensity/noise image topic\"/>\n \n   <node pkg=\"ouster_ros\" name=\"os1_node\" type=\"os1_node\" output=\"screen\" required=\"true\">\n     <param name=\"~/lidar_mode\" type=\"string\" value=\"$(arg lidar_mode)\"/>\n+    <param name=\"~/timestamp_mode\" type=\"string\" value=\"$(arg timestamp_mode)\"/>\n     <param name=\"~/replay\" value=\"$(arg replay)\"/>\n     <param name=\"~/os1_hostname\" value=\"$(arg os1_hostname)\"/>\n     <param name=\"~/os1_udp_dest\" value=\"$(arg os1_udp_dest)\"/>"
+        },
+        {
+          "sha": "824a96d4a7eff544aff6b3f04f02a8a76a3db847",
+          "filename": "src/os1_node.cpp",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 0,
+          "changes": 11,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/e6aff8b3051e3a4484f3adfbf7dcf844d25fa1d3/src%2Fos1_node.cpp",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/e6aff8b3051e3a4484f3adfbf7dcf844d25fa1d3/src%2Fos1_node.cpp",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/src%2Fos1_node.cpp?ref=e6aff8b3051e3a4484f3adfbf7dcf844d25fa1d3",
+          "patch": "@@ -151,6 +151,7 @@ int main(int argc, char** argv) {\n     auto imu_port = nh.param(\"os1_imu_port\", 7502);\n     auto replay = nh.param(\"replay\", false);\n     auto lidar_mode = nh.param(\"lidar_mode\", std::string{});\n+    auto timestamp_mode = nh.param(\"timestamp_mode\", std::string{});\n \n     // fall back to metadata file name based on hostname, if available\n     auto meta_file = nh.param(\"metadata\", std::string{});\n@@ -167,6 +168,15 @@ int main(int argc, char** argv) {\n         return EXIT_FAILURE;\n     }\n \n+    if (not timestamp_mode.size()) {\n+        timestamp_mode = OS1::to_string(OS1::TIME_FROM_INTERNAL_OSC);\n+    }\n+\n+    if (!OS1::timestamp_mode_of_string(timestamp_mode)) {\n+        ROS_ERROR(\"Invalid timestamp mode %s\", timestamp_mode.c_str());\n+        return EXIT_FAILURE;\n+    }\n+\n     if (!replay && (!hostname.size() || !udp_dest.size())) {\n         ROS_ERROR(\"Must specify both hostname and udp destination\");\n         return EXIT_FAILURE;\n@@ -195,6 +205,7 @@ int main(int argc, char** argv) {\n \n         auto cli = OS1::init_client(hostname, udp_dest,\n                                     OS1::lidar_mode_of_string(lidar_mode),\n+                                    OS1::timestamp_mode_of_string(timestamp_mode),\n                                     lidar_port, imu_port);\n \n         if (!cli) {"
+        }
+      ]
+    },
+    {
+      "author": "daniel-dsouza",
+      "date": "2019-06-11T14:02:30Z",
+      "sha": "749452a2934d339110a56829dfbc11103ac155fc",
+      "message": "turn on position independent code for ouster_ros\n\nnow this library can be used when building dynamic libraries.",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "15106655afc36106a7844101098879a0f8270ecc",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/749452a2934d339110a56829dfbc11103ac155fc/CMakeLists.txt",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/749452a2934d339110a56829dfbc11103ac155fc/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/CMakeLists.txt?ref=749452a2934d339110a56829dfbc11103ac155fc",
+          "patch": "@@ -43,6 +43,7 @@ catkin_package(\n )\n \n add_library(ouster_ros STATIC src/os1_ros.cpp)\n+set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)\n target_link_libraries(ouster_ros ${catkin_LIBRARIES})\n add_dependencies(ouster_ros ${PROJECT_NAME}_gencpp)\n "
+        }
+      ]
+    },
+    {
+      "author": "pronif",
+      "date": "2019-05-17T12:52:57Z",
+      "sha": "aa6621e4681766a36505b9e0c2655d6a76d3bbbf",
+      "message": "Handle tf_prefix correctly\n\nIgnore tf_prefix if not present in param server, check it is well formatted otherwise",
+      "files_changed": 2,
+      "additions": 8,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "c894b652c7ece356b6e6e098e20665aae6acb876",
+          "filename": "os1.launch",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/aa6621e4681766a36505b9e0c2655d6a76d3bbbf/os1.launch",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/aa6621e4681766a36505b9e0c2655d6a76d3bbbf/os1.launch",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/os1.launch?ref=aa6621e4681766a36505b9e0c2655d6a76d3bbbf",
+          "patch": "@@ -9,6 +9,7 @@\n   <arg name=\"metadata\" default=\"\" doc=\"override default metadata file for replays\"/>\n   <arg name=\"viz\" default=\"false\" doc=\"whether to run a simple visualizer\"/>\n   <arg name=\"image\" default=\"false\" doc=\"publish range/intensity/noise image topic\"/>\n+  <arg name=\"tf_prefix\" default=\"\" doc=\"namespace for tf transforms\"/>\n \n   <node pkg=\"ouster_ros\" name=\"os1_node\" type=\"os1_node\" output=\"screen\" required=\"true\">\n     <param name=\"~/lidar_mode\" type=\"string\" value=\"$(arg lidar_mode)\"/>\n@@ -24,6 +25,7 @@\n     <remap from=\"~/os1_config\" to=\"/os1_node/os1_config\"/>\n     <remap from=\"~/lidar_packets\" to=\"/os1_node/lidar_packets\"/>\n     <remap from=\"~/imu_packets\" to=\"/os1_node/imu_packets\"/>\n+    <param name=\"~/tf_prefix\" value=\"$(arg tf_prefix)\"/>\n   </node>\n \n   <node if=\"$(arg viz)\" pkg=\"ouster_ros\" name=\"viz_node\" type=\"viz_node\" output=\"screen\" required=\"true\">"
+        },
+        {
+          "sha": "18759c75b4428d48645de52c06ff99ff34cfe59b",
+          "filename": "src/os1_cloud_node.cpp",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 3,
+          "changes": 9,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/aa6621e4681766a36505b9e0c2655d6a76d3bbbf/src%2Fos1_cloud_node.cpp",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/aa6621e4681766a36505b9e0c2655d6a76d3bbbf/src%2Fos1_cloud_node.cpp",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/src%2Fos1_cloud_node.cpp?ref=aa6621e4681766a36505b9e0c2655d6a76d3bbbf",
+          "patch": "@@ -28,9 +28,12 @@ int main(int argc, char** argv) {\n     ros::NodeHandle nh(\"~\");\n \n     auto tf_prefix = nh.param(\"tf_prefix\", std::string{});\n-    auto sensor_frame = tf_prefix + \"/os1_sensor\";\n-    auto imu_frame = tf_prefix + \"/os1_imu\";\n-    auto lidar_frame = tf_prefix + \"/os1_lidar\";\n+    if (!tf_prefix.empty()) {\n+      if (tf_prefix.back() != '/') tf_prefix.append(1, '/');\n+    }\n+    auto sensor_frame = tf_prefix + \"os1_sensor\";\n+    auto imu_frame = tf_prefix + \"os1_imu\";\n+    auto lidar_frame = tf_prefix + \"os1_lidar\";\n \n     ouster_ros::OS1ConfigSrv cfg{};\n     auto client = nh.serviceClient<ouster_ros::OS1ConfigSrv>(\"os1_config\");"
+        }
+      ]
+    },
+    {
+      "author": "philband",
+      "date": "2019-03-05T00:32:43Z",
+      "sha": "bd9f677a3642efc136a8b4300c6923712d7623d8",
+      "message": "ros node: Added missing dependency tf2_geometry_msgs",
+      "files_changed": 2,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "1dcfd68d1ced5a30e702197c693b06e51d476e77",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/bd9f677a3642efc136a8b4300c6923712d7623d8/CMakeLists.txt",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/bd9f677a3642efc136a8b4300c6923712d7623d8/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/CMakeLists.txt?ref=bd9f677a3642efc136a8b4300c6923712d7623d8",
+          "patch": "@@ -18,6 +18,7 @@ find_package(catkin REQUIRED COMPONENTS\n   ouster_viz\n   tf2\n   tf2_ros\n+  tf2_geometry_msgs\n )\n \n add_message_files(FILES PacketMsg.msg)"
+        },
+        {
+          "sha": "592f196084a4c3e1736a3f9c4c9bb21aab7d3b63",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/bd9f677a3642efc136a8b4300c6923712d7623d8/package.xml",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/bd9f677a3642efc136a8b4300c6923712d7623d8/package.xml",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/package.xml?ref=bd9f677a3642efc136a8b4300c6923712d7623d8",
+          "patch": "@@ -16,6 +16,7 @@\n   <build_depend>pcl_conversions</build_depend>\n   <build_depend>tf2</build_depend>\n   <build_depend>tf2_ros</build_depend>\n+  <build_depend>tf2_geometry_msgs</build_depend>\n   <build_depend>ouster_client</build_depend>\n   <build_depend>ouster_viz</build_depend>\n "
+        }
+      ]
+    },
+    {
+      "author": "rrinberg",
+      "date": "2018-10-13T00:14:24Z",
+      "sha": "aac302f6cab33212777406931abb7241f97a7869",
+      "message": "Fix minor bugs and typos\n\n* Improve positional argument parsing in viz\n* Use allocate_shared for Eigen compatibility\n* Fix typo in readme",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "56ba32e2666313637295a5c4035214247abc69ba",
+          "filename": "readme.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/aac302f6cab33212777406931abb7241f97a7869/readme.md",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/aac302f6cab33212777406931abb7241f97a7869/readme.md",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/readme.md?ref=aac302f6cab33212777406931abb7241f97a7869",
+          "patch": "@@ -1,4 +1,4 @@\n-#README for OS1 Example ROS Node\n+# README for OS1 Example ROS Node\n \n ## Building the Sample ROS Node\n * Supports Ubuntu 16.04 with ROS Kinetic (for ouster_ros)"
+        }
+      ]
+    },
+    {
+      "author": "alexc-ouster",
+      "date": "2026-04-13T18:44:41Z",
+      "sha": "a58526729f2b61154f838a26cd0db4151f3b0c54",
+      "message": "Add ROS launch support for sensor time-sync and min_distance parameters (#529)\n\n* Added sensor time_param to config sensor\n* Modified launch file to include doc for minimum reported range for different FW version\n* Modified ouster sensor config param in launch and sensor_nodelet.cpp\n* Set parse_min_distance to sentinel -1\n* Modified minor doc grammar issue in launch file\n\nCo-authored-by: Alex Chua Zhi Hao <alexchua0108@outlook.com>",
+      "files_changed": 4,
+      "additions": 221,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "07db4a3ffb334ba3b17e5d6948a59697c4c4ef5f",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/a58526729f2b61154f838a26cd0db4151f3b0c54/CHANGELOG.rst",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/a58526729f2b61154f838a26cd0db4151f3b0c54/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/CHANGELOG.rst?ref=a58526729f2b61154f838a26cd0db4151f3b0c54",
+          "patch": "@@ -7,6 +7,13 @@ Changelog\n * Restore ``whole-archive`` only on ouster_ros library to avoid double free corruption issue.\n   - The ``ouster_client`` library is now linked normally without whole-archive.\n * Use ``add_compile_definitions`` instead of ``add_definitions`` to set the ``EIGEN_MPL2_ONLY`` flag.\n+* Add launch file and nodelet support for additional sensor configuration parameters (time\n+  synchronization, multipurpose IO, and minimum reported range on FW 3.1+):\n+  - ``multipurpose_io_mode``\n+  - ``nmea_in_polarity``, ``nmea_ignore_valid_char``, ``nmea_baud_rate``, ``nmea_leap_seconds``\n+  - ``sync_pulse_in_polarity``, ``sync_pulse_out_polarity``, ``sync_pulse_out_frequency``,\n+    ``sync_pulse_out_angle``, ``sync_pulse_out_pulse_width``\n+  - ``min_distance`` (sensor field ``min_range_threshold_cm``)\n \n ouster_ros v0.14.0\n =================="
+        },
+        {
+          "sha": "65fcf15c38dc303ce306b9aef7044b945efea440",
+          "filename": "launch/driver.launch",
+          "status": "modified",
+          "additions": 78,
+          "deletions": 0,
+          "changes": 78,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/a58526729f2b61154f838a26cd0db4151f3b0c54/launch%2Fdriver.launch",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/a58526729f2b61154f838a26cd0db4151f3b0c54/launch%2Fdriver.launch",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/launch%2Fdriver.launch?ref=a58526729f2b61154f838a26cd0db4151f3b0c54",
+          "patch": "@@ -60,6 +60,66 @@\n     TIME_FROM_PTP_1588,\n     TIME_FROM_ROS_TIME\n     }\"/>\n+\n+  <arg name=\"multipurpose_io_mode\" default=\"OFF\"\n+    doc=\"Configure the mode of the MULTIPURPOSE_IO pin; possible values: {\n+    OFF,\n+    INPUT_NMEA_UART,\n+    OUTPUT_FROM_INTERNAL_OSC,\n+    OUTPUT_FROM_SYNC_PULSE_IN,\n+    OUTPUT_FROM_PTP_1588,\n+    OUTPUT_FROM_ENCODER_ANGLE\n+    }\"/>\n+ \n+  <arg name=\"nmea_in_polarity\" default=\"ACTIVE_HIGH\"\n+    doc=\"Set the polarity of NMEA UART input $GPRMC messages.\n+      Use ACTIVE_HIGH if UART is active high, idle low, and start bit is after a falling edge.\n+      possible values: {\n+        ACTIVE_HIGH,\n+        ACTIVE_LOW\n+    }\"/>\n+   \n+  <arg name=\"nmea_ignore_valid_char\" default=\"false\"\n+    doc=\"Set false if NMEA UART input $GPRMC messages should be ignored if valid character is not set,\n+      and true if messages should be used for time syncing regardless of the valid character.\"/>\n+\n+  <arg name=\"nmea_baud_rate\" default=\"BAUD_9600\"\n+    doc=\"Expected baud for NMEA UART $GPRMC; possible values: {\n+        BAUD_9600,\n+        BAUD_115200\n+    }\"/>\n+  \n+  <arg name=\"nmea_leap_seconds\" default=\"0\"\n+    doc=\"Set an integer number of leap seconds that will be added to the UDP timestamp when calculating seconds since 00:00:00 Thursday, 1 January 1970.\n+      For Unix Epoch time, this should be set to 0.\"/>\n+  \n+  <arg name=\"sync_pulse_in_polarity\" default=\"ACTIVE_HIGH\"\n+    doc=\"The polarity of SYNC_PULSE_IN input, which controls polarity of SYNC_PULSE_IN pin when timestamp_mode is set in TIME_FROM_SYNC_PULSE_IN;\n+      possible values: {\n+        ACTIVE_HIGH,\n+        ACTIVE_LOW\n+    }\"/>\n+\n+  <arg name=\"sync_pulse_out_polarity\" default=\"ACTIVE_LOW\"\n+    doc=\"Polarity of SYNC_PULSE_OUT when this sensor is the time-sync master;\n+      possible values: {\n+        ACTIVE_HIGH,\n+        ACTIVE_LOW\n+    }\"/>\n+  \n+  <arg name=\"sync_pulse_out_frequency\" default=\"-1\"\n+    doc=\"The output SYNC_PULSE_OUT pulse rate in Hz. Valid inputs are integers >0 Hz,\n+    but also limited by the criteria described in the Time Synchronization section of the Firmware User Manual.\"/>\n+\n+  <arg name=\"sync_pulse_out_angle\" default=\"-1\"\n+    doc=\"The angle in terms of degrees that the sensor traverses between each SYNC_PULSE_OUT pulse. \n+      E.g. a value of 180 means a sync pulse is sent out every 180° for a total of two pulses per revolution and angular frequency of 20 Hz;\n+      values range [0, 360], -1 is unset\"/>\n+\n+  <arg name=\"sync_pulse_out_pulse_width\" default=\"-1\"\n+    doc=\"The polarity of SYNC_PULSE_OUT output, if the sensor is set as the master sensor used for time synchronization.\n+      Output SYNC_PULSE_OUT pulse width is in ms, increments in 1 ms. -1 is unset\"/>\n+\n   <arg name=\"ptp_utc_tai_offset\" default=\"-37.0\"\n     doc=\"UTC/TAI offset in seconds to apply when using TIME_FROM_PTP_1588\"/>\n   <arg name=\"metadata\" default=\" \" doc=\"path to write metadata file when receiving sensor data\"/>\n@@ -136,6 +196,13 @@\n     NEAREST_TO_FARTHEST\n     \"/>\n \n+  <!-- Only set this parameter when working with FW 3.1+ -->\n+  <arg name=\"min_distance\" default=\"-1\"\n+    doc=\"to change the sensor’s minimum reported range (cm);\n+    available options (FW3.1+): {0, 30}\n+    available options (FW3.2+): {0, 30, 50}\"\n+     />\n+\n   <!-- Only set this parameter when working with FW 3.2+ -->\n   <arg name=\"bloom_reduction_optimization\" default=\" \"\n     doc=\"level of bloom reduction optimization to apply on the sensor (FW3.2+); possible values:\n@@ -194,6 +261,16 @@\n       <param name=\"~/accel_fsr\" type=\"str\" value=\"$(arg accel_fsr)\"/>\n       <param name=\"~/lidar_mode\" type=\"str\" value=\"$(arg lidar_mode)\"/>\n       <param name=\"~/timestamp_mode\" type=\"str\" value=\"$(arg timestamp_mode)\"/>\n+      <param name=\"~/multipurpose_io_mode\" type=\"str\" value=\"$(arg multipurpose_io_mode)\"/>\n+      <param name=\"~/nmea_in_polarity\" type=\"str\" value=\"$(arg nmea_in_polarity)\"/>\n+      <param name=\"~/nmea_ignore_valid_char\" type=\"bool\" value=\"$(arg nmea_ignore_valid_char)\"/>\n+      <param name=\"~/nmea_baud_rate\" type=\"str\" value=\"$(arg nmea_baud_rate)\"/>\n+      <param name=\"~/nmea_leap_seconds\" type=\"int\" value=\"$(arg nmea_leap_seconds)\"/>\n+      <param name=\"~/sync_pulse_in_polarity\" type=\"str\" value=\"$(arg sync_pulse_in_polarity)\"/>\n+      <param name=\"~/sync_pulse_out_polarity\" type=\"str\" value=\"$(arg sync_pulse_out_polarity)\"/>\n+      <param name=\"~/sync_pulse_out_frequency\" type=\"int\" value=\"$(arg sync_pulse_out_frequency)\"/>\n+      <param name=\"~/sync_pulse_out_angle\" type=\"int\" value=\"$(arg sync_pulse_out_angle)\"/>\n+      <param name=\"~/sync_pulse_out_pulse_width\" type=\"int\" value=\"$(arg sync_pulse_out_pulse_width)\"/>\n       <param name=\"~/ptp_utc_tai_offset\" type=\"double\"\n         value=\"$(arg ptp_utc_tai_offset)\"/>\n       <param name=\"~/metadata\" type=\"str\" value=\"$(arg metadata)\"/>\n@@ -223,6 +300,7 @@\n              value=\"$(arg max_failed_reconnect_attempts)\"/>\n       <param name=\"~/organized\" value=\"$(arg organized)\"/>\n       <param name=\"~/destagger\" value=\"$(arg destagger)\"/>\n+      <param name=\"~/min_distance\" value=\"$(arg min_distance)\"/>\n       <param name=\"~/min_range\" value=\"$(arg min_range)\"/>\n       <param name=\"~/max_range\" value=\"$(arg max_range)\"/>\n       <param name=\"~/v_reduction\" value=\"$(arg v_reduction)\"/>"
+        },
+        {
+          "sha": "440713b5dfc6f1e498631baae2b44a2e73c5b732",
+          "filename": "src/os_sensor_nodelet.cpp",
+          "status": "modified",
+          "additions": 125,
+          "deletions": 0,
+          "changes": 125,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/a58526729f2b61154f838a26cd0db4151f3b0c54/src%2Fos_sensor_nodelet.cpp",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/a58526729f2b61154f838a26cd0db4151f3b0c54/src%2Fos_sensor_nodelet.cpp",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/src%2Fos_sensor_nodelet.cpp?ref=a58526729f2b61154f838a26cd0db4151f3b0c54",
+          "patch": "@@ -453,6 +453,108 @@ void OusterSensor::parse_udp_profile_imu_and_settings(SensorConfig& config) {\n     }\n }\n \n+void OusterSensor::parse_multipurpose_io_mode(SensorConfig& config) {\n+    auto& nh = getPrivateNodeHandle();\n+    auto arg = nh.param(\"multipurpose_io_mode\", std::string{});\n+    if (!is_arg_set(arg)) return;\n+\n+    auto mode = ouster::sdk::core::multipurpose_io_mode_of_string(arg);\n+    if (!mode) {\n+        auto error_msg = \"Invalid multipurpose io mode: \" + arg;\n+        NODELET_FATAL_STREAM(error_msg);\n+        throw std::runtime_error(error_msg);\n+    }\n+    config.multipurpose_io_mode = mode.value();\n+}\n+\n+void OusterSensor::parse_nmea_in_polarity(SensorConfig& config) {\n+    auto& nh = getPrivateNodeHandle();\n+    auto arg = nh.param(\"nmea_in_polarity\", std::string{});\n+    if (!is_arg_set(arg)) return;\n+\n+    auto pol = ouster::sdk::core::polarity_of_string(arg);\n+    if (!pol) {\n+        auto error_msg = \"Invalid nmea_in_polarity: \" + arg;\n+        NODELET_FATAL_STREAM(error_msg);\n+        throw std::runtime_error(error_msg);\n+    }\n+    config.nmea_in_polarity = pol.value();\n+}\n+\n+void OusterSensor::parse_nmea_ignore_valid_char(SensorConfig& config) {\n+    auto& nh = getPrivateNodeHandle();\n+    config.nmea_ignore_valid_char = nh.param(\"nmea_ignore_valid_char\", false);\n+}\n+\n+void OusterSensor::parse_nmea_baud_rate(SensorConfig& config) {\n+    auto& nh = getPrivateNodeHandle();\n+    auto arg = nh.param(\"nmea_baud_rate\", std::string{});\n+    if (!is_arg_set(arg)) return;\n+\n+    auto rate = ouster::sdk::core::nmea_baud_rate_of_string(arg);\n+    if (!rate) {\n+        auto error_msg = \"Invalid nmea_baud_rate: \" + arg;\n+        NODELET_FATAL_STREAM(error_msg);\n+        throw std::runtime_error(error_msg);\n+    }\n+    config.nmea_baud_rate = rate.value();\n+}\n+\n+void OusterSensor::parse_nmea_leap_seconds(SensorConfig& config) {\n+    auto& nh = getPrivateNodeHandle();\n+    auto val = nh.param(\"nmea_leap_seconds\", 0);\n+    config.nmea_leap_seconds = val;\n+}\n+\n+void OusterSensor::parse_sync_pulse_in_polarity(SensorConfig& config) {\n+    auto& nh = getPrivateNodeHandle();\n+    auto arg = nh.param(\"sync_pulse_in_polarity\", std::string{});\n+    if (!is_arg_set(arg)) return;\n+\n+    auto pol = ouster::sdk::core::polarity_of_string(arg);\n+    if (!pol) {\n+        auto error_msg = \"Invalid sync_pulse_in_polarity: \" + arg;\n+        NODELET_FATAL_STREAM(error_msg);\n+        throw std::runtime_error(error_msg);\n+    }\n+    config.sync_pulse_in_polarity = pol.value();\n+}\n+\n+void OusterSensor::parse_sync_pulse_out_polarity(SensorConfig& config) {\n+    auto& nh = getPrivateNodeHandle();\n+    auto arg = nh.param(\"sync_pulse_out_polarity\", std::string{});\n+    if (!is_arg_set(arg)) return;\n+\n+    auto pol = ouster::sdk::core::polarity_of_string(arg);\n+    if (!pol) {\n+        auto error_msg = \"Invalid sync_pulse_out_polarity: \" + arg;\n+        NODELET_FATAL_STREAM(error_msg);\n+        throw std::runtime_error(error_msg);\n+    }\n+    config.sync_pulse_out_polarity = pol.value();\n+}\n+\n+void OusterSensor::parse_sync_pulse_out_frequency(SensorConfig& config) {\n+    auto& nh = getPrivateNodeHandle();\n+    auto val = nh.param(\"sync_pulse_out_frequency\", -1);\n+    if (val < 0) return;\n+    config.sync_pulse_out_frequency = val;\n+}\n+\n+void OusterSensor::parse_sync_pulse_out_angle(SensorConfig& config) {\n+    auto& nh = getPrivateNodeHandle();\n+    auto val = nh.param(\"sync_pulse_out_angle\", -1);\n+    if (val < 0) return;\n+    config.sync_pulse_out_angle = val;\n+}\n+\n+void OusterSensor::parse_sync_pulse_out_pulse_width(SensorConfig& config) {\n+    auto& nh = getPrivateNodeHandle();\n+    auto val = nh.param(\"sync_pulse_out_pulse_width\", -1);\n+    if (val < 0) return;\n+    config.sync_pulse_out_pulse_width = val;\n+}\n+\n void OusterSensor::parse_lidar_mode(SensorConfig& config) {\n     auto& nh = getPrivateNodeHandle();\n     auto lidar_mode_arg = nh.param(\"lidar_mode\", std::string{});\n@@ -552,6 +654,18 @@ void OusterSensor::parse_phase_lock_and_offset(SensorConfig& config) {\n     config.phase_lock_offset = phase_lock_offset;\n }\n \n+void OusterSensor::parse_min_distance(SensorConfig& config) {\n+    auto& nh = getPrivateNodeHandle();\n+    auto min_distance = nh.param(\"min_distance\", -1);\n+    if (min_distance < 0) return;\n+    // Only allow exact values: 0, 30, or 50 (cm)\n+    if (min_distance != 0 && min_distance != 30 && min_distance != 50) {\n+        NODELET_FATAL(\"min_distance must be one of {0, 30, 50} cm\");\n+        throw std::runtime_error(\"invalid min_distance value!\");\n+    }\n+    config.min_range_threshold_cm = min_distance;\n+}\n+\n void OusterSensor::parse_lidar_frame_azimuth_offset(SensorConfig& config) {\n     auto& nh = getPrivateNodeHandle();\n     auto azimuth_offset = nh.param(\"lidar_frame_azimuth_offset\", -1);\n@@ -614,7 +728,18 @@ SensorConfig OusterSensor::parse_config_from_ros_parameters() {\n     parse_azimuth_window(config);\n     parse_operating_mode(config);\n     parse_signal_multiplier(config);\n+    parse_multipurpose_io_mode(config);\n+    parse_nmea_in_polarity(config);\n+    parse_nmea_ignore_valid_char(config);\n+    parse_nmea_baud_rate(config);\n+    parse_nmea_leap_seconds(config);\n+    parse_sync_pulse_in_polarity(config);\n+    parse_sync_pulse_out_polarity(config);\n+    parse_sync_pulse_out_frequency(config);\n+    parse_sync_pulse_out_angle(config);\n+    parse_sync_pulse_out_pulse_width(config);\n     parse_phase_lock_and_offset(config);\n+    parse_min_distance(config);\n     parse_lidar_frame_azimuth_offset(config);\n     parse_return_order(config);\n     parse_bloom_reduction_optimization(config);"
+        },
+        {
+          "sha": "cb8a1aac1d6c1f8798153db04b27e07308dff264",
+          "filename": "src/os_sensor_nodelet.h",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 0,
+          "changes": 11,
+          "blob_url": "https://github.com/ouster-lidar/ouster-ros/blob/a58526729f2b61154f838a26cd0db4151f3b0c54/src%2Fos_sensor_nodelet.h",
+          "raw_url": "https://github.com/ouster-lidar/ouster-ros/raw/a58526729f2b61154f838a26cd0db4151f3b0c54/src%2Fos_sensor_nodelet.h",
+          "contents_url": "https://api.github.com/repos/ouster-lidar/ouster-ros/contents/src%2Fos_sensor_nodelet.h?ref=a58526729f2b61154f838a26cd0db4151f3b0c54",
+          "patch": "@@ -93,6 +93,17 @@ class OusterSensor : public OusterSensorNodeletBase {\n     void parse_operating_mode(ouster::sdk::core::SensorConfig& config);\n     void parse_signal_multiplier(ouster::sdk::core::SensorConfig& config);\n     void parse_phase_lock_and_offset(ouster::sdk::core::SensorConfig& config);\n+    void parse_min_distance(ouster::sdk::core::SensorConfig& config);\n+    void parse_multipurpose_io_mode(ouster::sdk::core::SensorConfig& config);\n+    void parse_nmea_in_polarity(ouster::sdk::core::SensorConfig& config);\n+    void parse_nmea_ignore_valid_char(ouster::sdk::core::SensorConfig& config);\n+    void parse_nmea_baud_rate(ouster::sdk::core::SensorConfig& config);\n+    void parse_nmea_leap_seconds(ouster::sdk::core::SensorConfig& config);\n+    void parse_sync_pulse_in_polarity(ouster::sdk::core::SensorConfig& config);\n+    void parse_sync_pulse_out_polarity(ouster::sdk::core::SensorConfig& config);\n+    void parse_sync_pulse_out_frequency(ouster::sdk::core::SensorConfig& config);\n+    void parse_sync_pulse_out_angle(ouster::sdk::core::SensorConfig& config);\n+    void parse_sync_pulse_out_pulse_width(ouster::sdk::core::SensorConfig& config);\n     void parse_lidar_frame_azimuth_offset(ouster::sdk::core::SensorConfig& config);\n     void parse_bloom_reduction_optimization(ouster::sdk::core::SensorConfig& config);\n     void parse_return_order(ouster::sdk::core::SensorConfig& config);"
+        }
+      ]
+    }
+  ]
+}

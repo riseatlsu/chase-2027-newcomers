@@ -1,0 +1,191 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T04:39:04Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "christianrauch",
+    "repo": "apriltag_ros"
+  },
+  "data": [
+    {
+      "author": "christianrauch",
+      "date": "2017-10-09T00:51:25Z",
+      "sha": "ae454c614d034358dcdbc0c9c5f711bd291495f0",
+      "message": "AprilTag detection",
+      "files_changed": 3,
+      "additions": 136,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "c457c43d306e13f48c3b0a3bb0458916727b374d",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 31,
+          "deletions": 0,
+          "changes": 31,
+          "blob_url": "https://github.com/christianrauch/apriltag_ros/blob/ae454c614d034358dcdbc0c9c5f711bd291495f0/CMakeLists.txt",
+          "raw_url": "https://github.com/christianrauch/apriltag_ros/raw/ae454c614d034358dcdbc0c9c5f711bd291495f0/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/christianrauch/apriltag_ros/contents/CMakeLists.txt?ref=ae454c614d034358dcdbc0c9c5f711bd291495f0",
+          "patch": "@@ -0,0 +1,31 @@\n+cmake_minimum_required(VERSION 3.5)\n+\n+project(apriltag2_node)\n+\n+set(CMAKE_CXX_STANDARD 14)\n+\n+find_package(rclcpp REQUIRED)\n+find_package(sensor_msgs REQUIRED)\n+\n+find_package(Threads REQUIRED)\n+\n+set(ENV{PKG_CONFIG_PATH} \"$ENV{PKG_CONFIG_PATH}:${CMAKE_INSTALL_PREFIX}/lib/pkgconfig\")\n+\n+find_package(PkgConfig)\n+pkg_search_module(apriltag REQUIRED apriltag)\n+include_directories(${apriltag_INCLUDE_DIRS})\n+link_directories(${apriltag_LIBDIR})\n+\n+add_executable(apriltag2_node src/apriltag2_node.cpp)\n+ament_target_dependencies(apriltag2_node\n+  geometry_msgs\n+  rclcpp\n+  sensor_msgs)\n+target_link_libraries(apriltag2_node ${apriltag_LIBRARIES} Threads::Threads)\n+\n+target_include_directories(apriltag2_node PRIVATE ${kobuki_driver_INCLUDE_DIRS})\n+target_link_libraries(apriltag2_node ${kobuki_driver_LIBRARIES})\n+\n+install(TARGETS apriltag2_node DESTINATION lib/${PROJECT_NAME})\n+\n+ament_package()"
+        },
+        {
+          "sha": "96bbf6ff334c4bbd176487486346a8b968f7dbb7",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 18,
+          "deletions": 0,
+          "changes": 18,
+          "blob_url": "https://github.com/christianrauch/apriltag_ros/blob/ae454c614d034358dcdbc0c9c5f711bd291495f0/package.xml",
+          "raw_url": "https://github.com/christianrauch/apriltag_ros/raw/ae454c614d034358dcdbc0c9c5f711bd291495f0/package.xml",
+          "contents_url": "https://api.github.com/repos/christianrauch/apriltag_ros/contents/package.xml?ref=ae454c614d034358dcdbc0c9c5f711bd291495f0",
+          "patch": "@@ -0,0 +1,18 @@\n+<?xml version=\"1.0\"?>\n+<package format=\"2\">\n+  <name>apriltag2_node</name>\n+  <version>0.0.0</version>\n+  <description>apriltag2_node</description>\n+  <maintainer email=\"Rauch.Christian@gmx.de\"></maintainer>\n+  <license>MIT</license>\n+\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+\n+  <depend>rclcpp</depend>\n+  <depend>sensor_msgs</depend>\n+  <depend>geometry_msgs</depend>\n+\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n+</package>"
+        },
+        {
+          "sha": "fb0d679d855e80f7a226d637496d5ab445896e78",
+          "filename": "src/apriltag2_node.cpp",
+          "status": "added",
+          "additions": 87,
+          "deletions": 0,
+          "changes": 87,
+          "blob_url": "https://github.com/christianrauch/apriltag_ros/blob/ae454c614d034358dcdbc0c9c5f711bd291495f0/src%2Fapriltag2_node.cpp",
+          "raw_url": "https://github.com/christianrauch/apriltag_ros/raw/ae454c614d034358dcdbc0c9c5f711bd291495f0/src%2Fapriltag2_node.cpp",
+          "contents_url": "https://api.github.com/repos/christianrauch/apriltag_ros/contents/src%2Fapriltag2_node.cpp?ref=ae454c614d034358dcdbc0c9c5f711bd291495f0",
+          "patch": "@@ -0,0 +1,87 @@\n+// ros\n+#include <rclcpp/rclcpp.hpp>\n+#include <sensor_msgs/msg/compressed_image.hpp>\n+#include <geometry_msgs/msg/transform_stamped.hpp>\n+\n+// apriltag\n+#include <apriltag.h>\n+#include <tag36h11.h>\n+#include <common/pjpeg.h>\n+\n+class AprilTag2Node : public rclcpp::Node {\n+public:\n+    AprilTag2Node() : Node(\"apriltag2\") {\n+        sub_img = this->create_subscription<sensor_msgs::msg::CompressedImage>(\"image/compressed\",\n+            std::bind(&AprilTag2Node::onImage, this, std::placeholders::_1));\n+        pub_pose = this->create_publisher<geometry_msgs::msg::TransformStamped>(\"tag_pose\");\n+\n+        tf = tag36h11_create();\n+        td = apriltag_detector_create();\n+        apriltag_detector_add_family(td, tf);\n+    }\n+\n+    ~AprilTag2Node() {\n+        apriltag_detector_destroy(td);\n+        tag36h11_destroy(tf);\n+    }\n+\n+private:\n+    apriltag_family_t* tf;\n+    apriltag_detector_t* td;\n+\n+    rclcpp::Subscription<sensor_msgs::msg::CompressedImage>::SharedPtr sub_img;\n+    rclcpp::Publisher<geometry_msgs::msg::TransformStamped>::SharedPtr pub_pose;\n+\n+    void onImage(const sensor_msgs::msg::CompressedImage::SharedPtr msg_img) {\n+        // decode image\n+        image_u8_t* im = NULL;\n+\n+        if(msg_img->format==\"jpeg\") {\n+            // convert jpeg data\n+            int err = 0;\n+            pjpeg_t* pj = pjpeg_create_from_buffer(msg_img->data.data(), msg_img->data.size(), 0, &err);\n+            if(pj==NULL) {\n+                printf(\"pjpeg error %d\\n\", err);\n+                return;\n+            }\n+\n+            im = pjpeg_to_u8_baseline(pj);\n+\n+            pjpeg_destroy(pj);\n+        }\n+        else {\n+            std::cerr << \"not supported: \" << msg_img->format << std::endl;\n+            return;\n+        }\n+\n+        if (im == NULL) {\n+            printf(\"could not load image\\n\");\n+            return;\n+        }\n+\n+        // decode image\n+        zarray_t* detections = apriltag_detector_detect(td, im);\n+\n+        for (int i = 0; i < zarray_size(detections); i++) {\n+            apriltag_detection_t* det;\n+            zarray_get(detections, i, &det);\n+\n+            printf(\"detection %3d: id (%2dx%2d)-%-4d, hamming %d, goodness %8.3f, margin %8.3f\\n\",\n+                       i, det->family->d*det->family->d, det->family->h, det->id, det->hamming, det->goodness, det->decision_margin);\n+\n+            // TODO: do the projection\n+            const matd_t* H = det->H;\n+        }\n+\n+        apriltag_detections_destroy(detections);\n+\n+        image_u8_destroy(im);\n+    }\n+};\n+\n+int main(int argc, char **argv) {\n+    rclcpp::init(argc, argv);\n+    rclcpp::spin(std::make_shared<AprilTag2Node>());\n+    rclcpp::shutdown();\n+    return 0;\n+}\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "cheriehu",
+      "date": "2025-11-10T09:24:06Z",
+      "sha": "962b0213f92933f67a0dc1d92b99ae458d0e11da",
+      "message": "configurable QOS profile\n\nstore qos_profiles as map\n\nadd back deleted comment\n\nfix style issue",
+      "files_changed": 2,
+      "additions": 8,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "6550ca7015f4815a38d9296a172ed256b85b7877",
+          "filename": "cfg/tags_36h11.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/christianrauch/apriltag_ros/blob/962b0213f92933f67a0dc1d92b99ae458d0e11da/cfg%2Ftags_36h11.yaml",
+          "raw_url": "https://github.com/christianrauch/apriltag_ros/raw/962b0213f92933f67a0dc1d92b99ae458d0e11da/cfg%2Ftags_36h11.yaml",
+          "contents_url": "https://api.github.com/repos/christianrauch/apriltag_ros/contents/cfg%2Ftags_36h11.yaml?ref=962b0213f92933f67a0dc1d92b99ae458d0e11da",
+          "patch": "@@ -4,6 +4,7 @@\n         family: 36h11           # tag family name\n         size: 0.173             # tag edge size in meter\n         max_hamming: 0          # maximum allowed hamming distance (corrected bits)\n+        qos_profile: default    # optional qos_profile, \"sensor_data\", \"default\", or \"system_default\"\n \n         # see \"apriltag.h\" 'struct apriltag_detector' for more documentation on these optional parameters\n         detector:"
+        },
+        {
+          "sha": "4de3940456dddac1c0a81bce48578a4575692cd2",
+          "filename": "src/AprilTagNode.cpp",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 1,
+          "changes": 8,
+          "blob_url": "https://github.com/christianrauch/apriltag_ros/blob/962b0213f92933f67a0dc1d92b99ae458d0e11da/src%2FAprilTagNode.cpp",
+          "raw_url": "https://github.com/christianrauch/apriltag_ros/raw/962b0213f92933f67a0dc1d92b99ae458d0e11da/src%2FAprilTagNode.cpp",
+          "contents_url": "https://api.github.com/repos/christianrauch/apriltag_ros/contents/src%2FAprilTagNode.cpp?ref=962b0213f92933f67a0dc1d92b99ae458d0e11da",
+          "patch": "@@ -56,6 +56,12 @@ descr(const std::string& description, const bool& read_only = false)\n     return descr;\n }\n \n+const static std::unordered_map<std::string, rmw_qos_profile_t> qos_profiles{\n+    {\"default\", rmw_qos_profile_default},\n+    {\"sensor_data\", rmw_qos_profile_sensor_data},\n+    {\"system_default\", rmw_qos_profile_system_default},\n+};\n+\n class AprilTagNode : public rclcpp::Node {\n public:\n     AprilTagNode(const rclcpp::NodeOptions& options);\n@@ -103,7 +109,7 @@ AprilTagNode::AprilTagNode(const rclcpp::NodeOptions& options)\n         this->get_node_topics_interface()->resolve_topic_name(\"image_rect\"),\n         std::bind(&AprilTagNode::onCamera, this, std::placeholders::_1, std::placeholders::_2),\n         declare_parameter(\"image_transport\", \"raw\", descr({}, true)),\n-        rmw_qos_profile_sensor_data)),\n+        qos_profiles.at(declare_parameter(\"qos_profile\", \"default\", descr(\"qos profile to use. 'default', 'sensor_data' or 'system_default'\", true))))),\n     pub_detections(create_publisher<apriltag_msgs::msg::AprilTagDetectionArray>(\"detections\", rclcpp::QoS(1))),\n     tf_broadcaster(this)\n {"
+        }
+      ]
+    },
+    {
+      "author": "DLu",
+      "date": "2025-05-08T00:55:54Z",
+      "sha": "168a86636cf58e93830d0504a247fe1b6fab177b",
+      "message": "[kilted] Update deprecated call to ament_target_dependencies",
+      "files_changed": 1,
+      "additions": 16,
+      "deletions": 17,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "8b0e2e1826346212e58e5ab1de12cd288a121154",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 16,
+          "deletions": 17,
+          "changes": 33,
+          "blob_url": "https://github.com/christianrauch/apriltag_ros/blob/168a86636cf58e93830d0504a247fe1b6fab177b/CMakeLists.txt",
+          "raw_url": "https://github.com/christianrauch/apriltag_ros/raw/168a86636cf58e93830d0504a247fe1b6fab177b/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/christianrauch/apriltag_ros/contents/CMakeLists.txt?ref=168a86636cf58e93830d0504a247fe1b6fab177b",
+          "patch": "@@ -66,13 +66,12 @@ add_library(conversion STATIC\n     src/conversion.cpp\n )\n target_link_libraries(conversion\n+  PUBLIC\n     apriltag::apriltag\n     Eigen3::Eigen\n     opencv_core\n-)\n-ament_target_dependencies(conversion\n-    geometry_msgs\n-    tf2\n+    ${geometry_msgs_TARGETS}\n+    tf2::tf2\n )\n set_property(TARGET conversion PROPERTY\n     POSITION_INDEPENDENT_CODE ON\n@@ -84,14 +83,13 @@ add_library(pose_estimation STATIC\n     src/pose_estimation.cpp\n )\n target_link_libraries(pose_estimation\n+  PUBLIC\n     apriltag::apriltag\n     Eigen3::Eigen\n     opencv_calib3d\n     conversion\n-)\n-ament_target_dependencies(pose_estimation\n-    geometry_msgs\n-    tf2\n+    ${geometry_msgs_TARGETS}\n+    tf2::tf2\n )\n set_property(TARGET pose_estimation PROPERTY\n     POSITION_INDEPENDENT_CODE ON\n@@ -102,19 +100,20 @@ set_property(TARGET pose_estimation PROPERTY\n add_library(AprilTagNode SHARED\n     src/AprilTagNode.cpp\n )\n-ament_target_dependencies(AprilTagNode\n-    rclcpp\n-    rclcpp_components\n-    sensor_msgs\n-    apriltag_msgs\n-    tf2_ros\n-    image_transport\n-    cv_bridge\n-)\n target_link_libraries(AprilTagNode\n+  PUBLIC\n     apriltag::apriltag\n     tags\n     pose_estimation\n+    ${apriltag_msgs_TARGETS}\n+    ${sensor_msgs_TARGETS}\n+    cv_bridge::cv_bridge\n+    image_transport::image_transport\n+    rclcpp::rclcpp\n+    rclcpp_components::component\n+    rclcpp_components::component_manager\n+    sensor_msgs::sensor_msgs_library\n+    tf2_ros::tf2_ros\n )\n rclcpp_components_register_node(AprilTagNode\n     PLUGIN \"AprilTagNode\""
+        }
+      ]
+    },
+    {
+      "author": "KmakD",
+      "date": "2025-05-05T09:39:34Z",
+      "sha": "6fcfb29e5960d22271ddd9082e00c3c131d8a50e",
+      "message": "Add image_transport_plugins",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "fbb775372245f3811d44fc8565fd7da7845e406f",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/christianrauch/apriltag_ros/blob/6fcfb29e5960d22271ddd9082e00c3c131d8a50e/package.xml",
+          "raw_url": "https://github.com/christianrauch/apriltag_ros/raw/6fcfb29e5960d22271ddd9082e00c3c131d8a50e/package.xml",
+          "contents_url": "https://api.github.com/repos/christianrauch/apriltag_ros/contents/package.xml?ref=6fcfb29e5960d22271ddd9082e00c3c131d8a50e",
+          "patch": "@@ -22,6 +22,7 @@\n \n   <exec_depend>camera_ros</exec_depend>\n   <exec_depend condition=\"$ROS_DISTRO != 'humble'\">image_proc</exec_depend>\n+  <exec_depend>image_transport_plugins</exec_depend>\n \n   <test_depend>ament_lint_auto</test_depend>\n   <test_depend>ament_cmake_clang_format</test_depend>"
+        }
+      ]
+    },
+    {
+      "author": "23pointsNorth",
+      "date": "2024-01-24T11:14:32Z",
+      "sha": "ebd76ffe042b93f111290f5e7c18e392b7cd1034",
+      "message": "Change True/False strings in yaml",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "9c6352003d8458563842cd06bbf33162a189997d",
+          "filename": "cfg/tags_36h11.yaml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/christianrauch/apriltag_ros/blob/ebd76ffe042b93f111290f5e7c18e392b7cd1034/cfg%2Ftags_36h11.yaml",
+          "raw_url": "https://github.com/christianrauch/apriltag_ros/raw/ebd76ffe042b93f111290f5e7c18e392b7cd1034/cfg%2Ftags_36h11.yaml",
+          "contents_url": "https://api.github.com/repos/christianrauch/apriltag_ros/contents/cfg%2Ftags_36h11.yaml?ref=ebd76ffe042b93f111290f5e7c18e392b7cd1034",
+          "patch": "@@ -10,9 +10,9 @@\n             threads: 1          # number of threads\n             decimate: 2.0       # decimate resolution for quad detection\n             blur: 0.0           # sigma of Gaussian blur for quad detection\n-            refine: 1           # snap to strong gradients\n+            refine: True        # snap to strong gradients\n             sharpening: 0.25    # sharpening of decoded images\n-            debug: 0            # write additional debugging images to current working directory\n+            debug: False        # write additional debugging images to current working directory\n \n         # optional list of tags\n         tag:"
+        }
+      ]
+    },
+    {
+      "author": "brennand",
+      "date": "2021-08-18T09:51:54Z",
+      "sha": "69a4bcee35a0e0bad20cf563f335e66bffa385c2",
+      "message": "Define parameter types explicitly: Due to API in ROS2 Galaxy",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "9523e68828d0b07f39f3bfab72c6fdbe7b332b46",
+          "filename": "src/AprilTagNode.cpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/christianrauch/apriltag_ros/blob/69a4bcee35a0e0bad20cf563f335e66bffa385c2/src%2FAprilTagNode.cpp",
+          "raw_url": "https://github.com/christianrauch/apriltag_ros/raw/69a4bcee35a0e0bad20cf563f335e66bffa385c2/src%2FAprilTagNode.cpp",
+          "contents_url": "https://api.github.com/repos/christianrauch/apriltag_ros/contents/src%2FAprilTagNode.cpp?ref=69a4bcee35a0e0bad20cf563f335e66bffa385c2",
+          "patch": "@@ -62,8 +62,8 @@ AprilTagNode::AprilTagNode(rclcpp::NodeOptions options)\n     td->refine_edges =  declare_parameter<int>(\"refine-edges\", true);\n \n     // get tag names, IDs and sizes\n-    const auto ids = declare_parameter<std::vector<int64_t>>(\"tag_ids\", {});\n-    const auto frames = declare_parameter<std::vector<std::string>>(\"tag_frames\", {});\n+    const auto ids = declare_parameter<std::vector<int64_t>>(\"tag_ids\", std::vector<int64_t>{});\n+    const auto frames = declare_parameter<std::vector<std::string>>(\"tag_frames\", std::vector<std::string>{});\n \n     if(!frames.empty()) {\n         if(ids.size()!=frames.size()) {\n@@ -72,7 +72,7 @@ AprilTagNode::AprilTagNode(rclcpp::NodeOptions options)\n         for(size_t i = 0; i<ids.size(); i++) { tag_frames[ids[i]] = frames[i]; }\n     }\n \n-    const auto sizes = declare_parameter<std::vector<double>>(\"tag_sizes\", {});\n+    const auto sizes = declare_parameter<std::vector<double>>(\"tag_sizes\", std::vector<double>{});\n     if(!sizes.empty()) {\n         // use tag specific size\n         if(ids.size()!=sizes.size()) {"
+        }
+      ]
+    }
+  ]
+}

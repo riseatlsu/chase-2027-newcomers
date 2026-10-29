@@ -1,0 +1,683 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T05:50:44Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ros-drivers",
+    "repo": "nmea_navsat_driver"
+  },
+  "data": [
+    {
+      "author": "djpetti",
+      "date": "2022-10-16T22:12:11Z",
+      "sha": "b168f499349e5f26e3aed9982deb44ed2f41f8e2",
+      "message": "Fix a bug in the GPS time parsing.\n\nThis causes it to emit incorrect time reference messages if the\nsystem time is off the GPS time by more than a second.",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "df40f13788c1065d4f88ceb9109cddde834cc12e",
+          "filename": "src/libnmea_navsat_driver/parser.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/b168f499349e5f26e3aed9982deb44ed2f41f8e2/src%2Flibnmea_navsat_driver%2Fparser.py",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/b168f499349e5f26e3aed9982deb44ed2f41f8e2/src%2Flibnmea_navsat_driver%2Fparser.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/src%2Flibnmea_navsat_driver%2Fparser.py?ref=b168f499349e5f26e3aed9982deb44ed2f41f8e2",
+          "patch": "@@ -136,7 +136,7 @@ def convert_time(nmea_utc):\n     # Resolve the ambiguity of day\n     day_offset = int((utc_time.hour - hours)/12.0)\n     utc_time += datetime.timedelta(day_offset)\n-    utc_time.replace(hour=hours, minute=minutes, second=seconds)\n+    utc_time = utc_time.replace(hour=hours, minute=minutes, second=seconds)\n \n     unix_secs = calendar.timegm(utc_time.timetuple())\n     return (unix_secs, nanosecs)"
+        }
+      ]
+    },
+    {
+      "author": "evenator",
+      "date": "2017-12-06T14:49:42Z",
+      "sha": "a9a929a9a6119d948bf65763289b78f2abc1d14d",
+      "message": "Update maintainer to Ed Venator\n\nAlso, remove boilerplate comments from package.xml",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 11,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "5bdc88061fbe614914d94b58ff809d45868978d9",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 11,
+          "changes": 12,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/a9a929a9a6119d948bf65763289b78f2abc1d14d/package.xml",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/a9a929a9a6119d948bf65763289b78f2abc1d14d/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/package.xml?ref=a9a929a9a6119d948bf65763289b78f2abc1d14d",
+          "patch": "@@ -6,18 +6,9 @@\n \tPackage to parse NMEA strings and publish a very simple GPS message. Does not require the GPSD deamon.\n   </description>\n \n-  <!-- One maintainer tag required, multiple allowed, one person per tag --> \n-  <maintainer email=\"eric@ericperko.com\">Eric Perko</maintainer>\n-\n-  <!-- One license tag required, multiple allowed, one license per tag -->\n+  <maintainer email=\"evenator@gmail.com\">Ed Venator</maintainer>\n   <license>BSD</license>\n-\n-  <!-- Url tags are optional, but mutiple are allowed, one per tag -->\n-  <!-- Optional attribute type can be: website, bugtracker, or repository -->\n   <url type=\"website\">http://ros.org/wiki/nmea_navsat_driver</url>\n-\n-  <!-- Author tags are optional, mutiple are allowed, one per tag -->\n-  <!-- Authors do not have to be maintianers, but could be -->\n   <author email=\"eric@ericperko.com\">Eric Perko</author>\n   <author>Steven Martin</author>\n \n@@ -29,7 +20,6 @@\n   <run_depend>nmea_msgs</run_depend>\n   <run_depend>sensor_msgs</run_depend>\n \n-  <!-- The export tag contains other, unspecified, tags -->\n   <export>\n     <!-- This is a pure Python package, so mark it architecture independent -->\n     <architecture_independent/>"
+        }
+      ]
+    },
+    {
+      "author": "ggaessler",
+      "date": "2022-01-02T17:54:45Z",
+      "sha": "9413fe0baf6539cf9975d138388261b0b273562c",
+      "message": "Add automated testing (via catkin_virtualenv) (#136)\n\nAutomatically test the code on every push or PR by playing back data to the driver and test whether the expected amount of messages is outputted by the driver and the messages contain the expected data.\r\n\r\nThe tester can cover more functionality that the current version of the nmea_navsat_driver supports, for these features new PRs will be created. The full usage can be observed in the boschresearch fork.\r\n\r\nSigned-off-by: Gabriel Gaessler <gabriel.gaessler@de.bosch.com>",
+      "files_changed": 10,
+      "additions": 631,
+      "deletions": 3,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "4cb7131aa19c457fbebde0c7908fa02699f9ce72",
+          "filename": ".github/workflows/ci.yaml",
+          "status": "added",
+          "additions": 20,
+          "deletions": 0,
+          "changes": 20,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/9413fe0baf6539cf9975d138388261b0b273562c/.github%2Fworkflows%2Fci.yaml",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/9413fe0baf6539cf9975d138388261b0b273562c/.github%2Fworkflows%2Fci.yaml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/.github%2Fworkflows%2Fci.yaml?ref=9413fe0baf6539cf9975d138388261b0b273562c",
+          "patch": "@@ -0,0 +1,20 @@\n+on: [push, pull_request]\n+\n+jobs:\n+  test:\n+    runs-on: [ubuntu-latest]\n+    timeout-minutes: 10\n+    strategy:\n+      matrix:\n+        ros_distro: [noetic]\n+        ubuntu_distro: [focal]\n+        arch: [amd64]\n+    steps:\n+      - uses: ros-tooling/setup-ros@v0.2\n+        with:\n+          required-ros-distributions: ${{ matrix.ros_distro }}\n+      - name: build and test\n+        uses: ros-tooling/action-ros-ci@v0.2\n+        with:\n+          package-name: nmea_navsat_driver\n+          target-ros1-distro: ${{ matrix.ros_distro }}"
+        },
+        {
+          "sha": "491ff4d742a03fd308e6a2e841cf8f20cd369c3a",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 27,
+          "deletions": 3,
+          "changes": 30,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/9413fe0baf6539cf9975d138388261b0b273562c/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/9413fe0baf6539cf9975d138388261b0b273562c/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/CMakeLists.txt?ref=9413fe0baf6539cf9975d138388261b0b273562c",
+          "patch": "@@ -1,7 +1,15 @@\n cmake_minimum_required(VERSION 3.0.2)\n project(nmea_navsat_driver)\n \n-find_package(catkin REQUIRED)\n+if (NOT CATKIN_ENABLE_TESTING)\n+  find_package(catkin REQUIRED COMPONENTS\n+  )\n+endif()\n+if (CATKIN_ENABLE_TESTING)\n+  find_package(catkin REQUIRED COMPONENTS\n+    catkin_virtualenv\n+  )\n+endif()\n \n catkin_python_setup()\n catkin_package()\n@@ -19,12 +27,28 @@ install(DIRECTORY launch/\n    FILES_MATCHING PATTERN \"*.launch\"\n )\n \n-install(FILES LICENSE.txt\n+install(FILES\n+   LICENSE.txt\n+   test/requirements.txt\n    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}\n )\n \n if (CATKIN_ENABLE_TESTING)\n-  find_package(roslint)\n+  catkin_generate_virtualenv(\n+    PYTHON_INTERPRETER python3\n+  )\n+\n+  catkin_add_nosetests(\n+    test/test_driver.py\n+    DEPENDENCIES ${${PROJECT_NAME}_EXPORTED_TARGETS} ${PROJECT_NAME}_generate_virtualenv\n+  )\n+\n+  catkin_install_python(\n+    PROGRAMS\n+      test/test_driver.py\n+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})\n+\n+  find_package(roslint REQUIRED)\n   roslint_python()\n   roslint_add_test()\n endif()"
+        },
+        {
+          "sha": "4df53d421435a09c37b78a7a633a32291f796364",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/9413fe0baf6539cf9975d138388261b0b273562c/package.xml",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/9413fe0baf6539cf9975d138388261b0b273562c/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/package.xml?ref=9413fe0baf6539cf9975d138388261b0b273562c",
+          "patch": "@@ -22,15 +22,23 @@\n   <exec_depend>rospy</exec_depend>\n   <exec_depend condition=\"$ROS_PYTHON_VERSION == 2\">python-serial</exec_depend>\n   <exec_depend condition=\"$ROS_PYTHON_VERSION == 3\">python3-serial</exec_depend>\n+  <exec_depend condition=\"$ROS_PYTHON_VERSION == 2\">python-rospkg</exec_depend>\n+  <exec_depend condition=\"$ROS_PYTHON_VERSION == 3\">python3-rospkg</exec_depend>\n   <exec_depend>geometry_msgs</exec_depend>\n   <exec_depend>nmea_msgs</exec_depend>\n   <exec_depend>sensor_msgs</exec_depend>\n   <exec_depend>tf</exec_depend>\n+  <exec_depend condition=\"$ROS_PYTHON_VERSION == 2\">python-yaml</exec_depend>\n+  <exec_depend condition=\"$ROS_PYTHON_VERSION == 3\">python3-yaml</exec_depend>\n+\n+  <test_depend condition=\"$ROS_PYTHON_VERSION == 3\">catkin_virtualenv</test_depend>\n \n   <test_depend>roslint</test_depend>\n+  <test_depend>rostest</test_depend>\n   <!-- The export tag contains other, unspecified, tags -->\n   <export>\n     <!-- This is a pure Python package, so mark it architecture independent -->\n     <architecture_independent/>\n+    <pip_requirements>test/requirements.txt</pip_requirements>\n   </export>\n </package>"
+        },
+        {
+          "sha": "025433e20c5d812c8e9946b9ed5719c71358bd7a",
+          "filename": "test/README.rst",
+          "status": "added",
+          "additions": 16,
+          "deletions": 0,
+          "changes": 16,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/9413fe0baf6539cf9975d138388261b0b273562c/test%2FREADME.rst",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/9413fe0baf6539cf9975d138388261b0b273562c/test%2FREADME.rst",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/test%2FREADME.rst?ref=9413fe0baf6539cf9975d138388261b0b273562c",
+          "patch": "@@ -0,0 +1,16 @@\n+nmea_navsat_driver testing\n+==========================\n+\n+This folder contains a tester for the nmea_navsat_driver_package as well as configurations and GNSS device logs for playback.\n+\n+Configurations\n+--------------\n+\n+* `config_launch.yaml` defines with launch files should be called, which interface they refer to and which messages are in scope. For `serial` a virtual serial port is created and for `tcp` a TCP-server is created.\n+* `config_logs.yaml` defines which pre-recorded logs shall be tested in which mode at which speed. And even more important which messages are to be expected from the driver in which quantity and which fields have to stay in which boundaries. These settings determine whether the test will result in pass or fail. Also defines which parameters shall be passed to the launch files.\n+* `config_tester.yaml` general settings of the tester.\n+\n+Running the test\n+----------------\n+\n+The tester can be automatically executed via Github Actions, running the nosetests defined in the CMakeLists.txt eventually calling the rostest. The workflow configuration is therefore located at `.github/workflows/ci.yaml`."
+        },
+        {
+          "sha": "846a2d40d2e63e0f74ed760371be594b8df3d422",
+          "filename": "test/configs/config_launch.yaml",
+          "status": "added",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/9413fe0baf6539cf9975d138388261b0b273562c/test%2Fconfigs%2Fconfig_launch.yaml",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/9413fe0baf6539cf9975d138388261b0b273562c/test%2Fconfigs%2Fconfig_launch.yaml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/test%2Fconfigs%2Fconfig_launch.yaml?ref=9413fe0baf6539cf9975d138388261b0b273562c",
+          "patch": "@@ -0,0 +1,7 @@\n+# list of all launch files to be tested\n+nmea_serial_driver.launch:\n+  # interface, serial or TCP\n+  interface: serial\n+  # messages that are supported by this driver configuration\n+  messages:\n+    - NavSatFix"
+        },
+        {
+          "sha": "80a57d1c578dc1e6d0847fd2ed3264aea2845fb1",
+          "filename": "test/configs/config_log.yaml",
+          "status": "added",
+          "additions": 15,
+          "deletions": 0,
+          "changes": 15,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/9413fe0baf6539cf9975d138388261b0b273562c/test%2Fconfigs%2Fconfig_log.yaml",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/9413fe0baf6539cf9975d138388261b0b273562c/test%2Fconfigs%2Fconfig_log.yaml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/test%2Fconfigs%2Fconfig_log.yaml?ref=9413fe0baf6539cf9975d138388261b0b273562c",
+          "patch": "@@ -0,0 +1,15 @@\n+# list of all raw data logs that shall be tested\n+nmea.log:\n+  # mode, nmea or binary (u-blox)\n+  mode: nmea\n+  # rate for nmea mode in lines per second\n+  rate: 4\n+  # additional parameters to pass to the launch file\n+  parameters: []\n+  topics:\n+    fix:\n+      _message_count: 120\n+      _type: NavSatFix\n+      latitude:\n+        max: 48.7734\n+        min: 48.7733"
+        },
+        {
+          "sha": "bda3a0e865fa3136259ac8354acb043730aecf7e",
+          "filename": "test/configs/config_tester.yaml",
+          "status": "added",
+          "additions": 8,
+          "deletions": 0,
+          "changes": 8,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/9413fe0baf6539cf9975d138388261b0b273562c/test%2Fconfigs%2Fconfig_tester.yaml",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/9413fe0baf6539cf9975d138388261b0b273562c/test%2Fconfigs%2Fconfig_tester.yaml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/test%2Fconfigs%2Fconfig_tester.yaml?ref=9413fe0baf6539cf9975d138388261b0b273562c",
+          "patch": "@@ -0,0 +1,8 @@\n+# speedup in comparison to real time playback\n+speedup_rate: 20\n+# chunksize in bytes to read at once for binary data\n+binary_read_len: 10\n+# tcp host\n+tcp_host: 127.0.0.1\n+# tcp port to start with, will increment from here\n+tcp_port: 4242"
+        },
+        {
+          "sha": "8c32622d01d384048dffbd579a2d1286adf21416",
+          "filename": "test/logs/nmea.log",
+          "status": "added",
+          "additions": 240,
+          "deletions": 0,
+          "changes": 240,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/9413fe0baf6539cf9975d138388261b0b273562c/test%2Flogs%2Fnmea.log",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/9413fe0baf6539cf9975d138388261b0b273562c/test%2Flogs%2Fnmea.log",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/test%2Flogs%2Fnmea.log?ref=9413fe0baf6539cf9975d138388261b0b273562c",
+          "patch": "@@ -0,0 +1,240 @@\n+$GNRMC,092542.00,A,4846.4008666,N,00854.7249096,E,0.011,,200420,,,R,V*01\r\n+$GNGGA,092542.00,4846.4008666,N,00854.7249096,E,4,12,0.47,419.166,M,47.535,M,0.0,0000*66\r\n+$GNRMC,092542.50,A,4846.4008639,N,00854.7249134,E,0.017,,200420,,,R,V*01\r\n+$GNGGA,092542.50,4846.4008639,N,00854.7249134,E,4,12,0.47,419.164,M,47.535,M,0.0,0000*62\r\n+$GNRMC,092543.00,A,4846.4008633,N,00854.7249165,E,0.016,,200420,,,R,V*0A\r\n+$GNGGA,092543.00,4846.4008633,N,00854.7249165,E,4,12,0.47,419.163,M,47.535,M,0.0,0000*6F\r\n+$GNRMC,092543.50,A,4846.4008626,N,00854.7249190,E,0.015,,200420,,,R,V*02\r\n+$GNGGA,092543.50,4846.4008626,N,00854.7249190,E,4,12,0.47,419.164,M,47.535,M,0.0,0000*63\r\n+$GNRMC,092544.00,A,4846.4008631,N,00854.7249227,E,0.015,,200420,,,R,V*09\r\n+$GNGGA,092544.00,4846.4008631,N,00854.7249227,E,4,12,0.47,419.161,M,47.535,M,0.0,0000*6D\r\n+$GNRMC,092544.50,A,4846.4008623,N,00854.7249256,E,0.017,,200420,,,R,V*0B\r\n+$GNGGA,092544.50,4846.4008623,N,00854.7249256,E,4,12,0.48,419.159,M,47.535,M,0.0,0000*69\r\n+$GNRMC,092545.00,A,4846.4008600,N,00854.7249288,E,0.017,,200420,,,R,V*0D\r\n+$GNGGA,092545.00,4846.4008600,N,00854.7249288,E,4,12,0.48,419.157,M,47.535,M,0.0,0000*61\r\n+$GNRMC,092545.50,A,4846.4008591,N,00854.7249306,E,0.015,,200420,,,R,V*06\r\n+$GNGGA,092545.50,4846.4008591,N,00854.7249306,E,4,12,0.48,419.155,M,47.535,M,0.0,0000*6A\r\n+$GNRMC,092546.00,A,4846.4008590,N,00854.7249360,E,0.013,,200420,,,R,V*07\r\n+$GNGGA,092546.00,4846.4008590,N,00854.7249360,E,4,12,0.48,419.154,M,47.535,M,0.0,0000*6C\r\n+$GNRMC,092546.50,A,4846.4008571,N,00854.7249377,E,0.020,,200420,,,R,V*0B\r\n+$GNGGA,092546.50,4846.4008571,N,00854.7249377,E,4,12,0.48,419.151,M,47.535,M,0.0,0000*65\r\n+$GNRMC,092547.00,A,4846.4008566,N,00854.7249403,E,0.020,,200420,,,R,V*0D\r\n+$GNGGA,092547.00,4846.4008566,N,00854.7249403,E,4,12,0.48,419.149,M,47.535,M,0.0,0000*6A\r\n+$GNRMC,092547.50,A,4846.4008550,N,00854.7249424,E,0.010,,200420,,,R,V*0B\r\n+$GNGGA,092547.50,4846.4008550,N,00854.7249424,E,4,12,0.48,419.150,M,47.535,M,0.0,0000*67\r\n+$GNRMC,092548.00,A,4846.4008544,N,00854.7249474,E,0.019,,200420,,,R,V*08\r\n+$GNGGA,092548.00,4846.4008544,N,00854.7249474,E,4,12,0.48,419.150,M,47.535,M,0.0,0000*6D\r\n+$GNRMC,092548.50,A,4846.4008526,N,00854.7249500,E,0.018,,200420,,,R,V*0A\r\n+$GNGGA,092548.50,4846.4008526,N,00854.7249500,E,4,12,0.48,419.147,M,47.535,M,0.0,0000*68\r\n+$GNRMC,092549.00,A,4846.4008512,N,00854.7249513,E,0.017,,200420,,,R,V*04\r\n+$GNGGA,092549.00,4846.4008512,N,00854.7249513,E,4,12,0.48,419.140,M,47.535,M,0.0,0000*6E\r\n+$GNRMC,092549.50,A,4846.4008503,N,00854.7249550,E,0.010,,200420,,,R,V*01\r\n+$GNGGA,092549.50,4846.4008503,N,00854.7249550,E,4,12,0.48,419.134,M,47.535,M,0.0,0000*6F\r\n+$GNRMC,092550.00,A,4846.4008488,N,00854.7249571,E,0.013,,200420,,,R,V*0E\r\n+$GNGGA,092550.00,4846.4008488,N,00854.7249571,E,4,12,0.48,419.130,M,47.535,M,0.0,0000*67\r\n+$GNRMC,092550.50,A,4846.4008478,N,00854.7249592,E,0.020,,200420,,,R,V*09\r\n+$GNGGA,092550.50,4846.4008478,N,00854.7249592,E,4,12,0.48,419.126,M,47.535,M,0.0,0000*67\r\n+$GNRMC,092551.00,A,4846.4008460,N,00854.7249618,E,0.023,,200420,,,R,V*06\r\n+$GNGGA,092551.00,4846.4008460,N,00854.7249618,E,4,12,0.48,419.122,M,47.535,M,0.0,0000*6F\r\n+$GNRMC,092551.50,A,4846.4008450,N,00854.7249652,E,0.019,,200420,,,R,V*07\r\n+$GNGGA,092551.50,4846.4008450,N,00854.7249652,E,4,12,0.48,419.116,M,47.535,M,0.0,0000*60\r\n+$GNRMC,092552.00,A,4846.4008435,N,00854.7249686,E,0.018,,200420,,,R,V*0A\r\n+$GNGGA,092552.00,4846.4008435,N,00854.7249686,E,4,12,0.48,419.110,M,47.535,M,0.0,0000*6A\r\n+$GNRMC,092552.50,A,4846.4008425,N,00854.7249710,E,0.017,,200420,,,R,V*0F\r\n+$GNGGA,092552.50,4846.4008425,N,00854.7249710,E,4,12,0.49,419.106,M,47.535,M,0.0,0000*66\r\n+$GNRMC,092553.00,A,4846.4008409,N,00854.7249738,E,0.012,,200420,,,R,V*0A\r\n+$GNGGA,092553.00,4846.4008409,N,00854.7249738,E,4,12,0.49,419.099,M,47.535,M,0.0,0000*61\r\n+$GNRMC,092553.50,A,4846.4008405,N,00854.7249753,E,0.018,,200420,,,R,V*04\r\n+$GNGGA,092553.50,4846.4008405,N,00854.7249753,E,4,12,0.49,419.096,M,47.535,M,0.0,0000*6A\r\n+$GNRMC,092554.00,A,4846.4008401,N,00854.7249790,E,0.014,,200420,,,R,V*01\r\n+$GNGGA,092554.00,4846.4008401,N,00854.7249790,E,4,12,0.49,419.093,M,47.535,M,0.0,0000*66\r\n+$GNRMC,092554.50,A,4846.4008388,N,00854.7249812,E,0.014,,200420,,,R,V*07\r\n+$GNGGA,092554.50,4846.4008388,N,00854.7249812,E,4,12,0.49,419.091,M,47.535,M,0.0,0000*62\r\n+$GNRMC,092555.00,A,4846.4008374,N,00854.7249826,E,0.014,,200420,,,R,V*07\r\n+$GNGGA,092555.00,4846.4008374,N,00854.7249826,E,4,12,0.49,419.095,M,47.535,M,0.0,0000*66\r\n+$GNRMC,092555.50,A,4846.4008347,N,00854.7249843,E,0.013,,200420,,,R,V*06\r\n+$GNGGA,092555.50,4846.4008347,N,00854.7249843,E,4,12,0.49,419.097,M,47.535,M,0.0,0000*62\r\n+$GNRMC,092556.00,A,4846.4008345,N,00854.7249864,E,0.012,,200420,,,R,V*06\r\n+$GNGGA,092556.00,4846.4008345,N,00854.7249864,E,4,12,0.50,419.095,M,47.535,M,0.0,0000*69\r\n+$GNRMC,092556.50,A,4846.4008324,N,00854.7249876,E,0.014,,200420,,,R,V*01\r\n+$GNGGA,092556.50,4846.4008324,N,00854.7249876,E,4,12,0.50,419.093,M,47.535,M,0.0,0000*6E\r\n+$GNRMC,092557.00,A,4846.4008316,N,00854.7249899,E,0.016,,200420,,,R,V*07\r\n+$GNGGA,092557.00,4846.4008316,N,00854.7249899,E,4,12,0.50,419.094,M,47.535,M,0.0,0000*6D\r\n+$GNRMC,092557.50,A,4846.4008301,N,00854.7249902,E,0.017,,200420,,,R,V*06\r\n+$GNGGA,092557.50,4846.4008301,N,00854.7249902,E,4,12,0.50,419.095,M,47.535,M,0.0,0000*6C\r\n+$GNRMC,092558.00,A,4846.4008285,N,00854.7249918,E,0.011,,200420,,,R,V*0C\r\n+$GNGGA,092558.00,4846.4008285,N,00854.7249918,E,4,12,0.50,419.095,M,47.535,M,0.0,0000*60\r\n+$GNRMC,092558.50,A,4846.4008280,N,00854.7249943,E,0.010,,200420,,,R,V*03\r\n+$GNGGA,092558.50,4846.4008280,N,00854.7249943,E,4,12,0.50,419.094,M,47.535,M,0.0,0000*6F\r\n+$GNRMC,092559.00,A,4846.4008279,N,00854.7249973,E,0.012,,200420,,,R,V*00\r\n+$GNGGA,092559.00,4846.4008279,N,00854.7249973,E,4,12,0.50,419.090,M,47.535,M,0.0,0000*6A\r\n+$GNRMC,092559.50,A,4846.4008265,N,00854.7250015,E,0.017,,200420,,,R,V*0C\r\n+$GNGGA,092559.50,4846.4008265,N,00854.7250015,E,4,12,0.50,419.089,M,47.535,M,0.0,0000*6B\r\n+$GNRMC,092600.00,A,4846.4008244,N,00854.7250041,E,0.016,,200420,,,R,V*05\r\n+$GNGGA,092600.00,4846.4008244,N,00854.7250041,E,4,12,0.50,419.092,M,47.535,M,0.0,0000*69\r\n+$GNRMC,092600.50,A,4846.4008243,N,00854.7250068,E,0.016,,200420,,,R,V*0C\r\n+$GNGGA,092600.50,4846.4008243,N,00854.7250068,E,4,12,0.50,419.086,M,47.535,M,0.0,0000*65\r\n+$GNRMC,092601.00,A,4846.4008227,N,00854.7250103,E,0.018,,200420,,,R,V*08\r\n+$GNGGA,092601.00,4846.4008227,N,00854.7250103,E,4,12,0.50,419.085,M,47.535,M,0.0,0000*6C\r\n+$GNRMC,092601.50,A,4846.4008212,N,00854.7250134,E,0.008,,200420,,,R,V*0E\r\n+$GNGGA,092601.50,4846.4008212,N,00854.7250134,E,4,12,0.50,419.085,M,47.535,M,0.0,0000*6B\r\n+$GNRMC,092602.00,A,4846.4008195,N,00854.7250185,E,0.007,,200420,,,R,V*01\r\n+$GNGGA,092602.00,4846.4008195,N,00854.7250185,E,4,12,0.50,419.082,M,47.535,M,0.0,0000*6C\r\n+$GNRMC,092602.50,A,4846.4008203,N,00854.7250211,E,0.011,,200420,,,R,V*01\r\n+$GNGGA,092602.50,4846.4008203,N,00854.7250211,E,4,12,0.50,419.077,M,47.535,M,0.0,0000*61\r\n+$GNRMC,092603.00,A,4846.4008185,N,00854.7250245,E,0.016,,200420,,,R,V*0E\r\n+$GNGGA,092603.00,4846.4008185,N,00854.7250245,E,4,12,0.50,419.078,M,47.535,M,0.0,0000*66\r\n+$GNRMC,092603.50,A,4846.4008178,N,00854.7250270,E,0.012,,200420,,,R,V*0B\r\n+$GNGGA,092603.50,4846.4008178,N,00854.7250270,E,4,12,0.50,419.077,M,47.535,M,0.0,0000*68\r\n+$GNRMC,092604.00,A,4846.4008167,N,00854.7250308,E,0.009,,200420,,,R,V*03\r\n+$GNGGA,092604.00,4846.4008167,N,00854.7250308,E,4,12,0.50,419.074,M,47.535,M,0.0,0000*69\r\n+$GNRMC,092604.50,A,4846.4008163,N,00854.7250343,E,0.007,,200420,,,R,V*03\r\n+$GNGGA,092604.50,4846.4008163,N,00854.7250343,E,4,12,0.50,419.072,M,47.535,M,0.0,0000*61\r\n+$GNRMC,092605.00,A,4846.4008151,N,00854.7250389,E,0.015,,200420,,,R,V*03\r\n+$GNGGA,092605.00,4846.4008151,N,00854.7250389,E,4,12,0.50,419.073,M,47.535,M,0.0,0000*63\r\n+$GNRMC,092605.50,A,4846.4008133,N,00854.7250437,E,0.010,,200420,,,R,V*05\r\n+$GNGGA,092605.50,4846.4008133,N,00854.7250437,E,4,12,0.50,419.073,M,47.535,M,0.0,0000*60\r\n+$GNRMC,092606.00,A,4846.4008136,N,00854.7250462,E,0.005,,200420,,,R,V*02\r\n+$GNGGA,092606.00,4846.4008136,N,00854.7250462,E,4,12,0.50,419.076,M,47.535,M,0.0,0000*66\r\n+$GNRMC,092606.50,A,4846.4008130,N,00854.7250486,E,0.009,,200420,,,R,V*07\r\n+$GNGGA,092606.50,4846.4008130,N,00854.7250486,E,4,12,0.50,419.078,M,47.535,M,0.0,0000*61\r\n+$GNRMC,092607.00,A,4846.4008114,N,00854.7250519,E,0.008,,200420,,,R,V*03\r\n+$GNGGA,092607.00,4846.4008114,N,00854.7250519,E,4,12,0.50,419.077,M,47.535,M,0.0,0000*6B\r\n+$GNRMC,092607.50,A,4846.4008119,N,00854.7250548,E,0.011,,200420,,,R,V*07\r\n+$GNGGA,092607.50,4846.4008119,N,00854.7250548,E,4,12,0.50,419.079,M,47.535,M,0.0,0000*69\r\n+$GNRMC,092608.00,A,4846.4008101,N,00854.7250572,E,0.014,,200420,,,R,V*08\r\n+$GNGGA,092608.00,4846.4008101,N,00854.7250572,E,4,12,0.50,419.080,M,47.535,M,0.0,0000*65\r\n+$GNRMC,092608.50,A,4846.4008083,N,00854.7250614,E,0.015,,200420,,,R,V*04\r\n+$GNGGA,092608.50,4846.4008083,N,00854.7250614,E,4,12,0.50,419.082,M,47.535,M,0.0,0000*6A\r\n+$GNRMC,092609.00,A,4846.4008072,N,00854.7250651,E,0.009,,200420,,,R,V*02\r\n+$GNGGA,092609.00,4846.4008072,N,00854.7250651,E,4,12,0.50,419.086,M,47.535,M,0.0,0000*65\r\n+$GNRMC,092609.50,A,4846.4008066,N,00854.7250677,E,0.011,,200420,,,R,V*0F\r\n+$GNGGA,092609.50,4846.4008066,N,00854.7250677,E,4,12,0.50,419.085,M,47.535,M,0.0,0000*62\r\n+$GNRMC,092610.00,A,4846.4008049,N,00854.7250708,E,0.017,,200420,,,R,V*00\r\n+$GNGGA,092610.00,4846.4008049,N,00854.7250708,E,4,12,0.50,419.093,M,47.535,M,0.0,0000*6C\r\n+$GNRMC,092610.50,A,4846.4008044,N,00854.7250739,E,0.007,,200420,,,R,V*0B\r\n+$GNGGA,092610.50,4846.4008044,N,00854.7250739,E,4,12,0.50,419.097,M,47.535,M,0.0,0000*62\r\n+$GNRMC,092611.00,A,4846.4008032,N,00854.7250735,E,0.012,,200420,,,R,V*06\r\n+$GNGGA,092611.00,4846.4008032,N,00854.7250735,E,4,12,0.50,419.103,M,47.535,M,0.0,0000*67\r\n+$GNRMC,092611.50,A,4846.4008035,N,00854.7250749,E,0.015,,200420,,,R,V*08\r\n+$GNGGA,092611.50,4846.4008035,N,00854.7250749,E,4,12,0.50,419.109,M,47.535,M,0.0,0000*64\r\n+$GNRMC,092612.00,A,4846.4008033,N,00854.7250771,E,0.016,,200420,,,R,V*00\r\n+$GNGGA,092612.00,4846.4008033,N,00854.7250771,E,4,12,0.50,419.110,M,47.535,M,0.0,0000*67\r\n+$GNRMC,092612.50,A,4846.4008028,N,00854.7250788,E,0.010,,200420,,,R,V*0F\r\n+$GNGGA,092612.50,4846.4008028,N,00854.7250788,E,4,12,0.50,419.109,M,47.535,M,0.0,0000*66\r\n+$GNRMC,092613.00,A,4846.4008016,N,00854.7250800,E,0.024,,200420,,,R,V*0E\r\n+$GNGGA,092613.00,4846.4008016,N,00854.7250800,E,4,12,0.50,419.112,M,47.535,M,0.0,0000*6A\r\n+$GNRMC,092613.50,A,4846.4008002,N,00854.7250804,E,0.014,,200420,,,R,V*09\r\n+$GNGGA,092613.50,4846.4008002,N,00854.7250804,E,4,12,0.50,419.111,M,47.535,M,0.0,0000*6D\r\n+$GNRMC,092614.00,A,4846.4008007,N,00854.7250794,E,0.010,,200420,,,R,V*0C\r\n+$GNGGA,092614.00,4846.4008007,N,00854.7250794,E,4,12,0.50,419.119,M,47.535,M,0.0,0000*64\r\n+$GNRMC,092614.50,A,4846.4007990,N,00854.7250796,E,0.007,,200420,,,R,V*05\r\n+$GNGGA,092614.50,4846.4007990,N,00854.7250796,E,4,12,0.50,419.119,M,47.535,M,0.0,0000*6B\r\n+$GNRMC,092615.00,A,4846.4007977,N,00854.7250797,E,0.008,,200420,,,R,V*06\r\n+$GNGGA,092615.00,4846.4007977,N,00854.7250797,E,4,12,0.50,419.126,M,47.535,M,0.0,0000*6B\r\n+$GNRMC,092615.50,A,4846.4007977,N,00854.7250808,E,0.009,,200420,,,R,V*0B\r\n+$GNGGA,092615.50,4846.4007977,N,00854.7250808,E,4,12,0.50,419.129,M,47.535,M,0.0,0000*68\r\n+$GNRMC,092616.00,A,4846.4007967,N,00854.7250824,E,0.008,,200420,,,R,V*03\r\n+$GNGGA,092616.00,4846.4007967,N,00854.7250824,E,4,12,0.50,419.127,M,47.535,M,0.0,0000*6F\r\n+$GNRMC,092616.50,A,4846.4007948,N,00854.7250838,E,0.009,,200420,,,R,V*07\r\n+$GNGGA,092616.50,4846.4007948,N,00854.7250838,E,4,12,0.50,419.134,M,47.535,M,0.0,0000*68\r\n+$GNRMC,092617.00,A,4846.4007940,N,00854.7250871,E,0.005,,200420,,,R,V*0A\r\n+$GNGGA,092617.00,4846.4007940,N,00854.7250871,E,4,12,0.50,419.132,M,47.535,M,0.0,0000*6F\r\n+$GNRMC,092617.50,A,4846.4007937,N,00854.7250885,E,0.017,,200420,,,R,V*07\r\n+$GNGGA,092617.50,4846.4007937,N,00854.7250885,E,4,12,0.50,419.129,M,47.535,M,0.0,0000*6B\r\n+$GNRMC,092618.00,A,4846.4007930,N,00854.7250886,E,0.015,,200420,,,R,V*0B\r\n+$GNGGA,092618.00,4846.4007930,N,00854.7250886,E,4,12,0.50,419.132,M,47.535,M,0.0,0000*6F\r\n+$GNRMC,092618.50,A,4846.4007914,N,00854.7250905,E,0.015,,200420,,,R,V*02\r\n+$GNGGA,092618.50,4846.4007914,N,00854.7250905,E,4,12,0.50,419.128,M,47.535,M,0.0,0000*6D\r\n+$GNRMC,092619.00,A,4846.4007904,N,00854.7250928,E,0.012,,200420,,,R,V*0F\r\n+$GNGGA,092619.00,4846.4007904,N,00854.7250928,E,4,12,0.50,419.127,M,47.535,M,0.0,0000*68\r\n+$GNRMC,092619.50,A,4846.4007896,N,00854.7250932,E,0.015,,200420,,,R,V*0C\r\n+$GNGGA,092619.50,4846.4007896,N,00854.7250932,E,4,12,0.49,419.125,M,47.535,M,0.0,0000*66\r\n+$GNRMC,092620.00,A,4846.4007884,N,00854.7250964,E,0.011,,200420,,,R,V*07\r\n+$GNGGA,092620.00,4846.4007884,N,00854.7250964,E,4,12,0.49,419.126,M,47.535,M,0.0,0000*6A\r\n+$GNRMC,092620.50,A,4846.4007869,N,00854.7250979,E,0.013,,200420,,,R,V*0F\r\n+$GNGGA,092620.50,4846.4007869,N,00854.7250979,E,4,12,0.49,419.122,M,47.535,M,0.0,0000*64\r\n+$GNRMC,092621.00,A,4846.4007843,N,00854.7251004,E,0.010,,200420,,,R,V*02\r\n+$GNGGA,092621.00,4846.4007843,N,00854.7251004,E,4,12,0.49,419.124,M,47.535,M,0.0,0000*6C\r\n+$GNRMC,092621.50,A,4846.4007837,N,00854.7251027,E,0.013,,200420,,,R,V*06\r\n+$GNGGA,092621.50,4846.4007837,N,00854.7251027,E,4,12,0.49,419.119,M,47.535,M,0.0,0000*65\r\n+$GNRMC,092622.00,A,4846.4007820,N,00854.7251021,E,0.016,,200420,,,R,V*05\r\n+$GNGGA,092622.00,4846.4007820,N,00854.7251021,E,4,12,0.49,419.120,M,47.535,M,0.0,0000*69\r\n+$GNRMC,092622.50,A,4846.4007816,N,00854.7251013,E,0.011,,200420,,,R,V*03\r\n+$GNGGA,092622.50,4846.4007816,N,00854.7251013,E,4,12,0.49,419.118,M,47.535,M,0.0,0000*63\r\n+$GNRMC,092623.00,A,4846.4007795,N,00854.7251014,E,0.011,,200420,,,R,V*04\r\n+$GNGGA,092623.00,4846.4007795,N,00854.7251014,E,4,12,0.49,419.122,M,47.535,M,0.0,0000*6D\r\n+$GNRMC,092623.50,A,4846.4007781,N,00854.7251019,E,0.017,,200420,,,R,V*0F\r\n+$GNGGA,092623.50,4846.4007781,N,00854.7251019,E,4,12,0.49,419.123,M,47.535,M,0.0,0000*61\r\n+$GNRMC,092624.00,A,4846.4007777,N,00854.7251037,E,0.016,,200420,,,R,V*09\r\n+$GNGGA,092624.00,4846.4007777,N,00854.7251037,E,4,12,0.49,419.119,M,47.535,M,0.0,0000*6F\r\n+$GNRMC,092624.50,A,4846.4007764,N,00854.7251040,E,0.017,,200420,,,R,V*0F\r\n+$GNGGA,092624.50,4846.4007764,N,00854.7251040,E,4,12,0.49,419.120,M,47.535,M,0.0,0000*62\r\n+$GNRMC,092625.00,A,4846.4007762,N,00854.7251050,E,0.008,,200420,,,R,V*02\r\n+$GNGGA,092625.00,4846.4007762,N,00854.7251050,E,4,12,0.49,419.121,M,47.535,M,0.0,0000*60\r\n+$GNRMC,092625.50,A,4846.4007754,N,00854.7251061,E,0.013,,200420,,,R,V*0A\r\n+$GNGGA,092625.50,4846.4007754,N,00854.7251061,E,4,12,0.50,419.122,M,47.535,M,0.0,0000*69\r\n+$GNRMC,092626.00,A,4846.4007742,N,00854.7251083,E,0.013,,200420,,,R,V*07\r\n+$GNGGA,092626.00,4846.4007742,N,00854.7251083,E,4,12,0.50,419.116,M,47.535,M,0.0,0000*63\r\n+$GNRMC,092626.50,A,4846.4007722,N,00854.7251091,E,0.010,,200420,,,R,V*04\r\n+$GNGGA,092626.50,4846.4007722,N,00854.7251091,E,4,12,0.50,419.110,M,47.535,M,0.0,0000*65\r\n+$GNRMC,092627.00,A,4846.4007709,N,00854.7251094,E,0.019,,200420,,,R,V*05\r\n+$GNGGA,092627.00,4846.4007709,N,00854.7251094,E,4,12,0.50,419.110,M,47.535,M,0.0,0000*6D\r\n+$GNRMC,092627.50,A,4846.4007675,N,00854.7251109,E,0.015,,200420,,,R,V*03\r\n+$GNGGA,092627.50,4846.4007675,N,00854.7251109,E,4,12,0.50,419.110,M,47.535,M,0.0,0000*67\r\n+$GNRMC,092628.00,A,4846.4007669,N,00854.7251105,E,0.014,,200420,,,R,V*09\r\n+$GNGGA,092628.00,4846.4007669,N,00854.7251105,E,4,12,0.50,419.103,M,47.535,M,0.0,0000*6E\r\n+$GNRMC,092628.50,A,4846.4007646,N,00854.7251117,E,0.010,,200420,,,R,V*06\r\n+$GNGGA,092628.50,4846.4007646,N,00854.7251117,E,4,12,0.50,419.100,M,47.535,M,0.0,0000*66\r\n+$GNRMC,092629.00,A,4846.4007632,N,00854.7251127,E,0.016,,200420,,,R,V*04\r\n+$GNGGA,092629.00,4846.4007632,N,00854.7251127,E,4,12,0.50,419.097,M,47.535,M,0.0,0000*6D\r\n+$GNRMC,092629.50,A,4846.4007617,N,00854.7251132,E,0.013,,200420,,,R,V*07\r\n+$GNGGA,092629.50,4846.4007617,N,00854.7251132,E,4,12,0.50,419.097,M,47.535,M,0.0,0000*6B\r\n+$GNRMC,092630.00,A,4846.4007603,N,00854.7251133,E,0.021,,200420,,,R,V*0F\r\n+$GNGGA,092630.00,4846.4007603,N,00854.7251133,E,4,12,0.50,419.099,M,47.535,M,0.0,0000*6C\r\n+$GNRMC,092630.50,A,4846.4007601,N,00854.7251133,E,0.014,,200420,,,R,V*0E\r\n+$GNGGA,092630.50,4846.4007601,N,00854.7251133,E,4,12,0.50,419.100,M,47.535,M,0.0,0000*6A\r\n+$GNRMC,092631.00,A,4846.4007598,N,00854.7251112,E,0.010,,200420,,,R,V*0E\r\n+$GNGGA,092631.00,4846.4007598,N,00854.7251112,E,4,12,0.50,419.100,M,47.535,M,0.0,0000*6E\r\n+$GNRMC,092631.50,A,4846.4007574,N,00854.7251119,E,0.015,,200420,,,R,V*07\r\n+$GNGGA,092631.50,4846.4007574,N,00854.7251119,E,4,12,0.50,419.099,M,47.535,M,0.0,0000*63\r\n+$GNRMC,092632.00,A,4846.4007556,N,00854.7251100,E,0.007,,200420,,,R,V*0A\r\n+$GNGGA,092632.00,4846.4007556,N,00854.7251100,E,4,12,0.49,419.098,M,47.535,M,0.0,0000*64\r\n+$GNRMC,092632.50,A,4846.4007531,N,00854.7251109,E,0.013,,200420,,,R,V*02\r\n+$GNGGA,092632.50,4846.4007531,N,00854.7251109,E,4,12,0.51,419.091,M,47.535,M,0.0,0000*69\r\n+$GNRMC,092633.00,A,4846.4007509,N,00854.7251111,E,0.018,,200420,,,R,V*0F\r\n+$GNGGA,092633.00,4846.4007509,N,00854.7251111,E,4,12,0.51,419.089,M,47.535,M,0.0,0000*66\r\n+$GNRMC,092633.50,A,4846.4007482,N,00854.7251102,E,0.014,,200420,,,R,V*06\r\n+$GNGGA,092633.50,4846.4007482,N,00854.7251102,E,4,12,0.51,419.084,M,47.535,M,0.0,0000*6E\r\n+$GNRMC,092634.00,A,4846.4007472,N,00854.7251109,E,0.015,,200420,,,R,V*01\r\n+$GNGGA,092634.00,4846.4007472,N,00854.7251109,E,4,12,0.51,419.077,M,47.535,M,0.0,0000*64\r\n+$GNRMC,092634.50,A,4846.4007448,N,00854.7251106,E,0.018,,200420,,,R,V*0F\r\n+$GNGGA,092634.50,4846.4007448,N,00854.7251106,E,4,12,0.50,419.073,M,47.535,M,0.0,0000*62\r\n+$GNRMC,092635.00,A,4846.4007452,N,00854.7251093,E,0.013,,200420,,,R,V*06\r\n+$GNGGA,092635.00,4846.4007452,N,00854.7251093,E,4,12,0.50,419.069,M,47.535,M,0.0,0000*6B\r\n+$GNRMC,092635.50,A,4846.4007434,N,00854.7251100,E,0.018,,200420,,,R,V*03\r\n+$GNGGA,092635.50,4846.4007434,N,00854.7251100,E,4,12,0.50,419.067,M,47.535,M,0.0,0000*6B\r\n+$GNRMC,092636.00,A,4846.4007439,N,00854.7251108,E,0.018,,200420,,,R,V*00\r\n+$GNGGA,092636.00,4846.4007439,N,00854.7251108,E,4,12,0.50,419.066,M,47.535,M,0.0,0000*69\r\n+$GNRMC,092636.50,A,4846.4007430,N,00854.7251101,E,0.013,,200420,,,R,V*0E\r\n+$GNGGA,092636.50,4846.4007430,N,00854.7251101,E,4,12,0.50,419.065,M,47.535,M,0.0,0000*6F\r\n+$GNRMC,092637.00,A,4846.4007430,N,00854.7251111,E,0.007,,200420,,,R,V*0E\r\n+$GNGGA,092637.00,4846.4007430,N,00854.7251111,E,4,12,0.50,419.060,M,47.535,M,0.0,0000*6F\r\n+$GNRMC,092637.50,A,4846.4007428,N,00854.7251131,E,0.009,,200420,,,R,V*0E\r\n+$GNGGA,092637.50,4846.4007428,N,00854.7251131,E,4,12,0.50,419.054,M,47.535,M,0.0,0000*66\r\n+$GNRMC,092638.00,A,4846.4007428,N,00854.7251129,E,0.033,,200420,,,R,V*04\r\n+$GNGGA,092638.00,4846.4007428,N,00854.7251129,E,4,12,0.50,419.047,M,47.535,M,0.0,0000*67\r\n+$GNRMC,092638.50,A,4846.4007424,N,00854.7251129,E,0.012,,200420,,,R,V*0E\r\n+$GNGGA,092638.50,4846.4007424,N,00854.7251129,E,4,12,0.50,419.047,M,47.535,M,0.0,0000*6E\r\n+$GNRMC,092639.00,A,4846.4007405,N,00854.7251138,E,0.015,,200420,,,R,V*0E\r\n+$GNGGA,092639.00,4846.4007405,N,00854.7251138,E,4,12,0.50,419.044,M,47.535,M,0.0,0000*6A\r\n+$GNRMC,092639.50,A,4846.4007407,N,00854.7251136,E,0.011,,200420,,,R,V*03\r\n+$GNGGA,092639.50,4846.4007407,N,00854.7251136,E,4,12,0.50,419.038,M,47.535,M,0.0,0000*68\r\n+$GNRMC,092640.00,A,4846.4007395,N,00854.7251138,E,0.014,,200420,,,R,V*0F\r\n+$GNGGA,092640.00,4846.4007395,N,00854.7251138,E,4,12,0.50,419.033,M,47.535,M,0.0,0000*6A\r\n+$GNRMC,092640.50,A,4846.4007400,N,00854.7251143,E,0.014,,200420,,,R,V*0D\r\n+$GNGGA,092640.50,4846.4007400,N,00854.7251143,E,4,12,0.50,419.025,M,47.535,M,0.0,0000*6F\r\n+$GNRMC,092641.00,A,4846.4007400,N,00854.7251154,E,0.006,,200420,,,R,V*0C\r\n+$GNGGA,092641.00,4846.4007400,N,00854.7251154,E,4,12,0.50,419.021,M,47.535,M,0.0,0000*69\r\n+$GNRMC,092641.50,A,4846.4007406,N,00854.7251148,E,0.011,,200420,,,R,V*04\r\n+$GNGGA,092641.50,4846.4007406,N,00854.7251148,E,4,12,0.50,419.015,M,47.535,M,0.0,0000*60\r"
+        },
+        {
+          "sha": "bfa89ad7dab89f3ab0cdf0602675f50740cb9e62",
+          "filename": "test/requirements.txt",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/9413fe0baf6539cf9975d138388261b0b273562c/test%2Frequirements.txt",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/9413fe0baf6539cf9975d138388261b0b273562c/test%2Frequirements.txt",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/test%2Frequirements.txt?ref=9413fe0baf6539cf9975d138388261b0b273562c",
+          "patch": "@@ -0,0 +1 @@\n+PyVirtualSerialPorts==1.0.1"
+        },
+        {
+          "sha": "c144d9eecab4c30ab24ecaff1cea22851fe05db9",
+          "filename": "test/test_driver.py",
+          "status": "added",
+          "additions": 289,
+          "deletions": 0,
+          "changes": 289,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/9413fe0baf6539cf9975d138388261b0b273562c/test%2Ftest_driver.py",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/9413fe0baf6539cf9975d138388261b0b273562c/test%2Ftest_driver.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/test%2Ftest_driver.py?ref=9413fe0baf6539cf9975d138388261b0b273562c",
+          "patch": "@@ -0,0 +1,289 @@\n+#!/usr/bin/env python3\n+\"\"\"Testing node for nmea_navsat_driver.\"\"\"\n+\n+# Software License Agreement (BSD License)\n+#\n+# Copyright (c) 2020-2021, Robert Bosch GmbH\n+# All rights reserved.\n+#\n+# Redistribution and use in source and binary forms, with or without\n+# modification, are permitted provided that the following conditions\n+# are met:\n+#\n+#  * Redistributions of source code must retain the above copyright\n+#    notice, this list of conditions and the following disclaimer.\n+#  * Redistributions in binary form must reproduce the above\n+#    copyright notice, this list of conditions and the following\n+#    disclaimer in the documentation and/or other materials provided\n+#    with the distribution.\n+#  * Neither the names of the authors nor the names of their\n+#    affiliated organizations may be used to endorse or promote products derived\n+#    from this software without specific prior written permission.\n+#\n+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n+# \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS\n+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\n+# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,\n+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,\n+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\n+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN\n+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+# POSSIBILITY OF SUCH DAMAGE.\n+\n+import io\n+import os\n+import socket\n+import subprocess\n+import sys\n+import threading\n+import unittest\n+from contextlib import redirect_stdout\n+\n+import rospkg\n+import rospy\n+import rostest\n+import serial\n+import virtualserialports\n+import yaml\n+from sensor_msgs.msg import *\n+\n+\n+class TestDriver(unittest.TestCase):\n+    \"\"\"Test nmea_navsat_driver.\"\"\"\n+\n+    def initialize(self):\n+        \"\"\"Initialize class.\"\"\"\n+        with open(rospkg.RosPack().get_path('nmea_navsat_driver') + '/test/configs/config_log.yaml') as f:\n+            self.cfg_logs = yaml.safe_load(f)\n+        with open(rospkg.RosPack().get_path('nmea_navsat_driver') + '/test/configs/config_launch.yaml') as f:\n+            self.cfg_launches = yaml.safe_load(f)\n+        with open(rospkg.RosPack().get_path('nmea_navsat_driver') + '/test/configs/config_tester.yaml') as f:\n+            self.cfg_tester = yaml.safe_load(f)\n+\n+        self.test_failed = False\n+\n+        # tcp ports can't be re-used in quick succession, therefore cache it\n+        # here to increment it later\n+        self.tcp_port = self.cfg_tester['tcp_port']\n+\n+    def cb(self, msg, args):\n+        \"\"\"Calback for all messages.\"\"\"\n+        log, topic = args\n+\n+        if topic not in self.msg_counter.keys():\n+            self.msg_counter[topic] = 0\n+\n+        self.msg_counter[topic] += 1\n+        self.check_msg(msg, log, topic)\n+\n+    def check_msg(self, msg, log, topic):\n+        \"\"\"Check whether message content complies with target specs.\"\"\"\n+        topics = self.cfg_logs[log]['topics']\n+\n+        if topic in topics.keys():\n+            for attribute in topics[topic]:\n+                if not attribute.startswith('_'):\n+                    val = getattr(msg, attribute)\n+\n+                    if 'min' in topics[topic][attribute].keys():\n+                        if val < topics[topic][attribute]['min']:\n+                            self.errors.append(\n+                                '{} {} {} {}: violating minimium value {}: {}'.format(log, msg.header.stamp.to_sec(),\n+                                                                                      topic, attribute,\n+                                                                                      topics[topic][attribute]['min'],\n+                                                                                      val))\n+                    if 'max' in topics[topic][attribute].keys():\n+                        if val > topics[topic][attribute]['max']:\n+                            self.errors.append(\n+                                '{} {} {} {}: violating maximum value {}: {}'.format(log, msg.header.stamp.to_sec(),\n+                                                                                     topic, attribute,\n+                                                                                     topics[topic][attribute]['max'],\n+                                                                                     val))\n+                    if 'val' in topics[topic][attribute].keys():\n+                        if val != topics[topic][attribute]['val']:\n+                            self.errors.append(\n+                                '{} {} {} {}: violating value {}: {}'.format(log, msg.header.stamp.to_sec(), topic,\n+                                                                             attribute, topics[topic][attribute]['val'],\n+                                                                             val))\n+\n+    @staticmethod\n+    def create_vsps():\n+        \"\"\"Create virtual serial ports (vsp) for serial driver testing.\"\"\"\n+        f = io.StringIO()\n+        with redirect_stdout(f):\n+            th_vsp = threading.Thread(target=virtualserialports.run, args=(2, False, False))\n+            th_vsp.daemon = True\n+            th_vsp.start()\n+\n+        return f.getvalue().split('\\n')[:-1]\n+\n+    def playback_log(self, launchfile, log):\n+        \"\"\"Playback a logfile.\"\"\"\n+        playback_path = rospkg.RosPack().get_path('nmea_navsat_driver') + '/test/logs/' + log\n+\n+        if self.cfg_launches[launchfile]['interface'] == 'serial':\n+            if self.cfg_logs[log]['mode'] == 'nmea':\n+                with open(playback_path, 'r') as f:\n+                    for line in f:\n+                        self.serial_writer.write(str(line).encode('utf-8'))\n+                        rospy.sleep(1. / self.cfg_logs[log]['rate'] / self.cfg_tester['speedup_rate'])\n+            elif self.cfg_logs[log]['mode'] == 'binary':\n+                with open(playback_path, 'rb') as f:\n+                    byte = f.read(self.cfg_tester['binary_read_len'])\n+                    while byte:\n+                        self.serial_writer.write(byte)\n+                        rospy.sleep(1. / self.cfg_logs[log]['rate'] / self.cfg_tester['speedup_rate'] *\n+                                    self.cfg_tester['binary_read_len'])\n+                        byte = f.read(self.cfg_tester['binary_read_len'])\n+        elif self.cfg_launches[launchfile]['interface'] == 'tcp':\n+            if self.cfg_logs[log]['mode'] == 'nmea':\n+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:\n+                    s.bind((self.cfg_tester['tcp_host'], self.tcp_port))\n+                    s.listen()\n+                    conn, addr = s.accept()\n+                    with conn:\n+                        rospy.loginfo('TCP driver connected')\n+                        if self.cfg_logs[log]['mode'] == 'nmea':\n+                            with open(playback_path, 'r') as f:\n+                                for line in f:\n+                                    conn.send(str(line).encode('utf-8'))\n+                                    rospy.sleep(1. / self.cfg_logs[log]['rate'] / self.cfg_tester['speedup_rate'])\n+\n+                self.tcp_port += 1\n+\n+    def print_errors(self, launchfile, log, msg_types):\n+        \"\"\"Print errors.\"\"\"\n+        for topic in self.cfg_logs[log]['topics']:\n+            msg_count_target = self.cfg_logs[log]['topics'][topic]['_message_count']\n+            if msg_types[topic] not in self.cfg_launches[launchfile]['messages']:\n+                rospy.loginfo(\n+                    '{}: skipping topic {} since not in scope for launch file {}'.format(log, topic, launchfile))\n+            elif topic not in self.msg_counter:\n+                self.errors.append('{}: topic \"{}\" not published for log'.format(log, topic))\n+            elif self.msg_counter[topic] != msg_count_target:\n+                self.errors.append(\n+                    '{}: unmet target message count {}: {} for topic {}'.format(log, msg_count_target,\n+                                                                                self.msg_counter[topic], topic))\n+\n+        if len(self.errors) == 0:\n+            rospy.logwarn('{}: no errors detected'.format(log))\n+        else:\n+            for error in self.errors:\n+                rospy.logerr(error)\n+\n+    def test(self):\n+        \"\"\"Run the tester.\"\"\"\n+        self.initialize()\n+\n+        # init ros\n+        ros_master_uri = 'http://127.0.0.1:11311'\n+        env_variables = os.environ.copy()\n+        env_variables['ROS_MASTER_URI'] = ros_master_uri\n+        p_roscore = subprocess.Popen(['roscore'], env=env_variables)\n+        rospy.init_node('nmea_navsat_driver_tester')\n+\n+        # init serial handler and wait until vsps are ready\n+        ports = self.create_vsps()\n+        self.serial_writer = serial.Serial(ports[0], 115200)\n+        while len(ports) < 2:\n+            rospy.logwarn('Virtual serial ports not ready yet, waiting...')\n+            rospy.sleep(.5)\n+\n+        # process all launch files\n+        for launchfile in self.cfg_launches:\n+            rospy.loginfo('========== Testing launch file {} =========='.format(launchfile))\n+\n+            # process all logs\n+            for log in self.cfg_logs:\n+                # tcp interface doesn't support binary mode\n+                if self.cfg_launches[launchfile]['interface'] == 'tcp' and self.cfg_logs[log]['mode'] == 'binary':\n+                    rospy.loginfo('Skipping log {} for TCP driver'.format(log))\n+                    continue\n+\n+                rospy.loginfo('---------- Processing logfile {} ----------'.format(log))\n+                self.errors = []\n+                self.msg_counter = {}\n+                msg_types = {}\n+                subscribers = []\n+\n+                # create subscribers\n+                for topic in self.cfg_logs[log]['topics']:\n+                    msg_type = self.cfg_logs[log]['topics'][topic]['_type']\n+                    msg_types[topic] = msg_type\n+                    subscribers.append(\n+                        rospy.Subscriber(\n+                            '/' + topic,\n+                            getattr(sys.modules[__name__], msg_type),\n+                            self.cb,\n+                            [log, topic]\n+                        )\n+                    )\n+\n+                # launch\n+                if self.cfg_launches[launchfile]['interface'] == 'serial':\n+                    p_driver = subprocess.Popen(\n+                        [\n+                            'roslaunch',\n+                            'nmea_navsat_driver',\n+                            launchfile,\n+                            '--wait'\n+                        ] +\n+                        self.cfg_logs[log]['parameters'] +\n+                        [\n+                            'port:=' + ports[1],\n+                            'baud:=115200'\n+                        ]\n+                    )\n+                elif self.cfg_launches[launchfile]['interface'] == 'tcp':\n+                    p_driver = subprocess.Popen(\n+                        [\n+                            'roslaunch',\n+                            'nmea_navsat_driver',\n+                            launchfile,\n+                            '--wait'\n+                        ] +\n+                        self.cfg_logs[log]['parameters'] +\n+                        [\n+                            'ip:=' + self.cfg_tester['tcp_host'],\n+                            'port:=' + str(self.tcp_port),\n+                        ]\n+                    )\n+                else:\n+                    rospy.logerr('Unknown interface: {}'.format(self.cfg_launches[launchfile]['interface']))\n+                    continue\n+\n+                # wait until driver is running\n+                rospy.sleep(2.)\n+\n+                # playback log\n+                self.playback_log(launchfile, log)\n+\n+                # wait until last message is processed, assuming 2 seconds is enough\n+                rospy.sleep(2.)\n+\n+                # stop driver\n+                p_driver.terminate()\n+\n+                # let the driver shut down\n+                rospy.sleep(2.)\n+\n+                # stop subscribers\n+                for subscriber in subscribers:\n+                    subscriber.unregister()\n+\n+                self.print_errors(launchfile, log, msg_types)\n+\n+                if len(self.errors) > 0:\n+                    self.test_failed = True\n+\n+        self.serial_writer.close()\n+        p_roscore.terminate()\n+\n+        self.assertFalse(self.test_failed)\n+\n+\n+if __name__ == '__main__':\n+    rostest.rosrun('nmea_navsat_driver', 'driver_tester', TestDriver)"
+        }
+      ]
+    },
+    {
+      "author": "vonunwerth",
+      "date": "2020-06-13T18:34:06Z",
+      "sha": "b67cfaccc2972b7852dcbd4fde14fbae5cd889f8",
+      "message": "Trim whitespace in nmea_topic_driver (#98)\n\nnmea_topic_driver gets raw NMEA sentences. Those may contain carriage return and new lines, which do not pass the validation regex. Strip whitespace from the nmea sentence before processing for consistency with the parser validator.",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e72761821a2a2958f489b60231f9dc9485282139",
+          "filename": "src/libnmea_navsat_driver/parser.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/b67cfaccc2972b7852dcbd4fde14fbae5cd889f8/src%2Flibnmea_navsat_driver%2Fparser.py",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/b67cfaccc2972b7852dcbd4fde14fbae5cd889f8/src%2Flibnmea_navsat_driver%2Fparser.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/src%2Flibnmea_navsat_driver%2Fparser.py?ref=b67cfaccc2972b7852dcbd4fde14fbae5cd889f8",
+          "patch": "@@ -280,7 +280,7 @@ def parse_nmea_sentence(nmea_sentence):\n         False if the sentence could not be parsed.\n     \"\"\"\n     # Check for a valid nmea sentence\n-\n+    nmea_sentence = nmea_sentence.strip()  # Cut possible carriage return or new line of NMEA Sentence\n     if not re.match(\n             r'(^\\$GP|^\\$GN|^\\$GL|^\\$IN).*\\*[0-9A-Fa-f]{2}$', nmea_sentence):\n         logger.debug("
+        }
+      ]
+    },
+    {
+      "author": "rgov",
+      "date": "2020-02-01T22:30:27Z",
+      "sha": "062f379a87254080d75964c26dc79d38b0af6a44",
+      "message": "Rewrite nmea_socket_driver to use serversocket (#92)\n\nUse Python's SocketServer rather than low level socket APIs. This simplifies code and makes it easier to add TCP support in the future. The buffer_size parameter is no longer necessary because this is an internal detail of UDPServer.",
+      "files_changed": 1,
+      "additions": 45,
+      "deletions": 52,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "493c096969654a485be8247efcec814ee8d383c5",
+          "filename": "src/libnmea_navsat_driver/nodes/nmea_socket_driver.py",
+          "status": "modified",
+          "additions": 45,
+          "deletions": 52,
+          "changes": 97,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/062f379a87254080d75964c26dc79d38b0af6a44/src%2Flibnmea_navsat_driver%2Fnodes%2Fnmea_socket_driver.py",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/062f379a87254080d75964c26dc79d38b0af6a44/src%2Flibnmea_navsat_driver%2Fnodes%2Fnmea_socket_driver.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/src%2Flibnmea_navsat_driver%2Fnodes%2Fnmea_socket_driver.py?ref=062f379a87254080d75964c26dc79d38b0af6a44",
+          "patch": "@@ -33,14 +33,41 @@\n \"\"\"Defines the main method for the nmea_socket_driver executable.\"\"\"\n \n \n-import socket\n+import select\n import sys\n+import traceback\n+\n+try:\n+    import socketserver\n+except ImportError:\n+    import SocketServer as socketserver  # Python 2.7\n \n import rospy\n \n from libnmea_navsat_driver.driver import RosNMEADriver\n \n \n+class NMEAMessageHandler(socketserver.DatagramRequestHandler):\n+    def handle(self):\n+        for line in self.rfile:\n+            line = line.strip()\n+            if not line:\n+                continue\n+\n+            try:\n+                self.server.driver.add_sentence(line, self.server.frame_id)\n+            except ValueError:\n+                rospy.logwarn(\n+                    \"ValueError, likely due to missing fields in the NMEA \"\n+                    \"message. Please report this issue at \"\n+                    \"https://github.com/ros-drivers/nmea_navsat_driver\"\n+                    \", including the following:\\n\\n\"\n+                    \"```\\n\" +\n+                    repr(line) + \"\\n\\n\" +\n+                    traceback.format_exc() +\n+                    \"```\")\n+\n+\n def main():\n     \"\"\"Create and run the nmea_socket_driver ROS node.\n \n@@ -49,69 +76,35 @@ def main():\n     ROS parameters:\n         ~ip (str): IPV4 address of the socket to open.\n         ~port (int): Local port of the socket to open.\n-        ~buffer_size (int): The size of the buffer for the socket, in bytes.\n         ~timeout (float): The time out period for the socket, in seconds.\n     \"\"\"\n     rospy.init_node('nmea_socket_driver')\n \n     try:\n         local_ip = rospy.get_param('~ip', '0.0.0.0')\n         local_port = rospy.get_param('~port', 10110)\n-        buffer_size = rospy.get_param('~buffer_size', 4096)\n         timeout = rospy.get_param('~timeout_sec', 2)\n     except KeyError as e:\n         rospy.logerr(\"Parameter %s not found\" % e)\n         sys.exit(1)\n \n-    frame_id = RosNMEADriver.get_frame_id()\n+    # Create a socket\n+    server = socketserver.UDPServer((local_ip, local_port), NMEAMessageHandler,\n+                                    bind_and_activate=False)\n+    server.frame_id = RosNMEADriver.get_frame_id()\n+    server.driver = RosNMEADriver()\n \n-    driver = RosNMEADriver()\n+    # Start listening for connections\n+    server.server_bind()\n+    server.server_activate()\n \n-    # Connection-loop: connect and keep receiving. If receiving fails,\n-    # reconnect\n-    while not rospy.is_shutdown():\n-        try:\n-            # Create a socket\n-            socket_ = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)\n-\n-            # Bind the socket to the port\n-            socket_.bind((local_ip, local_port))\n-\n-            # Set timeout\n-            socket_.settimeout(timeout)\n-        except socket.error as exc:\n-            rospy.logerr(\n-                \"Caught exception socket.error when setting up socket: %s\" %\n-                exc)\n-            sys.exit(1)\n-\n-        # recv-loop: When we're connected, keep receiving stuff until that\n-        # fails\n+    # Handle incoming connections until ROS shuts down\n+    try:\n         while not rospy.is_shutdown():\n-            try:\n-                data, remote_address = socket_.recvfrom(buffer_size)\n-\n-                # strip the data\n-                data_list = data.strip().split(\"\\n\")\n-\n-                for data in data_list:\n-\n-                    try:\n-                        driver.add_sentence(data, frame_id)\n-                    except ValueError as e:\n-                        rospy.logwarn(\n-                            \"Value error, likely due to missing fields in the NMEA message. \"\n-                            \"Error was: %s. Please report this issue at \"\n-                            \"github.com/ros-drivers/nmea_navsat_driver, including a bag file with the NMEA \"\n-                            \"sentences that caused it.\" %\n-                            e)\n-\n-            except socket.error as exc:\n-                rospy.logerr(\n-                    \"Caught exception socket.error during recvfrom: %s\" % exc)\n-                socket_.close()\n-                # This will break out of the recv-loop so we start another\n-                # iteration of the connection-loop\n-                break\n-\n-        socket_.close()  # Close socket\n+            rlist, _, _ = select.select([server], [], [], timeout)\n+            if server in rlist:\n+                server.handle_request()\n+    except Exception:\n+        rospy.logerr(traceback.format_exc())\n+    finally:\n+        server.server_close()"
+        }
+      ]
+    },
+    {
+      "author": "zhixy",
+      "date": "2019-08-17T16:21:23Z",
+      "sha": "1ee32b37b769ccb87a351c5229d07cb2c2272f82",
+      "message": "Add an Option to Use GNSS Time and Improve Time Parsing (#79)\n\n- Add an optional parameter `use_GNSS_time` to use the time from the GPS sentences for ROS message time instead of using system time.\r\n- Improve GPS time parsing to support nanosecond precision on devices that support it.\r\n- Improve GPS time parsing to use RMC message for date when available.\r\n- Improve GPS time parsing to resolve ambiguities in date and century using system time.",
+      "files_changed": 3,
+      "additions": 96,
+      "deletions": 30,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "cdf3c70007be9033cc4b569a55a8e5f0a79e4512",
+          "filename": "launch/nmea_serial_driver.launch",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/1ee32b37b769ccb87a351c5229d07cb2c2272f82/launch%2Fnmea_serial_driver.launch",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/1ee32b37b769ccb87a351c5229d07cb2c2272f82/launch%2Fnmea_serial_driver.launch",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/launch%2Fnmea_serial_driver.launch?ref=1ee32b37b769ccb87a351c5229d07cb2c2272f82",
+          "patch": "@@ -5,13 +5,15 @@\n   <arg name=\"port\" default=\"/dev/ttyUSB0\" />\n   <arg name=\"baud\" default=\"4800\" />\n   <arg name=\"frame_id\" default=\"gps\" />\n+  <arg name=\"use_GNSS_time\" default=\"False\" />\n   <arg name=\"time_ref_source\" default=\"gps\" />\n   <arg name=\"useRMC\" default=\"False\" />\n \n   <node name=\"nmea_serial_driver_node\" pkg=\"nmea_navsat_driver\" type=\"nmea_serial_driver\" output=\"screen\">\n     <param name=\"port\" value=\"$(arg port)\"/>\n     <param name=\"baud\" value=\"$(arg baud)\" />\n     <param name=\"frame_id\" value=\"$(arg frame_id)\" />\n+    <param name=\"use_GNSS_time\" value=\"$(arg use_GNSS_time)\" />\n     <param name=\"time_ref_source\" value=\"$(arg time_ref_source)\" />\n     <param name=\"useRMC\" value=\"$(arg useRMC)\" />\n   </node>"
+        },
+        {
+          "sha": "557b6e7df7c40fa7c67db49a120e022b7c858137",
+          "filename": "src/libnmea_navsat_driver/driver.py",
+          "status": "modified",
+          "additions": 31,
+          "deletions": 15,
+          "changes": 46,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/1ee32b37b769ccb87a351c5229d07cb2c2272f82/src%2Flibnmea_navsat_driver%2Fdriver.py",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/1ee32b37b769ccb87a351c5229d07cb2c2272f82/src%2Flibnmea_navsat_driver%2Fdriver.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/src%2Flibnmea_navsat_driver%2Fdriver.py?ref=1ee32b37b769ccb87a351c5229d07cb2c2272f82",
+          "patch": "@@ -49,8 +49,10 @@ def __init__(self):\n         self.vel_pub = rospy.Publisher('vel', TwistStamped, queue_size=1)\n         self.heading_pub = rospy.Publisher(\n             'heading', QuaternionStamped, queue_size=1)\n-        self.time_ref_pub = rospy.Publisher(\n-            'time_reference', TimeReference, queue_size=1)\n+        self.use_GNSS_time = rospy.get_param('~use_GNSS_time', False)\n+        if not self.use_GNSS_time:\n+            self.time_ref_pub = rospy.Publisher(\n+                'time_reference', TimeReference, queue_size=1)\n \n         self.time_ref_source = rospy.get_param('~time_ref_source', None)\n         self.use_RMC = rospy.get_param('~useRMC', False)\n@@ -140,19 +142,27 @@ def add_sentence(self, nmea_string, frame_id, timestamp=None):\n         current_fix = NavSatFix()\n         current_fix.header.stamp = current_time\n         current_fix.header.frame_id = frame_id\n-        current_time_ref = TimeReference()\n-        current_time_ref.header.stamp = current_time\n-        current_time_ref.header.frame_id = frame_id\n-        if self.time_ref_source:\n-            current_time_ref.source = self.time_ref_source\n-        else:\n-            current_time_ref.source = frame_id\n+        if not self.use_GNSS_time:\n+            current_time_ref = TimeReference()\n+            current_time_ref.header.stamp = current_time\n+            current_time_ref.header.frame_id = frame_id\n+            if self.time_ref_source:\n+                current_time_ref.source = self.time_ref_source\n+            else:\n+                current_time_ref.source = frame_id\n \n         if not self.use_RMC and 'GGA' in parsed_sentence:\n             current_fix.position_covariance_type = \\\n                 NavSatFix.COVARIANCE_TYPE_APPROXIMATED\n \n             data = parsed_sentence['GGA']\n+\n+            if self.use_GNSS_time:\n+                if math.isnan(data['utc_time'][0]):\n+                    rospy.logwarn(\"Time in the NMEA sentence is NOT valid\")\n+                    return False\n+                current_fix.header.stamp = rospy.Time(data['utc_time'][0], data['utc_time'][1])\n+\n             fix_type = data['fix_type']\n             if not (fix_type in self.gps_qualities):\n                 fix_type = -1\n@@ -199,9 +209,9 @@ def add_sentence(self, nmea_string, frame_id, timestamp=None):\n \n             self.fix_pub.publish(current_fix)\n \n-            if not math.isnan(data['utc_time']):\n-                current_time_ref.time_ref = rospy.Time.from_sec(\n-                    data['utc_time'])\n+            if not (math.isnan(data['utc_time'][0]) or self.use_GNSS_time):\n+                current_time_ref.time_ref = rospy.Time(\n+                    data['utc_time'][0], data['utc_time'][1])\n                 self.last_valid_fix_time = current_time_ref\n                 self.time_ref_pub.publish(current_time_ref)\n \n@@ -223,6 +233,12 @@ def add_sentence(self, nmea_string, frame_id, timestamp=None):\n         elif 'RMC' in parsed_sentence:\n             data = parsed_sentence['RMC']\n \n+            if self.use_GNSS_time:\n+                if math.isnan(data['utc_time'][0]):\n+                    rospy.logwarn(\"Time in the NMEA sentence is NOT valid\")\n+                    return False\n+                current_fix.header.stamp = rospy.Time(data['utc_time'][0], data['utc_time'][1])\n+\n             # Only publish a fix from RMC if the use_RMC flag is set.\n             if self.use_RMC:\n                 if data['fix_valid']:\n@@ -248,9 +264,9 @@ def add_sentence(self, nmea_string, frame_id, timestamp=None):\n \n                 self.fix_pub.publish(current_fix)\n \n-                if not math.isnan(data['utc_time']):\n-                    current_time_ref.time_ref = rospy.Time.from_sec(\n-                        data['utc_time'])\n+                if not (math.isnan(data['utc_time'][0]) or self.use_GNSS_time):\n+                    current_time_ref.time_ref = rospy.Time(\n+                        data['utc_time'][0], data['utc_time'][1])\n                     self.time_ref_pub.publish(current_time_ref)\n \n             # Publish velocity from RMC regardless, since GGA doesn't provide"
+        },
+        {
+          "sha": "0bcc065ac3f748f2fa5095e073c0eeb02dcfa258",
+          "filename": "src/libnmea_navsat_driver/parser.py",
+          "status": "modified",
+          "additions": 63,
+          "deletions": 15,
+          "changes": 78,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/1ee32b37b769ccb87a351c5229d07cb2c2272f82/src%2Flibnmea_navsat_driver%2Fparser.py",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/1ee32b37b769ccb87a351c5229d07cb2c2272f82/src%2Flibnmea_navsat_driver%2Fparser.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/src%2Flibnmea_navsat_driver%2Fparser.py?ref=1ee32b37b769ccb87a351c5229d07cb2c2272f82",
+          "patch": "@@ -31,7 +31,7 @@\n # POSSIBILITY OF SUCH DAMAGE.\n \n import re\n-import time\n+import datetime\n import calendar\n import math\n import logging\n@@ -61,22 +61,68 @@ def convert_longitude(field):\n \n \n def convert_time(nmea_utc):\n-    # Get current time in UTC for date information\n-    utc_struct = time.gmtime()  # immutable, so cannot modify this one\n-    utc_list = list(utc_struct)\n+    \"\"\"\n+    Parameters:\n+        nmea_utc - nmea sentence\n+\n+    Returns:\n+        2-tuple of (unix seconds, nanoseconds),\n+        or (NaN, NaN) if sentence does not contain valid time\n+    \"\"\"\n     # If one of the time fields is empty, return NaN seconds\n     if not nmea_utc[0:2] or not nmea_utc[2:4] or not nmea_utc[4:6]:\n-        return float('NaN')\n-    else:\n-        hours = int(nmea_utc[0:2])\n-        minutes = int(nmea_utc[2:4])\n-        seconds = int(nmea_utc[4:6])\n-        utc_list[3] = hours\n-        utc_list[4] = minutes\n-        utc_list[5] = seconds\n-        unix_time = calendar.timegm(tuple(utc_list))\n-        return unix_time\n+        return (float('NaN'), float('NaN'))\n+\n+    # Get current time in UTC for date information\n+    utc_time = datetime.datetime.utcnow()\n+    hours = int(nmea_utc[0:2])\n+    minutes = int(nmea_utc[2:4])\n+    seconds = int(nmea_utc[4:6])\n+    nanosecs = int(nmea_utc[7:]) * pow(10, 9 - len(nmea_utc[7:]))\n+\n+    ## resolve the ambiguity of day\n+    day_offset = int((utc_time.hour - hours)/12.0)\n+    utc_time += datetime.timedelta(day_offset)\n+    utc_time.replace(hour=hours, minute=minutes, second=seconds)\n+\n+    unix_secs = calendar.timegm(utc_time.timetuple())\n+    return (unix_secs, nanosecs)\n+\n+def convert_time_rmc(date_str, time_str):\n+    \"\"\"\n+    Parameters:\n+        nmea_utc - nmea sentence\n+\n+    Returns:\n+        2-tuple of (unix seconds, nanoseconds),\n+        or (NaN, NaN) if sentence does not contain valid time\n+    \"\"\"\n+    # If one of the time fields is empty, return NaN seconds\n+    if not time_str[0:2] or not time_str[2:4] or not time_str[4:6]:\n+        return (float('NaN'), float('NaN'))\n \n+    pc_year = datetime.date.today().year\n+\n+    ## resolve the ambiguity of century\n+    \"\"\"\n+    example 1: utc_year = 99, pc_year = 2100\n+    years = 2100 + int((2100 % 100 - 99) / 50.0) = 2099\n+    example 2: utc_year = 00, pc_year = 2099\n+    years = 2099 + int((2099 % 100 - 00) / 50.0) = 2100\n+    \"\"\"\n+    utc_year = int(date_str[4:6])\n+    years = pc_year + int((pc_year % 100 - utc_year) / 50.0)\n+\n+    months = int(date_str[2:4])\n+    days = int(date_str[0:2])\n+\n+    hours = int(time_str[0:2])\n+    minutes = int(time_str[2:4])\n+    seconds = int(time_str[4:6])\n+    nanosecs = int(time_str[7:]) * pow(10, 9 - len(time_str[7:]))\n+\n+    unix_secs = calendar.timegm((years, months, days, hours, minutes, seconds))\n+    return (unix_secs, nanosecs)\n \n def convert_status_flag(status_flag):\n     if status_flag == \"A\":\n@@ -113,7 +159,6 @@ def convert_deg_to_rads(degs):\n         (\"utc_time\", convert_time, 1),\n     ],\n     \"RMC\": [\n-        (\"utc_time\", convert_time, 1),\n         (\"fix_valid\", convert_status_flag, 2),\n         (\"latitude\", convert_latitude, 3),\n         (\"latitude_direction\", str, 4),\n@@ -167,4 +212,7 @@ def parse_nmea_sentence(nmea_sentence):\n     for entry in parse_map:\n         parsed_sentence[entry[0]] = entry[1](fields[entry[2]])\n \n+    if sentence_type == \"RMC\":\n+        parsed_sentence[\"utc_time\"] = convert_time_rmc(fields[9], fields[1])\n+\n     return {sentence_type: parsed_sentence}"
+        }
+      ]
+    },
+    {
+      "author": "diasdm",
+      "date": "2019-02-28T23:28:21Z",
+      "sha": "80df328102afc03a1ecfc1396292682948682025",
+      "message": "Add nmea_serial_driver launch file (#60)\n\nAdd example nmea_serial_driver launch file.",
+      "files_changed": 2,
+      "additions": 24,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "23aa0b7ae8e036fcbba5c1083884bb0f72764e35",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/80df328102afc03a1ecfc1396292682948682025/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/80df328102afc03a1ecfc1396292682948682025/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/CMakeLists.txt?ref=80df328102afc03a1ecfc1396292682948682025",
+          "patch": "@@ -14,6 +14,11 @@ install(PROGRAMS\n    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n )\n \n+install(DIRECTORY launch/\n+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch\n+   FILES_MATCHING PATTERN \"*.launch\"\n+)\n+\n if (CATKIN_ENABLE_TESTING)\n   find_package(roslint)\n   roslint_python()"
+        },
+        {
+          "sha": "ba3854af001690ca85ad6ff9179f010616b67f03",
+          "filename": "launch/nmea_serial_driver.launch",
+          "status": "added",
+          "additions": 19,
+          "deletions": 0,
+          "changes": 19,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/80df328102afc03a1ecfc1396292682948682025/launch%2Fnmea_serial_driver.launch",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/80df328102afc03a1ecfc1396292682948682025/launch%2Fnmea_serial_driver.launch",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/launch%2Fnmea_serial_driver.launch?ref=80df328102afc03a1ecfc1396292682948682025",
+          "patch": "@@ -0,0 +1,19 @@\n+<launch>\n+\n+  <!-- A simple launch file for the nmea_serial_driver node. -->\n+\n+  <arg name=\"port\" default=\"/dev/ttyUSB0\" />\n+  <arg name=\"baud\" default=\"4800\" />\n+  <arg name=\"frame_id\" default=\"gps\" />\n+  <arg name=\"time_ref_source\" default=\"gps\" />\n+  <arg name=\"useRMC\" default=\"False\" />\n+\n+  <node name=\"nmea_serial_driver_node\" pkg=\"nmea_navsat_driver\" type=\"nmea_serial_driver\" output=\"screen\">\n+    <param name=\"port\" value=\"$(arg port)\"/>\n+    <param name=\"baud\" value=\"$(arg baud)\" />\n+    <param name=\"frame_id\" value=\"$(arg frame_id)\" />\n+    <param name=\"time_ref_source\" value=\"$(arg time_ref_source)\" />\n+    <param name=\"useRMC\" value=\"$(arg useRMC)\" />\n+  </node>\n+\n+</launch>"
+        }
+      ]
+    },
+    {
+      "author": "tonybaltovski",
+      "date": "2018-12-29T18:57:09Z",
+      "sha": "689936f115b8aa1cb917c6ba252469181a6a4784",
+      "message": "Removed roslint as build depend. (#59)\n\nroslint was accidentally re-added as a build dependency in #25.",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 2,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "8a44c388c8c2a4dfefb8fff42d2934ff175746c7",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 2,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/689936f115b8aa1cb917c6ba252469181a6a4784/package.xml",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/689936f115b8aa1cb917c6ba252469181a6a4784/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/package.xml?ref=689936f115b8aa1cb917c6ba252469181a6a4784",
+          "patch": "@@ -3,7 +3,7 @@\n   <name>nmea_navsat_driver</name>\n   <version>0.5.0</version>\n   <description>\n-    Package to parse NMEA strings and publish a very simple GPS message. Does not \n+    Package to parse NMEA strings and publish a very simple GPS message. Does not\n     require or use the GPSD deamon.\n   </description>\n \n@@ -17,7 +17,6 @@\n   <author>Steven Martin</author>\n \n   <buildtool_depend>catkin</buildtool_depend>\n-  <build_depend>roslint</build_depend>\n   <exec_depend>rospy</exec_depend>\n   <exec_depend>python-serial</exec_depend>\n   <exec_depend>geometry_msgs</exec_depend>"
+        }
+      ]
+    },
+    {
+      "author": "mr337",
+      "date": "2018-10-14T15:51:56Z",
+      "sha": "a3a3d10f7573ced06b13e879061896020e9adb12",
+      "message": "Publish heading (#25)\n\nAdd support for publishing heading from GPHDT as a `QuanternionStamped` message to a new topic `/heading`.",
+      "files_changed": 3,
+      "additions": 19,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "d86c9e42bd9c8f4166ac41cf474418862bf456bb",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/a3a3d10f7573ced06b13e879061896020e9adb12/package.xml",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/a3a3d10f7573ced06b13e879061896020e9adb12/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/package.xml?ref=a3a3d10f7573ced06b13e879061896020e9adb12",
+          "patch": "@@ -17,6 +17,7 @@\n   <author>Steven Martin</author>\n \n   <buildtool_depend>catkin</buildtool_depend>\n+  <build_depend>roslint</build_depend>\n   <exec_depend>rospy</exec_depend>\n   <exec_depend>python-serial</exec_depend>\n   <exec_depend>geometry_msgs</exec_depend>"
+        },
+        {
+          "sha": "fc899b47e726538e3ab304717a36b7dd32ec10de",
+          "filename": "src/libnmea_navsat_driver/driver.py",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 2,
+          "changes": 17,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/a3a3d10f7573ced06b13e879061896020e9adb12/src%2Flibnmea_navsat_driver%2Fdriver.py",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/a3a3d10f7573ced06b13e879061896020e9adb12/src%2Flibnmea_navsat_driver%2Fdriver.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/src%2Flibnmea_navsat_driver%2Fdriver.py?ref=a3a3d10f7573ced06b13e879061896020e9adb12",
+          "patch": "@@ -35,7 +35,8 @@\n import rospy\n \n from sensor_msgs.msg import NavSatFix, NavSatStatus, TimeReference\n-from geometry_msgs.msg import TwistStamped\n+from geometry_msgs.msg import TwistStamped, QuaternionStamped\n+from tf.transformations import quaternion_from_euler\n \n from libnmea_navsat_driver.checksum_utils import check_nmea_checksum\n import libnmea_navsat_driver.parser\n@@ -46,6 +47,7 @@ class RosNMEADriver(object):\n     def __init__(self):\n         self.fix_pub = rospy.Publisher('fix', NavSatFix, queue_size=1)\n         self.vel_pub = rospy.Publisher('vel', TwistStamped, queue_size=1)\n+        self.heading_pub = rospy.Publisher('heading', QuaternionStamped, queue_size=1)\n         self.time_ref_pub = rospy.Publisher('time_reference', TimeReference, queue_size=1)\n \n         self.time_ref_source = rospy.get_param('~time_ref_source', None)\n@@ -237,7 +239,18 @@ def add_sentence(self, nmea_string, frame_id, timestamp=None):\n             self.lon_std_dev = data['lon_std_dev']\n             self.lat_std_dev = data['lat_std_dev']\n             self.alt_std_dev = data['alt_std_dev']\n-\n+        elif 'HDT' in parsed_sentence:\n+            data = parsed_sentence['HDT']\n+            if data['heading']:\n+                current_heading = QuaternionStamped()\n+                current_heading.header.stamp = current_time\n+                current_heading.header.frame_id = frame_id\n+                q = quaternion_from_euler(0, 0, math.radians(data['heading']))\n+                current_heading.quaternion.x = q[0]\n+                current_heading.quaternion.y = q[1]\n+                current_heading.quaternion.z = q[2]\n+                current_heading.quaternion.w = q[3]\n+                self.heading_pub.publish(current_heading)\n         else:\n             return False\n "
+        },
+        {
+          "sha": "f468c1fb905d59a10572981bbfcffd7ea023bcfb",
+          "filename": "src/libnmea_navsat_driver/parser.py",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/a3a3d10f7573ced06b13e879061896020e9adb12/src%2Flibnmea_navsat_driver%2Fparser.py",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/a3a3d10f7573ced06b13e879061896020e9adb12/src%2Flibnmea_navsat_driver%2Fparser.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/src%2Flibnmea_navsat_driver%2Fparser.py?ref=a3a3d10f7573ced06b13e879061896020e9adb12",
+          "patch": "@@ -130,6 +130,9 @@ def convert_deg_to_rads(degs):\n         (\"lat_std_dev\", safe_float, 6),\n         (\"lon_std_dev\", safe_float, 7),\n         (\"alt_std_dev\", safe_float, 8),\n+        ],\n+    \"HDT\": [\n+        (\"heading\", safe_float, 1),\n         ]\n     }\n "
+        }
+      ]
+    },
+    {
+      "author": "Nick-Sullivan",
+      "date": "2018-08-28T23:11:25Z",
+      "sha": "c457319ecbb4ccd97c559a801d552fdc486b927c",
+      "message": "Improve Covariance Estimation (#46)\n\nUse GST covariance where available, otherwise uses default covariances estimated from fix type.\r\n\r\nThe previous implementation set covariance to HDOP^2. Instead, it should multiply that by the measurement variance. HDOP should be greater than 1.0.",
+      "files_changed": 3,
+      "additions": 110,
+      "deletions": 30,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "814fe71a15be73c4cdf2513861644dead1702055",
+          "filename": "scripts/nmea_topic_serial_reader",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/c457319ecbb4ccd97c559a801d552fdc486b927c/scripts%2Fnmea_topic_serial_reader",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/c457319ecbb4ccd97c559a801d552fdc486b927c/scripts%2Fnmea_topic_serial_reader",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/scripts%2Fnmea_topic_serial_reader?ref=c457319ecbb4ccd97c559a801d552fdc486b927c",
+          "patch": "@@ -42,7 +42,7 @@ from libnmea_navsat_driver.driver import RosNMEADriver\n if __name__ == '__main__':\n     rospy.init_node('nmea_topic_serial_reader')\n \n-    nmea_pub = rospy.Publisher(\"nmea_sentence\", Sentence)\n+    nmea_pub = rospy.Publisher(\"nmea_sentence\", Sentence, queue_size=1)\n \n     serial_port = rospy.get_param('~port','/dev/ttyUSB0')\n     serial_baud = rospy.get_param('~baud',4800)"
+        },
+        {
+          "sha": "d7989600f7ce0c97a3a102230cdc05594d907c74",
+          "filename": "src/libnmea_navsat_driver/driver.py",
+          "status": "modified",
+          "additions": 97,
+          "deletions": 27,
+          "changes": 124,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/c457319ecbb4ccd97c559a801d552fdc486b927c/src%2Flibnmea_navsat_driver%2Fdriver.py",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/c457319ecbb4ccd97c559a801d552fdc486b927c/src%2Flibnmea_navsat_driver%2Fdriver.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/src%2Flibnmea_navsat_driver%2Fdriver.py?ref=c457319ecbb4ccd97c559a801d552fdc486b927c",
+          "patch": "@@ -42,6 +42,7 @@\n \n \n class RosNMEADriver(object):\n+\n     def __init__(self):\n         self.fix_pub = rospy.Publisher('fix', NavSatFix, queue_size=1)\n         self.vel_pub = rospy.Publisher('vel', TwistStamped, queue_size=1)\n@@ -50,6 +51,67 @@ def __init__(self):\n         self.time_ref_source = rospy.get_param('~time_ref_source', None)\n         self.use_RMC = rospy.get_param('~useRMC', False)\n \n+        # epe = estimated position error\n+        self.default_epe_quality0 = rospy.get_param('~epe_quality0', 1000000)\n+        self.default_epe_quality1 = rospy.get_param('~epe_quality1', 4.0)\n+        self.default_epe_quality2 = rospy.get_param('~epe_quality2', 0.1)\n+        self.default_epe_quality4 = rospy.get_param('~epe_quality4', 0.02)\n+        self.default_epe_quality5 = rospy.get_param('~epe_quality5', 4.0)\n+        self.default_epe_quality9 = rospy.get_param('~epe_quality9', 3.0)\n+        self.using_receiver_epe = False\n+\n+        self.lon_std_dev = float(\"nan\")\n+        self.lat_std_dev = float(\"nan\")\n+        self.alt_std_dev = float(\"nan\")\n+\n+        \"\"\"Format for this dictionary is the fix type from a GGA message as the key, with\n+        each entry containing a tuple consisting of a default estimated\n+        position error, a NavSatStatus value, and a NavSatFix covariance value.\"\"\"\n+        self.gps_qualities = {\n+          # Unknown\n+          -1: [\n+              self.default_epe_quality0,\n+              NavSatStatus.STATUS_NO_FIX,\n+              NavSatFix.COVARIANCE_TYPE_UNKNOWN\n+              ],\n+          # Invalid\n+          0: [\n+              self.default_epe_quality0,\n+              NavSatStatus.STATUS_NO_FIX,\n+              NavSatFix.COVARIANCE_TYPE_UNKNOWN\n+              ],\n+          # SPS\n+          1: [\n+              self.default_epe_quality1,\n+              NavSatStatus.STATUS_FIX,\n+              NavSatFix.COVARIANCE_TYPE_APPROXIMATED\n+              ],\n+          # DGPS\n+          2: [\n+              self.default_epe_quality2,\n+              NavSatStatus.STATUS_SBAS_FIX,\n+              NavSatFix.COVARIANCE_TYPE_APPROXIMATED\n+              ],\n+          # RTK Fix\n+          4: [\n+              self.default_epe_quality4,\n+              NavSatStatus.STATUS_GBAS_FIX,\n+              NavSatFix.COVARIANCE_TYPE_APPROXIMATED\n+              ],\n+          # RTK Float\n+          5: [\n+              self.default_epe_quality5,\n+              NavSatStatus.STATUS_GBAS_FIX,\n+              NavSatFix.COVARIANCE_TYPE_APPROXIMATED\n+              ],\n+          # WAAS\n+          9: [\n+              self.default_epe_quality9,\n+              NavSatStatus.STATUS_GBAS_FIX,\n+              NavSatFix.COVARIANCE_TYPE_APPROXIMATED\n+              ]\n+          }\n+\n     # Returns True if we successfully did something with the passed in\n     # nmea_string\n     def add_sentence(self, nmea_string, frame_id, timestamp=None):\n@@ -60,7 +122,7 @@ def add_sentence(self, nmea_string, frame_id, timestamp=None):\n \n         parsed_sentence = libnmea_navsat_driver.parser.parse_nmea_sentence(nmea_string)\n         if not parsed_sentence:\n-            rospy.logdebug(\"Failed to parse NMEA sentence. Sentece was: %s\" % nmea_string)\n+            rospy.logdebug(\"Failed to parse NMEA sentence. Sentence was: %s\" % nmea_string)\n             return False\n \n         if timestamp:\n@@ -79,27 +141,19 @@ def add_sentence(self, nmea_string, frame_id, timestamp=None):\n             current_time_ref.source = frame_id\n \n         if not self.use_RMC and 'GGA' in parsed_sentence:\n-            data = parsed_sentence['GGA']\n-            gps_qual = data['fix_type']\n-            if gps_qual == 0:\n-                current_fix.status.status = NavSatStatus.STATUS_NO_FIX\n-            elif gps_qual == 1:\n-                current_fix.status.status = NavSatStatus.STATUS_FIX\n-            elif gps_qual == 2:\n-                current_fix.status.status = NavSatStatus.STATUS_SBAS_FIX\n-            elif gps_qual in (4, 5):\n-                current_fix.status.status = NavSatStatus.STATUS_GBAS_FIX\n-            elif gps_qual == 9:\n-                # Support specifically for NOVATEL OEM4 recievers which report WAAS fix as 9\n-                # http://www.novatel.com/support/known-solutions/which-novatel-position-types-correspond-to-the-gga-quality-indicator/\n-                current_fix.status.status = NavSatStatus.STATUS_SBAS_FIX\n-            else:\n-                current_fix.status.status = NavSatStatus.STATUS_NO_FIX\n+            current_fix.position_covariance_type = \\\n+                NavSatFix.COVARIANCE_TYPE_APPROXIMATED\n \n+            data = parsed_sentence['GGA']\n+            fix_type = data['fix_type']\n+            if not (fix_type in self.gps_qualities):\n+              fix_type = -1\n+            gps_qual = self.gps_qualities[fix_type]\n+            default_epe = gps_qual[0];\n+            current_fix.status.status = gps_qual[1]\n+            current_fix.position_covariance_type = gps_qual[2];\n             current_fix.status.service = NavSatStatus.SERVICE_GPS\n \n-            current_fix.header.stamp = current_time\n-\n             latitude = data['latitude']\n             if data['latitude_direction'] == 'S':\n                 latitude = -latitude\n@@ -110,16 +164,23 @@ def add_sentence(self, nmea_string, frame_id, timestamp=None):\n                 longitude = -longitude\n             current_fix.longitude = longitude\n \n-            hdop = data['hdop']\n-            current_fix.position_covariance[0] = hdop ** 2\n-            current_fix.position_covariance[4] = hdop ** 2\n-            current_fix.position_covariance[8] = (2 * hdop) ** 2  # FIXME\n-            current_fix.position_covariance_type = \\\n-                NavSatFix.COVARIANCE_TYPE_APPROXIMATED\n-\n-            altitude = data['altitude']\n+            # Altitude is above ellipsoid, so adjust for mean-sea-level\n+            altitude = data['altitude'] + data['mean_sea_level']\n             current_fix.altitude = altitude\n \n+            # use default epe std_dev unless we've received a GST sentence with epes\n+            if not self.using_receiver_epe or math.isnan(self.lon_std_dev):\n+                self.lon_std_dev = default_epe\n+            if not self.using_receiver_epe or math.isnan(self.lat_std_dev):\n+                self.lat_std_dev = default_epe\n+            if not self.using_receiver_epe or math.isnan(self.alt_std_dev):\n+                self.alt_std_dev = default_epe * 2\n+\n+            hdop = data['hdop']\n+            current_fix.position_covariance[0] = (hdop * self.lon_std_dev) ** 2\n+            current_fix.position_covariance[4] = (hdop * self.lat_std_dev) ** 2\n+            current_fix.position_covariance[8] = (2 * hdop * self.alt_std_dev) ** 2  # FIXME\n+\n             self.fix_pub.publish(current_fix)\n \n             if not math.isnan(data['utc_time']):\n@@ -168,6 +229,15 @@ def add_sentence(self, nmea_string, frame_id, timestamp=None):\n                 current_vel.twist.linear.y = data['speed'] * \\\n                     math.cos(data['true_course'])\n                 self.vel_pub.publish(current_vel)\n+        elif 'GST' in parsed_sentence:\n+            data = parsed_sentence['GST']\n+\n+            # Use receiver-provided error estimate if available\n+            self.using_receiver_epe = True\n+            self.lon_std_dev = data['lon_std_dev']\n+            self.lat_std_dev = data['lat_std_dev']\n+            self.alt_std_dev = data['alt_std_dev']\n+\n         else:\n             return False\n "
+        },
+        {
+          "sha": "36c0df3ba6aaa26d4a4fe23144c98120893af849",
+          "filename": "src/libnmea_navsat_driver/parser.py",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 2,
+          "changes": 14,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/c457319ecbb4ccd97c559a801d552fdc486b927c/src%2Flibnmea_navsat_driver%2Fparser.py",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/c457319ecbb4ccd97c559a801d552fdc486b927c/src%2Flibnmea_navsat_driver%2Fparser.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/src%2Flibnmea_navsat_driver%2Fparser.py?ref=c457319ecbb4ccd97c559a801d552fdc486b927c",
+          "patch": "@@ -95,8 +95,8 @@ def convert_knots_to_mps(knots):\n def convert_deg_to_rads(degs):\n     return math.radians(safe_float(degs))\n \n-\"\"\"Format for this is a sentence identifier (e.g. \"GGA\") as the key, with a\n-tuple of tuples where each tuple is a field name, conversion function and index\n+\"\"\"Format for this dictionary is a sentence identifier (e.g. \"GGA\") as the key, with a\n+list of tuples where each tuple is a field name, conversion function and index\n into the split sentence\"\"\"\n parse_maps = {\n     \"GGA\": [\n@@ -120,6 +120,16 @@ def convert_deg_to_rads(degs):\n         (\"longitude_direction\", str, 6),\n         (\"speed\", convert_knots_to_mps, 7),\n         (\"true_course\", convert_deg_to_rads, 8),\n+        ],\n+    \"GST\": [\n+        (\"utc_time\", convert_time, 1),\n+        (\"ranges_std_dev\", safe_float, 2),\n+        (\"semi_major_ellipse_std_dev\", safe_float, 3),\n+        (\"semi_minor_ellipse_std_dev\", safe_float, 4),\n+        (\"semi_major_orientation\", safe_float, 5),\n+        (\"lat_std_dev\", safe_float, 6),\n+        (\"lon_std_dev\", safe_float, 7),\n+        (\"alt_std_dev\", safe_float, 8),\n         ]\n     }\n "
+        }
+      ]
+    },
+    {
+      "author": "LoyVanBeek",
+      "date": "2018-08-26T20:53:07Z",
+      "sha": "e36f9cd1efd7bb4624305e83d98631afe65921d6",
+      "message": "Add Socket Driver (#32)\n\nAdd a NMEA socket driver node, which is like the existing serial driver node, but instead of attaching to a TTY handle from a serial port, it listens to a UDP port for NMEA sentences.",
+      "files_changed": 3,
+      "additions": 98,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "903506a0c0308c73b4d7a4e85ff2806ff3f40e06",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/e36f9cd1efd7bb4624305e83d98631afe65921d6/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/e36f9cd1efd7bb4624305e83d98631afe65921d6/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/CMakeLists.txt?ref=e36f9cd1efd7bb4624305e83d98631afe65921d6",
+          "patch": "@@ -8,6 +8,7 @@ catkin_package()\n \n install(PROGRAMS\n    scripts/nmea_serial_driver\n+   scripts/nmea_socket_driver\n    scripts/nmea_topic_driver\n    scripts/nmea_topic_serial_reader\n    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}"
+        },
+        {
+          "sha": "9bde855fe8c8c2451203245723e4d05c0b586149",
+          "filename": "scripts/nmea_socket_driver",
+          "status": "added",
+          "additions": 96,
+          "deletions": 0,
+          "changes": 96,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/e36f9cd1efd7bb4624305e83d98631afe65921d6/scripts%2Fnmea_socket_driver",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/e36f9cd1efd7bb4624305e83d98631afe65921d6/scripts%2Fnmea_socket_driver",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/scripts%2Fnmea_socket_driver?ref=e36f9cd1efd7bb4624305e83d98631afe65921d6",
+          "patch": "@@ -0,0 +1,96 @@\n+#! /usr/bin/env python\n+\n+# Software License Agreement (BSD License)\n+#\n+# Copyright (c) 2016, Rein Appeldoorn\n+# All rights reserved.\n+#\n+# Redistribution and use in source and binary forms, with or without\n+# modification, are permitted provided that the following conditions\n+# are met:\n+#\n+#  * Redistributions of source code must retain the above copyright\n+#    notice, this list of conditions and the following disclaimer.\n+#  * Redistributions in binary form must reproduce the above\n+#    copyright notice, this list of conditions and the following\n+#    disclaimer in the documentation and/or other materials provided\n+#    with the distribution.\n+#  * Neither the names of the authors nor the names of their\n+#    affiliated organizations may be used to endorse or promote products derived\n+#    from this software without specific prior written permission.\n+#\n+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n+# \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS\n+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\n+# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,\n+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,\n+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\n+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN\n+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+# POSSIBILITY OF SUCH DAMAGE.\n+\n+import socket\n+import sys\n+\n+import rospy\n+\n+import libnmea_navsat_driver.driver\n+\n+if __name__ == '__main__':\n+    rospy.init_node('nmea_socket_driver')\n+\n+    try:\n+        local_ip = rospy.get_param('~ip', '0.0.0.0')\n+        local_port = rospy.get_param('~port', 10110)\n+        buffer_size = rospy.get_param('~buffer_size', 4096)\n+        timeout = rospy.get_param('~timeout_sec', 2)\n+    except KeyError as e:\n+        rospy.logerr(\"Parameter %s not found\" % e)\n+        sys.exit(1)\n+\n+    frame_id = libnmea_navsat_driver.driver.RosNMEADriver.get_frame_id()\n+\n+    driver = libnmea_navsat_driver.driver.RosNMEADriver()\n+\n+    # Connection-loop: connect and keep receiving. If receiving fails, reconnect\n+    while not rospy.is_shutdown():\n+        try:\n+            # Create a socket\n+            socket_ = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)\n+\n+            # Bind the socket to the port\n+            socket_.bind((local_ip, local_port))\n+\n+            # Set timeout\n+            socket_.settimeout(timeout)\n+        except socket.error, exc:\n+            rospy.logerr(\"Caught exception socket.error when setting up socket: %s\" % exc)\n+            sys.exit(1)\n+\n+        # recv-loop: When we're connected, keep receiving stuff until that fails\n+        while not rospy.is_shutdown():\n+            try:\n+                data, remote_address = socket_.recvfrom(buffer_size)\n+\n+                # strip the data\n+                data_list = data.strip().split(\"\\n\")\n+\n+                for data in data_list:\n+\n+                    try:\n+                        driver.add_sentence(data, frame_id)\n+                    except ValueError as e:\n+                        rospy.logwarn(\"Value error, likely due to missing fields in the NMEA message. \"\n+                                    \"Error was: %s. Please report this issue at github.com/ros-drivers/nmea_navsat_driver, \"\n+                                    \"including a bag file with the NMEA sentences that caused it.\" % e)\n+\n+            except socket.error, exc:\n+                rospy.logerr(\"Caught exception socket.error during recvfrom: %s\" % exc)\n+                socket_.close()\n+                # This will break out of the recv-loop so we start another iteration of the connection-loop\n+                break\n+\n+        socket_.close()  # Close socket"
+        },
+        {
+          "sha": "1986e4c9666a05770ced4fa2f51e11ce38926627",
+          "filename": "src/libnmea_navsat_driver/parser.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/e36f9cd1efd7bb4624305e83d98631afe65921d6/src%2Flibnmea_navsat_driver%2Fparser.py",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/e36f9cd1efd7bb4624305e83d98631afe65921d6/src%2Flibnmea_navsat_driver%2Fparser.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/src%2Flibnmea_navsat_driver%2Fparser.py?ref=e36f9cd1efd7bb4624305e83d98631afe65921d6",
+          "patch": "@@ -126,6 +126,7 @@ def convert_deg_to_rads(degs):\n \n def parse_nmea_sentence(nmea_sentence):\n     # Check for a valid nmea sentence\n+\n     if not re.match('(^\\$GP|^\\$GN|^\\$GL).*\\*[0-9A-Fa-f]{2}$', nmea_sentence):\n         logger.debug(\"Regex didn't match, sentence not valid NMEA? Sentence was: %s\"\n                      % repr(nmea_sentence))"
+        }
+      ]
+    },
+    {
+      "author": "Vikrant Shah",
+      "date": "2018-08-25T02:20:41Z",
+      "sha": "9fb652d04ba2b71533724b265b360a11ad52d679",
+      "message": "Add code to handle serial exception to allow node to exit cleanly (#52)\n\n- Catch Serial exceptions and exit cleanly, instead of printing Python stack trace.\r\n- Catch Serial exception when opening the serial port, log a FATAL message, and exit instead of printing Python stack trace.",
+      "files_changed": 1,
+      "additions": 16,
+      "deletions": 10,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "ae6e01686deda4fdc1f4a05075e238969ac0538e",
+          "filename": "scripts/nmea_serial_driver",
+          "status": "modified",
+          "additions": 16,
+          "deletions": 10,
+          "changes": 26,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/9fb652d04ba2b71533724b265b360a11ad52d679/scripts%2Fnmea_serial_driver",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/9fb652d04ba2b71533724b265b360a11ad52d679/scripts%2Fnmea_serial_driver",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/scripts%2Fnmea_serial_driver?ref=9fb652d04ba2b71533724b265b360a11ad52d679",
+          "patch": "@@ -38,6 +38,8 @@ import rospy\n \n import libnmea_navsat_driver.driver\n \n+import sys\n+\n if __name__ == '__main__':\n     rospy.init_node('nmea_serial_driver')\n \n@@ -47,13 +49,17 @@ if __name__ == '__main__':\n \n     try:\n         GPS = serial.Serial(port=serial_port, baudrate=serial_baud, timeout=2)\n-        driver = libnmea_navsat_driver.driver.RosNMEADriver()\n-        while not rospy.is_shutdown():\n-            data = GPS.readline().strip()\n-            try:\n-                driver.add_sentence(data, frame_id)\n-            except ValueError as e:\n-                rospy.logwarn(\"Value error, likely due to missing fields in the NMEA message. Error was: %s. Please report this issue at github.com/ros-drivers/nmea_navsat_driver, including a bag file with the NMEA sentences that caused it.\" % e)\n-\n-    except rospy.ROSInterruptException:\n-        GPS.close() #Close GPS serial port\n+\n+        try:\n+            driver = libnmea_navsat_driver.driver.RosNMEADriver()\n+            while not rospy.is_shutdown():\n+                data = GPS.readline().strip()\n+                try:\n+                    driver.add_sentence(data, frame_id)\n+                except ValueError as e:\n+                    rospy.logwarn(\"Value error, likely due to missing fields in the NMEA message. Error was: %s. Please report this issue at github.com/ros-drivers/nmea_navsat_driver, including a bag file with the NMEA sentences that caused it.\" % e)\n+\n+        except (rospy.ROSInterruptException, serial.serialutil.SerialException):\n+            GPS.close() #Close GPS serial port\n+    except serial.SerialException as ex:\n+        rospy.logfatal(\"Could not open serial port: I/O error({0}): {1}\".format(ex.errno, ex.strerror))"
+        }
+      ]
+    },
+    {
+      "author": "anlif",
+      "date": "2018-08-14T15:40:43Z",
+      "sha": "12dd9d759b7cc9e506bc398f7896d883fccfa7df",
+      "message": "Remove MSL compensation (#36)\n\nFix for #29 Altitude vs Elipsoid Height.",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "8b7e8e9a822b1e3f8fed4148fa85178a692dc22e",
+          "filename": "src/libnmea_navsat_driver/driver.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 2,
+          "changes": 3,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/12dd9d759b7cc9e506bc398f7896d883fccfa7df/src%2Flibnmea_navsat_driver%2Fdriver.py",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/12dd9d759b7cc9e506bc398f7896d883fccfa7df/src%2Flibnmea_navsat_driver%2Fdriver.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/src%2Flibnmea_navsat_driver%2Fdriver.py?ref=12dd9d759b7cc9e506bc398f7896d883fccfa7df",
+          "patch": "@@ -117,8 +117,7 @@ def add_sentence(self, nmea_string, frame_id, timestamp=None):\n             current_fix.position_covariance_type = \\\n                 NavSatFix.COVARIANCE_TYPE_APPROXIMATED\n \n-            # Altitude is above ellipsoid, so adjust for mean-sea-level\n-            altitude = data['altitude'] + data['mean_sea_level']\n+            altitude = data['altitude']\n             current_fix.altitude = altitude\n \n             self.fix_pub.publish(current_fix)"
+        }
+      ]
+    },
+    {
+      "author": "mikepurvis",
+      "date": "2013-09-13T17:48:46Z",
+      "sha": "09ade02b1e1260074b3df7505ed1b54616279adf",
+      "message": "Publish vel from RMC even in GGA mode.",
+      "files_changed": 1,
+      "additions": 23,
+      "deletions": 20,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "1b2fb9a702ed87447448f04649299048921c3434",
+          "filename": "src/libnmea_navsat_driver/driver.py",
+          "status": "modified",
+          "additions": 23,
+          "deletions": 20,
+          "changes": 43,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/09ade02b1e1260074b3df7505ed1b54616279adf/src%2Flibnmea_navsat_driver%2Fdriver.py",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/09ade02b1e1260074b3df7505ed1b54616279adf/src%2Flibnmea_navsat_driver%2Fdriver.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/src%2Flibnmea_navsat_driver%2Fdriver.py?ref=09ade02b1e1260074b3df7505ed1b54616279adf",
+          "patch": "@@ -123,35 +123,38 @@ def add_sentence(self, nmea_string, frame_id, timestamp=None):\n             self.fix_pub.publish(current_fix)\n             self.time_ref_pub.publish(current_time_ref)\n \n-        elif self.use_RMC and 'RMC' in parsed_sentence:\n+        elif 'RMC' in parsed_sentence:\n             data = parsed_sentence['RMC']\n \n-            if data['fix_valid']:\n-                current_fix.status.status = NavSatStatus.STATUS_FIX\n-            else:\n-                current_fix.status.status = NavSatStatus.STATUS_NO_FIX\n+            # Only publish a fix from RMC if the use_RMC flag is set.\n+            if self.use_RMC:\n+                if data['fix_valid']:\n+                    current_fix.status.status = NavSatStatus.STATUS_FIX\n+                else:\n+                    current_fix.status.status = NavSatStatus.STATUS_NO_FIX\n \n-            current_fix.status.service = NavSatStatus.SERVICE_GPS\n+                current_fix.status.service = NavSatStatus.SERVICE_GPS\n \n-            latitude = data['latitude']\n-            if data['latitude_direction'] == 'S':\n-                latitude = -latitude\n-            current_fix.latitude = latitude\n+                latitude = data['latitude']\n+                if data['latitude_direction'] == 'S':\n+                    latitude = -latitude\n+                current_fix.latitude = latitude\n \n-            longitude = data['longitude']\n-            if data['longitude_direction'] == 'W':\n-                longitude = -longitude\n-            current_fix.longitude = longitude\n+                longitude = data['longitude']\n+                if data['longitude_direction'] == 'W':\n+                    longitude = -longitude\n+                current_fix.longitude = longitude\n \n-            current_fix.altitude = float('NaN')\n-            current_fix.position_covariance_type = \\\n-                NavSatFix.COVARIANCE_TYPE_UNKNOWN\n+                current_fix.altitude = float('NaN')\n+                current_fix.position_covariance_type = \\\n+                    NavSatFix.COVARIANCE_TYPE_UNKNOWN\n \n-            current_time_ref.time_ref = rospy.Time.from_sec(data['utc_time'])\n+                current_time_ref.time_ref = rospy.Time.from_sec(data['utc_time'])\n \n-            self.fix_pub.publish(current_fix)\n-            self.time_ref_pub.publish(current_time_ref)\n+                self.fix_pub.publish(current_fix)\n+                self.time_ref_pub.publish(current_time_ref)\n \n+            # Publish velocity from RMC regardless, since GGA doesn't provide it.\n             if data['fix_valid']:\n                 current_vel = TwistStamped()\n                 current_vel.header.stamp = current_time"
+        }
+      ]
+    },
+    {
+      "author": "ericperko",
+      "date": "2013-07-21T18:36:49Z",
+      "sha": "052f243b13a68d903a89b9cd7d60828d14142d5e",
+      "message": "Initial commit",
+      "files_changed": 5,
+      "additions": 240,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "b788c224510234c4b953e85c845006d9607ccaa2",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/052f243b13a68d903a89b9cd7d60828d14142d5e/.gitignore",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/052f243b13a68d903a89b9cd7d60828d14142d5e/.gitignore",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/.gitignore?ref=052f243b13a68d903a89b9cd7d60828d14142d5e",
+          "patch": "@@ -0,0 +1,4 @@\n+build/\n+*.pyc\n+*.pyo\n+*.swp"
+        },
+        {
+          "sha": "efd26361841a1b13ef56e873ec8e7f8cdb37250a",
+          "filename": "CHANGELOG.rst",
+          "status": "added",
+          "additions": 27,
+          "deletions": 0,
+          "changes": 27,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/052f243b13a68d903a89b9cd7d60828d14142d5e/CHANGELOG.rst",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/052f243b13a68d903a89b9cd7d60828d14142d5e/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/CHANGELOG.rst?ref=052f243b13a68d903a89b9cd7d60828d14142d5e",
+          "patch": "@@ -0,0 +1,27 @@\n+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n+Change log for nmea_navsat_driver package\n+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n+\n+0.3.2 (2013-07-21)\n+-------------------\n+* Moved to nmea_navsat_driver package\n+\n+0.3.1 (2013-05-07)\n+-------------------\n+* Removed incorrect find_package dependencies\n+\n+0.3.0 (2013-05-05)\n+-------------------\n+* Initial release for Hydro\n+* Converted to Catkin\n+* nmea_gps_driver.py is now deprecated and will be removed in I-Turtle. Replacement node is nmea_serial_driver.py .\n+* Refactored code into NMEA parser, common ROS driver and separate nodes for reading directly from serial or from topic.\n+* Bugs fixed:\n+\n+  - nmea_gps_driver crashes when a sentence doesn't have a checksum * character ( http://kforge.ros.org/gpsdrivers/trac/ticket/4 )\n+  - Add ability for nmea_gps_driver to support reading from string topic ( https://github.com/ros-drivers/nmea_gps_driver/issues/1 ). Use the nmea_topic_driver.py node to get this support.\n+\n+0.2.0 (2012-03-15)\n+------------------\n+* Initial version (released into Fuerte)\n+* Supports GGA or RMC+GSA sentences to generate sensor_msgs/NavSatFix messages"
+        },
+        {
+          "sha": "0604a0240fd0560bdefa67833fca313f625d2884",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 138,
+          "deletions": 0,
+          "changes": 138,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/052f243b13a68d903a89b9cd7d60828d14142d5e/CMakeLists.txt",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/052f243b13a68d903a89b9cd7d60828d14142d5e/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/CMakeLists.txt?ref=052f243b13a68d903a89b9cd7d60828d14142d5e",
+          "patch": "@@ -0,0 +1,138 @@\n+cmake_minimum_required(VERSION 2.8.3)\n+project(nmea_navsat_driver)\n+\n+## Find catkin macros and libraries\n+## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)\n+## is used, also find other catkin packages\n+find_package(catkin REQUIRED COMPONENTS geometry_msgs nmea_msgs sensor_msgs)\n+\n+## System dependencies are found with CMake's conventions\n+# find_package(Boost REQUIRED COMPONENTS system)\n+\n+\n+## Uncomment this if the package has a setup.py. This macro ensures\n+## modules and global scripts declared therein get installed\n+## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html\n+catkin_python_setup()\n+\n+#######################################\n+## Declare ROS messages and services ##\n+#######################################\n+\n+## Generate messages in the 'msg' folder\n+# add_message_files(\n+#   FILES\n+#   Message1.msg\n+#   Message2.msg\n+# )\n+\n+## Generate services in the 'srv' folder\n+# add_service_files(\n+#   FILES\n+#   Service1.srv\n+#   Service2.srv\n+# )\n+\n+## Generate added messages and services with any dependencies listed here\n+# generate_messages(\n+#   DEPENDENCIES\n+#   geometry_msgs#   nmea_msgs#   sensor_msgs\n+# )\n+\n+###################################\n+## catkin specific configuration ##\n+###################################\n+## The catkin_package macro generates cmake config files for your package\n+## Declare things to be passed to dependent projects\n+## INCLUDE_DIRS: uncomment this if you package contains header files\n+## LIBRARIES: libraries you create in this project that dependent projects also need\n+## CATKIN_DEPENDS: catkin_packages dependent projects also need\n+## DEPENDS: system dependencies of this project that dependent projects also need\n+catkin_package(\n+  CATKIN_DEPENDS geometry_msgs nmea_msgs sensor_msgs\n+)\n+\n+###########\n+## Build ##\n+###########\n+\n+## Specify additional locations of header files\n+## Your package locations should be listed before other locations\n+# include_directories(include)\n+include_directories(\n+  ${catkin_INCLUDE_DIRS}\n+)\n+\n+## Declare a cpp library\n+# add_library(nmea_navsat_driver\n+#   src/${PROJECT_NAME}/nmea_navsat_driver.cpp\n+# )\n+\n+## Declare a cpp executable\n+# add_executable(nmea_navsat_driver_node src/nmea_navsat_driver_node.cpp)\n+\n+## Add cmake target dependencies of the executable/library\n+## as an example, message headers may need to be generated before nodes\n+# add_dependencies(nmea_navsat_driver_node nmea_navsat_driver_generate_messages_cpp)\n+\n+## Specify libraries to link a library or executable target against\n+# target_link_libraries(nmea_navsat_driver_node\n+#   ${catkin_LIBRARIES}\n+# )\n+\n+#############\n+## Install ##\n+#############\n+\n+# all install targets should use catkin DESTINATION variables\n+# See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html\n+\n+## Mark executable scripts (Python etc.) for installation\n+## not required for python when using catkin_python_setup()\n+ install(PROGRAMS\n+   scripts/nmea_serial_driver\n+   scripts/nmea_topic_driver\n+   scripts/nmea_topic_serial_reader\n+   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n+ )\n+\n+## Mark executable scripts (Python etc.) for installation\n+## in contrast to setup.py, you can choose the destination\n+# install(PROGRAMS\n+#   scripts/my_python_script\n+#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n+# )\n+\n+## Mark executables and/or libraries for installation\n+# install(TARGETS nmea_navsat_driver nmea_navsat_driver_node\n+#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n+#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n+#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n+# )\n+\n+## Mark cpp header files for installation\n+# install(DIRECTORY include/${PROJECT_NAME}/\n+#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}\n+#   FILES_MATCHING PATTERN \"*.h\"\n+#   PATTERN \".svn\" EXCLUDE\n+# )\n+\n+## Mark other files for installation (e.g. launch and bag files, etc.)\n+# install(FILES\n+#   # myfile1\n+#   # myfile2\n+#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}\n+# )\n+\n+#############\n+## Testing ##\n+#############\n+\n+## Add gtest based cpp test target and link libraries\n+# catkin_add_gtest(${PROJECT_NAME}-test test/test_nmea_navsat_driver.cpp)\n+# if(TARGET ${PROJECT_NAME}-test)\n+#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})\n+# endif()\n+\n+## Add folders to be run by python nosetests\n+# catkin_add_nosetests(test)"
+        },
+        {
+          "sha": "7cfdf43f70898bcd0b4d00e15a117e1866eeba2b",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 62,
+          "deletions": 0,
+          "changes": 62,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/052f243b13a68d903a89b9cd7d60828d14142d5e/package.xml",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/052f243b13a68d903a89b9cd7d60828d14142d5e/package.xml",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/package.xml?ref=052f243b13a68d903a89b9cd7d60828d14142d5e",
+          "patch": "@@ -0,0 +1,62 @@\n+<?xml version=\"1.0\"?>\n+<package>\n+  <name>nmea_navsat_driver</name>\n+  <version>0.3.2</version>\n+  <description>\n+\tPackage to parse NMEA strings and publish a very simple GPS messgae. Does not require the GPSD deamon.\n+  </description>\n+\n+  <!-- One maintainer tag required, multiple allowed, one person per tag --> \n+  <maintainer email=\"eric@ericperko.com\">Eric Perko</maintainer>\n+\n+\n+  <!-- One license tag required, multiple allowed, one license per tag -->\n+  <!-- Commonly used license strings: -->\n+  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->\n+  <license>BSD</license>\n+\n+\n+  <!-- Url tags are optional, but mutiple are allowed, one per tag -->\n+  <!-- Optional attribute type can be: website, bugtracker, or repository -->\n+  <url type=\"website\">http://ros.org/wiki/nmea_navsat_driver</url>\n+\n+\n+  <!-- Author tags are optional, mutiple are allowed, one per tag -->\n+  <!-- Authors do not have to be maintianers, but could be -->\n+  <author email=\"eric@ericperko.com\">Eric Perko</author>\n+  <author>Steven Martin</author>\n+\n+  <!-- The *_depend tags are used to specify dependencies -->\n+  <!-- Dependencies can be catkin packages or system dependencies -->\n+  <!-- Examples: -->\n+  <!-- Use build_depend for packages you need at compile time: -->\n+  <!--   <build_depend>message_generation</build_depend> -->\n+  <!-- Use buildtool_depend for build tool packages: -->\n+  <!--   <buildtool_depend>catkin</buildtool_depend> -->\n+  <!-- Use run_depend for packages you need at runtime: -->\n+  <!--   <run_depend>message_runtime</run_depend> -->\n+  <!-- Use test_depend for packages you need only for testing: -->\n+  <!--   <test_depend>gtest</test_depend> -->\n+  <buildtool_depend>catkin</buildtool_depend>\n+  <build_depend>geometry_msgs</build_depend>\n+  <build_depend>nmea_msgs</build_depend>\n+  <build_depend>sensor_msgs</build_depend>\n+  <run_depend>rospy</run_depend>\n+  <run_depend>python-serial</run_depend>\n+  <run_depend>geometry_msgs</run_depend>\n+  <run_depend>nmea_msgs</run_depend>\n+  <run_depend>sensor_msgs</run_depend>\n+\n+\n+  <!-- The export tag contains other, unspecified, tags -->\n+  <export>\n+    <!-- This is a pure Python package, so mark it architecture independent -->\n+    <architecture_independent/>\n+\n+    <!-- You can specify that this package is a metapackage here: -->\n+    <!-- <metapackage/> -->\n+\n+    <!-- Other tools can request additional information be placed here -->\n+\n+  </export>\n+</package>"
+        },
+        {
+          "sha": "fe6c02e9472528112c945d0802832ef90c6af5bc",
+          "filename": "setup.py",
+          "status": "added",
+          "additions": 9,
+          "deletions": 0,
+          "changes": 9,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/052f243b13a68d903a89b9cd7d60828d14142d5e/setup.py",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/052f243b13a68d903a89b9cd7d60828d14142d5e/setup.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/setup.py?ref=052f243b13a68d903a89b9cd7d60828d14142d5e",
+          "patch": "@@ -0,0 +1,9 @@\n+from distutils.core import setup\n+from catkin_pkg.python_setup import generate_distutils_setup\n+\n+d = generate_distutils_setup(\n+        packages=['libnmea_navsat_driver'],\n+        package_dir={ '' : 'src' }\n+    )\n+\n+setup(**d)"
+        }
+      ]
+    },
+    {
+      "author": "roehling",
+      "date": "2016-06-17T10:03:57Z",
+      "sha": "904ea247aa0c5305facf71811defc846394b28d3",
+      "message": "Add GLONASS support\n\nGLONASS capable devices send different NMEA sentences, which are\nbasically identical to the GPS sentences, but with other prefixes.",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "8b5ab7380f79c1ed266b6c165c0fe5010aca4b0d",
+          "filename": "src/libnmea_navsat_driver/parser.py",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/904ea247aa0c5305facf71811defc846394b28d3/src%2Flibnmea_navsat_driver%2Fparser.py",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/904ea247aa0c5305facf71811defc846394b28d3/src%2Flibnmea_navsat_driver%2Fparser.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/src%2Flibnmea_navsat_driver%2Fparser.py?ref=904ea247aa0c5305facf71811defc846394b28d3",
+          "patch": "@@ -126,7 +126,7 @@ def convert_deg_to_rads(degs):\n \n def parse_nmea_sentence(nmea_sentence):\n     # Check for a valid nmea sentence\n-    if not re.match('^\\$GP.*\\*[0-9A-Fa-f]{2}$', nmea_sentence):\n+    if not re.match('(^\\$GP|^\\$GN|^\\$GL).*\\*[0-9A-Fa-f]{2}$', nmea_sentence):\n         logger.debug(\"Regex didn't match, sentence not valid NMEA? Sentence was: %s\"\n                      % repr(nmea_sentence))\n         return False"
+        }
+      ]
+    },
+    {
+      "author": "baronep",
+      "date": "2016-04-07T21:30:01Z",
+      "sha": "70704649ea88eeedf3ed2a6ec7f049f2c050f3cd",
+      "message": "Updated driver to accept status of 9 which some novatel recievers report for a WAAS (SBAS) fix.\n\nSee http://www.novatel.com/support/known-solutions/which-novatel-position-types-correspond-to-the-gga-quality-indicator/",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "ad506ce8e7eb8ada2463dadc05568c130d68dc54",
+          "filename": "src/libnmea_navsat_driver/driver.py",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/ros-drivers/nmea_navsat_driver/blob/70704649ea88eeedf3ed2a6ec7f049f2c050f3cd/src%2Flibnmea_navsat_driver%2Fdriver.py",
+          "raw_url": "https://github.com/ros-drivers/nmea_navsat_driver/raw/70704649ea88eeedf3ed2a6ec7f049f2c050f3cd/src%2Flibnmea_navsat_driver%2Fdriver.py",
+          "contents_url": "https://api.github.com/repos/ros-drivers/nmea_navsat_driver/contents/src%2Flibnmea_navsat_driver%2Fdriver.py?ref=70704649ea88eeedf3ed2a6ec7f049f2c050f3cd",
+          "patch": "@@ -89,6 +89,10 @@ def add_sentence(self, nmea_string, frame_id, timestamp=None):\n                 current_fix.status.status = NavSatStatus.STATUS_SBAS_FIX\n             elif gps_qual in (4, 5):\n                 current_fix.status.status = NavSatStatus.STATUS_GBAS_FIX\n+            elif gps_qual == 9:\n+                # Support specifically for NOVATEL OEM4 recievers which report WAAS fix as 9\n+                # http://www.novatel.com/support/known-solutions/which-novatel-position-types-correspond-to-the-gga-quality-indicator/\n+                current_fix.status.status = NavSatStatus.STATUS_SBAS_FIX\n             else:\n                 current_fix.status.status = NavSatStatus.STATUS_NO_FIX\n "
+        }
+      ]
+    }
+  ]
+}

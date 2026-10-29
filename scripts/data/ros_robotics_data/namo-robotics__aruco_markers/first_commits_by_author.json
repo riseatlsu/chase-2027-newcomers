@@ -1,0 +1,131 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T03:57:12Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "namo-robotics",
+    "repo": "aruco_markers"
+  },
+  "data": [
+    {
+      "author": "David Brown",
+      "date": "2025-01-13T14:51:20Z",
+      "sha": "7722e40fb30ae7afa1fe3e26ee9fbc06a57732d0",
+      "message": "first commit",
+      "files_changed": 6,
+      "additions": 283,
+      "deletions": 10,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "6ea6e617a18693797829485fb0a20dc38d5f0a16",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/namo-robotics/aruco_markers/blob/7722e40fb30ae7afa1fe3e26ee9fbc06a57732d0/.gitignore",
+          "raw_url": "https://github.com/namo-robotics/aruco_markers/raw/7722e40fb30ae7afa1fe3e26ee9fbc06a57732d0/.gitignore",
+          "contents_url": "https://api.github.com/repos/namo-robotics/aruco_markers/contents/.gitignore?ref=7722e40fb30ae7afa1fe3e26ee9fbc06a57732d0",
+          "patch": "@@ -0,0 +1,4 @@\n+.vscode/settings.json\n+build\n+install\n+log"
+        },
+        {
+          "sha": "81218fd8f714bb175248109d0231c4d329acf86a",
+          "filename": ".vscode/c_cpp_properties.json",
+          "status": "added",
+          "additions": 19,
+          "deletions": 0,
+          "changes": 19,
+          "blob_url": "https://github.com/namo-robotics/aruco_markers/blob/7722e40fb30ae7afa1fe3e26ee9fbc06a57732d0/.vscode%2Fc_cpp_properties.json",
+          "raw_url": "https://github.com/namo-robotics/aruco_markers/raw/7722e40fb30ae7afa1fe3e26ee9fbc06a57732d0/.vscode%2Fc_cpp_properties.json",
+          "contents_url": "https://api.github.com/repos/namo-robotics/aruco_markers/contents/.vscode%2Fc_cpp_properties.json?ref=7722e40fb30ae7afa1fe3e26ee9fbc06a57732d0",
+          "patch": "@@ -0,0 +1,19 @@\n+{\n+    \"configurations\": [\n+        {\n+            \"name\": \"Linux\",\n+            \"includePath\": [\n+                \"${workspaceFolder}/**\",\n+                \"/opt/ros/humble/include\", // ROS 2 include path (change based on ROS version)\n+                \"/opt/ros/humble/include/**\", // ROS 2 includes (wildcard)\n+                \"/usr/include/opencv4\" // OpenCV include path\n+            ],\n+            \"defines\": [],\n+            \"compilerPath\": \"/usr/bin/gcc\",\n+            \"cStandard\": \"c17\",\n+            \"cppStandard\": \"gnu++17\",\n+            \"intelliSenseMode\": \"linux-gcc-x64\"\n+        }\n+    ],\n+    \"version\": 4\n+}\n\\ No newline at end of file"
+        },
+        {
+          "sha": "5bd4f0e89103283f8d2ccd58bc0423b8528ca903",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 62,
+          "deletions": 0,
+          "changes": 62,
+          "blob_url": "https://github.com/namo-robotics/aruco_markers/blob/7722e40fb30ae7afa1fe3e26ee9fbc06a57732d0/CMakeLists.txt",
+          "raw_url": "https://github.com/namo-robotics/aruco_markers/raw/7722e40fb30ae7afa1fe3e26ee9fbc06a57732d0/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/namo-robotics/aruco_markers/contents/CMakeLists.txt?ref=7722e40fb30ae7afa1fe3e26ee9fbc06a57732d0",
+          "patch": "@@ -0,0 +1,62 @@\n+cmake_minimum_required(VERSION 3.8)\n+project(aruco_ros2)\n+\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  add_compile_options(-Wall -Wextra -Wpedantic)\n+endif()\n+\n+# find dependencies\n+find_package(ament_cmake REQUIRED)\n+find_package(rclcpp REQUIRED)\n+find_package(std_msgs REQUIRED)\n+find_package(OpenCV REQUIRED)\n+find_package(image_transport REQUIRED)\n+find_package(cv_bridge REQUIRED)\n+find_package(tf2_ros REQUIRED)\n+find_package(geometry_msgs REQUIRED)\n+find_package(sensor_msgs REQUIRED)\n+\n+# uncomment the following section in order to fill in\n+# further dependencies manually.\n+# find_package(<dependency> REQUIRED)\n+\n+# Create the executable for the node\n+add_executable(aruco_ros2 src/aruco_ros2.cpp)\n+\n+# Link the OpenCV libraries to your node\n+ament_target_dependencies(aruco_ros2\n+  rclcpp\n+  std_msgs\n+  OpenCV\n+  image_transport\n+  cv_bridge\n+  tf2_ros\n+  geometry_msgs\n+  sensor_msgs\n+)\n+\n+# Include OpenCV headers\n+target_include_directories(aruco_ros2 PRIVATE ${OpenCV_INCLUDE_DIRS})\n+\n+# Link OpenCV libraries to your node\n+target_link_libraries(aruco_ros2 ${OpenCV_LIBRARIES})\n+\n+# Install the executable\n+install(TARGETS\n+aruco_ros2\n+  DESTINATION lib/${PROJECT_NAME}\n+)\n+\n+if(BUILD_TESTING)\n+  find_package(ament_lint_auto REQUIRED)\n+  # the following line skips the linter which checks for copyrights\n+  # comment the line when a copyright and license is added to all source files\n+  set(ament_cmake_copyright_FOUND TRUE)\n+  # the following line skips cpplint (only works in a git repo)\n+  # comment the line when this package is in a git repo and when\n+  # a copyright and license is added to all source files\n+  set(ament_cmake_cpplint_FOUND TRUE)\n+  ament_lint_auto_find_test_dependencies()\n+endif()\n+\n+ament_package()"
+        },
+        {
+          "sha": "30e8e2ece557688ae98a9f6f0e1b4cf450a85ae2",
+          "filename": "LICENSE",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 10,
+          "changes": 16,
+          "blob_url": "https://github.com/namo-robotics/aruco_markers/blob/7722e40fb30ae7afa1fe3e26ee9fbc06a57732d0/LICENSE",
+          "raw_url": "https://github.com/namo-robotics/aruco_markers/raw/7722e40fb30ae7afa1fe3e26ee9fbc06a57732d0/LICENSE",
+          "contents_url": "https://api.github.com/repos/namo-robotics/aruco_markers/contents/LICENSE?ref=7722e40fb30ae7afa1fe3e26ee9fbc06a57732d0",
+          "patch": "@@ -1,21 +1,17 @@\n-MIT License\n-\n-Copyright (c) 2025 David Brown\n-\n Permission is hereby granted, free of charge, to any person obtaining a copy\n of this software and associated documentation files (the \"Software\"), to deal\n in the Software without restriction, including without limitation the rights\n to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n copies of the Software, and to permit persons to whom the Software is\n furnished to do so, subject to the following conditions:\n \n-The above copyright notice and this permission notice shall be included in all\n-copies or substantial portions of the Software.\n+The above copyright notice and this permission notice shall be included in\n+all copies or substantial portions of the Software.\n \n THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL\n+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n-SOFTWARE.\n+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n+THE SOFTWARE."
+        },
+        {
+          "sha": "4107deb072f406fff83ccfa4933fdb729f297733",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 32,
+          "deletions": 0,
+          "changes": 32,
+          "blob_url": "https://github.com/namo-robotics/aruco_markers/blob/7722e40fb30ae7afa1fe3e26ee9fbc06a57732d0/package.xml",
+          "raw_url": "https://github.com/namo-robotics/aruco_markers/raw/7722e40fb30ae7afa1fe3e26ee9fbc06a57732d0/package.xml",
+          "contents_url": "https://api.github.com/repos/namo-robotics/aruco_markers/contents/package.xml?ref=7722e40fb30ae7afa1fe3e26ee9fbc06a57732d0",
+          "patch": "@@ -0,0 +1,32 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n+  <name>aruco_ros2</name>\n+  <version>0.0.0</version>\n+  <description>TODO: Package description</description>\n+  <maintainer email=\"david.brown@inria.fr\">chroma</maintainer>\n+  <license>MIT</license>\n+\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+\n+  <test_depend>ament_lint_auto</test_depend>\n+  <test_depend>ament_lint_common</test_depend>\n+\n+  <build_depend>opencv</build_depend>\n+  <build_depend>image_transport</build_depend>\n+  <build_depend>cv_bridge</build_depend>\n+  <build_depend>tf2_ros</build_depend>\n+  <build_depend>geometry_msgs</build_depend>\n+  <build_depend>sensor_msgs</build_depend>\n+\n+  <exec_depend>opencv</exec_depend>\n+  <exec_depend>image_transport</exec_depend>\n+  <exec_depend>cv_bridge</exec_depend>\n+  <exec_depend>tf2_ros</exec_depend>\n+  <exec_depend>geometry_msgs</exec_depend>\n+  <exec_depend>sensor_msgs</exec_depend>\n+  \n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n+</package>\n\\ No newline at end of file"
+        },
+        {
+          "sha": "10a6290fe39574980e2041a79801abecf8e57c33",
+          "filename": "src/aruco_ros2.cpp",
+          "status": "added",
+          "additions": 160,
+          "deletions": 0,
+          "changes": 160,
+          "blob_url": "https://github.com/namo-robotics/aruco_markers/blob/7722e40fb30ae7afa1fe3e26ee9fbc06a57732d0/src%2Faruco_ros2.cpp",
+          "raw_url": "https://github.com/namo-robotics/aruco_markers/raw/7722e40fb30ae7afa1fe3e26ee9fbc06a57732d0/src%2Faruco_ros2.cpp",
+          "contents_url": "https://api.github.com/repos/namo-robotics/aruco_markers/contents/src%2Faruco_ros2.cpp?ref=7722e40fb30ae7afa1fe3e26ee9fbc06a57732d0",
+          "patch": "@@ -0,0 +1,160 @@\n+#include <rclcpp/rclcpp.hpp>\n+#include <std_msgs/msg/string.hpp>\n+#include <sensor_msgs/msg/image.hpp>\n+#include <opencv2/opencv.hpp>\n+#include <opencv2/aruco.hpp>\n+#include <cv_bridge/cv_bridge.h>\n+#include <image_transport/image_transport.hpp>\n+#include <tf2_ros/transform_broadcaster.h>\n+#include <geometry_msgs/msg/transform_stamped.hpp>\n+\n+using namespace std::chrono_literals;\n+\n+class ArucoRos2Node : public rclcpp::Node\n+{\n+public:\n+    ArucoRos2Node() : Node(\"aruco_ros2\")\n+    {\n+        // Publisher for marker information\n+        marker_info_publisher_ = this->create_publisher<std_msgs::msg::String>(\"aruco_marker_info\", 10);\n+        // Set up ArUco marker detector\n+        aruco_dict_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);\n+        aruco_parameters_ = cv::aruco::DetectorParameters::create();\n+    }\n+\n+    void initialize()\n+    {\n+        RCLCPP_INFO(this->get_logger(), \"Initializing\");\n+\n+        // Image transport subscriber\n+        it_ = std::make_unique<image_transport::ImageTransport>(shared_from_this());\n+        image_subscriber_ = it_->subscribe(\"/camera/color/image_raw\", 1,\n+                                           std::bind(&ArucoRos2Node::image_callback, this, std::placeholders::_1));\n+\n+        // Publisher for marker information\n+        marker_info_publisher_ = this->create_publisher<std_msgs::msg::String>(\"aruco_marker_info\", 10);\n+\n+        // Camera info subscriber to get intrinsic parameters\n+        camera_info_subscriber_ = this->create_subscription<sensor_msgs::msg::CameraInfo>(\n+            \"/camera/color/camera_info\", 10, std::bind(&ArucoRos2Node::camera_info_callback, this, std::placeholders::_1));\n+\n+        // TF broadcaster for publishing transforms\n+        tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(*this);\n+\n+        // Set up ArUco marker detector\n+        aruco_dict_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);\n+        aruco_parameters_ = cv::aruco::DetectorParameters::create();\n+    }\n+\n+private:\n+    void camera_info_callback(const sensor_msgs::msg::CameraInfo::SharedPtr msg)\n+    {\n+        camera_matrix_ = cv::Mat(3, 3, CV_64F, const_cast<double *>(msg->k.data()));\n+        RCLCPP_INFO(this->get_logger(), \"Received camera info.\");\n+        received_camera_info_ = true;\n+    }\n+\n+    // Callback for image subscription\n+    void image_callback(const sensor_msgs::msg::Image::ConstSharedPtr msg)\n+    {\n+        if (!received_camera_info_)\n+        {\n+            RCLCPP_INFO(this->get_logger(), \"Waiting for camera info.\");\n+            return;\n+        }\n+\n+        try\n+        {\n+            // Convert ROS image message to OpenCV image\n+            cv_bridge::CvImagePtr cv_image_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);\n+            cv::Mat &image = cv_image_ptr->image;\n+\n+            // Detect ArUco markers\n+            std::vector<int> marker_ids;\n+            std::vector<std::vector<cv::Point2f>> marker_corners, rejected_candidates;\n+            cv::aruco::detectMarkers(image, aruco_dict_, marker_corners, marker_ids, aruco_parameters_, rejected_candidates);\n+\n+            if (!marker_ids.empty())\n+            {\n+                // Draw the detected markers on the image\n+                cv::aruco::drawDetectedMarkers(image, marker_corners, marker_ids);\n+\n+                // Estimate the pose of the ArUco markers (using solvePnP)\n+                cv::Mat rvec, tvec;\n+                std::vector<cv::Point3f> marker_points = {\n+                    {0.0f, 0.0f, 0.0f}, // Center of marker\n+                    {1.0f, 0.0f, 0.0f}, // Right corner\n+                    {0.0f, 1.0f, 0.0f}, // Top corner\n+                    {0.0f, 0.0f, 1.0f}  // Front corner\n+                };\n+\n+                // Camera intrinsics (example values, you should replace with actual camera parameters)\n+                cv::Mat camera_matrix = (cv::Mat_<double>(3, 3) << 640, 0, 320, 0, 640, 240, 0, 0, 1); // Fx, Fy, Cx, Cy\n+                cv::Mat dist_coeffs = cv::Mat::zeros(4, 1, CV_64F);                                    // No lens distortion\n+\n+                cv::aruco::estimatePoseSingleMarkers(marker_corners, 0.1, camera_matrix_, dist_coeffs, rvec, tvec);\n+\n+                // Get the position and orientation of the detected marker\n+                if (tvec.empty() || rvec.empty())\n+                    return;\n+\n+                // Broadcast transform from 'map' to 'aruco_marker'\n+                geometry_msgs::msg::TransformStamped marker_transform;\n+                marker_transform.header.stamp = this->get_clock()->now();\n+                marker_transform.header.frame_id = \"camera_rgb_optical_frame\"; // Parent frame (map)\n+                marker_transform.child_frame_id = \"aruco_marker\";              // Detected marker frame\n+                marker_transform.transform.translation.x = tvec.at<double>(0);\n+                marker_transform.transform.translation.y = tvec.at<double>(1);\n+                marker_transform.transform.translation.z = tvec.at<double>(2);\n+\n+                marker_transform.transform.rotation.x = rvec.at<double>(0);\n+                marker_transform.transform.rotation.y = rvec.at<double>(1);\n+                marker_transform.transform.rotation.z = rvec.at<double>(2);\n+                marker_transform.transform.rotation.w = 1.0; // Assuming no rotation (simplified)\n+\n+                tf_broadcaster_->sendTransform(marker_transform);\n+\n+                RCLCPP_INFO(this->get_logger(), \"Published transform from map to aruco_marker\");\n+            }\n+\n+            // Display the image (for debugging)\n+            cv::imshow(\"Image with ArUco markers\", image);\n+            cv::waitKey(1); // Necessary to update the window\n+        }\n+        catch (const cv_bridge::Exception &e)\n+        {\n+            RCLCPP_ERROR(this->get_logger(), \"CV Bridge exception: %s\", e.what());\n+        }\n+    }\n+    // ROS 2 Publisher for ArUco marker info\n+    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr marker_info_publisher_;\n+\n+    // Image subscriber (using image_transport)\n+    std::unique_ptr<image_transport::ImageTransport> it_;\n+    image_transport::Subscriber image_subscriber_;\n+\n+    // Camera info subscriber\n+    rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr camera_info_subscriber_;\n+\n+    // TF broadcaster\n+    std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;\n+\n+    // ArUco marker detector variables\n+    cv::Ptr<cv::aruco::Dictionary> aruco_dict_;\n+    cv::Ptr<cv::aruco::DetectorParameters> aruco_parameters_;\n+\n+    // Camera intrinsics\n+    cv::Mat camera_matrix_;\n+\n+    bool received_camera_info_ = false;\n+};\n+\n+int main(int argc, char *argv[])\n+{\n+    rclcpp::init(argc, argv);\n+    auto aruco_node = std::make_shared<ArucoRos2Node>();\n+    aruco_node->initialize();\n+    rclcpp::spin(aruco_node);\n+    rclcpp::shutdown();\n+    return 0;\n+}"
+        }
+      ]
+    },
+    {
+      "author": "david-wb",
+      "date": "2025-01-13T13:16:59Z",
+      "sha": "628a9ea3cb591d3d1caece200a986199555203fe",
+      "message": "Initial commit",
+      "files_changed": 2,
+      "additions": 22,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "442b2d9029c2fc68e50fbdb0f7c5caca0f618f92",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 21,
+          "deletions": 0,
+          "changes": 21,
+          "blob_url": "https://github.com/namo-robotics/aruco_markers/blob/628a9ea3cb591d3d1caece200a986199555203fe/LICENSE",
+          "raw_url": "https://github.com/namo-robotics/aruco_markers/raw/628a9ea3cb591d3d1caece200a986199555203fe/LICENSE",
+          "contents_url": "https://api.github.com/repos/namo-robotics/aruco_markers/contents/LICENSE?ref=628a9ea3cb591d3d1caece200a986199555203fe",
+          "patch": "@@ -0,0 +1,21 @@\n+MIT License\n+\n+Copyright (c) 2025 David Brown\n+\n+Permission is hereby granted, free of charge, to any person obtaining a copy\n+of this software and associated documentation files (the \"Software\"), to deal\n+in the Software without restriction, including without limitation the rights\n+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n+copies of the Software, and to permit persons to whom the Software is\n+furnished to do so, subject to the following conditions:\n+\n+The above copyright notice and this permission notice shall be included in all\n+copies or substantial portions of the Software.\n+\n+THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n+SOFTWARE."
+        },
+        {
+          "sha": "2a8ee59acfe6618ef7327f7431f497878414e3fc",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/namo-robotics/aruco_markers/blob/628a9ea3cb591d3d1caece200a986199555203fe/README.md",
+          "raw_url": "https://github.com/namo-robotics/aruco_markers/raw/628a9ea3cb591d3d1caece200a986199555203fe/README.md",
+          "contents_url": "https://api.github.com/repos/namo-robotics/aruco_markers/contents/README.md?ref=628a9ea3cb591d3d1caece200a986199555203fe",
+          "patch": "@@ -0,0 +1 @@\n+# aruco_ros2\n\\ No newline at end of file"
+        }
+      ]
+    }
+  ]
+}

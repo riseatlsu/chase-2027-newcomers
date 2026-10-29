@@ -1,0 +1,157 @@
+{
+  "_meta": {
+    "fetched_at": "2026-09-24T14:53:57Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "gazebo-release",
+    "repo": "gz_dartsim_vendor",
+    "refreshed_at": "2026-09-24T14:53:57Z",
+    "refresh_note": "incrementally added 2 author(s) missing from a prior stale cache"
+  },
+  "data": [
+    {
+      "author": "azeey",
+      "date": "2024-03-13T23:15:31Z",
+      "sha": "d1802b011d99f6c2147d682f79479572090fcbd3",
+      "message": "Initial import\n\nSigned-off-by: Addisu Z. Taddese <addisu@openrobotics.org>",
+      "files_changed": 2,
+      "additions": 71,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "8bd8e30cdc49d3ceda212c8da49dd488b5e68858",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/gazebo-release/gz_dartsim_vendor/blob/d1802b011d99f6c2147d682f79479572090fcbd3/CMakeLists.txt",
+          "raw_url": "https://github.com/gazebo-release/gz_dartsim_vendor/raw/d1802b011d99f6c2147d682f79479572090fcbd3/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_dartsim_vendor/contents/CMakeLists.txt?ref=d1802b011d99f6c2147d682f79479572090fcbd3",
+          "patch": "@@ -0,0 +1,23 @@\n+cmake_minimum_required(VERSION 3.10)\n+project(gazebo_dart_vendor)\n+\n+find_package(ament_cmake REQUIRED)\n+find_package(ament_cmake_vendor_package REQUIRED)\n+\n+ament_vendor(${PROJECT_NAME}\n+  VCS_URL https://github.com/dartsim/dart.git\n+  VCS_VERSION v6.13.1\n+  CMAKE_ARGS\n+    -DDART_BUILD_OSG:BOOL=FALSE\n+    -DDART_BUILD_GUI_OSG:BOOL=FALSE\n+    -DDART_BUILD_DARTPY:BOOL=FALSE\n+    -DDART_TREAT_WARNINGS_AS_ERRORS:BOOL=FALSE # TODO(azeey) Remove when https://github.com/dartsim/dart/issues/1781 is resolved.\n+  GLOBAL_HOOK\n+)\n+\n+if(BUILD_TESTING)\n+  find_package(ament_lint_auto REQUIRED)\n+  ament_lint_auto_find_test_dependencies()\n+endif()\n+\n+ament_package()"
+        },
+        {
+          "sha": "73bca5f2ca926eff008d23dd6ae13601c3134507",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 48,
+          "deletions": 0,
+          "changes": 48,
+          "blob_url": "https://github.com/gazebo-release/gz_dartsim_vendor/blob/d1802b011d99f6c2147d682f79479572090fcbd3/package.xml",
+          "raw_url": "https://github.com/gazebo-release/gz_dartsim_vendor/raw/d1802b011d99f6c2147d682f79479572090fcbd3/package.xml",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_dartsim_vendor/contents/package.xml?ref=d1802b011d99f6c2147d682f79479572090fcbd3",
+          "patch": "@@ -0,0 +1,48 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model\n+  href=\"http://download.ros.org/schema/package_format2.xsd\"\n+  schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"2\">\n+  <name>gazebo_dart_vendor</name>\n+  <version>6.13.1</version>\n+  <description>\n+    Vendor package for the DART physics engine\n+  </description>\n+\n+  <maintainer email=\"addisu@intrinsic.ai\">Addisu Taddese</maintainer>\n+\n+  <license>Apache License 2.0</license>  <!-- the contents of this package are Apache 2.0 -->\n+  <license>BSD-2</license>  <!-- DART is BSD-2 (https://dartsim.github.io/license.html) -->\n+\n+  <url type=\"website\">https://dartsim.github.io/</url>\n+\n+  <author email=\"addisu@intrinsic.ai\">Addisu Taddese</author>\n+\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+  <buildtool_depend>ament_cmake_vendor_package</buildtool_depend>\n+\n+  <depend>libeigen3-dev</depend>\n+  <depend>libccd-dev</depend>\n+  <depend>libfcl-dev</depend>\n+  <depend>libbullet-dev</depend>\n+  <depend>libode-dev</depend>\n+  <depend>libassimp-dev</depend>\n+  <depend>freeglut3-dev</depend>\n+  <depend>libxi-dev</depend>\n+  <depend>libxmu-dev</depend>\n+  <depend>libflann-dev</depend>\n+  <depend>libtinyxml2-dev</depend>\n+  <depend>liburdfdom-dev</depend>\n+  <depend>libboost-dev</depend>\n+  <depend>libboost-system-dev</depend>\n+  <depend>libboost-regex-dev</depend>\n+  <depend>liboctomap-dev</depend>\n+  <depend>libopenthreads-dev</depend>\n+  <depend>liblz4-dev</depend>\n+\n+  <test_depend>ament_cmake_xmllint</test_depend>\n+  <test_depend>ament_lint_auto</test_depend>\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n+</package>"
+        }
+      ]
+    },
+    {
+      "author": "oysstu",
+      "date": "2024-08-29T15:48:17Z",
+      "sha": "ca003ffa41cb226e3e3bd437f0522727775360b9",
+      "message": "Add check for system installed dartsim (#6)\n\n* Check for system installed dart first.\r\n\r\nSigned-off-by: Rhys Mainwaring <rhys.mainwaring@me.com>\r\n\r\n* Update dart version and add extra debug message\r\n\r\nSigned-off-by: Rhys Mainwaring <rhys.mainwaring@me.com>\r\n\r\n* Add relaxed version matching when requested\r\n\r\nSigned-off-by: Øystein Sture <os@skarvtech.com>\r\n\r\n---------\r\n\r\nSigned-off-by: Rhys Mainwaring <rhys.mainwaring@me.com>\r\nSigned-off-by: Øystein Sture <os@skarvtech.com>\r\nCo-authored-by: Rhys Mainwaring <rhys.mainwaring@me.com>",
+      "files_changed": 1,
+      "additions": 38,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "77ca9364556c518e389e2f1dc2273d69dc2c6e30",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 38,
+          "deletions": 1,
+          "changes": 39,
+          "blob_url": "https://github.com/gazebo-release/gz_dartsim_vendor/blob/ca003ffa41cb226e3e3bd437f0522727775360b9/CMakeLists.txt",
+          "raw_url": "https://github.com/gazebo-release/gz_dartsim_vendor/raw/ca003ffa41cb226e3e3bd437f0522727775360b9/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_dartsim_vendor/contents/CMakeLists.txt?ref=ca003ffa41cb226e3e3bd437f0522727775360b9",
+          "patch": "@@ -1,12 +1,44 @@\n cmake_minimum_required(VERSION 3.10)\n project(gz_dartsim_vendor)\n \n+# Project-specific settings\n+set(LIB_VER_MAJOR 6)\n+set(LIB_VER_MINOR 13)\n+set(LIB_VER_PATCH 2)\n+\n+# Derived variables\n+set(LIB_VER ${LIB_VER_MAJOR}.${LIB_VER_MINOR}.${LIB_VER_PATCH})\n+\n find_package(ament_cmake REQUIRED)\n find_package(ament_cmake_vendor_package REQUIRED)\n \n+# Set the VERSION_MATCH to \"EXACT\" by default, but relax the requirement\n+# if we are users are building from source (determined by the\n+# GZ_BUILD_FROM_SOURCE environment variable) or if explicitly told to do so\n+# by the GZ_RELAX_VERSION_MATCH environment variable.\n+set(VERSION_MATCH \"EXACT\")\n+if(NOT $ENV{GZ_BUILD_FROM_SOURCE} STREQUAL \"\")\n+  set(VERSION_MATCH \"\")\n+endif()\n+\n+if(NOT $ENV{GZ_RELAX_VERSION_MATCH} STREQUAL \"\")\n+  set(VERSION_MATCH \"\")\n+endif()\n+\n+find_package(DART ${VERSION_MATCH} ${LIB_VER_MAJOR}.${LIB_VER_MINOR}\n+  CONFIG\n+  COMPONENTS\n+  collision-bullet\n+  collision-ode\n+  utils\n+  utils-urdf\n+  QUIET\n+)\n+\n ament_vendor(${PROJECT_NAME}\n+  SATISFIED ${DART_FOUND}\n   VCS_URL https://github.com/dartsim/dart.git\n-  VCS_VERSION v6.13.2\n+  VCS_VERSION v${LIB_VER}\n   CMAKE_ARGS\n     -DDART_BUILD_GUI_OSG:BOOL=FALSE\n     -DDART_BUILD_DARTPY:BOOL=FALSE\n@@ -15,6 +47,11 @@ ament_vendor(${PROJECT_NAME}\n   PATCHES patches\n )\n \n+message(VERBOSE \"DART_FOUND: ${DART_FOUND}\")\n+message(VERBOSE \"DART_VERSION: ${DART_VERSION}\")\n+message(VERBOSE \"DART_INCLUDE_DIRS: ${DART_INCLUDE_DIRS}\")\n+message(VERBOSE \"DART_LIBRARIES: ${DART_LIBRARIES}\")\n+\n if(BUILD_TESTING)\n   find_package(ament_lint_auto REQUIRED)\n   ament_lint_auto_find_test_dependencies()"
+        }
+      ]
+    },
+    {
+      "author": "clalancette",
+      "date": "2024-06-24T22:22:42Z",
+      "sha": "f7e15d7470f113aa4d449a044a58b8f3e68ef24d",
+      "message": "Switch to using the liboctomap-dev key for a dependency. (#5)\n\nThis is now available in rosdep.\r\n\r\nSigned-off-by: Chris Lalancette <clalancette@gmail.com>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 3,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "4417698b37de5fae53dd58ab62cf46d8bc87e897",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 3,
+          "changes": 4,
+          "blob_url": "https://github.com/gazebo-release/gz_dartsim_vendor/blob/f7e15d7470f113aa4d449a044a58b8f3e68ef24d/package.xml",
+          "raw_url": "https://github.com/gazebo-release/gz_dartsim_vendor/raw/f7e15d7470f113aa4d449a044a58b8f3e68ef24d/package.xml",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_dartsim_vendor/contents/package.xml?ref=f7e15d7470f113aa4d449a044a58b8f3e68ef24d",
+          "patch": "@@ -40,9 +40,7 @@\n   <depend>libboost-dev</depend>\n   <depend>libboost-system-dev</depend>\n   <depend>libboost-regex-dev</depend>\n-  <!-- Octomap is an optional dependency. There seems to be an issue resolving\n-    this key on the ROS buildfarm, so disabling it for now -->\n-  <!-- <depend>octomap</depend> -->\n+  <depend>liboctomap-dev</depend>\n   <depend>lz4</depend>\n \n   <test_depend>ament_cmake_xmllint</test_depend>"
+        }
+      ]
+    },
+    {
+      "author": "j-rivero",
+      "date": "2026-04-17T16:46:16Z",
+      "sha": "c4c36eb6026d295d260ad0b6e254f74199190a3f",
+      "message": "Update patch\n\nSigned-off-by: Jose Luis Rivero <jrivero@honurobotics.com>",
+      "files_changed": 1,
+      "additions": 11,
+      "deletions": 14,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "adca728b83979bbf5856c85435daea103d591907",
+          "filename": "patches/0001-Fix-pkgconfig-installation-so-it-works-with-CMAKE_ST.patch",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 14,
+          "changes": 25,
+          "blob_url": "https://github.com/gazebo-release/gz_dartsim_vendor/blob/c4c36eb6026d295d260ad0b6e254f74199190a3f/patches%2F0001-Fix-pkgconfig-installation-so-it-works-with-CMAKE_ST.patch",
+          "raw_url": "https://github.com/gazebo-release/gz_dartsim_vendor/raw/c4c36eb6026d295d260ad0b6e254f74199190a3f/patches%2F0001-Fix-pkgconfig-installation-so-it-works-with-CMAKE_ST.patch",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_dartsim_vendor/contents/patches%2F0001-Fix-pkgconfig-installation-so-it-works-with-CMAKE_ST.patch?ref=c4c36eb6026d295d260ad0b6e254f74199190a3f",
+          "patch": "@@ -1,32 +1,29 @@\n-From d05efd325c779944ca351c0354b000851ba17da5 Mon Sep 17 00:00:00 2001\n From: \"Addisu Z. Taddese\" <addisu@openrobotics.org>\n Date: Fri, 29 Mar 2024 15:00:46 -0500\n Subject: [PATCH] Fix pkgconfig installation so it works with\n  `CMAKE_STAGING_PREFIX`\n \n Signed-off-by: Addisu Z. Taddese <addisu@openrobotics.org>\n ---\n- CMakeLists.txt | 5 +++--\n- 1 file changed, 3 insertions(+), 2 deletions(-)\n \n diff --git a/CMakeLists.txt b/CMakeLists.txt\n-index acdfebf..2700b44 100644\n+index f3fe251..df820b0 100644\n --- a/CMakeLists.txt\n +++ b/CMakeLists.txt\n-@@ -473,10 +473,11 @@ install(\n- # Generate the DART pkg-config\n- set(PC_CONFIG_IN ${DART_SOURCE_DIR}/cmake/dart.pc.in)\n- set(PC_CONFIG_OUT ${DART_BINARY_DIR}/cmake/dart.pc)\n--set(PC_CONFIG_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/pkgconfig)\n-+set(PC_CONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/pkgconfig)\n-+set(PC_CONFIG_INSTALL_ABS_DIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/pkgconfig)\n+@@ -529,13 +529,14 @@ if(ABSOLUTE_CMAKE_INSTALL_LIBDIR)\n+ else()\n+   # When \"CMAKE_INSTALL_*DIR\" are relative, we should ensure the installed\n+   # files contain relocatable references to install paths.\n+-  set(PC_CONFIG_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/pkgconfig)\n++  set(PC_CONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/pkgconfig)\n++  set(PC_CONFIG_INSTALL_ABS_DIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/pkgconfig)\n+   set(PC_LIBDIR \"\\${prefix}/${CMAKE_INSTALL_LIBDIR}\")\n+   set(PC_INCLUDEDIR \"\\${prefix}/${CMAKE_INSTALL_INCLUDEDIR}\")\n+ endif()\n  file(RELATIVE_PATH\n    RELATIVE_PATH_TO_INSTALL_PREFIX\n -  \"${PC_CONFIG_INSTALL_DIR}\"\n +  \"${PC_CONFIG_INSTALL_ABS_DIR}\"\n    \"${CMAKE_INSTALL_PREFIX}\"\n  )\n  if(DART_VERBOSE)\n--- \n-2.43.0\n-"
+        }
+      ]
+    },
+    {
+      "author": "Addisu Z. Taddese",
+      "date": "2024-03-13T23:15:31Z",
+      "sha": "d1802b011d99f6c2147d682f79479572090fcbd3",
+      "message": "Initial import\n\nSigned-off-by: Addisu Z. Taddese <addisu@openrobotics.org>",
+      "files_changed": 2,
+      "additions": 71,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "8bd8e30cdc49d3ceda212c8da49dd488b5e68858",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/gazebo-release/gz_dartsim_vendor/blob/d1802b011d99f6c2147d682f79479572090fcbd3/CMakeLists.txt",
+          "raw_url": "https://github.com/gazebo-release/gz_dartsim_vendor/raw/d1802b011d99f6c2147d682f79479572090fcbd3/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_dartsim_vendor/contents/CMakeLists.txt?ref=d1802b011d99f6c2147d682f79479572090fcbd3",
+          "patch": "@@ -0,0 +1,23 @@\n+cmake_minimum_required(VERSION 3.10)\n+project(gazebo_dart_vendor)\n+\n+find_package(ament_cmake REQUIRED)\n+find_package(ament_cmake_vendor_package REQUIRED)\n+\n+ament_vendor(${PROJECT_NAME}\n+  VCS_URL https://github.com/dartsim/dart.git\n+  VCS_VERSION v6.13.1\n+  CMAKE_ARGS\n+    -DDART_BUILD_OSG:BOOL=FALSE\n+    -DDART_BUILD_GUI_OSG:BOOL=FALSE\n+    -DDART_BUILD_DARTPY:BOOL=FALSE\n+    -DDART_TREAT_WARNINGS_AS_ERRORS:BOOL=FALSE # TODO(azeey) Remove when https://github.com/dartsim/dart/issues/1781 is resolved.\n+  GLOBAL_HOOK\n+)\n+\n+if(BUILD_TESTING)\n+  find_package(ament_lint_auto REQUIRED)\n+  ament_lint_auto_find_test_dependencies()\n+endif()\n+\n+ament_package()"
+        },
+        {
+          "sha": "73bca5f2ca926eff008d23dd6ae13601c3134507",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 48,
+          "deletions": 0,
+          "changes": 48,
+          "blob_url": "https://github.com/gazebo-release/gz_dartsim_vendor/blob/d1802b011d99f6c2147d682f79479572090fcbd3/package.xml",
+          "raw_url": "https://github.com/gazebo-release/gz_dartsim_vendor/raw/d1802b011d99f6c2147d682f79479572090fcbd3/package.xml",
+          "contents_url": "https://api.github.com/repos/gazebo-release/gz_dartsim_vendor/contents/package.xml?ref=d1802b011d99f6c2147d682f79479572090fcbd3",
+          "patch": "@@ -0,0 +1,48 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model\n+  href=\"http://download.ros.org/schema/package_format2.xsd\"\n+  schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"2\">\n+  <name>gazebo_dart_vendor</name>\n+  <version>6.13.1</version>\n+  <description>\n+    Vendor package for the DART physics engine\n+  </description>\n+\n+  <maintainer email=\"addisu@intrinsic.ai\">Addisu Taddese</maintainer>\n+\n+  <license>Apache License 2.0</license>  <!-- the contents of this package are Apache 2.0 -->\n+  <license>BSD-2</license>  <!-- DART is BSD-2 (https://dartsim.github.io/license.html) -->\n+\n+  <url type=\"website\">https://dartsim.github.io/</url>\n+\n+  <author email=\"addisu@intrinsic.ai\">Addisu Taddese</author>\n+\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+  <buildtool_depend>ament_cmake_vendor_package</buildtool_depend>\n+\n+  <depend>libeigen3-dev</depend>\n+  <depend>libccd-dev</depend>\n+  <depend>libfcl-dev</depend>\n+  <depend>libbullet-dev</depend>\n+  <depend>libode-dev</depend>\n+  <depend>libassimp-dev</depend>\n+  <depend>freeglut3-dev</depend>\n+  <depend>libxi-dev</depend>\n+  <depend>libxmu-dev</depend>\n+  <depend>libflann-dev</depend>\n+  <depend>libtinyxml2-dev</depend>\n+  <depend>liburdfdom-dev</depend>\n+  <depend>libboost-dev</depend>\n+  <depend>libboost-system-dev</depend>\n+  <depend>libboost-regex-dev</depend>\n+  <depend>liboctomap-dev</depend>\n+  <depend>libopenthreads-dev</depend>\n+  <depend>liblz4-dev</depend>\n+\n+  <test_depend>ament_cmake_xmllint</test_depend>\n+  <test_depend>ament_lint_auto</test_depend>\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n+</package>"
+        }
+      ]
+    }
+  ]
+}

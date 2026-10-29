@@ -1,0 +1,515 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T06:42:10Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ros2",
+    "repo": "spdlog_vendor"
+  },
+  "data": [
+    {
+      "author": "cottsay",
+      "date": "2020-05-19T04:08:16Z",
+      "sha": "ca18e3ea322f3abfafd14a83d9961507ee852642",
+      "message": "Add an external package QD for the spdlog library (#8)\n\nSigned-off-by: Scott K Logan <logans@cottsay.net>",
+      "files_changed": 2,
+      "additions": 147,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "34b0eb91988cd97daef55b2754e2e58979003202",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/ca18e3ea322f3abfafd14a83d9961507ee852642/README.md",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/ca18e3ea322f3abfafd14a83d9961507ee852642/README.md",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/README.md?ref=ca18e3ea322f3abfafd14a83d9961507ee852642",
+          "patch": "@@ -4,3 +4,5 @@ CMake shim over the spdlog library: https://github.com/gabime/spdlog.git\n ## Quality Declaration files\n \n Quality declaration for this package: [spdlog_vendor QD](QUALITY_DECLARATION.md).\n+\n+Quality declaration for spdlog: [spdlog QD](SPDLOG_QUALITY_DECLARATION.md)."
+        },
+        {
+          "sha": "315fede6abb68e774dcb19cd17acd28ee20fa831",
+          "filename": "SPDLOG_QUALITY_DECLARATION.md",
+          "status": "added",
+          "additions": 145,
+          "deletions": 0,
+          "changes": 145,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/ca18e3ea322f3abfafd14a83d9961507ee852642/SPDLOG_QUALITY_DECLARATION.md",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/ca18e3ea322f3abfafd14a83d9961507ee852642/SPDLOG_QUALITY_DECLARATION.md",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/SPDLOG_QUALITY_DECLARATION.md?ref=ca18e3ea322f3abfafd14a83d9961507ee852642",
+          "patch": "@@ -0,0 +1,145 @@\n+This document is a declaration of software quality for the `spdlog` external dependency imported by the `spdlog_vendor` package, based on the guidelines in [REP-2004](https://www.ros.org/reps/rep-2004.html).\n+\n+# `spdlog` Quality Declaration\n+\n+This quality declaration claims that `spdlog` is in the **Quality Level 4** category.\n+\n+Though `spdlog` meets many of the criteria stated for software quality, there are key points preventing it from achieving a higher level category.\n+As `spdlog` itself is not a ROS package, many of these gaps could be reconciled in the vendor package that is used to control `spdlog` distribution within ROS.\n+Engagement with the upstream development team to define policies for versioning, API/ABI stability and enforcing peer review would lead to higher quality, and could increase the level category for `spdlog` in a subsequent review.\n+\n+Below are the rationales, notes, and caveats for this claim, organized by each requirement listed in the [Package Requirements for Quality Level 4 in REP-2004](https://www.ros.org/reps/rep-2004.html).\n+\n+## Version Policy [1]\n+\n+### Version Scheme [1.i]\n+\n+There is a three-part version attached to `spdlog` releases.\n+The sources define the version parts as `MAJOR`.`MINOR`.`PATCH`.\n+There is an [old ticket](https://github.com/gabime/spdlog/issues/86) where the project's primary developer discusses versioning, but there is no documentation officially stating what approach the developer is taking.\n+\n+### Version Stability [1.ii]\n+\n+The latest release of `spdlog` has a stable version, i.e. `>= 1.0.0`.\n+\n+### Public API Declaration [1.iii]\n+\n+Because `spdlog` can be consumed as a header-only library, nearly all of the source code can be considered part of the public API.\n+For the compiled portion of `spdlog`, the `SPDLOG_API` C++ macro indicates the symbols that are part of the public API.\n+\n+### API Stability Policy [1.iv]\n+\n+There is no published policy for API stability in `spdlog`.\n+\n+### ABI Stability Policy [1.v]\n+\n+There is no published policy for ABI stability in `spdlog`.\n+\n+### ABI and ABI Stability Within a Released ROS Distribution [1.vi]\n+\n+As an external package, `spdlog` is not released on the same cadence as ROS.\n+However, the `spdlog_vendor` package controls what version of `spdlog` is acceptable, so API/ABI stability within a ROS release can be enforced.\n+\n+## Change Control Process [2]\n+\n+### Change Requests [2.i]\n+\n+The source code repository for `spdlog` is hosted in GitHub, and the change process follows a typical GitHub pull request model.\n+The developer appears to be active in triaging incoming issues and addressing incoming pull requests in a timely manner.\n+\n+### Contributor Origin [2.ii]\n+\n+Changes to `spdlog` do not contain or require any confirmation of contributor origin.\n+\n+### Peer Review Policy [2.iii]\n+\n+It appears that a single developer is reviewing and merging the proposed changes.\n+That primary developer does commit directly to the repository, so not all changes appear to be peer-reviewed.\n+\n+### Continuous Integration [2.iv]\n+\n+Incoming pull requests automatically trigger continuous integration testing and must run successfully to be merged.\n+Automated testing runs for:\n+- Ubuntu Linux with gcc 4.8 and gcc 7, Clang 3.5, and Clang 10\n+- macOS High Sierra with Xcode 9.4.1\n+- Windows Server 2012 R2 with Visual Studio 2015\n+- Windows Server 2016 with Visual Studio 2017\n+\n+Any commits to the development branch also trigger continuous integration testing.\n+\n+## Documentation [3]\n+\n+### Feature Documentation [3.i]\n+\n+A feature list is included in the `spdlog` documentation [in the repository](https://github.com/gabime/spdlog#features).\n+\n+### Public API Documentation [3.ii]\n+\n+The API for `spdlog` is documented with a targeted example for each advertised feature.\n+This documentation is available [in the repository](https://github.com/gabime/spdlog#usage-samples), and there is more detailed information on some specific topics available in the GitHub Wiki for `spdlog`.\n+\n+### License [3.iii]\n+\n+The license for `spdlog` is MIT, and all of the code includes a header stating so.\n+The `spdlog` repository also includes a [`LICENSE`](https://github.com/gabime/spdlog/blob/v1.x/LICENSE) file with the full terms.\n+\n+There is some `spdlog` test code which is licensed under Boost 1.0, and the full license text is [included](https://github.com/gabime/spdlog/blob/v1.x/tests/catch.license) alongside the affected source code files.\n+\n+### Copyright Statement [3.iv]\n+\n+Each of the `spdlog` source files containing code include a copyright statement with the license information in the file's header.\n+\n+## Testing [4]\n+\n+### Feature Testing [4.i]\n+\n+Many (if not all) of the advertised features of `spdlog` are tested as part of continuous integration.\n+\n+### Public API Testing [4.ii]\n+\n+There is some, but very little testing in `spdlog` specifically focused on API stability.\n+\n+### Coverage [4.iii]\n+\n+There is no test coverage tracking in `spdlog`.\n+\n+### Performance [4.iv]\n+\n+Performance tests for `spdlog` can be built by specifying the `SPDLOG_BUILD_BENCH` CMake option.\n+The benchmarks are not run as part of continuous integration, but some results are included in the `spdlog` documentation [in the repository](https://github.com/gabime/spdlog#benchmarks).\n+\n+### Linters and Static Analysis [4.v]\n+\n+`clang-tidy` and `clang-format` are configured to run for `spdlog`, but are not run as part of continuous integration.\n+There are two sanitizer options that can be enabled with CMake options:\n+* `SPDLOG_SANITIZE_ADDRESS`\n+* `SPDLOG_SANITIZE_THREAD`\n+\n+The ASAN option is enabled as part of continuous integration.\n+\n+## Dependencies [5]\n+\n+### Direct Runtime ROS Dependencies [5.i]\n+\n+As an external dependency, there are no ROS dependencies in `spdlog`.\n+\n+### Optional Direct Runtime ROS Dependencies [5.ii]\n+\n+As an external dependency, there are no ROS dependencies in `spdlog`.\n+\n+### Direct Runtime non-ROS Dependency [5.iii]\n+\n+There are no external dependencies in `spdlog`.\n+\n+## Platform Support [6]\n+\n+The `spdlog` documentation states that it is supported on the following platforms, and more:\n+* Linux (gcc 4.8-7.0) (Partially [Tested in CI](https://travis-ci.org/github/gabime/spdlog))\n+* Windows (msvc 2013+) (Partially [Tested in CI](https://ci.appveyor.com/project/gabime/spdlog))\n+* macOS (clang 3.5-7.0) (Partially [Tested in CI](https://travis-ci.org/github/gabime/spdlog))\n+\n+## Security [7]\n+\n+### Vulnerability Disclosure Policy [7.i]\n+\n+There is no Vulnerability Disclosure Policy for `spdlog`."
+        }
+      ]
+    },
+    {
+      "author": "clalancette",
+      "date": "2019-09-24T18:21:28Z",
+      "sha": "4f9d34a6d56b1cf1cdd14ac36149ea5c8c8b2e02",
+      "message": "Initial commit.\n\nSigned-off-by: Chris Lalancette <clalancette@openrobotics.org>",
+      "files_changed": 4,
+      "additions": 303,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "fc19f4c71a2cdecb35099b521e2ada62d6a88376",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 77,
+          "deletions": 0,
+          "changes": 77,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/4f9d34a6d56b1cf1cdd14ac36149ea5c8c8b2e02/CMakeLists.txt",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/4f9d34a6d56b1cf1cdd14ac36149ea5c8c8b2e02/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/CMakeLists.txt?ref=4f9d34a6d56b1cf1cdd14ac36149ea5c8c8b2e02",
+          "patch": "@@ -0,0 +1,77 @@\n+cmake_minimum_required(VERSION 3.5)\n+\n+project(spdlog_vendor)\n+\n+find_package(ament_cmake REQUIRED)\n+\n+option(FORCE_BUILD_VENDOR_PKG\n+  \"Build spdlog from source, even if system-installed package is available\"\n+  OFF)\n+\n+if(NOT FORCE_BUILD_VENDOR_PKG)\n+  find_package(spdlog QUIET)\n+endif()\n+\n+macro(build_spdlog)\n+  set(extra_cmake_args)\n+  if(DEFINED CMAKE_BUILD_TYPE)\n+    list(APPEND extra_cmake_args -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE})\n+  endif()\n+  if(DEFINED CMAKE_TOOLCHAIN_FILE)\n+    list(APPEND extra_cmake_args \"-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}\")\n+    if(ANDROID)\n+      if(DEFINED ANDROID_ABI)\n+        list(APPEND extra_cmake_args \"-DANDROID_ABI=${ANDROID_ABI}\")\n+      endif()\n+      if(DEFINED ANDROID_CPP_FEATURES)\n+        list(APPEND extra_cmake_args \"-DANDROID_CPP_FEATURES=${ANDROID_CPP_FEATURES}\")\n+      endif()\n+      if(DEFINED ANDROID_FUNCTION_LEVEL_LINKING)\n+        list(APPEND extra_cmake_args \"-DANDROID_FUNCTION_LEVEL_LINKING=${ANDROID_FUNCTION_LEVEL_LINKING}\")\n+      endif()\n+      if(DEFINED ANDROID_NATIVE_API_LEVEL)\n+        list(APPEND extra_cmake_args \"-DANDROID_NATIVE_API_LEVEL=${ANDROID_NATIVE_API_LEVEL}\")\n+      endif()\n+      if(DEFINED ANDROID_NDK)\n+        list(APPEND extra_cmake_args \"-DANDROID_NDK=${ANDROID_NDK}\")\n+      endif()\n+      if(DEFINED ANDROID_STL)\n+        list(APPEND extra_cmake_args \"-DANDROID_STL=${ANDROID_STL}\")\n+      endif()\n+      if(DEFINED ANDROID_TOOLCHAIN_NAME)\n+        list(APPEND extra_cmake_args \"-DANDROID_TOOLCHAIN_NAME=${ANDROID_TOOLCHAIN_NAME}\")\n+      endif()\n+    endif()\n+  else()\n+    list(APPEND extra_cmake_args \"-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}\")\n+    list(APPEND extra_cmake_args \"-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}\")\n+  endif()\n+  list(APPEND extra_cmake_args \"-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}\")\n+\n+  include(ExternalProject)\n+  # Get spdlog 1.3.1\n+  ExternalProject_Add(spdlog-1.3.1\n+    URL https://github.com/gabime/spdlog/archive/v1.3.1.tar.gz\n+    URL_MD5 3c17dd6983de2a66eca8b5a0b213d29f\n+    TIMEOUT 600\n+    CMAKE_ARGS\n+      -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_install\n+      ${extra_cmake_args}\n+      -Wno-dev\n+  )\n+\n+  # The external project will install to the build folder, but we'll install that on make install.\n+  install(\n+    DIRECTORY\n+      ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_install/\n+    DESTINATION\n+      ${CMAKE_INSTALL_PREFIX}\n+  )\n+endmacro()\n+\n+if(NOT spdlog_FOUND OR \"${spdlog_VERSION}\" VERSION_LESS 1.3.1)\n+  build_spdlog()\n+endif()\n+\n+# this ensures that the package has an environment hook setting the PATH\n+ament_package()"
+        },
+        {
+          "sha": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 201,
+          "deletions": 0,
+          "changes": 201,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/4f9d34a6d56b1cf1cdd14ac36149ea5c8c8b2e02/LICENSE",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/4f9d34a6d56b1cf1cdd14ac36149ea5c8c8b2e02/LICENSE",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/LICENSE?ref=4f9d34a6d56b1cf1cdd14ac36149ea5c8c8b2e02",
+          "patch": "@@ -0,0 +1,201 @@\n+                                 Apache License\n+                           Version 2.0, January 2004\n+                        http://www.apache.org/licenses/\n+\n+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION\n+\n+   1. Definitions.\n+\n+      \"License\" shall mean the terms and conditions for use, reproduction,\n+      and distribution as defined by Sections 1 through 9 of this document.\n+\n+      \"Licensor\" shall mean the copyright owner or entity authorized by\n+      the copyright owner that is granting the License.\n+\n+      \"Legal Entity\" shall mean the union of the acting entity and all\n+      other entities that control, are controlled by, or are under common\n+      control with that entity. For the purposes of this definition,\n+      \"control\" means (i) the power, direct or indirect, to cause the\n+      direction or management of such entity, whether by contract or\n+      otherwise, or (ii) ownership of fifty percent (50%) or more of the\n+      outstanding shares, or (iii) beneficial ownership of such entity.\n+\n+      \"You\" (or \"Your\") shall mean an individual or Legal Entity\n+      exercising permissions granted by this License.\n+\n+      \"Source\" form shall mean the preferred form for making modifications,\n+      including but not limited to software source code, documentation\n+      source, and configuration files.\n+\n+      \"Object\" form shall mean any form resulting from mechanical\n+      transformation or translation of a Source form, including but\n+      not limited to compiled object code, generated documentation,\n+      and conversions to other media types.\n+\n+      \"Work\" shall mean the work of authorship, whether in Source or\n+      Object form, made available under the License, as indicated by a\n+      copyright notice that is included in or attached to the work\n+      (an example is provided in the Appendix below).\n+\n+      \"Derivative Works\" shall mean any work, whether in Source or Object\n+      form, that is based on (or derived from) the Work and for which the\n+      editorial revisions, annotations, elaborations, or other modifications\n+      represent, as a whole, an original work of authorship. For the purposes\n+      of this License, Derivative Works shall not include works that remain\n+      separable from, or merely link (or bind by name) to the interfaces of,\n+      the Work and Derivative Works thereof.\n+\n+      \"Contribution\" shall mean any work of authorship, including\n+      the original version of the Work and any modifications or additions\n+      to that Work or Derivative Works thereof, that is intentionally\n+      submitted to Licensor for inclusion in the Work by the copyright owner\n+      or by an individual or Legal Entity authorized to submit on behalf of\n+      the copyright owner. For the purposes of this definition, \"submitted\"\n+      means any form of electronic, verbal, or written communication sent\n+      to the Licensor or its representatives, including but not limited to\n+      communication on electronic mailing lists, source code control systems,\n+      and issue tracking systems that are managed by, or on behalf of, the\n+      Licensor for the purpose of discussing and improving the Work, but\n+      excluding communication that is conspicuously marked or otherwise\n+      designated in writing by the copyright owner as \"Not a Contribution.\"\n+\n+      \"Contributor\" shall mean Licensor and any individual or Legal Entity\n+      on behalf of whom a Contribution has been received by Licensor and\n+      subsequently incorporated within the Work.\n+\n+   2. Grant of Copyright License. Subject to the terms and conditions of\n+      this License, each Contributor hereby grants to You a perpetual,\n+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n+      copyright license to reproduce, prepare Derivative Works of,\n+      publicly display, publicly perform, sublicense, and distribute the\n+      Work and such Derivative Works in Source or Object form.\n+\n+   3. Grant of Patent License. Subject to the terms and conditions of\n+      this License, each Contributor hereby grants to You a perpetual,\n+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n+      (except as stated in this section) patent license to make, have made,\n+      use, offer to sell, sell, import, and otherwise transfer the Work,\n+      where such license applies only to those patent claims licensable\n+      by such Contributor that are necessarily infringed by their\n+      Contribution(s) alone or by combination of their Contribution(s)\n+      with the Work to which such Contribution(s) was submitted. If You\n+      institute patent litigation against any entity (including a\n+      cross-claim or counterclaim in a lawsuit) alleging that the Work\n+      or a Contribution incorporated within the Work constitutes direct\n+      or contributory patent infringement, then any patent licenses\n+      granted to You under this License for that Work shall terminate\n+      as of the date such litigation is filed.\n+\n+   4. Redistribution. You may reproduce and distribute copies of the\n+      Work or Derivative Works thereof in any medium, with or without\n+      modifications, and in Source or Object form, provided that You\n+      meet the following conditions:\n+\n+      (a) You must give any other recipients of the Work or\n+          Derivative Works a copy of this License; and\n+\n+      (b) You must cause any modified files to carry prominent notices\n+          stating that You changed the files; and\n+\n+      (c) You must retain, in the Source form of any Derivative Works\n+          that You distribute, all copyright, patent, trademark, and\n+          attribution notices from the Source form of the Work,\n+          excluding those notices that do not pertain to any part of\n+          the Derivative Works; and\n+\n+      (d) If the Work includes a \"NOTICE\" text file as part of its\n+          distribution, then any Derivative Works that You distribute must\n+          include a readable copy of the attribution notices contained\n+          within such NOTICE file, excluding those notices that do not\n+          pertain to any part of the Derivative Works, in at least one\n+          of the following places: within a NOTICE text file distributed\n+          as part of the Derivative Works; within the Source form or\n+          documentation, if provided along with the Derivative Works; or,\n+          within a display generated by the Derivative Works, if and\n+          wherever such third-party notices normally appear. The contents\n+          of the NOTICE file are for informational purposes only and\n+          do not modify the License. You may add Your own attribution\n+          notices within Derivative Works that You distribute, alongside\n+          or as an addendum to the NOTICE text from the Work, provided\n+          that such additional attribution notices cannot be construed\n+          as modifying the License.\n+\n+      You may add Your own copyright statement to Your modifications and\n+      may provide additional or different license terms and conditions\n+      for use, reproduction, or distribution of Your modifications, or\n+      for any such Derivative Works as a whole, provided Your use,\n+      reproduction, and distribution of the Work otherwise complies with\n+      the conditions stated in this License.\n+\n+   5. Submission of Contributions. Unless You explicitly state otherwise,\n+      any Contribution intentionally submitted for inclusion in the Work\n+      by You to the Licensor shall be under the terms and conditions of\n+      this License, without any additional terms or conditions.\n+      Notwithstanding the above, nothing herein shall supersede or modify\n+      the terms of any separate license agreement you may have executed\n+      with Licensor regarding such Contributions.\n+\n+   6. Trademarks. This License does not grant permission to use the trade\n+      names, trademarks, service marks, or product names of the Licensor,\n+      except as required for reasonable and customary use in describing the\n+      origin of the Work and reproducing the content of the NOTICE file.\n+\n+   7. Disclaimer of Warranty. Unless required by applicable law or\n+      agreed to in writing, Licensor provides the Work (and each\n+      Contributor provides its Contributions) on an \"AS IS\" BASIS,\n+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or\n+      implied, including, without limitation, any warranties or conditions\n+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A\n+      PARTICULAR PURPOSE. You are solely responsible for determining the\n+      appropriateness of using or redistributing the Work and assume any\n+      risks associated with Your exercise of permissions under this License.\n+\n+   8. Limitation of Liability. In no event and under no legal theory,\n+      whether in tort (including negligence), contract, or otherwise,\n+      unless required by applicable law (such as deliberate and grossly\n+      negligent acts) or agreed to in writing, shall any Contributor be\n+      liable to You for damages, including any direct, indirect, special,\n+      incidental, or consequential damages of any character arising as a\n+      result of this License or out of the use or inability to use the\n+      Work (including but not limited to damages for loss of goodwill,\n+      work stoppage, computer failure or malfunction, or any and all\n+      other commercial damages or losses), even if such Contributor\n+      has been advised of the possibility of such damages.\n+\n+   9. Accepting Warranty or Additional Liability. While redistributing\n+      the Work or Derivative Works thereof, You may choose to offer,\n+      and charge a fee for, acceptance of support, warranty, indemnity,\n+      or other liability obligations and/or rights consistent with this\n+      License. However, in accepting such obligations, You may act only\n+      on Your own behalf and on Your sole responsibility, not on behalf\n+      of any other Contributor, and only if You agree to indemnify,\n+      defend, and hold each Contributor harmless for any liability\n+      incurred by, or claims asserted against, such Contributor by reason\n+      of your accepting any such warranty or additional liability.\n+\n+   END OF TERMS AND CONDITIONS\n+\n+   APPENDIX: How to apply the Apache License to your work.\n+\n+      To apply the Apache License to your work, attach the following\n+      boilerplate notice, with the fields enclosed by brackets \"[]\"\n+      replaced with your own identifying information. (Don't include\n+      the brackets!)  The text should be enclosed in the appropriate\n+      comment syntax for the file format. We also recommend that a\n+      file or class name and description of purpose be included on the\n+      same \"printed page\" as the copyright notice for easier\n+      identification within third-party archives.\n+\n+   Copyright [yyyy] [name of copyright owner]\n+\n+   Licensed under the Apache License, Version 2.0 (the \"License\");\n+   you may not use this file except in compliance with the License.\n+   You may obtain a copy of the License at\n+\n+       http://www.apache.org/licenses/LICENSE-2.0\n+\n+   Unless required by applicable law or agreed to in writing, software\n+   distributed under the License is distributed on an \"AS IS\" BASIS,\n+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+   See the License for the specific language governing permissions and\n+   limitations under the License."
+        },
+        {
+          "sha": "256bb2c64579ee70dd18dcf20faf0705b88731e2",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/4f9d34a6d56b1cf1cdd14ac36149ea5c8c8b2e02/README.md",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/4f9d34a6d56b1cf1cdd14ac36149ea5c8c8b2e02/README.md",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/README.md?ref=4f9d34a6d56b1cf1cdd14ac36149ea5c8c8b2e02",
+          "patch": "@@ -0,0 +1,2 @@\n+# spdlog_vendor\n+CMake shim over the spdlog library: https://github.com/gabime/spdlog.git"
+        },
+        {
+          "sha": "10a928a41dafcea7d20a8ecf21ab81db71f05c92",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/4f9d34a6d56b1cf1cdd14ac36149ea5c8c8b2e02/package.xml",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/4f9d34a6d56b1cf1cdd14ac36149ea5c8c8b2e02/package.xml",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/package.xml?ref=4f9d34a6d56b1cf1cdd14ac36149ea5c8c8b2e02",
+          "patch": "@@ -0,0 +1,23 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model\n+  href=\"http://download.ros.org/schema/package_format2.xsd\"\n+  schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"2\">\n+  <name>spdlog_vendor</name>\n+  <version>1.0.0</version>\n+  <description>\n+    Wrapper around spdlog, providing nothing but a dependency on spdlog, on some systems.\n+    On others, it provides an ExternalProject build of spdlog.\n+  </description>\n+  <maintainer email=\"clalancette@openrobotics.org\">Chris Lalancette</maintainer>\n+  <license>Apache License 2.0</license>  <!-- the contents of this package are Apache 2.0 -->\n+  <license>MIT</license>  <!-- spdlog is MIT -->\n+\n+  <url type=\"website\">https://github.com/gabime/spdlog</url>\n+\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n+</package>"
+        }
+      ]
+    },
+    {
+      "author": "marcoag",
+      "date": "2024-04-04T12:28:55Z",
+      "sha": "17a72b5f38e408c56d9e843c8f5015a16e561386",
+      "message": "Upgrade to v1.12.0. (#35)\n\nSigned-off-by: Marco A. Gutierrez <marcogg@marcogg.com>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "8f5efa0c68fc3da8521c8b0dac09b435606d3bf7",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/17a72b5f38e408c56d9e843c8f5015a16e561386/CMakeLists.txt",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/17a72b5f38e408c56d9e843c8f5015a16e561386/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/CMakeLists.txt?ref=17a72b5f38e408c56d9e843c8f5015a16e561386",
+          "patch": "@@ -13,7 +13,7 @@ set(BUILD_SHARED_LIBS TRUE CACHE BOOL \"Build shared libraries\")\n ament_vendor(spdlog_vendor\n   SATISFIED ${spdlog_FOUND}\n   VCS_URL https://github.com/gabime/spdlog.git\n-  VCS_VERSION v1.9.2\n+  VCS_VERSION v1.12.0\n   CMAKE_ARGS\n     -DSPDLOG_BUILD_TESTS:BOOL=OFF\n     -DSPDLOG_BUILD_EXAMPLE:BOOL=OFF"
+        }
+      ]
+    },
+    {
+      "author": "ahcorde",
+      "date": "2020-06-30T06:22:08Z",
+      "sha": "e3fa186a8442751be0680af44b62b5604af8077b",
+      "message": "Bump QD to level 3 and updated QD (#14)\n\n* Bump QD to level3 and fixed QD\r\n\r\nSigned-off-by: ahcorde <ahcorde@gmail.com>\r\n\r\n* Added feedback\r\n\r\nSigned-off-by: ahcorde <ahcorde@gmail.com>\r\n\r\n* Added feedback\r\n\r\nSigned-off-by: ahcorde <ahcorde@gmail.com>",
+      "files_changed": 2,
+      "additions": 18,
+      "deletions": 21,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "6bee20b6574d05128f4cdefa64159eac584f79fa",
+          "filename": "QUALITY_DECLARATION.md",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 17,
+          "changes": 32,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/e3fa186a8442751be0680af44b62b5604af8077b/QUALITY_DECLARATION.md",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/e3fa186a8442751be0680af44b62b5604af8077b/QUALITY_DECLARATION.md",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/QUALITY_DECLARATION.md?ref=e3fa186a8442751be0680af44b62b5604af8077b",
+          "patch": "@@ -1,8 +1,8 @@\n This document is a declaration of software quality for the `spdlog_vendor` package, based on the guidelines in [REP-2004](https://www.ros.org/reps/rep-2004.html).\n \n-# `spdlog_vendor` Quality Declaration\n+# spdlog_vendor Quality Declaration\n \n-The package `spdlog_vendor` claims to be in the **Quality Level 4** category.\n+The package `spdlog_vendor` claims to be in the **Quality Level 3** category.\n \n Below are the rationales, notes, and caveats for this claim, organized by each requirement listed in the [Package Quality Categories in REP-2004](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#package-quality-categories) of the ROS2 developer guide.\n \n@@ -45,10 +45,10 @@ All pull requests will be peer-reviewed, check the [ROS 2 Developer Guide](https\n All pull requests must pass CI on all [tier 1 platforms](https://www.ros.org/reps/rep-2000.html#support-tiers).\n \n Currently nightly results can be seen here:\n-* [linux-aarch64_release](https://ci.ros2.org/view/nightly/job/nightly_linux-aarch64_release/lastBuild/testReport/spdlog_vendor/)\n-* [linux_release](https://ci.ros2.org/view/nightly/job/nightly_linux_release/lastBuild/testReport/spdlog_vendor/)\n-* [mac_osx_release](https://ci.ros2.org/view/nightly/job/nightly_osx_release/lastBuild/testReport/spdlog_vendor/)\n-* [windows_release](https://ci.ros2.org/view/nightly/job/nightly_win_rel/lastBuild/testReport/spdlog_vendor/)\n+* [linux-aarch64_release](https://ci.ros2.org/view/nightly/job/nightly_linux-aarch64_release/lastSuccessfulBuild/testReport/spdlog_vendor/)\n+* [linux_release](https://ci.ros2.org/view/nightly/job/nightly_linux_release/lastSuccessfulBuild/testReport/spdlog_vendor/)\n+* [mac_osx_release](https://ci.ros2.org/view/nightly/job/nightly_osx_release/lastSuccessfulBuild/testReport/spdlog_vendor/)\n+* [windows_release](https://ci.ros2.org/view/nightly/job/nightly_win_rel/lastSuccessfulBuild/testReport/spdlog_vendor/)\n \n ### Documentation Policy [2.v]\n \n@@ -68,13 +68,13 @@ All pull requests must resolve related documentation changes before merging.\n \n The license for `spdlog_vendor` is Apache 2.0, and a summary is in each source file, the type is declared in the [`package.xml`](./package.xml) manifest file, and a full copy of the license is in the [LICENSE](./LICENSE) file. The vendored library, `spdlog` license is MIT as stated in its [Quality declaration](./SPDLOG_QUALITY_DECLARATION.md) document (Section 5.iii).\n \n-There is an automated test which runs a linter that ensures each file has a license statement. [Here](https://ci.ros2.org/view/nightly/job/nightly_linux-aarch64_release/lastBuild/testReport/spdlog_vendor/) can be found a list with the latest results of the various linters being run on the package.\n+There is an automated test which runs a linter that ensures each file has a license statement. [Here](https://ci.ros2.org/view/nightly/job/nightly_linux-aarch64_release/lastSuccessfulBuild/testReport/spdlog_vendor/) can be found a list with the latest results of the various linters being run on the package.\n \n ### Copyright Statements [3.iv]\n \n The copyright holders each provide a statement of copyright in each source code file in `spdlog_vendor`.\n \n-There is an automated test which runs a linter that ensures each file has at least one copyright statement. Latest linter result report can be seen [here](https://ci.ros2.org/view/nightly/job/nightly_linux-aarch64_release/lastBuild/testReport/spdlog_vendor/copyright/).\n+There is an automated test which runs a linter that ensures each file has at least one copyright statement. Latest linter result report can be seen [here](https://ci.ros2.org/view/nightly/job/nightly_linux-aarch64_release/lastSuccessfulBuild/testReport/spdlog_vendor/copyright/).\n \n ## Testing [4]\n \n@@ -85,10 +85,10 @@ There is an automated test which runs a linter that ensures each file has at lea\n `spdlog_vendor` uses and passes all the ROS2 standard linters and static analysis tools as described in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#linters-and-static-analysis). Passing implies there are no linter/static errors when testing against CI of supported platforms.\n \n Currently nightly test results can be seen here:\n-* [linux-aarch64_release](https://ci.ros2.org/view/nightly/job/nightly_linux-aarch64_release/lastBuild/testReport/spdlog_vendor/)\n-* [linux_release](https://ci.ros2.org/view/nightly/job/nightly_linux_release/lastBuild/testReport/spdlog_vendor/)\n-* [mac_osx_release](https://ci.ros2.org/view/nightly/job/nightly_osx_release/lastBuild/testReport/spdlog_vendor/)\n-* [windows_release](https://ci.ros2.org/view/nightly/job/nightly_win_rel/lastBuild/testReport/spdlog_vendor/)\n+* [linux-aarch64_release](https://ci.ros2.org/view/nightly/job/nightly_linux-aarch64_release/lastSuccessfulBuild/testReport/spdlog_vendor/)\n+* [linux_release](https://ci.ros2.org/view/nightly/job/nightly_linux_release/lastSuccessfulBuild/testReport/spdlog_vendor/)\n+* [mac_osx_release](https://ci.ros2.org/view/nightly/job/nightly_osx_release/lastSuccessfulBuild/testReport/spdlog_vendor/)\n+* [windows_release](https://ci.ros2.org/view/nightly/job/nightly_win_rel/lastSuccessfulBuild/testReport/spdlog_vendor/)\n \n ## Dependencies [5]\n \n@@ -98,7 +98,7 @@ Currently nightly test results can be seen here:\n \n ### Direct Runtime non-ROS Dependency [5.iii]\n \n-`spdlog_vendor` depends directly on the external dependency `spdlog`, which is qualified as quality level 4 in its [Quality Declaration](./SPDLOG_QUALITY_DECLARATION.md).\n+`spdlog_vendor` depends directly on the external dependency `spdlog`, which is qualified as quality level 3 in its [Quality Declaration](./SPDLOG_QUALITY_DECLARATION.md).\n \n ## Platform Support [6]\n \n@@ -151,10 +151,8 @@ The chart below compares the requirements in the REP-2004 with the current state\n |6| Platform support | --- |\n |6.i| Support targets Tier1 ROS platforms| ✓ |\n |7| Security | --- |\n-|7.i| Vulnerability Disclosure Policy | ☓ |\n+|7.i| Vulnerability Disclosure Policy | ✓ |\n \n-Comparing this table with the [Quality Level Comparison Chart of REP2004](https://github.com/ros-infrastructure/rep/blob/master/rep-2004.rst#quality-level-comparison-chart) lead us to decide that this package qualifies to Quality Level 4.\n-\n-To reach Quality level 2, adding a Vulnerability Disclosure will be needed.\n+Comparing this table with the [Quality Level Comparison Chart of REP2004](https://github.com/ros-infrastructure/rep/blob/master/rep-2004.rst#quality-level-comparison-chart) lead us to decide that this package qualifies to Quality Level 3.\n \n `spdlog_vendor` is limited by the quality level of the upstream dependency spdlog. In order to reach higher quality levels, the issues limiting `spdlog` will either need to be addressed by `spdlog` itself, or through adequate quality control measures in this package."
+        },
+        {
+          "sha": "8dff5ce6e020aaccb5adac0f73dbc55b8e7d3738",
+          "filename": "SPDLOG_QUALITY_DECLARATION.md",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 4,
+          "changes": 7,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/e3fa186a8442751be0680af44b62b5604af8077b/SPDLOG_QUALITY_DECLARATION.md",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/e3fa186a8442751be0680af44b62b5604af8077b/SPDLOG_QUALITY_DECLARATION.md",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/SPDLOG_QUALITY_DECLARATION.md?ref=e3fa186a8442751be0680af44b62b5604af8077b",
+          "patch": "@@ -29,16 +29,15 @@ For the compiled portion of `spdlog`, the `SPDLOG_API` C++ macro indicates the s\n \n ### API Stability Policy [1.iv]\n \n-There is no published policy for API stability in `spdlog`.\n+There is no policy for API stability. However, the vendored package `spdlog_vendor` package importing the `spdlog dependency` is using a fixed version, in this case [1.5.0](https://github.com/gabime/spdlog/releases/tag/v1.5.0), which will provide API stability to downstream packages.\n \n ### ABI Stability Policy [1.v]\n \n-There is no published policy for ABI stability in `spdlog`.\n+There is no policy for ABI stability. This is not a problem because the `spdlog_vendor` package importing the `spdlog` dependency is using a fixed version, in this case [1.5.0](https://github.com/gabime/spdlog/releases/tag/v1.5.0).\n \n ### ABI and ABI Stability Within a Released ROS Distribution [1.vi]\n \n-As an external package, `spdlog` is not released on the same cadence as ROS.\n-However, the `spdlog_vendor` package controls what version of `spdlog` is acceptable, so API/ABI stability within a ROS release can be enforced.\n+`spdlog`'s API and ABI stability within a ROS Distribution are maintained by `spdlog_vendor` which pins the `spdlog` dependency to a specific version, in this case [1.5.0](https://github.com/gabime/spdlog/releases/tag/v1.5.0).\n \n ## Change Control Process [2]\n "
+        }
+      ]
+    },
+    {
+      "author": "Yadunund",
+      "date": "2023-04-28T11:10:02Z",
+      "sha": "8fecda4dbb1850e9b2075340254295949dabe7a4",
+      "message": "1.5.0",
+      "files_changed": 2,
+      "additions": 4,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "5d4e149fb62468184ebc2e8511fed26505af00f0",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/8fecda4dbb1850e9b2075340254295949dabe7a4/CHANGELOG.rst",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/8fecda4dbb1850e9b2075340254295949dabe7a4/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/CHANGELOG.rst?ref=8fecda4dbb1850e9b2075340254295949dabe7a4",
+          "patch": "@@ -2,6 +2,9 @@\n Changelog for package spdlog_vendor\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+1.5.0 (2023-04-28)\n+------------------\n+\n 1.4.4 (2023-04-11)\n ------------------\n * Update to spdlog 1.9.2 (`#33 <https://github.com/ros2/spdlog_vendor/issues/33>`_)"
+        },
+        {
+          "sha": "f779d770e07b819b09780f04c2c5e71775e0e485",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/8fecda4dbb1850e9b2075340254295949dabe7a4/package.xml",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/8fecda4dbb1850e9b2075340254295949dabe7a4/package.xml",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/package.xml?ref=8fecda4dbb1850e9b2075340254295949dabe7a4",
+          "patch": "@@ -4,7 +4,7 @@\n   schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"2\">\n   <name>spdlog_vendor</name>\n-  <version>1.4.4</version>\n+  <version>1.5.0</version>\n   <description>\n     Wrapper around spdlog, providing nothing but a dependency on spdlog, on some systems.\n     On others, it provides an ExternalProject build of spdlog."
+        }
+      ]
+    },
+    {
+      "author": "audrow",
+      "date": "2022-11-17T14:02:00Z",
+      "sha": "67e338e0a0a47b28ab9fd32a9473a21c006f7bff",
+      "message": "[rolling] Update maintainers - 2022-11-07 (#31)",
+      "files_changed": 2,
+      "additions": 5,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "39caf944d49d25b72496d1bee5bdca87bb10dfa6",
+          "filename": "CODEOWNERS",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/67e338e0a0a47b28ab9fd32a9473a21c006f7bff/CODEOWNERS",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/67e338e0a0a47b28ab9fd32a9473a21c006f7bff/CODEOWNERS",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/CODEOWNERS?ref=67e338e0a0a47b28ab9fd32a9473a21c006f7bff",
+          "patch": "@@ -0,0 +1,2 @@\n+# This file was generated by https://github.com/audrow/update-ros2-repos\n+* @quarkytale @cottsay"
+        },
+        {
+          "sha": "e19559ee22e8d70750e6c73fe52a823d5cf2cb56",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/67e338e0a0a47b28ab9fd32a9473a21c006f7bff/package.xml",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/67e338e0a0a47b28ab9fd32a9473a21c006f7bff/package.xml",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/package.xml?ref=67e338e0a0a47b28ab9fd32a9473a21c006f7bff",
+          "patch": "@@ -9,7 +9,10 @@\n     Wrapper around spdlog, providing nothing but a dependency on spdlog, on some systems.\n     On others, it provides an ExternalProject build of spdlog.\n   </description>\n+\n   <maintainer email=\"dharini@openrobotics.org\">Dharini Dutia</maintainer>\n+  <maintainer email=\"scott@openrobotics.org\">Scott K Logan</maintainer>\n+\n   <license>Apache License 2.0</license>  <!-- the contents of this package are Apache 2.0 -->\n   <license>MIT</license>  <!-- spdlog is MIT -->\n "
+        }
+      ]
+    },
+    {
+      "author": "Crola1702",
+      "date": "2022-09-12T14:37:49Z",
+      "sha": "e33de128109ad048776dcb13b2edf47ae7f906c0",
+      "message": "Fixes policy CMP0135 warning for CMake >= 3.24 (#30)\n\n* Fixes policy CMP0135 warning for CMake >= 3.24\r\n\r\nSigned-off-by: Crola1702 <cristobal.arroyo@ekumenlabs.com>",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "f84e06de10d9e10c1da917593a1b1d051cbbc0f6",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/e33de128109ad048776dcb13b2edf47ae7f906c0/CMakeLists.txt",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/e33de128109ad048776dcb13b2edf47ae7f906c0/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/CMakeLists.txt?ref=e33de128109ad048776dcb13b2edf47ae7f906c0",
+          "patch": "@@ -5,6 +5,11 @@ project(spdlog_vendor)\n find_package(ament_cmake REQUIRED)\n ament_add_default_options()\n \n+# Avoid DOWNLOAD_EXTRACT_TIMESTAMP warning for CMake >= 3.24\n+if(POLICY CMP0135)\n+  cmake_policy(SET CMP0135 NEW)\n+endif()\n+\n option(FORCE_BUILD_VENDOR_PKG\n   \"Build spdlog from source, even if system-installed package is available\"\n   OFF)"
+        }
+      ]
+    },
+    {
+      "author": "hannes09",
+      "date": "2022-07-12T17:25:39Z",
+      "sha": "4174be33a38958fbce4b5c09cc66b07cebd05eb5",
+      "message": "build shared lib only if BUILD_SHARED_LIBS is set (#29)\n\nCo-authored-by: Hannes Harms <h.harms@grimme.de>",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "48606e15ba442d539bdb05c080e27d1800a7fdd5",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/4174be33a38958fbce4b5c09cc66b07cebd05eb5/CMakeLists.txt",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/4174be33a38958fbce4b5c09cc66b07cebd05eb5/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/CMakeLists.txt?ref=4174be33a38958fbce4b5c09cc66b07cebd05eb5",
+          "patch": "@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.5)\n project(spdlog_vendor)\n \n find_package(ament_cmake REQUIRED)\n+ament_add_default_options()\n \n option(FORCE_BUILD_VENDOR_PKG\n   \"Build spdlog from source, even if system-installed package is available\"\n@@ -48,7 +49,7 @@ macro(build_spdlog)\n   list(APPEND extra_cmake_args \"-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}\")\n   list(APPEND extra_cmake_args \"-DSPDLOG_BUILD_TESTS=OFF\")\n   list(APPEND extra_cmake_args \"-DSPDLOG_BUILD_EXAMPLE=OFF\")\n-  if(NOT WIN32)\n+  if(NOT WIN32 AND BUILD_SHARED_LIBS)\n     list(APPEND extra_cmake_args \"-DSPDLOG_BUILD_SHARED=ON\")\n   endif()\n "
+        }
+      ]
+    },
+    {
+      "author": "paudrow",
+      "date": "2022-05-04T21:25:28Z",
+      "sha": "68d3256fe4688597f08eb6920b647202c8d550ff",
+      "message": "1.4.0\n\nSigned-off-by: Audrow Nash <audrow@hey.com>",
+      "files_changed": 2,
+      "additions": 4,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "f7d33dba48e8565032ca91b1de695edb85a6c8f1",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/68d3256fe4688597f08eb6920b647202c8d550ff/CHANGELOG.rst",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/68d3256fe4688597f08eb6920b647202c8d550ff/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/CHANGELOG.rst?ref=68d3256fe4688597f08eb6920b647202c8d550ff",
+          "patch": "@@ -2,6 +2,9 @@\n Changelog for package spdlog_vendor\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+1.4.0 (2022-05-04)\n+------------------\n+\n 1.3.0 (2021-04-06)\n ------------------\n * updating quality declaration links (re: `ros2/docs.ros2.org#52 <https://github.com/ros2/docs.ros2.org/issues/52>`_) (`#24 <https://github.com/ros2/spdlog_vendor/issues/24>`_)"
+        },
+        {
+          "sha": "9d016f081d06ee4bec3c7625479d84ae2ee3d7fb",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/68d3256fe4688597f08eb6920b647202c8d550ff/package.xml",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/68d3256fe4688597f08eb6920b647202c8d550ff/package.xml",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/package.xml?ref=68d3256fe4688597f08eb6920b647202c8d550ff",
+          "patch": "@@ -4,7 +4,7 @@\n   schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n <package format=\"2\">\n   <name>spdlog_vendor</name>\n-  <version>1.3.0</version>\n+  <version>1.4.0</version>\n   <description>\n     Wrapper around spdlog, providing nothing but a dependency on spdlog, on some systems.\n     On others, it provides an ExternalProject build of spdlog."
+        }
+      ]
+    },
+    {
+      "author": "quarkytale",
+      "date": "2022-05-11T01:35:21Z",
+      "sha": "aac849af98d206fe8e7773cfe0ee497b7a7f80a4",
+      "message": "updating maintainer\n\nSigned-off-by: Dharini Dutia <dharini@openrobotics.org>",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "48abd77c64962c13206cdc23f9823fd0caaebe56",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/aac849af98d206fe8e7773cfe0ee497b7a7f80a4/package.xml",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/aac849af98d206fe8e7773cfe0ee497b7a7f80a4/package.xml",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/package.xml?ref=aac849af98d206fe8e7773cfe0ee497b7a7f80a4",
+          "patch": "@@ -9,9 +9,10 @@\n     Wrapper around spdlog, providing nothing but a dependency on spdlog, on some systems.\n     On others, it provides an ExternalProject build of spdlog.\n   </description>\n-  <maintainer email=\"clalancette@openrobotics.org\">Chris Lalancette</maintainer>\n+  <maintainer email=\"dharini@openrobotics.org\">Dharini Dutia</maintainer>\n   <license>Apache License 2.0</license>  <!-- the contents of this package are Apache 2.0 -->\n   <license>MIT</license>  <!-- spdlog is MIT -->\n+  <author email=\"clalancette@openrobotics.org\">Chris Lalancette</author>\n \n   <url type=\"website\">https://github.com/gabime/spdlog</url>\n "
+        }
+      ]
+    },
+    {
+      "author": "shonigmann",
+      "date": "2021-04-02T06:37:34Z",
+      "sha": "422ee205a0187e5fce5cca015c30fae1eeb5f6db",
+      "message": "updating quality declaration links (re: ros2/docs.ros2.org#52) (#24)\n\nSigned-off-by: Simon Honigmann <shonigmann@blueorigin.com>\r\n\r\nCo-authored-by: Simon Honigmann <shonigmann@blueorigin.com>",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 5,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "b8bea4c104cfc7024a9c41843e9e7817893cd779",
+          "filename": "QUALITY_DECLARATION.md",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 5,
+          "changes": 10,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/422ee205a0187e5fce5cca015c30fae1eeb5f6db/QUALITY_DECLARATION.md",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/422ee205a0187e5fce5cca015c30fae1eeb5f6db/QUALITY_DECLARATION.md",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/QUALITY_DECLARATION.md?ref=422ee205a0187e5fce5cca015c30fae1eeb5f6db",
+          "patch": "@@ -4,13 +4,13 @@ This document is a declaration of software quality for the `spdlog_vendor` packa\n \n The package `spdlog_vendor` claims to be in the **Quality Level 1** category.\n \n-Below are the rationales, notes, and caveats for this claim, organized by each requirement listed in the [Package Quality Categories in REP-2004](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#package-quality-categories) of the ROS2 developer guide.\n+Below are the rationales, notes, and caveats for this claim, organized by each requirement listed in the [Package Quality Categories in REP-2004](https://www.ros.org/reps/rep-2004.html) of the ROS2 developer guide.\n \n ## Version Policy [1]\n \n ### Version Scheme [1.i]\n \n-`spdlog_vendor` uses `semver` according to the recommendation for ROS Core packages in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#versioning).\n+`spdlog_vendor` uses `semver` according to the recommendation for ROS Core packages in the [ROS 2 Developer Guide](https://docs.ros.org/en/rolling/Contributing/Developer-Guide.html#versioning).\n \n ### Version Stability [1.ii]\n \n@@ -30,15 +30,15 @@ There is no policy for ABI stability. This is not a problem because the `spdlog_\n \n ## Change Control Process [2]\n \n-`spdlog_vendor` follows the recommended guidelines for ROS Core packages in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#change-control-process).\n+`spdlog_vendor` follows the recommended guidelines for ROS Core packages in the [ROS 2 Developer Guide](https://docs.ros.org/en/rolling/Contributing/Developer-Guide.html#change-control-process).\n \n ### Contributor Origin [2.ii]\n \n This package uses DCO as its confirmation of contributor origin policy. More information can be found in [CONTRIBUTING](./CONTRIBUTING.md).\n \n ### Peer Review Policy [2.iii]\n \n-All pull requests will be peer-reviewed, check the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#change-control-process) for additional information.\n+All pull requests will be peer-reviewed, check the [ROS 2 Developer Guide](https://docs.ros.org/en/rolling/Contributing/Developer-Guide.html#change-control-process) for additional information.\n \n ### Continuous Integration [2.iv]\n \n@@ -98,7 +98,7 @@ There is an automated test which runs a linter that ensures each file has at lea\n \n ### Linters and Static Analysis [4.v]\n \n-`spdlog_vendor` uses and passes all the ROS2 standard linters and static analysis tools as described in the [ROS 2 Developer Guide](https://index.ros.org/doc/ros2/Contributing/Developer-Guide/#linters-and-static-analysis). Passing implies there are no linter/static errors when testing against CI of supported platforms.\n+`spdlog_vendor` uses and passes all the ROS2 standard linters and static analysis tools as described in the [ROS 2 Developer Guide](https://docs.ros.org/en/rolling/Contributing/Developer-Guide.html#linters-and-static-analysis). Passing implies there are no linter/static errors when testing against CI of supported platforms.\n \n Currently nightly test results can be seen here:\n * [linux-aarch64_release](https://ci.ros2.org/view/nightly/job/nightly_linux-aarch64_release/lastSuccessfulBuild/testReport/spdlog_vendor/)"
+        }
+      ]
+    },
+    {
+      "author": "dirk-thomas",
+      "date": "2020-07-15T03:31:50Z",
+      "sha": "0223d4586fff5863e6d380c38bde5fee46802af7",
+      "message": "bump spdlog version to 1.6.1 (#15)\n\n* bump spdlog version to 1.6.1\r\n\r\nSigned-off-by: Dirk Thomas <dirk-thomas@users.noreply.github.com>\r\n\r\n* remove unnecessary compiler flags\r\n\r\nSigned-off-by: Dirk Thomas <dirk-thomas@users.noreply.github.com>\r\n\r\n* remove obsolete patch\r\n\r\nSigned-off-by: Dirk Thomas <dirk-thomas@users.noreply.github.com>",
+      "files_changed": 2,
+      "additions": 4,
+      "deletions": 46,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "585605a11ad3268975ca6bb7630d7b272df60e90",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 9,
+          "changes": 13,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/0223d4586fff5863e6d380c38bde5fee46802af7/CMakeLists.txt",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/0223d4586fff5863e6d380c38bde5fee46802af7/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/CMakeLists.txt?ref=0223d4586fff5863e6d380c38bde5fee46802af7",
+          "patch": "@@ -49,25 +49,20 @@ macro(build_spdlog)\n   list(APPEND extra_cmake_args \"-DSPDLOG_BUILD_TESTS=OFF\")\n   list(APPEND extra_cmake_args \"-DSPDLOG_BUILD_EXAMPLE=OFF\")\n   if(NOT WIN32)\n-    # TODO(karsten1987): re-address this once upstream ticket is resolved:\n-    # https://github.com/fmtlib/fmt/issues/1604\n-    list(APPEND extra_cmake_args \"-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} -Wno-sign-conversion\")\n     list(APPEND extra_cmake_args \"-DSPDLOG_BUILD_SHARED=ON\")\n   endif()\n \n   include(ExternalProject)\n   find_package(Patch REQUIRED)\n \n-  # Get spdlog 1.5.0\n-  externalproject_add(spdlog-1.5.0\n-    URL https://github.com/gabime/spdlog/archive/v1.5.0.tar.gz\n-    URL_MD5 a966eea01f81551527853d282896cb4d\n+  # Get spdlog 1.6.1\n+  externalproject_add(spdlog-1.6.1\n+    URL https://github.com/gabime/spdlog/archive/v1.6.1.tar.gz\n+    URL_MD5 8447612b9263a5eec1b57019c21b85f8\n     TIMEOUT 600\n     CMAKE_ARGS\n       -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_install\n       ${extra_cmake_args}\n-    PATCH_COMMAND\n-    ${Patch_EXECUTABLE} -p1 -N < ${CMAKE_CURRENT_SOURCE_DIR}/gnuinstalldirs-after-project.patch\n   )\n \n   # The external project will install to the build folder, but we'll install that on make install."
+        },
+        {
+          "sha": "ebafaf28e7a1483e541403ebf225d18e17bc0f70",
+          "filename": "gnuinstalldirs-after-project.patch",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 37,
+          "changes": 37,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/e3fa186a8442751be0680af44b62b5604af8077b/gnuinstalldirs-after-project.patch",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/e3fa186a8442751be0680af44b62b5604af8077b/gnuinstalldirs-after-project.patch",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/gnuinstalldirs-after-project.patch?ref=e3fa186a8442751be0680af44b62b5604af8077b",
+          "patch": "@@ -1,37 +0,0 @@\n-commit 1b4621962fd6787b0006ca641944aa5e60b570e5\n-Author: Vitaly Lipatov <lav@etersoft.ru>\n-Date:   Thu Jan 30 14:51:42 2020 +0300\n-\n-    CMakeLists.txt: put GNUInstallDirs after set project language\n-\n-diff --git a/CMakeLists.txt b/CMakeLists.txt\n-index 508a0b65..4c414f0e 100644\n---- a/CMakeLists.txt\n-+++ b/CMakeLists.txt\n-@@ -6,12 +6,16 @@ cmake_minimum_required(VERSION 3.2)\n- #---------------------------------------------------------------------------------------\n- # Start spdlog project\n- #---------------------------------------------------------------------------------------\n--include(GNUInstallDirs)\n- include(cmake/utils.cmake)\n- include(cmake/ide.cmake)\n- \n- spdlog_extract_version()\n- \n-+project(spdlog VERSION ${SPDLOG_VERSION} LANGUAGES CXX)\n-+message(STATUS \"Build spdlog: ${SPDLOG_VERSION}\")\n-+\n-+include(GNUInstallDirs)\n-+\n- #---------------------------------------------------------------------------------------\n- # Set default build to release\n- #---------------------------------------------------------------------------------------\n-@@ -19,8 +23,6 @@ if(NOT CMAKE_BUILD_TYPE)\n-     set(CMAKE_BUILD_TYPE \"Release\" CACHE STRING \"Choose Release or Debug\" FORCE)\n- endif()\n- \n--project(spdlog VERSION ${SPDLOG_VERSION} LANGUAGES CXX)\n--message(STATUS \"Build spdlog: ${SPDLOG_VERSION}\")\n- \n- #---------------------------------------------------------------------------------------\n- # Compiler config"
+        }
+      ]
+    },
+    {
+      "author": "Blast545",
+      "date": "2020-02-19T16:31:54Z",
+      "sha": "ef35b8c01ffe70d8e8cf9579f46e2b7d75d85619",
+      "message": "Enable linter tests on spdlog_vendor (#1)\n\n* Add linters check to the package files\r\n* Fix linter checks\r\n\r\nSigned-off-by: Jorge J. Perez <jjperez@ekumenlabs.com>",
+      "files_changed": 2,
+      "additions": 9,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "4f203cedb903a662b5a148aed1f49609cbd81353",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 1,
+          "changes": 7,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/ef35b8c01ffe70d8e8cf9579f46e2b7d75d85619/CMakeLists.txt",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/ef35b8c01ffe70d8e8cf9579f46e2b7d75d85619/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/CMakeLists.txt?ref=ef35b8c01ffe70d8e8cf9579f46e2b7d75d85619",
+          "patch": "@@ -52,7 +52,7 @@ macro(build_spdlog)\n \n   include(ExternalProject)\n   # Get spdlog 1.3.1\n-  ExternalProject_Add(spdlog-1.3.1\n+  externalproject_add(spdlog-1.3.1\n     URL https://github.com/gabime/spdlog/archive/v1.3.1.tar.gz\n     URL_MD5 3c17dd6983de2a66eca8b5a0b213d29f\n     TIMEOUT 600\n@@ -75,5 +75,10 @@ if(NOT spdlog_FOUND OR \"${spdlog_VERSION}\" VERSION_LESS 1.3.1)\n   build_spdlog()\n endif()\n \n+if(BUILD_TESTING)\n+  find_package(ament_lint_auto REQUIRED)\n+  ament_lint_auto_find_test_dependencies()\n+endif()\n+\n # this ensures that the package has an environment hook setting the PATH\n ament_package()"
+        },
+        {
+          "sha": "8fecfe67655442104e52fe00b40a5d2941575f77",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/ef35b8c01ffe70d8e8cf9579f46e2b7d75d85619/package.xml",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/ef35b8c01ffe70d8e8cf9579f46e2b7d75d85619/package.xml",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/package.xml?ref=ef35b8c01ffe70d8e8cf9579f46e2b7d75d85619",
+          "patch": "@@ -19,6 +19,9 @@\n \n   <depend>spdlog</depend>\n \n+  <test_depend>ament_lint_auto</test_depend>\n+  <test_depend>ament_lint_common</test_depend>\n+\n   <export>\n     <build_type>ament_cmake</build_type>\n   </export>"
+        }
+      ]
+    },
+    {
+      "author": "claireyywang",
+      "date": "2020-04-24T20:26:50Z",
+      "sha": "adb19e3ea1c39c0f009b39f6f838d41a0535ce5b",
+      "message": "add changelog\n\nSigned-off-by: claireyywang <clairewang@openrobotics.org>",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "bf51d4ab0482a2dde2d25d3c1af84136c500865c",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/adb19e3ea1c39c0f009b39f6f838d41a0535ce5b/CHANGELOG.rst",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/adb19e3ea1c39c0f009b39f6f838d41a0535ce5b/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/CHANGELOG.rst?ref=adb19e3ea1c39c0f009b39f6f838d41a0535ce5b",
+          "patch": "@@ -2,6 +2,10 @@\n Changelog for package spdlog_vendor\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+Forthcoming\n+-----------\n+* Silence warning from GNUInstallDirs on Windows. (`#10 <https://github.com/ros2/spdlog_vendor/issues/10>`_)\n+\n 1.1.0 (2020-04-10)\n ------------------\n * suppress sign conversion warning (`#7 <https://github.com/ros2/spdlog_vendor/issues/7>`_)"
+        }
+      ]
+    },
+    {
+      "author": "Karsten1987",
+      "date": "2020-03-24T18:07:03Z",
+      "sha": "8fd05486fc651e3a5a7288c071c171a5dc4ba458",
+      "message": "suppress sign conversion warning (#7)\n\n* suppress sign conversion warning\r\n\r\nSigned-off-by: Karsten Knese <karsten@openrobotics.org>\r\n\r\n* apply logic only to MSVC\r\n\r\nSigned-off-by: Karsten Knese <karsten@openrobotics.org>\r\n\r\n* link fmt upstream ticket\r\n\r\nSigned-off-by: Karsten Knese <karsten@openrobotics.org>",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "1bf28f1620a5e425f250967f9f3bb9136f3492e0",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/8fd05486fc651e3a5a7288c071c171a5dc4ba458/CMakeLists.txt",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/8fd05486fc651e3a5a7288c071c171a5dc4ba458/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/CMakeLists.txt?ref=8fd05486fc651e3a5a7288c071c171a5dc4ba458",
+          "patch": "@@ -49,6 +49,9 @@ macro(build_spdlog)\n   list(APPEND extra_cmake_args \"-DSPDLOG_BUILD_TESTS=OFF\")\n   list(APPEND extra_cmake_args \"-DSPDLOG_BUILD_EXAMPLE=OFF\")\n   if(NOT WIN32)\n+    # TODO(karsten1987): re-address this once upstream ticket is resolved:\n+    # https://github.com/fmtlib/fmt/issues/1604\n+    list(APPEND extra_cmake_args \"-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS} -Wno-sign-conversion\")\n     list(APPEND extra_cmake_args \"-DSPDLOG_BUILD_SHARED=ON\")\n   endif()\n "
+        }
+      ]
+    },
+    {
+      "author": "Anas Abou Allaban",
+      "date": "2020-03-13T22:46:32Z",
+      "sha": "f3bd77cb322cd0866ffab78858928e15607a1af8",
+      "message": "Fix linting (#3)\n\nSigned-off-by: Anas Abou Allaban <allabana@amazon.com>",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "218a9d2e136677beb4868f76f8f95da750af7cc7",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/ros2/spdlog_vendor/blob/f3bd77cb322cd0866ffab78858928e15607a1af8/CMakeLists.txt",
+          "raw_url": "https://github.com/ros2/spdlog_vendor/raw/f3bd77cb322cd0866ffab78858928e15607a1af8/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros2/spdlog_vendor/contents/CMakeLists.txt?ref=f3bd77cb322cd0866ffab78858928e15607a1af8",
+          "patch": "@@ -48,7 +48,7 @@ macro(build_spdlog)\n   list(APPEND extra_cmake_args \"-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}\")\n   list(APPEND extra_cmake_args \"-DSPDLOG_BUILD_TESTS=OFF\")\n   list(APPEND extra_cmake_args \"-DSPDLOG_BUILD_EXAMPLE=OFF\")\n-  if (NOT WIN32)\n+  if(NOT WIN32)\n     list(APPEND extra_cmake_args \"-DSPDLOG_BUILD_SHARED=ON\")\n   endif()\n "
+        }
+      ]
+    }
+  ]
+}

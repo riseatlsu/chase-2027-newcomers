@@ -1,0 +1,347 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T04:57:45Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "ros",
+    "repo": "eigen_stl_containers"
+  },
+  "data": [
+    {
+      "author": "mosfet80",
+      "date": "2025-03-17T18:48:47Z",
+      "sha": "33a6c4e5febbd56055db2536ecd06a405ee3d21e",
+      "message": "Update CMakeLists.txt (#20)\n\nHumble Hawksbill (May 2022 - May 2027)  : https://www.ros.org/reps/rep-2000.html\r\n\r\nrequirements:\r\nCxx standard 17\r\nmin cmake 3.14.4",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "5335dde381c2edd8bf1a6c2a0cbede5a7ea756b5",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ros/eigen_stl_containers/blob/33a6c4e5febbd56055db2536ecd06a405ee3d21e/CMakeLists.txt",
+          "raw_url": "https://github.com/ros/eigen_stl_containers/raw/33a6c4e5febbd56055db2536ecd06a405ee3d21e/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/eigen_stl_containers/contents/CMakeLists.txt?ref=33a6c4e5febbd56055db2536ecd06a405ee3d21e",
+          "patch": "@@ -1,9 +1,9 @@\n-cmake_minimum_required(VERSION 3.5)\n+cmake_minimum_required(VERSION 3.14.4)\n project(eigen_stl_containers)\n \n # Default to C++14\n if(NOT CMAKE_CXX_STANDARD)\n-  set(CMAKE_CXX_STANDARD 14)\n+  set(CMAKE_CXX_STANDARD 17)\n endif()\n \n if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")"
+        }
+      ]
+    },
+    {
+      "author": "clalancette",
+      "date": "2017-03-03T18:34:57Z",
+      "sha": "505a0d303d545ee4189c765fa6ec1a2f2fac82c1",
+      "message": "Fix it up so we can correctly find Eigen everywhere.\n\nSigned-off-by: Chris Lalancette <clalancette@osrfoundation.org>",
+      "files_changed": 1,
+      "additions": 9,
+      "deletions": 4,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "eafcc0494831f4c9b50fde53f1845c9dc4065b98",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 4,
+          "changes": 13,
+          "blob_url": "https://github.com/ros/eigen_stl_containers/blob/505a0d303d545ee4189c765fa6ec1a2f2fac82c1/CMakeLists.txt",
+          "raw_url": "https://github.com/ros/eigen_stl_containers/raw/505a0d303d545ee4189c765fa6ec1a2f2fac82c1/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/eigen_stl_containers/contents/CMakeLists.txt?ref=505a0d303d545ee4189c765fa6ec1a2f2fac82c1",
+          "patch": "@@ -3,8 +3,12 @@ project(eigen_stl_containers)\n \n find_package(catkin REQUIRED)\n \n-# we don't build anything here, but in order to export the right\n-# build flags in catkin_package(), we still have to find Eigen3 here\n+# We don't build anything here, but in order to export the right\n+# build flags in catkin_package(), we still have to find Eigen3 here.  Note\n+# that this is somewhat complicated because of our need to support Ubuntu\n+# all the way back to saucy.  First we look for the Eigen3 cmake module\n+# provided by the libeigen3-dev on newer Ubuntu.  If that fails, then we\n+# fall-back to the version provided by cmake_modules, which is a stand-in.\n find_package(Eigen3 QUIET)\n if(NOT EIGEN3_FOUND)\n   # saucy does not have Eigen3, but have Eigen instead\n@@ -13,14 +17,15 @@ if(NOT EIGEN3_FOUND)\n   set(EIGEN3_INCLUDE_DIRS ${EIGEN_INCLUDE_DIRS})\n endif()\n \n-# eigen 3.2 (wily) only provdies EIGEN3_INCLUDE_DIR, not EIGEN3_INCLUDE_DIRS\n+# Note that eigen 3.2 (on Ubuntu Wily) only provides EIGEN3_INCLUDE_DIR,\n+# not EIGEN3_INCLUDE_DIRS, so we have to set the latter from the former.\n if(NOT EIGEN3_INCLUDE_DIRS)\n   set(EIGEN3_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})\n endif()\n \n catkin_package(\n   INCLUDE_DIRS include\n-  DEPENDS EIGEN3)\n+  INCLUDE_DIRS ${EIGEN3_INCLUDE_DIRS})\n \n install(DIRECTORY include/${PROJECT_NAME}/\n         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}"
+        }
+      ]
+    },
+    {
+      "author": "Matthias Schoepfer",
+      "date": "2023-10-26T23:17:45Z",
+      "sha": "30c7cc9ffdcf36c481a3d955acf611429f007557",
+      "message": "CMakeLists.txt: fixing relocatable package issue (#19)\n\n* CMakeLists.txt: fixing relocatable package issue\r\n\r\nWith the current CMakeLists, the installed package will have an absolute\r\npath, which breaks if the package gets relocated later on.\r\n\r\nThis patch tries to set up a proper header only ros2 package.\r\n\r\n* Cleanup to be more of an INTERFACE library.\r\n\r\nSigned-off-by: Matthias Schoepfer <m.schoepfer@rethinkrobotics.com>\r\nCo-authored-by: Chris Lalancette <clalancette@gmail.com>",
+      "files_changed": 1,
+      "additions": 24,
+      "deletions": 4,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "cc322f4d2a661d9c0e26e8d283593431a471bfd3",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 24,
+          "deletions": 4,
+          "changes": 28,
+          "blob_url": "https://github.com/ros/eigen_stl_containers/blob/30c7cc9ffdcf36c481a3d955acf611429f007557/CMakeLists.txt",
+          "raw_url": "https://github.com/ros/eigen_stl_containers/raw/30c7cc9ffdcf36c481a3d955acf611429f007557/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/eigen_stl_containers/contents/CMakeLists.txt?ref=30c7cc9ffdcf36c481a3d955acf611429f007557",
+          "patch": "@@ -13,9 +13,29 @@ endif()\n find_package(ament_cmake REQUIRED)\n find_package(Eigen3 REQUIRED)\n \n-install(DIRECTORY include/${PROJECT_NAME}/\n-        DESTINATION include/${PROJECT_NAME}\n-        FILES_MATCHING PATTERN \"*.h\")\n+add_library(${PROJECT_NAME} INTERFACE)\n+\n+target_link_libraries(${PROJECT_NAME} INTERFACE Eigen3::Eigen)\n+target_include_directories(${PROJECT_NAME} INTERFACE\n+  \"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>\"\n+  \"$<INSTALL_INTERFACE:include/${PROJECT_NAME}>\")\n+\n+install(\n+  DIRECTORY include/\n+  DESTINATION include/${PROJECT_NAME}\n+)\n+\n+install(\n+  TARGETS ${PROJECT_NAME}\n+  EXPORT ${PROJECT_NAME}Targets\n+)\n+\n+# Export old-style CMake variables\n+ament_export_include_directories(\"include/${PROJECT_NAME}\")\n+\n+# Export modern CMake targets\n+ament_export_targets(${PROJECT_NAME}Targets)\n+\n+ament_export_dependencies(Eigen3)\n \n-ament_export_include_directories(include ${EIGEN3_INCLUDE_DIRS})\n ament_package()"
+        }
+      ]
+    },
+    {
+      "author": "Víctor Mayoral Vilches",
+      "date": "2019-02-10T14:07:46Z",
+      "sha": "3863444dd152880a7a54a6a0977da6ae69114ad0",
+      "message": "Port package to ROS 2 (#16)\n\n* Port package to ROS 2\r\n\r\n* Address comments of clalancette\r\n\r\nComments made at https://github.com/ros/eigen_stl_containers/pull/16\r\n\r\n* Small fixups.\r\n\r\nSigned-off-by: Chris Lalancette <clalancette@openrobotics.org>",
+      "files_changed": 2,
+      "additions": 16,
+      "deletions": 26,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "63c1563f881204c89ae1b54b45700949c6d980c0",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 12,
+          "deletions": 22,
+          "changes": 34,
+          "blob_url": "https://github.com/ros/eigen_stl_containers/blob/3863444dd152880a7a54a6a0977da6ae69114ad0/CMakeLists.txt",
+          "raw_url": "https://github.com/ros/eigen_stl_containers/raw/3863444dd152880a7a54a6a0977da6ae69114ad0/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/eigen_stl_containers/contents/CMakeLists.txt?ref=3863444dd152880a7a54a6a0977da6ae69114ad0",
+          "patch": "@@ -1,31 +1,21 @@\n-cmake_minimum_required(VERSION 2.8.3)\n+cmake_minimum_required(VERSION 3.5)\n project(eigen_stl_containers)\n \n-find_package(catkin REQUIRED)\n-\n-# We don't build anything here, but in order to export the right\n-# build flags in catkin_package(), we still have to find Eigen3 here.  Note\n-# that this is somewhat complicated because of our need to support Ubuntu\n-# all the way back to saucy.  First we look for the Eigen3 cmake module\n-# provided by the libeigen3-dev on newer Ubuntu.  If that fails, then we\n-# fall-back to the version provided by cmake_modules, which is a stand-in.\n-find_package(Eigen3 QUIET)\n-if(NOT EIGEN3_FOUND)\n-  # saucy does not have Eigen3, but have Eigen instead\n-  find_package(cmake_modules REQUIRED)\n-  find_package(Eigen REQUIRED)\n-  set(EIGEN3_INCLUDE_DIRS ${EIGEN_INCLUDE_DIRS})\n+# Default to C++14\n+if(NOT CMAKE_CXX_STANDARD)\n+  set(CMAKE_CXX_STANDARD 14)\n endif()\n \n-# Note that eigen 3.2 (on Ubuntu Wily) only provides EIGEN3_INCLUDE_DIR,\n-# not EIGEN3_INCLUDE_DIRS, so we have to set the latter from the former.\n-if(NOT EIGEN3_INCLUDE_DIRS)\n-  set(EIGEN3_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  add_compile_options(-Wall -Wextra -Wpedantic)\n endif()\n \n-catkin_package(\n-  INCLUDE_DIRS include ${EIGEN3_INCLUDE_DIRS})\n+find_package(ament_cmake REQUIRED)\n+find_package(Eigen3 REQUIRED)\n \n install(DIRECTORY include/${PROJECT_NAME}/\n-        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}\n+        DESTINATION include/${PROJECT_NAME}\n         FILES_MATCHING PATTERN \"*.h\")\n+\n+ament_export_include_directories(include ${EIGEN3_INCLUDE_DIRS})\n+ament_package()"
+        },
+        {
+          "sha": "4721519699ddd4ae999d01d3139a9b4cae3802d5",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 4,
+          "changes": 8,
+          "blob_url": "https://github.com/ros/eigen_stl_containers/blob/3863444dd152880a7a54a6a0977da6ae69114ad0/package.xml",
+          "raw_url": "https://github.com/ros/eigen_stl_containers/raw/3863444dd152880a7a54a6a0977da6ae69114ad0/package.xml",
+          "contents_url": "https://api.github.com/repos/ros/eigen_stl_containers/contents/package.xml?ref=3863444dd152880a7a54a6a0977da6ae69114ad0",
+          "patch": "@@ -13,10 +13,10 @@\n   <url type=\"bugtracker\">https://github.com/ros/eigen_stl_containers/issues</url>\n   <url type=\"repository\">https://github.com/ros/eigen_stl_containers</url>\n \n-  <buildtool_depend>catkin</buildtool_depend>\n-\n-  <build_depend>cmake_modules</build_depend>\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n   <build_depend>eigen</build_depend>\n-\n   <build_export_depend>eigen</build_export_depend>\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n </package>"
+        }
+      ]
+    },
+    {
+      "author": "k-okada",
+      "date": "2016-09-28T08:36:57Z",
+      "sha": "ceb6c4d5a58e8de5c67ec17e5e51717e507839ef",
+      "message": "Fix eigen3 depends (#6)\n\n* fix use of DEPENDS to include eigen3\r\n\r\nThis is the correct way to make use of catkin_package's DEPENDS\r\nflag. It was plain broken before and I'm pretty sure nobody ever\r\nchecked.\r\n\r\n* eigen 3.2 does not provdie EIGEN3_INCLUDE_DIRS, only support EIGEN3_INCLUDE_DIR",
+      "files_changed": 2,
+      "additions": 12,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "6372b0c6431a4a38322c77ab1d93ff31fdf089e0",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 1,
+          "changes": 12,
+          "blob_url": "https://github.com/ros/eigen_stl_containers/blob/ceb6c4d5a58e8de5c67ec17e5e51717e507839ef/CMakeLists.txt",
+          "raw_url": "https://github.com/ros/eigen_stl_containers/raw/ceb6c4d5a58e8de5c67ec17e5e51717e507839ef/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/eigen_stl_containers/contents/CMakeLists.txt?ref=ceb6c4d5a58e8de5c67ec17e5e51717e507839ef",
+          "patch": "@@ -2,9 +2,19 @@ cmake_minimum_required(VERSION 2.8.3)\n project(eigen_stl_containers)\n \n find_package(catkin REQUIRED)\n+\n+# we don't build anything here, but in order to export the right\n+# build flags in catkin_package(), we still have to find Eigen3 here\n+find_package(Eigen3 REQUIRED)\n+\n+# eigen 3.2 (wily) only provdies EIGEN3_INCLUDE_DIR, not EIGEN3_INCLUDE_DIRS\n+if(NOT EIGEN3_INCLUDE_DIRS)\n+  set(EIGEN3_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})\n+endif()\n+\n catkin_package(\n   INCLUDE_DIRS include\n-  DEPENDS Eigen)\n+  DEPENDS EIGEN3)\n \n install(DIRECTORY include/\n         DESTINATION include"
+        },
+        {
+          "sha": "acf8762f2fe43d12470c11a4442e74eeac56f8b6",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/ros/eigen_stl_containers/blob/ceb6c4d5a58e8de5c67ec17e5e51717e507839ef/package.xml",
+          "raw_url": "https://github.com/ros/eigen_stl_containers/raw/ceb6c4d5a58e8de5c67ec17e5e51717e507839ef/package.xml",
+          "contents_url": "https://api.github.com/repos/ros/eigen_stl_containers/contents/package.xml?ref=ceb6c4d5a58e8de5c67ec17e5e51717e507839ef",
+          "patch": "@@ -14,6 +14,7 @@\n \n   <buildtool_depend>catkin</buildtool_depend>\n \n+  <build_depend>eigen</build_depend>\n   <run_depend>eigen</run_depend>\n \n </package>"
+        }
+      ]
+    },
+    {
+      "author": "sloretz",
+      "date": "2017-02-27T22:53:29Z",
+      "sha": "c769b4a6be991c770b6172dd0d63b0714e7bc5c0",
+      "message": "Added @clalancette and @sloretz as maintainers (#9)",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "d098de4700d0227c049be7d12272666dedc6fea5",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/ros/eigen_stl_containers/blob/c769b4a6be991c770b6172dd0d63b0714e7bc5c0/package.xml",
+          "raw_url": "https://github.com/ros/eigen_stl_containers/raw/c769b4a6be991c770b6172dd0d63b0714e7bc5c0/package.xml",
+          "contents_url": "https://api.github.com/repos/ros/eigen_stl_containers/contents/package.xml?ref=c769b4a6be991c770b6172dd0d63b0714e7bc5c0",
+          "patch": "@@ -5,7 +5,8 @@\n   <description>This package provides a set of typedef's that allow\n   using Eigen datatypes in STL containers</description>\n   <author email=\"isucan@willowgarage.com\">Ioan Sucan</author>\n-  <maintainer email=\"isucan@willowgarage.com\">Ioan Sucan</maintainer>\n+  <maintainer email=\"clalancette@osrfoundation.org\">Chris Lalancette</maintainer>\n+  <maintainer email=\"sloretz@osrfoundation.org\">Shane Loretz</maintainer>\n   <license>BSD</license>\n \n   <url>http://eigen.tuxfamily.org/dox/TopicUnalignedArrayAssert.html</url>"
+        }
+      ]
+    },
+    {
+      "author": "v4hn",
+      "date": "2017-02-27T23:54:47Z",
+      "sha": "a945c460d8b2a6fafbc2a2fcce2fa0b18ceb41c2",
+      "message": "install headers to CATKIN_PACKAGE_INCLUDE_DESTINATION (#4)\n\nHeaders get installed to the same place, but allows overriding",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "f6b903a4249abeb0f5e10c8035d2d10d5e24672e",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/ros/eigen_stl_containers/blob/a945c460d8b2a6fafbc2a2fcce2fa0b18ceb41c2/CMakeLists.txt",
+          "raw_url": "https://github.com/ros/eigen_stl_containers/raw/a945c460d8b2a6fafbc2a2fcce2fa0b18ceb41c2/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/eigen_stl_containers/contents/CMakeLists.txt?ref=a945c460d8b2a6fafbc2a2fcce2fa0b18ceb41c2",
+          "patch": "@@ -16,6 +16,6 @@ catkin_package(\n   INCLUDE_DIRS include\n   DEPENDS EIGEN3)\n \n-install(DIRECTORY include/\n-        DESTINATION include\n+install(DIRECTORY include/${PROJECT_NAME}/\n+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}\n         FILES_MATCHING PATTERN \"*.h\")"
+        }
+      ]
+    },
+    {
+      "author": "VictorLamoine",
+      "date": "2017-02-27T23:39:25Z",
+      "sha": "e914aff69c1aa8b2ff3e0413ab8174a9617060c3",
+      "message": "Add more typedefs (#8)\n\nDidn't break anything",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "8aeeadcdccf64d42d1e0064fee59bfa9544fb0ba",
+          "filename": "include/eigen_stl_containers/eigen_stl_vector_container.h",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 1,
+          "changes": 5,
+          "blob_url": "https://github.com/ros/eigen_stl_containers/blob/e914aff69c1aa8b2ff3e0413ab8174a9617060c3/include%2Feigen_stl_containers%2Feigen_stl_vector_container.h",
+          "raw_url": "https://github.com/ros/eigen_stl_containers/raw/e914aff69c1aa8b2ff3e0413ab8174a9617060c3/include%2Feigen_stl_containers%2Feigen_stl_vector_container.h",
+          "contents_url": "https://api.github.com/repos/ros/eigen_stl_containers/contents/include%2Feigen_stl_containers%2Feigen_stl_vector_container.h?ref=e914aff69c1aa8b2ff3e0413ab8174a9617060c3",
+          "patch": "@@ -50,8 +50,11 @@ namespace EigenSTL\n typedef std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f> > vector_Vector3f;\n typedef std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d> > vector_Vector3d;\n typedef std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f> > vector_Vector4f;\n-typedef std::vector<Eigen::Affine3d, Eigen::aligned_allocator<Eigen::Affine3d> > vector_Affine3d;\n+typedef std::vector<Eigen::Vector4d, Eigen::aligned_allocator<Eigen::Vector4d> > vector_Vector4d;\n typedef std::vector<Eigen::Affine3f, Eigen::aligned_allocator<Eigen::Affine3f> > vector_Affine3f;\n+typedef std::vector<Eigen::Affine3d, Eigen::aligned_allocator<Eigen::Affine3d> > vector_Affine3d;\n+typedef std::vector<Eigen::Isometry3f, Eigen::aligned_allocator<Eigen::Isometry3f> > vector_Isometry3f;\n+typedef std::vector<Eigen::Isometry3d, Eigen::aligned_allocator<Eigen::Isometry3d> > vector_Isometry3d;\n \n }\n "
+        }
+      ]
+    },
+    {
+      "author": "wjwwood",
+      "date": "2015-04-22T01:08:04Z",
+      "sha": "f97b652949b03eafdba39d958884ab5adb5d3a08",
+      "message": "Merge pull request #3 from scpeters/patch-1\n\nadd links to repository and issue tracker",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "bb2f2ce6f2b4cf4284645d1a150eb3b5a9f99b6e",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ros/eigen_stl_containers/blob/f97b652949b03eafdba39d958884ab5adb5d3a08/package.xml",
+          "raw_url": "https://github.com/ros/eigen_stl_containers/raw/f97b652949b03eafdba39d958884ab5adb5d3a08/package.xml",
+          "contents_url": "https://api.github.com/repos/ros/eigen_stl_containers/contents/package.xml?ref=f97b652949b03eafdba39d958884ab5adb5d3a08",
+          "patch": "@@ -9,6 +9,8 @@\n   <license>BSD</license>\n \n   <url>http://eigen.tuxfamily.org/dox/TopicUnalignedArrayAssert.html</url>\n+  <url type=\"bugtracker\">https://github.com/ros/eigen_stl_containers/issues</url>\n+  <url type=\"repository\">https://github.com/ros/eigen_stl_containers</url>\n \n   <buildtool_depend>catkin</buildtool_depend>\n "
+        }
+      ]
+    },
+    {
+      "author": "Jackie Kay",
+      "date": "2016-03-23T17:19:20Z",
+      "sha": "c7ea11fabd6184abf70f6c35f93d271823e8a652",
+      "message": "Wild Changelog appeared!",
+      "files_changed": 1,
+      "additions": 41,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "15a900695b024869abdb1aec8dc1e23923c4697c",
+          "filename": "CHANGELOG.rst",
+          "status": "added",
+          "additions": 41,
+          "deletions": 0,
+          "changes": 41,
+          "blob_url": "https://github.com/ros/eigen_stl_containers/blob/c7ea11fabd6184abf70f6c35f93d271823e8a652/CHANGELOG.rst",
+          "raw_url": "https://github.com/ros/eigen_stl_containers/raw/c7ea11fabd6184abf70f6c35f93d271823e8a652/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/ros/eigen_stl_containers/contents/CHANGELOG.rst?ref=c7ea11fabd6184abf70f6c35f93d271823e8a652",
+          "patch": "@@ -0,0 +1,41 @@\n+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n+Changelog for package eigen_stl_containers\n+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n+\n+Forthcoming\n+-----------\n+* Merge pull request `#3 <https://github.com/ros/eigen_stl_containers/issues/3>`_ from scpeters/patch-1\n+  add links to repository and issue tracker\n+* add links to repository and issue tracker\n+* Added tag 0.1.4 for changeset 27d05d1c09b5\n+* Contributors: Ioan Sucan, Steven Peters, William Woodall\n+\n+0.1.4 (2013-03-13)\n+------------------\n+* properly export includes and depends for catkin\n+* Added tag 0.1.3 for changeset 93304e48d411\n+* Contributors: Ioan Sucan\n+\n+0.1.3 (2012-12-15)\n+------------------\n+* Added tag 0.1.2 for changeset a0b26dabeaec\n+* Contributors: Ioan Sucan\n+\n+0.1.2 (2012-10-18)\n+------------------\n+* bump version\n+* Added tag 0.1.2 for changeset 17cd6bd5aedd\n+* switching to package.xml\n+* Added tag 0.1.1 for changeset 7647a299476f\n+* Contributors: Ioan Sucan\n+\n+0.1.1 (2012-09-19)\n+------------------\n+* add more typedefs\n+* Added tag 0.1.0 for changeset 14f67f1013f4\n+* Contributors: Ioan Sucan\n+\n+0.1.0 (2012-08-12)\n+------------------\n+* add vector types\n+* Contributors: Ioan Sucan"
+        }
+      ]
+    },
+    {
+      "author": "scpeters",
+      "date": "2015-04-22T00:54:42Z",
+      "sha": "3019ee98e82a2e454e511fb2dca92985ea1773fb",
+      "message": "add links to repository and issue tracker",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "bb2f2ce6f2b4cf4284645d1a150eb3b5a9f99b6e",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/ros/eigen_stl_containers/blob/3019ee98e82a2e454e511fb2dca92985ea1773fb/package.xml",
+          "raw_url": "https://github.com/ros/eigen_stl_containers/raw/3019ee98e82a2e454e511fb2dca92985ea1773fb/package.xml",
+          "contents_url": "https://api.github.com/repos/ros/eigen_stl_containers/contents/package.xml?ref=3019ee98e82a2e454e511fb2dca92985ea1773fb",
+          "patch": "@@ -9,6 +9,8 @@\n   <license>BSD</license>\n \n   <url>http://eigen.tuxfamily.org/dox/TopicUnalignedArrayAssert.html</url>\n+  <url type=\"bugtracker\">https://github.com/ros/eigen_stl_containers/issues</url>\n+  <url type=\"repository\">https://github.com/ros/eigen_stl_containers</url>\n \n   <buildtool_depend>catkin</buildtool_depend>\n "
+        }
+      ]
+    },
+    {
+      "author": "Ioan Sucan",
+      "date": "2012-08-12T22:17:16Z",
+      "sha": "eac644ea505b817aef2556be03d4a5bdde3f75b8",
+      "message": "add vector types",
+      "files_changed": 3,
+      "additions": 86,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "2552e1e26a711f78431a350909d226f105299f17",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 11,
+          "deletions": 0,
+          "changes": 11,
+          "blob_url": "https://github.com/ros/eigen_stl_containers/blob/eac644ea505b817aef2556be03d4a5bdde3f75b8/CMakeLists.txt",
+          "raw_url": "https://github.com/ros/eigen_stl_containers/raw/eac644ea505b817aef2556be03d4a5bdde3f75b8/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/ros/eigen_stl_containers/contents/CMakeLists.txt?ref=eac644ea505b817aef2556be03d4a5bdde3f75b8",
+          "patch": "@@ -0,0 +1,11 @@\n+cmake_minimum_required(VERSION 2.8)\n+project(eigen_stl_containers)\n+\n+find_package(catkin REQUIRED)\n+catkin_stack()\n+\n+catkin_project(${PROJECT_NAME} INCLUDE_DIRS include)\n+\n+install(DIRECTORY include/\n+        DESTINATION include\n+        FILES_MATCHING PATTERN \"*.h\")"
+        },
+        {
+          "sha": "ae920218ec1af2e590b12707a52338b75ef7dc87",
+          "filename": "include/eigen_stl_containers/eigen_stl_containers.h",
+          "status": "added",
+          "additions": 59,
+          "deletions": 0,
+          "changes": 59,
+          "blob_url": "https://github.com/ros/eigen_stl_containers/blob/eac644ea505b817aef2556be03d4a5bdde3f75b8/include%2Feigen_stl_containers%2Feigen_stl_containers.h",
+          "raw_url": "https://github.com/ros/eigen_stl_containers/raw/eac644ea505b817aef2556be03d4a5bdde3f75b8/include%2Feigen_stl_containers%2Feigen_stl_containers.h",
+          "contents_url": "https://api.github.com/repos/ros/eigen_stl_containers/contents/include%2Feigen_stl_containers%2Feigen_stl_containers.h?ref=eac644ea505b817aef2556be03d4a5bdde3f75b8",
+          "patch": "@@ -0,0 +1,59 @@\n+/*********************************************************************\n+ * Software License Agreement (BSD License)\n+ *\n+ *  Copyright (c) 2012, Willow Garage, Inc.\n+ *  All rights reserved.\n+ *\n+ *  Redistribution and use in source and binary forms, with or without\n+ *  modification, are permitted provided that the following conditions\n+ *  are met:\n+ *\n+ *   * Redistributions of source code must retain the above copyright\n+ *     notice, this list of conditions and the following disclaimer.\n+ *   * Redistributions in binary form must reproduce the above\n+ *     copyright notice, this list of conditions and the following\n+ *     disclaimer in the documentation and/or other materials provided\n+ *     with the distribution.\n+ *   * Neither the name of the Willow Garage nor the names of its\n+ *     contributors may be used to endorse or promote products derived\n+ *     from this software without specific prior written permission.\n+ *\n+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n+ *  \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS\n+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\n+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,\n+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,\n+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\n+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN\n+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+ *  POSSIBILITY OF SUCH DAMAGE.\n+ *********************************************************************/\n+\n+/* Author: Ioan Sucan */\n+\n+#ifndef EIGEN_STL_CONTAINERS_EIGEN_STL_CONTAINERS_\n+#define EIGEN_STL_CONTAINERS_EIGEN_STL_CONTAINERS_\n+\n+#include <Eigen/Core>\n+#include <Eigen/Geometry>\n+#include <Eigen/StdVector>\n+\n+#include <vector>\n+\n+/** \\brief Typedef's for STL containers of Eigen types with proper memory alignment. */\n+namespace EigenSTL\n+{\n+\n+typedef std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f> > vector_Vector3f;\n+typedef std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d> > vector_Vector3d;\n+typedef std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f> > vector_Vector4f;\n+typedef std::vector<Eigen::Affine3d, Eigen::aligned_allocator<Eigen::Affine3d> > vector_Affine3d;\n+typedef std::vector<Eigen::Affine3f, Eigen::aligned_allocator<Eigen::Affine3f> > vector_Affine3f;\n+\n+}\n+\n+\n+#endif"
+        },
+        {
+          "sha": "6f4f0e9d55d87ba5a25ad7e63d80bb3602a6949a",
+          "filename": "stack.xml",
+          "status": "added",
+          "additions": 16,
+          "deletions": 0,
+          "changes": 16,
+          "blob_url": "https://github.com/ros/eigen_stl_containers/blob/eac644ea505b817aef2556be03d4a5bdde3f75b8/stack.xml",
+          "raw_url": "https://github.com/ros/eigen_stl_containers/raw/eac644ea505b817aef2556be03d4a5bdde3f75b8/stack.xml",
+          "contents_url": "https://api.github.com/repos/ros/eigen_stl_containers/contents/stack.xml?ref=eac644ea505b817aef2556be03d4a5bdde3f75b8",
+          "patch": "@@ -0,0 +1,16 @@\n+<stack>\n+  <name>eigen_stl_containers</name>\n+  <version>0.1.0</version>\n+  <description>This package provides a set of typedef's that allow\n+  using Eigen datatypes in STL containers</description>\n+  <author email=\"isucan@willowgarage.com\">Ioan Sucan</author>\n+  <maintainer email=\"isucan@willowgarage.com\">Ioan Sucan</maintainer>\n+  <license>BSD</license>\n+  <copyright>Willow Garage</copyright>\n+\n+  <url>http://eigen.tuxfamily.org/dox/TopicUnalignedArrayAssert.html</url>\n+\n+  <build_depends>catkin</build_depends>\n+  <depends>eigen</depends>\n+\n+</stack>"
+        }
+      ]
+    }
+  ]
+}

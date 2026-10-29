@@ -1,0 +1,944 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T04:34:31Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "clearpathrobotics",
+    "repo": "wireless"
+  },
+  "data": [
+    {
+      "author": "hilary-luo",
+      "date": "2025-03-03T19:17:24Z",
+      "sha": "e17c975eb735793b9c20d20539057287c193c401",
+      "message": "Feature/diagnostics (#22)\n\n* demark private variables with underscore\n\n* Run loop using a timer callback\n\n* Add Wi-Fi diagnostics",
+      "files_changed": 4,
+      "additions": 116,
+      "deletions": 65,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "dd2839933911d365908d99878b5d86dd3692aa56",
+          "filename": "wireless_watcher/CMakeLists.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/e17c975eb735793b9c20d20539057287c193c401/wireless_watcher%2FCMakeLists.txt",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/e17c975eb735793b9c20d20539057287c193c401/wireless_watcher%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2FCMakeLists.txt?ref=e17c975eb735793b9c20d20539057287c193c401",
+          "patch": "@@ -3,6 +3,7 @@ project(wireless_watcher)\n \n # Find dependencies\n find_package(ament_cmake REQUIRED)\n+find_package(diagnostic_updater REQUIRED)\n find_package(rclcpp REQUIRED)\n find_package(std_msgs REQUIRED)\n find_package(wireless_msgs REQUIRED)\n@@ -18,6 +19,7 @@ target_include_directories(\n \n # Link against ROS 2 libraries\n ament_target_dependencies(wireless_watcher\n+  diagnostic_updater\n   rclcpp\n   std_msgs\n   wireless_msgs"
+        },
+        {
+          "sha": "ef25f15c865d6b84b7eb14e3ce059ed9f126f761",
+          "filename": "wireless_watcher/include/wireless_watcher/wireless_watcher.hpp",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 3,
+          "changes": 14,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/e17c975eb735793b9c20d20539057287c193c401/wireless_watcher%2Finclude%2Fwireless_watcher%2Fwireless_watcher.hpp",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/e17c975eb735793b9c20d20539057287c193c401/wireless_watcher%2Finclude%2Fwireless_watcher%2Fwireless_watcher.hpp",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Finclude%2Fwireless_watcher%2Fwireless_watcher.hpp?ref=e17c975eb735793b9c20d20539057287c193c401",
+          "patch": "@@ -45,25 +45,33 @@\n #include \"wireless_msgs/msg/network.hpp\"\n \n #define SYS_NET_PATH \"/sys/class/net\"\n+#define SIGNAL_STRENGTH_WEAK -67\n+#define SIGNAL_STRENGTH_VERY_WEAK -75\n \n class WirelessWatcher : public rclcpp::Node {\n public:\n     WirelessWatcher();\n \n private:\n+    // Parameters\n     double hz;\n     std::string dev;\n     std::string connected_topic;\n     std::string connection_topic;\n \n-\n+    // Other Variables\n+    rclcpp::TimerBase::SharedPtr timer_;\n     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr connected_pub_;\n     rclcpp::Publisher<wireless_msgs::msg::Connection>::SharedPtr connection_pub_;\n-    std_msgs::msg::Bool connected_msg;\n-    wireless_msgs::msg::Connection connection_msg;\n+    std_msgs::msg::Bool connected_msg_;\n+    wireless_msgs::msg::Connection connection_msg_;\n+    diagnostic_updater::Updater updater_;\n \n+    // Methods\n+    void timer_callback();\n     std::string exec_cmd(const std::string& cmd);\n     std::vector<std::string> split(const std::string& s, const std::string& delimiter);\n+    void diagnostic(diagnostic_updater::DiagnosticStatusWrapper & stat);\n };\n \n #endif  // WIRELESS_WATCHER_HPP\n\\ No newline at end of file"
+        },
+        {
+          "sha": "5a3498c3818b8e583c3e2d094e65075659c8b693",
+          "filename": "wireless_watcher/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/e17c975eb735793b9c20d20539057287c193c401/wireless_watcher%2Fpackage.xml",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/e17c975eb735793b9c20d20539057287c193c401/wireless_watcher%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Fpackage.xml?ref=e17c975eb735793b9c20d20539057287c193c401",
+          "patch": "@@ -12,6 +12,7 @@\n \n   <license>BSD</license>\n \n+  <depend>diagnostic_updater</depend>\n   <depend>rclcpp</depend>\n   <depend>wireless_msgs</depend>\n   <depend>wireless-tools</depend>"
+        },
+        {
+          "sha": "c38007f190664051f6d5cd2f5e62c7e502a630fc",
+          "filename": "wireless_watcher/src/wireless_watcher.cpp",
+          "status": "modified",
+          "additions": 102,
+          "deletions": 62,
+          "changes": 164,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/e17c975eb735793b9c20d20539057287c193c401/wireless_watcher%2Fsrc%2Fwireless_watcher.cpp",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/e17c975eb735793b9c20d20539057287c193c401/wireless_watcher%2Fsrc%2Fwireless_watcher.cpp",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Fsrc%2Fwireless_watcher.cpp?ref=e17c975eb735793b9c20d20539057287c193c401",
+          "patch": "@@ -46,12 +46,14 @@\n #include <cstdio>\n #include <dirent.h>\n \n+#include \"diagnostic_updater/diagnostic_updater.hpp\"\n+\n #include \"wireless_watcher/wireless_watcher.hpp\"\n \n using namespace std::chrono_literals;\n \n \n-WirelessWatcher::WirelessWatcher() : rclcpp::Node(\"wireless_watcher\") {\n+WirelessWatcher::WirelessWatcher() : rclcpp::Node(\"wireless_watcher\"), updater_(this) {\n     this->declare_parameter(\"hz\", 1.0);\n     this->declare_parameter(\"dev\", \"\");\n     this->declare_parameter(\"connected_topic\", \"connected\");\n@@ -91,78 +93,86 @@ WirelessWatcher::WirelessWatcher() : rclcpp::Node(\"wireless_watcher\") {\n     connected_pub_ = this->create_publisher<std_msgs::msg::Bool>(connected_topic, rclcpp::SensorDataQoS());\n     connection_pub_ = this->create_publisher<wireless_msgs::msg::Connection>(connection_topic, rclcpp::SensorDataQoS());\n \n-    while (rclcpp::ok()) {\n-        try {\n-            std::string operstate_filepath = std::string(SYS_NET_PATH);\n-            operstate_filepath += \"/\";\n-            operstate_filepath += dev;\n-            operstate_filepath += \"/operstate\";\n-            std::ifstream operstate_file(operstate_filepath.c_str());\n-            std::string operstate;\n-            operstate_file >> operstate;\n-            connected_msg.data = operstate == \"up\";\n-        } catch (const std::exception& e) {\n-            connected_msg.data = false;\n-        }\n-        connected_pub_->publish(connected_msg);\n+    timer_ = this->create_wall_timer(std::chrono::milliseconds(static_cast<int>(1000.0 / hz)), std::bind(&WirelessWatcher::timer_callback, this));\n \n-        std::string iwconfig_output = exec_cmd(\"iwconfig \" + dev);\n-        std::vector<std::string> fields_str = split(iwconfig_output, \"\\\\s\\\\s+\");\n+    updater_.setHardwareID(\"none\");\n+    updater_.add(\"Wi-Fi Monitor\", this, &WirelessWatcher::diagnostic);\n+}\n \n-        std::unordered_map<std::string, std::string> fields_dict;\n-        fields_dict[\"dev\"] = fields_str[0];\n-        fields_dict[\"type\"] = fields_str[1];\n-        fields_dict[\"Access Point\"] = split(fields_str[5], \" \").back();\n+void WirelessWatcher::timer_callback() {\n+    try {\n+        std::string operstate_filepath = std::string(SYS_NET_PATH);\n+        operstate_filepath += \"/\";\n+        operstate_filepath += dev;\n+        operstate_filepath += \"/operstate\";\n+        std::ifstream operstate_file(operstate_filepath.c_str());\n+        std::string operstate;\n+        operstate_file >> operstate;\n+        connected_msg_.data = operstate == \"up\";\n+    } catch (const std::exception& e) {\n+        connected_msg_.data = false;\n+    }\n+    connected_pub_->publish(connected_msg_);\n \n-        for (size_t i = 2; i < fields_str.size(); ++i) {\n-            std::vector<std::string> field = split(fields_str[i], \"[:=]\");\n-            if (field.size() == 2) {\n-                fields_dict[field[0]] = field[1];\n-            }\n-        }\n+    if (!connected_msg_.data) {\n+        return;\n+    }\n \n-        if (fields_dict[\"Access Point\"].find(\"Not-Associated\") == std::string::npos) {\n-            try\n-            {\n-                connection_msg.bitrate = std::stof(split(fields_dict[\"Bit Rate\"], \" \")[0]);\n-            }\n-            catch(std::invalid_argument)\n-            {\n-                connection_msg.bitrate = std::numeric_limits<float>::quiet_NaN();\n-            }\n+    std::string iwconfig_output = exec_cmd(\"iwconfig \" + dev);\n+    std::vector<std::string> fields_str = split(iwconfig_output, \"\\\\s\\\\s+\");\n \n-            connection_msg.txpower = std::stoi(split(fields_dict[\"Tx-Power\"], \" \")[0]);\n-            connection_msg.signal_level = std::stoi(split(fields_dict[\"Signal level\"], \" \")[0]);\n+    std::unordered_map<std::string, std::string> fields_dict;\n+    fields_dict[\"dev\"] = fields_str[0];\n+    fields_dict[\"type\"] = fields_str[1];\n+    fields_dict[\"Access Point\"] = split(fields_str[5], \" \").back();\n \n-            // Strip quotations from ESSID\n-            std::string essid = fields_dict[\"ESSID\"];\n-            essid.erase(std::remove(essid.begin(), essid.end(), '\\\"'), essid.end());\n-            connection_msg.essid = essid;\n+    for (size_t i = 2; i < fields_str.size(); ++i) {\n+        std::vector<std::string> field = split(fields_str[i], \"[:=]\");\n+        if (field.size() == 2) {\n+            fields_dict[field[0]] = field[1];\n+        }\n+    }\n \n-            try\n-            {\n-                connection_msg.frequency = std::stof(split(fields_dict[\"Frequency\"], \" \")[0]);\n-            }\n-            catch(std::invalid_argument)\n-            {\n-                connection_msg.frequency = std::numeric_limits<float>::quiet_NaN();\n-            }\n+    if (fields_dict[\"Access Point\"].find(\"Not-Associated\") == std::string::npos) {\n+        try\n+        {\n+            connection_msg_.bitrate = std::stof(split(fields_dict[\"Bit Rate\"], \" \")[0]);\n+        }\n+        catch(std::invalid_argument)\n+        {\n+            connection_msg_.bitrate = std::numeric_limits<float>::quiet_NaN();\n+        }\n \n-            connection_msg.bssid = fields_dict[\"Access Point\"];\n+        connection_msg_.txpower = std::stoi(split(fields_dict[\"Tx-Power\"], \" \")[0]);\n+        connection_msg_.signal_level = std::stoi(split(fields_dict[\"Signal level\"], \" \")[0]);\n \n-            // Calculate link_quality from Link Quality\n-            std::string link_quality_str = fields_dict[\"Link Quality\"];\n-            connection_msg.link_quality_raw = link_quality_str;\n-            size_t delimiter_pos = link_quality_str.find(\"/\");\n-            if (delimiter_pos != std::string::npos) {\n-                int num = std::stoi(link_quality_str.substr(0, delimiter_pos));\n-                int den = std::stoi(link_quality_str.substr(delimiter_pos + 1));\n-                connection_msg.link_quality = static_cast<float>(num) / den;\n-            }\n+        // Strip quotations from ESSID\n+        std::string essid = fields_dict[\"ESSID\"];\n+        essid.erase(std::remove(essid.begin(), essid.end(), '\\\"'), essid.end());\n+        connection_msg_.essid = essid;\n \n-            connection_pub_->publish(connection_msg);\n+        try\n+        {\n+            connection_msg_.frequency = std::stof(split(fields_dict[\"Frequency\"], \" \")[0]);\n         }\n-        std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(1000.0 / hz)));\n+        catch(std::invalid_argument)\n+        {\n+            connection_msg_.frequency = std::numeric_limits<float>::quiet_NaN();\n+        }\n+\n+        connection_msg_.bssid = fields_dict[\"Access Point\"];\n+\n+        // Calculate link_quality from Link Quality\n+        std::string link_quality_str = fields_dict[\"Link Quality\"];\n+        connection_msg_.link_quality_raw = link_quality_str;\n+        size_t delimiter_pos = link_quality_str.find(\"/\");\n+        if (delimiter_pos != std::string::npos) {\n+            int num = std::stoi(link_quality_str.substr(0, delimiter_pos));\n+            int den = std::stoi(link_quality_str.substr(delimiter_pos + 1));\n+            connection_msg_.link_quality = static_cast<float>(num) / den;\n+        }\n+\n+        connection_pub_->publish(connection_msg_);\n     }\n }\n \n@@ -187,6 +197,36 @@ std::vector<std::string> WirelessWatcher::split(const std::string& s, const std:\n }\n \n \n+void WirelessWatcher::diagnostic(diagnostic_updater::DiagnosticStatusWrapper & stat) {\n+    stat.add(\"Wireless Network Interface\", dev);\n+    stat.add(\"Wi-Fi Connected\", connected_msg_.data ? \"True\" : \"False\");\n+\n+    if (!connected_msg_.data) {\n+        stat.summaryf(diagnostic_updater::DiagnosticStatusWrapper::WARN, \"%s Disconnected\", dev.c_str());\n+        return;\n+    }\n+\n+    stat.add(\"Frequency (GHz)\", connection_msg_.frequency);\n+    stat.add(\"ESSID\", connection_msg_.essid);\n+    stat.add(\"BSSID\", connection_msg_.bssid);\n+    stat.add(\"Transmit Power (dBm)\", connection_msg_.txpower);\n+    stat.add(\"Theoretical Max Bitrate (Mbps)\", connection_msg_.bitrate);\n+    stat.add(\"Link Quality Raw\", connection_msg_.link_quality_raw);\n+    stat.addf(\"Link Quality (%)\", \"%.1f\", connection_msg_.link_quality * 100);\n+    stat.add(\"Signal Strength (dBm)\", connection_msg_.signal_level);\n+\n+    if (connection_msg_.signal_level < SIGNAL_STRENGTH_VERY_WEAK) {\n+        stat.summaryf(diagnostic_updater::DiagnosticStatusWrapper::WARN,\n+                      \"Very Poor Signal Strength (%d dBm)\", connection_msg_.signal_level);\n+    } else if (connection_msg_.signal_level < SIGNAL_STRENGTH_WEAK) {\n+        stat.summaryf(diagnostic_updater::DiagnosticStatusWrapper::WARN,\n+                      \"Poor Signal Strength (%d dBm)\", connection_msg_.signal_level);\n+    } else {\n+        stat.summary(diagnostic_updater::DiagnosticStatusWrapper::OK, \"OK\");\n+    }\n+}\n+\n+\n int main(int argc, char * argv[]) {\n     rclcpp::init(argc, argv);\n     rclcpp::spin(std::make_shared<WirelessWatcher>());"
+        }
+      ]
+    },
+    {
+      "author": "tonybaltovski",
+      "date": "2022-08-12T14:04:39Z",
+      "sha": "6fa94a8ba7b9b233a83a928bd8cace12255ccf89",
+      "message": "Merge pull request #15 from clearpathrobotics/rkreinin/foxy-devel\n\nROS2 Foxy",
+      "files_changed": 16,
+      "additions": 275,
+      "deletions": 69,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "5e710e07ac1aea4d9313227ba3191cbea450d708",
+          "filename": "wireless_msgs/CMakeLists.txt",
+          "status": "modified",
+          "additions": 22,
+          "deletions": 12,
+          "changes": 34,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_msgs%2FCMakeLists.txt",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_msgs%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_msgs%2FCMakeLists.txt?ref=6fa94a8ba7b9b233a83a928bd8cace12255ccf89",
+          "patch": "@@ -1,18 +1,28 @@\n-cmake_minimum_required(VERSION 2.8.3)\n+cmake_minimum_required(VERSION 3.5)\n project(wireless_msgs)\n \n-find_package(catkin REQUIRED COMPONENTS\n-  message_generation\n-  std_msgs\n-)\n+# Default to C++14\n+if(NOT CMAKE_CXX_STANDARD)\n+  set(CMAKE_CXX_STANDARD 14)\n+endif()\n+\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  add_compile_options(-Wall -Wextra -Wpedantic)\n+endif()\n+\n+find_package(ament_cmake REQUIRED)\n+find_package(std_msgs REQUIRED)\n+find_package(builtin_interfaces REQUIRED)\n+find_package(rosidl_default_generators REQUIRED)\n \n-add_message_files(FILES\n-  Connection.msg\n-  Network.msg\n-  Quality.msg\n-  Scan.msg\n+rosidl_generate_interfaces(${PROJECT_NAME}\n+   msg/Connection.msg\n+   msg/Network.msg\n+   msg/Quality.msg\n+   msg/Scan.msg\n+   DEPENDENCIES std_msgs builtin_interfaces\n )\n \n-generate_messages(DEPENDENCIES std_msgs)\n+ament_export_dependencies(rosidl_default_runtime)\n \n-catkin_package(CATKIN_DEPENDS std_msgs message_runtime)\n+ament_package()"
+        },
+        {
+          "sha": "0f0ba94cc05eb0151cb7502f8207e8943b37e730",
+          "filename": "wireless_msgs/msg/Quality.msg",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_msgs%2Fmsg%2FQuality.msg",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_msgs%2Fmsg%2FQuality.msg",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_msgs%2Fmsg%2FQuality.msg?ref=6fa94a8ba7b9b233a83a928bd8cace12255ccf89",
+          "patch": "@@ -1,4 +1,4 @@\n-Header header\n+std_msgs/Header header\n \n uint16 messages_received\n uint16 messages_missed"
+        },
+        {
+          "sha": "47b1e1801e6915257f8317bba0ced82a4b1be4f7",
+          "filename": "wireless_msgs/package.xml",
+          "status": "modified",
+          "additions": 18,
+          "deletions": 5,
+          "changes": 23,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_msgs%2Fpackage.xml",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_msgs%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_msgs%2Fpackage.xml?ref=6fa94a8ba7b9b233a83a928bd8cace12255ccf89",
+          "patch": "@@ -1,17 +1,30 @@\n <?xml version=\"1.0\"?>\n-<package format=\"2\">\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n   <name>wireless_msgs</name>\n   <version>0.1.2</version>\n   <description>Messages for describing a wireless network such as bitrate, essid, and link quality.</description>\n \n-  <maintainer email=\"mpurvis@clearpath.ai\">Mike Purvis</maintainer>\n   <author>Mike Purvis</author>\n+\n+  <maintainer email=\"rkreinin@clearpathrobotics.com\">Roni Kreinin</maintainer>\n+  <maintainer email=\"tbaltovski@clearpathrobotics.com\">Tony Baltovski</maintainer>\n   \n   <license>BSD</license>\n \n-  <buildtool_depend>catkin</buildtool_depend>\n-  <build_depend>message_generation</build_depend>\n-  <exec_depend>message_runtime</exec_depend>\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n \n   <depend>std_msgs</depend>\n+\n+  <build_depend>builtin_interfaces</build_depend>\n+  <build_depend>rosidl_default_generators</build_depend>\n+\n+  <exec_depend>builtin_interfaces</exec_depend>\n+  <exec_depend>rosidl_default_runtime</exec_depend>\n+\n+  <member_of_group>rosidl_interface_packages</member_of_group>\n+\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n </package>"
+        },
+        {
+          "sha": "1e7478ad614d93d2d813bbf26caf4f5b7e2245f0",
+          "filename": "wireless_watcher/CHANGELOG.rst",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_watcher%2FCHANGELOG.rst",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_watcher%2FCHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2FCHANGELOG.rst?ref=6fa94a8ba7b9b233a83a928bd8cace12255ccf89",
+          "patch": "@@ -61,4 +61,4 @@ Changelog for package wireless_watcher\n \n 0.0.1 (2013-10-17)\n ------------------\n-* Catkinize wireless_watcher\n+* Catkinize wireless_watcher\n\\ No newline at end of file"
+        },
+        {
+          "sha": "3a2d4db7b596d36be56996205466c1e7d4364ce6",
+          "filename": "wireless_watcher/CMakeLists.txt",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 14,
+          "changes": 14,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/018ed4706d02dab79108db6abc4239fb141cd21d/wireless_watcher%2FCMakeLists.txt",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/018ed4706d02dab79108db6abc4239fb141cd21d/wireless_watcher%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2FCMakeLists.txt?ref=018ed4706d02dab79108db6abc4239fb141cd21d",
+          "patch": "@@ -1,14 +0,0 @@\n-cmake_minimum_required(VERSION 2.8.3)\n-project(wireless_watcher)\n-\n-find_package(catkin REQUIRED)\n-\n-catkin_package()\n-\n-catkin_install_python(PROGRAMS\n-  nodes/watcher_node\n-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n-)\n-\n-install(DIRECTORY launch\n-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})"
+        },
+        {
+          "sha": "3a3693523f973712e6e9e14aae93979b4e2ac367",
+          "filename": "wireless_watcher/launch/watcher.launch",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 3,
+          "changes": 3,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/018ed4706d02dab79108db6abc4239fb141cd21d/wireless_watcher%2Flaunch%2Fwatcher.launch",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/018ed4706d02dab79108db6abc4239fb141cd21d/wireless_watcher%2Flaunch%2Fwatcher.launch",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Flaunch%2Fwatcher.launch?ref=018ed4706d02dab79108db6abc4239fb141cd21d",
+          "patch": "@@ -1,3 +0,0 @@\n-<launch>\n-  <node ns=\"wireless\" pkg=\"wireless_watcher\" name=\"wireless_watcher\" type=\"watcher_node\" />\n-</launch>"
+        },
+        {
+          "sha": "165b16ab468804e18785652baa784ddcfe380d5d",
+          "filename": "wireless_watcher/launch/watcher.launch.py",
+          "status": "added",
+          "additions": 62,
+          "deletions": 0,
+          "changes": 62,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_watcher%2Flaunch%2Fwatcher.launch.py",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_watcher%2Flaunch%2Fwatcher.launch.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Flaunch%2Fwatcher.launch.py?ref=6fa94a8ba7b9b233a83a928bd8cace12255ccf89",
+          "patch": "@@ -0,0 +1,62 @@\n+# Copyright 2022 Clearpath Robotics, Inc.\n+#\n+# Software License Agreement (BSD)\n+#\n+# @author    Roni Kreinin <rkreinin@clearpathrobotics.com>\n+# @copyright (c) 2022, Clearpath Robotics, Inc., All rights reserved.\n+#\n+# Redistribution and use in source and binary forms, with or without modification, are permitted provided that\n+# the following conditions are met:\n+# * Redistributions of source code must retain the above copyright notice, this list of conditions and the\n+#   following disclaimer.\n+# * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the\n+#   following disclaimer in the documentation and/or other materials provided with the distribution.\n+# * Neither the name of Clearpath Robotics nor the names of its contributors may be used to endorse or\n+#   promote products derived from this software without specific prior written permission.\n+#\n+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED\n+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A\n+# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR\n+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED\n+# TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)\n+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING\n+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+# POSSIBILITY OF SUCH DAMAGE.\n+\n+\n+from launch import LaunchDescription\n+from launch.actions import DeclareLaunchArgument\n+from launch.substitutions import LaunchConfiguration\n+\n+from launch_ros.actions import Node\n+\n+ARGUMENTS = [\n+    DeclareLaunchArgument('hz', default_value='1',\n+                          description='Update frequency'),\n+    DeclareLaunchArgument('dev', default_value=\"''\",\n+                          description='Wireless device'),\n+    DeclareLaunchArgument('connected_topic', default_value='connected',\n+                          description='Connected status topic'),\n+    DeclareLaunchArgument('connection_topic', default_value='connection',\n+                          description='Connection information topic'),\n+]\n+\n+\n+def generate_launch_description():\n+\n+    watcher = Node(\n+            package='wireless_watcher',\n+            executable='wireless_watcher',\n+            name='wireless_watcher',\n+            output='screen',\n+            parameters=[{\n+               'hz': LaunchConfiguration('hz'),\n+               'dev': LaunchConfiguration('dev'),\n+               'connected_topic': LaunchConfiguration('connected_topic'),\n+               'connection_topic': LaunchConfiguration('connection_topic')\n+            }],\n+        )\n+\n+    ld = LaunchDescription(ARGUMENTS)\n+    ld.add_action(watcher)\n+    return ld"
+        },
+        {
+          "sha": "0e5d130389b0f3864253abfc58728844113961c8",
+          "filename": "wireless_watcher/package.xml",
+          "status": "modified",
+          "additions": 18,
+          "deletions": 7,
+          "changes": 25,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_watcher%2Fpackage.xml",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_watcher%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Fpackage.xml?ref=6fa94a8ba7b9b233a83a928bd8cace12255ccf89",
+          "patch": "@@ -1,16 +1,27 @@\n <?xml version=\"1.0\"?>\n-<package format=\"2\">\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n   <name>wireless_watcher</name>\n   <version>0.1.2</version>\n-  <description>A Python-based which publishes connection information about a linux wireless interface.</description>\n+  <description>A Python-based node which publishes connection information about a linux wireless interface.</description>\n \n-  <maintainer email=\"mpurvis@clearpath.ai\">Mike Purvis</maintainer>\n   <author>Mike Purvis</author>\n \n+  <maintainer email=\"rkreinin@clearpathrobotics.com\">rkreinin</maintainer>\n+  <maintainer email=\"tbaltovski@clearpathrobotics.com\">Tony Baltovski</maintainer>\n+\n   <license>BSD</license>\n \n-  <buildtool_depend>catkin</buildtool_depend>\n-  <exec_depend>rospy</exec_depend>\n-  <exec_depend>wireless_msgs</exec_depend>\n-  <exec_depend>wireless-tools</exec_depend>\n+  <depend>rclpy</depend>\n+  <depend>wireless_msgs</depend>\n+  <depend>wireless-tools</depend>\n+\n+  <test_depend>ament_copyright</test_depend>\n+  <test_depend>ament_flake8</test_depend>\n+  <test_depend>ament_pep257</test_depend>\n+  <test_depend>python3-pytest</test_depend>\n+\n+  <export>\n+    <build_type>ament_python</build_type>\n+  </export>\n </package>"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "wireless_watcher/resource/wireless_watcher",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_watcher%2Fresource%2Fwireless_watcher",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_watcher%2Fresource%2Fwireless_watcher",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Fresource%2Fwireless_watcher?ref=6fa94a8ba7b9b233a83a928bd8cace12255ccf89"
+        },
+        {
+          "sha": "97963fb5b8870dec6f8065552114d7dbc08a8e1b",
+          "filename": "wireless_watcher/setup.cfg",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_watcher%2Fsetup.cfg",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_watcher%2Fsetup.cfg",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Fsetup.cfg?ref=6fa94a8ba7b9b233a83a928bd8cace12255ccf89",
+          "patch": "@@ -0,0 +1,4 @@\n+[develop]\n+script-dir=$base/lib/wireless_watcher\n+[install]\n+install-scripts=$base/lib/wireless_watcher"
+        },
+        {
+          "sha": "2014853bc38aabeded936fef20b37e1fc9d0884a",
+          "filename": "wireless_watcher/setup.py",
+          "status": "added",
+          "additions": 31,
+          "deletions": 0,
+          "changes": 31,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_watcher%2Fsetup.py",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_watcher%2Fsetup.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Fsetup.py?ref=6fa94a8ba7b9b233a83a928bd8cace12255ccf89",
+          "patch": "@@ -0,0 +1,31 @@\n+from glob import glob\n+\n+import os\n+\n+from setuptools import setup\n+\n+package_name = 'wireless_watcher'\n+\n+setup(\n+    name=package_name,\n+    version='0.1.2',\n+    packages=[package_name],\n+    data_files=[\n+        ('share/ament_index/resource_index/packages',\n+            ['resource/' + package_name]),\n+        ('share/' + package_name, ['package.xml']),\n+        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),\n+    ],\n+    install_requires=['setuptools'],\n+    zip_safe=True,\n+    maintainer='rkreinin',\n+    maintainer_email='rkreinin@clearpathrobotics.com',\n+    description='A Python-based node which publishes connection information about a linux wireless interface.',\n+    license='BSD',\n+    tests_require=['pytest'],\n+    entry_points={\n+        'console_scripts': [\n+            'wireless_watcher = wireless_watcher.wireless_watcher:main'\n+        ],\n+    },\n+)"
+        },
+        {
+          "sha": "cc8ff03f79abb8eb061827a24f2a331e052c5c37",
+          "filename": "wireless_watcher/test/test_copyright.py",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_watcher%2Ftest%2Ftest_copyright.py",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_watcher%2Ftest%2Ftest_copyright.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Ftest%2Ftest_copyright.py?ref=6fa94a8ba7b9b233a83a928bd8cace12255ccf89",
+          "patch": "@@ -0,0 +1,23 @@\n+# Copyright 2015 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_copyright.main import main\n+import pytest\n+\n+\n+@pytest.mark.copyright\n+@pytest.mark.linter\n+def test_copyright():\n+    rc = main(argv=['.', 'test'])\n+    assert rc == 0, 'Found errors'"
+        },
+        {
+          "sha": "27ee1078ff077cc3a0fec75b7d023101a68164d1",
+          "filename": "wireless_watcher/test/test_flake8.py",
+          "status": "added",
+          "additions": 25,
+          "deletions": 0,
+          "changes": 25,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_watcher%2Ftest%2Ftest_flake8.py",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_watcher%2Ftest%2Ftest_flake8.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Ftest%2Ftest_flake8.py?ref=6fa94a8ba7b9b233a83a928bd8cace12255ccf89",
+          "patch": "@@ -0,0 +1,25 @@\n+# Copyright 2017 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_flake8.main import main_with_errors\n+import pytest\n+\n+\n+@pytest.mark.flake8\n+@pytest.mark.linter\n+def test_flake8():\n+    rc, errors = main_with_errors(argv=[])\n+    assert rc == 0, \\\n+        'Found %d code style errors / warnings:\\n' % len(errors) + \\\n+        '\\n'.join(errors)"
+        },
+        {
+          "sha": "b234a3840f4c5bd38f043638c8622b8f240e1185",
+          "filename": "wireless_watcher/test/test_pep257.py",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_watcher%2Ftest%2Ftest_pep257.py",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_watcher%2Ftest%2Ftest_pep257.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Ftest%2Ftest_pep257.py?ref=6fa94a8ba7b9b233a83a928bd8cace12255ccf89",
+          "patch": "@@ -0,0 +1,23 @@\n+# Copyright 2015 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_pep257.main import main\n+import pytest\n+\n+\n+@pytest.mark.linter\n+@pytest.mark.pep257\n+def test_pep257():\n+    rc = main(argv=['.', 'test'])\n+    assert rc == 0, 'Found code style errors / warnings'"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "wireless_watcher/wireless_watcher/__init__.py",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_watcher%2Fwireless_watcher%2F__init__.py",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_watcher%2Fwireless_watcher%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Fwireless_watcher%2F__init__.py?ref=6fa94a8ba7b9b233a83a928bd8cace12255ccf89"
+        },
+        {
+          "sha": "eda05b24bc480656838e3ac62c521b00dc7090f3",
+          "filename": "wireless_watcher/wireless_watcher/wireless_watcher.py",
+          "status": "renamed",
+          "additions": 47,
+          "deletions": 26,
+          "changes": 73,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_watcher%2Fwireless_watcher%2Fwireless_watcher.py",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6fa94a8ba7b9b233a83a928bd8cace12255ccf89/wireless_watcher%2Fwireless_watcher%2Fwireless_watcher.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Fwireless_watcher%2Fwireless_watcher.py?ref=6fa94a8ba7b9b233a83a928bd8cace12255ccf89",
+          "patch": "@@ -2,7 +2,8 @@\n # Software License Agreement (BSD)\n #\n # @author    Mike Purvis <mpurvis@clearpath.ai>\n-# @copyright (c) 2018, Clearpath Robotics, Inc., All rights reserved.\n+# @author    Roni Kreinin <rkreinin@clearpathrobotics.com>\n+# @copyright (c) 2022, Clearpath Robotics, Inc., All rights reserved.\n #\n # Redistribution and use in source and binary forms, with or without modification, are permitted provided that\n # the following conditions are met:\n@@ -24,10 +25,14 @@\n \n import os\n import re\n-import rospy\n+import rclpy\n+import threading\n import std_msgs.msg\n import subprocess\n-import wireless_msgs.msg\n+\n+from wireless_msgs.msg import Connection, Network\n+\n+from rclpy.qos import qos_profile_sensor_data\n \n SYS_NET_PATH = '/sys/class/net'\n \n@@ -38,7 +43,7 @@ def trim(field, type=int):\n         return type(m.group(0))\n \n \n-class Connection(wireless_msgs.msg.Connection):\n+class WirelessConnection(Connection):\n     def __init__(self, fields):\n         args = {}\n \n@@ -48,7 +53,7 @@ def __init__(self, fields):\n         args['noise_level'] = trim(fields.get('Noise level', \"0\"))\n         args['essid'] = fields.get('ESSID', \"\").strip('\"')\n         args['bssid'] = fields.get('Access Point', \"\").strip()\n-        args['frequency'] = trim(fields.get('Frequency', \"\"), float)\n+        args['frequency'] = trim(fields.get('Frequency', \"0.0\"), float)\n \n         try:\n             args['link_quality_raw'] = fields['Link Quality']\n@@ -57,46 +62,64 @@ def __init__(self, fields):\n         except:\n             pass\n \n-        super(Connection, self).__init__(**args)\n+        self.msg = Connection(**args)\n \n \n-class Network(wireless_msgs.msg.Network):\n+class WirelessNetwork(Network):\n     def __init__(self, fields):\n         args = {}\n-        super(Network, self).__init__(**args)\n+        self.msg = Network(**args)\n \n \n def main():\n-    rospy.init_node('wireless_watcher')\n+    rclpy.init()\n+\n+    node = rclpy.create_node('wireless_watcher')\n \n-    hz = rospy.get_param('~hz', 1)\n+    node.declare_parameter('hz', 1)\n+    node.declare_parameter('dev', None)\n+    node.declare_parameter('connected_topic', 'connected')\n+    node.declare_parameter('connection_topic', 'connection')\n+\n+    hz = node.get_parameter('hz').value\n+    dev = node.get_parameter('dev').value\n+    connected_topic = node.get_parameter('connected_topic').value\n+    connection_topic = node.get_parameter('connection_topic').value\n \n-    dev = rospy.get_param('~dev', None)\n     if not dev:\n         wldevs = [d for d in os.listdir(SYS_NET_PATH) if d.startswith('wl') or d.startswith('wifi')]\n         if wldevs:\n             dev = wldevs[0]\n         else:\n-            rospy.logfatal(\"No wireless device found to monitor.\")\n+            node.get_logger().fatal('No wireless device found to monitor.')\n             return 1\n-    rospy.loginfo(\"Monitoring %s\" % dev)\n+\n+    node.get_logger().info('Monitoring {0}'.format(dev))\n \n     previous_error = False\n     previous_success = False\n-    r = rospy.Rate(hz)\n \n-    connection_pub = rospy.Publisher('connection', Connection, queue_size=1)\n-    connected_pub = rospy.Publisher('connected', std_msgs.msg.Bool, queue_size=1)\n+    thread = threading.Thread(target=rclpy.spin, args=(node, ), daemon=True)\n+    thread.start()\n+\n+    r = node.create_rate(hz)\n+\n+    connected_pub = node.create_publisher(std_msgs.msg.Bool, connected_topic, qos_profile_sensor_data)\n+    connection_pub = node.create_publisher(Connection, connection_topic, qos_profile_sensor_data)\n \n     # Disable this until we actually collect and publish the data.\n-    # network_pub = rospy.Publisher('network', Network)\n+    # network_pub = node.create_publisher(Network, 'network', qos_profile_sensor_data)\n \n-    while not rospy.is_shutdown():\n+    connected_msg = std_msgs.msg.Bool()\n+\n+    while rclpy.ok():\n         try:\n             with open(os.path.join(SYS_NET_PATH, dev, 'operstate'), 'rb') as f:\n-                connected_pub.publish(f.read().strip() == b'up')\n+                connected_msg.data = f.read().strip() == b'up'\n         except FileNotFoundError:\n-            connected_pub.publish(False)\n+            connected_msg.data = False\n+        finally:\n+            connected_pub.publish(connected_msg)\n \n         try:\n             wifi_str = subprocess.check_output(['iwconfig', dev], stderr=subprocess.STDOUT).decode()\n@@ -106,22 +129,20 @@ def main():\n             fields_dict.update(dict([field for field in fields_list if len(field) == 2]))\n \n             # Check if WiFi is connected to a network\n-            connection_msg = {}\n             if \"Not-Associated\" not in fields_dict['Access Point']:\n-                connection_msg = Connection(fields_dict)\n-\n-            connection_pub.publish(connection_msg)\n+                connection = WirelessConnection(fields_dict)\n+                connection_pub.publish(connection.msg)\n \n             if not previous_success:\n                 previous_success = True\n                 previous_error = False\n-                rospy.loginfo(\"Retrieved status of interface %s. Now updating at %f Hz.\" % (dev, hz))\n+                node.get_logger().info('Retrieved status of interface {0}. Now updating at {1} Hz.'.format(dev, hz))\n \n         except subprocess.CalledProcessError:\n             if not previous_error:\n                 previous_error = True\n                 previous_success = False\n-                rospy.logerr(\"Error checking status of interface %s. Will try again at %f Hz.\" % (dev, hz))\n+                node.get_logger().error('Error checking status of interface {0}. Will try again at {1} Hz.'.format(dev, hz))\n \n         r.sleep()\n     return 0",
+          "previous_filename": "wireless_watcher/nodes/watcher_node"
+        }
+      ]
+    },
+    {
+      "author": "luis-camero",
+      "date": "2024-08-19T21:14:07Z",
+      "sha": "4eb430a4b548409ca0708ae473381c0e399fa489",
+      "message": "Add try-catch to BitRate and Frequency field",
+      "files_changed": 1,
+      "additions": 41,
+      "deletions": 25,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "a7c5f90410dd11737f7321ea657f503d65c39655",
+          "filename": "wireless_watcher/src/wireless_watcher.cpp",
+          "status": "modified",
+          "additions": 41,
+          "deletions": 25,
+          "changes": 66,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/4eb430a4b548409ca0708ae473381c0e399fa489/wireless_watcher%2Fsrc%2Fwireless_watcher.cpp",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/4eb430a4b548409ca0708ae473381c0e399fa489/wireless_watcher%2Fsrc%2Fwireless_watcher.cpp",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Fsrc%2Fwireless_watcher.cpp?ref=4eb430a4b548409ca0708ae473381c0e399fa489",
+          "patch": "@@ -107,7 +107,7 @@ WirelessWatcher::WirelessWatcher() : rclcpp::Node(\"wireless_watcher\") {\n \n         std::string iwconfig_output = exec_cmd(\"iwconfig \" + dev);\n         std::vector<std::string> fields_str = split(iwconfig_output, \"\\\\s\\\\s+\");\n-        \n+\n         std::unordered_map<std::string, std::string> fields_dict;\n         fields_dict[\"dev\"] = fields_str[0];\n         fields_dict[\"type\"] = fields_str[1];\n@@ -121,31 +121,47 @@ WirelessWatcher::WirelessWatcher() : rclcpp::Node(\"wireless_watcher\") {\n         }\n \n         if (fields_dict[\"Access Point\"].find(\"Not-Associated\") == std::string::npos) {\n-          connection_msg.bitrate = std::stof(split(fields_dict[\"Bit Rate\"], \" \")[0]);\n-          connection_msg.txpower = std::stoi(split(fields_dict[\"Tx-Power\"], \" \")[0]);\n-          connection_msg.signal_level = std::stoi(split(fields_dict[\"Signal level\"], \" \")[0]);\n-\n-          // Strip quotations from ESSID\n-          std::string essid = fields_dict[\"ESSID\"];\n-          essid.erase(std::remove(essid.begin(), essid.end(), '\\\"'), essid.end());\n-          connection_msg.essid = essid;\n-      \n-          connection_msg.bssid = fields_dict[\"Access Point\"];\n-          connection_msg.frequency = std::stof(split(fields_dict[\"Frequency\"], \" \")[0]);\n-\n-          // Calculate link_quality from Link Quality\n-          std::string link_quality_str = fields_dict[\"Link Quality\"];\n-          connection_msg.link_quality_raw = link_quality_str;\n-          size_t delimiter_pos = link_quality_str.find(\"/\");\n-          if (delimiter_pos != std::string::npos) {\n-              int num = std::stoi(link_quality_str.substr(0, delimiter_pos));\n-              int den = std::stoi(link_quality_str.substr(delimiter_pos + 1));\n-              connection_msg.link_quality = static_cast<float>(num) / den;\n-          }\n-\n-          connection_pub_->publish(connection_msg);\n+            try\n+            {\n+                connection_msg.bitrate = std::stof(split(fields_dict[\"Bit Rate\"], \" \")[0]);\n+            }\n+            catch(std::invalid_argument)\n+            {\n+                connection_msg.bitrate = 0.0;\n+            }\n+\n+            connection_msg.txpower = std::stoi(split(fields_dict[\"Tx-Power\"], \" \")[0]);\n+            connection_msg.signal_level = std::stoi(split(fields_dict[\"Signal level\"], \" \")[0]);\n+\n+            // Strip quotations from ESSID\n+            std::string essid = fields_dict[\"ESSID\"];\n+            essid.erase(std::remove(essid.begin(), essid.end(), '\\\"'), essid.end());\n+            connection_msg.essid = essid;\n+\n+            try\n+            {\n+                connection_msg.frequency = std::stof(split(fields_dict[\"Frequency\"], \" \")[0]);\n+            }\n+            catch(std::invalid_argument)\n+            {\n+                connection_msg.frequency = 0.0;\n+            }\n+\n+            connection_msg.bssid = fields_dict[\"Access Point\"];\n+\n+            // Calculate link_quality from Link Quality\n+            std::string link_quality_str = fields_dict[\"Link Quality\"];\n+            connection_msg.link_quality_raw = link_quality_str;\n+            size_t delimiter_pos = link_quality_str.find(\"/\");\n+            if (delimiter_pos != std::string::npos) {\n+                int num = std::stoi(link_quality_str.substr(0, delimiter_pos));\n+                int den = std::stoi(link_quality_str.substr(delimiter_pos + 1));\n+                connection_msg.link_quality = static_cast<float>(num) / den;\n+            }\n+\n+            connection_pub_->publish(connection_msg);\n         }\n-      std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(1000.0 / hz)));\n+        std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(1000.0 / hz)));\n     }\n }\n "
+        }
+      ]
+    },
+    {
+      "author": "roni-kreinin",
+      "date": "2022-07-26T18:17:54Z",
+      "sha": "6ad61594cd4d5272e544ad4bf242c94bd0d1499b",
+      "message": "Updated wireless_msgs for ROS2.\nUpdated wireless_watcher for ROS2.",
+      "files_changed": 16,
+      "additions": 271,
+      "deletions": 134,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "5e710e07ac1aea4d9313227ba3191cbea450d708",
+          "filename": "wireless_msgs/CMakeLists.txt",
+          "status": "modified",
+          "additions": 22,
+          "deletions": 12,
+          "changes": 34,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_msgs%2FCMakeLists.txt",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_msgs%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_msgs%2FCMakeLists.txt?ref=6ad61594cd4d5272e544ad4bf242c94bd0d1499b",
+          "patch": "@@ -1,18 +1,28 @@\n-cmake_minimum_required(VERSION 2.8.3)\n+cmake_minimum_required(VERSION 3.5)\n project(wireless_msgs)\n \n-find_package(catkin REQUIRED COMPONENTS\n-  message_generation\n-  std_msgs\n-)\n+# Default to C++14\n+if(NOT CMAKE_CXX_STANDARD)\n+  set(CMAKE_CXX_STANDARD 14)\n+endif()\n+\n+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES \"Clang\")\n+  add_compile_options(-Wall -Wextra -Wpedantic)\n+endif()\n+\n+find_package(ament_cmake REQUIRED)\n+find_package(std_msgs REQUIRED)\n+find_package(builtin_interfaces REQUIRED)\n+find_package(rosidl_default_generators REQUIRED)\n \n-add_message_files(FILES\n-  Connection.msg\n-  Network.msg\n-  Quality.msg\n-  Scan.msg\n+rosidl_generate_interfaces(${PROJECT_NAME}\n+   msg/Connection.msg\n+   msg/Network.msg\n+   msg/Quality.msg\n+   msg/Scan.msg\n+   DEPENDENCIES std_msgs builtin_interfaces\n )\n \n-generate_messages(DEPENDENCIES std_msgs)\n+ament_export_dependencies(rosidl_default_runtime)\n \n-catkin_package(CATKIN_DEPENDS std_msgs message_runtime)\n+ament_package()"
+        },
+        {
+          "sha": "0f0ba94cc05eb0151cb7502f8207e8943b37e730",
+          "filename": "wireless_msgs/msg/Quality.msg",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_msgs%2Fmsg%2FQuality.msg",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_msgs%2Fmsg%2FQuality.msg",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_msgs%2Fmsg%2FQuality.msg?ref=6ad61594cd4d5272e544ad4bf242c94bd0d1499b",
+          "patch": "@@ -1,4 +1,4 @@\n-Header header\n+std_msgs/Header header\n \n uint16 messages_received\n uint16 messages_missed"
+        },
+        {
+          "sha": "acef54eac98857116410e29642149ac336f97ac1",
+          "filename": "wireless_msgs/package.xml",
+          "status": "modified",
+          "additions": 17,
+          "deletions": 6,
+          "changes": 23,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_msgs%2Fpackage.xml",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_msgs%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_msgs%2Fpackage.xml?ref=6ad61594cd4d5272e544ad4bf242c94bd0d1499b",
+          "patch": "@@ -1,17 +1,28 @@\n <?xml version=\"1.0\"?>\n-<package format=\"2\">\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n   <name>wireless_msgs</name>\n   <version>0.1.2</version>\n   <description>Messages for describing a wireless network such as bitrate, essid, and link quality.</description>\n \n-  <maintainer email=\"mpurvis@clearpath.ai\">Mike Purvis</maintainer>\n-  <author>Mike Purvis</author>\n+  <maintainer email=\"rkreinin@clearpathrobotics.com\">Roni Kreinin</maintainer>\n+  <maintainer email=\"tbaltovski@clearpathrobotics.com\">Tony Baltovski</maintainer>\n   \n   <license>BSD</license>\n \n-  <buildtool_depend>catkin</buildtool_depend>\n-  <build_depend>message_generation</build_depend>\n-  <exec_depend>message_runtime</exec_depend>\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n \n   <depend>std_msgs</depend>\n+\n+  <build_depend>builtin_interfaces</build_depend>\n+  <build_depend>rosidl_default_generators</build_depend>\n+\n+  <exec_depend>builtin_interfaces</exec_depend>\n+  <exec_depend>rosidl_default_runtime</exec_depend>\n+\n+  <member_of_group>rosidl_interface_packages</member_of_group>\n+\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n </package>"
+        },
+        {
+          "sha": "b7904c0b82644fd482d877f0e7244cb873c1d0a0",
+          "filename": "wireless_watcher/CHANGELOG.rst",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 64,
+          "changes": 64,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/018ed4706d02dab79108db6abc4239fb141cd21d/wireless_watcher%2FCHANGELOG.rst",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/018ed4706d02dab79108db6abc4239fb141cd21d/wireless_watcher%2FCHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2FCHANGELOG.rst?ref=018ed4706d02dab79108db6abc4239fb141cd21d",
+          "patch": "@@ -1,64 +0,0 @@\n-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n-Changelog for package wireless_watcher\n-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n-\n-0.1.2 (2021-11-30)\n-------------------\n-* Add wireless-tools as a dependency (`#14 <https://github.com/clearpathrobotics/wireless/issues/14>`_)\n-* Contributors: Chris I-B\n-\n-0.1.1 (2020-05-01)\n-------------------\n-* Improve connected detection logic so topic doesn't stop when interface is down\n-* Contributors: Nikesh Bernardshaw\n-\n-0.1.0 (2019-10-10)\n-------------------\n-* Python 3 fixes for watcher_node. (`#10 <https://github.com/clearpathrobotics/wireless/issues/10>`_)\n-* Contributors: Mike Purvis\n-\n-0.0.9 (2018-11-27)\n-------------------\n-* Accept 'wifi' as device prefix for auto-detection.\n-* Contributors: Mike Purvis\n-\n-0.0.8 (2018-11-07)\n-------------------\n-* Package format 2.\n-* Further pep8 fixups.\n-* Auto-detect wl* device if not passed explicitly.\n-* Contributors: Mike Purvis\n-\n-0.0.7 (2015-09-09)\n-------------------\n-* Added frequency to watcher node\n-* Contributors: Alex Bencz\n-\n-0.0.6 (2015-09-02)\n-------------------\n-* Added queue_size parameter to publishers\n-* Contributors: Mustafa Safri\n-\n-0.0.5 (2015-08-25)\n-------------------\n-* Added checks for missing fields\n-* Contributors: Mustafa Safri\n-\n-0.0.4 (2015-06-25)\n-------------------\n-* Add install rule for launch dir\n-* Contributors: Paul Bovbel\n-\n-0.0.3 (2015-06-17)\n-------------------\n-* Added ESSID and BSSID fields, use floats for bitrate\n-* Contributors: Alex Bencz\n-\n-0.0.2 (2013-10-24)\n-------------------\n-* Workaround to suppress DummyThread error spew.\n-* Add simple boolean to publish ethernet-has-ip status.\n-\n-0.0.1 (2013-10-17)\n-------------------\n-* Catkinize wireless_watcher"
+        },
+        {
+          "sha": "3a2d4db7b596d36be56996205466c1e7d4364ce6",
+          "filename": "wireless_watcher/CMakeLists.txt",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 14,
+          "changes": 14,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/018ed4706d02dab79108db6abc4239fb141cd21d/wireless_watcher%2FCMakeLists.txt",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/018ed4706d02dab79108db6abc4239fb141cd21d/wireless_watcher%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2FCMakeLists.txt?ref=018ed4706d02dab79108db6abc4239fb141cd21d",
+          "patch": "@@ -1,14 +0,0 @@\n-cmake_minimum_required(VERSION 2.8.3)\n-project(wireless_watcher)\n-\n-find_package(catkin REQUIRED)\n-\n-catkin_package()\n-\n-catkin_install_python(PROGRAMS\n-  nodes/watcher_node\n-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n-)\n-\n-install(DIRECTORY launch\n-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})"
+        },
+        {
+          "sha": "3a3693523f973712e6e9e14aae93979b4e2ac367",
+          "filename": "wireless_watcher/launch/watcher.launch",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 3,
+          "changes": 3,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/018ed4706d02dab79108db6abc4239fb141cd21d/wireless_watcher%2Flaunch%2Fwatcher.launch",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/018ed4706d02dab79108db6abc4239fb141cd21d/wireless_watcher%2Flaunch%2Fwatcher.launch",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Flaunch%2Fwatcher.launch?ref=018ed4706d02dab79108db6abc4239fb141cd21d",
+          "patch": "@@ -1,3 +0,0 @@\n-<launch>\n-  <node ns=\"wireless\" pkg=\"wireless_watcher\" name=\"wireless_watcher\" type=\"watcher_node\" />\n-</launch>"
+        },
+        {
+          "sha": "165b16ab468804e18785652baa784ddcfe380d5d",
+          "filename": "wireless_watcher/launch/watcher.launch.py",
+          "status": "added",
+          "additions": 62,
+          "deletions": 0,
+          "changes": 62,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_watcher%2Flaunch%2Fwatcher.launch.py",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_watcher%2Flaunch%2Fwatcher.launch.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Flaunch%2Fwatcher.launch.py?ref=6ad61594cd4d5272e544ad4bf242c94bd0d1499b",
+          "patch": "@@ -0,0 +1,62 @@\n+# Copyright 2022 Clearpath Robotics, Inc.\n+#\n+# Software License Agreement (BSD)\n+#\n+# @author    Roni Kreinin <rkreinin@clearpathrobotics.com>\n+# @copyright (c) 2022, Clearpath Robotics, Inc., All rights reserved.\n+#\n+# Redistribution and use in source and binary forms, with or without modification, are permitted provided that\n+# the following conditions are met:\n+# * Redistributions of source code must retain the above copyright notice, this list of conditions and the\n+#   following disclaimer.\n+# * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the\n+#   following disclaimer in the documentation and/or other materials provided with the distribution.\n+# * Neither the name of Clearpath Robotics nor the names of its contributors may be used to endorse or\n+#   promote products derived from this software without specific prior written permission.\n+#\n+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED\n+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A\n+# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR\n+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED\n+# TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)\n+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING\n+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+# POSSIBILITY OF SUCH DAMAGE.\n+\n+\n+from launch import LaunchDescription\n+from launch.actions import DeclareLaunchArgument\n+from launch.substitutions import LaunchConfiguration\n+\n+from launch_ros.actions import Node\n+\n+ARGUMENTS = [\n+    DeclareLaunchArgument('hz', default_value='1',\n+                          description='Update frequency'),\n+    DeclareLaunchArgument('dev', default_value=\"''\",\n+                          description='Wireless device'),\n+    DeclareLaunchArgument('connected_topic', default_value='connected',\n+                          description='Connected status topic'),\n+    DeclareLaunchArgument('connection_topic', default_value='connection',\n+                          description='Connection information topic'),\n+]\n+\n+\n+def generate_launch_description():\n+\n+    watcher = Node(\n+            package='wireless_watcher',\n+            executable='wireless_watcher',\n+            name='wireless_watcher',\n+            output='screen',\n+            parameters=[{\n+               'hz': LaunchConfiguration('hz'),\n+               'dev': LaunchConfiguration('dev'),\n+               'connected_topic': LaunchConfiguration('connected_topic'),\n+               'connection_topic': LaunchConfiguration('connection_topic')\n+            }],\n+        )\n+\n+    ld = LaunchDescription(ARGUMENTS)\n+    ld.add_action(watcher)\n+    return ld"
+        },
+        {
+          "sha": "b25bf2e03ed286a3a5fe6c71f9f6f10b04141ce7",
+          "filename": "wireless_watcher/package.xml",
+          "status": "modified",
+          "additions": 16,
+          "deletions": 8,
+          "changes": 24,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_watcher%2Fpackage.xml",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_watcher%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Fpackage.xml?ref=6ad61594cd4d5272e544ad4bf242c94bd0d1499b",
+          "patch": "@@ -1,16 +1,24 @@\n <?xml version=\"1.0\"?>\n-<package format=\"2\">\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n   <name>wireless_watcher</name>\n   <version>0.1.2</version>\n-  <description>A Python-based which publishes connection information about a linux wireless interface.</description>\n+  <description>A Python-based node which publishes connection information about a linux wireless interface.</description>\n \n-  <maintainer email=\"mpurvis@clearpath.ai\">Mike Purvis</maintainer>\n-  <author>Mike Purvis</author>\n+  <maintainer email=\"rkreinin@clearpathrobotics.com\">rkreinin</maintainer>\n+  <maintainer email=\"tbaltovski@clearpathrobotics.com\">Tony Baltovski</maintainer>\n \n   <license>BSD</license>\n \n-  <buildtool_depend>catkin</buildtool_depend>\n-  <exec_depend>rospy</exec_depend>\n-  <exec_depend>wireless_msgs</exec_depend>\n-  <exec_depend>wireless-tools</exec_depend>\n+  <depend>rclpy</depend>\n+  <depend>wireless_msgs</depend>\n+\n+  <test_depend>ament_copyright</test_depend>\n+  <test_depend>ament_flake8</test_depend>\n+  <test_depend>ament_pep257</test_depend>\n+  <test_depend>python3-pytest</test_depend>\n+\n+  <export>\n+    <build_type>ament_python</build_type>\n+  </export>\n </package>"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "wireless_watcher/resource/wireless_watcher",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_watcher%2Fresource%2Fwireless_watcher",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_watcher%2Fresource%2Fwireless_watcher",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Fresource%2Fwireless_watcher?ref=6ad61594cd4d5272e544ad4bf242c94bd0d1499b"
+        },
+        {
+          "sha": "97963fb5b8870dec6f8065552114d7dbc08a8e1b",
+          "filename": "wireless_watcher/setup.cfg",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_watcher%2Fsetup.cfg",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_watcher%2Fsetup.cfg",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Fsetup.cfg?ref=6ad61594cd4d5272e544ad4bf242c94bd0d1499b",
+          "patch": "@@ -0,0 +1,4 @@\n+[develop]\n+script-dir=$base/lib/wireless_watcher\n+[install]\n+install-scripts=$base/lib/wireless_watcher"
+        },
+        {
+          "sha": "9e64247062f381d750b2887009ebda3db2d7b5b1",
+          "filename": "wireless_watcher/setup.py",
+          "status": "added",
+          "additions": 31,
+          "deletions": 0,
+          "changes": 31,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_watcher%2Fsetup.py",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_watcher%2Fsetup.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Fsetup.py?ref=6ad61594cd4d5272e544ad4bf242c94bd0d1499b",
+          "patch": "@@ -0,0 +1,31 @@\n+from glob import glob\n+\n+import os\n+\n+from setuptools import setup\n+\n+package_name = 'wireless_watcher'\n+\n+setup(\n+    name=package_name,\n+    version='0.0.0',\n+    packages=[package_name],\n+    data_files=[\n+        ('share/ament_index/resource_index/packages',\n+            ['resource/' + package_name]),\n+        ('share/' + package_name, ['package.xml']),\n+        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),\n+    ],\n+    install_requires=['setuptools'],\n+    zip_safe=True,\n+    maintainer='rkreinin',\n+    maintainer_email='rkreinin@clearpathrobotics.com',\n+    description='A Python-based node which publishes connection information about a linux wireless interface.',\n+    license='BSD',\n+    tests_require=['pytest'],\n+    entry_points={\n+        'console_scripts': [\n+            'wireless_watcher = wireless_watcher.wireless_watcher:main'\n+        ],\n+    },\n+)"
+        },
+        {
+          "sha": "cc8ff03f79abb8eb061827a24f2a331e052c5c37",
+          "filename": "wireless_watcher/test/test_copyright.py",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_watcher%2Ftest%2Ftest_copyright.py",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_watcher%2Ftest%2Ftest_copyright.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Ftest%2Ftest_copyright.py?ref=6ad61594cd4d5272e544ad4bf242c94bd0d1499b",
+          "patch": "@@ -0,0 +1,23 @@\n+# Copyright 2015 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_copyright.main import main\n+import pytest\n+\n+\n+@pytest.mark.copyright\n+@pytest.mark.linter\n+def test_copyright():\n+    rc = main(argv=['.', 'test'])\n+    assert rc == 0, 'Found errors'"
+        },
+        {
+          "sha": "27ee1078ff077cc3a0fec75b7d023101a68164d1",
+          "filename": "wireless_watcher/test/test_flake8.py",
+          "status": "added",
+          "additions": 25,
+          "deletions": 0,
+          "changes": 25,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_watcher%2Ftest%2Ftest_flake8.py",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_watcher%2Ftest%2Ftest_flake8.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Ftest%2Ftest_flake8.py?ref=6ad61594cd4d5272e544ad4bf242c94bd0d1499b",
+          "patch": "@@ -0,0 +1,25 @@\n+# Copyright 2017 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_flake8.main import main_with_errors\n+import pytest\n+\n+\n+@pytest.mark.flake8\n+@pytest.mark.linter\n+def test_flake8():\n+    rc, errors = main_with_errors(argv=[])\n+    assert rc == 0, \\\n+        'Found %d code style errors / warnings:\\n' % len(errors) + \\\n+        '\\n'.join(errors)"
+        },
+        {
+          "sha": "b234a3840f4c5bd38f043638c8622b8f240e1185",
+          "filename": "wireless_watcher/test/test_pep257.py",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_watcher%2Ftest%2Ftest_pep257.py",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_watcher%2Ftest%2Ftest_pep257.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Ftest%2Ftest_pep257.py?ref=6ad61594cd4d5272e544ad4bf242c94bd0d1499b",
+          "patch": "@@ -0,0 +1,23 @@\n+# Copyright 2015 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_pep257.main import main\n+import pytest\n+\n+\n+@pytest.mark.linter\n+@pytest.mark.pep257\n+def test_pep257():\n+    rc = main(argv=['.', 'test'])\n+    assert rc == 0, 'Found code style errors / warnings'"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "wireless_watcher/wireless_watcher/__init__.py",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_watcher%2Fwireless_watcher%2F__init__.py",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_watcher%2Fwireless_watcher%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Fwireless_watcher%2F__init__.py?ref=6ad61594cd4d5272e544ad4bf242c94bd0d1499b"
+        },
+        {
+          "sha": "eda05b24bc480656838e3ac62c521b00dc7090f3",
+          "filename": "wireless_watcher/wireless_watcher/wireless_watcher.py",
+          "status": "renamed",
+          "additions": 47,
+          "deletions": 26,
+          "changes": 73,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_watcher%2Fwireless_watcher%2Fwireless_watcher.py",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6ad61594cd4d5272e544ad4bf242c94bd0d1499b/wireless_watcher%2Fwireless_watcher%2Fwireless_watcher.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Fwireless_watcher%2Fwireless_watcher.py?ref=6ad61594cd4d5272e544ad4bf242c94bd0d1499b",
+          "patch": "@@ -2,7 +2,8 @@\n # Software License Agreement (BSD)\n #\n # @author    Mike Purvis <mpurvis@clearpath.ai>\n-# @copyright (c) 2018, Clearpath Robotics, Inc., All rights reserved.\n+# @author    Roni Kreinin <rkreinin@clearpathrobotics.com>\n+# @copyright (c) 2022, Clearpath Robotics, Inc., All rights reserved.\n #\n # Redistribution and use in source and binary forms, with or without modification, are permitted provided that\n # the following conditions are met:\n@@ -24,10 +25,14 @@\n \n import os\n import re\n-import rospy\n+import rclpy\n+import threading\n import std_msgs.msg\n import subprocess\n-import wireless_msgs.msg\n+\n+from wireless_msgs.msg import Connection, Network\n+\n+from rclpy.qos import qos_profile_sensor_data\n \n SYS_NET_PATH = '/sys/class/net'\n \n@@ -38,7 +43,7 @@ def trim(field, type=int):\n         return type(m.group(0))\n \n \n-class Connection(wireless_msgs.msg.Connection):\n+class WirelessConnection(Connection):\n     def __init__(self, fields):\n         args = {}\n \n@@ -48,7 +53,7 @@ def __init__(self, fields):\n         args['noise_level'] = trim(fields.get('Noise level', \"0\"))\n         args['essid'] = fields.get('ESSID', \"\").strip('\"')\n         args['bssid'] = fields.get('Access Point', \"\").strip()\n-        args['frequency'] = trim(fields.get('Frequency', \"\"), float)\n+        args['frequency'] = trim(fields.get('Frequency', \"0.0\"), float)\n \n         try:\n             args['link_quality_raw'] = fields['Link Quality']\n@@ -57,46 +62,64 @@ def __init__(self, fields):\n         except:\n             pass\n \n-        super(Connection, self).__init__(**args)\n+        self.msg = Connection(**args)\n \n \n-class Network(wireless_msgs.msg.Network):\n+class WirelessNetwork(Network):\n     def __init__(self, fields):\n         args = {}\n-        super(Network, self).__init__(**args)\n+        self.msg = Network(**args)\n \n \n def main():\n-    rospy.init_node('wireless_watcher')\n+    rclpy.init()\n+\n+    node = rclpy.create_node('wireless_watcher')\n \n-    hz = rospy.get_param('~hz', 1)\n+    node.declare_parameter('hz', 1)\n+    node.declare_parameter('dev', None)\n+    node.declare_parameter('connected_topic', 'connected')\n+    node.declare_parameter('connection_topic', 'connection')\n+\n+    hz = node.get_parameter('hz').value\n+    dev = node.get_parameter('dev').value\n+    connected_topic = node.get_parameter('connected_topic').value\n+    connection_topic = node.get_parameter('connection_topic').value\n \n-    dev = rospy.get_param('~dev', None)\n     if not dev:\n         wldevs = [d for d in os.listdir(SYS_NET_PATH) if d.startswith('wl') or d.startswith('wifi')]\n         if wldevs:\n             dev = wldevs[0]\n         else:\n-            rospy.logfatal(\"No wireless device found to monitor.\")\n+            node.get_logger().fatal('No wireless device found to monitor.')\n             return 1\n-    rospy.loginfo(\"Monitoring %s\" % dev)\n+\n+    node.get_logger().info('Monitoring {0}'.format(dev))\n \n     previous_error = False\n     previous_success = False\n-    r = rospy.Rate(hz)\n \n-    connection_pub = rospy.Publisher('connection', Connection, queue_size=1)\n-    connected_pub = rospy.Publisher('connected', std_msgs.msg.Bool, queue_size=1)\n+    thread = threading.Thread(target=rclpy.spin, args=(node, ), daemon=True)\n+    thread.start()\n+\n+    r = node.create_rate(hz)\n+\n+    connected_pub = node.create_publisher(std_msgs.msg.Bool, connected_topic, qos_profile_sensor_data)\n+    connection_pub = node.create_publisher(Connection, connection_topic, qos_profile_sensor_data)\n \n     # Disable this until we actually collect and publish the data.\n-    # network_pub = rospy.Publisher('network', Network)\n+    # network_pub = node.create_publisher(Network, 'network', qos_profile_sensor_data)\n \n-    while not rospy.is_shutdown():\n+    connected_msg = std_msgs.msg.Bool()\n+\n+    while rclpy.ok():\n         try:\n             with open(os.path.join(SYS_NET_PATH, dev, 'operstate'), 'rb') as f:\n-                connected_pub.publish(f.read().strip() == b'up')\n+                connected_msg.data = f.read().strip() == b'up'\n         except FileNotFoundError:\n-            connected_pub.publish(False)\n+            connected_msg.data = False\n+        finally:\n+            connected_pub.publish(connected_msg)\n \n         try:\n             wifi_str = subprocess.check_output(['iwconfig', dev], stderr=subprocess.STDOUT).decode()\n@@ -106,22 +129,20 @@ def main():\n             fields_dict.update(dict([field for field in fields_list if len(field) == 2]))\n \n             # Check if WiFi is connected to a network\n-            connection_msg = {}\n             if \"Not-Associated\" not in fields_dict['Access Point']:\n-                connection_msg = Connection(fields_dict)\n-\n-            connection_pub.publish(connection_msg)\n+                connection = WirelessConnection(fields_dict)\n+                connection_pub.publish(connection.msg)\n \n             if not previous_success:\n                 previous_success = True\n                 previous_error = False\n-                rospy.loginfo(\"Retrieved status of interface %s. Now updating at %f Hz.\" % (dev, hz))\n+                node.get_logger().info('Retrieved status of interface {0}. Now updating at {1} Hz.'.format(dev, hz))\n \n         except subprocess.CalledProcessError:\n             if not previous_error:\n                 previous_error = True\n                 previous_success = False\n-                rospy.logerr(\"Error checking status of interface %s. Will try again at %f Hz.\" % (dev, hz))\n+                node.get_logger().error('Error checking status of interface {0}. Will try again at {1} Hz.'.format(dev, hz))\n \n         r.sleep()\n     return 0",
+          "previous_filename": "wireless_watcher/nodes/watcher_node"
+        }
+      ]
+    },
+    {
+      "author": "civerachb-cpr",
+      "date": "2021-11-30T16:10:14Z",
+      "sha": "c71e9627f779d8b229da2b1005dde82364d5aea9",
+      "message": "Add wireless-tools as a dependency (#14)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "efd9eae5fa64968f785ca65253ccbf0e04b6ce73",
+          "filename": "wireless_watcher/package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/c71e9627f779d8b229da2b1005dde82364d5aea9/wireless_watcher%2Fpackage.xml",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/c71e9627f779d8b229da2b1005dde82364d5aea9/wireless_watcher%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Fpackage.xml?ref=c71e9627f779d8b229da2b1005dde82364d5aea9",
+          "patch": "@@ -12,4 +12,5 @@\n   <buildtool_depend>catkin</buildtool_depend>\n   <exec_depend>rospy</exec_depend>\n   <exec_depend>wireless_msgs</exec_depend>\n+  <exec_depend>wireless-tools</exec_depend>\n </package>"
+        }
+      ]
+    },
+    {
+      "author": "nbernardshaw",
+      "date": "2020-05-01T19:27:48Z",
+      "sha": "6f419388a5e897260c340d71c4806b303fc817bd",
+      "message": "Improve connected detection logic so topic doesn't stop when interface is down",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 5,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "a48967f6ffc276fc270305b4adcf6b190d83bc9a",
+          "filename": "wireless_watcher/nodes/watcher_node",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 5,
+          "changes": 9,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6f419388a5e897260c340d71c4806b303fc817bd/wireless_watcher%2Fnodes%2Fwatcher_node",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6f419388a5e897260c340d71c4806b303fc817bd/wireless_watcher%2Fnodes%2Fwatcher_node",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Fnodes%2Fwatcher_node?ref=6f419388a5e897260c340d71c4806b303fc817bd",
+          "patch": "@@ -1,4 +1,4 @@\n-#!/usr/bin/env python\n+#!/usr/bin/env python3\n # Software License Agreement (BSD)\n #\n # @author    Mike Purvis <mpurvis@clearpath.ai>\n@@ -93,10 +93,9 @@ def main():\n \n     while not rospy.is_shutdown():\n         try:\n-            ip_str = subprocess.check_output(['ip', 'addr', 'show', dev], stderr=subprocess.STDOUT)\n-            if re.search(b'^\\s*inet\\s', ip_str, re.MULTILINE):\n-                connected_pub.publish(True)\n-        except subprocess.CalledProcessError:\n+            with open(os.path.join(SYS_NET_PATH, dev, 'operstate'), 'rb') as f:\n+                connected_pub.publish(f.read().strip() == b'up')\n+        except FileNotFoundError:\n             connected_pub.publish(False)\n \n         try:"
+        }
+      ]
+    },
+    {
+      "author": "nikechristo",
+      "date": "2020-05-01T21:46:04Z",
+      "sha": "c0a33200055d96711425eaec916605899bcc8918",
+      "message": "Merge pull request #11 from clearpathrobotics/CORE-14253\n\nImprove connected detection logic so topic doesn't stop when interface is down",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 5,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "a48967f6ffc276fc270305b4adcf6b190d83bc9a",
+          "filename": "wireless_watcher/nodes/watcher_node",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 5,
+          "changes": 9,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/c0a33200055d96711425eaec916605899bcc8918/wireless_watcher%2Fnodes%2Fwatcher_node",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/c0a33200055d96711425eaec916605899bcc8918/wireless_watcher%2Fnodes%2Fwatcher_node",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Fnodes%2Fwatcher_node?ref=c0a33200055d96711425eaec916605899bcc8918",
+          "patch": "@@ -1,4 +1,4 @@\n-#!/usr/bin/env python\n+#!/usr/bin/env python3\n # Software License Agreement (BSD)\n #\n # @author    Mike Purvis <mpurvis@clearpath.ai>\n@@ -93,10 +93,9 @@ def main():\n \n     while not rospy.is_shutdown():\n         try:\n-            ip_str = subprocess.check_output(['ip', 'addr', 'show', dev], stderr=subprocess.STDOUT)\n-            if re.search(b'^\\s*inet\\s', ip_str, re.MULTILINE):\n-                connected_pub.publish(True)\n-        except subprocess.CalledProcessError:\n+            with open(os.path.join(SYS_NET_PATH, dev, 'operstate'), 'rb') as f:\n+                connected_pub.publish(f.read().strip() == b'up')\n+        except FileNotFoundError:\n             connected_pub.publish(False)\n \n         try:"
+        }
+      ]
+    },
+    {
+      "author": "mikepurvis",
+      "date": "2013-03-04T18:49:10Z",
+      "sha": "b30e269df63853dd28b1d80d8c277779d9a8b55e",
+      "message": "Initial msgs, stub watcher package.",
+      "files_changed": 14,
+      "additions": 162,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "cf86d52c29d3eafcec0524dbb50f1b1bb2c66d0d",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 17,
+          "deletions": 0,
+          "changes": 17,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/b30e269df63853dd28b1d80d8c277779d9a8b55e/CMakeLists.txt",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/b30e269df63853dd28b1d80d8c277779d9a8b55e/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/CMakeLists.txt?ref=b30e269df63853dd28b1d80d8c277779d9a8b55e",
+          "patch": "@@ -0,0 +1,17 @@\n+cmake_minimum_required(VERSION 2.4.6)\n+include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)\n+\n+# Append to CPACK_SOURCE_IGNORE_FILES a semicolon-separated list of\n+# directories (or patterns, but directories should suffice) that should\n+# be excluded from the distro.  This is not the place to put things that\n+# should be ignored everywhere, like \"build\" directories; that happens in\n+# rosbuild/rosbuild.cmake.  Here should be listed packages that aren't\n+# ready for inclusion in a distro.\n+#\n+# This list is combined with the list in rosbuild/rosbuild.cmake.  Note\n+# that CMake 2.6 may be required to ensure that the two lists are combined\n+# properly.  CMake 2.4 seems to have unpredictable scoping rules for such\n+# variables.\n+#list(APPEND CPACK_SOURCE_IGNORE_FILES /core/experimental)\n+\n+rosbuild_make_distribution(0.1.2)"
+        },
+        {
+          "sha": "a818ccadb911aa86a9120d25981d64abf102dd30",
+          "filename": "Makefile",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/b30e269df63853dd28b1d80d8c277779d9a8b55e/Makefile",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/b30e269df63853dd28b1d80d8c277779d9a8b55e/Makefile",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/Makefile?ref=b30e269df63853dd28b1d80d8c277779d9a8b55e",
+          "patch": "@@ -0,0 +1 @@\n+include $(shell rospack find mk)/cmake_stack.mk\n\\ No newline at end of file"
+        },
+        {
+          "sha": "a8de97b949264cc3af0e3a36fd80ecf7f6c833de",
+          "filename": "stack.xml",
+          "status": "added",
+          "additions": 9,
+          "deletions": 0,
+          "changes": 9,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/b30e269df63853dd28b1d80d8c277779d9a8b55e/stack.xml",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/b30e269df63853dd28b1d80d8c277779d9a8b55e/stack.xml",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/stack.xml?ref=b30e269df63853dd28b1d80d8c277779d9a8b55e",
+          "patch": "@@ -0,0 +1,9 @@\n+<stack>\n+  <description brief=\"wireless\">wireless</description>\n+  <author>Mike Purvis</author>\n+  <license>BSD</license>  \n+  <review status=\"unreviewed\" notes=\"\"/>\n+  <url>http://ros.org/wiki/wireless</url>\n+  <depend stack=\"ros_comm\" />\n+  <!-- TODO: system dependency on wireless-tools -->\n+</stack>"
+        },
+        {
+          "sha": "5891795e10b54cac14d1574f13c761c539515d0b",
+          "filename": "wireless_msgs/CMakeLists.txt",
+          "status": "added",
+          "additions": 30,
+          "deletions": 0,
+          "changes": 30,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/b30e269df63853dd28b1d80d8c277779d9a8b55e/wireless_msgs%2FCMakeLists.txt",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/b30e269df63853dd28b1d80d8c277779d9a8b55e/wireless_msgs%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_msgs%2FCMakeLists.txt?ref=b30e269df63853dd28b1d80d8c277779d9a8b55e",
+          "patch": "@@ -0,0 +1,30 @@\n+cmake_minimum_required(VERSION 2.4.6)\n+include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)\n+\n+# Set the build type.  Options are:\n+#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage\n+#  Debug          : w/ debug symbols, w/o optimization\n+#  Release        : w/o debug symbols, w/ optimization\n+#  RelWithDebInfo : w/ debug symbols, w/ optimization\n+#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries\n+#set(ROS_BUILD_TYPE RelWithDebInfo)\n+\n+rosbuild_init()\n+\n+#set the default path for built executables to the \"bin\" directory\n+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)\n+#set the default path for built libraries to the \"lib\" directory\n+set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)\n+\n+#uncomment if you have defined messages\n+rosbuild_genmsg()\n+#uncomment if you have defined services\n+#rosbuild_gensrv()\n+\n+#common commands for building c++ executables and libraries\n+#rosbuild_add_library(${PROJECT_NAME} src/example.cpp)\n+#target_link_libraries(${PROJECT_NAME} another_library)\n+#rosbuild_add_boost_directories()\n+#rosbuild_link_boost(${PROJECT_NAME} thread)\n+#rosbuild_add_executable(example examples/example.cpp)\n+#target_link_libraries(example ${PROJECT_NAME})"
+        },
+        {
+          "sha": "b75b928f20ef9ea4f509a17db62e4e31b422c27f",
+          "filename": "wireless_msgs/Makefile",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/b30e269df63853dd28b1d80d8c277779d9a8b55e/wireless_msgs%2FMakefile",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/b30e269df63853dd28b1d80d8c277779d9a8b55e/wireless_msgs%2FMakefile",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_msgs%2FMakefile?ref=b30e269df63853dd28b1d80d8c277779d9a8b55e",
+          "patch": "@@ -0,0 +1 @@\n+include $(shell rospack find mk)/cmake.mk\n\\ No newline at end of file"
+        },
+        {
+          "sha": "db39f48df4d3ffe445625881f2e6ff5636e59e19",
+          "filename": "wireless_msgs/mainpage.dox",
+          "status": "added",
+          "additions": 14,
+          "deletions": 0,
+          "changes": 14,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/b30e269df63853dd28b1d80d8c277779d9a8b55e/wireless_msgs%2Fmainpage.dox",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/b30e269df63853dd28b1d80d8c277779d9a8b55e/wireless_msgs%2Fmainpage.dox",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_msgs%2Fmainpage.dox?ref=b30e269df63853dd28b1d80d8c277779d9a8b55e",
+          "patch": "@@ -0,0 +1,14 @@\n+/**\n+\\mainpage\n+\\htmlinclude manifest.html\n+\n+\\b wireless_msgs \n+\n+<!-- \n+Provide an overview of your package.\n+-->\n+\n+-->\n+\n+\n+*/"
+        },
+        {
+          "sha": "79ad46197f84bd6017e79e5f07cce625baf69d78",
+          "filename": "wireless_msgs/manifest.xml",
+          "status": "added",
+          "additions": 14,
+          "deletions": 0,
+          "changes": 14,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/b30e269df63853dd28b1d80d8c277779d9a8b55e/wireless_msgs%2Fmanifest.xml",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/b30e269df63853dd28b1d80d8c277779d9a8b55e/wireless_msgs%2Fmanifest.xml",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_msgs%2Fmanifest.xml?ref=b30e269df63853dd28b1d80d8c277779d9a8b55e",
+          "patch": "@@ -0,0 +1,14 @@\n+<package>\n+  <description brief=\"wireless_msgs\">\n+\n+     wireless_msgs\n+\n+  </description>\n+  <author>Mike Purvis</author>\n+  <license>BSD</license>\n+  <review status=\"unreviewed\" notes=\"\"/>\n+  <url>http://ros.org/wiki/wireless_msgs</url>\n+\n+</package>\n+\n+"
+        },
+        {
+          "sha": "74a2978933d16ad05c9a57dbca2e8e9e7fe2b0ab",
+          "filename": "wireless_msgs/msg/AccessPoint.msg",
+          "status": "added",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/b30e269df63853dd28b1d80d8c277779d9a8b55e/wireless_msgs%2Fmsg%2FAccessPoint.msg",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/b30e269df63853dd28b1d80d8c277779d9a8b55e/wireless_msgs%2Fmsg%2FAccessPoint.msg",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_msgs%2Fmsg%2FAccessPoint.msg?ref=b30e269df63853dd28b1d80d8c277779d9a8b55e",
+          "patch": "@@ -0,0 +1,5 @@\n+string type\n+string essid\n+string mac\n+string mode\n+string frequency"
+        },
+        {
+          "sha": "58d9524050418aacc25c8faccc84056adf574494",
+          "filename": "wireless_msgs/msg/Connection.msg",
+          "status": "added",
+          "additions": 10,
+          "deletions": 0,
+          "changes": 10,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/b30e269df63853dd28b1d80d8c277779d9a8b55e/wireless_msgs%2Fmsg%2FConnection.msg",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/b30e269df63853dd28b1d80d8c277779d9a8b55e/wireless_msgs%2Fmsg%2FConnection.msg",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_msgs%2Fmsg%2FConnection.msg?ref=b30e269df63853dd28b1d80d8c277779d9a8b55e",
+          "patch": "@@ -0,0 +1,10 @@\n+int16 bitrate  # Mb/s\n+int16 txpower  # dBm\n+\n+# Fractional link quality number preserved in raw\n+# field, resolved to decimal for link_quality field.\n+string link_quality_raw\n+float link_quality\n+\n+int16 signal_level  # dBm\n+int16 noise_level  # dBm"
+        },
+        {
+          "sha": "f8f1c9ccad793e5385c2eb83ffd7ed7b15c5b343",
+          "filename": "wireless_watcher/CMakeLists.txt",
+          "status": "added",
+          "additions": 30,
+          "deletions": 0,
+          "changes": 30,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/b30e269df63853dd28b1d80d8c277779d9a8b55e/wireless_watcher%2FCMakeLists.txt",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/b30e269df63853dd28b1d80d8c277779d9a8b55e/wireless_watcher%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2FCMakeLists.txt?ref=b30e269df63853dd28b1d80d8c277779d9a8b55e",
+          "patch": "@@ -0,0 +1,30 @@\n+cmake_minimum_required(VERSION 2.4.6)\n+include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)\n+\n+# Set the build type.  Options are:\n+#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage\n+#  Debug          : w/ debug symbols, w/o optimization\n+#  Release        : w/o debug symbols, w/ optimization\n+#  RelWithDebInfo : w/ debug symbols, w/ optimization\n+#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries\n+#set(ROS_BUILD_TYPE RelWithDebInfo)\n+\n+rosbuild_init()\n+\n+#set the default path for built executables to the \"bin\" directory\n+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)\n+#set the default path for built libraries to the \"lib\" directory\n+set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)\n+\n+#uncomment if you have defined messages\n+#rosbuild_genmsg()\n+#uncomment if you have defined services\n+#rosbuild_gensrv()\n+\n+#common commands for building c++ executables and libraries\n+#rosbuild_add_library(${PROJECT_NAME} src/example.cpp)\n+#target_link_libraries(${PROJECT_NAME} another_library)\n+#rosbuild_add_boost_directories()\n+#rosbuild_link_boost(${PROJECT_NAME} thread)\n+#rosbuild_add_executable(example examples/example.cpp)\n+#target_link_libraries(example ${PROJECT_NAME})"
+        },
+        {
+          "sha": "b75b928f20ef9ea4f509a17db62e4e31b422c27f",
+          "filename": "wireless_watcher/Makefile",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/b30e269df63853dd28b1d80d8c277779d9a8b55e/wireless_watcher%2FMakefile",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/b30e269df63853dd28b1d80d8c277779d9a8b55e/wireless_watcher%2FMakefile",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2FMakefile?ref=b30e269df63853dd28b1d80d8c277779d9a8b55e",
+          "patch": "@@ -0,0 +1 @@\n+include $(shell rospack find mk)/cmake.mk\n\\ No newline at end of file"
+        },
+        {
+          "sha": "ef0f37372e32d03b215722c8d92d7669e9ca3f02",
+          "filename": "wireless_watcher/mainpage.dox",
+          "status": "added",
+          "additions": 14,
+          "deletions": 0,
+          "changes": 14,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/b30e269df63853dd28b1d80d8c277779d9a8b55e/wireless_watcher%2Fmainpage.dox",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/b30e269df63853dd28b1d80d8c277779d9a8b55e/wireless_watcher%2Fmainpage.dox",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Fmainpage.dox?ref=b30e269df63853dd28b1d80d8c277779d9a8b55e",
+          "patch": "@@ -0,0 +1,14 @@\n+/**\n+\\mainpage\n+\\htmlinclude manifest.html\n+\n+\\b wireless_watcher \n+\n+<!-- \n+Provide an overview of your package.\n+-->\n+\n+-->\n+\n+\n+*/"
+        },
+        {
+          "sha": "33c49678b567daf03028bdae3372cb48e2a03025",
+          "filename": "wireless_watcher/manifest.xml",
+          "status": "added",
+          "additions": 16,
+          "deletions": 0,
+          "changes": 16,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/b30e269df63853dd28b1d80d8c277779d9a8b55e/wireless_watcher%2Fmanifest.xml",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/b30e269df63853dd28b1d80d8c277779d9a8b55e/wireless_watcher%2Fmanifest.xml",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Fmanifest.xml?ref=b30e269df63853dd28b1d80d8c277779d9a8b55e",
+          "patch": "@@ -0,0 +1,16 @@\n+<package>\n+  <description brief=\"wireless_watcher\">\n+\n+     wireless_watcher\n+\n+  </description>\n+  <author>Mike Purvis</author>\n+  <license>BSD</license>\n+  <review status=\"unreviewed\" notes=\"\"/>\n+  <url>http://ros.org/wiki/wireless_watcher</url>\n+  <depend package=\"rospy\"/>\n+  <depend package=\"wireless_msgs\"/>\n+\n+</package>\n+\n+"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "wireless_watcher/src/watcher.py",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/b30e269df63853dd28b1d80d8c277779d9a8b55e/wireless_watcher%2Fsrc%2Fwatcher.py",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/b30e269df63853dd28b1d80d8c277779d9a8b55e/wireless_watcher%2Fsrc%2Fwatcher.py",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Fsrc%2Fwatcher.py?ref=b30e269df63853dd28b1d80d8c277779d9a8b55e"
+        }
+      ]
+    },
+    {
+      "author": "guillaumeautran",
+      "date": "2018-11-08T01:13:25Z",
+      "sha": "ebb9da24410a38dc08d8b0a442476bf7ce4b2234",
+      "message": "changelog",
+      "files_changed": 2,
+      "additions": 12,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "739588c2e052611b9c302be16650f105d0d63456",
+          "filename": "wireless_msgs/CHANGELOG.rst",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/ebb9da24410a38dc08d8b0a442476bf7ce4b2234/wireless_msgs%2FCHANGELOG.rst",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/ebb9da24410a38dc08d8b0a442476bf7ce4b2234/wireless_msgs%2FCHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_msgs%2FCHANGELOG.rst?ref=ebb9da24410a38dc08d8b0a442476bf7ce4b2234",
+          "patch": "@@ -2,6 +2,11 @@\n Changelog for package wireless_msgs\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+Forthcoming\n+-----------\n+* Package format 2.\n+* Contributors: Mike Purvis\n+\n 0.0.7 (2015-09-09)\n ------------------\n * Added frequency to watcher node"
+        },
+        {
+          "sha": "1e210a53ccaf6d2a146ac53dae4d6d6e5430c17a",
+          "filename": "wireless_watcher/CHANGELOG.rst",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/ebb9da24410a38dc08d8b0a442476bf7ce4b2234/wireless_watcher%2FCHANGELOG.rst",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/ebb9da24410a38dc08d8b0a442476bf7ce4b2234/wireless_watcher%2FCHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2FCHANGELOG.rst?ref=ebb9da24410a38dc08d8b0a442476bf7ce4b2234",
+          "patch": "@@ -2,6 +2,13 @@\n Changelog for package wireless_watcher\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+Forthcoming\n+-----------\n+* Package format 2.\n+* Further pep8 fixups.\n+* Auto-detect wl* device if not passed explicitly.\n+* Contributors: Mike Purvis\n+\n 0.0.7 (2015-09-09)\n ------------------\n * Added frequency to watcher node"
+        }
+      ]
+    },
+    {
+      "author": "Alex Bencz",
+      "date": "2015-05-25T13:58:57Z",
+      "sha": "67731ed81619eef6b5f4170486fbb87cd28e1bd5",
+      "message": "Added ESSID and BSSID fields, use floats for bitrate",
+      "files_changed": 2,
+      "additions": 10,
+      "deletions": 4,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "c9aa42594193e865596fb47bdb661515fff96bfd",
+          "filename": "wireless_msgs/msg/Connection.msg",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 1,
+          "changes": 5,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/67731ed81619eef6b5f4170486fbb87cd28e1bd5/wireless_msgs%2Fmsg%2FConnection.msg",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/67731ed81619eef6b5f4170486fbb87cd28e1bd5/wireless_msgs%2Fmsg%2FConnection.msg",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_msgs%2Fmsg%2FConnection.msg?ref=67731ed81619eef6b5f4170486fbb87cd28e1bd5",
+          "patch": "@@ -1,4 +1,4 @@\n-int16 bitrate  # Mb/s\n+float32 bitrate  # Mb/s\n int16 txpower  # dBm\n \n # Fractional link quality number preserved in raw\n@@ -8,3 +8,6 @@ float32 link_quality\n \n int16 signal_level  # dBm\n int16 noise_level  # dBm\n+\n+string essid\n+string bssid"
+        },
+        {
+          "sha": "b2a014340e369031c39272b8bb4ac367438ed4cb",
+          "filename": "wireless_watcher/nodes/watcher_node",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 3,
+          "changes": 9,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/67731ed81619eef6b5f4170486fbb87cd28e1bd5/wireless_watcher%2Fnodes%2Fwatcher_node",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/67731ed81619eef6b5f4170486fbb87cd28e1bd5/wireless_watcher%2Fnodes%2Fwatcher_node",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Fnodes%2Fwatcher_node?ref=67731ed81619eef6b5f4170486fbb87cd28e1bd5",
+          "patch": "@@ -17,16 +17,16 @@ previous_error = False\n previous_success = False\n r = rospy.Rate(hz)\n \n-def trim(field):\n+def trim(field, type=int):\n     m = re.match('[0-9-.]+', field)\n     if m:\n-        return int(m.group(0))\n+        return type(m.group(0))\n \n class Connection(wireless_msgs.msg.Connection):\n     def __init__(self, fields):\n         args = {}\n \n-        args['bitrate'] = trim(fields['Bit Rate'])\n+        args['bitrate'] = trim(fields['Bit Rate'], float)\n \n         try: args['txpower'] = trim(fields['Tx-Power'])\n         except: pass\n@@ -40,6 +40,9 @@ class Connection(wireless_msgs.msg.Connection):\n         try: args['noise_level'] = trim(fields['Noise level'])\n         except: pass\n \n+        args['essid'] = fields['ESSID'].strip('\"')\n+        args['bssid'] = fields['Access Point'].strip()\n+\n         super(Connection, self).__init__(**args)\n \n class Network(wireless_msgs.msg.Network):"
+        }
+      ]
+    },
+    {
+      "author": "abencz",
+      "date": "2015-05-25T14:11:04Z",
+      "sha": "1f79982c843b887111559fcb811e766a949f4811",
+      "message": "Merge pull request #1 from abencz/master\n\nAdded ESSID and BSSID fields, use floats for bitrate",
+      "files_changed": 2,
+      "additions": 10,
+      "deletions": 4,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "c9aa42594193e865596fb47bdb661515fff96bfd",
+          "filename": "wireless_msgs/msg/Connection.msg",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 1,
+          "changes": 5,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/1f79982c843b887111559fcb811e766a949f4811/wireless_msgs%2Fmsg%2FConnection.msg",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/1f79982c843b887111559fcb811e766a949f4811/wireless_msgs%2Fmsg%2FConnection.msg",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_msgs%2Fmsg%2FConnection.msg?ref=1f79982c843b887111559fcb811e766a949f4811",
+          "patch": "@@ -1,4 +1,4 @@\n-int16 bitrate  # Mb/s\n+float32 bitrate  # Mb/s\n int16 txpower  # dBm\n \n # Fractional link quality number preserved in raw\n@@ -8,3 +8,6 @@ float32 link_quality\n \n int16 signal_level  # dBm\n int16 noise_level  # dBm\n+\n+string essid\n+string bssid"
+        },
+        {
+          "sha": "b2a014340e369031c39272b8bb4ac367438ed4cb",
+          "filename": "wireless_watcher/nodes/watcher_node",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 3,
+          "changes": 9,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/1f79982c843b887111559fcb811e766a949f4811/wireless_watcher%2Fnodes%2Fwatcher_node",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/1f79982c843b887111559fcb811e766a949f4811/wireless_watcher%2Fnodes%2Fwatcher_node",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Fnodes%2Fwatcher_node?ref=1f79982c843b887111559fcb811e766a949f4811",
+          "patch": "@@ -17,16 +17,16 @@ previous_error = False\n previous_success = False\n r = rospy.Rate(hz)\n \n-def trim(field):\n+def trim(field, type=int):\n     m = re.match('[0-9-.]+', field)\n     if m:\n-        return int(m.group(0))\n+        return type(m.group(0))\n \n class Connection(wireless_msgs.msg.Connection):\n     def __init__(self, fields):\n         args = {}\n \n-        args['bitrate'] = trim(fields['Bit Rate'])\n+        args['bitrate'] = trim(fields['Bit Rate'], float)\n \n         try: args['txpower'] = trim(fields['Tx-Power'])\n         except: pass\n@@ -40,6 +40,9 @@ class Connection(wireless_msgs.msg.Connection):\n         try: args['noise_level'] = trim(fields['Noise level'])\n         except: pass\n \n+        args['essid'] = fields['ESSID'].strip('\"')\n+        args['bssid'] = fields['Access Point'].strip()\n+\n         super(Connection, self).__init__(**args)\n \n class Network(wireless_msgs.msg.Network):"
+        }
+      ]
+    },
+    {
+      "author": "Mustafa Safri",
+      "date": "2015-08-05T17:44:07Z",
+      "sha": "139c3a4a18dda39dbbef5f3ee14576fbf5b122dd",
+      "message": "Added checks for missing fields",
+      "files_changed": 1,
+      "additions": 15,
+      "deletions": 8,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "a049057d6af6116869c4dc595284d90cb720261c",
+          "filename": "wireless_watcher/nodes/watcher_node",
+          "status": "modified",
+          "additions": 15,
+          "deletions": 8,
+          "changes": 23,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/139c3a4a18dda39dbbef5f3ee14576fbf5b122dd/wireless_watcher%2Fnodes%2Fwatcher_node",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/139c3a4a18dda39dbbef5f3ee14576fbf5b122dd/wireless_watcher%2Fnodes%2Fwatcher_node",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2Fnodes%2Fwatcher_node?ref=139c3a4a18dda39dbbef5f3ee14576fbf5b122dd",
+          "patch": "@@ -26,22 +26,29 @@ class Connection(wireless_msgs.msg.Connection):\n     def __init__(self, fields):\n         args = {}\n \n-        args['bitrate'] = trim(fields['Bit Rate'], float)\n+        try: args['bitrate'] = trim(fields['Bit Rate'], float)\n+        except: pass\n \n         try: args['txpower'] = trim(fields['Tx-Power'])\n         except: pass\n \n-        args['link_quality_raw'] = fields['Link Quality']\n-        num, den = re.split('/', args['link_quality_raw']) \n-        args['link_quality'] = float(num) / float(den)\n-\n-        args['signal_level'] = trim(fields['Signal level'])\n+        try: \n+          args['link_quality_raw'] = fields['Link Quality']\n+          num, den = re.split('/', args['link_quality_raw'])\n+          args['link_quality'] = float(num) / float(den)\n+        except: pass\n+        \n+        try: args['signal_level'] = trim(fields['Signal level'])\n+        except: pass\n \n         try: args['noise_level'] = trim(fields['Noise level'])\n         except: pass\n \n-        args['essid'] = fields['ESSID'].strip('\"')\n-        args['bssid'] = fields['Access Point'].strip()\n+        try: args['essid'] = fields['ESSID'].strip('\"')\n+        except: pass\n+\n+        try: args['bssid'] = fields['Access Point'].strip()\n+        except: pass\n \n         super(Connection, self).__init__(**args)\n "
+        }
+      ]
+    },
+    {
+      "author": "Paul Bovbel",
+      "date": "2015-06-22T19:34:40Z",
+      "sha": "c1caccfdedeb8ae7bb38e3e10cc3e2831bcca022",
+      "message": "Add install rule for launch dir",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "032bee5b96c511b34014ae6787e8b2abb9ef00ba",
+          "filename": "wireless_watcher/CMakeLists.txt",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 0,
+          "changes": 3,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/c1caccfdedeb8ae7bb38e3e10cc3e2831bcca022/wireless_watcher%2FCMakeLists.txt",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/c1caccfdedeb8ae7bb38e3e10cc3e2831bcca022/wireless_watcher%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2FCMakeLists.txt?ref=c1caccfdedeb8ae7bb38e3e10cc3e2831bcca022",
+          "patch": "@@ -9,3 +9,6 @@ install(PROGRAMS\n   nodes/watcher_node\n   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n )\n+\n+install(DIRECTORY launch\n+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})"
+        }
+      ]
+    },
+    {
+      "author": "System User",
+      "date": "2015-06-17T20:01:44Z",
+      "sha": "6273590e612a2437647f3d8d183bbb5f021a71ac",
+      "message": "Updated changelogs",
+      "files_changed": 2,
+      "additions": 10,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "7344176fee316edee64923332660469c5b53fc42",
+          "filename": "wireless_msgs/CHANGELOG.rst",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6273590e612a2437647f3d8d183bbb5f021a71ac/wireless_msgs%2FCHANGELOG.rst",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6273590e612a2437647f3d8d183bbb5f021a71ac/wireless_msgs%2FCHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_msgs%2FCHANGELOG.rst?ref=6273590e612a2437647f3d8d183bbb5f021a71ac",
+          "patch": "@@ -2,6 +2,11 @@\n Changelog for package wireless_msgs\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+Forthcoming\n+-----------\n+* Added ESSID and BSSID fields, use floats for bitrate\n+* Contributors: Alex Bencz\n+\n 0.0.2 (2013-10-24)\n ------------------\n "
+        },
+        {
+          "sha": "58293e90c184bc3f46c2a600a03548b42ba81cb1",
+          "filename": "wireless_watcher/CHANGELOG.rst",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/clearpathrobotics/wireless/blob/6273590e612a2437647f3d8d183bbb5f021a71ac/wireless_watcher%2FCHANGELOG.rst",
+          "raw_url": "https://github.com/clearpathrobotics/wireless/raw/6273590e612a2437647f3d8d183bbb5f021a71ac/wireless_watcher%2FCHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/clearpathrobotics/wireless/contents/wireless_watcher%2FCHANGELOG.rst?ref=6273590e612a2437647f3d8d183bbb5f021a71ac",
+          "patch": "@@ -2,6 +2,11 @@\n Changelog for package wireless_watcher\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+Forthcoming\n+-----------\n+* Added ESSID and BSSID fields, use floats for bitrate\n+* Contributors: Alex Bencz\n+\n 0.0.2 (2013-10-24)\n ------------------\n * Workaround to suppress DummyThread error spew."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T04:19:44Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "OUXT-Polaris",
+    "repo": "ouxt_common"
+  },
+  "data": [
+    {
+      "author": "github-actions[bot]",
+      "date": "2023-06-14T12:03:16Z",
+      "sha": "0d3b77bef32f18234915eda569b076f5bcb7bc54",
+      "message": "Merge pull request #56 from OUXT-Polaris/fix/build_test\n\nfix build test",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "9ec1103d7edd13f229d58661c7830521ac4b2f74",
+          "filename": ".github/workflows/BuildTest.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/OUXT-Polaris/ouxt_common/blob/0d3b77bef32f18234915eda569b076f5bcb7bc54/.github%2Fworkflows%2FBuildTest.yaml",
+          "raw_url": "https://github.com/OUXT-Polaris/ouxt_common/raw/0d3b77bef32f18234915eda569b076f5bcb7bc54/.github%2Fworkflows%2FBuildTest.yaml",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/ouxt_common/contents/.github%2Fworkflows%2FBuildTest.yaml?ref=0d3b77bef32f18234915eda569b076f5bcb7bc54",
+          "patch": "@@ -113,7 +113,7 @@ jobs:\n     needs: build\n     steps:\n       - name: merge PR\n-        if : ${{ github.event_name == 'pull_request' }} && ${{ github.actor != 'wam-v-tan' }}\n+        if : ${{ (github.event_name == 'pull_request') && (github.actor != 'wam-v-tan') }}\n         env:\n           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n         run: gh pr merge ${{ github.event.pull_request.html_url }} --merge"
+        }
+      ]
+    },
+    {
+      "author": "wam-v-tan",
+      "date": "2021-09-07T00:57:41Z",
+      "sha": "31b3f1674f7d4a37d6b0bdd2d337f51c652e12bb",
+      "message": "Setup build test workflow",
+      "files_changed": 1,
+      "additions": 82,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "e89883678ea47fa1ea804fe19a877eeb152f9b75",
+          "filename": ".github/workflows/BuildTest.yaml",
+          "status": "added",
+          "additions": 82,
+          "deletions": 0,
+          "changes": 82,
+          "blob_url": "https://github.com/OUXT-Polaris/ouxt_common/blob/31b3f1674f7d4a37d6b0bdd2d337f51c652e12bb/.github%2Fworkflows%2FBuildTest.yaml",
+          "raw_url": "https://github.com/OUXT-Polaris/ouxt_common/raw/31b3f1674f7d4a37d6b0bdd2d337f51c652e12bb/.github%2Fworkflows%2FBuildTest.yaml",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/ouxt_common/contents/.github%2Fworkflows%2FBuildTest.yaml?ref=31b3f1674f7d4a37d6b0bdd2d337f51c652e12bb",
+          "patch": "@@ -0,0 +1,82 @@\n+name: BuildTest\n+\n+on:\n+  schedule:\n+    - cron: 0 0 * * *\n+  push:\n+  workflow_dispatch:\n+\n+jobs:\n+  build_and_test:\n+    name: Build\n+    runs-on: ubuntu-20.04\n+    strategy:\n+      fail-fast: false\n+      matrix:\n+        rosdistro : [foxy,galactic]\n+    steps:\n+      - uses: actions/checkout@v2-beta\n+      - name: Check dependency-${{ matrix.rosdistro }}.repos existence\n+        id: check_rosdistro_repos_files\n+        uses: andstor/file-existence-action@v1\n+        with:\n+          files: dependency-${{ matrix.rosdistro }}.repos\n+          allow_failure: false\n+      - name: Check dependency.repos existence\n+        id: check_repos_files\n+        uses: andstor/file-existence-action@v1\n+        with:\n+          files: dependency.repos\n+          allow_failure: false\n+      - name: Setup ROS2 ${{ matrix.rosdistro }} environment\n+        uses: ros-tooling/setup-ros@v0.2\n+        with:\n+          required-ros-distributions: ${{ matrix.rosdistro }}\n+      - name: Copy repository\n+        run: |\n+            mkdir -p ~/ros2_ws/src\n+            cp -rf . ~/ros2_ws/src\n+      - name: Run ros-tooling/action-ros-ci@v0.2 with dependency-${{ matrix.rosdistro }}.repos\n+        uses: ros-tooling/action-ros-ci@v0.2\n+        if: steps.check_rosdistro_repos_files.outputs.files_exists == 'true'\n+        with:\n+          target-ros2-distro: ${{ matrix.rosdistro }}\n+          colcon-defaults: |\n+            {\n+              \"build\": {\n+                \"mixin\": [\"coverage-gcc\"]\n+              }\n+            }\n+          # If possible, pin the repository in the workflow to a specific commit to avoid\n+          # changes in colcon-mixin-repository from breaking your tests.\n+          colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/1ddb69bedfd1f04c2f000e95452f7c24a4d6176b/index.yaml\n+          vcs-repo-file-url: dependency-${{ matrix.rosdistro }}.repos\n+      - name: Run ros-tooling/action-ros-ci@v0.2 with dependency.repos\n+        uses: ros-tooling/action-ros-ci@v0.2\n+        if: steps.check_rosdistro_repos_files.outputs.files_exists == 'false' && steps.check_repos_files.outputs.files_exists == 'true'\n+        with:\n+          target-ros2-distro: ${{ matrix.rosdistro }}\n+          colcon-defaults: |\n+            {\n+              \"build\": {\n+                \"mixin\": [\"coverage-gcc\"]\n+              }\n+            }\n+          # If possible, pin the repository in the workflow to a specific commit to avoid\n+          # changes in colcon-mixin-repository from breaking your tests.\n+          colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/1ddb69bedfd1f04c2f000e95452f7c24a4d6176b/index.yaml\n+          vcs-repo-file-url: dependency.repos\n+      - name: Run ros-tooling/action-ros-ci@v0.2 without repos\n+        uses: ros-tooling/action-ros-ci@v0.2\n+        if: steps.check_rosdistro_repos_files.outputs.files_exists == 'false' && steps.check_repos_files.outputs.files_exists == 'false'\n+        with:\n+          target-ros2-distro: ${{ matrix.rosdistro }}\n+          colcon-defaults: |\n+            {\n+              \"build\": {\n+                \"mixin\": [\"coverage-gcc\"]\n+              }\n+            }\n+          # If possible, pin the repository in the workflow to a specific commit to avoid\n+          # changes in colcon-mixin-repository from breaking your tests.\n+          colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/1ddb69bedfd1f04c2f000e95452f7c24a4d6176b/index.yaml\n\\ No newline at end of file"
+        }
+      ]
+    },
+    {
+      "author": "hakuturu583",
+      "date": "2021-09-06T16:47:05Z",
+      "sha": "7926d445193e882d65a2c3035c217e37a4d75c60",
+      "message": "initial commit\n\nSigned-off-by: Masaya Kataoka <ms.kataoka@gmail.com>",
+      "files_changed": 2,
+      "additions": 30,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "939108c46e1453ac6b03994ab60e3b2aefa93186",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 9,
+          "deletions": 0,
+          "changes": 9,
+          "blob_url": "https://github.com/OUXT-Polaris/ouxt_common/blob/7926d445193e882d65a2c3035c217e37a4d75c60/CMakeLists.txt",
+          "raw_url": "https://github.com/OUXT-Polaris/ouxt_common/raw/7926d445193e882d65a2c3035c217e37a4d75c60/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/ouxt_common/contents/CMakeLists.txt?ref=7926d445193e882d65a2c3035c217e37a4d75c60",
+          "patch": "@@ -0,0 +1,9 @@\n+cmake_minimum_required(VERSION 3.5)\n+project(ouxt_common)\n+\n+find_package(ament_cmake_core REQUIRED)\n+find_package(ament_cmake_export_dependencies REQUIRED)\n+\n+ament_package_xml()\n+ament_export_dependencies(${${PROJECT_NAME}_EXEC_DEPENDS})\n+ament_package()"
+        },
+        {
+          "sha": "3d7d7624753b2c634b164c8cf844cad6870cbd70",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 21,
+          "deletions": 0,
+          "changes": 21,
+          "blob_url": "https://github.com/OUXT-Polaris/ouxt_common/blob/7926d445193e882d65a2c3035c217e37a4d75c60/package.xml",
+          "raw_url": "https://github.com/OUXT-Polaris/ouxt_common/raw/7926d445193e882d65a2c3035c217e37a4d75c60/package.xml",
+          "contents_url": "https://api.github.com/repos/OUXT-Polaris/ouxt_common/contents/package.xml?ref=7926d445193e882d65a2c3035c217e37a4d75c60",
+          "patch": "@@ -0,0 +1,21 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n+  <name>ouxt_common</name>\n+  <version>0.0.0</version>\n+  <description>common settings for OUXT Polaris ROS2 packages</description>\n+  <maintainer email=\"ms.kataoka@gmail.com\">masaya</maintainer>\n+  <license>Apache 2.0</license>\n+\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+\n+  <exec_depend>ament_cmake_clang_format</exec_depend>\n+  <exec_depend>ament_cmake_copyright</exec_depend>\n+  <exec_depend>ament_cmake_lint_cmake</exec_depend>\n+  <exec_depend>ament_cmake_pep257</exec_depend>\n+  <exec_depend>ament_cmake_xmllint</exec_depend>\n+\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n+</package>"
+        }
+      ]
+    }
+  ]
+}

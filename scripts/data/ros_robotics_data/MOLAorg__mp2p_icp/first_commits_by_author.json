@@ -1,0 +1,107 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T05:44:11Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "MOLAorg",
+    "repo": "mp2p_icp"
+  },
+  "data": [
+    {
+      "author": "jlblancoc",
+      "date": "2018-12-16T23:43:52Z",
+      "sha": "16d6de0769d956d03d50b40405f8b51202209ec1",
+      "message": "Initial commit",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "8a56807eeb1dbe85b90c700432ecba09e4a7d8d6",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/MOLAorg/mp2p_icp/blob/16d6de0769d956d03d50b40405f8b51202209ec1/README.md",
+          "raw_url": "https://github.com/MOLAorg/mp2p_icp/raw/16d6de0769d956d03d50b40405f8b51202209ec1/README.md",
+          "contents_url": "https://api.github.com/repos/MOLAorg/mp2p_icp/contents/README.md?ref=16d6de0769d956d03d50b40405f8b51202209ec1",
+          "patch": "@@ -0,0 +1,2 @@\n+# mola-fe-lidar-icp\n+MOLA module: Front-end for point-cloud sensors based on ICP"
+        }
+      ]
+    },
+    {
+      "author": "r-aguilera",
+      "date": "2024-07-15T05:43:34Z",
+      "sha": "4b2124539b5a14795db0803205f2f23148773cdb",
+      "message": "Fix pointcloud ptr typo",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "f532e58f23035d3cbb603bad66a495280f46adfa",
+          "filename": "mp2p_icp_map/src/pointcloud_sanity_check.cpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/MOLAorg/mp2p_icp/blob/4b2124539b5a14795db0803205f2f23148773cdb/mp2p_icp_map%2Fsrc%2Fpointcloud_sanity_check.cpp",
+          "raw_url": "https://github.com/MOLAorg/mp2p_icp/raw/4b2124539b5a14795db0803205f2f23148773cdb/mp2p_icp_map%2Fsrc%2Fpointcloud_sanity_check.cpp",
+          "contents_url": "https://api.github.com/repos/MOLAorg/mp2p_icp/contents/mp2p_icp_map%2Fsrc%2Fpointcloud_sanity_check.cpp?ref=4b2124539b5a14795db0803205f2f23148773cdb",
+          "patch": "@@ -66,7 +66,7 @@ bool mp2p_icp::pointcloud_sanity_check(\n             if (printWarnings)\n                 std::cerr << \"[mp2p_icp] WARNING: Intensity channel has \"\n                              \"incorrect length=\"\n-                          << pcIRT->getPointsBufferRef_intensity()->size()\n+                          << pcI->getPointsBufferRef_intensity()->size()\n                           << \" expected=\" << n << std::endl;\n         }\n     }"
+        }
+      ]
+    },
+    {
+      "author": "FranciscoJManasAlvarez",
+      "date": "2020-03-27T15:40:08Z",
+      "sha": "848bf1c412f75752fefcc52122005dd78d318671",
+      "message": "Branch creation and data structures",
+      "files_changed": 3,
+      "additions": 45,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "f8e82a739dca546728b79fb8fe44201721a8dd47",
+          "filename": "include/mp2p_icp/optimal_tf_gauss_newton.h",
+          "status": "modified",
+          "additions": 26,
+          "deletions": 1,
+          "changes": 27,
+          "blob_url": "https://github.com/MOLAorg/mp2p_icp/blob/848bf1c412f75752fefcc52122005dd78d318671/include%2Fmp2p_icp%2Foptimal_tf_gauss_newton.h",
+          "raw_url": "https://github.com/MOLAorg/mp2p_icp/raw/848bf1c412f75752fefcc52122005dd78d318671/include%2Fmp2p_icp%2Foptimal_tf_gauss_newton.h",
+          "contents_url": "https://api.github.com/repos/MOLAorg/mp2p_icp/contents/include%2Fmp2p_icp%2Foptimal_tf_gauss_newton.h?ref=848bf1c412f75752fefcc52122005dd78d318671",
+          "patch": "@@ -34,8 +34,30 @@ struct point_plane_pair_t\n };\n using TMatchedPointPlaneList = std::vector<point_plane_pair_t>;\n \n+struct point_line_pair_t\n+{\n+    /// \\note \"this\"=global, \"other\"=local, while finding the transformation\n+    /// local wrt global\n+    line_patch_t            ln_this;\n+    mrpt::math::TPoint3D    pt_other;\n+\n+    point_line_pair_t() = default;\n+    point_line_pair_t(\n+            const line_patch_t& l_this, const mrpt::math::TPoint3D& p_other)\n+            : ln_this(l_this),pt_other(p_other)\n+    {\n+    }\n+};\n+\n+using TMatchedPointLineList = std::vector<point_line_pair_t>;\n+\n struct Pairings_GaussNewton : public PairingsCommon\n {\n+    /** In addition to base members in PairingsCommon, the Gauss-Newton method\n+     * supports point-to-line pairings:\n+     */\n+    TMatchedPointLineList paired_pt2ln;\n+\n     /** In addition to base members in PairingsCommon, the Gauss-Newton method\n      * supports point-to-plane pairings:\n      */\n@@ -45,6 +67,9 @@ struct Pairings_GaussNewton : public PairingsCommon\n      * pairings. \\sa point_weights */\n     double weight_point2point{1.0};\n \n+    /** Weight (i.e. scalar information matrix) of point-to-line pairings */\n+    double weight_point2line{1.0};\n+\n     /** Weight (i.e. scalar information matrix) of point-to-plane pairings */\n     double weight_point2plane{1.0};\n \n@@ -65,7 +90,7 @@ struct Pairings_GaussNewton : public PairingsCommon\n \n     bool verbose{false};\n \n-    bool empty() const { return paired_points.empty() && paired_pt2pl.empty(); }\n+    bool empty() const { return paired_points.empty() && paired_pt2pl.empty() && paired_pt2ln.empty(); }\n };\n \n /** Gauss-Newton non-linear, iterative optimizer to find the SE(3) optimal"
+        },
+        {
+          "sha": "e72f58d76dc28463e871c2379495f5f5bc3efe48",
+          "filename": "include/mp2p_icp/pointcloud.h",
+          "status": "modified",
+          "additions": 14,
+          "deletions": 0,
+          "changes": 14,
+          "blob_url": "https://github.com/MOLAorg/mp2p_icp/blob/848bf1c412f75752fefcc52122005dd78d318671/include%2Fmp2p_icp%2Fpointcloud.h",
+          "raw_url": "https://github.com/MOLAorg/mp2p_icp/raw/848bf1c412f75752fefcc52122005dd78d318671/include%2Fmp2p_icp%2Fpointcloud.h",
+          "contents_url": "https://api.github.com/repos/MOLAorg/mp2p_icp/contents/include%2Fmp2p_icp%2Fpointcloud.h?ref=848bf1c412f75752fefcc52122005dd78d318671",
+          "patch": "@@ -49,6 +49,20 @@ struct plane_patch_t\n     }\n };\n \n+struct line_patch_t\n+{\n+    mrpt::math::TLine3D line;\n+    //No tengo claro si se usa el autovector o el centro como en el caso del plano.\n+    mrpt::math::TLine3D autovector;\n+\n+    line_patch_t() = default;\n+    line_patch_t(\n+            const mrpt::math::TLine3D& ln, const mrpt::math::TLine3D& vector)\n+            : line(ln), autovector(vector)\n+    {\n+    }\n+};\n+\n /**\n  * @brief Generic container of pointcloud(s), and/or extracted features.\n  *"
+        },
+        {
+          "sha": "63385a3162e87f65312c2f9361a586edd320335e",
+          "filename": "src/optimal_tf_gauss_newton.cpp",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 1,
+          "changes": 6,
+          "blob_url": "https://github.com/MOLAorg/mp2p_icp/blob/848bf1c412f75752fefcc52122005dd78d318671/src%2Foptimal_tf_gauss_newton.cpp",
+          "raw_url": "https://github.com/MOLAorg/mp2p_icp/raw/848bf1c412f75752fefcc52122005dd78d318671/src%2Foptimal_tf_gauss_newton.cpp",
+          "contents_url": "https://api.github.com/repos/MOLAorg/mp2p_icp/contents/src%2Foptimal_tf_gauss_newton.cpp?ref=848bf1c412f75752fefcc52122005dd78d318671",
+          "patch": "@@ -29,16 +29,18 @@ void mp2p_icp::optimal_tf_gauss_newton(\n     result.optimal_pose = in.initial_guess;\n \n     const auto nPt2Pt = in.paired_points.size();\n+    const auto nPt2Ln = in.paired_pt2ln.size();\n     const auto nPt2Pl = in.paired_pt2pl.size();\n     const auto nPl2Pl = in.paired_planes.size();\n \n+    // ¿Cuántos términos añade punto-linea?\n     const auto nErrorTerms = (nPt2Pt + nPl2Pl) * 3 + nPt2Pl;\n \n     Eigen::VectorXd                          err(nErrorTerms);\n     Eigen::Matrix<double, Eigen::Dynamic, 6> J(nErrorTerms, 6);\n \n     double       w_pt = in.weight_point2point;\n-    const double w_pl = in.weight_point2plane, w_pl2pl = in.weight_plane2plane;\n+    const double w_pl = in.weight_point2plane, w_pt2ln = in.weight_point2line, w_pl2pl = in.weight_plane2plane;\n \n     const bool  has_per_pt_weight       = !in.point_weights.empty();\n     auto        cur_point_block_weights = in.point_weights.begin();\n@@ -91,6 +93,8 @@ void mp2p_icp::optimal_tf_gauss_newton(\n             J.block<3, 6>(idx_pt * 3, 0) = w_pt * J1 * dDexpe_de.asEigen();\n         }\n \n+        // Point-to-line\n+\n         // Point-to-plane:\n         auto base_idx = nPt2Pt * 3;\n         for (size_t idx_pl = 0; idx_pl < nPt2Pl; idx_pl++)"
+        }
+      ]
+    }
+  ]
+}

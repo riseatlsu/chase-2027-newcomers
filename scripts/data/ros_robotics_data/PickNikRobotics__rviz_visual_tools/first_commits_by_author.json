@@ -1,0 +1,1235 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T06:37:29Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "PickNikRobotics",
+    "repo": "rviz_visual_tools"
+  },
+  "data": [
+    {
+      "author": "simonschmeisser",
+      "date": "2025-01-07T17:14:11Z",
+      "sha": "147b1cd79bd4eddddf6ae8751e71756ace2ee581",
+      "message": "Drop Qt4 support, add Qt6 (#267)",
+      "files_changed": 1,
+      "additions": 8,
+      "deletions": 8,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "5aab1244965ba7de9f18110e825302a3bcdc1df3",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 8,
+          "changes": 16,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/147b1cd79bd4eddddf6ae8751e71756ace2ee581/CMakeLists.txt",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/147b1cd79bd4eddddf6ae8751e71756ace2ee581/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/CMakeLists.txt?ref=147b1cd79bd4eddddf6ae8751e71756ace2ee581",
+          "patch": "@@ -28,19 +28,19 @@ find_package(Boost REQUIRED thread system)\n find_package(PkgConfig REQUIRED)\n pkg_check_modules(OGRE_OV OGRE)\n \n-# Qt 4 or 5\n-if(\"${rviz_QT_VERSION}\" VERSION_LESS \"5\")\n-  find_package(Qt4 ${rviz_QT_VERSION} REQUIRED QtCore QtGui)\n-  include(${QT_USE_FILE})\n-  macro(qt_wrap_ui)\n-    qt4_wrap_ui(${ARGN})\n-  endmacro()\n-else()\n+# Qt 5 or 6\n+if(\"${rviz_QT_VERSION}\" VERSION_LESS \"6\")\n   find_package(Qt5 ${rviz_QT_VERSION} REQUIRED Core Widgets)\n   set(QT_LIBRARIES Qt5::Widgets)\n   macro(qt_wrap_ui)\n     qt5_wrap_ui(${ARGN})\n   endmacro()\n+else()\n+  find_package(Qt6 ${rviz_QT_VERSION} REQUIRED Core Widgets)\n+  set(QT_LIBRARIES Qt6::Widgets)\n+  macro(qt_wrap_ui)\n+    qt6_wrap_ui(${ARGN})\n+  endmacro()\n endif()\n ## Prefer the Qt signals and slots to avoid defining \"emit\", \"slots\",\n ## etc because they can conflict with boost signals, so define QT_NO_KEYWORDS here."
+        }
+      ]
+    },
+    {
+      "author": "v4hn",
+      "date": "2018-04-11T04:44:54Z",
+      "sha": "d0d648d797435e741bacafac9565126b431de516",
+      "message": "actually link qt code into the _gui library (#74)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "4bb906bab9bb3ccafc1be8d7a3151d270dfa54fd",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/d0d648d797435e741bacafac9565126b431de516/CMakeLists.txt",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/d0d648d797435e741bacafac9565126b431de516/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/CMakeLists.txt?ref=d0d648d797435e741bacafac9565126b431de516",
+          "patch": "@@ -98,7 +98,7 @@ set(SOURCE_FILES\n )\n \n # Rviz GUI library\n-add_library(${PROJECT_NAME}_gui ${SOURCE_FILES} src/remote_control.cpp)\n+add_library(${PROJECT_NAME}_gui ${MOC_FILES} ${SOURCE_FILES} src/remote_control.cpp)\n target_link_libraries(${PROJECT_NAME}_gui ${rviz_DEFAULT_PLUGIN_LIBRARIES} ${QT_LIBRARIES} ${catkin_LIBRARIES})\n \n # Remote control library"
+        }
+      ]
+    },
+    {
+      "author": "mosfet80",
+      "date": "2023-04-22T21:57:20Z",
+      "sha": "50da4eeabf69fd813cc31447d317aa14e5fa78ea",
+      "message": "Update .pre-commit-config.yaml (#234)\n\nupdate pre-commit libraries",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "c1ef1cbc506db1fb341f08ab221086095e01347f",
+          "filename": ".pre-commit-config.yaml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/50da4eeabf69fd813cc31447d317aa14e5fa78ea/.pre-commit-config.yaml",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/50da4eeabf69fd813cc31447d317aa14e5fa78ea/.pre-commit-config.yaml",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/.pre-commit-config.yaml?ref=50da4eeabf69fd813cc31447d317aa14e5fa78ea",
+          "patch": "@@ -15,7 +15,7 @@\n repos:\n   # Standard hooks\n   - repo: https://github.com/pre-commit/pre-commit-hooks\n-    rev: v3.4.0\n+    rev: v4.4.0\n     hooks:\n       - id: check-added-large-files\n       - id: check-case-conflict\n@@ -34,7 +34,7 @@ repos:\n       - id: trailing-whitespace\n \n   - repo: https://github.com/psf/black\n-    rev: 20.8b1\n+    rev: 23.3.0\n     hooks:\n       - id: black\n "
+        }
+      ]
+    },
+    {
+      "author": "Vatan Aksoy Tezer",
+      "date": "2022-09-20T17:15:34Z",
+      "sha": "891f38a7b22a60d108732eb042d47d474ee5460d",
+      "message": "3.9.2",
+      "files_changed": 2,
+      "additions": 11,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "29995ad62e7256da45abd007d6034209e89ed312",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 0,
+          "changes": 10,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/891f38a7b22a60d108732eb042d47d474ee5460d/CHANGELOG.rst",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/891f38a7b22a60d108732eb042d47d474ee5460d/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/CHANGELOG.rst?ref=891f38a7b22a60d108732eb042d47d474ee5460d",
+          "patch": "@@ -2,6 +2,16 @@\n Changelog for package rviz_visual_tools\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+3.9.2 (2022-09-20)\n+------------------\n+* Cleanup for new Ubuntu versions (`#215 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/215>`_)\n+* spin independent thread for RemoteControl (`#224 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/224>`_)\n+  Avoid deadlocks and cross-thread effects with other callbacks.\n+* Migrate CI to Github Actions (`#197 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/197>`_)\n+* migrate to <random> (`#195 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/195>`_)\n+* Fix bugtracker typo (`#186 <https://github.com/PickNikRobotics/rviz_visual_tools/issues/186>`_)\n+* Contributors: Jochen Sprickerhof, Michael Görner, Nathan Brooks, Vatan Aksoy Tezer\n+\n 3.9.1 (2020-10-09)\n ------------------\n * [maint] add soname versions to libraries (`#166 <https://github.com/tylerjw/rviz_visual_tools/issues/166>`_)"
+        },
+        {
+          "sha": "bad112e84cf891fd1213dbad1c95b3b5a890f6bb",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/891f38a7b22a60d108732eb042d47d474ee5460d/package.xml",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/891f38a7b22a60d108732eb042d47d474ee5460d/package.xml",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/package.xml?ref=891f38a7b22a60d108732eb042d47d474ee5460d",
+          "patch": "@@ -1,7 +1,7 @@\n <?xml version=\"1.0\"?>\n <package format=\"2\">\n   <name>rviz_visual_tools</name>\n-  <version>3.9.1</version>\n+  <version>3.9.2</version>\n   <description>Utility functions for displaying and debugging data in Rviz via published markers</description>\n \n   <maintainer email=\"davetcoleman@gmail.com\">Dave Coleman</maintainer>"
+        }
+      ]
+    },
+    {
+      "author": "jspricke",
+      "date": "2018-08-22T00:00:26Z",
+      "sha": "f9c38c15e81a64946f6d45d74e5d99e59816098b",
+      "message": "Add OGRE dependency (#88)",
+      "files_changed": 2,
+      "additions": 5,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "018a624b2e0bab4a72508e0419dc6f992f92a915",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 1,
+          "changes": 5,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/f9c38c15e81a64946f6d45d74e5d99e59816098b/CMakeLists.txt",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/f9c38c15e81a64946f6d45d74e5d99e59816098b/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/CMakeLists.txt?ref=f9c38c15e81a64946f6d45d74e5d99e59816098b",
+          "patch": "@@ -30,6 +30,8 @@ find_package(catkin REQUIRED COMPONENTS\n \n find_package(Eigen3 REQUIRED)\n find_package(Boost REQUIRED thread system)\n+find_package(PkgConfig REQUIRED)\n+pkg_check_modules(OGRE_OV OGRE)\n \n # Qt 4 or 5\n if(rviz_QT_VERSION VERSION_LESS \"5\")\n@@ -69,9 +71,10 @@ catkin_package(\n     roscpp\n   INCLUDE_DIRS\n     include\n+    ${OGRE_OV_INCLUDE_DIRS}\n )\n \n-include_directories(SYSTEM include ${catkin_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS})\n+include_directories(SYSTEM include ${catkin_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS} ${OGRE_OV_INCLUDE_DIRS})\n \n ###########\n ## Build ##"
+        },
+        {
+          "sha": "c01e238d581504d989e11a128cb47211c370d979",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/f9c38c15e81a64946f6d45d74e5d99e59816098b/package.xml",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/f9c38c15e81a64946f6d45d74e5d99e59816098b/package.xml",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/package.xml?ref=f9c38c15e81a64946f6d45d74e5d99e59816098b",
+          "patch": "@@ -28,6 +28,7 @@\n   <depend>trajectory_msgs</depend>\n   <depend>roslint</depend>\n   <depend>eigen_stl_containers</depend>\n+  <depend>libogre-dev</depend>\n \n   <!-- Something changed in ROS Lunar / Ubuntu Zesty that requires extra QT5 dependency-->\n   <!-- I suspect this depend is more than needed, but was the only dependency available -->"
+        }
+      ]
+    },
+    {
+      "author": "vatanaksoytezer",
+      "date": "2021-09-15T16:35:22Z",
+      "sha": "9b10fd2d96f9f2aa8177052e4dc35df8ce914003",
+      "message": "Migrate CI to Github Actions (#197)",
+      "files_changed": 6,
+      "additions": 176,
+      "deletions": 30,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "91119f5dc18dbed579194d3a19411fa85526ca81",
+          "filename": ".ci.prepare_codecov",
+          "status": "added",
+          "additions": 21,
+          "deletions": 0,
+          "changes": 21,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/9b10fd2d96f9f2aa8177052e4dc35df8ce914003/.ci.prepare_codecov",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/9b10fd2d96f9f2aa8177052e4dc35df8ce914003/.ci.prepare_codecov",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/.ci.prepare_codecov?ref=9b10fd2d96f9f2aa8177052e4dc35df8ce914003",
+          "patch": "@@ -0,0 +1,21 @@\n+#!/bin/bash\n+pushd $BASEDIR\n+\n+BLUE='\\033[0;34m'\n+NOCOLOR='\\033[0m'\n+\n+apt-get install -qq lcov\n+\n+echo -e \"${BLUE}Capture coverage info${NOCOLOR}\"\n+lcov --capture --directory target_ws --output-file coverage.info\n+\n+echo -e \"${BLUE}Extract repository files${NOCOLOR}\"\n+lcov --extract coverage.info \"$BASEDIR/target_ws/src/$TARGET_REPO_NAME/*\" --output-file coverage.info\n+\n+echo -e \"${BLUE}Filter out test files${NOCOLOR}\"\n+lcov --remove coverage.info '*/test/*' --output-file coverage.info\n+\n+echo -e \"${BLUE}Output coverage data for debugging${NOCOLOR}\"\n+lcov --list coverage.info\n+\n+popd"
+        },
+        {
+          "sha": "af76461ae36967ed404648630f645387d12e5b00",
+          "filename": ".github/workflows/build_and_test.yaml",
+          "status": "added",
+          "additions": 81,
+          "deletions": 0,
+          "changes": 81,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/9b10fd2d96f9f2aa8177052e4dc35df8ce914003/.github%2Fworkflows%2Fbuild_and_test.yaml",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/9b10fd2d96f9f2aa8177052e4dc35df8ce914003/.github%2Fworkflows%2Fbuild_and_test.yaml",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/.github%2Fworkflows%2Fbuild_and_test.yaml?ref=9b10fd2d96f9f2aa8177052e4dc35df8ce914003",
+          "patch": "@@ -0,0 +1,81 @@\n+# This config uses industrial_ci (https://github.com/ros-industrial/industrial_ci.git).\n+# For troubleshooting, see readme (https://github.com/ros-industrial/industrial_ci/blob/master/README.rst)\n+\n+name: Build And Test\n+\n+on:\n+  workflow_dispatch:\n+  pull_request:\n+  push:\n+    branches:\n+      - master\n+\n+jobs:\n+  industrial_ci:\n+    strategy:\n+      matrix:\n+        env:\n+          - ROS_DISTRO: melodic\n+            ROS_REPO: main\n+          - ROS_DISTRO: melodic\n+            ROS_REPO: testing\n+          - ROS_DISTRO: noetic\n+            ROS_REPO: main\n+            CCOV: true\n+            CLANG_TIDY: true\n+          - ROS_DISTRO: noetic\n+            ROS_REPO: testing\n+\n+    env:\n+      AFTER_RUN_TARGET_TEST: ${{ matrix.env.CCOV && './.ci.prepare_codecov' || '' }}\n+      TARGET_CMAKE_ARGS: >\n+        -DCMAKE_BUILD_TYPE=${{ matrix.env.CCOV && 'Debug' || 'Release'}}\n+        ${{ matrix.env.CCOV && '-DCMAKE_CXX_FLAGS=\"--coverage\" --no-warn-unused-cli' || '' }}\n+      CCACHE_DIR: ${{ github.workspace }}/.ccache\n+      BASEDIR: ${{ github.workspace }}/.work\n+      CACHE_PREFIX: ${{ matrix.env.ROS_DISTRO }}-${{ matrix.env.ROS_REPO }}${{ matrix.env.CCOV && '-ccov' || '' }}\n+      CLANG_TIDY_BASE_REF: ${{ github.base_ref || github.ref }}\n+\n+    name: \"${{ matrix.env.ROS_DISTRO }}-${{ matrix.env.ROS_REPO }}${{ matrix.env.CCOV && ' + ccov' || ''}}${{ matrix.env.CLANG_TIDY && ' + clang-tidy' || '' }}\"\n+    runs-on: ubuntu-latest\n+    steps:\n+      - uses: actions/checkout@v2\n+      # The target directory cache doesn't include the source directory because\n+      # that comes from the checkout.  See \"prepare target_ws for cache\" task below\n+      - name: cache target_ws\n+        if: ${{ ! matrix.env.CCOV }}\n+        uses: pat-s/always-upload-cache@v2.1.5\n+        with:\n+          path: ${{ env.BASEDIR }}/target_ws\n+          key: target_ws-${{ env.CACHE_PREFIX }}-${{ hashFiles('**/CMakeLists.txt', '**/package.xml') }}-${{ github.run_id }}\n+          restore-keys: |\n+            target_ws-${{ env.CACHE_PREFIX }}-${{ hashFiles('**/CMakeLists.txt', '**/package.xml') }}\n+      - name: cache ccache\n+        uses: pat-s/always-upload-cache@v2.1.5\n+        with:\n+          path: ${{ env.CCACHE_DIR }}\n+          key: ccache-${{ env.CACHE_PREFIX }}-${{ github.sha }}-${{ github.run_id }}\n+          restore-keys: |\n+            ccache-${{ env.CACHE_PREFIX }}-${{ github.sha }}\n+            ccache-${{ env.CACHE_PREFIX }}\n+      - name: industrial_ci\n+        uses: 'ros-industrial/industrial_ci@master'\n+        env: ${{ matrix.env }}\n+      - name: upload test artifacts (on failure)\n+        uses: actions/upload-artifact@v2\n+        if: failure()\n+        with:\n+          name: test-results\n+          path: ${{ env.BASEDIR }}/target_ws/**/test_results/**/*.xml\n+      - name: upload codecov report\n+        uses: codecov/codecov-action@v1\n+        if: ${{ matrix.env.CCOV }}\n+        with:\n+          files: ${{ env.BASEDIR }}/coverage.info\n+      - name: prepare target_ws for cache\n+        if: ${{ always() && ! matrix.env.CCOV }}\n+        run: |\n+          du -sh ${{ env.BASEDIR }}/target_ws\n+          sudo find ${{ env.BASEDIR }}/target_ws -wholename '*/test_results/*' -delete\n+          sudo rm -rf ${{ env.BASEDIR }}/target_ws/src\n+          du -sh ${{ env.BASEDIR }}/target_ws"
+        },
+        {
+          "sha": "ec75cbdfaff5616bd8ec1f9f953ee15491c99f9c",
+          "filename": ".github/workflows/format.yaml",
+          "status": "added",
+          "additions": 20,
+          "deletions": 0,
+          "changes": 20,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/9b10fd2d96f9f2aa8177052e4dc35df8ce914003/.github%2Fworkflows%2Fformat.yaml",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/9b10fd2d96f9f2aa8177052e4dc35df8ce914003/.github%2Fworkflows%2Fformat.yaml",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/.github%2Fworkflows%2Fformat.yaml?ref=9b10fd2d96f9f2aa8177052e4dc35df8ce914003",
+          "patch": "@@ -0,0 +1,20 @@\n+# This is a format job. Pre-commit has a first-party GitHub action, so we use\n+# that: https://github.com/pre-commit/action\n+\n+name: Format\n+\n+on:\n+  workflow_dispatch:\n+  pull_request:\n+  push:\n+\n+jobs:\n+  pre-commit:\n+    name: Format\n+    runs-on: ubuntu-latest\n+    steps:\n+    - uses: actions/checkout@v2\n+    - uses: actions/setup-python@v2\n+    - name: Install clang-format-10\n+      run: sudo apt-get install clang-format-10\n+    - uses: pre-commit/action@v2.0.3"
+        },
+        {
+          "sha": "9a6e3b409579adfafd2fee875549c3a2593ba871",
+          "filename": ".pre-commit-config.yaml",
+          "status": "added",
+          "additions": 49,
+          "deletions": 0,
+          "changes": 49,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/9b10fd2d96f9f2aa8177052e4dc35df8ce914003/.pre-commit-config.yaml",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/9b10fd2d96f9f2aa8177052e4dc35df8ce914003/.pre-commit-config.yaml",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/.pre-commit-config.yaml?ref=9b10fd2d96f9f2aa8177052e4dc35df8ce914003",
+          "patch": "@@ -0,0 +1,49 @@\n+# To use:\n+#\n+#     pre-commit run -a\n+#\n+# Or:\n+#\n+#     pre-commit install  # (runs every time you commit in git)\n+#\n+# To update this file:\n+#\n+#     pre-commit autoupdate\n+#\n+# See https://github.com/pre-commit/pre-commit\n+\n+repos:\n+  # Standard hooks\n+  - repo: https://github.com/pre-commit/pre-commit-hooks\n+    rev: v3.4.0\n+    hooks:\n+      - id: check-added-large-files\n+      - id: check-case-conflict\n+      - id: check-json\n+      - id: check-merge-conflict\n+      - id: check-symlinks\n+      - id: check-toml\n+      - id: check-xml\n+      - id: check-yaml\n+      - id: debug-statements\n+      - id: destroyed-symlinks\n+      - id: detect-private-key\n+      - id: end-of-file-fixer\n+      - id: mixed-line-ending\n+      - id: pretty-format-json\n+      - id: trailing-whitespace\n+\n+  - repo: https://github.com/psf/black\n+    rev: 20.8b1\n+    hooks:\n+      - id: black\n+\n+  - repo: local\n+    hooks:\n+      - id: clang-format\n+        name: clang-format\n+        description: Format files with ClangFormat.\n+        entry: clang-format-10\n+        language: system\n+        files: \\.(c|cc|cxx|cpp|frag|glsl|h|hpp|hxx|ih|ispc|ipp|java|js|m|proto|vert)$\n+        args: ['-fallback-style=none', '-i']"
+        },
+        {
+          "sha": "66d69e03fff47e37399ed611f0b85d012f79f0a1",
+          "filename": ".travis.yml",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 26,
+          "changes": 26,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/5d0a61839447fa4b061b8a7d0c1487f3e471a865/.travis.yml",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/5d0a61839447fa4b061b8a7d0c1487f3e471a865/.travis.yml",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/.travis.yml?ref=5d0a61839447fa4b061b8a7d0c1487f3e471a865",
+          "patch": "@@ -1,26 +0,0 @@\n-# This config file for Travis CI utilizes https://github.com/ros-planning/moveit_ci package.\n-sudo: required\n-dist: xenial  # distro used by Travis, moveit_ci uses the docker image's distro\n-services:\n-  - docker\n-language: cpp\n-compiler: gcc\n-cache: ccache\n-\n-env:\n-  global:\n-    - DOCKER_IMAGE=moveit/moveit:master-source\n-    - CXXFLAGS=\"-Wall -Wextra -Wwrite-strings -Wunreachable-code -Wpointer-arith -Wredundant-decls -Wno-unused-parameter -Wno-unused-function\"\n-    - WARNINGS_OK=false\n-  matrix:\n-    - TEST=\"clang-format\" # TODO(davetcoleman): enable catkin_lint in the future\n-    - TEST=clang-tidy-fix\n-    - DOCKER_IMAGE=moveit/moveit:melodic-source\n-    - DOCKER_IMAGE=moveit/moveit:master-source\n-    - DOCKER_IMAGE=moveit/moveit:kinetic-ci  TEST_BLACKLIST=moveit_ros_perception\n-\n-before_script:\n-  - git clone -q --depth=1 https://github.com/ros-planning/moveit_ci.git .moveit_ci\n-\n-script:\n-  - .moveit_ci/travis.sh"
+        },
+        {
+          "sha": "265153211f344e1ad511d8e99121388f7e97812b",
+          "filename": "src/rviz_visual_tools.cpp",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 4,
+          "changes": 9,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/9b10fd2d96f9f2aa8177052e4dc35df8ce914003/src%2Frviz_visual_tools.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/9b10fd2d96f9f2aa8177052e4dc35df8ce914003/src%2Frviz_visual_tools.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/src%2Frviz_visual_tools.cpp?ref=9b10fd2d96f9f2aa8177052e4dc35df8ce914003",
+          "patch": "@@ -2805,20 +2805,21 @@ bool RvizVisualTools::posesEqual(const Eigen::Isometry3d& pose1, const Eigen::Is\n \n double RvizVisualTools::dRand(double min, double max)\n {\n-  return std::uniform_real_distribution<double>(min,max)(mt_random_engine_);\n+  return std::uniform_real_distribution<double>(min, max)(mt_random_engine_);\n }\n \n float RvizVisualTools::fRand(float min, float max)\n {\n-  return std::uniform_real_distribution<float>(min,max)(mt_random_engine_);\n+  return std::uniform_real_distribution<float>(min, max)(mt_random_engine_);\n }\n \n int RvizVisualTools::iRand(int min, int max)\n {\n-  return std::uniform_int_distribution<int>(min,max)(mt_random_engine_);\n+  return std::uniform_int_distribution<int>(min, max)(mt_random_engine_);\n }\n \n-void RvizVisualTools::setRandomSeed(unsigned int seed){\n+void RvizVisualTools::setRandomSeed(unsigned int seed)\n+{\n   mt_random_engine_.seed(seed);\n }\n "
+        }
+      ]
+    },
+    {
+      "author": "nbbrooks",
+      "date": "2021-06-30T14:43:05Z",
+      "sha": "99e8c9c5c3dbcda0e71d41d591b501e5a212fe05",
+      "message": "Fix bugtracker typo (#186)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "c6d2a31649af3568c5dfa699f88f49d8cd7a4bdf",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/99e8c9c5c3dbcda0e71d41d591b501e5a212fe05/package.xml",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/99e8c9c5c3dbcda0e71d41d591b501e5a212fe05/package.xml",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/package.xml?ref=99e8c9c5c3dbcda0e71d41d591b501e5a212fe05",
+          "patch": "@@ -9,7 +9,7 @@\n   <license>BSD</license>\n \n   <url type=\"website\">https://github.com/davetcoleman/rviz_visual_tools</url>\n-  <url type=\"butracker\">https://github.com/davetcoleman/rviz_visual_tools/issues</url>\n+  <url type=\"bugtracker\">https://github.com/davetcoleman/rviz_visual_tools/issues</url>\n   <url type=\"repository\">https://github.com/davetcoleman/rviz_visual_tools/</url>\n \n   <author email=\"dave@picknik.ai\">Dave Coleman</author>"
+        }
+      ]
+    },
+    {
+      "author": "tylerjw",
+      "date": "2020-10-09T18:02:49Z",
+      "sha": "99155c8b2aefe1e5e3d8a69fbc35e524a455249c",
+      "message": "[maint] Apply clang-format-10 (#173)",
+      "files_changed": 5,
+      "additions": 51,
+      "deletions": 43,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "9a6ec509a4087ac607ec0836dee711692e8fdeaf",
+          "filename": ".clang-format",
+          "status": "modified",
+          "additions": 42,
+          "deletions": 33,
+          "changes": 75,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/99155c8b2aefe1e5e3d8a69fbc35e524a455249c/.clang-format",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/99155c8b2aefe1e5e3d8a69fbc35e524a455249c/.clang-format",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/.clang-format?ref=99155c8b2aefe1e5e3d8a69fbc35e524a455249c",
+          "patch": "@@ -1,66 +1,75 @@\n ---\n BasedOnStyle:  Google\n+ColumnLimit:    120\n+MaxEmptyLinesToKeep: 1\n+SortIncludes: false\n+\n+Standard:        Auto\n+IndentWidth:     2\n+TabWidth:        2\n+UseTab:          Never\n AccessModifierOffset: -2\n ConstructorInitializerIndentWidth: 2\n+NamespaceIndentation: None\n+ContinuationIndentWidth: 4\n+IndentCaseLabels: true\n+IndentFunctionDeclarationAfterType: false\n+\n AlignEscapedNewlinesLeft: false\n AlignTrailingComments: true\n+\n AllowAllParametersOfDeclarationOnNextLine: false\n+ExperimentalAutoDetectBinPacking: false\n+ObjCSpaceBeforeProtocolList: true\n+Cpp11BracedListStyle: false\n+\n+AllowShortBlocksOnASingleLine: true\n AllowShortIfStatementsOnASingleLine: false\n AllowShortLoopsOnASingleLine: false\n AllowShortFunctionsOnASingleLine: None\n-AllowShortLoopsOnASingleLine: false\n+AllowShortCaseLabelsOnASingleLine: false\n+\n AlwaysBreakTemplateDeclarations: true\n AlwaysBreakBeforeMultilineStrings: false\n BreakBeforeBinaryOperators: false\n BreakBeforeTernaryOperators: false\n BreakConstructorInitializersBeforeComma: true\n+\n BinPackParameters: true\n-ColumnLimit:    120\n ConstructorInitializerAllOnOneLineOrOnePerLine: true\n DerivePointerBinding: false\n PointerBindsToType: true\n-ExperimentalAutoDetectBinPacking: false\n-IndentCaseLabels: true\n-MaxEmptyLinesToKeep: 1\n-NamespaceIndentation: None\n-ObjCSpaceBeforeProtocolList: true\n-PenaltyBreakBeforeFirstCallParameter: 19\n-PenaltyBreakComment: 60\n+\n+PenaltyExcessCharacter: 50\n+PenaltyBreakBeforeFirstCallParameter: 30\n+PenaltyBreakComment: 1000\n+PenaltyBreakFirstLessLess: 10\n PenaltyBreakString: 100\n-PenaltyBreakFirstLessLess: 1000\n-PenaltyExcessCharacter: 1000\n-PenaltyReturnTypeOnItsOwnLine: 70\n+PenaltyReturnTypeOnItsOwnLine: 50\n+\n SpacesBeforeTrailingComments: 2\n-Cpp11BracedListStyle: false\n-Standard:        Auto\n-IndentWidth:     2\n-TabWidth:        2\n-UseTab:          Never\n-IndentFunctionDeclarationAfterType: false\n SpacesInParentheses: false\n SpacesInAngles:  false\n SpaceInEmptyParentheses: false\n SpacesInCStyleCastParentheses: false\n+SpaceAfterCStyleCast: false\n SpaceAfterControlStatementKeyword: true\n SpaceBeforeAssignmentOperators: true\n-ContinuationIndentWidth: 4\n-SortIncludes: false\n-SpaceAfterCStyleCast: false\n \n # Configure each individual brace in BraceWrapping\n BreakBeforeBraces: Custom\n \n # Control of individual brace wrapping cases\n-BraceWrapping: {\n-    AfterClass: 'true'\n-    AfterControlStatement: 'true'\n-    AfterEnum : 'true'\n-    AfterFunction : 'true'\n-    AfterNamespace : 'true'\n-    AfterStruct : 'true'\n-    AfterUnion : 'true'\n-    BeforeCatch : 'true'\n-    BeforeElse : 'true'\n-    IndentBraces : 'false'\n-}\n+BraceWrapping:\n+    AfterCaseLabel: true\n+    AfterClass: true\n+    AfterControlStatement: true\n+    AfterEnum: true\n+    AfterFunction: true\n+    AfterNamespace: true\n+    AfterStruct: true\n+    AfterUnion: true\n+    BeforeCatch: true\n+    BeforeElse: true\n+    IndentBraces: false\n ..."
+        },
+        {
+          "sha": "56fb0a225484580e5f24095bc6a102d390c04772",
+          "filename": "include/rviz_visual_tools/imarker_simple.h",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/99155c8b2aefe1e5e3d8a69fbc35e524a455249c/include%2Frviz_visual_tools%2Fimarker_simple.h",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/99155c8b2aefe1e5e3d8a69fbc35e524a455249c/include%2Frviz_visual_tools%2Fimarker_simple.h",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/include%2Frviz_visual_tools%2Fimarker_simple.h?ref=99155c8b2aefe1e5e3d8a69fbc35e524a455249c",
+          "patch": "@@ -54,8 +54,8 @@\n \n namespace rviz_visual_tools\n {\n-using visualization_msgs::InteractiveMarkerFeedback;\n using visualization_msgs::InteractiveMarkerControl;\n+using visualization_msgs::InteractiveMarkerFeedback;\n \n typedef std::function<void(const visualization_msgs::InteractiveMarkerFeedbackConstPtr&)> IMarkerCallback;\n \n@@ -67,7 +67,7 @@ geometry_msgs::Pose getIdentityPose()\n   pose.orientation.w = 1.0;\n   return pose;\n }\n-}\n+}  // namespace\n \n class IMarkerSimple\n {"
+        },
+        {
+          "sha": "d27d5a7fa3a15bdad47a9968c491f50cd82afa6b",
+          "filename": "include/rviz_visual_tools/rviz_visual_tools.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 2,
+          "changes": 3,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/99155c8b2aefe1e5e3d8a69fbc35e524a455249c/include%2Frviz_visual_tools%2Frviz_visual_tools.h",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/99155c8b2aefe1e5e3d8a69fbc35e524a455249c/include%2Frviz_visual_tools%2Frviz_visual_tools.h",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/include%2Frviz_visual_tools%2Frviz_visual_tools.h?ref=99155c8b2aefe1e5e3d8a69fbc35e524a455249c",
+          "patch": "@@ -780,8 +780,7 @@ class RvizVisualTools\n    */\n   bool publishAxis(const geometry_msgs::Pose& pose, scales scale = MEDIUM, const std::string& ns = \"Axis\");\n   bool publishAxis(const Eigen::Isometry3d& pose, scales scale = MEDIUM, const std::string& ns = \"Axis\");\n-  bool publishAxis(const geometry_msgs::Pose& pose, double length, double radius = 0.01,\n-                   const std::string& ns = \"Axis\");\n+  bool publishAxis(const geometry_msgs::Pose& pose, double length, double radius = 0.01, const std::string& ns = \"Axis\");\n   bool publishAxis(const Eigen::Isometry3d& pose, double length, double radius = 0.01, const std::string& ns = \"Axis\");\n \n private:"
+        },
+        {
+          "sha": "49ffa53b0d4eb30d5c8f6ad2032d4f80e19deea0",
+          "filename": "src/rviz_visual_tools.cpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 4,
+          "changes": 8,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/99155c8b2aefe1e5e3d8a69fbc35e524a455249c/src%2Frviz_visual_tools.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/99155c8b2aefe1e5e3d8a69fbc35e524a455249c/src%2Frviz_visual_tools.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/src%2Frviz_visual_tools.cpp?ref=99155c8b2aefe1e5e3d8a69fbc35e524a455249c",
+          "patch": "@@ -2079,8 +2079,8 @@ bool RvizVisualTools::publishPath(const EigenSTL::vector_Vector3d& path, const s\n \n   if (path.size() != colors.size())\n   {\n-    ROS_ERROR_STREAM_NAMED(LOGNAME, \"Skipping path because \" << path.size() << \" different from \" << colors.size()\n-                                                             << \".\");\n+    ROS_ERROR_STREAM_NAMED(LOGNAME,\n+                           \"Skipping path because \" << path.size() << \" different from \" << colors.size() << \".\");\n     return false;\n   }\n \n@@ -2104,8 +2104,8 @@ bool RvizVisualTools::publishPath(const EigenSTL::vector_Vector3d& path, const s\n \n   if (path.size() != colors.size())\n   {\n-    ROS_ERROR_STREAM_NAMED(LOGNAME, \"Skipping path because \" << path.size() << \" different from \" << colors.size()\n-                                                             << \".\");\n+    ROS_ERROR_STREAM_NAMED(LOGNAME,\n+                           \"Skipping path because \" << path.size() << \" different from \" << colors.size() << \".\");\n     return false;\n   }\n "
+        },
+        {
+          "sha": "d0986594428308110ee44f7e657da880ea30b9d5",
+          "filename": "tests/rvt_test.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/99155c8b2aefe1e5e3d8a69fbc35e524a455249c/tests%2Frvt_test.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/99155c8b2aefe1e5e3d8a69fbc35e524a455249c/tests%2Frvt_test.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/tests%2Frvt_test.cpp?ref=99155c8b2aefe1e5e3d8a69fbc35e524a455249c",
+          "patch": "@@ -85,8 +85,8 @@ class RVTTest\n     static const double EPSILON = 0.000001;\n     for (std::size_t i = 0; i < expect.size(); ++i)\n     {\n-      EXPECT_GT(EPSILON, fabs(expect[i] - actual[i])) << \"Section \" << id << \", Element \" << i\n-                                                      << \", Expect: \" << expect[i] << \", Actual: \" << actual[i];\n+      EXPECT_GT(EPSILON, fabs(expect[i] - actual[i]))\n+          << \"Section \" << id << \", Element \" << i << \", Expect: \" << expect[i] << \", Actual: \" << actual[i];\n     }\n \n     return true;"
+        }
+      ]
+    },
+    {
+      "author": "seanyen",
+      "date": "2019-07-26T06:26:37Z",
+      "sha": "3ea03e70183c854945bc20c3111f2af090512af1",
+      "message": "Windows bring up. (#116)",
+      "files_changed": 2,
+      "additions": 27,
+      "deletions": 9,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "e6f7b2f3797f871f7c64272b50e91e00adf88338",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 14,
+          "deletions": 8,
+          "changes": 22,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/3ea03e70183c854945bc20c3111f2af090512af1/CMakeLists.txt",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/3ea03e70183c854945bc20c3111f2af090512af1/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/CMakeLists.txt?ref=3ea03e70183c854945bc20c3111f2af090512af1",
+          "patch": "@@ -1,17 +1,18 @@\n cmake_minimum_required(VERSION 2.8.6)\n project(rviz_visual_tools)\n \n-add_definitions(-std=c++11)\n+if(NOT MSVC)\n+  add_compile_options(-std=c++11)\n+  # Warnings\n+  add_definitions(-W -Wall -Wextra\n+    #-Wcast-qual\n+    -Wwrite-strings -Wunreachable-code -Wpointer-arith\n+    -Winit-self -Wredundant-decls\n+    -Wno-unused-parameter -Wno-unused-function)\n+endif()\n \n set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n \n-# Warnings\n-add_definitions(-W -Wall -Wextra\n-  #-Wcast-qual\n-  -Wwrite-strings -Wunreachable-code -Wpointer-arith\n-  -Winit-self -Wredundant-decls\n-  -Wno-unused-parameter -Wno-unused-function)\n-\n find_package(catkin REQUIRED COMPONENTS\n   eigen_conversions\n   eigen_stl_containers\n@@ -170,6 +171,10 @@ install(\n     ${PROJECT_NAME}_remote_control\n   LIBRARY DESTINATION\n     ${CATKIN_PACKAGE_LIB_DESTINATION}\n+  ARCHIVE DESTINATION\n+    ${CATKIN_PACKAGE_LIB_DESTINATION}\n+  RUNTIME DESTINATION\n+    ${CATKIN_GLOBAL_BIN_DESTINATION}\n )\n \n # Install header files\n@@ -188,5 +193,6 @@ install(FILES\n # Install executables\n install(TARGETS ${PROJECT_NAME}_demo ${PROJECT_NAME}_imarker_simple_demo\n   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n )"
+        },
+        {
+          "sha": "1babe894377877f2f0514629690e892d36df444f",
+          "filename": "include/rviz_visual_tools/rviz_visual_tools.h",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 1,
+          "changes": 14,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/3ea03e70183c854945bc20c3111f2af090512af1/include%2Frviz_visual_tools%2Frviz_visual_tools.h",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/3ea03e70183c854945bc20c3111f2af090512af1/include%2Frviz_visual_tools%2Frviz_visual_tools.h",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/include%2Frviz_visual_tools%2Frviz_visual_tools.h?ref=3ea03e70183c854945bc20c3111f2af090512af1",
+          "patch": "@@ -69,6 +69,18 @@\n #include <rviz_visual_tools/deprecation.h>\n #include <rviz_visual_tools/remote_control.h>\n \n+// Import/export for windows dll's and visibility for gcc shared libraries.\n+\n+#ifdef ROS_BUILD_SHARED_LIBS // ros is being built around shared libraries\n+  #ifdef rviz_visual_tools_EXPORTS // we are building a shared lib/dll\n+    #define RVIZ_VISUAL_TOOLS_DECL ROS_HELPER_EXPORT\n+  #else // we are using shared lib/dll\n+    #define RVIZ_VISUAL_TOOLS_DECL ROS_HELPER_IMPORT\n+  #endif\n+#else // ros is being built around static libraries\n+  #define RVIZ_VISUAL_TOOLS_DECL\n+#endif\n+\n namespace rviz_visual_tools\n {\n // Default constants\n@@ -1079,7 +1091,7 @@ class RvizVisualTools\n   ros::NodeHandle nh_;\n \n   // Short name for this class\n-  static const std::string name_;\n+  static RVIZ_VISUAL_TOOLS_DECL const std::string name_;\n \n   // Optional remote control\n   RemoteControlPtr remote_control_;"
+        }
+      ]
+    },
+    {
+      "author": "JafarAbdi",
+      "date": "2019-09-25T09:28:30Z",
+      "sha": "9454ac5e51dddf0fd3a582d90377e846819a5a52",
+      "message": "Apply clang-tidy (#127)\n\n* Apply clang-tidy\r\n\r\n* Switch include guards to pragma once",
+      "files_changed": 14,
+      "additions": 128,
+      "deletions": 114,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "7fae366878f227420d360b9cde060211efa88d70",
+          "filename": ".clang-tidy",
+          "status": "modified",
+          "additions": 39,
+          "deletions": 3,
+          "changes": 42,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/9454ac5e51dddf0fd3a582d90377e846819a5a52/.clang-tidy",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/9454ac5e51dddf0fd3a582d90377e846819a5a52/.clang-tidy",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/.clang-tidy?ref=9454ac5e51dddf0fd3a582d90377e846819a5a52",
+          "patch": "@@ -1,14 +1,50 @@\n ---\n-Checks:          '*'\n-WarningsAsErrors: ''\n+Checks:          '-*,\n+                  performance-*,\n+                  llvm-namespace-comment,\n+                  modernize-redundant-void-arg,\n+                  modernize-use-nullptr,\n+                  modernize-use-default,\n+                  modernize-use-override,\n+                  modernize-loop-convert,\n+                  readability-named-parameter,\n+                  readability-redundant-smartptr-get,\n+                  readability-redundant-string-cstr,\n+                  readability-simplify-boolean-expr,\n+                  readability-container-size-empty,\n+                  readability-identifier-naming,\n+                  '\n HeaderFilterRegex: ''\n AnalyzeTemporaryDtors: false\n-User:            dave\n CheckOptions:\n   - key:             llvm-namespace-comment.ShortNamespaceLines\n     value:           '10'\n   - key:             llvm-namespace-comment.SpacesBeforeComments\n     value:           '2'\n   - key:             readability-braces-around-statements.ShortStatementLines\n     value:           '2'\n+  # type names\n+  - key:             readability-identifier-naming.ClassCase\n+    value:           CamelCase\n+  - key:             readability-identifier-naming.EnumCase\n+    value:           CamelCase\n+  - key:             readability-identifier-naming.UnionCase\n+    value:           CamelCase\n+  # method names\n+  - key:             readability-identifier-naming.MethodCase\n+    value:           camelBack\n+  # variable names\n+  - key:             readability-identifier-naming.VariableCase\n+    value:           lower_case\n+  - key:             readability-identifier-naming.ClassMemberSuffix\n+    value:           '_'\n+  # const static or global variables are UPPER_CASE\n+  - key:             readability-identifier-naming.EnumConstantCase\n+    value:           UPPER_CASE\n+  - key:             readability-identifier-naming.StaticConstantCase\n+    value:           UPPER_CASE\n+  - key:             readability-identifier-naming.ClassConstantCase\n+    value:           UPPER_CASE\n+  - key:             readability-identifier-naming.GlobalVariableCase\n+    value:           UPPER_CASE\n ..."
+        },
+        {
+          "sha": "3ebdef2e468f198eb2b1ec8407b2b01c04472258",
+          "filename": ".travis.yml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/9454ac5e51dddf0fd3a582d90377e846819a5a52/.travis.yml",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/9454ac5e51dddf0fd3a582d90377e846819a5a52/.travis.yml",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/.travis.yml?ref=9454ac5e51dddf0fd3a582d90377e846819a5a52",
+          "patch": "@@ -14,7 +14,7 @@ env:\n     - WARNINGS_OK=false\n   matrix:\n     - TEST=\"clang-format\" # TODO(davetcoleman): enable catkin_lint in the future \n-    #- TEST=clang-tidy-fix   # TODO(davetcoleman): enable in the future\n+    - TEST=clang-tidy-fix\n     - DOCKER_IMAGE=moveit/moveit:melodic-source\n     - DOCKER_IMAGE=moveit/moveit:master-source\n     - DOCKER_IMAGE=moveit/moveit:kinetic-ci  TEST_BLACKLIST=moveit_ros_perception"
+        },
+        {
+          "sha": "8b50aa752aef5c83b950d47ebb52455231c9e93a",
+          "filename": "include/rviz_visual_tools/deprecation.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 4,
+          "changes": 5,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/9454ac5e51dddf0fd3a582d90377e846819a5a52/include%2Frviz_visual_tools%2Fdeprecation.h",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/9454ac5e51dddf0fd3a582d90377e846819a5a52/include%2Frviz_visual_tools%2Fdeprecation.h",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/include%2Frviz_visual_tools%2Fdeprecation.h?ref=9454ac5e51dddf0fd3a582d90377e846819a5a52",
+          "patch": "@@ -32,8 +32,7 @@\n  *  POSSIBILITY OF SUCH DAMAGE.\n  *********************************************************************/\n \n-#ifndef RVIZ_VISUAL_TOOLS_DEPRECATION_H\n-#define RVIZ_VISUAL_TOOLS_DEPRECATION_H\n+#pragma once\n \n /** \\def RVIZ_VISUAL_TOOLS_DEPRECATED\n     Macro that marks functions as deprecated */\n@@ -47,5 +46,3 @@\n #else\n #define RVIZ_VISUAL_TOOLS_DEPRECATED /* Nothing */\n #endif\n-\n-#endif  // RVIZ_VISUAL_TOOLS_DEPRECATION_H"
+        },
+        {
+          "sha": "93e50b0ce1a58ed6e31313a7abba2b6cd831a0e7",
+          "filename": "include/rviz_visual_tools/imarker_simple.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 3,
+          "changes": 4,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/9454ac5e51dddf0fd3a582d90377e846819a5a52/include%2Frviz_visual_tools%2Fimarker_simple.h",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/9454ac5e51dddf0fd3a582d90377e846819a5a52/include%2Frviz_visual_tools%2Fimarker_simple.h",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/include%2Frviz_visual_tools%2Fimarker_simple.h?ref=9454ac5e51dddf0fd3a582d90377e846819a5a52",
+          "patch": "@@ -36,8 +36,7 @@\n    Desc:   Use interactive markers in a C++ class\n */\n \n-#ifndef RVIZ_VISUAL_TOOLS_IMARKER_SIMPLE_H\n-#define RVIZ_VISUAL_TOOLS_IMARKER_SIMPLE_H\n+#pragma once\n \n // ROS\n #include <ros/ros.h>\n@@ -120,4 +119,3 @@ typedef std::shared_ptr<IMarkerSimple> IMarkerSimplePtr;\n typedef std::shared_ptr<const IMarkerSimple> IMarkerSimpleConstPtr;\n \n }  // namespace rviz_visual_tools\n-#endif  // RVIZ_VISUAL_TOOLS_IMARKER_SIMPLE_H"
+        },
+        {
+          "sha": "62883a8b708b5a08d2c0c4a252ab8df82d3ad897",
+          "filename": "include/rviz_visual_tools/remote_control.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 4,
+          "changes": 5,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/9454ac5e51dddf0fd3a582d90377e846819a5a52/include%2Frviz_visual_tools%2Fremote_control.h",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/9454ac5e51dddf0fd3a582d90377e846819a5a52/include%2Frviz_visual_tools%2Fremote_control.h",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/include%2Frviz_visual_tools%2Fremote_control.h?ref=9454ac5e51dddf0fd3a582d90377e846819a5a52",
+          "patch": "@@ -38,8 +38,7 @@\n            Think GDB for robots, or like, a state machine.\n */\n \n-#ifndef RVIZ_VISUAL_TOOLS_REMOTE_CONTROL_H\n-#define RVIZ_VISUAL_TOOLS_REMOTE_CONTROL_H\n+#pragma once\n \n // C++\n #include <string>\n@@ -137,5 +136,3 @@ typedef std::shared_ptr<RemoteControl> RemoteControlPtr;\n typedef std::shared_ptr<const RemoteControl> RemoteControlConstPtr;\n \n }  // namespace rviz_visual_tools\n-\n-#endif  // RVIZ_VISUAL_TOOLS_REMOTE_CONTROL_H"
+        },
+        {
+          "sha": "c321678c4ccb0418421c0b2aedb2217237324bdf",
+          "filename": "include/rviz_visual_tools/remote_reciever.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 4,
+          "changes": 5,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/9454ac5e51dddf0fd3a582d90377e846819a5a52/include%2Frviz_visual_tools%2Fremote_reciever.h",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/9454ac5e51dddf0fd3a582d90377e846819a5a52/include%2Frviz_visual_tools%2Fremote_reciever.h",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/include%2Frviz_visual_tools%2Fremote_reciever.h?ref=9454ac5e51dddf0fd3a582d90377e846819a5a52",
+          "patch": "@@ -36,8 +36,7 @@\n    Desc:   Object for wrapping remote control functionality\n */\n \n-#ifndef RVIZ_VISUAL_TOOLS_REMOTE_RECIEVER_H\n-#define RVIZ_VISUAL_TOOLS_REMOTE_RECIEVER_H\n+#pragma once\n \n #include <sensor_msgs/Joy.h>\n #include <ros/ros.h>\n@@ -99,5 +98,3 @@ class RemoteReciever\n };\n \n }  // end namespace rviz_visual_tools\n-\n-#endif  // RVIZ_VISUAL_TOOLS_REMOTE_RECIEVER_H"
+        },
+        {
+          "sha": "3b366e8afdab0a183e78fae49bfaf2ba8f6ff45c",
+          "filename": "include/rviz_visual_tools/rviz_visual_tools.h",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 6,
+          "changes": 9,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/9454ac5e51dddf0fd3a582d90377e846819a5a52/include%2Frviz_visual_tools%2Frviz_visual_tools.h",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/9454ac5e51dddf0fd3a582d90377e846819a5a52/include%2Frviz_visual_tools%2Frviz_visual_tools.h",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/include%2Frviz_visual_tools%2Frviz_visual_tools.h?ref=9454ac5e51dddf0fd3a582d90377e846819a5a52",
+          "patch": "@@ -36,8 +36,7 @@\n    Desc:   Helper functions for displaying basic shape markers in Rviz\n */\n \n-#ifndef RVIZ_VISUAL_TOOLS_RVIZ_VISUAL_TOOLS_H\n-#define RVIZ_VISUAL_TOOLS_RVIZ_VISUAL_TOOLS_H\n+#pragma once\n \n #include <ros/ros.h>\n \n@@ -1091,7 +1090,7 @@ class RvizVisualTools\n   ros::NodeHandle nh_;\n \n   // Short name for this class\n-  static RVIZ_VISUAL_TOOLS_DECL const std::string name_;\n+  static RVIZ_VISUAL_TOOLS_DECL const std::string NAME;\n \n   // Optional remote control\n   RemoteControlPtr remote_control_;\n@@ -1135,7 +1134,7 @@ class RvizVisualTools\n   bool psychedelic_mode_ = false;\n \n   // Chose random colors from this list\n-  static const std::array<colors, 14> all_rand_colors_;\n+  static const std::array<colors, 14> ALL_RAND_COLORS;\n \n public:\n   EIGEN_MAKE_ALIGNED_OPERATOR_NEW  // http://eigen.tuxfamily.org/dox/group__TopicStructHavingEigenMembers.html\n@@ -1145,5 +1144,3 @@ typedef std::shared_ptr<RvizVisualTools> RvizVisualToolsPtr;\n typedef std::shared_ptr<const RvizVisualTools> RvizVisualToolsConstPtr;\n \n }  // namespace rviz_visual_tools\n-\n-#endif  // RVIZ_VISUAL_TOOLS_RVIZ_VISUAL_TOOLS_H"
+        },
+        {
+          "sha": "489bbdd47f7ac1ba2d55be68191a2993cc9a7bb9",
+          "filename": "include/rviz_visual_tools/tf_visual_tools.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 4,
+          "changes": 5,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/9454ac5e51dddf0fd3a582d90377e846819a5a52/include%2Frviz_visual_tools%2Ftf_visual_tools.h",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/9454ac5e51dddf0fd3a582d90377e846819a5a52/include%2Frviz_visual_tools%2Ftf_visual_tools.h",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/include%2Frviz_visual_tools%2Ftf_visual_tools.h?ref=9454ac5e51dddf0fd3a582d90377e846819a5a52",
+          "patch": "@@ -38,8 +38,7 @@\n    because of https://github.com/ros/geometry_experimental/issues/108\n */\n \n-#ifndef RVIZ_VISUAL_TOOLS_TF_VISUAL_TOOLS_H\n-#define RVIZ_VISUAL_TOOLS_TF_VISUAL_TOOLS_H\n+#pragma once\n \n // C++\n #include <vector>\n@@ -107,5 +106,3 @@ typedef boost::shared_ptr<TFVisualTools> TFVisualToolsPtr;\n typedef boost::shared_ptr<const TFVisualTools> TFVisualToolsConstPtr;\n \n }  // namespace rviz_visual_tools\n-\n-#endif  // RVIZ_VISUAL_TOOLS_TF_VISUAL_TOOLS_H"
+        },
+        {
+          "sha": "004966dc0e8104bbc042fc19c058839cf0ff0de9",
+          "filename": "src/key_tool.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 4,
+          "changes": 5,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/9454ac5e51dddf0fd3a582d90377e846819a5a52/src%2Fkey_tool.h",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/9454ac5e51dddf0fd3a582d90377e846819a5a52/src%2Fkey_tool.h",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/src%2Fkey_tool.h?ref=9454ac5e51dddf0fd3a582d90377e846819a5a52",
+          "patch": "@@ -27,8 +27,7 @@\n  * POSSIBILITY OF SUCH DAMAGE.\n  */\n \n-#ifndef RVIZ_VISUAL_TOOLS_KEY_TOOL_H\n-#define RVIZ_VISUAL_TOOLS_KEY_TOOL_H\n+#pragma once\n \n #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829\n \n@@ -65,5 +64,3 @@ public Q_SLOTS:\n   RemoteReciever remote_reciever_;\n };\n }  // namespace rviz_visual_tools\n-\n-#endif"
+        },
+        {
+          "sha": "b69dc20262b1bb3a0d95a013d220cba770d0eb95",
+          "filename": "src/rviz_visual_tools.cpp",
+          "status": "modified",
+          "additions": 34,
+          "deletions": 33,
+          "changes": 67,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/9454ac5e51dddf0fd3a582d90377e846819a5a52/src%2Frviz_visual_tools.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/9454ac5e51dddf0fd3a582d90377e846819a5a52/src%2Frviz_visual_tools.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/src%2Frviz_visual_tools.cpp?ref=9454ac5e51dddf0fd3a582d90377e846819a5a52",
+          "patch": "@@ -54,11 +54,11 @@ namespace rviz_visual_tools\n const std::string LOGNAME = \"visual_tools\";\n \n // DEPRECATED, remove in Melodic after Dec 2018 release or so\n-const std::string RvizVisualTools::name_ = \"visual_tools\";\n+const std::string RvizVisualTools::NAME = \"visual_tools\";\n \n-const std::array<colors, 14> RvizVisualTools::all_rand_colors_ = { RED,        GREEN,  BLUE,   GREY,   DARK_GREY,\n-                                                                   WHITE,      ORANGE, YELLOW, BROWN,  PINK,\n-                                                                   LIME_GREEN, PURPLE, CYAN,   MAGENTA };\n+const std::array<colors, 14> RvizVisualTools::ALL_RAND_COLORS = { RED,        GREEN,  BLUE,   GREY,   DARK_GREY,\n+                                                                  WHITE,      ORANGE, YELLOW, BROWN,  PINK,\n+                                                                  LIME_GREEN, PURPLE, CYAN,   MAGENTA };\n \n RvizVisualTools::RvizVisualTools(std::string base_frame, std::string marker_topic, ros::NodeHandle nh)\n   : nh_(nh), marker_topic_(std::move(marker_topic)), base_frame_(std::move(base_frame))\n@@ -364,8 +364,8 @@ void RvizVisualTools::setLifetime(double lifetime)\n \n colors RvizVisualTools::getRandColor()\n {\n-  const int rand_num = iRand(0, all_rand_colors_.size() - 1);\n-  return all_rand_colors_[rand_num];\n+  const int rand_num = iRand(0, ALL_RAND_COLORS.size() - 1);\n+  return ALL_RAND_COLORS[rand_num];\n }\n \n std_msgs::ColorRGBA RvizVisualTools::getColor(colors color) const\n@@ -580,7 +580,7 @@ std_msgs::ColorRGBA RvizVisualTools::createRandColor() const\n {\n   std_msgs::ColorRGBA result;\n \n-  const std::size_t MAX_ATTEMPTS = 20;  // bound the performance\n+  const std::size_t max_attempts = 20;  // bound the performance\n   std::size_t attempts = 0;\n \n   // Make sure color is not *too* dark\n@@ -592,9 +592,9 @@ std_msgs::ColorRGBA RvizVisualTools::createRandColor() const\n     // ROS_DEBUG_STREAM_NAMED(LOGNAME, \"Looking for random color that is not too light, current value is \"\n     //<< (result.r + result.g + result.b) << \" attempt #\" << attempts);\n     attempts++;\n-    if (attempts > MAX_ATTEMPTS)\n+    if (attempts > max_attempts)\n     {\n-      ROS_WARN_STREAM_NAMED(LOGNAME, \"Unable to find appropriate random color after \" << MAX_ATTEMPTS << \" attempts\");\n+      ROS_WARN_STREAM_NAMED(LOGNAME, \"Unable to find appropriate random color after \" << max_attempts << \" attempts\");\n       break;\n     }\n   } while (result.r + result.g + result.b < 1.5);  // 3 would be white\n@@ -936,7 +936,7 @@ bool RvizVisualTools::publishCone(const geometry_msgs::Pose& pose, double angle,\n   triangle_marker_.pose = pose;\n \n   geometry_msgs::Point p[3];\n-  static const double delta_theta = M_PI / 16.0;\n+  static const double DELTA_THETA = M_PI / 16.0;\n   double theta = 0;\n \n   triangle_marker_.points.clear();\n@@ -951,14 +951,14 @@ bool RvizVisualTools::publishCone(const geometry_msgs::Pose& pose, double angle,\n     p[1].z = scale * sin(theta) / angle;\n \n     p[2].x = scale;\n-    p[2].y = scale * cos(theta + delta_theta) / angle;\n-    p[2].z = scale * sin(theta + delta_theta) / angle;\n+    p[2].y = scale * cos(theta + DELTA_THETA) / angle;\n+    p[2].z = scale * sin(theta + DELTA_THETA) / angle;\n \n     triangle_marker_.points.push_back(p[0]);\n     triangle_marker_.points.push_back(p[1]);\n     triangle_marker_.points.push_back(p[2]);\n \n-    theta += delta_theta;\n+    theta += DELTA_THETA;\n   }\n \n   triangle_marker_.scale.x = 1.0;\n@@ -1879,22 +1879,23 @@ bool RvizVisualTools::publishLines(const EigenSTL::vector_Vector3d& aPoints, con\n   BOOST_ASSERT_MSG(aPoints.size() == bPoints.size() && bPoints.size() == colors.size(), \"Mismatching vector sizes: \"\n                                                                                         \"aPoints, bPoints, and colors\");\n \n-  std::vector<geometry_msgs::Point> aPoints_msg;\n-  std::vector<geometry_msgs::Point> bPoints_msg;\n+  std::vector<geometry_msgs::Point> a_points_msg;\n+  std::vector<geometry_msgs::Point> b_points_msg;\n   std::vector<std_msgs::ColorRGBA> colors_msg;\n \n   for (std::size_t i = 0; i < aPoints.size(); ++i)\n   {\n     // Convert Eigen to ROS Msg\n-    aPoints_msg.push_back(convertPoint(aPoints[i]));\n-    bPoints_msg.push_back(convertPoint(bPoints[i]));\n+    a_points_msg.push_back(convertPoint(aPoints[i]));\n+    b_points_msg.push_back(convertPoint(bPoints[i]));\n     // Convert color to ROS Msg\n     colors_msg.push_back(getColor(colors[i]));\n   }\n-  BOOST_ASSERT_MSG(aPoints_msg.size() == bPoints_msg.size() && bPoints_msg.size() == colors_msg.size(), \"Mismatched \"\n-                                                                                                        \"vector sizes\");\n+  BOOST_ASSERT_MSG(a_points_msg.size() == b_points_msg.size() && b_points_msg.size() == colors_msg.size(),\n+                   \"Mismatched \"\n+                   \"vector sizes\");\n \n-  return publishLines(aPoints_msg, bPoints_msg, colors_msg, getScale(scale));\n+  return publishLines(a_points_msg, b_points_msg, colors_msg, getScale(scale));\n }\n \n bool RvizVisualTools::publishLines(const std::vector<geometry_msgs::Point>& aPoints,\n@@ -2519,9 +2520,9 @@ void RvizVisualTools::convertPoseSafe(const Eigen::Isometry3d& pose, geometry_ms\n \n Eigen::Isometry3d RvizVisualTools::convertPose(const geometry_msgs::Pose& pose)\n {\n-  Eigen::Isometry3d shared_pose_eigen_;\n-  tf::poseMsgToEigen(pose, shared_pose_eigen_);\n-  return shared_pose_eigen_;\n+  Eigen::Isometry3d shared_pose_eigen;\n+  tf::poseMsgToEigen(pose, shared_pose_eigen);\n+  return shared_pose_eigen;\n }\n \n void RvizVisualTools::convertPoseSafe(const geometry_msgs::Pose& pose_msg, Eigen::Isometry3d& pose)\n@@ -2531,12 +2532,12 @@ void RvizVisualTools::convertPoseSafe(const geometry_msgs::Pose& pose_msg, Eigen\n \n Eigen::Isometry3d RvizVisualTools::convertPoint32ToPose(const geometry_msgs::Point32& point)\n {\n-  Eigen::Isometry3d shared_pose_eigen_;\n-  shared_pose_eigen_ = Eigen::Isometry3d::Identity();\n-  shared_pose_eigen_.translation().x() = point.x;\n-  shared_pose_eigen_.translation().y() = point.y;\n-  shared_pose_eigen_.translation().z() = point.z;\n-  return shared_pose_eigen_;\n+  Eigen::Isometry3d shared_pose_eigen;\n+  shared_pose_eigen = Eigen::Isometry3d::Identity();\n+  shared_pose_eigen.translation().x() = point.x;\n+  shared_pose_eigen.translation().y() = point.y;\n+  shared_pose_eigen.translation().z() = point.z;\n+  return shared_pose_eigen;\n }\n \n geometry_msgs::Pose RvizVisualTools::convertPointToPose(const geometry_msgs::Point& point)\n@@ -2552,10 +2553,10 @@ geometry_msgs::Pose RvizVisualTools::convertPointToPose(const geometry_msgs::Poi\n \n Eigen::Isometry3d RvizVisualTools::convertPointToPose(const Eigen::Vector3d& point)\n {\n-  Eigen::Isometry3d shared_pose_eigen_;\n-  shared_pose_eigen_ = Eigen::Isometry3d::Identity();\n-  shared_pose_eigen_.translation() = point;\n-  return shared_pose_eigen_;\n+  Eigen::Isometry3d shared_pose_eigen;\n+  shared_pose_eigen = Eigen::Isometry3d::Identity();\n+  shared_pose_eigen.translation() = point;\n+  return shared_pose_eigen;\n }\n \n geometry_msgs::Point RvizVisualTools::convertPoseToPoint(const Eigen::Isometry3d& pose)"
+        },
+        {
+          "sha": "face522263200278201b13cfb5d20b19fa0ae927",
+          "filename": "src/rviz_visual_tools_demo.cpp",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 5,
+          "changes": 10,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/9454ac5e51dddf0fd3a582d90377e846819a5a52/src%2Frviz_visual_tools_demo.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/9454ac5e51dddf0fd3a582d90377e846819a5a52/src%2Frviz_visual_tools_demo.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/src%2Frviz_visual_tools_demo.cpp?ref=9454ac5e51dddf0fd3a582d90377e846819a5a52",
+          "patch": "@@ -412,7 +412,7 @@ class RvizVisualToolsDemo\n     double y_width = 0.05;\n \n     Eigen::Vector3d n;\n-    double A, B, C = 0, D;\n+    double a, b, c = 0, d;\n     y += space_between_rows;\n     double x_plane = 0, y_plane = y;\n \n@@ -424,11 +424,11 @@ class RvizVisualToolsDemo\n     for (std::size_t i = 0; i < 10; ++i)\n     {\n       x_plane = i * step;\n-      A = x_plane;\n-      B = y_plane;\n+      a = x_plane;\n+      b = y_plane;\n       // D takes this value to satisfy Ax+By+D=0\n-      D = -(x_plane * x_plane + y_plane * y_plane);\n-      visual_tools_->publishABCDPlane(A, B, C, D, rvt::MAGENTA, x_width, y_width);\n+      d = -(x_plane * x_plane + y_plane * y_plane);\n+      visual_tools_->publishABCDPlane(a, b, c, d, rvt::MAGENTA, x_width, y_width);\n       x_location += step;\n     }\n "
+        },
+        {
+          "sha": "4c5daaac674aab1daa3fc45d8557f44612f7b2c7",
+          "filename": "src/rviz_visual_tools_gui.h",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 4,
+          "changes": 5,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/9454ac5e51dddf0fd3a582d90377e846819a5a52/src%2Frviz_visual_tools_gui.h",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/9454ac5e51dddf0fd3a582d90377e846819a5a52/src%2Frviz_visual_tools_gui.h",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/src%2Frviz_visual_tools_gui.h?ref=9454ac5e51dddf0fd3a582d90377e846819a5a52",
+          "patch": "@@ -39,8 +39,7 @@\n // TODO(dave): convert to flow layout:\n // http://doc.qt.io/qt-5/qtwidgets-layouts-flowlayout-example.html\n \n-#ifndef RVIZ_VISUAL_TOOLS__RVIZ_VISUAL_TOOLS_GUI_H\n-#define RVIZ_VISUAL_TOOLS__RVIZ_VISUAL_TOOLS_GUI_H\n+#pragma once\n \n #ifndef Q_MOC_RUN\n #include <ros/ros.h>\n@@ -89,5 +88,3 @@ protected Q_SLOTS:\n };\n \n }  // end namespace rviz_visual_tools\n-\n-#endif  // RVIZ_VISUAL_TOOLS__RVIZ_VISUAL_TOOLS_GUI_H"
+        },
+        {
+          "sha": "821a054668102d717b83baecd0e454d8d8ca7824",
+          "filename": "src/tf_visual_tools.cpp",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 9,
+          "changes": 18,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/9454ac5e51dddf0fd3a582d90377e846819a5a52/src%2Ftf_visual_tools.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/9454ac5e51dddf0fd3a582d90377e846819a5a52/src%2Ftf_visual_tools.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/src%2Ftf_visual_tools.cpp?ref=9454ac5e51dddf0fd3a582d90377e846819a5a52",
+          "patch": "@@ -65,17 +65,17 @@ bool TFVisualTools::publishTransform(const Eigen::Isometry3d& transform, const s\n   tf::transformEigenToMsg(transform, tf2_msg.transform);\n \n   // Prevent TF_DENORMALIZED_QUATERNION errors in TF2 from happening.\n-  double quatNorm;\n+  double quat_norm;\n \n   // Normalizing the Quaternion\n-  quatNorm = 1 / sqrt(tf2_msg.transform.rotation.x * tf2_msg.transform.rotation.x +\n-                      tf2_msg.transform.rotation.y * tf2_msg.transform.rotation.y +\n-                      tf2_msg.transform.rotation.z * tf2_msg.transform.rotation.z +\n-                      tf2_msg.transform.rotation.w * tf2_msg.transform.rotation.w);\n-  tf2_msg.transform.rotation.x *= quatNorm;\n-  tf2_msg.transform.rotation.y *= quatNorm;\n-  tf2_msg.transform.rotation.z *= quatNorm;\n-  tf2_msg.transform.rotation.w *= quatNorm;\n+  quat_norm = 1 / sqrt(tf2_msg.transform.rotation.x * tf2_msg.transform.rotation.x +\n+                       tf2_msg.transform.rotation.y * tf2_msg.transform.rotation.y +\n+                       tf2_msg.transform.rotation.z * tf2_msg.transform.rotation.z +\n+                       tf2_msg.transform.rotation.w * tf2_msg.transform.rotation.w);\n+  tf2_msg.transform.rotation.x *= quat_norm;\n+  tf2_msg.transform.rotation.y *= quat_norm;\n+  tf2_msg.transform.rotation.z *= quat_norm;\n+  tf2_msg.transform.rotation.w *= quat_norm;\n \n   tf2_msg.header.frame_id = from_frame;\n   tf2_msg.child_frame_id = to_frame;"
+        },
+        {
+          "sha": "fc0ba489910ec472a3a4fe9c58505137a16a7512",
+          "filename": "tests/rvt_test.cpp",
+          "status": "modified",
+          "additions": 30,
+          "deletions": 30,
+          "changes": 60,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/9454ac5e51dddf0fd3a582d90377e846819a5a52/tests%2Frvt_test.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/9454ac5e51dddf0fd3a582d90377e846819a5a52/tests%2Frvt_test.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/tests%2Frvt_test.cpp?ref=9454ac5e51dddf0fd3a582d90377e846819a5a52",
+          "patch": "@@ -101,12 +101,12 @@ class RVTTest\n };  // class\n \n /* Create instance of test class ---------------------------------------------------------- */\n-RVTTest base;\n+RVTTest BASE;\n \n /* Run tests ------------------------------------------------------------------------------ */\n TEST(RVTTest, initialize)\n {\n-  ASSERT_TRUE(base.initialize());\n+  ASSERT_TRUE(BASE.initialize());\n }\n \n // Test rpy conversion\n@@ -115,90 +115,90 @@ TEST(RVTTest, test_rpy_conversions)\n   // Identity conversions with RPY\n   Eigen::Isometry3d expected_affine = Eigen::Isometry3d::Identity();\n   std::vector<double> xyzrpy;\n-  base.visual_tools_->convertToXYZRPY(expected_affine, xyzrpy);\n+  BASE.visual_tools_->convertToXYZRPY(expected_affine, xyzrpy);\n   std::vector<double> expected_vector;\n   expected_vector.push_back(0);\n   expected_vector.push_back(0);\n   expected_vector.push_back(0);\n   expected_vector.push_back(0);\n   expected_vector.push_back(0);\n   expected_vector.push_back(0);\n-  EXPECT_TRUE(base.testVector(\"Identity: \", expected_vector, xyzrpy));\n+  EXPECT_TRUE(BASE.testVector(\"Identity: \", expected_vector, xyzrpy));\n \n   // Identity conversion back to Eigen\n-  Eigen::Isometry3d expected_affine2 = base.visual_tools_->convertFromXYZRPY(xyzrpy, rviz_visual_tools::XYZ);\n-  EXPECT_TRUE(base.testIsometry3d(\"Identity convert back\", expected_affine, expected_affine2));\n+  Eigen::Isometry3d expected_affine2 = BASE.visual_tools_->convertFromXYZRPY(xyzrpy, rviz_visual_tools::XYZ);\n+  EXPECT_TRUE(BASE.testIsometry3d(\"Identity convert back\", expected_affine, expected_affine2));\n \n   // -------------------------------------------------------------------\n   // Translation conversions to RPY\n   expected_affine.translation().x() = 1;\n   expected_affine.translation().y() = 2;\n   expected_affine.translation().z() = 3;\n-  base.visual_tools_->convertToXYZRPY(expected_affine, xyzrpy);\n+  BASE.visual_tools_->convertToXYZRPY(expected_affine, xyzrpy);\n   expected_vector[0] = 1;\n   expected_vector[1] = 2;\n   expected_vector[2] = 3;\n-  EXPECT_TRUE(base.testVector(\"123: \", expected_vector, xyzrpy));\n+  EXPECT_TRUE(BASE.testVector(\"123: \", expected_vector, xyzrpy));\n \n   // Translation convertion back to Eigen\n-  expected_affine2 = base.visual_tools_->convertFromXYZRPY(xyzrpy, rviz_visual_tools::XYZ);\n-  EXPECT_TRUE(base.testIsometry3d(\"123 convert back\", expected_affine, expected_affine2));\n+  expected_affine2 = BASE.visual_tools_->convertFromXYZRPY(xyzrpy, rviz_visual_tools::XYZ);\n+  EXPECT_TRUE(BASE.testIsometry3d(\"123 convert back\", expected_affine, expected_affine2));\n \n   // Translation convertion back to Eigen via long function\n-  expected_affine2 = base.visual_tools_->convertFromXYZRPY(xyzrpy[0], xyzrpy[1], xyzrpy[2], xyzrpy[3], xyzrpy[4],\n+  expected_affine2 = BASE.visual_tools_->convertFromXYZRPY(xyzrpy[0], xyzrpy[1], xyzrpy[2], xyzrpy[3], xyzrpy[4],\n                                                            xyzrpy[5], rviz_visual_tools::XYZ);\n-  EXPECT_TRUE(base.testIsometry3d(\"123 convert back long\", expected_affine, expected_affine2));\n+  EXPECT_TRUE(BASE.testIsometry3d(\"123 convert back long\", expected_affine, expected_affine2));\n \n   // Translation convertion back to Eigen via NEW long function\n-  expected_affine2 = base.visual_tools_->convertFromXYZRPY(xyzrpy[0], xyzrpy[1], xyzrpy[2], xyzrpy[3], xyzrpy[4],\n+  expected_affine2 = BASE.visual_tools_->convertFromXYZRPY(xyzrpy[0], xyzrpy[1], xyzrpy[2], xyzrpy[3], xyzrpy[4],\n                                                            xyzrpy[5], rviz_visual_tools::XYZ);\n-  EXPECT_TRUE(base.testIsometry3d(\"123 convert back new long\", expected_affine, expected_affine2));\n+  EXPECT_TRUE(BASE.testIsometry3d(\"123 convert back new long\", expected_affine, expected_affine2));\n \n   // -------------------------------------------------------------------\n   // Rotation conversions to RPY\n   expected_affine = expected_affine * Eigen::AngleAxisd(M_PI, Eigen::Vector3d::UnitX()) *\n                     Eigen::AngleAxisd(0.5 * M_PI, Eigen::Vector3d::UnitZ()) *\n                     Eigen::AngleAxisd(-0.5 * M_PI, Eigen::Vector3d::UnitX());\n-  base.visual_tools_->convertToXYZRPY(expected_affine, xyzrpy);\n+  BASE.visual_tools_->convertToXYZRPY(expected_affine, xyzrpy);\n \n   // Rotation convertion back to Eigen\n-  expected_affine2 = base.visual_tools_->convertFromXYZRPY(xyzrpy, rviz_visual_tools::XYZ);\n-  EXPECT_TRUE(base.testIsometry3d(\"123 convert back\", expected_affine, expected_affine2));\n+  expected_affine2 = BASE.visual_tools_->convertFromXYZRPY(xyzrpy, rviz_visual_tools::XYZ);\n+  EXPECT_TRUE(BASE.testIsometry3d(\"123 convert back\", expected_affine, expected_affine2));\n \n   // Rotation convertion back to Eigen via long function\n-  expected_affine2 = base.visual_tools_->convertFromXYZRPY(xyzrpy[0], xyzrpy[1], xyzrpy[2], xyzrpy[3], xyzrpy[4],\n+  expected_affine2 = BASE.visual_tools_->convertFromXYZRPY(xyzrpy[0], xyzrpy[1], xyzrpy[2], xyzrpy[3], xyzrpy[4],\n                                                            xyzrpy[5], rviz_visual_tools::XYZ);\n-  EXPECT_TRUE(base.testIsometry3d(\"123 convert back long\", expected_affine, expected_affine2));\n+  EXPECT_TRUE(BASE.testIsometry3d(\"123 convert back long\", expected_affine, expected_affine2));\n \n   // Rotation convertion back to Eigen via NEW long function\n-  expected_affine2 = base.visual_tools_->convertFromXYZRPY(xyzrpy[0], xyzrpy[1], xyzrpy[2], xyzrpy[3], xyzrpy[4],\n+  expected_affine2 = BASE.visual_tools_->convertFromXYZRPY(xyzrpy[0], xyzrpy[1], xyzrpy[2], xyzrpy[3], xyzrpy[4],\n                                                            xyzrpy[5], rviz_visual_tools::XYZ);\n-  EXPECT_TRUE(base.testIsometry3d(\"123 convert back new long\", expected_affine, expected_affine2));\n+  EXPECT_TRUE(BASE.testIsometry3d(\"123 convert back new long\", expected_affine, expected_affine2));\n }\n \n TEST(RVTTest, default_arguments)\n {\n   // Check for correct number of parameters and correct size of path\n   std::vector<geometry_msgs::Point> path1;\n-  EXPECT_FALSE(base.visual_tools_->publishPath(path1, rviz_visual_tools::RED, rviz_visual_tools::MEDIUM));\n+  EXPECT_FALSE(BASE.visual_tools_->publishPath(path1, rviz_visual_tools::RED, rviz_visual_tools::MEDIUM));\n   path1.resize(1);\n-  EXPECT_FALSE(base.visual_tools_->publishPath(path1, rviz_visual_tools::RED, rviz_visual_tools::MEDIUM));\n+  EXPECT_FALSE(BASE.visual_tools_->publishPath(path1, rviz_visual_tools::RED, rviz_visual_tools::MEDIUM));\n   path1.resize(2);\n-  EXPECT_TRUE(base.visual_tools_->publishPath(path1, rviz_visual_tools::RED, rviz_visual_tools::MEDIUM));\n+  EXPECT_TRUE(BASE.visual_tools_->publishPath(path1, rviz_visual_tools::RED, rviz_visual_tools::MEDIUM));\n \n   EigenSTL::vector_Isometry3d path2;\n-  EXPECT_FALSE(base.visual_tools_->publishPath(path2, rviz_visual_tools::GREEN, rviz_visual_tools::MEDIUM));\n+  EXPECT_FALSE(BASE.visual_tools_->publishPath(path2, rviz_visual_tools::GREEN, rviz_visual_tools::MEDIUM));\n   path2.resize(1);\n-  EXPECT_FALSE(base.visual_tools_->publishPath(path2, rviz_visual_tools::RED, rviz_visual_tools::MEDIUM));\n+  EXPECT_FALSE(BASE.visual_tools_->publishPath(path2, rviz_visual_tools::RED, rviz_visual_tools::MEDIUM));\n   path2.resize(2);\n-  EXPECT_TRUE(base.visual_tools_->publishPath(path2, rviz_visual_tools::RED, rviz_visual_tools::MEDIUM));\n+  EXPECT_TRUE(BASE.visual_tools_->publishPath(path2, rviz_visual_tools::RED, rviz_visual_tools::MEDIUM));\n \n   EigenSTL::vector_Vector3d path3;\n-  EXPECT_FALSE(base.visual_tools_->publishPath(path3, rviz_visual_tools::BLUE, rviz_visual_tools::MEDIUM));\n+  EXPECT_FALSE(BASE.visual_tools_->publishPath(path3, rviz_visual_tools::BLUE, rviz_visual_tools::MEDIUM));\n   path3.resize(1);\n-  EXPECT_FALSE(base.visual_tools_->publishPath(path3, rviz_visual_tools::RED, rviz_visual_tools::MEDIUM));\n+  EXPECT_FALSE(BASE.visual_tools_->publishPath(path3, rviz_visual_tools::RED, rviz_visual_tools::MEDIUM));\n   path3.resize(2);\n-  EXPECT_TRUE(base.visual_tools_->publishPath(path3, rviz_visual_tools::RED, rviz_visual_tools::MEDIUM));\n+  EXPECT_TRUE(BASE.visual_tools_->publishPath(path3, rviz_visual_tools::RED, rviz_visual_tools::MEDIUM));\n }\n \n /* Main  ------------------------------------------------------------------------------------- */"
+        }
+      ]
+    },
+    {
+      "author": "AndyZe",
+      "date": "2019-05-22T15:01:09Z",
+      "sha": "de6aae203f579cc8c5fc74cecdb1b153d388f28d",
+      "message": "Publish plane from Ax+By+Cz+D=0 equation (#119)\n\n* Publish plane from Ax+By+Cz+D=0 equation\r\n\r\n* Adding a 'D' argument to publishABCDplane\r\n\r\n* Small simplifications to ABCD plane implementation.",
+      "files_changed": 4,
+      "additions": 66,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "220da41980a51277940c41f52504d497951ceae6",
+          "filename": "include/rviz_visual_tools/rviz_visual_tools.h",
+          "status": "modified",
+          "additions": 14,
+          "deletions": 0,
+          "changes": 14,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/de6aae203f579cc8c5fc74cecdb1b153d388f28d/include%2Frviz_visual_tools%2Frviz_visual_tools.h",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/de6aae203f579cc8c5fc74cecdb1b153d388f28d/include%2Frviz_visual_tools%2Frviz_visual_tools.h",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/include%2Frviz_visual_tools%2Frviz_visual_tools.h?ref=de6aae203f579cc8c5fc74cecdb1b153d388f28d",
+          "patch": "@@ -400,6 +400,20 @@ a   *        Warning: when using this in a loop be sure to call trigger() at end\n   bool publishCone(const Eigen::Isometry3d& pose, double angle, colors color = TRANSLUCENT, double scale = 1.0);\n   bool publishCone(const geometry_msgs::Pose& pose, double angle, colors color = TRANSLUCENT, double scale = 1.0);\n \n+  /**\n+   * \\brief Display a plane (a very wide, thin cuboid)\n+   * \\param A - coefficient from Ax+By+Cz+D=0\n+   * \\param B - coefficient from Ax+By+Cz+D=0\n+   * \\param C - coefficient from Ax+By+Cz+D=0\n+   * \\param D - coefficient from Ax+By+Cz+D=0\n+   * \\param color - the color of the plane\n+   * \\param x_width - X-size of the vizualized plane [meters]\n+   * \\param y_width - Y-size of the visualized plane [meters]\n+   * \\return true on success\n+   */\n+  bool publishABCDPlane(const double A, const double B, const double C, const double D,\n+                        colors color=TRANSLUCENT, double x_width = 1.0, double y_width = 1.0);\n+\n   /**\n    * \\brief Display the XY plane of a given pose\n    * \\param pose - the position of the plane"
+        },
+        {
+          "sha": "6e9f4039a5026bba2807f4e36d7565d4ac62f0b2",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/de6aae203f579cc8c5fc74cecdb1b153d388f28d/package.xml",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/de6aae203f579cc8c5fc74cecdb1b153d388f28d/package.xml",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/package.xml?ref=de6aae203f579cc8c5fc74cecdb1b153d388f28d",
+          "patch": "@@ -12,7 +12,8 @@\n   <url type=\"butracker\">https://github.com/davetcoleman/rviz_visual_tools/issues</url>\n   <url type=\"repository\">https://github.com/davetcoleman/rviz_visual_tools/</url>\n \n-  <author email=\"davetcoleman@gmail.com\">Dave Coleman</author>\n+  <author email=\"dave@picknik.ai\">Dave Coleman</author>\n+  <author email=\"zelenak@picknik.ai\">Andy Zelenak</author>\n \n   <buildtool_depend>catkin</buildtool_depend>\n "
+        },
+        {
+          "sha": "2d3f23e40d89f2f26b34013d461668ce8a7756ff",
+          "filename": "src/rviz_visual_tools.cpp",
+          "status": "modified",
+          "additions": 24,
+          "deletions": 0,
+          "changes": 24,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/de6aae203f579cc8c5fc74cecdb1b153d388f28d/src%2Frviz_visual_tools.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/de6aae203f579cc8c5fc74cecdb1b153d388f28d/src%2Frviz_visual_tools.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/src%2Frviz_visual_tools.cpp?ref=de6aae203f579cc8c5fc74cecdb1b153d388f28d",
+          "patch": "@@ -968,6 +968,30 @@ bool RvizVisualTools::publishCone(const geometry_msgs::Pose& pose, double angle,\n   return publishMarker(triangle_marker_);\n }\n \n+bool RvizVisualTools::publishABCDPlane(const double A, const double B, const double C, const double D,\n+                                        colors color, double x_width, double y_width)\n+{\n+  Eigen::Isometry3d pose;\n+\n+  // The coefficients A,B,C give the normal to the plane.\n+  Eigen::Vector3d n(A, B, C);\n+\n+  // Graphic is centered at this point\n+  Eigen::Vector3d center = n.normalized() * D;\n+\n+  pose.translation() = center;\n+\n+  // Calculate the rotation matrix from the original normal z_0 = (0,0,1) to new normal n = (A,B,C)\n+  Eigen::Vector3d z_0 = Eigen::Vector3d::UnitZ();\n+  Eigen::Quaterniond q = Eigen::Quaterniond::FromTwoVectors(z_0, n);\n+  pose.linear() = q.toRotationMatrix();\n+\n+  double height = 0.001; // very thin\n+  publishCuboid(pose, x_width, y_width, height, color);\n+\n+  return true;\n+}\n+\n bool RvizVisualTools::publishXYPlane(const Eigen::Isometry3d& pose, colors color, double scale)\n {\n   return publishXYPlane(convertPose(pose), color, scale);"
+        },
+        {
+          "sha": "602f352f62e1e6ebf67da7eeec47d065d30a54d3",
+          "filename": "src/rviz_visual_tools_demo.cpp",
+          "status": "modified",
+          "additions": 26,
+          "deletions": 0,
+          "changes": 26,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/de6aae203f579cc8c5fc74cecdb1b153d388f28d/src%2Frviz_visual_tools_demo.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/de6aae203f579cc8c5fc74cecdb1b153d388f28d/src%2Frviz_visual_tools_demo.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/src%2Frviz_visual_tools_demo.cpp?ref=de6aae203f579cc8c5fc74cecdb1b153d388f28d",
+          "patch": "@@ -406,8 +406,34 @@ class RvizVisualToolsDemo\n     visual_tools_->publishPath(path, colors);\n     visual_tools_->trigger();\n \n+    // --------------------------------------------------------------------\n+    ROS_INFO_STREAM_NAMED(name_, \"Displaying ABCD Plane\");\n+    double x_width = 0.15;\n+    double y_width = 0.05;\n+    pose1 = Eigen::Isometry3d::Identity();\n+    y += space_between_rows;\n+    pose1.translation().y() = y;\n+    pose1.translation().x() = width;\n+\n+    Eigen::Vector3d n;\n+    double A, B, C, D;\n+\n+    for (std::size_t i = 0; i < 10; ++i)\n+    {\n+      A = i * step;\n+      B = pose1.translation().y();\n+      C = 0;\n+      // Set D = - |(A,B,C)| to keep a constant y-position for this row\n+      D = sqrt(A * A + B * B + C * C);\n+      visual_tools_->publishABCDPlane(A, B, C, D, rvt::MAGENTA, x_width, y_width);\n+      x_location += step;\n+    }\n+    publishLabelHelper(pose1, \"ABCD Plane\");\n+\n     // Set x location for next visualization function\n     x_location += 1.25;\n+\n+    visual_tools_->trigger();\n   }\n \n   /** \\brief Compare sizes of markers using all MEDIUM-scale markers */"
+        }
+      ]
+    },
+    {
+      "author": "gleichdick",
+      "date": "2020-06-02T20:38:13Z",
+      "sha": "b44dd4805b5e8b4c8e6d0c8774882d36eb5369e9",
+      "message": "replace tf_conversions with tf2 (#151)\n\nCo-authored-by: Bjar Ne <gleichdick@users.noreply.github.com>",
+      "files_changed": 5,
+      "additions": 46,
+      "deletions": 48,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "28d65294f23884774c051753b610fddf03931eb7",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 4,
+          "changes": 9,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/b44dd4805b5e8b4c8e6d0c8774882d36eb5369e9/CMakeLists.txt",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/b44dd4805b5e8b4c8e6d0c8774882d36eb5369e9/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/CMakeLists.txt?ref=b44dd4805b5e8b4c8e6d0c8774882d36eb5369e9",
+          "patch": "@@ -14,7 +14,6 @@ endif()\n set(CMAKE_EXPORT_COMPILE_COMMANDS ON)\n \n find_package(catkin REQUIRED COMPONENTS\n-  eigen_conversions\n   eigen_stl_containers\n   geometry_msgs\n   graph_msgs\n@@ -25,7 +24,9 @@ find_package(catkin REQUIRED COMPONENTS\n   rviz\n   sensor_msgs\n   std_msgs\n-  tf_conversions\n+  tf2_eigen\n+  tf2_ros\n+  tf2_geometry_msgs\n   trajectory_msgs\n   visualization_msgs\n )\n@@ -63,14 +64,14 @@ catkin_package(\n     ${PROJECT_NAME}_remote_control\n     ${PROJECT_NAME}_imarker_simple\n   CATKIN_DEPENDS\n-    eigen_conversions\n     geometry_msgs\n     graph_msgs\n     shape_msgs\n     roscpp\n     sensor_msgs\n     std_msgs\n-    tf_conversions\n+    tf2_eigen\n+    tf2_ros\n     trajectory_msgs\n     visualization_msgs\n   INCLUDE_DIRS"
+        },
+        {
+          "sha": "b429ee535d725ffbf0c77e1c571316e1f4dc06cf",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 2,
+          "changes": 5,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/b44dd4805b5e8b4c8e6d0c8774882d36eb5369e9/package.xml",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/b44dd4805b5e8b4c8e6d0c8774882d36eb5369e9/package.xml",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/package.xml?ref=b44dd4805b5e8b4c8e6d0c8774882d36eb5369e9",
+          "patch": "@@ -18,11 +18,12 @@\n \n   <depend>rviz</depend>\n   <depend>sensor_msgs</depend>\n-  <depend>eigen_conversions</depend>\n+  <depend>tf2_eigen</depend>\n+  <depend>tf2_ros</depend>\n+  <depend>tf2_geometry_msgs</depend>\n   <depend>geometry_msgs</depend>\n   <depend>shape_msgs</depend>\n   <depend>roscpp</depend>\n-  <depend>tf_conversions</depend>\n   <depend>visualization_msgs</depend>\n   <depend>graph_msgs</depend>\n   <depend>std_msgs</depend>"
+        },
+        {
+          "sha": "6f5cf362d9e0b739ffbb4b2e7d821adcef8f74c0",
+          "filename": "src/rviz_visual_tools.cpp",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 38,
+          "changes": 51,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/b44dd4805b5e8b4c8e6d0c8774882d36eb5369e9/src%2Frviz_visual_tools.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/b44dd4805b5e8b4c8e6d0c8774882d36eb5369e9/src%2Frviz_visual_tools.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/src%2Frviz_visual_tools.cpp?ref=b44dd4805b5e8b4c8e6d0c8774882d36eb5369e9",
+          "patch": "@@ -39,8 +39,9 @@\n #include <rviz_visual_tools/rviz_visual_tools.h>\n \n // Conversions\n-#include <eigen_conversions/eigen_msg.h>\n-#include <tf_conversions/tf_eigen.h>\n+#include <tf2_eigen/tf2_eigen.h>\n+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>\n+#include <tf2/convert.h>\n \n // C++\n #include <cmath>  // for random poses\n@@ -775,7 +776,7 @@ Eigen::Isometry3d RvizVisualTools::getVectorBetweenPoints(const Eigen::Vector3d&\n     return result_pose;\n   }\n \n-  right_axis_vector.normalized();\n+  right_axis_vector.normalize();\n \n   if (verbose)\n   {\n@@ -786,33 +787,7 @@ Eigen::Isometry3d RvizVisualTools::getVectorBetweenPoints(const Eigen::Vector3d&\n   double theta = axis_vector.dot(up_vector);\n   double angle_rotation = -1.0 * acos(theta);\n \n-  //-------------------------------------------\n-  // Method 1 - TF - works\n-\n-  // Convert vector to TF format\n-  tf::Vector3 tf_right_axis_vector;\n-  tf::vectorEigenToTF(right_axis_vector, tf_right_axis_vector);\n-\n-  // Create quaternion using 'Axis angle Constructor'\n-  //   axis: The axis which the rotation is around\n-  //   angle: The magnitude of the rotation around the angle (Radians)\n-  tf::Quaternion tf_q(tf_right_axis_vector, angle_rotation);\n-\n-  // Convert back to Eigen\n-  tf::quaternionTFToEigen(tf_q, q);\n-  //-------------------------------------------\n-\n-  if (verbose)\n-  {\n-    std::cout << \"rotation matrix: \" << std::endl;\n-    std::cout << q.toRotationMatrix() << std::endl;\n-  }\n-\n-  //-------------------------------------------\n-  // Method 2 - Eigen - broken TODO(davetcoleman)\n-  // q = Eigen::AngleAxis<double>(angle_rotation, right_axis_vector);\n-  //-------------------------------------------\n-  // std::cout << q.toRotationMatrix() << std::endl;\n+  q = Eigen::AngleAxis<double>(angle_rotation, right_axis_vector);\n \n   q.normalize();\n \n@@ -1167,15 +1142,15 @@ bool RvizVisualTools::publishSphere(const Eigen::Vector3d& point, colors color,\n                                     std::size_t id)\n {\n   geometry_msgs::Pose pose_msg;\n-  tf::pointEigenToMsg(point, pose_msg.position);\n+  tf2::convert(point, pose_msg.position);\n   return publishSphere(pose_msg, color, scale, ns, id);\n }\n \n bool RvizVisualTools::publishSphere(const Eigen::Vector3d& point, colors color, double scale, const std::string& ns,\n                                     std::size_t id)\n {\n   geometry_msgs::Pose pose_msg = getIdentityPose();\n-  tf::pointEigenToMsg(point, pose_msg.position);\n+  tf2::convert(point, pose_msg.position);\n   return publishSphere(pose_msg, color, scale, ns, id);\n }\n \n@@ -1219,7 +1194,7 @@ bool RvizVisualTools::publishSphere(const Eigen::Vector3d& point, const std_msgs\n                                     const geometry_msgs::Vector3 scale, const std::string& ns, std::size_t id)\n {\n   geometry_msgs::Pose pose_msg = getIdentityPose();\n-  tf::pointEigenToMsg(point, pose_msg.position);\n+  tf2::convert(point, pose_msg.position);\n   return publishSphere(pose_msg, color, scale, ns, id);\n }\n \n@@ -2561,25 +2536,25 @@ bool RvizVisualTools::publishText(const geometry_msgs::Pose& pose, const std::st\n geometry_msgs::Pose RvizVisualTools::convertPose(const Eigen::Isometry3d& pose)\n {\n   geometry_msgs::Pose pose_msg;\n-  tf::poseEigenToMsg(pose, pose_msg);\n+  tf2::convert(pose, pose_msg);\n   return pose_msg;\n }\n \n void RvizVisualTools::convertPoseSafe(const Eigen::Isometry3d& pose, geometry_msgs::Pose& pose_msg)\n {\n-  tf::poseEigenToMsg(pose, pose_msg);\n+  tf2::convert(pose, pose_msg);\n }\n \n Eigen::Isometry3d RvizVisualTools::convertPose(const geometry_msgs::Pose& pose)\n {\n   Eigen::Isometry3d shared_pose_eigen;\n-  tf::poseMsgToEigen(pose, shared_pose_eigen);\n+  tf2::convert(pose, shared_pose_eigen);\n   return shared_pose_eigen;\n }\n \n void RvizVisualTools::convertPoseSafe(const geometry_msgs::Pose& pose_msg, Eigen::Isometry3d& pose)\n {\n-  tf::poseMsgToEigen(pose_msg, pose);\n+  tf2::convert(pose_msg, pose);\n }\n \n Eigen::Isometry3d RvizVisualTools::convertPoint32ToPose(const geometry_msgs::Point32& point)\n@@ -2614,7 +2589,7 @@ Eigen::Isometry3d RvizVisualTools::convertPointToPose(const Eigen::Vector3d& poi\n geometry_msgs::Point RvizVisualTools::convertPoseToPoint(const Eigen::Isometry3d& pose)\n {\n   geometry_msgs::Pose pose_msg;\n-  tf::poseEigenToMsg(pose, pose_msg);\n+  tf2::convert(pose, pose_msg);\n   return pose_msg.position;\n }\n "
+        },
+        {
+          "sha": "67295524a3355d2da0c57a1ecae5a5cf5a6aad11",
+          "filename": "src/tf_visual_tools.cpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 4,
+          "changes": 7,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/b44dd4805b5e8b4c8e6d0c8774882d36eb5369e9/src%2Ftf_visual_tools.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/b44dd4805b5e8b4c8e6d0c8774882d36eb5369e9/src%2Ftf_visual_tools.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/src%2Ftf_visual_tools.cpp?ref=b44dd4805b5e8b4c8e6d0c8774882d36eb5369e9",
+          "patch": "@@ -38,8 +38,8 @@\n \n #include <rviz_visual_tools/tf_visual_tools.h>\n \n-// TF\n-#include <eigen_conversions/eigen_msg.h>\n+// TF2\n+#include <tf2_eigen/tf2_eigen.h>\n \n // C++\n #include <string>\n@@ -60,9 +60,8 @@ bool TFVisualTools::publishTransform(const Eigen::Isometry3d& transform, const s\n   ROS_DEBUG_STREAM_NAMED(\"tf_visual_tools\", \"Publishing transform from \" << from_frame << \" to \" << to_frame);\n \n   // Create transform msg\n-  geometry_msgs::TransformStamped tf2_msg;\n+  geometry_msgs::TransformStamped tf2_msg = tf2::eigenToTransform(transform);\n   tf2_msg.header.stamp = ros::Time::now();\n-  tf::transformEigenToMsg(transform, tf2_msg.transform);\n \n   // Prevent TF_DENORMALIZED_QUATERNION errors in TF2 from happening.\n   double quat_norm;"
+        },
+        {
+          "sha": "a7ee6d927c3a980875683b7dcb983c3d12db45a3",
+          "filename": "tests/rvt_test.cpp",
+          "status": "modified",
+          "additions": 22,
+          "deletions": 0,
+          "changes": 22,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/b44dd4805b5e8b4c8e6d0c8774882d36eb5369e9/tests%2Frvt_test.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/b44dd4805b5e8b4c8e6d0c8774882d36eb5369e9/tests%2Frvt_test.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/tests%2Frvt_test.cpp?ref=b44dd4805b5e8b4c8e6d0c8774882d36eb5369e9",
+          "patch": "@@ -201,6 +201,28 @@ TEST(RVTTest, default_arguments)\n   EXPECT_TRUE(BASE.visual_tools_->publishPath(path3, rviz_visual_tools::RED, rviz_visual_tools::MEDIUM));\n }\n \n+TEST(RVTTest, get_vector_between_points)\n+{\n+  using namespace Eigen;\n+  const auto x_actual = BASE.visual_tools_->getVectorBetweenPoints(Vector3d::UnitX(), Vector3d::Zero());\n+  const auto x_expected =\n+      Isometry3d(Isometry3d::Identity()).translate(Vector3d::UnitX()).rotate(AngleAxisd(M_PI, Vector3d::UnitY()));\n+  EXPECT_TRUE(BASE.testIsometry3d(\"get_vector_between_points X\", x_expected, x_actual));\n+\n+  const auto x2_actual = BASE.visual_tools_->getVectorBetweenPoints(2 * Vector3d::UnitX(), Vector3d::Zero());\n+  const auto x2_expected =\n+      Isometry3d(Isometry3d::Identity()).translate(2 * Vector3d::UnitX()).rotate(AngleAxisd(M_PI, Vector3d::UnitY()));\n+  EXPECT_TRUE(BASE.testIsometry3d(\"get_vector_between_points 2X\", x2_expected, x2_actual));\n+\n+  const auto random_actual = BASE.visual_tools_->getVectorBetweenPoints({ 2.0, 3.0, 4.0 }, { 5.0, 6.0, 7.0 });\n+  const auto random_expected = []() {\n+    Eigen::Matrix4d d;\n+    d << 0.57735, -0.211325, -0.788675, 2, 0.57735, 0.788675, 0.211325, 3, 0.57735, -0.57735, 0.57735, 4, 0, 0, 0, 1;\n+    return Eigen::Isometry3d(d);\n+  }();\n+  EXPECT_TRUE(BASE.testIsometry3d(\"get_vector_between_points random\", random_expected, random_actual));\n+}\n+\n /* Main  ------------------------------------------------------------------------------------- */\n int main(int argc, char** argv)\n {"
+        }
+      ]
+    },
+    {
+      "author": "mlautman",
+      "date": "2019-10-24T20:46:09Z",
+      "sha": "763fbd8eb06b21ebd6b766ad268c560a966a5c68",
+      "message": "remove trailing whitespaces (#130)",
+      "files_changed": 3,
+      "additions": 3,
+      "deletions": 3,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "1b1e99c84c47b4f003cf111201bae2140d0f1bac",
+          "filename": ".github/auto_assign.yml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/763fbd8eb06b21ebd6b766ad268c560a966a5c68/.github%2Fauto_assign.yml",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/763fbd8eb06b21ebd6b766ad268c560a966a5c68/.github%2Fauto_assign.yml",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/.github%2Fauto_assign.yml?ref=763fbd8eb06b21ebd6b766ad268c560a966a5c68",
+          "patch": "@@ -14,7 +14,7 @@ reviewers:\n   - JafarAbdi\n   - guilesn\n   - mamoll\n-  \n+\n # A list of keywords to be skipped the process that add reviewers if pull requests include it\n #skipKeywords:\n #  - wip"
+        },
+        {
+          "sha": "66d69e03fff47e37399ed611f0b85d012f79f0a1",
+          "filename": ".travis.yml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/763fbd8eb06b21ebd6b766ad268c560a966a5c68/.travis.yml",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/763fbd8eb06b21ebd6b766ad268c560a966a5c68/.travis.yml",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/.travis.yml?ref=763fbd8eb06b21ebd6b766ad268c560a966a5c68",
+          "patch": "@@ -13,7 +13,7 @@ env:\n     - CXXFLAGS=\"-Wall -Wextra -Wwrite-strings -Wunreachable-code -Wpointer-arith -Wredundant-decls -Wno-unused-parameter -Wno-unused-function\"\n     - WARNINGS_OK=false\n   matrix:\n-    - TEST=\"clang-format\" # TODO(davetcoleman): enable catkin_lint in the future \n+    - TEST=\"clang-format\" # TODO(davetcoleman): enable catkin_lint in the future\n     - TEST=clang-tidy-fix\n     - DOCKER_IMAGE=moveit/moveit:melodic-source\n     - DOCKER_IMAGE=moveit/moveit:master-source"
+        },
+        {
+          "sha": "8d39227c0a745a73e9d892f2bf867f1cf35f0053",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/763fbd8eb06b21ebd6b766ad268c560a966a5c68/README.md",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/763fbd8eb06b21ebd6b766ad268c560a966a5c68/README.md",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/README.md?ref=763fbd8eb06b21ebd6b766ad268c560a966a5c68",
+          "patch": "@@ -103,7 +103,7 @@ In the following snippet we create a pose at xyz (0.1, 0.1, 0.1) and rotate the\n \n     // Don't forget to trigger the publisher!\n     visual_tools_->trigger();\n-    \n+\n For more example code see [rviz_visual_tools_demo.cpp](https://github.com/PickNikRobotics/rviz_visual_tools/blob/melodic-devel/src/rviz_visual_tools_demo.cpp)\n \n ## Rviz GUI Usage"
+        }
+      ]
+    },
+    {
+      "author": "davetcoleman",
+      "date": "2014-10-21T00:59:11Z",
+      "sha": "117091f705b372dbdac2ad89a3879d4c20a381e7",
+      "message": "Initial commit",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "29ae98e63b88577c54f5f27dc22cd8ddce1f0868",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/117091f705b372dbdac2ad89a3879d4c20a381e7/README.md",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/117091f705b372dbdac2ad89a3879d4c20a381e7/README.md",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/README.md?ref=117091f705b372dbdac2ad89a3879d4c20a381e7",
+          "patch": "@@ -0,0 +1,4 @@\n+rviz_visual_tools\n+=================\n+\n+Helper functions for displaying objects in Rviz"
+        }
+      ]
+    },
+    {
+      "author": "RoboticsYY",
+      "date": "2019-05-22T19:46:56Z",
+      "sha": "a51aa6e5b64f0078e7a327487efb6a93868a7837",
+      "message": "Make `rviz_visual_tools` publish triangle mesh and `tf_visual_tools` clean published transforms (#117)\n\n* Add `clearAllTransform` method to tf_visual_tools\r\n\r\n* Add new function to publish mesh marker from triangles and vertices",
+      "files_changed": 6,
+      "additions": 75,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "ef16e846ef2c4a88fd46cf4269cc070fe61aea62",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/a51aa6e5b64f0078e7a327487efb6a93868a7837/CMakeLists.txt",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/a51aa6e5b64f0078e7a327487efb6a93868a7837/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/CMakeLists.txt?ref=a51aa6e5b64f0078e7a327487efb6a93868a7837",
+          "patch": "@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS\n   eigen_stl_containers\n   geometry_msgs\n   graph_msgs\n+  shape_msgs\n   roscpp\n   roslint\n   rostest\n@@ -64,6 +65,7 @@ catkin_package(\n     eigen_conversions\n     geometry_msgs\n     graph_msgs\n+    shape_msgs\n     roscpp\n     sensor_msgs\n     std_msgs"
+        },
+        {
+          "sha": "cf33825ea74c026e5381070a80b87972b27c1aad",
+          "filename": "include/rviz_visual_tools/rviz_visual_tools.h",
+          "status": "modified",
+          "additions": 17,
+          "deletions": 0,
+          "changes": 17,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/a51aa6e5b64f0078e7a327487efb6a93868a7837/include%2Frviz_visual_tools%2Frviz_visual_tools.h",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/a51aa6e5b64f0078e7a327487efb6a93868a7837/include%2Frviz_visual_tools%2Frviz_visual_tools.h",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/include%2Frviz_visual_tools%2Frviz_visual_tools.h?ref=a51aa6e5b64f0078e7a327487efb6a93868a7837",
+          "patch": "@@ -57,6 +57,7 @@\n #include <boost/shared_ptr.hpp>\n \n // Messages\n+#include <shape_msgs/Mesh.h>\n #include <std_msgs/ColorRGBA.h>\n #include <graph_msgs/GeometryGraph.h>\n #include <geometry_msgs/PoseArray.h>\n@@ -833,6 +834,22 @@ a   *        Warning: when using this in a loop be sure to call trigger() at end\n   bool publishMesh(const geometry_msgs::Pose& pose, const std::string& file_name, colors color = CLEAR,\n                    double scale = 1, const std::string& ns = \"mesh\", std::size_t id = 0);\n \n+  /**\n+   * \\brief Display a mesh from triangles and vertices\n+   * \\param pose - the location to publish the marker with respect to the base frame\n+   * \\param mesh - shape_msgs::Mesh contains the triangles and vertices\n+   * \\param color - an enum pre-defined name of a color\n+   * \\param scale - an enum pre-defined name of a size\n+   * \\param ns - namespace of marker\n+   * \\param id - unique counter of mesh that allows you to overwrite a previous mesh. if 0, defaults\n+   * to incremental counter\n+   * \\return true on success\n+   */\n+  bool publishMesh(const Eigen::Isometry3d& pose, const shape_msgs::Mesh& mesh, colors color = CLEAR, double scale = 1,\n+                   const std::string& ns = \"mesh\", std::size_t id = 0);\n+  bool publishMesh(const geometry_msgs::Pose& pose, const shape_msgs::Mesh& mesh, colors color = CLEAR, double scale = 1,\n+                   const std::string& ns = \"mesh\", std::size_t id = 0);\n+\n   /**\n    * \\brief Display a graph\n    * \\param graph of nodes and edges"
+        },
+        {
+          "sha": "b244b0f067af09a3daf6cf5f7092b95a0a2e983b",
+          "filename": "include/rviz_visual_tools/tf_visual_tools.h",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/a51aa6e5b64f0078e7a327487efb6a93868a7837/include%2Frviz_visual_tools%2Ftf_visual_tools.h",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/a51aa6e5b64f0078e7a327487efb6a93868a7837/include%2Frviz_visual_tools%2Ftf_visual_tools.h",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/include%2Frviz_visual_tools%2Ftf_visual_tools.h?ref=a51aa6e5b64f0078e7a327487efb6a93868a7837",
+          "patch": "@@ -76,6 +76,11 @@ class TFVisualTools\n    */\n   bool publishTransform(const Eigen::Isometry3d& transform, const std::string& from_frame, const std::string& to_frame);\n \n+  /**\n+   * \\brief Clear all transforms\n+   */\n+  void clearAllTransforms();\n+\n   /**\n    * \\brief At a certain frequency update the tf transforms that we are tracking\n    *        This is called internally by a clock, you should not need to use this"
+        },
+        {
+          "sha": "93ce470babea38296e5b292d5274da79528ab13d",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/a51aa6e5b64f0078e7a327487efb6a93868a7837/package.xml",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/a51aa6e5b64f0078e7a327487efb6a93868a7837/package.xml",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/package.xml?ref=a51aa6e5b64f0078e7a327487efb6a93868a7837",
+          "patch": "@@ -21,6 +21,7 @@\n   <depend>sensor_msgs</depend>\n   <depend>eigen_conversions</depend>\n   <depend>geometry_msgs</depend>\n+  <depend>shape_msgs</depend>\n   <depend>roscpp</depend>\n   <depend>tf_conversions</depend>\n   <depend>visualization_msgs</depend>"
+        },
+        {
+          "sha": "6d4bd4d73356ce586bfb7b90bb596b5895ac8648",
+          "filename": "src/rviz_visual_tools.cpp",
+          "status": "modified",
+          "additions": 45,
+          "deletions": 0,
+          "changes": 45,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/a51aa6e5b64f0078e7a327487efb6a93868a7837/src%2Frviz_visual_tools.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/a51aa6e5b64f0078e7a327487efb6a93868a7837/src%2Frviz_visual_tools.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/src%2Frviz_visual_tools.cpp?ref=a51aa6e5b64f0078e7a327487efb6a93868a7837",
+          "patch": "@@ -1629,6 +1629,51 @@ bool RvizVisualTools::publishMesh(const geometry_msgs::Pose& pose, const std::st\n   return publishMarker(mesh_marker_);\n }\n \n+bool RvizVisualTools::publishMesh(const Eigen::Isometry3d& pose, const shape_msgs::Mesh& mesh, colors color, \n+                                  double scale, const std::string& ns, std::size_t id)\n+{\n+  return publishMesh(convertPose(pose), mesh, color, scale, ns, id);\n+}\n+\n+bool RvizVisualTools::publishMesh(const geometry_msgs::Pose& pose, const shape_msgs::Mesh& mesh, colors color, \n+                                  double scale, const std::string& ns, std::size_t id)\n+{\n+  triangle_marker_.header.stamp = ros::Time::now();\n+\n+  if (id == 0)\n+  {\n+    triangle_marker_.id++;\n+  }\n+  else\n+  {\n+    triangle_marker_.id = id;\n+  }\n+\n+  // Set the mesh\n+  triangle_marker_.points.clear();\n+  for (const shape_msgs::MeshTriangle& triangle : mesh.triangles)\n+    for (const uint32_t & index : triangle.vertex_indices)\n+      triangle_marker_.points.push_back(mesh.vertices[index]);\n+\n+  // Set the pose\n+  triangle_marker_.pose = pose;\n+\n+  // Set marker size\n+  triangle_marker_.scale.x = scale;\n+  triangle_marker_.scale.y = scale;\n+  triangle_marker_.scale.z = scale;\n+\n+  // Set the namespace and id for this marker.  This serves to create a unique\n+  // ID\n+  triangle_marker_.ns = ns;\n+\n+  // Set marker color\n+  triangle_marker_.color = getColor(color);\n+\n+  // Helper for publishing rviz markers\n+  return publishMarker(triangle_marker_);\n+}\n+\n bool RvizVisualTools::publishGraph(const graph_msgs::GeometryGraph& graph, colors color, double radius)\n {\n   // Track which pairs of nodes we've already connected since graph is"
+        },
+        {
+          "sha": "b27895c208d3e330d38d2402bb2c10c14c0d9e5f",
+          "filename": "src/tf_visual_tools.cpp",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/a51aa6e5b64f0078e7a327487efb6a93868a7837/src%2Ftf_visual_tools.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/a51aa6e5b64f0078e7a327487efb6a93868a7837/src%2Ftf_visual_tools.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/src%2Ftf_visual_tools.cpp?ref=a51aa6e5b64f0078e7a327487efb6a93868a7837",
+          "patch": "@@ -96,6 +96,11 @@ bool TFVisualTools::publishTransform(const Eigen::Isometry3d& transform, const s\n   return true;\n }\n \n+void TFVisualTools::clearAllTransforms()\n+{\n+  transforms_.clear();\n+}\n+\n void TFVisualTools::publishAllTransforms(const ros::TimerEvent& /*e*/)\n {\n   ROS_DEBUG_STREAM_NAMED(\"tf_visual_tools\", \"Publishing transforms\");"
+        }
+      ]
+    },
+    {
+      "author": "d-walsh",
+      "date": "2019-02-23T00:54:21Z",
+      "sha": "3444363fbb33b14a93a75b859831ca0a6c473801",
+      "message": "Fixed publishCylinder namespace (#109)",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "882a8a9f5b4f5b1d793d8be5e087656542565794",
+          "filename": "src/rviz_visual_tools.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/3444363fbb33b14a93a75b859831ca0a6c473801/src%2Frviz_visual_tools.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/3444363fbb33b14a93a75b859831ca0a6c473801/src%2Frviz_visual_tools.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/src%2Frviz_visual_tools.cpp?ref=3444363fbb33b14a93a75b859831ca0a6c473801",
+          "patch": "@@ -1505,7 +1505,7 @@ bool RvizVisualTools::publishCylinder(const Eigen::Vector3d& point1, const Eigen\n }\n \n bool RvizVisualTools::publishCylinder(const Eigen::Vector3d& point1, const Eigen::Vector3d& point2,\n-                                      const std_msgs::ColorRGBA& color, double radius, const std::string& /*ns*/)\n+                                      const std_msgs::ColorRGBA& color, double radius, const std::string& ns)\n {\n   // Distance between two points\n   double height = (point1 - point2).lpNorm<2>();\n@@ -1523,7 +1523,7 @@ bool RvizVisualTools::publishCylinder(const Eigen::Vector3d& point1, const Eigen\n   pose = pose * rotation;\n \n   // Turn into msg\n-  return publishCylinder(convertPose(pose), color, height, radius);\n+  return publishCylinder(convertPose(pose), color, height, radius, ns);\n }\n \n bool RvizVisualTools::publishCylinder(const Eigen::Isometry3d& pose, colors color, double height, double radius,"
+        }
+      ]
+    },
+    {
+      "author": "VictorLamoine",
+      "date": "2016-06-14T14:08:40Z",
+      "sha": "8eb47377c286f36c6bd793da67ef9f4a3b30476f",
+      "message": "Update README.md\n\nInclude path, boost typedef and class name are now up to date with the code.",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 3,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "852a5f8ada2c2a2512f73e2eed095fdd74a71b9e",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/8eb47377c286f36c6bd793da67ef9f4a3b30476f/README.md",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/8eb47377c286f36c6bd793da67ef9f4a3b30476f/README.md",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/README.md?ref=8eb47377c286f36c6bd793da67ef9f4a3b30476f",
+          "patch": "@@ -52,18 +52,18 @@ We'll assume you will be using these helper functions within a class. Almost all\n \n Add to your includes:\n ```\n-#include <rviz_visual_tools/visual_tools.h>\n+#include <rviz_visual_tools/rviz_visual_tools.h>\n ```\n \n Add to your class's member variables:\n ```\n // For visualizing things in rviz\n-rviz_visual_tools::VisualToolsPtr visual_tools_;\n+rviz_visual_tools::RvizVisualToolsPtr visual_tools_;\n ```\n \n In your class' constructor add:\n ```\n-visual_tools_.reset(new rviz_visual_tools::VisualTools(\"base_frame\",\"/rviz_visual_markers\"));\n+visual_tools_.reset(new rviz_visual_tools::RvizVisualTools(\"base_frame\",\"/rviz_visual_markers\"));\n ```\n \n Change the first parameter to the name of your robot's base frame, and the second parameter to whatever name you'd like to use for the corresponding Rviz marker ROS topic."
+        }
+      ]
+    },
+    {
+      "author": "Simon Schmeisser",
+      "date": "2018-08-21T23:57:48Z",
+      "sha": "6071da7b44e00c7d57d28d23585da552c99416f1",
+      "message": "Fix Travis badge (#84)\n\nthe repo seems to have moved",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "daf58239fa84ed35e875f2177b790ecfa6fe17fa",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/6071da7b44e00c7d57d28d23585da552c99416f1/README.md",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/6071da7b44e00c7d57d28d23585da552c99416f1/README.md",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/README.md?ref=6071da7b44e00c7d57d28d23585da552c99416f1",
+          "patch": "@@ -20,7 +20,7 @@ Developed by [Dave Coleman](http://dav.ee) at the Correll Robotics Lab, Universi\n \n <a href='https://ko-fi.com/A7182AMW' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://az743702.vo.msecnd.net/cdn/kofi2.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>\n \n- * [![Build Status](https://travis-ci.org/davetcoleman/rviz_visual_tools.svg)](https://travis-ci.org/davetcoleman/rviz_visual_tools) Travis CI\n+ * [![Build Status](https://travis-ci.org/PickNikRobotics/rviz_visual_tools.svg)](https://travis-ci.org/PickNikRobotics/rviz_visual_tools) Travis CI\n  * [![Build Status](http://build.ros.org/buildStatus/icon?job=Kbin_uX64__rviz_visual_tools__ubuntu_xenial_amd64__binary)](http://build.ros.org/view/Kbin_uX64/job/Kbin_uX64__rviz_visual_tools__ubuntu_xenial_amd64__binary/) ROS Buildfarm - AMD64 Xenial Debian Build\n  * [![Build Status](http://build.ros.org/buildStatus/icon?job=Kdev__rviz_visual_tools__ubuntu_xenial_amd64)](http://build.ros.org/view/Kdev/job/Kdev__rviz_visual_tools__ubuntu_xenial_amd64/) ROS Buildfarm - AMD64 Xenial Devel Build\n "
+        }
+      ]
+    },
+    {
+      "author": "geoffreychiou",
+      "date": "2018-01-04T21:43:31Z",
+      "sha": "cb12fda31cfb2baff971a44be5cd94486df8125c",
+      "message": "Addresses Issue #49 - Default Constructor Not Nodelet Friendly (#66)\n\n* Added option to pass in a node handle in the constructor that defaults to\r\n\r\n* changed formatting",
+      "files_changed": 2,
+      "additions": 4,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "58bd1e4a276f620083b3cb36e07daaba5ddd9c8f",
+          "filename": "include/rviz_visual_tools/rviz_visual_tools.h",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/cb12fda31cfb2baff971a44be5cd94486df8125c/include%2Frviz_visual_tools%2Frviz_visual_tools.h",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/cb12fda31cfb2baff971a44be5cd94486df8125c/include%2Frviz_visual_tools%2Frviz_visual_tools.h",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/include%2Frviz_visual_tools%2Frviz_visual_tools.h?ref=cb12fda31cfb2baff971a44be5cd94486df8125c",
+          "patch": "@@ -183,8 +183,9 @@ class RvizVisualTools\n    * \\brief Constructor\n    * \\param base_frame - common base for all visualization markers, usually \"/world\" or \"/odom\"\n    * \\param marker_topic - rostopic to publish markers to - your Rviz display should match\n+   * \\param nh - optional ros node handle - defaults to \"~\"\n    */\n-  explicit RvizVisualTools(std::string base_frame, std::string marker_topic = RVIZ_MARKER_TOPIC);\n+  explicit RvizVisualTools(std::string base_frame, std::string marker_topic = RVIZ_MARKER_TOPIC, ros::NodeHandle nh = ros::NodeHandle(\"~\"));\n   /**\n    * \\brief Deconstructor\n    */"
+        },
+        {
+          "sha": "82fc3a2cb792e3823e927d756f475c4f5a8f592f",
+          "filename": "src/rviz_visual_tools.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/cb12fda31cfb2baff971a44be5cd94486df8125c/src%2Frviz_visual_tools.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/cb12fda31cfb2baff971a44be5cd94486df8125c/src%2Frviz_visual_tools.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/src%2Frviz_visual_tools.cpp?ref=cb12fda31cfb2baff971a44be5cd94486df8125c",
+          "patch": "@@ -57,8 +57,8 @@ const std::array<colors, 14> RvizVisualTools::all_rand_colors_ = { RED,        G\n                                                                    WHITE,      ORANGE, YELLOW, BROWN,  PINK,\n                                                                    LIME_GREEN, PURPLE, CYAN,   MAGENTA };\n \n-RvizVisualTools::RvizVisualTools(std::string base_frame, std::string marker_topic)\n-  : nh_(\"~\"), marker_topic_(std::move(marker_topic)), base_frame_(std::move(base_frame))\n+RvizVisualTools::RvizVisualTools(std::string base_frame, std::string marker_topic, ros::NodeHandle nh)\n+  : nh_(nh), marker_topic_(std::move(marker_topic)), base_frame_(std::move(base_frame))\n {\n   initialize();\n }"
+        }
+      ]
+    },
+    {
+      "author": "mcevoyandy",
+      "date": "2015-02-02T19:17:54Z",
+      "sha": "db436645e54aef90ac481ee8b5c21406c274f22e",
+      "message": "added a clear overlay",
+      "files_changed": 2,
+      "additions": 9,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "83250cc0e4072e4a1ba750c086cb636550f1e7db",
+          "filename": "include/rviz_visual_tools/rviz_visual_tools.h",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 2,
+          "changes": 5,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/db436645e54aef90ac481ee8b5c21406c274f22e/include%2Frviz_visual_tools%2Frviz_visual_tools.h",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/db436645e54aef90ac481ee8b5c21406c274f22e/include%2Frviz_visual_tools%2Frviz_visual_tools.h",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/include%2Frviz_visual_tools%2Frviz_visual_tools.h?ref=db436645e54aef90ac481ee8b5c21406c274f22e",
+          "patch": "@@ -86,6 +86,7 @@ enum colors { RED,\n               TRANSLUCENT,\n               TRANSLUCENT_DARK,\n               RAND,\n+\t      CLEAR,\n               DEFAULT // i.e. 'do not change default color'\n             };\n \n@@ -425,9 +426,9 @@ class RvizVisualTools\n    * \\param file name of mesh, starting with \"file://\"\n    * \\return true on success\n    */\n-  bool publishMesh(const Eigen::Affine3d &pose, const std::string& file_name, const rviz_visual_tools::colors color = BLUE, \n+  bool publishMesh(const Eigen::Affine3d &pose, const std::string& file_name, const rviz_visual_tools::colors color = CLEAR, \n                    double scale = 1);\n-  bool publishMesh(const geometry_msgs::Pose &pose, const std::string& file_name, const rviz_visual_tools::colors color = BLUE, \n+  bool publishMesh(const geometry_msgs::Pose &pose, const std::string& file_name, const rviz_visual_tools::colors color = CLEAR, \n                    double scale = 1);\n \n   /**"
+        },
+        {
+          "sha": "388a563d3e2f580c81567cfa74f1d9687979f83b",
+          "filename": "src/rviz_visual_tools.cpp",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/db436645e54aef90ac481ee8b5c21406c274f22e/src%2Frviz_visual_tools.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/db436645e54aef90ac481ee8b5c21406c274f22e/src%2Frviz_visual_tools.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/src%2Frviz_visual_tools.cpp?ref=db436645e54aef90ac481ee8b5c21406c274f22e",
+          "patch": "@@ -410,6 +410,12 @@ std_msgs::ColorRGBA RvizVisualTools::getColor(const rviz_visual_tools::colors &c\n       result.g = 1.0;\n       result.b = 0.2;\n       break;\n+    case CLEAR:\n+      result.r=1.0;\n+      result.g=1.0;\n+      result.b=1.0;\n+      result.a=0.0;\n+      break;\n     case PURPLE:\n       result.r = 0.597;\n       result.g = 0.0;"
+        }
+      ]
+    },
+    {
+      "author": "ffurrer",
+      "date": "2017-10-16T04:17:44Z",
+      "sha": "a35ac9537cdf1f65af7515bc495b3fa034278944",
+      "message": "add linking to visualization tools library for imarker_simple (#59)",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 7,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "e7e6a6ae007ac3b8cb146ac22ed112bfede3d844",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 7,
+          "changes": 10,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/a35ac9537cdf1f65af7515bc495b3fa034278944/CMakeLists.txt",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/a35ac9537cdf1f65af7515bc495b3fa034278944/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/CMakeLists.txt?ref=a35ac9537cdf1f65af7515bc495b3fa034278944",
+          "patch": "@@ -77,12 +77,7 @@ catkin_package(\n     include\n )\n \n-include_directories(SYSTEM ${EIGEN3_INCLUDE_DIRS})\n-\n-include_directories(\n-  include\n-  ${catkin_INCLUDE_DIRS}\n-)\n+include_directories(SYSTEM include ${catkin_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIRS})\n \n ###########\n ## Build ##\n@@ -128,6 +123,7 @@ add_library(${PROJECT_NAME}_imarker_simple\n target_link_libraries(${PROJECT_NAME}_imarker_simple\n   ${catkin_LIBRARIES}\n   ${Boost_LIBRARIES}\n+  ${PROJECT_NAME}\n )\n \n # Demo executable\n@@ -186,4 +182,4 @@ install(FILES\n install(TARGETS ${PROJECT_NAME}_demo\n   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}\n-)\n\\ No newline at end of file\n+)"
+        }
+      ]
+    },
+    {
+      "author": "miguelprada",
+      "date": "2016-08-05T19:53:41Z",
+      "sha": "752accbfd61cda27a9f77348144f93e350427e3f",
+      "message": "Change the sphere marker type from SPHERE_LIST to SPHERE. (#47)\n\nThis makes irregularly scaled spheres (i.e. ellipsoids) to be rendered correctly.",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 12,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "9d40d5796f791c3eb14b27bc00519ddaf31c0c40",
+          "filename": "src/rviz_visual_tools.cpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 12,
+          "changes": 15,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/752accbfd61cda27a9f77348144f93e350427e3f/src%2Frviz_visual_tools.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/752accbfd61cda27a9f77348144f93e350427e3f/src%2Frviz_visual_tools.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/src%2Frviz_visual_tools.cpp?ref=752accbfd61cda27a9f77348144f93e350427e3f",
+          "patch": "@@ -215,7 +215,7 @@ bool RvizVisualTools::loadRvizMarkers()\n   // ID\n   sphere_marker_.ns = \"Sphere\";\n   // Set the marker type.\n-  sphere_marker_.type = visualization_msgs::Marker::SPHERE_LIST;\n+  sphere_marker_.type = visualization_msgs::Marker::SPHERE;\n   // Set the marker action.  Options are ADD and DELETE\n   sphere_marker_.action = visualization_msgs::Marker::ADD;\n   // Marker group position and orientation\n@@ -1165,17 +1165,11 @@ bool RvizVisualTools::publishSphere(const geometry_msgs::Pose &pose, const std_m\n   else\n     sphere_marker_.id = id;\n \n+  sphere_marker_.pose = pose;\n   sphere_marker_.color = color;\n   sphere_marker_.scale = scale;\n   sphere_marker_.ns = ns;\n \n-  // Update the single point with new pose\n-  sphere_marker_.points.resize(\n-      1);  // TODO(davetcoleman): not sure why we need to resize it, but someone was growing this vector larger\n-  sphere_marker_.colors.resize(1);\n-  sphere_marker_.points[0] = pose.position;\n-  sphere_marker_.colors[0] = color;\n-\n   // Helper for publishing rviz markers\n   return publishMarker(sphere_marker_);\n }\n@@ -1191,14 +1185,11 @@ bool RvizVisualTools::publishSphere(const geometry_msgs::PoseStamped &pose, colo\n   else\n     sphere_marker_.id = id;\n \n+  sphere_marker_.pose = pose.pose;\n   sphere_marker_.color = getColor(color);\n   sphere_marker_.scale = scale;\n   sphere_marker_.ns = ns;\n \n-  // Update the single point with new pose\n-  sphere_marker_.points[0] = pose.pose.position;\n-  sphere_marker_.colors[0] = getColor(color);\n-\n   // Helper for publishing rviz markers\n   publishMarker(sphere_marker_);\n "
+        }
+      ]
+    },
+    {
+      "author": "Enrique Fernandez",
+      "date": "2016-07-13T15:56:02Z",
+      "sha": "9b9bed331232ecc82a1ae13812dac488ac0064ac",
+      "message": "Catkin depend on eigen and tf conversions",
+      "files_changed": 2,
+      "additions": 4,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "ddd7cd8d7258473beb47b40b547ab21c7a4a4e9f",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/9b9bed331232ecc82a1ae13812dac488ac0064ac/CMakeLists.txt",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/9b9bed331232ecc82a1ae13812dac488ac0064ac/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/CMakeLists.txt?ref=9b9bed331232ecc82a1ae13812dac488ac0064ac",
+          "patch": "@@ -22,10 +22,12 @@ catkin_package(\n   LIBRARIES\n     ${PROJECT_NAME}\n   CATKIN_DEPENDS\n+    eigen_conversions\n     geometry_msgs\n     visualization_msgs\n     graph_msgs\n     std_msgs\n+    tf_conversions\n     trajectory_msgs\n   INCLUDE_DIRS include\n )"
+        },
+        {
+          "sha": "faba4daa7ef7953b4c3791407eeda4222ad2438a",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/9b9bed331232ecc82a1ae13812dac488ac0064ac/package.xml",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/9b9bed331232ecc82a1ae13812dac488ac0064ac/package.xml",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/package.xml?ref=9b9bed331232ecc82a1ae13812dac488ac0064ac",
+          "patch": "@@ -31,7 +31,9 @@\n   <test_depend>rostest</test_depend>\n   <test_depend>rosunit</test_depend>\n \n+  <run_depend>eigen_conversions</run_depend>\n   <run_depend>geometry_msgs</run_depend>\n+  <run_depend>tf_conversions</run_depend>\n   <run_depend>visualization_msgs</run_depend>\n   <run_depend>graph_msgs</run_depend>\n   <run_depend>std_msgs</run_depend>"
+        }
+      ]
+    },
+    {
+      "author": "jontromanab",
+      "date": "2016-06-15T06:04:19Z",
+      "sha": "b043aeefc3ef434d7516b9f5186bc34cc9ef8aa9",
+      "message": "Update rviz_visual_tools.cpp\n\nChanging the angles will change the opening angle of the cone",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 4,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "8e8a5823f06645178b72c4d4af1ce0446ce121b0",
+          "filename": "src/rviz_visual_tools.cpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 4,
+          "changes": 8,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/b043aeefc3ef434d7516b9f5186bc34cc9ef8aa9/src%2Frviz_visual_tools.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/b043aeefc3ef434d7516b9f5186bc34cc9ef8aa9/src%2Frviz_visual_tools.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/src%2Frviz_visual_tools.cpp?ref=b043aeefc3ef434d7516b9f5186bc34cc9ef8aa9",
+          "patch": "@@ -789,12 +789,12 @@ bool RvizVisualTools::publishCone(const geometry_msgs::Pose &pose, double angle,\n     p[0].z = 0;\n \n     p[1].x = scale;\n-    p[1].y = scale * cos(theta);\n-    p[1].z = scale * sin(theta);\n+    p[1].y = scale * cos(theta)/angle;\n+    p[1].z = scale * sin(theta)/angle;\n \n     p[2].x = scale;\n-    p[2].y = scale * cos(theta + delta_theta);\n-    p[2].z = scale * sin(theta + delta_theta);\n+    p[2].y = scale * cos(theta + delta_theta)/angle;\n+    p[2].z = scale * sin(theta + delta_theta)/angle;\n \n     triangle_marker_.points.push_back(p[0]);\n     triangle_marker_.points.push_back(p[1]);"
+        }
+      ]
+    },
+    {
+      "author": "Nandite",
+      "date": "2016-06-14T14:32:04Z",
+      "sha": "c0f0d3d78fcb3a3684d38c5946bf7604d7801217",
+      "message": "Added blocking constraint option in function waitForSubscriber",
+      "files_changed": 2,
+      "additions": 10,
+      "deletions": 5,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "fd200a0cd548747bc01245e78086b9372dcd719a",
+          "filename": "include/rviz_visual_tools/rviz_visual_tools.h",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 2,
+          "changes": 5,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/c0f0d3d78fcb3a3684d38c5946bf7604d7801217/include%2Frviz_visual_tools%2Frviz_visual_tools.h",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/c0f0d3d78fcb3a3684d38c5946bf7604d7801217/include%2Frviz_visual_tools%2Frviz_visual_tools.h",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/include%2Frviz_visual_tools%2Frviz_visual_tools.h?ref=c0f0d3d78fcb3a3684d38c5946bf7604d7801217",
+          "patch": "@@ -214,11 +214,12 @@ class RvizVisualTools\n \n   /**\n    * \\brief Wait until at least one subscriber connects to a publisher\n-   * \\param pub - the publisher to check for subsribers\n+   * \\param pub - the publisher to check for subscribers\n    * \\param wait_time - time to wait for subscriber to be available before throwing warning\n+   * \\param blocking - if true, the function loop until a subscriber is gotten\n    * \\return true on successful connection\n    */\n-  bool waitForSubscriber(const ros::Publisher &pub, const double &wait_time = 0.5);\n+  bool waitForSubscriber(const ros::Publisher &pub, const double &wait_time = 0.5, const bool blocking = false);\n \n   /**\n    * \\brief Allows an offset between base link and floor where objects are built. Default is zero"
+        },
+        {
+          "sha": "bb23363be3f1bf61dfab4a7accea69e0ede6941c",
+          "filename": "src/rviz_visual_tools.cpp",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 3,
+          "changes": 10,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/c0f0d3d78fcb3a3684d38c5946bf7604d7801217/src%2Frviz_visual_tools.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/c0f0d3d78fcb3a3684d38c5946bf7604d7801217/src%2Frviz_visual_tools.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/src%2Frviz_visual_tools.cpp?ref=c0f0d3d78fcb3a3684d38c5946bf7604d7801217",
+          "patch": "@@ -278,7 +278,7 @@ void RvizVisualTools::loadMarkerPub(bool wait_for_subscriber, bool latched)\n     waitForSubscriber(pub_rviz_markers_);\n }\n \n-bool RvizVisualTools::waitForSubscriber(const ros::Publisher &pub, const double &wait_time)\n+bool RvizVisualTools::waitForSubscriber(const ros::Publisher &pub, const double &wait_time, const bool blocking)\n {\n   // Will wait at most this amount of time\n   ros::Time max_time(ros::Time::now() + ros::Duration(wait_time));\n@@ -290,11 +290,15 @@ bool RvizVisualTools::waitForSubscriber(const ros::Publisher &pub, const double\n   // How often to check for subscribers\n   ros::Rate poll_rate(200);\n \n-  // Wait for subsriber\n+  // Wait for subscriber\n   while (num_existing_subscribers == 0)\n   {\n+    if (blocking)\n+    {\n+      ROS_WARN_STREAM_NAMED(name_, \"Topic '\" << pub.getTopic() << \"' waiting for subscriber...\");\n+    }\n     // Check if timed out\n-    if (ros::Time::now() > max_time)\n+    else if (ros::Time::now() > max_time)\n     {\n       ROS_WARN_STREAM_NAMED(name_, \"Topic '\" << pub.getTopic() << \"' unable to connect to any subscribers within \"\n                                              << wait_time << \" sec. It is possible initially published visual messages \""
+        }
+      ]
+    },
+    {
+      "author": "naveedhd",
+      "date": "2016-04-28T06:28:15Z",
+      "sha": "c269540348153a60823a2f460065641382e873ad",
+      "message": "Adds Publish Labeled Axis",
+      "files_changed": 3,
+      "additions": 28,
+      "deletions": 8,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "4e3d8a4d0a37190b41e4311f38dc2d595256c869",
+          "filename": "include/rviz_visual_tools/rviz_visual_tools.h",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/c269540348153a60823a2f460065641382e873ad/include%2Frviz_visual_tools%2Frviz_visual_tools.h",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/c269540348153a60823a2f460065641382e873ad/include%2Frviz_visual_tools%2Frviz_visual_tools.h",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/include%2Frviz_visual_tools%2Frviz_visual_tools.h?ref=c269540348153a60823a2f460065641382e873ad",
+          "patch": "@@ -658,8 +658,8 @@ class RvizVisualTools\n    * \\param scale - size of axis\n    * \\return true on success\n    */\n-  bool publishAxisLabeled(const Eigen::Affine3d &pose, const std::string &label, const scales &scale = REGULAR);\n-  bool publishAxisLabeled(const geometry_msgs::Pose &pose, const std::string &label, const scales &scale = REGULAR);\n+  bool publishAxisLabeled(const Eigen::Affine3d &pose, const std::string &label, const colors &color = WHITE, const scales &scale = SMALL);\n+  bool publishAxisLabeled(const geometry_msgs::Pose &pose, const std::string &label, const colors &color = WHITE, const scales &scale = SMALL);\n \n   /**\n    * \\brief Display a marker of a axis"
+        },
+        {
+          "sha": "0415afb3787f738f2b58c363ade146c1254b4821",
+          "filename": "src/rviz_visual_tools.cpp",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 5,
+          "changes": 13,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/c269540348153a60823a2f460065641382e873ad/src%2Frviz_visual_tools.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/c269540348153a60823a2f460065641382e873ad/src%2Frviz_visual_tools.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/src%2Frviz_visual_tools.cpp?ref=c269540348153a60823a2f460065641382e873ad",
+          "patch": "@@ -1198,16 +1198,19 @@ bool RvizVisualTools::publishBlock(const Eigen::Affine3d &pose, const colors &co\n   return publishBlock(convertPose(pose), color, block_size);\n }\n \n-bool RvizVisualTools::publishAxisLabeled(const Eigen::Affine3d &pose, const std::string &label, const scales &scale)\n+bool RvizVisualTools::publishAxisLabeled(const Eigen::Affine3d &pose, const std::string &label, const colors &color, const scales &scale)\n {\n-  return publishAxisLabeled(convertPose(pose), label, scale);\n+  return publishAxisLabeled(convertPose(pose), label, color, scale);\n }\n \n-bool RvizVisualTools::publishAxisLabeled(const geometry_msgs::Pose &pose, const std::string &label, const scales &scale)\n+bool RvizVisualTools::publishAxisLabeled(const geometry_msgs::Pose &pose, const std::string &label, const colors &color, const scales &scale)\n {\n-  publishText(pose, label, rviz_visual_tools::BLACK, rviz_visual_tools::SMALL,\n-              false);  // TODO(davetcoleman): change size based on passed in scale\n   publishAxis(pose, 0.1, 0.01, label);\n+\n+  geometry_msgs::Pose pose_shifted = pose;\n+  pose_shifted.position.y -= 0.05; // For avoiding overriden Axis and Text\n+  publishText(pose_shifted, label, color, scale,\n+              false);  // TODO(davetcoleman): change size based on passed in scale\n   return true;\n }\n "
+        },
+        {
+          "sha": "f2abb3d1bac07f42c041920e57202305835d34fc",
+          "filename": "src/rviz_visual_tools_demo.cpp",
+          "status": "modified",
+          "additions": 18,
+          "deletions": 1,
+          "changes": 19,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/c269540348153a60823a2f460065641382e873ad/src%2Frviz_visual_tools_demo.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/c269540348153a60823a2f460065641382e873ad/src%2Frviz_visual_tools_demo.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/src%2Frviz_visual_tools_demo.cpp?ref=c269540348153a60823a2f460065641382e873ad",
+          "patch": "@@ -319,7 +319,24 @@ class RvizVisualToolsDemo\n     // TODO publishPolygon\n \n     // --------------------------------------------------------------------\n-    // TODO publishAxisLabeled\n+    ROS_INFO_STREAM_NAMED(name_, \"Displaying Labeled Coordinate Axis\");\n+    pose1.translation().x() = 0;\n+    y += space_between_rows;\n+    pose1.translation().y() = y;\n+    step = 0.2;\n+    for (double i = 0; i <= 1.0; i += step)\n+    {\n+      visual_tools_->publishAxisLabeled(pose1, \"label of axis\");\n+      if (!i)\n+        publishLabelHelper(pose1, \"Labeled Coordinate Axis\");\n+\n+      pose1.translation().x() += step;\n+      pose1 = pose1 * Eigen::AngleAxisd(step*2*M_PI, Eigen::Vector3d::UnitX())\n+        * Eigen::AngleAxisd(step*2*M_PI, Eigen::Vector3d::UnitY())\n+        * Eigen::AngleAxisd(step*2*M_PI, Eigen::Vector3d::UnitZ());\n+    }\n+    visual_tools_->triggerBatchPublish();\n+\n \n   }\n "
+        }
+      ]
+    },
+    {
+      "author": "Dave Coleman",
+      "date": "2015-07-31T19:04:24Z",
+      "sha": "49a5b4607e53066d61f381eb9770b01d60e4ecbe",
+      "message": "New print transform functions",
+      "files_changed": 2,
+      "additions": 27,
+      "deletions": 3,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "ef94818fcb3c70d365247ca5c05adead31fe7cb0",
+          "filename": "include/rviz_visual_tools/rviz_visual_tools.h",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 3,
+          "changes": 16,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/49a5b4607e53066d61f381eb9770b01d60e4ecbe/include%2Frviz_visual_tools%2Frviz_visual_tools.h",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/49a5b4607e53066d61f381eb9770b01d60e4ecbe/include%2Frviz_visual_tools%2Frviz_visual_tools.h",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/include%2Frviz_visual_tools%2Frviz_visual_tools.h?ref=49a5b4607e53066d61f381eb9770b01d60e4ecbe",
+          "patch": "@@ -741,7 +741,7 @@ class RvizVisualTools\n   /**\n    * \\brief Convert an affine3d to xyz rpy components\n    */\n-  static void convertToXYZRPY(const Eigen::Affine3d& pose, double& x, double& y, double& z, \n+  static void convertToXYZRPY(const Eigen::Affine3d& pose, double& x, double& y, double& z,\n                               double& roll, double& pitch, double& yaw);\n   /**\n    * \\brief Create a random pose within bounds of random_pose_bounds_\n@@ -770,6 +770,16 @@ class RvizVisualTools\n   static float fRand(float min, float max);\n   static int iRand(int min, int max);\n \n+  /**\n+   * \\brief Display in the console a transform in quaternions\n+   */\n+  static void printTransform(const Eigen::Affine3d &transform);\n+\n+  /**\n+   * \\brief Display in the console a transform in roll pitch yaw\n+   */\n+  static void printTransformRPY(const Eigen::Affine3d &transform);\n+\n protected:\n \n   /**\n@@ -798,7 +808,7 @@ class RvizVisualTools\n   double floor_to_base_height_; // allows an offset between base link and floor where objects are built\n \n   // Duration to have Rviz markers persist, 0 for infinity\n-  ros::Duration marker_lifetime_; // TODO remove this  \n+  ros::Duration marker_lifetime_; // TODO remove this\n \n   // Settings\n   bool batch_publishing_enabled_;\n@@ -829,7 +839,7 @@ class RvizVisualTools\n   geometry_msgs::Point32 shared_point32_msg_;\n   Eigen::Affine3d shared_pose_eigen_;\n   Eigen::Vector3d shared_point_eigen_;\n-  \n+\n }; // class\n \n typedef boost::shared_ptr<RvizVisualTools> RvizVisualToolsPtr;"
+        },
+        {
+          "sha": "b00b34cb52f835d145569c9e40be4cb4e08d0633",
+          "filename": "src/rviz_visual_tools.cpp",
+          "status": "modified",
+          "additions": 14,
+          "deletions": 0,
+          "changes": 14,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/49a5b4607e53066d61f381eb9770b01d60e4ecbe/src%2Frviz_visual_tools.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/49a5b4607e53066d61f381eb9770b01d60e4ecbe/src%2Frviz_visual_tools.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/src%2Frviz_visual_tools.cpp?ref=49a5b4607e53066d61f381eb9770b01d60e4ecbe",
+          "patch": "@@ -1970,4 +1970,18 @@ bool RvizVisualTools::triggerInternalBatchPublishAndDisable()\n   return result;\n }\n \n+void RvizVisualTools::printTransform(const Eigen::Affine3d &transform)\n+{\n+  Eigen::Quaterniond q(transform.rotation());\n+  std::cout << \"T.xyz = [\" << transform.translation().x() << \", \" << transform.translation().y() << \", \" << transform.translation().z() << \"], Q.xyzw = [\"\n+            << q.x() << \", \" << q.y() << \", \" << q.z() << \", \" << q.w() << \"]\" << std::endl;\n+}\n+\n+void RvizVisualTools::printTransformRPY(const Eigen::Affine3d &transform)\n+{\n+  double x, y, z, r, p, yaw;\n+  convertToXYZRPY(transform, x, y, z, r, p, yaw);\n+  std::cout << \"transform: [\" << x << \", \" << y << \", \" << z << \", \" << r << \", \" << p << \", \" << yaw << \"]\\n\";\n+}\n+\n } // namespace"
+        }
+      ]
+    },
+    {
+      "author": "Jorge-C",
+      "date": "2015-03-16T21:56:55Z",
+      "sha": "ec90529babbe0962c4ac17c00b16d8d7751b0adc",
+      "message": "Add WireframCuboid function to show oriented bounding boxes as computed from PCL.",
+      "files_changed": 1,
+      "additions": 52,
+      "deletions": 1,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "f8b1cb3f2b493b44f0af3fda57d68558016945bf",
+          "filename": "src/rviz_visual_tools.cpp",
+          "status": "modified",
+          "additions": 52,
+          "deletions": 1,
+          "changes": 53,
+          "blob_url": "https://github.com/PickNikRobotics/rviz_visual_tools/blob/ec90529babbe0962c4ac17c00b16d8d7751b0adc/src%2Frviz_visual_tools.cpp",
+          "raw_url": "https://github.com/PickNikRobotics/rviz_visual_tools/raw/ec90529babbe0962c4ac17c00b16d8d7751b0adc/src%2Frviz_visual_tools.cpp",
+          "contents_url": "https://api.github.com/repos/PickNikRobotics/rviz_visual_tools/contents/src%2Frviz_visual_tools.cpp?ref=ec90529babbe0962c4ac17c00b16d8d7751b0adc",
+          "patch": "@@ -1088,7 +1088,58 @@ bool RvizVisualTools::publishPolygon(const geometry_msgs::Polygon &polygon, cons\n   publishPath(points, color, scale, ns);\n }\n \n-bool RvizVisualTools::publishSpheres(const std::vector<Eigen::Vector3d> &points, const rviz_visual_tools::colors &color, const double scale, const std::string& ns)\n+  bool RvizVisualTools::publishWireframeCuboid(const Eigen::Affine3d &pose,\n+\t\t\t\t\t       const Eigen::Vector3d &position,\n+\t\t\t\t\t       const Eigen::Matrix3d &rotation_matrix,\n+\t\t\t\t\t       const Eigen::Vector3d &min_point,\n+\t\t\t\t\t       const Eigen::Vector3d &max_point)\n+{\n+  /* Publish cuboid at a certain pose. Useful to show an oriented\n+     bounding as computed by PCL. */\n+    Eigen::Vector3d p1 (min_point[0], min_point[1], min_point[2]);\n+    Eigen::Vector3d p2 (min_point[0], min_point[1], max_point[2]);\n+    Eigen::Vector3d p3 (max_point[0], min_point[1], max_point[2]);\n+    Eigen::Vector3d p4 (max_point[0], min_point[1], min_point[2]);\n+    Eigen::Vector3d p5 (min_point[0], max_point[1], min_point[2]);\n+    Eigen::Vector3d p6 (min_point[0], max_point[1], max_point[2]);\n+    Eigen::Vector3d p7 (max_point[0], max_point[1], max_point[2]);\n+    Eigen::Vector3d p8 (max_point[0], max_point[1], min_point[2]);\n+\n+    p1 = rotation_matrix * p1 + position;\n+    p2 = rotation_matrix * p2 + position;\n+    p3 = rotation_matrix * p3 + position;\n+    p4 = rotation_matrix * p4 + position;\n+    p5 = rotation_matrix * p5 + position;\n+    p6 = rotation_matrix * p6 + position;\n+    p7 = rotation_matrix * p7 + position;\n+    p8 = rotation_matrix * p8 + position;\n+\n+    p1 = pose * p1;\n+    p2 = pose * p2;\n+    p3 = pose * p3;\n+    p4 = pose * p4;\n+    p5 = pose * p5;\n+    p6 = pose * p6;\n+    p7 = pose * p7;\n+    p8 = pose * p8;\n+\n+    RvizVisualTools::publishLine(p1, p2);\n+    RvizVisualTools::publishLine(p1, p4);\n+    RvizVisualTools::publishLine(p1, p5);\n+    RvizVisualTools::publishLine(p5, p6);\n+    RvizVisualTools::publishLine(p5, p8);\n+    RvizVisualTools::publishLine(p2, p6);\n+    RvizVisualTools::publishLine(p6, p7);\n+    RvizVisualTools::publishLine(p7, p8);\n+    RvizVisualTools::publishLine(p2, p3);\n+    RvizVisualTools::publishLine(p4, p8);\n+    RvizVisualTools::publishLine(p3, p4);\n+    RvizVisualTools::publishLine(p3, p7);\n+\n+    return true;\n+  }\n+\n+bool RvizVisualTools::publishSpheres(const std::vector<Eigen::Vector3d> &points, const rviz_visual_tools::colors color, const double scale, const std::string& ns)\n {\n   std::vector<geometry_msgs::Point> points_msg;\n   geometry_msgs::Point temp;"
+        }
+      ]
+    }
+  ]
+}

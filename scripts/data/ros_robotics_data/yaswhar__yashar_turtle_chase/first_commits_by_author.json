@@ -1,0 +1,186 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T07:00:41Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "yaswhar",
+    "repo": "yashar_turtle_chase"
+  },
+  "data": [
+    {
+      "author": "yaswhar",
+      "date": "2025-04-14T13:01:38Z",
+      "sha": "d004e67c071bbf31064b277e9d38ce6095d9724b",
+      "message": "Initial commit for Yashar_Turtle_Chase package",
+      "files_changed": 14,
+      "additions": 380,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "94d4c924264f5edeec66b3973ea5a9f4bc9bd952",
+          "filename": "launch/dynamic_chase.launch.py",
+          "status": "added",
+          "additions": 57,
+          "deletions": 0,
+          "changes": 57,
+          "blob_url": "https://github.com/yaswhar/yashar_turtle_chase/blob/d004e67c071bbf31064b277e9d38ce6095d9724b/launch%2Fdynamic_chase.launch.py",
+          "raw_url": "https://github.com/yaswhar/yashar_turtle_chase/raw/d004e67c071bbf31064b277e9d38ce6095d9724b/launch%2Fdynamic_chase.launch.py",
+          "contents_url": "https://api.github.com/repos/yaswhar/yashar_turtle_chase/contents/launch%2Fdynamic_chase.launch.py?ref=d004e67c071bbf31064b277e9d38ce6095d9724b",
+          "patch": "@@ -0,0 +1,57 @@\n+#!/usr/bin/env python3\n+from launch import LaunchDescription\n+from launch_ros.actions import Node\n+from launch.substitutions import LaunchConfiguration\n+from launch.actions import DeclareLaunchArgument, ExecuteProcess\n+\n+def generate_launch_description():\n+    return LaunchDescription([\n+        DeclareLaunchArgument(\n+            'num_turtles',\n+            default_value='2',\n+            description='Number of turtles to spawn'\n+        ),\n+        DeclareLaunchArgument(\n+            'initial_leader',\n+            default_value='turtle1',\n+            description='Initial leader turtle name'\n+        ),\n+        \n+        # Turtlesim node\n+        Node(\n+            package='turtlesim',\n+            executable='turtlesim_node',\n+            name='turtlesim'\n+        ),\n+        \n+        # Spawn turtles node\n+        Node(\n+            package='yashar_turtle_chase',\n+            executable='spawn_turtles',\n+            name='spawn_turtles',\n+            parameters=[{'num_turtles': LaunchConfiguration('num_turtles')}]\n+        ),\n+        \n+        # Dynamic follower node (fixed in code)\n+        Node(\n+            package='yashar_turtle_chase',\n+            executable='dynamic_follower',\n+            name='dynamic_follower',\n+            parameters=[\n+                {'num_turtles': LaunchConfiguration('num_turtles')},\n+                {'initial_leader': LaunchConfiguration('initial_leader')}\n+            ]\n+        ),\n+        \n+        # Fixed teleop launch command\n+        ExecuteProcess(\n+            cmd=[\n+                'ros2', 'run', 'turtlesim', 'turtle_teleop_key',  # Fixed package name\n+                '--ros-args',\n+                '-r', '/turtle1/cmd_vel:=/leader/cmd_vel'\n+            ],\n+            output='screen',\n+            shell=True,\n+            prefix='xterm -e'\n+        )\n+    ])\n\\ No newline at end of file"
+        },
+        {
+          "sha": "552cd210ed50d9f7f86f586553f0ebbd79c16e2a",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 32,
+          "deletions": 0,
+          "changes": 32,
+          "blob_url": "https://github.com/yaswhar/yashar_turtle_chase/blob/d004e67c071bbf31064b277e9d38ce6095d9724b/package.xml",
+          "raw_url": "https://github.com/yaswhar/yashar_turtle_chase/raw/d004e67c071bbf31064b277e9d38ce6095d9724b/package.xml",
+          "contents_url": "https://api.github.com/repos/yaswhar/yashar_turtle_chase/contents/package.xml?ref=d004e67c071bbf31064b277e9d38ce6095d9724b",
+          "patch": "@@ -0,0 +1,32 @@\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n+  <name>yashar_turtle_chase</name>\n+  <version>0.0.0</version>\n+  <description>Dynamic leader-follower turtlesim demo with leader switching service</description>\n+  <maintainer email=\"zafari.h.yashar@gmail.com\">Yashar Zafari</maintainer>\n+  <license>Apache License 2.0</license>\n+\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n+  <build_depend>rosidl_default_generators</build_depend>\n+\n+  <test_depend>ament_copyright</test_depend>\n+  <test_depend>ament_flake8</test_depend>\n+  <test_depend>ament_pep257</test_depend>\n+  <test_depend>python3-pytest</test_depend>\n+  <test_depend>ament_lint_auto</test_depend>\n+  <test_depend>ament_lint_common</test_depend>\n+\n+  <exec_depend>rclpy</exec_depend>\n+  <exec_depend>turtlesim</exec_depend>\n+  <exec_depend>geometry_msgs</exec_depend>\n+  <exec_depend>std_msgs</exec_depend>\n+  <depend>rosidl_default_runtime</depend>\n+\n+  <export>\n+    <build_type>ament_python</build_type>\n+    <rosidl_generate_interfaces>\n+      <member_of_group>rosidl_interface_packages</member_of_group>\n+    </rosidl_generate_interfaces>\n+  </export>\n+</package>\n\\ No newline at end of file"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "resource/yashar_turtle_chase",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/yaswhar/yashar_turtle_chase/blob/d004e67c071bbf31064b277e9d38ce6095d9724b/resource%2Fyashar_turtle_chase",
+          "raw_url": "https://github.com/yaswhar/yashar_turtle_chase/raw/d004e67c071bbf31064b277e9d38ce6095d9724b/resource%2Fyashar_turtle_chase",
+          "contents_url": "https://api.github.com/repos/yaswhar/yashar_turtle_chase/contents/resource%2Fyashar_turtle_chase?ref=d004e67c071bbf31064b277e9d38ce6095d9724b"
+        },
+        {
+          "sha": "51f687af5acaf3ae076ee389a791fee828f0c68f",
+          "filename": "setup.cfg",
+          "status": "added",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/yaswhar/yashar_turtle_chase/blob/d004e67c071bbf31064b277e9d38ce6095d9724b/setup.cfg",
+          "raw_url": "https://github.com/yaswhar/yashar_turtle_chase/raw/d004e67c071bbf31064b277e9d38ce6095d9724b/setup.cfg",
+          "contents_url": "https://api.github.com/repos/yaswhar/yashar_turtle_chase/contents/setup.cfg?ref=d004e67c071bbf31064b277e9d38ce6095d9724b",
+          "patch": "@@ -0,0 +1,4 @@\n+[develop]\n+script_dir=$base/lib/yashar_turtle_chase\n+[install]\n+install_scripts=$base/lib/yashar_turtle_chase"
+        },
+        {
+          "sha": "df0406427c3958fad089fb1f56e8946179263653",
+          "filename": "setup.py",
+          "status": "added",
+          "additions": 29,
+          "deletions": 0,
+          "changes": 29,
+          "blob_url": "https://github.com/yaswhar/yashar_turtle_chase/blob/d004e67c071bbf31064b277e9d38ce6095d9724b/setup.py",
+          "raw_url": "https://github.com/yaswhar/yashar_turtle_chase/raw/d004e67c071bbf31064b277e9d38ce6095d9724b/setup.py",
+          "contents_url": "https://api.github.com/repos/yaswhar/yashar_turtle_chase/contents/setup.py?ref=d004e67c071bbf31064b277e9d38ce6095d9724b",
+          "patch": "@@ -0,0 +1,29 @@\n+from setuptools import find_packages, setup\n+from glob import glob\n+\n+package_name = 'yashar_turtle_chase'\n+\n+setup(\n+    name=package_name,\n+    version='0.0.0',\n+    packages=find_packages(exclude=['test']),\n+    install_requires=['setuptools'],\n+    zip_safe=True,\n+    maintainer='Yashar Zafari',\n+    maintainer_email='zafari.h.yashar@gmail.com',\n+    description='Dynamic leader-follower turtlesim demo with leader switching service',\n+    license='Apache License 2.0',\n+    tests_require=['pytest'],\n+    entry_points={\n+        'console_scripts': [\n+            'spawn_turtles = yashar_turtle_chase.spawn_turtles:main',\n+            'dynamic_follower = yashar_turtle_chase.dynamic_follower:main',\n+        ],\n+    },\n+    data_files=[\n+        # Install package.xml into the share directory\n+        ('share/yashar_turtle_chase', ['package.xml']),\n+        # Install launch files (all .launch.py files in the launch folder)\n+        ('share/yashar_turtle_chase/launch', glob('launch/*.launch.py'))\n+    ],\n+)"
+        },
+        {
+          "sha": "97a39196e84db97954341162a6d2e7f771d938c0",
+          "filename": "test/test_copyright.py",
+          "status": "added",
+          "additions": 25,
+          "deletions": 0,
+          "changes": 25,
+          "blob_url": "https://github.com/yaswhar/yashar_turtle_chase/blob/d004e67c071bbf31064b277e9d38ce6095d9724b/test%2Ftest_copyright.py",
+          "raw_url": "https://github.com/yaswhar/yashar_turtle_chase/raw/d004e67c071bbf31064b277e9d38ce6095d9724b/test%2Ftest_copyright.py",
+          "contents_url": "https://api.github.com/repos/yaswhar/yashar_turtle_chase/contents/test%2Ftest_copyright.py?ref=d004e67c071bbf31064b277e9d38ce6095d9724b",
+          "patch": "@@ -0,0 +1,25 @@\n+# Copyright 2015 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_copyright.main import main\n+import pytest\n+\n+\n+# Remove the `skip` decorator once the source file(s) have a copyright header\n+@pytest.mark.skip(reason='No copyright header has been placed in the generated source file.')\n+@pytest.mark.copyright\n+@pytest.mark.linter\n+def test_copyright():\n+    rc = main(argv=['.', 'test'])\n+    assert rc == 0, 'Found errors'"
+        },
+        {
+          "sha": "27ee1078ff077cc3a0fec75b7d023101a68164d1",
+          "filename": "test/test_flake8.py",
+          "status": "added",
+          "additions": 25,
+          "deletions": 0,
+          "changes": 25,
+          "blob_url": "https://github.com/yaswhar/yashar_turtle_chase/blob/d004e67c071bbf31064b277e9d38ce6095d9724b/test%2Ftest_flake8.py",
+          "raw_url": "https://github.com/yaswhar/yashar_turtle_chase/raw/d004e67c071bbf31064b277e9d38ce6095d9724b/test%2Ftest_flake8.py",
+          "contents_url": "https://api.github.com/repos/yaswhar/yashar_turtle_chase/contents/test%2Ftest_flake8.py?ref=d004e67c071bbf31064b277e9d38ce6095d9724b",
+          "patch": "@@ -0,0 +1,25 @@\n+# Copyright 2017 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_flake8.main import main_with_errors\n+import pytest\n+\n+\n+@pytest.mark.flake8\n+@pytest.mark.linter\n+def test_flake8():\n+    rc, errors = main_with_errors(argv=[])\n+    assert rc == 0, \\\n+        'Found %d code style errors / warnings:\\n' % len(errors) + \\\n+        '\\n'.join(errors)"
+        },
+        {
+          "sha": "b234a3840f4c5bd38f043638c8622b8f240e1185",
+          "filename": "test/test_pep257.py",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/yaswhar/yashar_turtle_chase/blob/d004e67c071bbf31064b277e9d38ce6095d9724b/test%2Ftest_pep257.py",
+          "raw_url": "https://github.com/yaswhar/yashar_turtle_chase/raw/d004e67c071bbf31064b277e9d38ce6095d9724b/test%2Ftest_pep257.py",
+          "contents_url": "https://api.github.com/repos/yaswhar/yashar_turtle_chase/contents/test%2Ftest_pep257.py?ref=d004e67c071bbf31064b277e9d38ce6095d9724b",
+          "patch": "@@ -0,0 +1,23 @@\n+# Copyright 2015 Open Source Robotics Foundation, Inc.\n+#\n+# Licensed under the Apache License, Version 2.0 (the \"License\");\n+# you may not use this file except in compliance with the License.\n+# You may obtain a copy of the License at\n+#\n+#     http://www.apache.org/licenses/LICENSE-2.0\n+#\n+# Unless required by applicable law or agreed to in writing, software\n+# distributed under the License is distributed on an \"AS IS\" BASIS,\n+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n+# See the License for the specific language governing permissions and\n+# limitations under the License.\n+\n+from ament_pep257.main import main\n+import pytest\n+\n+\n+@pytest.mark.linter\n+@pytest.mark.pep257\n+def test_pep257():\n+    rc = main(argv=['.', 'test'])\n+    assert rc == 0, 'Found code style errors / warnings'"
+        },
+        {
+          "sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+          "filename": "yashar_turtle_chase/__init__.py",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/yaswhar/yashar_turtle_chase/blob/d004e67c071bbf31064b277e9d38ce6095d9724b/yashar_turtle_chase%2F__init__.py",
+          "raw_url": "https://github.com/yaswhar/yashar_turtle_chase/raw/d004e67c071bbf31064b277e9d38ce6095d9724b/yashar_turtle_chase%2F__init__.py",
+          "contents_url": "https://api.github.com/repos/yaswhar/yashar_turtle_chase/contents/yashar_turtle_chase%2F__init__.py?ref=d004e67c071bbf31064b277e9d38ce6095d9724b"
+        },
+        {
+          "sha": "77cba79cc736d3f3ebe7b198a95bfe75b706407d",
+          "filename": "yashar_turtle_chase/__pycache__/__init__.cpython-310.pyc",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/yaswhar/yashar_turtle_chase/blob/d004e67c071bbf31064b277e9d38ce6095d9724b/yashar_turtle_chase%2F__pycache__%2F__init__.cpython-310.pyc",
+          "raw_url": "https://github.com/yaswhar/yashar_turtle_chase/raw/d004e67c071bbf31064b277e9d38ce6095d9724b/yashar_turtle_chase%2F__pycache__%2F__init__.cpython-310.pyc",
+          "contents_url": "https://api.github.com/repos/yaswhar/yashar_turtle_chase/contents/yashar_turtle_chase%2F__pycache__%2F__init__.cpython-310.pyc?ref=d004e67c071bbf31064b277e9d38ce6095d9724b"
+        },
+        {
+          "sha": "862d4c880101de908a514f4176fedc5ae1c3cd45",
+          "filename": "yashar_turtle_chase/__pycache__/dynamic_follower.cpython-310.pyc",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/yaswhar/yashar_turtle_chase/blob/d004e67c071bbf31064b277e9d38ce6095d9724b/yashar_turtle_chase%2F__pycache__%2Fdynamic_follower.cpython-310.pyc",
+          "raw_url": "https://github.com/yaswhar/yashar_turtle_chase/raw/d004e67c071bbf31064b277e9d38ce6095d9724b/yashar_turtle_chase%2F__pycache__%2Fdynamic_follower.cpython-310.pyc",
+          "contents_url": "https://api.github.com/repos/yaswhar/yashar_turtle_chase/contents/yashar_turtle_chase%2F__pycache__%2Fdynamic_follower.cpython-310.pyc?ref=d004e67c071bbf31064b277e9d38ce6095d9724b"
+        },
+        {
+          "sha": "0c03f22d7a4b8d7d7e4e11aee915f31a1d738b68",
+          "filename": "yashar_turtle_chase/__pycache__/spawn_turtles.cpython-310.pyc",
+          "status": "added",
+          "additions": 0,
+          "deletions": 0,
+          "changes": 0,
+          "blob_url": "https://github.com/yaswhar/yashar_turtle_chase/blob/d004e67c071bbf31064b277e9d38ce6095d9724b/yashar_turtle_chase%2F__pycache__%2Fspawn_turtles.cpython-310.pyc",
+          "raw_url": "https://github.com/yaswhar/yashar_turtle_chase/raw/d004e67c071bbf31064b277e9d38ce6095d9724b/yashar_turtle_chase%2F__pycache__%2Fspawn_turtles.cpython-310.pyc",
+          "contents_url": "https://api.github.com/repos/yaswhar/yashar_turtle_chase/contents/yashar_turtle_chase%2F__pycache__%2Fspawn_turtles.cpython-310.pyc?ref=d004e67c071bbf31064b277e9d38ce6095d9724b"
+        },
+        {
+          "sha": "a7c68383a4222ed5631775d4cee38e9b86f8a4f3",
+          "filename": "yashar_turtle_chase/dynamic_follower.py",
+          "status": "added",
+          "additions": 121,
+          "deletions": 0,
+          "changes": 121,
+          "blob_url": "https://github.com/yaswhar/yashar_turtle_chase/blob/d004e67c071bbf31064b277e9d38ce6095d9724b/yashar_turtle_chase%2Fdynamic_follower.py",
+          "raw_url": "https://github.com/yaswhar/yashar_turtle_chase/raw/d004e67c071bbf31064b277e9d38ce6095d9724b/yashar_turtle_chase%2Fdynamic_follower.py",
+          "contents_url": "https://api.github.com/repos/yaswhar/yashar_turtle_chase/contents/yashar_turtle_chase%2Fdynamic_follower.py?ref=d004e67c071bbf31064b277e9d38ce6095d9724b",
+          "patch": "@@ -0,0 +1,121 @@\n+#!/usr/bin/env python3\n+import rclpy\n+from rclpy.node import Node\n+from turtlesim.msg import Pose\n+from geometry_msgs.msg import Twist\n+from std_msgs.msg import String\n+import math\n+\n+class DynamicFollower(Node):\n+    def __init__(self):\n+        super().__init__('dynamic_follower')\n+        # Parameters: number of turtles and initial leader (default 'turtle1')\n+        self.declare_parameter('num_turtles', 2)\n+        self.declare_parameter('initial_leader', 'turtle1')\n+        self.num_turtles = self.get_parameter('num_turtles').value\n+        self.leader = self.get_parameter('initial_leader').value\n+\n+        # Dictionary to store turtle poses by name\n+        self.poses = {}\n+        # Dictionary of publishers for each turtle's cmd_vel topic\n+        self.cmd_pubs = {}\n+\n+        # Leader switch topic\n+        self.create_subscription(\n+            String,\n+            '/switch_leader',\n+            self.leader_switch_cb,\n+            10\n+        )\n+\n+        # For each turtle (turtle1 through turtleN), subscribe to pose and create a publisher for cmd_vel\n+        for i in range(1, self.num_turtles + 1):\n+            turtle_name = f'turtle{i}'\n+            self.create_subscription(\n+                Pose,\n+                f'/{turtle_name}/pose',\n+                self._create_pose_cb(turtle_name),\n+                10\n+            )\n+            self.cmd_pubs[turtle_name] = self.create_publisher(\n+                Twist,\n+                f'/{turtle_name}/cmd_vel',\n+                10\n+            )\n+\n+        # Special teleop relay: subscribe to /leader/cmd_vel and forward to the current leader\n+        self.create_subscription(Twist, '/leader/cmd_vel', self.teleop_cmd_cb, 10)\n+        # Timer for control loop: have followers track the leader\n+        self.timer = self.create_timer(0.1, self.control_loop)\n+        self.get_logger().info(f\"Initial leader set to: {self.leader}\")\n+\n+    def _create_pose_cb(self, turtle_name):\n+        # Create a callback that captures the turtle name.\n+        def cb(msg):\n+            self.poses[turtle_name] = msg\n+        return cb\n+\n+    def leader_switch_cb(self, msg):\n+        # Topic callback for switching the leader.\n+        leader_name = msg.data\n+        if leader_name in self.poses:\n+            self.leader = leader_name\n+            self.get_logger().info(f\"Leader switched to: {self.leader}\")\n+        else:\n+            self.get_logger().error(f\"Leader {leader_name} does not exist or is not available yet!\")\n+\n+    def teleop_cmd_cb(self, msg):\n+        # Relay teleop commands to the current leader.\n+        if self.leader in self.cmd_pubs:\n+            self.cmd_pubs[self.leader].publish(msg)\n+\n+    def control_loop(self):\n+        # Only run if the leader's pose is available.\n+        if self.leader not in self.poses:\n+            return\n+\n+        leader_pose = self.poses[self.leader]\n+        # Check if leader is moving\n+        velocity_threshold = 0.001\n+        leader_moving = (\n+            abs(leader_pose.linear_velocity) > velocity_threshold or \n+            abs(leader_pose.angular_velocity) > velocity_threshold\n+        )\n+\n+        # For every turtle (except the leader), compute velocity commands\n+        for turtle_name, pose in self.poses.items():\n+            if turtle_name == self.leader:\n+                continue\n+\n+            if leader_moving:\n+                dx = leader_pose.x - pose.x\n+                dy = leader_pose.y - pose.y\n+                distance = math.hypot(dx, dy)\n+                target_angle = math.atan2(dy, dx)\n+                angle_error = math.atan2(\n+                    math.sin(target_angle - pose.theta),\n+                    math.cos(target_angle - pose.theta)\n+                )\n+\n+                K_linear = 0.8\n+                K_angular = 1.2\n+\n+                cmd = Twist()\n+                cmd.linear.x = K_linear * distance\n+                cmd.angular.z = K_angular * angle_error\n+            else:\n+                cmd = Twist()\n+                cmd.linear.x = 0.0\n+                cmd.angular.z = 0.0\n+\n+            self.cmd_pubs[turtle_name].publish(cmd)\n+\n+def main(args=None):\n+    rclpy.init(args=args)\n+    node = DynamicFollower()\n+    rclpy.spin(node)\n+    node.destroy_node()\n+    rclpy.shutdown()\n+\n+if __name__ == '__main__':\n+    main()\n\\ No newline at end of file"
+        },
+        {
+          "sha": "80ead23bfebc2257e9cb9dfad1f2c728397422d2",
+          "filename": "yashar_turtle_chase/spawn_turtles.py",
+          "status": "added",
+          "additions": 64,
+          "deletions": 0,
+          "changes": 64,
+          "blob_url": "https://github.com/yaswhar/yashar_turtle_chase/blob/d004e67c071bbf31064b277e9d38ce6095d9724b/yashar_turtle_chase%2Fspawn_turtles.py",
+          "raw_url": "https://github.com/yaswhar/yashar_turtle_chase/raw/d004e67c071bbf31064b277e9d38ce6095d9724b/yashar_turtle_chase%2Fspawn_turtles.py",
+          "contents_url": "https://api.github.com/repos/yaswhar/yashar_turtle_chase/contents/yashar_turtle_chase%2Fspawn_turtles.py?ref=d004e67c071bbf31064b277e9d38ce6095d9724b",
+          "patch": "@@ -0,0 +1,64 @@\n+#!/usr/bin/env python3\n+import rclpy\n+from rclpy.node import Node\n+from turtlesim.srv import Spawn\n+import random\n+import math\n+\n+class TurtleSpawner(Node):\n+    def __init__(self):\n+        super().__init__('turtle_spawner')\n+        # Parameter for the total number of turtles (default is 2)\n+        self.declare_parameter('num_turtles', 2)\n+        self.num_turtles = self.get_parameter('num_turtles').value\n+\n+        # Spawn Service Client\n+        self.cli = self.create_client(Spawn, '/spawn')\n+        while not self.cli.wait_for_service(timeout_sec=1.0):\n+            self.get_logger().info('Spawn service not available, waiting...')\n+        # List to store positions (x, y) already used.\n+        # Assume turtle1's default position is (5.544444, 5.544444)\n+        self.existing_positions = [(5.544444, 5.544444)]\n+        self.spawn_turtles()\n+\n+    def generate_random_position(self, min_distance=1.0, x_range=(1.0, 10.0), y_range=(1.0, 10.0), max_attempts=50):\n+        \"\"\"Generate a random (x, y) position not too close to any existing positions.\"\"\"\n+        for _ in range(max_attempts):\n+            x = random.uniform(*x_range)\n+            y = random.uniform(*y_range)\n+            if all(math.hypot(x - ex, y - ey) >= min_distance for ex, ey in self.existing_positions):\n+                return x, y\n+        raise RuntimeError(\"Could not generate a non-colliding position after many attempts\")\n+\n+    def spawn_turtles(self):\n+        \"\"\"Spawn turtles dynamically.\"\"\"\n+        # Since turtle1 is automatically spawned by turtlesim_node,\n+        # spawn turtles from turtle2 up to num_turtles.\n+        for i in range(2, self.num_turtles + 1):\n+            req = Spawn.Request()\n+            x, y = self.generate_random_position()\n+            req.x = x\n+            req.y = y\n+            req.theta = random.uniform(0, 2 * math.pi)\n+            req.name = f'turtle{i}'\n+            self.existing_positions.append((x, y))\n+            future = self.cli.call_async(req)\n+            future.add_done_callback(lambda fut, name=req.name: self.spawn_callback(fut, name))\n+\n+    def spawn_callback(self, future, turtle_name):\n+        try:\n+            response = future.result()\n+            self.get_logger().info(f'Spawned {response.name} at a random position.')\n+        except Exception as e:\n+            self.get_logger().error(f'Failed to spawn {turtle_name}: {e}')\n+\n+def main(args=None):\n+    rclpy.init(args=args)\n+    node = TurtleSpawner()\n+    # Give a brief period for turtles to spawn.\n+    rclpy.spin_once(node, timeout_sec=0.5)\n+    node.destroy_node()\n+    rclpy.shutdown()\n+\n+if __name__ == '__main__':\n+    main()\n\\ No newline at end of file"
+        }
+      ]
+    }
+  ]
+}

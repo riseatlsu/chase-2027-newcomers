@@ -1,0 +1,792 @@
+{
+  "_meta": {
+    "fetched_at": "2026-09-21T19:27:39Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "moveit",
+    "repo": "random_numbers"
+  },
+  "data": [
+    {
+      "author": "rhaschke",
+      "date": "2019-03-28T09:24:43Z",
+      "sha": "0108aed549adbb956e552a9f0e1148a344b52de8",
+      "message": "Update Travis (#16)\n\n* make Travis use moveit_ci\r\n* clang-format\r\n* enable catkin_lint check",
+      "files_changed": 4,
+      "additions": 109,
+      "deletions": 66,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "bef3326796534dca922099b9027df4f8f58b86e1",
+          "filename": ".clang-format",
+          "status": "added",
+          "additions": 66,
+          "deletions": 0,
+          "changes": 66,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/0108aed549adbb956e552a9f0e1148a344b52de8/.clang-format",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/0108aed549adbb956e552a9f0e1148a344b52de8/.clang-format",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/.clang-format?ref=0108aed549adbb956e552a9f0e1148a344b52de8",
+          "patch": "@@ -0,0 +1,66 @@\n+---\n+BasedOnStyle:  Google\n+AccessModifierOffset: -2\n+ConstructorInitializerIndentWidth: 2\n+AlignEscapedNewlinesLeft: false\n+AlignTrailingComments: true\n+AllowAllParametersOfDeclarationOnNextLine: false\n+AllowShortIfStatementsOnASingleLine: false\n+AllowShortLoopsOnASingleLine: false\n+AllowShortFunctionsOnASingleLine: None\n+AllowShortLoopsOnASingleLine: false\n+AlwaysBreakTemplateDeclarations: true\n+AlwaysBreakBeforeMultilineStrings: false\n+BreakBeforeBinaryOperators: false\n+BreakBeforeTernaryOperators: false\n+BreakConstructorInitializersBeforeComma: true\n+BinPackParameters: true\n+ColumnLimit:    120\n+ConstructorInitializerAllOnOneLineOrOnePerLine: true\n+DerivePointerBinding: false\n+PointerBindsToType: true\n+ExperimentalAutoDetectBinPacking: false\n+IndentCaseLabels: true\n+MaxEmptyLinesToKeep: 1\n+NamespaceIndentation: None\n+ObjCSpaceBeforeProtocolList: true\n+PenaltyBreakBeforeFirstCallParameter: 19\n+PenaltyBreakComment: 60\n+PenaltyBreakString: 100\n+PenaltyBreakFirstLessLess: 1000\n+PenaltyExcessCharacter: 1000\n+PenaltyReturnTypeOnItsOwnLine: 70\n+SpacesBeforeTrailingComments: 2\n+Cpp11BracedListStyle: false\n+Standard:        Auto\n+IndentWidth:     2\n+TabWidth:        2\n+UseTab:          Never\n+IndentFunctionDeclarationAfterType: false\n+SpacesInParentheses: false\n+SpacesInAngles:  false\n+SpaceInEmptyParentheses: false\n+SpacesInCStyleCastParentheses: false\n+SpaceAfterControlStatementKeyword: true\n+SpaceBeforeAssignmentOperators: true\n+ContinuationIndentWidth: 4\n+SortIncludes: false\n+SpaceAfterCStyleCast: false\n+\n+# Configure each individual brace in BraceWrapping\n+BreakBeforeBraces: Custom\n+\n+# Control of individual brace wrapping cases\n+BraceWrapping: {\n+    AfterClass: 'true'\n+    AfterControlStatement: 'true'\n+    AfterEnum : 'true'\n+    AfterFunction : 'true'\n+    AfterNamespace : 'true'\n+    AfterStruct : 'true'\n+    AfterUnion : 'true'\n+    BeforeCatch : 'true'\n+    BeforeElse : 'true'\n+    IndentBraces : 'false'\n+}\n+..."
+        },
+        {
+          "sha": "6a5af87cdd634d1a02ec7e37d2323f0fae292813",
+          "filename": ".travis.yml",
+          "status": "modified",
+          "additions": 16,
+          "deletions": 35,
+          "changes": 51,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/0108aed549adbb956e552a9f0e1148a344b52de8/.travis.yml",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/0108aed549adbb956e552a9f0e1148a344b52de8/.travis.yml",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/.travis.yml?ref=0108aed549adbb956e552a9f0e1148a344b52de8",
+          "patch": "@@ -1,6 +1,10 @@\n # Generic MoveIt Travis Continuous Integration Configuration File\n # Works with all MoveIt! repositories/branches\n # Author: Dave Coleman, Jonathan Bohren\n+sudo: required\n+dist: trusty\n+services:\n+  - docker\n language:\n   - cpp\n   - python\n@@ -14,38 +18,15 @@ notifications:\n       - dave.hershberger@sri.com\n     on_success: change #[always|never|change] # default: change\n     on_failure: change #[always|never|change] # default: always\n-before_install: # Use this to prepare the system to install prerequisites or dependencies\n-  # Define some config vars\n-  - export ROS_DISTRO=hydro\n-  - export CI_SOURCE_PATH=$(pwd)\n-  - export REPOSITORY_NAME=${PWD##*/}\n-  - echo \"Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME\"\n-  - sudo sh -c 'echo \"deb http://packages.ros.org/ros/ubuntu precise main\" > /etc/apt/sources.list.d/ros-latest.list'\n-  - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -\n-  - sudo apt-get update -qq\n-  - sudo apt-get install -qq -y python-catkin-pkg python-rosdep python-wstool ros-$ROS_DISTRO-catkin ros-$ROS_DISTRO-ros\n-  # MongoDB hack - I don't fully understand this but its for moveit_warehouse\n-  - sudo apt-get remove -y mongodb mongodb-10gen\n-  - sudo apt-get install -y mongodb-clients mongodb-server -o Dpkg::Options::=\"--force-confdef\" # default actions\n-  # Setup rosdep\n-  - sudo rosdep init\n-  - rosdep update\n-install: # Use this to install any prerequisites or dependencies necessary to run your build\n-  # Create workspace\n-  - mkdir -p ~/ros/ws_moveit/src\n-  - cd ~/ros/ws_moveit/src\n-  - wstool init .\n-  # Download non-debian stuff\n-  - wstool merge https://raw.github.com/ros-planning/moveit_docs/hydro-devel/moveit.rosinstall\n-  - wstool update\n-  - git clone https://github.com/ros-planning/geometric_shapes.git\n-  # Delete the moveit.rosinstall version of this repo and use the one of the branch we are testing\n-  - rm -rf $REPOSITORY_NAME\n-  - ln -s $CI_SOURCE_PATH . # Link the repo we are testing to the new workspace\n-  - cd ../\n-  # Install dependencies for source repos\n-  - rosdep install --from-paths src --ignore-src --rosdistro $ROS_DISTRO -y\n-before_script: # Use this to prepare your build for testing e.g. copy database configurations, environment variables, etc.\n-  - source /opt/ros/$ROS_DISTRO/setup.bash  \n-script: # All commands must exit with code 0 on success. Anything else is considered failure.\n-  - catkin_make -j2\n+\n+env:\n+  matrix:\n+    - ROS_DISTRO=kinetic TEST=\"catkin_lint clang-format\"\n+    - ROS_DISTRO=kinetic ROS_REPO=ros\n+    - ROS_DISTRO=melodic ROS_REPO=ros\n+\n+before_script:\n+  - git clone -q https://github.com/ros-planning/moveit_ci.git .moveit_ci\n+\n+script:\n+  - source .moveit_ci/travis.sh"
+        },
+        {
+          "sha": "cac94477c54a5bf448ba4b1240925d20d72ae670",
+          "filename": "include/random_numbers/random_numbers.h",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 15,
+          "changes": 28,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/0108aed549adbb956e552a9f0e1148a344b52de8/include%2Frandom_numbers%2Frandom_numbers.h",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/0108aed549adbb956e552a9f0e1148a344b52de8/include%2Frandom_numbers%2Frandom_numbers.h",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/include%2Frandom_numbers%2Frandom_numbers.h?ref=0108aed549adbb956e552a9f0e1148a344b52de8",
+          "patch": "@@ -54,19 +54,18 @@ namespace random_numbers\n class RandomNumberGenerator\n {\n public:\n-  \n   /** \\brief Constructor. Always sets a \"random\" random seed */\n   RandomNumberGenerator(void);\n \n   /** \\brief Constructor. Allow a seed to be specified for deterministic behaviour */\n   RandomNumberGenerator(boost::uint32_t seed);\n-  \n+\n   /** \\brief Generate a random real between 0 and 1 */\n   double uniform01(void)\n   {\n     return uni_();\n   }\n-  \n+\n   /**\n    * @brief Generate a random real within given bounds: [\\e lower_bound, \\e upper_bound)\n    * @param lower_bound The lower bound\n@@ -82,39 +81,38 @@ class RandomNumberGenerator\n   {\n     return normal_();\n   }\n-  \n+\n   /** \\brief Generate a random real using a normal distribution with given mean and variance */\n   double gaussian(double mean, double stddev)\n   {\n     return normal_() * stddev + mean;\n   }\n-  \n+\n   /** \\brief Uniform random unit quaternion sampling. The computed value has the order (x,y,z,w)\n    * @param value[4] A four dimensional array in which the computed quaternion will be returned\n    */\n   void quaternion(double value[4]);\n-  \n+\n   /** \\brief Generate an integer uniformly at random within a specified range (inclusive) */\n   int uniformInteger(int min, int max)\n   {\n-    boost::uniform_int<> dis(min, max);  \n+    boost::uniform_int<> dis(min, max);\n     return dis(generator_);\n   }\n \n   /**\n-   * \\brief Allow the randomly generated seed to be saved so that experiments / benchmarks can be recreated in the future\n+   * \\brief Allow the randomly generated seed to be saved so that experiments / benchmarks can be recreated in the\n+   * future\n    */\n   boost::uint32_t getFirstSeed();\n-  \n+\n private:\n-  \n-  boost::mt19937                                                           generator_;\n-  boost::uniform_real<>                                                    uniDist_; \n-  boost::normal_distribution<>                                             normalDist_;\n-  boost::variate_generator<boost::mt19937&, boost::uniform_real<> >        uni_;  \n+  boost::mt19937 generator_;\n+  boost::uniform_real<> uniDist_;\n+  boost::normal_distribution<> normalDist_;\n+  boost::variate_generator<boost::mt19937&, boost::uniform_real<> > uni_;\n   boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > normal_;\n };\n-\n }\n \n #endif"
+        },
+        {
+          "sha": "9fe7403fb441cf2af8cd838cc3caafa26d9ce240",
+          "filename": "src/random_numbers.cpp",
+          "status": "modified",
+          "additions": 14,
+          "deletions": 16,
+          "changes": 30,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/0108aed549adbb956e552a9f0e1148a344b52de8/src%2Frandom_numbers.cpp",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/0108aed549adbb956e552a9f0e1148a344b52de8/src%2Frandom_numbers.cpp",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/src%2Frandom_numbers.cpp?ref=0108aed549adbb956e552a9f0e1148a344b52de8",
+          "patch": "@@ -49,9 +49,10 @@ static boost::uint32_t first_seed_ = 0;\n static boost::uint32_t firstSeed(void)\n {\n   boost::scoped_ptr<int> mem(new int());\n-  first_seed_ = (boost::uint32_t)((boost::posix_time::microsec_clock::universal_time() -\n-                            boost::posix_time::ptime(boost::date_time::min_date_time)).total_microseconds() +\n-                           (unsigned long long)(mem.get()));\n+  first_seed_ = (boost::uint32_t)(\n+      (boost::posix_time::microsec_clock::universal_time() - boost::posix_time::ptime(boost::date_time::min_date_time))\n+          .total_microseconds() +\n+      (unsigned long long)(mem.get()));\n   return first_seed_;\n }\n \n@@ -63,27 +64,23 @@ static boost::uint32_t nextSeed(void)\n   static boost::mutex rngMutex;\n   boost::mutex::scoped_lock slock(rngMutex);\n   static boost::lagged_fibonacci607 sGen(firstSeed());\n-  static boost::uniform_int<>       sDist(1, 1000000000);\n+  static boost::uniform_int<> sDist(1, 1000000000);\n   static boost::variate_generator<boost::lagged_fibonacci607&, boost::uniform_int<> > s(sGen, sDist);\n   boost::uint32_t v = s();\n   return v;\n }\n \n-\n-random_numbers::RandomNumberGenerator::RandomNumberGenerator(void) : generator_(nextSeed()),\n-                                                                     uniDist_(0, 1),  \n-                                                                     normalDist_(0, 1),\n-                                                                     uni_(generator_, uniDist_),\n-                                                                     normal_(generator_, normalDist_)\n+random_numbers::RandomNumberGenerator::RandomNumberGenerator(void)\n+  : generator_(nextSeed())\n+  , uniDist_(0, 1)\n+  , normalDist_(0, 1)\n+  , uni_(generator_, uniDist_)\n+  , normal_(generator_, normalDist_)\n {\n }\n \n random_numbers::RandomNumberGenerator::RandomNumberGenerator(boost::uint32_t seed)\n-                                                                   : generator_(seed),\n-                                                                     uniDist_(0, 1),\n-                                                                     normalDist_(0, 1),\n-                                                                     uni_(generator_, uniDist_),\n-                                                                     normal_(generator_, normalDist_)\n+  : generator_(seed), uniDist_(0, 1), normalDist_(0, 1), uni_(generator_, uniDist_), normal_(generator_, normalDist_)\n {\n   // Because we manually specified a seed, we need to save it ourselves\n   first_seed_ = seed;\n@@ -95,7 +92,8 @@ void random_numbers::RandomNumberGenerator::quaternion(double value[4])\n {\n   double x0 = uni_();\n   double r1 = sqrt(1.0 - x0), r2 = sqrt(x0);\n-  double t1 = 2.0 * boost::math::constants::pi<double>() * uni_(), t2 = 2.0 * boost::math::constants::pi<double>() * uni_();\n+  double t1 = 2.0 * boost::math::constants::pi<double>() * uni_(),\n+         t2 = 2.0 * boost::math::constants::pi<double>() * uni_();\n   double c1 = cos(t1), s1 = sin(t1);\n   double c2 = cos(t2), s2 = sin(t2);\n   value[0] = s1 * r1;"
+        }
+      ]
+    },
+    {
+      "author": "traversaro",
+      "date": "2025-06-22T17:04:50Z",
+      "sha": "79d6089c8ab211c9148f203588a61d9c91c8c613",
+      "message": "Fix link to Boost::thread imported target (#52)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "3b10c7cceb6dff568b5cf6ccfaad8890c57574e4",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/79d6089c8ab211c9148f203588a61d9c91c8c613/CMakeLists.txt",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/79d6089c8ab211c9148f203588a61d9c91c8c613/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/CMakeLists.txt?ref=79d6089c8ab211c9148f203588a61d9c91c8c613",
+          "patch": "@@ -12,6 +12,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC\n     $<INSTALL_INTERFACE:include/${PROJECT_NAME}>\n )\n target_link_libraries(${PROJECT_NAME} PUBLIC Boost::random)\n+target_link_libraries(${PROJECT_NAME} PRIVATE Boost::thread)\n ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)\n \n set_target_properties(${PROJECT_NAME} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)"
+        }
+      ]
+    },
+    {
+      "author": "mosfet80",
+      "date": "2025-05-28T05:46:53Z",
+      "sha": "4b40516f72f9a87166214b39a41fa58093cc1fe6",
+      "message": "Modernize cmake (#50)\n\n- Increase minimum cmake version\n- Drop enforcement of C++14 standard (C++17 is default)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 6,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "99a880765ae94d247c19c4de280707c120e14bcd",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 6,
+          "changes": 7,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/4b40516f72f9a87166214b39a41fa58093cc1fe6/CMakeLists.txt",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/4b40516f72f9a87166214b39a41fa58093cc1fe6/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/CMakeLists.txt?ref=4b40516f72f9a87166214b39a41fa58093cc1fe6",
+          "patch": "@@ -1,11 +1,6 @@\n-cmake_minimum_required(VERSION 3.5)\n+cmake_minimum_required(VERSION 3.20)\n project(random_numbers)\n \n-# Default to C++14\n-if(NOT CMAKE_CXX_STANDARD)\n-  set(CMAKE_CXX_STANDARD 14)\n-endif()\n-\n find_package(ament_cmake REQUIRED)\n find_package(Boost REQUIRED date_time random thread)\n "
+        }
+      ]
+    },
+    {
+      "author": "DLu",
+      "date": "2025-05-27T18:38:38Z",
+      "sha": "501ebba9e49436cb003c308d03ad998ba4818ec7",
+      "message": "Replace deprecated ament_target_libraries with target_link_libraries (#47)",
+      "files_changed": 1,
+      "additions": 3,
+      "deletions": 2,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "e0d6fc62b2a48505c862da8d5fe513c0ea2a90bb",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 2,
+          "changes": 5,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/501ebba9e49436cb003c308d03ad998ba4818ec7/CMakeLists.txt",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/501ebba9e49436cb003c308d03ad998ba4818ec7/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/CMakeLists.txt?ref=501ebba9e49436cb003c308d03ad998ba4818ec7",
+          "patch": "@@ -14,8 +14,8 @@ include_directories(include)\n add_library(${PROJECT_NAME} SHARED\n   src/random_numbers.cpp\n )\n-\n-ament_target_dependencies(${PROJECT_NAME} Boost)\n+target_link_libraries(${PROJECT_NAME} Boost::random)\n+ament_export_targets(export_${PROJECT_NAME})\n ament_export_libraries(${PROJECT_NAME})\n ament_export_dependencies(Boost)\n ament_export_include_directories(include)\n@@ -24,6 +24,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE\n \n install(\n   TARGETS ${PROJECT_NAME}\n+  EXPORT export_${PROJECT_NAME}\n   ARCHIVE DESTINATION lib\n   LIBRARY DESTINATION lib\n   RUNTIME DESTINATION bin"
+        }
+      ]
+    },
+    {
+      "author": "henningkayser",
+      "date": "2019-11-15T10:47:07Z",
+      "sha": "cf69cabf94a3da609a2612c4d62c40eb2e973646",
+      "message": "Fix ROS2 port (#18)\n\n* Library as SHARED\r\n* Let ament handle dependencies and includes",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 8,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "57b7955b5122d03750c0d9f4499c2d7d64432e7a",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 8,
+          "changes": 12,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/cf69cabf94a3da609a2612c4d62c40eb2e973646/CMakeLists.txt",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/cf69cabf94a3da609a2612c4d62c40eb2e973646/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/CMakeLists.txt?ref=cf69cabf94a3da609a2612c4d62c40eb2e973646",
+          "patch": "@@ -9,19 +9,15 @@ endif()\n find_package(ament_cmake REQUIRED)\n find_package(Boost REQUIRED date_time system thread)\n \n-include_directories(\n-  include\n-  ${Boost_INCLUDE_DIR}\n-)\n+include_directories(include)\n \n-add_library(${PROJECT_NAME}\n+add_library(${PROJECT_NAME} SHARED\n   src/random_numbers.cpp\n )\n \n-target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})\n-\n-ament_target_dependencies(${PROJECT_NAME})\n+ament_target_dependencies(${PROJECT_NAME} Boost)\n ament_export_libraries(${PROJECT_NAME})\n+ament_export_dependencies(Boost)\n ament_export_include_directories(include)\n \n install("
+        }
+      ]
+    },
+    {
+      "author": "stephanie-eng",
+      "date": "2022-03-29T15:57:24Z",
+      "sha": "3f38f614db1c2947845927ba3537eee46d4b565a",
+      "message": "Update black version (#40)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "0a5267bf54c5f860ec7d84ca0043377b8e07ba76",
+          "filename": ".pre-commit-config.yaml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/3f38f614db1c2947845927ba3537eee46d4b565a/.pre-commit-config.yaml",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/3f38f614db1c2947845927ba3537eee46d4b565a/.pre-commit-config.yaml",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/.pre-commit-config.yaml?ref=3f38f614db1c2947845927ba3537eee46d4b565a",
+          "patch": "@@ -28,7 +28,7 @@ repos:\n       - id: trailing-whitespace\n \n   - repo: https://github.com/psf/black\n-    rev: 20.8b1\n+    rev: 22.3.0\n     hooks:\n       - id: black\n "
+        }
+      ]
+    },
+    {
+      "author": "Vatan Aksoy Tezer",
+      "date": "2021-05-22T16:59:20Z",
+      "sha": "ff569a65974f10c94d820a313f42df202bc5626c",
+      "message": "Support rolling on CI (#32)\n\n* Support galactic and rolling on CI\n\n* Remove galactic\n\n* Update README to include ROS1",
+      "files_changed": 3,
+      "additions": 18,
+      "deletions": 8,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "fc2d72f515c9da09ccbe55c5f7cad040a86759ea",
+          "filename": ".github/workflows/build_and_test.yaml",
+          "status": "renamed",
+          "additions": 8,
+          "deletions": 4,
+          "changes": 12,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/ff569a65974f10c94d820a313f42df202bc5626c/.github%2Fworkflows%2Fbuild_and_test.yaml",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/ff569a65974f10c94d820a313f42df202bc5626c/.github%2Fworkflows%2Fbuild_and_test.yaml",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/.github%2Fworkflows%2Fbuild_and_test.yaml?ref=ff569a65974f10c94d820a313f42df202bc5626c",
+          "patch": "@@ -1,7 +1,7 @@\n # This config uses industrial_ci (https://github.com/ros-industrial/industrial_ci.git).\n # For troubleshooting, see readme (https://github.com/ros-industrial/industrial_ci/blob/master/README.rst)\n \n-name: BuildAndTest\n+name: Build and Test\n \n on:\n   workflow_dispatch:\n@@ -19,12 +19,16 @@ jobs:\n             ROS_REPO: main\n           - ROS_DISTRO: foxy\n             ROS_REPO: testing\n+          - ROS_DISTRO: rolling\n+            ROS_REPO: main\n+          - ROS_DISTRO: rolling\n+            ROS_REPO: testing\n     env:\n-      CCACHE_DIR: \"${{ github.workspace }}/.ccache\"\n+      CCACHE_DIR: ${{ github.workspace }}/.ccache\n       BASEDIR: ${{ github.workspace }}/.work\n-      CACHE_PREFIX: \"${{ matrix.env.ROS_DISTRO }}-${{ matrix.env.ROS_REPO }}\"\n+      CACHE_PREFIX: ${{ matrix.env.ROS_DISTRO }}-${{ matrix.env.ROS_REPO }}\n \n-    name: \"${{ matrix.env.ROS_DISTRO }}-${{ matrix.env.ROS_REPO }}\"\n+    name: ${{ matrix.env.ROS_DISTRO }}-${{ matrix.env.ROS_REPO }}\n     runs-on: ubuntu-latest\n     steps:\n       - uses: actions/checkout@v2",
+          "previous_filename": ".github/workflows/industrial_ci_action.yaml"
+        },
+        {
+          "sha": "4fcae0808d40126ed36d4d9861560de88992c327",
+          "filename": ".github/workflows/format.yaml",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 2,
+          "changes": 7,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/ff569a65974f10c94d820a313f42df202bc5626c/.github%2Fworkflows%2Fformat.yaml",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/ff569a65974f10c94d820a313f42df202bc5626c/.github%2Fworkflows%2Fformat.yaml",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/.github%2Fworkflows%2Fformat.yaml?ref=ff569a65974f10c94d820a313f42df202bc5626c",
+          "patch": "@@ -1,9 +1,12 @@\n # This is a format job. Pre-commit has a first-party GitHub action, so we use\n # that: https://github.com/pre-commit/action\n \n-name: Format\n+name: Formatting (pre-commit)\n \n-on: [pull_request, push]\n+on:\n+  workflow_dispatch:\n+  pull_request:\n+  push:\n \n jobs:\n   pre-commit:"
+        },
+        {
+          "sha": "ae25aa8a23cb28dd12ab833347b5a4ad602ce2a2",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 2,
+          "changes": 7,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/ff569a65974f10c94d820a313f42df202bc5626c/README.md",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/ff569a65974f10c94d820a313f42df202bc5626c/README.md",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/README.md?ref=ff569a65974f10c94d820a313f42df202bc5626c",
+          "patch": "@@ -6,8 +6,11 @@ This library contains wrappers for generating floating point values, integers, q\n \n ## Build Status\n \n-[![BuildAndTest](https://github.com/ros-planning/random_numbers/actions/workflows/industrial_ci_action.yaml/badge.svg?branch=ros2)](https://github.com/ros-planning/random_numbers/actions/workflows/industrial_ci_action.yaml?branch=ros2)\n-[![Format](https://github.com/ros-planning/random_numbers/actions/workflows/format.yaml/badge.svg?branch=ros2)](https://github.com/ros-planning/random_numbers/actions/workflows/format.yaml?branch=ros2)\n+| Branch | CI Status |\n+| ------ | --------- |\n+| `ros2` | [![Formatting (pre-commit)](https://github.com/ros-planning/random_numbers/actions/workflows/format.yaml/badge.svg?branch=ros2)](https://github.com/ros-planning/random_numbers/actions/workflows/format.yaml?query=branch%3Aros2) [![Build and Test](https://github.com/ros-planning/random_numbers/actions/workflows/build_and_test.yaml/badge.svg?branch=ros2)](https://github.com/ros-planning/random_numbers/actions/workflows/build_and_test.yaml?query=branch%3Aros2) |\n+| `master (ROS1)` | [![Formatting (pre-commit)](https://github.com/ros-planning/random_numbers/actions/workflows/format.yaml/badge.svg?branch=master)](https://github.com/ros-planning/random_numbers/actions/workflows/format.yaml?query=branch%3Akinetic-devel) [![Build and Test](https://github.com/ros-planning/random_numbers/actions/workflows/industrial_ci_action.yaml/badge.svg?branch=master)](https://github.com/ros-planning/random_numbers/actions/workflows/build_and_test.yaml?query=branch%3Amaster) |\n+\n \n ## Features\n "
+        }
+      ]
+    },
+    {
+      "author": "Tyler Weaver",
+      "date": "2020-07-07T23:00:14Z",
+      "sha": "03e36c3270f8a47e6fe903689cb4f2f8999fa7b3",
+      "message": "changelogs for 1.0.0 (foxy)\n\nCo-authored-by: Robert Haschke <rhaschke@users.noreply.github.com>",
+      "files_changed": 1,
+      "additions": 7,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "55000387b284486c3f8f67e68d012d4d10ee0ee3",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 7,
+          "deletions": 0,
+          "changes": 7,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/03e36c3270f8a47e6fe903689cb4f2f8999fa7b3/CHANGELOG.rst",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/03e36c3270f8a47e6fe903689cb4f2f8999fa7b3/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/CHANGELOG.rst?ref=03e36c3270f8a47e6fe903689cb4f2f8999fa7b3",
+          "patch": "@@ -2,6 +2,13 @@\n Changelog for package random_numbers\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+1.0.0 (2020-07-10)\n+------------------\n+* Fix ROS2 port (`#18 <https://github.com/ros-planning/random_numbers/issues/18>`_)\n+* Update Travis for ROS2 (`#14 <https://github.com/ros-planning/random_numbers/issues/14>`_, `#16 <https://github.com/ros-planning/random_numbers/issues/16>`_)\n+* Fix shared library install path (`#13 <https://github.com/ros-planning/random_numbers/issues/13>`_)\n+* Contributors: Henning Kayser, Mike Lautman, Robert Haschke, Sean Yen\n+\n 0.3.2 (2018-02-27)\n ------------------\n * Update maintainership. (`#11 <https://github.com/ros-planning/random_numbers/issues/11>`_)"
+        }
+      ]
+    },
+    {
+      "author": "lilustga",
+      "date": "2020-11-24T21:18:15Z",
+      "sha": "c6140513e07355d54d1c387bbedb2d80c68ba3da",
+      "message": "Enable WINDOWS_EXPORT_ALL_SYMBOLS property for MSVC support (#23)",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "007a2d6c475dddd671338a78b45fe119c67fb1cd",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/c6140513e07355d54d1c387bbedb2d80c68ba3da/CMakeLists.txt",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/c6140513e07355d54d1c387bbedb2d80c68ba3da/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/CMakeLists.txt?ref=c6140513e07355d54d1c387bbedb2d80c68ba3da",
+          "patch": "@@ -20,6 +20,8 @@ ament_export_libraries(${PROJECT_NAME})\n ament_export_dependencies(Boost)\n ament_export_include_directories(include)\n \n+set_target_properties(${PROJECT_NAME} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS TRUE)\n+\n install(\n   TARGETS ${PROJECT_NAME}\n   ARCHIVE DESTINATION lib"
+        }
+      ]
+    },
+    {
+      "author": "mikaelarguedas",
+      "date": "2020-11-24T21:14:39Z",
+      "sha": "83b682c853cfeadec8a564b098d0288632fb48de",
+      "message": "Declare specific boost depedencies (#22)\n\n* removed unnecessary libboost-math libraries as only headers-only parts are used\r\n\r\nSigned-off-by: Mikael Arguedas <mikael.arguedas@gmail.com>",
+      "files_changed": 2,
+      "additions": 14,
+      "deletions": 4,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "72a1286481245fe9f5e569b6b05afe4208b4a8d2",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/83b682c853cfeadec8a564b098d0288632fb48de/CMakeLists.txt",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/83b682c853cfeadec8a564b098d0288632fb48de/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/CMakeLists.txt?ref=83b682c853cfeadec8a564b098d0288632fb48de",
+          "patch": "@@ -7,7 +7,7 @@ if(NOT CMAKE_CXX_STANDARD)\n endif()\n \n find_package(ament_cmake REQUIRED)\n-find_package(Boost REQUIRED date_time system thread)\n+find_package(Boost REQUIRED date_time random thread)\n \n include_directories(include)\n "
+        },
+        {
+          "sha": "d3bab11ab7fa7f933c2047679733e8108cf2e821",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 3,
+          "changes": 16,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/83b682c853cfeadec8a564b098d0288632fb48de/package.xml",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/83b682c853cfeadec8a564b098d0288632fb48de/package.xml",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/package.xml?ref=83b682c853cfeadec8a564b098d0288632fb48de",
+          "patch": "@@ -9,15 +9,25 @@\n   The constructor of the wrapper is guaranteed to be thread safe and initialize its random number generator to a random seed.\n   Seeds are obtained using a separate and different random number generator.\n   </description>\n-  <author email=\"isucan@willowgarage.edu\">Ioan Sucan</author>\n   <maintainer email=\"anasarrak@erlerobotics.com\">Anas M'chichou</maintainer>\n   <maintainer email=\"stevenragnarok@osrfoundation.org\">Steven! Ragnarök</maintainer>\n   <license>BSD</license>\n   <url type=\"website\">http://ros.org/wiki/random_numbers</url>\n+  <author email=\"isucan@willowgarage.edu\">Ioan Sucan</author>\n \n   <buildtool_depend>ament_cmake</buildtool_depend>\n-  <build_depend>boost</build_depend>\n-  <exec_depend>boost</exec_depend>\n+  <build_depend>libboost-dev</build_depend>\n+  <build_depend>libboost-date-time-dev</build_depend>\n+  <build_depend>libboost-random-dev</build_depend>\n+  <build_depend>libboost-thread-dev</build_depend>\n+\n+  <build_export_depend>libboost-dev</build_export_depend>\n+  <build_export_depend>libboost-random-dev</build_export_depend>\n+  <build_export_depend>libboost-thread-dev</build_export_depend>\n+\n+  <exec_depend>libboost-date-time</exec_depend>\n+  <exec_depend>libboost-random</exec_depend>\n+  <exec_depend>libboost-thread</exec_depend>\n   <export>\n     <build_type>ament_cmake</build_type>\n   </export>"
+        }
+      ]
+    },
+    {
+      "author": "v4hn",
+      "date": "2020-04-02T16:10:16Z",
+      "sha": "2e11a58e95efa57f9e4d726546444ab98d8d451c",
+      "message": "Bump required cmake version (#19)",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "c2c771caa5f98005d6bbfd11220c0c20aefab0e7",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/2e11a58e95efa57f9e4d726546444ab98d8d451c/CMakeLists.txt",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/2e11a58e95efa57f9e4d726546444ab98d8d451c/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/CMakeLists.txt?ref=2e11a58e95efa57f9e4d726546444ab98d8d451c",
+          "patch": "@@ -1,4 +1,4 @@\n-cmake_minimum_required(VERSION 2.8.3)\n+cmake_minimum_required(VERSION 3.0.2)\n project(random_numbers)\n \n find_package(catkin REQUIRED)"
+        }
+      ]
+    },
+    {
+      "author": "mlautman",
+      "date": "2019-03-28T20:40:17Z",
+      "sha": "ad6ee7a8e2dc3ce28acfdf9c5f02c25e561016a6",
+      "message": "Ros2 travis (#14)",
+      "files_changed": 4,
+      "additions": 40,
+      "deletions": 28,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "544f24cca747f9b9fed6cbc1bc99590d0a50c368",
+          "filename": ".travis.yml",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 6,
+          "changes": 9,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/ad6ee7a8e2dc3ce28acfdf9c5f02c25e561016a6/.travis.yml",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/ad6ee7a8e2dc3ce28acfdf9c5f02c25e561016a6/.travis.yml",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/.travis.yml?ref=ad6ee7a8e2dc3ce28acfdf9c5f02c25e561016a6",
+          "patch": "@@ -8,8 +8,6 @@ services:\n language:\n   - cpp\n   - python\n-python:\n-  - \"2.7\"\n compiler:\n   - gcc\n notifications:\n@@ -21,12 +19,11 @@ notifications:\n \n env:\n   matrix:\n-    - ROS_DISTRO=kinetic TEST=\"catkin_lint clang-format\"\n-    - ROS_DISTRO=kinetic ROS_REPO=ros\n-    - ROS_DISTRO=melodic ROS_REPO=ros\n+    - ROS_DISTRO=crystal TEST=clang-format\n+    - ROS_DISTRO=crystal ROS_REPO=ros\n \n before_script:\n-  - git clone -q https://github.com/ros-planning/moveit_ci.git .moveit_ci\n+  - git clone --branch ros2 -q https://github.com/ros-planning/moveit_ci.git .moveit_ci\n \n script:\n   - source .moveit_ci/travis.sh"
+        },
+        {
+          "sha": "2ba21f2c17fe8ba02daf8ea4ba3a58ff957d4708",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 26,
+          "deletions": 16,
+          "changes": 42,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/ad6ee7a8e2dc3ce28acfdf9c5f02c25e561016a6/CMakeLists.txt",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/ad6ee7a8e2dc3ce28acfdf9c5f02c25e561016a6/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/CMakeLists.txt?ref=ad6ee7a8e2dc3ce28acfdf9c5f02c25e561016a6",
+          "patch": "@@ -1,27 +1,37 @@\n-cmake_minimum_required(VERSION 2.8.3)\n+cmake_minimum_required(VERSION 3.5)\n project(random_numbers)\n \n-find_package(catkin REQUIRED)\n-\n-catkin_package(\n-  LIBRARIES ${PROJECT_NAME}\n-  INCLUDE_DIRS include\n-  )\n+# Default to C++14\n+if(NOT CMAKE_CXX_STANDARD)\n+  set(CMAKE_CXX_STANDARD 14)\n+endif()\n \n+find_package(ament_cmake REQUIRED)\n find_package(Boost REQUIRED date_time system thread)\n-include_directories(${Boost_INCLUDE_DIR})\n \n-include_directories(include)\n+include_directories(\n+  include\n+  ${Boost_INCLUDE_DIR}\n+)\n \n add_library(${PROJECT_NAME}\n-  src/random_numbers.cpp)\n+  src/random_numbers.cpp\n+)\n \n target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})\n \n-install(TARGETS ${PROJECT_NAME}\n-        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n-        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n-        RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})\n+ament_target_dependencies(${PROJECT_NAME})\n+ament_export_libraries(${PROJECT_NAME})\n+ament_export_include_directories(include)\n+\n+install(\n+\tTARGETS ${PROJECT_NAME}\n+\tARCHIVE DESTINATION lib\n+\tLIBRARY DESTINATION lib\n+\tRUNTIME DESTINATION bin\n+)\n+\n+install(DIRECTORY include/\n+        DESTINATION include)\n \n-install(DIRECTORY include/${PROJECT_NAME}/\n-        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})\n+ament_package()"
+        },
+        {
+          "sha": "9572deda30b8c48f6d2c2683a6f2a8e6aef5f257",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/ad6ee7a8e2dc3ce28acfdf9c5f02c25e561016a6/README.md",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/ad6ee7a8e2dc3ce28acfdf9c5f02c25e561016a6/README.md",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/README.md?ref=ad6ee7a8e2dc3ce28acfdf9c5f02c25e561016a6",
+          "patch": "@@ -1,5 +1,7 @@\n # random_numbers\n \n+*This branch has been ported to ROS 2.0*\n+\n This library contains wrappers for generating floating point values, integers, quaternions using boost libraries.\n \n ## Build Status\n@@ -9,4 +11,3 @@ master branch: [![Build Status](https://travis-ci.org/ros-planning/random_number\n ## Features\n \n New: you can pass in a custom random number generator seed to allow optional deterministic behavior during debugging, testing, etc. using the secondary constructor.\n-"
+        },
+        {
+          "sha": "37f8b7be105a9de8277b1fb0a79cb9af84f089bd",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 5,
+          "changes": 14,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/ad6ee7a8e2dc3ce28acfdf9c5f02c25e561016a6/package.xml",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/ad6ee7a8e2dc3ce28acfdf9c5f02c25e561016a6/package.xml",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/package.xml?ref=ad6ee7a8e2dc3ce28acfdf9c5f02c25e561016a6",
+          "patch": "@@ -1,4 +1,6 @@\n-<package>\n+<?xml version=\"1.0\"?>\n+<?xml-model href=\"http://download.ros.org/schema/package_format3.xsd\" schematypens=\"http://www.w3.org/2001/XMLSchema\"?>\n+<package format=\"3\">\n   <name>random_numbers</name>\n   <version>0.3.2</version>\n   <description>\n@@ -8,13 +10,15 @@\n   Seeds are obtained using a separate and different random number generator.\n   </description>\n   <author email=\"isucan@willowgarage.edu\">Ioan Sucan</author>\n+  <maintainer email=\"anasarrak@erlerobotics.com\">Anas M'chichou</maintainer>\n   <maintainer email=\"stevenragnarok@osrfoundation.org\">Steven! Ragnarök</maintainer>\n   <license>BSD</license>\n   <url type=\"website\">http://ros.org/wiki/random_numbers</url>\n \n-  <buildtool_depend>catkin</buildtool_depend>\n-\n+  <buildtool_depend>ament_cmake</buildtool_depend>\n   <build_depend>boost</build_depend>\n-\n-  <run_depend>boost</run_depend>\n+  <exec_depend>boost</exec_depend>\n+  <export>\n+    <build_type>ament_cmake</build_type>\n+  </export>\n </package>"
+        }
+      ]
+    },
+    {
+      "author": "seanyen",
+      "date": "2019-03-18T08:14:51Z",
+      "sha": "42a63e896f71f05d429b057b6e9a3d3d05fa409c",
+      "message": "Fix shared library install path (#13)\n\nWindows .dlls go to a global bin folder.",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "f5052d331b913100c945b3ff9b43ac604eed8ec2",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/42a63e896f71f05d429b057b6e9a3d3d05fa409c/CMakeLists.txt",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/42a63e896f71f05d429b057b6e9a3d3d05fa409c/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/CMakeLists.txt?ref=42a63e896f71f05d429b057b6e9a3d3d05fa409c",
+          "patch": "@@ -20,7 +20,8 @@ target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})\n \n install(TARGETS ${PROJECT_NAME}\n         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n-        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})\n+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n+        RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})\n \n install(DIRECTORY include/${PROJECT_NAME}/\n         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})"
+        }
+      ]
+    },
+    {
+      "author": "nuclearsandwich",
+      "date": "2017-03-27T16:50:32Z",
+      "sha": "2706d600d577d4b084216386ce78ca7545fac3f1",
+      "message": "Update maintainership. (#11)\n\n* And truncate trailing whitespace.",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 2,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "dc7ef87445c0dbe730344aae00aed07d0319ca50",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 2,
+          "changes": 4,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/2706d600d577d4b084216386ce78ca7545fac3f1/package.xml",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/2706d600d577d4b084216386ce78ca7545fac3f1/package.xml",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/package.xml?ref=2706d600d577d4b084216386ce78ca7545fac3f1",
+          "patch": "@@ -3,12 +3,12 @@\n   <version>0.3.1</version>\n   <description>\n   This  library contains wrappers for generating floating point values, integers, quaternions using boost libraries.\n-    \n+\n   The constructor of the wrapper is guaranteed to be thread safe and initialize its random number generator to a random seed.\n   Seeds are obtained using a separate and different random number generator.\n   </description>\n   <author email=\"isucan@willowgarage.edu\">Ioan Sucan</author>\n-  <maintainer email=\"isucan@willowgarage.com\">Ioan Sucan</maintainer>\n+  <maintainer email=\"stevenragnarok@osrfoundation.org\">Steven! Ragnarök</maintainer>\n   <license>BSD</license>\n   <url type=\"website\">http://ros.org/wiki/random_numbers</url>\n "
+        }
+      ]
+    },
+    {
+      "author": "Jackie Kay",
+      "date": "2016-04-04T19:02:04Z",
+      "sha": "7273f9b06553ab6c5b622550b4ac6d839a174106",
+      "message": "Changelog",
+      "files_changed": 1,
+      "additions": 6,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "59c073fefcf45fa964b060cd04b608b9f64b0b40",
+          "filename": "CHANGELOG.rst",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/7273f9b06553ab6c5b622550b4ac6d839a174106/CHANGELOG.rst",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/7273f9b06553ab6c5b622550b4ac6d839a174106/CHANGELOG.rst",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/CHANGELOG.rst?ref=7273f9b06553ab6c5b622550b4ac6d839a174106",
+          "patch": "@@ -2,6 +2,12 @@\n Changelog for package random_numbers\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n \n+Forthcoming\n+-----------\n+* Merge pull request `#10 <https://github.com/ros-planning/random_numbers/issues/10>`_ from jspricke/cmake_lib\n+  Use catkin variables for install dirs\n+* Contributors: Dave Coleman, Jochen Sprickerhof\n+\n 0.3.0 (2014-09-05)\n ------------------\n * Update README.md with Documentation"
+        }
+      ]
+    },
+    {
+      "author": "davetcoleman",
+      "date": "2013-11-07T19:25:56Z",
+      "sha": "923586e62ebb859b49df4a16f192151dbd91b6a5",
+      "message": "Merge pull request #4 from ros-planning/add-travis\n\nadded travis support",
+      "files_changed": 2,
+      "additions": 52,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "b25c15b81fae06e1c55946ac6270bfdb293870e8",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/923586e62ebb859b49df4a16f192151dbd91b6a5/.gitignore",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/923586e62ebb859b49df4a16f192151dbd91b6a5/.gitignore",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/.gitignore?ref=923586e62ebb859b49df4a16f192151dbd91b6a5",
+          "patch": "@@ -0,0 +1 @@\n+*~"
+        },
+        {
+          "sha": "d4b222aef71728f7d172097c0500ef48f28f0621",
+          "filename": ".travis.yml",
+          "status": "added",
+          "additions": 51,
+          "deletions": 0,
+          "changes": 51,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/923586e62ebb859b49df4a16f192151dbd91b6a5/.travis.yml",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/923586e62ebb859b49df4a16f192151dbd91b6a5/.travis.yml",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/.travis.yml?ref=923586e62ebb859b49df4a16f192151dbd91b6a5",
+          "patch": "@@ -0,0 +1,51 @@\n+# Generic MoveIt Travis Continuous Integration Configuration File\n+# Works with all MoveIt! repositories/branches\n+# Author: Dave Coleman, Jonathan Bohren\n+language:\n+  - cpp\n+  - python\n+python:\n+  - \"2.7\"\n+compiler:\n+  - gcc\n+notifications:\n+  email:\n+    recipients:\n+      - dave.hershberger@sri.com\n+    on_success: change #[always|never|change] # default: change\n+    on_failure: change #[always|never|change] # default: always\n+before_install: # Use this to prepare the system to install prerequisites or dependencies\n+  # Define some config vars\n+  - export ROS_DISTRO=hydro\n+  - export CI_SOURCE_PATH=$(pwd)\n+  - export REPOSITORY_NAME=${PWD##*/}\n+  - echo \"Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME\"\n+  - sudo sh -c 'echo \"deb http://packages.ros.org/ros/ubuntu precise main\" > /etc/apt/sources.list.d/ros-latest.list'\n+  - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -\n+  - sudo apt-get update -qq\n+  - sudo apt-get install -qq -y python-catkin-pkg python-rosdep python-wstool ros-$ROS_DISTRO-catkin ros-$ROS_DISTRO-ros\n+  # MongoDB hack - I don't fully understand this but its for moveit_warehouse\n+  - sudo apt-get remove -y mongodb mongodb-10gen\n+  - sudo apt-get install -y mongodb-clients mongodb-server -o Dpkg::Options::=\"--force-confdef\" # default actions\n+  # Setup rosdep\n+  - sudo rosdep init\n+  - rosdep update\n+install: # Use this to install any prerequisites or dependencies necessary to run your build\n+  # Create workspace\n+  - mkdir -p ~/ros/ws_moveit/src\n+  - cd ~/ros/ws_moveit/src\n+  - wstool init .\n+  # Download non-debian stuff\n+  - wstool merge https://raw.github.com/ros-planning/moveit_docs/hydro-devel/moveit.rosinstall\n+  - wstool update\n+  - git clone https://github.com/ros-planning/geometric_shapes.git\n+  # Delete the moveit.rosinstall version of this repo and use the one of the branch we are testing\n+  - rm -rf $REPOSITORY_NAME\n+  - ln -s $CI_SOURCE_PATH . # Link the repo we are testing to the new workspace\n+  - cd ../\n+  # Install dependencies for source repos\n+  - rosdep install --from-paths src --ignore-src --rosdistro $ROS_DISTRO -y\n+before_script: # Use this to prepare your build for testing e.g. copy database configurations, environment variables, etc.\n+  - source /opt/ros/$ROS_DISTRO/setup.bash  \n+script: # All commands must exit with code 0 on success. Anything else is considered failure.\n+  - catkin_make -j2"
+        }
+      ]
+    },
+    {
+      "author": "jspricke",
+      "date": "2015-11-23T07:12:52Z",
+      "sha": "01397973a9fb14de6822dedd5871db9d3edb4496",
+      "message": "Use catkin variables for install dirs",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 6,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "d23bb1987cd08b283e38ae72e3741b6f5bd5d059",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 6,
+          "changes": 10,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/01397973a9fb14de6822dedd5871db9d3edb4496/CMakeLists.txt",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/01397973a9fb14de6822dedd5871db9d3edb4496/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/CMakeLists.txt?ref=01397973a9fb14de6822dedd5871db9d3edb4496",
+          "patch": "@@ -19,10 +19,8 @@ add_library(${PROJECT_NAME}\n target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})\n \n install(TARGETS ${PROJECT_NAME}\n-        ARCHIVE DESTINATION lib\n-        LIBRARY DESTINATION lib)\n-\n-install(DIRECTORY include/\n-        DESTINATION include\n-        FILES_MATCHING PATTERN \"*.h\")\n+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}\n+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})\n \n+install(DIRECTORY include/${PROJECT_NAME}/\n+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})"
+        }
+      ]
+    },
+    {
+      "author": "isucan",
+      "date": "2012-12-14T22:56:38Z",
+      "sha": "45415b7fc0f8b376f33f5796f838d8db2bd6c7d7",
+      "message": "Merge pull request #1 from ablasdel/patch-1\n\nUpdate package.xml to buildtool_depend",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "aa6dfe491a0c882390a5ca00d4bf0d8c37708258",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/45415b7fc0f8b376f33f5796f838d8db2bd6c7d7/package.xml",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/45415b7fc0f8b376f33f5796f838d8db2bd6c7d7/package.xml",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/package.xml?ref=45415b7fc0f8b376f33f5796f838d8db2bd6c7d7",
+          "patch": "@@ -7,8 +7,9 @@\n   <license>BSD</license>\n   <url type=\"website\">http://ros.org/wiki/random_numbers</url>\n \n+  <buildtool_depend>catkin</buildtool_depend>\n+\n   <build_depend>boost</build_depend>\n-  <build_depend>catkin</build_depend>\n \n   <run_depend>boost</run_depend>\n </package>"
+        }
+      ]
+    },
+    {
+      "author": "hersh",
+      "date": "2013-11-08T21:48:47Z",
+      "sha": "e6c6804b1b940e616aa9679815934ae9b56c60ee",
+      "message": "added travis build status indicator in README.md",
+      "files_changed": 1,
+      "additions": 5,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "9aa0fcf70545d972ef59864ba0b45c3776ef5705",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 5,
+          "deletions": 0,
+          "changes": 5,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/e6c6804b1b940e616aa9679815934ae9b56c60ee/README.md",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/e6c6804b1b940e616aa9679815934ae9b56c60ee/README.md",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/README.md?ref=e6c6804b1b940e616aa9679815934ae9b56c60ee",
+          "patch": "@@ -2,3 +2,8 @@ random_numbers\n ==============\n \n This library contains wrappers for generating floating point values, integers, quaternions using boost libraries.\n+\n+Build Status\n+============\n+\n+master branch: [![Build Status](https://travis-ci.org/ros-planning/random_numbers.png?branch=master)](https://travis-ci.org/ros-planning/random_numbers)"
+        }
+      ]
+    },
+    {
+      "author": "Dave Hershberger",
+      "date": "2013-11-05T22:29:11Z",
+      "sha": "a94031d679ac0f073fa4a79a0f3cdcbf2f84edbb",
+      "message": "added travis support",
+      "files_changed": 2,
+      "additions": 52,
+      "deletions": 0,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "b25c15b81fae06e1c55946ac6270bfdb293870e8",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 1,
+          "deletions": 0,
+          "changes": 1,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/a94031d679ac0f073fa4a79a0f3cdcbf2f84edbb/.gitignore",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/a94031d679ac0f073fa4a79a0f3cdcbf2f84edbb/.gitignore",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/.gitignore?ref=a94031d679ac0f073fa4a79a0f3cdcbf2f84edbb",
+          "patch": "@@ -0,0 +1 @@\n+*~"
+        },
+        {
+          "sha": "d4b222aef71728f7d172097c0500ef48f28f0621",
+          "filename": ".travis.yml",
+          "status": "added",
+          "additions": 51,
+          "deletions": 0,
+          "changes": 51,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/a94031d679ac0f073fa4a79a0f3cdcbf2f84edbb/.travis.yml",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/a94031d679ac0f073fa4a79a0f3cdcbf2f84edbb/.travis.yml",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/.travis.yml?ref=a94031d679ac0f073fa4a79a0f3cdcbf2f84edbb",
+          "patch": "@@ -0,0 +1,51 @@\n+# Generic MoveIt Travis Continuous Integration Configuration File\n+# Works with all MoveIt! repositories/branches\n+# Author: Dave Coleman, Jonathan Bohren\n+language:\n+  - cpp\n+  - python\n+python:\n+  - \"2.7\"\n+compiler:\n+  - gcc\n+notifications:\n+  email:\n+    recipients:\n+      - dave.hershberger@sri.com\n+    on_success: change #[always|never|change] # default: change\n+    on_failure: change #[always|never|change] # default: always\n+before_install: # Use this to prepare the system to install prerequisites or dependencies\n+  # Define some config vars\n+  - export ROS_DISTRO=hydro\n+  - export CI_SOURCE_PATH=$(pwd)\n+  - export REPOSITORY_NAME=${PWD##*/}\n+  - echo \"Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME\"\n+  - sudo sh -c 'echo \"deb http://packages.ros.org/ros/ubuntu precise main\" > /etc/apt/sources.list.d/ros-latest.list'\n+  - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -\n+  - sudo apt-get update -qq\n+  - sudo apt-get install -qq -y python-catkin-pkg python-rosdep python-wstool ros-$ROS_DISTRO-catkin ros-$ROS_DISTRO-ros\n+  # MongoDB hack - I don't fully understand this but its for moveit_warehouse\n+  - sudo apt-get remove -y mongodb mongodb-10gen\n+  - sudo apt-get install -y mongodb-clients mongodb-server -o Dpkg::Options::=\"--force-confdef\" # default actions\n+  # Setup rosdep\n+  - sudo rosdep init\n+  - rosdep update\n+install: # Use this to install any prerequisites or dependencies necessary to run your build\n+  # Create workspace\n+  - mkdir -p ~/ros/ws_moveit/src\n+  - cd ~/ros/ws_moveit/src\n+  - wstool init .\n+  # Download non-debian stuff\n+  - wstool merge https://raw.github.com/ros-planning/moveit_docs/hydro-devel/moveit.rosinstall\n+  - wstool update\n+  - git clone https://github.com/ros-planning/geometric_shapes.git\n+  # Delete the moveit.rosinstall version of this repo and use the one of the branch we are testing\n+  - rm -rf $REPOSITORY_NAME\n+  - ln -s $CI_SOURCE_PATH . # Link the repo we are testing to the new workspace\n+  - cd ../\n+  # Install dependencies for source repos\n+  - rosdep install --from-paths src --ignore-src --rosdistro $ROS_DISTRO -y\n+before_script: # Use this to prepare your build for testing e.g. copy database configurations, environment variables, etc.\n+  - source /opt/ros/$ROS_DISTRO/setup.bash  \n+script: # All commands must exit with code 0 on success. Anything else is considered failure.\n+  - catkin_make -j2"
+        }
+      ]
+    },
+    {
+      "author": "Ioan Sucan",
+      "date": "2012-06-18T20:17:37Z",
+      "sha": "e6d09b1b6bb1c493e075280013ede35dcca06373",
+      "message": "add initial version",
+      "files_changed": 5,
+      "additions": 276,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "975ed9fe8d40ff6954854df18b5367a97d440971",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 33,
+          "deletions": 0,
+          "changes": 33,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/e6d09b1b6bb1c493e075280013ede35dcca06373/CMakeLists.txt",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/e6d09b1b6bb1c493e075280013ede35dcca06373/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/CMakeLists.txt?ref=e6d09b1b6bb1c493e075280013ede35dcca06373",
+          "patch": "@@ -0,0 +1,33 @@\n+cmake_minimum_required(VERSION 2.8)\n+project(random_numbers)\n+\n+find_package(catkin REQUIRED)\n+catkin_stack()\n+\n+catkin_project(${PROJECT_NAME}\n+  LIBRARIES ${PROJECT_NAME}\n+  INCLUDE_DIRS include\n+  )\n+\n+find_package(Boost REQUIRED date_time thread)\n+include_directories(${Boost_INCLUDE_DIR})\n+\n+include_directories(include)\n+\n+add_library(${PROJECT_NAME}\n+  src/random_numbers.cpp)\n+\n+target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})\n+\n+install(TARGETS ${PROJECT_NAME}\n+        ARCHIVE DESTINATION lib\n+        LIBRARY DESTINATION lib)\n+\n+install(DIRECTORY include/\n+        DESTINATION include\n+        FILES_MATCHING PATTERN \"*.h\")\n+\n+# for compatibility with old build system\n+install(FILES manifest.xml\n+        DESTINATION share/${PROJECT_NAME})\n+"
+        },
+        {
+          "sha": "e6e03fdbd16f87d18065ad87109dd094fddc4ece",
+          "filename": "include/random_numbers/random_numbers.h",
+          "status": "added",
+          "additions": 112,
+          "deletions": 0,
+          "changes": 112,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/e6d09b1b6bb1c493e075280013ede35dcca06373/include%2Frandom_numbers%2Frandom_numbers.h",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/e6d09b1b6bb1c493e075280013ede35dcca06373/include%2Frandom_numbers%2Frandom_numbers.h",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/include%2Frandom_numbers%2Frandom_numbers.h?ref=e6d09b1b6bb1c493e075280013ede35dcca06373",
+          "patch": "@@ -0,0 +1,112 @@\n+/*********************************************************************\n+* Software License Agreement (BSD License)\n+*\n+*  Copyright (c) 2008, Willow Garage, Inc.\n+*  All rights reserved.\n+*\n+*  Redistribution and use in source and binary forms, with or without\n+*  modification, are permitted provided that the following conditions\n+*  are met:\n+*\n+*   * Redistributions of source code must retain the above copyright\n+*     notice, this list of conditions and the following disclaimer.\n+*   * Redistributions in binary form must reproduce the above\n+*     copyright notice, this list of conditions and the following\n+*     disclaimer in the documentation and/or other materials provided\n+*     with the distribution.\n+*   * Neither the name of the Willow Garage nor the names of its\n+*     contributors may be used to endorse or promote products derived\n+*     from this software without specific prior written permission.\n+*\n+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n+*  \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n+*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS\n+*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\n+*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,\n+*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,\n+*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\n+*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN\n+*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+*  POSSIBILITY OF SUCH DAMAGE.\n+*********************************************************************/\n+\n+/* Author: Ioan Sucan */\n+\n+#ifndef RANDOM_NUMBERS_RANDOM_NUMBERS_\n+#define RANDOM_NUMBERS_RANDOM_NUMBERS_\n+\n+#include <boost/random/mersenne_twister.hpp>\n+#include <boost/random/uniform_real.hpp>\n+#include <boost/random/uniform_int.hpp>\n+#include <boost/random/variate_generator.hpp>\n+#include <boost/random/normal_distribution.hpp>\n+\n+namespace random_numbers\n+{\n+/** \\brief Random number generation (wrapper for boost). An instance of this class\n+    cannot be used by multiple threads at once (member functions\n+    are not const). However, the constructor is thread safe and\n+    different instances can be used safely in any number of\n+    threads. It is also guaranteed that all created instances will\n+    have a \"random\" random seed. */\n+class RandomNumberGenerator\n+{\n+public:\n+  \n+  /** \\brief Constructor. Always sets a \"random\" random seed */\n+  RandomNumberGenerator(void);\n+  \n+  /** \\brief Generate a random real between 0 and 1 */\n+  double uniform01(void)\n+  {\n+    return uni_();\n+  }\n+  \n+  /**\n+   * @brief Generate a random real within given bounds: [\\e lower_bound, \\e upper_bound)\n+   * @param lower_bound The lower bound\n+   * @param upper_bound The upper bound\n+   */\n+  double uniformReal(double lower_bound, double upper_bound)\n+  {\n+    return (upper_bound - lower_bound) * uni_() + lower_bound;\n+  }\n+\n+  /** \\brief Generate a random real using a normal distribution with mean 0 and variance 1 */\n+  double gaussian01(void)\n+  {\n+    return normal_();\n+  }\n+  \n+  /** \\brief Generate a random real using a normal distribution with given mean and variance */\n+  double gaussian(double mean, double stddev)\n+  {\n+    return normal_() * stddev + mean;\n+  }\n+  \n+  /** \\brief Uniform random unit quaternion sampling. The computed value has the order (x,y,z,w)\n+   * @param value[4] A four dimensional array in which the computed quaternion will be returned\n+   */\n+  void quaternion(double value[4]);\n+  \n+  /** \\brief Generate an integer uniformly at random within a specified range (inclusive) */\n+  int uniformInteger(int min, int max)\n+  {\n+    boost::uniform_int<> dis(min, max);  \n+    return dis(generator_);\n+  }\n+  \n+private:\n+  \n+  boost::mt19937                                                           generator_;\n+  boost::uniform_real<>                                                    uniDist_; \n+  boost::normal_distribution<>                                             normalDist_;\n+  boost::variate_generator<boost::mt19937&, boost::uniform_real<> >        uni_;  \n+  boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > normal_;\n+};\n+\n+}\n+\n+#endif"
+        },
+        {
+          "sha": "f060298320903edbd24fa1baded63013e60ac327",
+          "filename": "manifest.xml",
+          "status": "added",
+          "additions": 23,
+          "deletions": 0,
+          "changes": 23,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/e6d09b1b6bb1c493e075280013ede35dcca06373/manifest.xml",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/e6d09b1b6bb1c493e075280013ede35dcca06373/manifest.xml",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/manifest.xml?ref=e6d09b1b6bb1c493e075280013ede35dcca06373",
+          "patch": "@@ -0,0 +1,23 @@\n+<package>\n+  <description brief=\"random_numbers\">\n+\n+     random_numbers\n+\n+  </description>\n+  <author>Ioan Sucan</author>\n+  <license>BSD</license>\n+  <review status=\"unreviewed\" notes=\"\"/>\n+  <url>http://ros.org/wiki/random_numbers</url>\n+\n+  <export>\n+    <cpp cflags=\"-I${prefix}/include `rosboost-cfg --cflags`\" lflags=\"-Wl,-rpath,${prefix}/lib -L${prefix}/lib -lrandom_numbers `rosboost-cfg --lflags thread,date_time`\"/>\n+  </export>\n+\n+  <platform os=\"ubuntu\" version=\"10.04\"/>\n+  <platform os=\"ubuntu\" version=\"10.10\"/>\n+  <platform os=\"ubuntu\" version=\"11.04\"/>\n+  <platform os=\"ubuntu\" version=\"11.10\"/>\n+\n+</package>\n+\n+"
+        },
+        {
+          "sha": "e364de089f6f2c174ad5e26398372b968e238cae",
+          "filename": "src/random_numbers.cpp",
+          "status": "added",
+          "additions": 90,
+          "deletions": 0,
+          "changes": 90,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/e6d09b1b6bb1c493e075280013ede35dcca06373/src%2Frandom_numbers.cpp",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/e6d09b1b6bb1c493e075280013ede35dcca06373/src%2Frandom_numbers.cpp",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/src%2Frandom_numbers.cpp?ref=e6d09b1b6bb1c493e075280013ede35dcca06373",
+          "patch": "@@ -0,0 +1,90 @@\n+/*********************************************************************\n+* Software License Agreement (BSD License)\n+*\n+*  Copyright (c) 2008, Willow Garage, Inc.\n+*  All rights reserved.\n+*\n+*  Redistribution and use in source and binary forms, with or without\n+*  modification, are permitted provided that the following conditions\n+*  are met:\n+*\n+*   * Redistributions of source code must retain the above copyright\n+*     notice, this list of conditions and the following disclaimer.\n+*   * Redistributions in binary form must reproduce the above\n+*     copyright notice, this list of conditions and the following\n+*     disclaimer in the documentation and/or other materials provided\n+*     with the distribution.\n+*   * Neither the name of the Willow Garage nor the names of its\n+*     contributors may be used to endorse or promote products derived\n+*     from this software without specific prior written permission.\n+*\n+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n+*  \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n+*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS\n+*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE\n+*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,\n+*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,\n+*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;\n+*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT\n+*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN\n+*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n+*  POSSIBILITY OF SUCH DAMAGE.\n+*********************************************************************/\n+\n+/* Author: Ioan Sucan */\n+\n+#include \"random_numbers/random_numbers.h\"\n+\n+#include <boost/random/lagged_fibonacci.hpp>\n+#include <boost/random/uniform_int.hpp>\n+#include <boost/thread/mutex.hpp>\n+#include <boost/date_time/posix_time/posix_time.hpp>\n+#include <boost/math/constants/constants.hpp>\n+#include <boost/scoped_ptr.hpp>\n+\n+/// Compute the first seed to be used; this function should be called only once\n+static boost::uint32_t firstSeed(void)\n+{\n+  boost::scoped_ptr<int> mem(new int());\n+  return (boost::uint32_t)((boost::posix_time::microsec_clock::universal_time() -\n+                            boost::posix_time::ptime(boost::date_time::min_date_time)).total_microseconds() +\n+                           (unsigned long long)(mem.get()));\n+}\n+\n+/// We use a different random number generator for the seeds of the\n+/// Other random generators. The root seed is from the number of\n+/// nano-seconds in the current time.\n+static boost::uint32_t nextSeed(void)\n+{\n+  static boost::mutex rngMutex;\n+  boost::mutex::scoped_lock slock(rngMutex);\n+  static boost::lagged_fibonacci607 sGen(firstSeed());\n+  static boost::uniform_int<>       sDist(1, 1000000000);\n+  static boost::variate_generator<boost::lagged_fibonacci607&, boost::uniform_int<> > s(sGen, sDist);\n+  boost::uint32_t v = s();\n+  return v;\n+}\n+\n+random_numbers::RandomNumberGenerator::RandomNumberGenerator(void) : generator_(nextSeed()),\n+                                                                     uniDist_(0, 1),  \n+                                                                     normalDist_(0, 1),\n+                                                                     uni_(generator_, uniDist_),\n+                                                                     normal_(generator_, normalDist_)\n+{\n+}\n+\n+// From: \"Uniform Random Rotations\", Ken Shoemake, Graphics Gems III,\n+//       pg. 124-132\n+void random_numbers::RandomNumberGenerator::quaternion(double value[4])\n+{\n+  double x0 = uni_();\n+  double r1 = sqrt(1.0 - x0), r2 = sqrt(x0);\n+  double t1 = 2.0 * boost::math::constants::pi<double>() * uni_(), t2 = 2.0 * boost::math::constants::pi<double>() * uni_();\n+  double c1 = cos(t1), s1 = sin(t1);\n+  double c2 = cos(t2), s2 = sin(t2);\n+  value[0] = s1 * r1;\n+  value[1] = c1 * r1;\n+  value[2] = s2 * r2;\n+  value[3] = c2 * r2;\n+}"
+        },
+        {
+          "sha": "a2e6b331c61c857e04f45414fa7054e80084f567",
+          "filename": "stack.xml",
+          "status": "added",
+          "additions": 18,
+          "deletions": 0,
+          "changes": 18,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/e6d09b1b6bb1c493e075280013ede35dcca06373/stack.xml",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/e6d09b1b6bb1c493e075280013ede35dcca06373/stack.xml",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/stack.xml?ref=e6d09b1b6bb1c493e075280013ede35dcca06373",
+          "patch": "@@ -0,0 +1,18 @@\n+<stack>\n+  <name>random_numbers</name>\n+  <version>0.1.0</version>\n+  <description brief=\"Random number generator using boost\">This package generates random floating point values, integers, quaternions using boost libraries.</description>\n+  <author email=\"isucan@willowgarage.edu\">Ioan Sucan</author>\n+  <maintainer email=\"isucan@willowgarage.com\">Ioan Sucan</maintainer>\n+\n+  <license>BSD</license>  \n+  <review status=\"unreviewed\" notes=\"\"/>\n+  <copyright>Willow Garage</copyright>\n+  <url>http://ros.org/wiki/random_numbers</url>\n+\n+  <build_depends>catkin</build_depends>\n+  <build_depends>boost</build_depends>\n+\n+  <depends>boost</depends>\n+\n+</stack>"
+        }
+      ]
+    },
+    {
+      "author": "wjwwood",
+      "date": "2013-06-05T18:03:08Z",
+      "sha": "273df35bdaf462e55a5824df97315e31f96b5c01",
+      "message": "Fix linkedit error on OS X with newer versions of Boost\n\nWhen building `random_numbers` on OS X with Boost 1.53.0 I get:\r\n\r\n```\r\n==> Processing catkin package: 'random_numbers'\r\n==> Creating build directory: 'build_isolated/random_numbers'\r\n==> Building with env: '/Users/william/moveit_ws/install_isolated/env.sh'\r\n==> cmake /Users/william/moveit_ws/src/random_numbers -DCATKIN_DEVEL_PREFIX=/Users/william/moveit_ws/devel_isolated/random_numbers -DCMAKE_INSTALL_PREFIX=/Users/william/moveit_ws/install_isolated\r\n-- The C compiler identification is Clang 4.2.0\r\n-- The CXX compiler identification is Clang 4.2.0\r\n-- Check for working C compiler: /usr/bin/cc\r\n-- Check for working C compiler: /usr/bin/cc -- works\r\n-- Detecting C compiler ABI info\r\n-- Detecting C compiler ABI info - done\r\n-- Check for working CXX compiler: /usr/bin/c++\r\n-- Check for working CXX compiler: /usr/bin/c++ -- works\r\n-- Detecting CXX compiler ABI info\r\n-- Detecting CXX compiler ABI info - done\r\n-- Using CATKIN_DEVEL_PREFIX: /Users/william/moveit_ws/devel_isolated/random_numbers\r\n-- Using CMAKE_PREFIX_PATH: /Users/william/moveit_ws/install_isolated\r\n-- This workspace overlays: /Users/william/moveit_ws/install_isolated\r\n-- Found PythonInterp: /usr/bin/python (found version \"2.7.2\")\r\n-- Found PY_em: /Library/Python/2.7/site-packages/em.pyc\r\n-- Found gtest: gtests will be built\r\n-- Using CATKIN_TEST_RESULTS_DIR: /Users/william/moveit_ws/build_isolated/random_numbers/test_results\r\n-- catkin 0.5.65\r\nWARNING: 'catkin' should be listed as a buildtool dependency in the package.xml (instead of build dependency)\r\n-- Boost version: 1.53.0\r\n-- Found the following Boost libraries:\r\n--   date_time\r\n--   thread\r\n-- Configuring done\r\n-- Generating done\r\n-- Build files have been written to: /Users/william/moveit_ws/build_isolated/random_numbers\r\n==> make -j4 -l4 in '/Users/william/moveit_ws/build_isolated/random_numbers'\r\nScanning dependencies of target random_numbers\r\n[100%] Building CXX object CMakeFiles/random_numbers.dir/src/random_numbers.cpp.o\r\nLinking CXX shared library /Users/william/moveit_ws/devel_isolated/random_numbers/lib/librandom_numbers.dylib\r\nUndefined symbols for architecture x86_64:\r\n  \"boost::system::system_category()\", referenced from:\r\n      ___cxx_global_var_init3 in random_numbers.cpp.o\r\n      boost::thread_exception::thread_exception(int, char const*) in random_numbers.cpp.o\r\n  \"boost::system::generic_category()\", referenced from:\r\n      ___cxx_global_var_init1 in random_numbers.cpp.o\r\n      ___cxx_global_var_init2 in random_numbers.cpp.o\r\nld: symbol(s) not found for architecture x86_64\r\nclang: error: linker command failed with exit code 1 (use -v to see invocation)\r\nmake[2]: *** [/Users/william/moveit_ws/devel_isolated/random_numbers/lib/librandom_numbers.dylib] Error 1\r\nmake[1]: *** [CMakeFiles/random_numbers.dir/all] Error 2\r\nmake: *** [all] Error 2\r\nTraceback (most recent call last):\r\n  File \"./src/catkin/bin/../python/catkin/builder.py\", line 658, in build_workspace_isolated\r\n    number=index + 1, of=len(ordered_packages)\r\n  File \"./src/catkin/bin/../python/catkin/builder.py\", line 443, in build_package\r\n    install, jobs, force_cmake, quiet, last_env, cmake_args, make_args\r\n  File \"./src/catkin/bin/../python/catkin/builder.py\", line 297, in build_catkin_package\r\n    run_command(make_cmd, build_dir, quiet)\r\n  File \"./src/catkin/bin/../python/catkin/builder.py\", line 186, in run_command\r\n    raise subprocess.CalledProcessError(proc.returncode, ' '.join(cmd))\r\nCalledProcessError: Command '/Users/william/moveit_ws/install_isolated/env.sh make -j4 -l4' returned non-zero exit status 2\r\n<== Failed to process package 'random_numbers':\r\n  Command '/Users/william/moveit_ws/install_isolated/env.sh make -j4 -l4' returned non-zero exit status 2\r\n\r\nReproduce this error by running:\r\n==> /Users/william/moveit_ws/install_isolated/env.sh make -j4 -l4\r\n\r\nCommand failed, exiting.\r\n```\r\n\r\nAdding the `system` element to the `Boost` components being found fixes this.",
+      "files_changed": 1,
+      "additions": 1,
+      "deletions": 1,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "a7043011cd4b513efa92b46f4e96586477b690a9",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/273df35bdaf462e55a5824df97315e31f96b5c01/CMakeLists.txt",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/273df35bdaf462e55a5824df97315e31f96b5c01/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/CMakeLists.txt?ref=273df35bdaf462e55a5824df97315e31f96b5c01",
+          "patch": "@@ -8,7 +8,7 @@ catkin_package(\n   INCLUDE_DIRS include\n   )\n \n-find_package(Boost REQUIRED date_time thread)\n+find_package(Boost REQUIRED date_time system thread)\n include_directories(${Boost_INCLUDE_DIR})\n \n include_directories(include)"
+        }
+      ]
+    },
+    {
+      "author": "Aaron Blasdel",
+      "date": "2012-12-14T22:54:40Z",
+      "sha": "ce18082324065b14d13493462ebaa96723e2f7f2",
+      "message": "Update package.xml to buildtool_depend",
+      "files_changed": 1,
+      "additions": 2,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "aa6dfe491a0c882390a5ca00d4bf0d8c37708258",
+          "filename": "package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 1,
+          "changes": 3,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/ce18082324065b14d13493462ebaa96723e2f7f2/package.xml",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/ce18082324065b14d13493462ebaa96723e2f7f2/package.xml",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/package.xml?ref=ce18082324065b14d13493462ebaa96723e2f7f2",
+          "patch": "@@ -7,8 +7,9 @@\n   <license>BSD</license>\n   <url type=\"website\">http://ros.org/wiki/random_numbers</url>\n \n+  <buildtool_depend>catkin</buildtool_depend>\n+\n   <build_depend>boost</build_depend>\n-  <build_depend>catkin</build_depend>\n \n   <run_depend>boost</run_depend>\n </package>"
+        }
+      ]
+    },
+    {
+      "author": "tfoote",
+      "date": "2012-10-13T02:49:04Z",
+      "sha": "4b35bb6714cab24b78db84dfa7ee279835a0b8db",
+      "message": "updating catkinization and 0.1.2",
+      "files_changed": 3,
+      "additions": 11,
+      "deletions": 32,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "d8d8faed331f47b525845a9f9e1076bb1f17297d",
+          "filename": "CMakeLists.txt",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 3,
+          "changes": 5,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/4b35bb6714cab24b78db84dfa7ee279835a0b8db/CMakeLists.txt",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/4b35bb6714cab24b78db84dfa7ee279835a0b8db/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/CMakeLists.txt?ref=4b35bb6714cab24b78db84dfa7ee279835a0b8db",
+          "patch": "@@ -1,10 +1,9 @@\n-cmake_minimum_required(VERSION 2.8)\n+cmake_minimum_required(VERSION 2.8.3)\n project(random_numbers)\n \n find_package(catkin REQUIRED)\n-catkin_stack()\n \n-catkin_project(${PROJECT_NAME}\n+catkin_package(\n   LIBRARIES ${PROJECT_NAME}\n   INCLUDE_DIRS include\n   )"
+        },
+        {
+          "sha": "82f9cb568a9deebc11b65532aba2a584a2ca1a0c",
+          "filename": "manifest.xml",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 11,
+          "changes": 20,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/4b35bb6714cab24b78db84dfa7ee279835a0b8db/manifest.xml",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/4b35bb6714cab24b78db84dfa7ee279835a0b8db/manifest.xml",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/manifest.xml?ref=4b35bb6714cab24b78db84dfa7ee279835a0b8db",
+          "patch": "@@ -1,16 +1,14 @@\n <package>\n-  <description brief=\"random_numbers\">\n-\n-     random_numbers\n-\n-  </description>\n-  <author>Ioan Sucan</author>\n+  <name>random_numbers</name>\n+  <version>0.1.2</version>\n+  <description>This package generates random floating point values, integers, quaternions using boost libraries.</description>\n+  <author email=\"isucan@willowgarage.edu\">Ioan Sucan</author>\n+  <maintainer email=\"isucan@willowgarage.com\">Ioan Sucan</maintainer>\n   <license>BSD</license>\n-  <review status=\"unreviewed\" notes=\"\"/>\n-  <url>http://ros.org/wiki/random_numbers</url>\n+  <url type=\"website\">http://ros.org/wiki/random_numbers</url>\n \n-  <export>\n-    <cpp cflags=\"`pkg-config --cflags random_numbers`\" lflags=\"`pkg-config --libs random_numbers`\"/>\n-  </export>\n+  <build_depend>boost</build_depend>\n+  <build_depend>catkin</build_depend>\n \n+  <run_depend>boost</run_depend>\n </package>"
+        },
+        {
+          "sha": "4115901e8d27380296c40e09efb528949124e8b8",
+          "filename": "stack.xml",
+          "status": "removed",
+          "additions": 0,
+          "deletions": 18,
+          "changes": 18,
+          "blob_url": "https://github.com/moveit/random_numbers/blob/06052270c2bb6285a8cc27521d027ea72b05f0e3/stack.xml",
+          "raw_url": "https://github.com/moveit/random_numbers/raw/06052270c2bb6285a8cc27521d027ea72b05f0e3/stack.xml",
+          "contents_url": "https://api.github.com/repos/moveit/random_numbers/contents/stack.xml?ref=06052270c2bb6285a8cc27521d027ea72b05f0e3",
+          "patch": "@@ -1,18 +0,0 @@\n-<stack>\n-  <name>random_numbers</name>\n-  <version>0.1.1</version>\n-  <description brief=\"Random number generator using boost\">This package generates random floating point values, integers, quaternions using boost libraries.</description>\n-  <author email=\"isucan@willowgarage.edu\">Ioan Sucan</author>\n-  <maintainer email=\"isucan@willowgarage.com\">Ioan Sucan</maintainer>\n-\n-  <license>BSD</license>  \n-  <review status=\"unreviewed\" notes=\"\"/>\n-  <copyright>Willow Garage</copyright>\n-  <url>http://ros.org/wiki/random_numbers</url>\n-\n-  <build_depends>catkin</build_depends>\n-  <build_depends>boost</build_depends>\n-\n-  <depends>boost</depends>\n-\n-</stack>"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T02:44:59Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "mrpt-ros-pkg",
+    "repo": "mrpt_sensors"
+  },
+  "data": [
+    {
+      "author": "jlblancoc",
+      "date": "2017-11-26T21:55:42Z",
+      "sha": "14715dcef034f0447edf38034e9cab2ba3cb864e",
+      "message": "Initial commit",
+      "files_changed": 2,
+      "additions": 31,
+      "deletions": 0,
+      "commit_type": "docs",
+      "files": [
+        {
+          "sha": "0a0daf3a7f61c3d101e13b9a1896e3889d3c08e8",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 29,
+          "deletions": 0,
+          "changes": 29,
+          "blob_url": "https://github.com/mrpt-ros-pkg/mrpt_sensors/blob/14715dcef034f0447edf38034e9cab2ba3cb864e/LICENSE",
+          "raw_url": "https://github.com/mrpt-ros-pkg/mrpt_sensors/raw/14715dcef034f0447edf38034e9cab2ba3cb864e/LICENSE",
+          "contents_url": "https://api.github.com/repos/mrpt-ros-pkg/mrpt_sensors/contents/LICENSE?ref=14715dcef034f0447edf38034e9cab2ba3cb864e",
+          "patch": "@@ -0,0 +1,29 @@\n+BSD 3-Clause License\n+\n+Copyright (c) 2017, mrpt-ros-pkg\n+All rights reserved.\n+\n+Redistribution and use in source and binary forms, with or without\n+modification, are permitted provided that the following conditions are met:\n+\n+* Redistributions of source code must retain the above copyright notice, this\n+  list of conditions and the following disclaimer.\n+\n+* Redistributions in binary form must reproduce the above copyright notice,\n+  this list of conditions and the following disclaimer in the documentation\n+  and/or other materials provided with the distribution.\n+\n+* Neither the name of the copyright holder nor the names of its\n+  contributors may be used to endorse or promote products derived from\n+  this software without specific prior written permission.\n+\n+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\"\n+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE\n+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE\n+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL\n+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR\n+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER\n+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,\n+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
+        },
+        {
+          "sha": "9469f962e98d653e21676e0fc44caf6a6b5c8503",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/mrpt-ros-pkg/mrpt_sensors/blob/14715dcef034f0447edf38034e9cab2ba3cb864e/README.md",
+          "raw_url": "https://github.com/mrpt-ros-pkg/mrpt_sensors/raw/14715dcef034f0447edf38034e9cab2ba3cb864e/README.md",
+          "contents_url": "https://api.github.com/repos/mrpt-ros-pkg/mrpt_sensors/contents/README.md?ref=14715dcef034f0447edf38034e9cab2ba3cb864e",
+          "patch": "@@ -0,0 +1,2 @@\n+# mrpt_sensors\n+ROS nodes for various robotics sensors via mrpt-hwdrivers"
+        }
+      ]
+    },
+    {
+      "author": "r-aguilera",
+      "date": "2024-08-08T12:30:28Z",
+      "sha": "9b5a98883a22ef6fc24d103b2caf601c26314a93",
+      "message": "fix uninitialized publishers",
+      "files_changed": 1,
+      "additions": 6,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b2949c1e42f6169ce35831d9723db8225964e2d9",
+          "filename": "mrpt_sensor_gnss_nmea/src/mrpt_sensor_gnss_nmea_node.cpp",
+          "status": "modified",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/mrpt-ros-pkg/mrpt_sensors/blob/9b5a98883a22ef6fc24d103b2caf601c26314a93/mrpt_sensor_gnss_nmea%2Fsrc%2Fmrpt_sensor_gnss_nmea_node.cpp",
+          "raw_url": "https://github.com/mrpt-ros-pkg/mrpt_sensors/raw/9b5a98883a22ef6fc24d103b2caf601c26314a93/mrpt_sensor_gnss_nmea%2Fsrc%2Fmrpt_sensor_gnss_nmea_node.cpp",
+          "contents_url": "https://api.github.com/repos/mrpt-ros-pkg/mrpt_sensors/contents/mrpt_sensor_gnss_nmea%2Fsrc%2Fmrpt_sensor_gnss_nmea_node.cpp?ref=9b5a98883a22ef6fc24d103b2caf601c26314a93",
+          "patch": "@@ -126,6 +126,12 @@ void process_gps(\n     ASSERT_(o);\n \n     auto& pubs = NMEA_Pubs::Instance();\n+\n+    std::string publish_topic = \"sensor\";\n+    node.declare_parameter(\"publish_topic\", publish_topic);\n+    node.get_parameter(\"publish_topic\", publish_topic);\n+    pubs.ensure_pubs_are_created(node, publish_topic);\n+\n     std_msgs::msg::Header msgHeader;\n     msgHeader.frame_id = node.sensor_frame_id();\n     msgHeader.stamp = mrpt::ros2bridge::toROS(obs->timestamp);"
+        }
+      ]
+    }
+  ]
+}

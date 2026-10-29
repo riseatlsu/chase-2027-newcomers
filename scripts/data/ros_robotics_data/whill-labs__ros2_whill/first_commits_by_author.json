@@ -1,0 +1,71 @@
+{
+  "_meta": {
+    "fetched_at": "2026-03-05T06:59:18Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "whill-labs",
+    "repo": "ros2_whill"
+  },
+  "data": [
+    {
+      "author": "GeorgeMandokoro",
+      "date": "2024-05-24T08:54:00Z",
+      "sha": "65b5f6483626fbf399b73309c6010fa88c2363cf",
+      "message": "Initial commit",
+      "files_changed": 1,
+      "additions": 21,
+      "deletions": 0,
+      "commit_type": "other",
+      "files": [
+        {
+          "sha": "46d07dd552636a95f21b2d98ab7dd8d571c25435",
+          "filename": "LICENSE",
+          "status": "added",
+          "additions": 21,
+          "deletions": 0,
+          "changes": 21,
+          "blob_url": "https://github.com/whill-labs/ros2_whill/blob/65b5f6483626fbf399b73309c6010fa88c2363cf/LICENSE",
+          "raw_url": "https://github.com/whill-labs/ros2_whill/raw/65b5f6483626fbf399b73309c6010fa88c2363cf/LICENSE",
+          "contents_url": "https://api.github.com/repos/whill-labs/ros2_whill/contents/LICENSE?ref=65b5f6483626fbf399b73309c6010fa88c2363cf",
+          "patch": "@@ -0,0 +1,21 @@\n+MIT License\n+\n+Copyright (c) 2024 WHILL, Inc.\n+\n+Permission is hereby granted, free of charge, to any person obtaining a copy\n+of this software and associated documentation files (the \"Software\"), to deal\n+in the Software without restriction, including without limitation the rights\n+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n+copies of the Software, and to permit persons to whom the Software is\n+furnished to do so, subject to the following conditions:\n+\n+The above copyright notice and this permission notice shall be included in\n+all copies or substantial portions of the Software.\n+\n+THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL\n+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n+THE SOFTWARE."
+        }
+      ]
+    },
+    {
+      "author": "s-daisuke",
+      "date": "2024-06-20T06:55:25Z",
+      "sha": "9625577af60ad8f217326020be86041e747d1c0e",
+      "message": "Update cmd_vel unit",
+      "files_changed": 2,
+      "additions": 11,
+      "deletions": 2,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "a0b93ef5554337bf01806256b64e87d9305daa36",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 1,
+          "changes": 2,
+          "blob_url": "https://github.com/whill-labs/ros2_whill/blob/9625577af60ad8f217326020be86041e747d1c0e/README.md",
+          "raw_url": "https://github.com/whill-labs/ros2_whill/raw/9625577af60ad8f217326020be86041e747d1c0e/README.md",
+          "contents_url": "https://api.github.com/repos/whill-labs/ros2_whill/contents/README.md?ref=9625577af60ad8f217326020be86041e747d1c0e",
+          "patch": "@@ -131,7 +131,7 @@ ros2 topic pub -r 12 /whill/controller/joy sensor_msgs/Joy \"{axes:[0, 0.25]}\"\n ##### Spin WHILL counterclockwise with direct velocity inputs\n \n ```sh\n-ros2 topic pub -r 12 /whill/controller/cmd_vel geometry_msgs/Twist '{linear: {x: 0}, angular: {z: -400.0}}'\n+ros2 topic pub -r 12 /whill/controller/cmd_vel geometry_msgs/Twist '{linear: {x: 0}, angular: {z: 0.785}}'\n ```\n \n "
+        },
+        {
+          "sha": "93634abb004e447c6d8778061f9045f9ca2871c3",
+          "filename": "whill_driver/src/whill_node.cpp",
+          "status": "modified",
+          "additions": 10,
+          "deletions": 1,
+          "changes": 11,
+          "blob_url": "https://github.com/whill-labs/ros2_whill/blob/9625577af60ad8f217326020be86041e747d1c0e/whill_driver%2Fsrc%2Fwhill_node.cpp",
+          "raw_url": "https://github.com/whill-labs/ros2_whill/raw/9625577af60ad8f217326020be86041e747d1c0e/whill_driver%2Fsrc%2Fwhill_node.cpp",
+          "contents_url": "https://api.github.com/repos/whill-labs/ros2_whill/contents/whill_driver%2Fsrc%2Fwhill_node.cpp?ref=9625577af60ad8f217326020be86041e747d1c0e",
+          "patch": "@@ -95,7 +95,16 @@ void WhillNode::OnControllerJoy(const sensor_msgs::msg::Joy::SharedPtr joy)\n \n void WhillNode::OnControllerCmdVel(const geometry_msgs::msg::Twist::SharedPtr cmd_vel)\n {\n-  whill_->SendSetVelocityCommand((int)cmd_vel->linear.x, (int)cmd_vel->angular.z);\n+  // [m/s] to [km/h]: *3.6\n+  // SetVelocityCommand takes command unit (0.004 km/h): *250\n+  int linear = cmd_vel->linear.x * 900;\n+\n+  // wheel_tread: 0.496\n+  // [rad/s] to [km/h]: *wheel_tread*3.6\n+  // SetVelocityCommand takes command unit (0.004 km/h): *250\n+  // The direction of rotation is reversed in ROS and SetVelocityCommand\n+  int angular = cmd_vel->angular.z * -446.4;\n+  whill_->SendSetVelocityCommand(linear, angular);\n   RCLCPP_INFO(\n     this->get_logger(), \"[CmdVel] linear:['%f'], angular:['%f']\", cmd_vel->linear.x,\n     cmd_vel->angular.z);"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,371 @@
+{
+  "_meta": {
+    "fetched_at": "2026-09-21T17:47:16Z",
+    "source": "derived+rest",
+    "derivation": "earliest commit per author_login from commits.json; enrich via /commits/{sha} for files/stats",
+    "owner": "gazebosim",
+    "repo": "gz-rviz"
+  },
+  "data": [
+    {
+      "author": "Thodoris1999",
+      "date": "2022-04-25T13:07:26Z",
+      "sha": "eecb9b006eceb28e62571b566bae24a9c29f4216",
+      "message": "Minimal scene GUI configuration file (#79)\n\nSigned-off-by: Theodoros Tyrovouzis <teotyrov@gmail.com>",
+      "files_changed": 1,
+      "additions": 11,
+      "deletions": 1,
+      "commit_type": "config",
+      "files": [
+        {
+          "sha": "31cffc58374a72ea95f9ff4d593eb26689127b87",
+          "filename": "ign_rviz/config/rviz.config",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 1,
+          "changes": 12,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/eecb9b006eceb28e62571b566bae24a9c29f4216/ign_rviz%2Fconfig%2Frviz.config",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/eecb9b006eceb28e62571b566bae24a9c29f4216/ign_rviz%2Fconfig%2Frviz.config",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/ign_rviz%2Fconfig%2Frviz.config?ref=eecb9b006eceb28e62571b566bae24a9c29f4216",
+          "patch": "@@ -7,7 +7,7 @@\n </window>\n \n <!-- GUI plugins -->\n-<plugin filename='Scene3D' name='3D View'>\n+<plugin filename='MinimalScene' name='3D View'>\n   <ignition-gui>\n     <title>3D View</title>\n     <property type='bool' key='showTitleBar'>false</property>\n@@ -19,3 +19,13 @@\n   <background_color>0.1875 0.1875 0.1875</background_color>\n   <camera_pose>-6 0 6 0 0.5 0</camera_pose>\n </plugin>\n+\n+<plugin filename=\"InteractiveViewControl\" name=\"Interactive view control\">\n+  <ignition-gui>\n+    <property key=\"resizable\" type=\"bool\">false</property>\n+    <property key=\"width\" type=\"double\">5</property>\n+    <property key=\"height\" type=\"double\">5</property>\n+    <property key=\"state\" type=\"string\">floating</property>\n+    <property key=\"showTitleBar\" type=\"bool\">false</property>\n+  </ignition-gui>\n+</plugin>"
+        }
+      ]
+    },
+    {
+      "author": "ahcorde",
+      "date": "2020-06-04T16:20:50Z",
+      "sha": "4deb93e01982c3bf01dca70e701dad269f884f15",
+      "message": "Fixes to compile the code\n\nSigned-off-by: ahcorde <ahcorde@gmail.com>",
+      "files_changed": 5,
+      "additions": 28,
+      "deletions": 20,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "ed4bbc8fb844ce3ad9918e2a8e4a2c96c1249c95",
+          "filename": "ign-rviz-plugins/CMakeLists.txt",
+          "status": "modified",
+          "additions": 9,
+          "deletions": 2,
+          "changes": 11,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/4deb93e01982c3bf01dca70e701dad269f884f15/ign-rviz-plugins%2FCMakeLists.txt",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/4deb93e01982c3bf01dca70e701dad269f884f15/ign-rviz-plugins%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/ign-rviz-plugins%2FCMakeLists.txt?ref=4deb93e01982c3bf01dca70e701dad269f884f15",
+          "patch": "@@ -17,6 +17,7 @@ find_package(rclcpp REQUIRED)\n find_package(geometry_msgs REQUIRED)\n find_package(tf2_msgs REQUIRED)\n find_package(pluginlib REQUIRED)\n+find_package(Qt5Widgets CONFIG REQUIRED)\n \n # Ignition libraries\n find_package(ignition-common3 REQUIRED)\n@@ -30,10 +31,14 @@ include_directories(SYSTEM\n   ${IGNITION-GUI_INCLUDE_DIRS}\n )\n \n-file(GLOB_RECURSE default_plugins \"src/rviz/plugins/tf_display.cpp\" \"include/ignition/rviz/plugins/message_display_base.hpp\" \"include/ignition/rviz/plugins/tf_display.hpp\")\n+set(ign_rviz_plugins_headers_to_moc\n+  \"include/ignition/rviz/plugins/message_display_base.hpp\"\n+  \"include/ignition/rviz/plugins/tf_display.hpp\"\n+)\n \n add_library(ign-rviz-plugins SHARED\n-  ${default_plugins}\n+  ${ign_rviz_plugins_headers_to_moc}\n+  src/rviz/plugins/tf_display.cpp\n )\n \n ament_target_dependencies(ign-rviz-plugins\n@@ -49,6 +54,7 @@ target_include_directories(ign-rviz-plugins\n   PUBLIC\n   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>\n   $<INSTALL_INTERFACE:include>\n+  ${Qt5Widgets_INCLUDE_DIRS}\n )\n \n pluginlib_export_plugin_description_file(ign-rviz-plugins ign-rviz-plugins.xml)\n@@ -59,6 +65,7 @@ install(\n )\n \n ament_export_include_directories(include)\n+ament_export_libraries(ign-rviz-plugins)\n \n install(\n   TARGETS ign-rviz-plugins"
+        },
+        {
+          "sha": "9fe23ea729c0b7f267874b9223b5445cf5920bfb",
+          "filename": "ign-rviz-plugins/ign-rviz-plugins.xml",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 7,
+          "changes": 8,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/4deb93e01982c3bf01dca70e701dad269f884f15/ign-rviz-plugins%2Fign-rviz-plugins.xml",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/4deb93e01982c3bf01dca70e701dad269f884f15/ign-rviz-plugins%2Fign-rviz-plugins.xml",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/ign-rviz-plugins%2Fign-rviz-plugins.xml?ref=4deb93e01982c3bf01dca70e701dad269f884f15",
+          "patch": "@@ -1,14 +1,8 @@\n <library path=\"ign-rviz-plugins\">\n-\t<class\n-\t\tname=\"ignition/rviz/plugins/PointDisplay\"\n-\t\ttype=\"ignition::rviz::plugins::PointDisplay\"\n-\t\tbase_class_type=\"ignition::rviz::plugins::MessageDisplayBase\">\n-\t\t<description>Visualization plugin for geoemtry_msgs/msgs/PointStamped</description>\n-\t</class>\n \t<class\n \t\tname=\"ignition/rviz/plugins/TFDisplay\"\n \t\ttype=\"ignition::rviz::plugins::TFDisplay\"\n \t\tbase_class_type=\"ignition::rviz::plugins::MessageDisplayBase\">\n \t\t<description>Visualization plugin for tf2_msgs/msg/TFMessage</description>\n \t</class>\n-</library>\n\\ No newline at end of file\n+</library>"
+        },
+        {
+          "sha": "e9b2e641ded39a6805153ce76ed94f44d84c8e06",
+          "filename": "ign-rviz-plugins/include/ignition/rviz/plugins/message_display_base.hpp",
+          "status": "modified",
+          "additions": 13,
+          "deletions": 9,
+          "changes": 22,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/4deb93e01982c3bf01dca70e701dad269f884f15/ign-rviz-plugins%2Finclude%2Fignition%2Frviz%2Fplugins%2Fmessage_display_base.hpp",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/4deb93e01982c3bf01dca70e701dad269f884f15/ign-rviz-plugins%2Finclude%2Fignition%2Frviz%2Fplugins%2Fmessage_display_base.hpp",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/ign-rviz-plugins%2Finclude%2Fignition%2Frviz%2Fplugins%2Fmessage_display_base.hpp?ref=4deb93e01982c3bf01dca70e701dad269f884f15",
+          "patch": "@@ -32,40 +32,45 @@ namespace plugins\n class MessageDisplayBase : public QObject\n {\n   Q_OBJECT\n-public:\n-  MessageDisplayBase() {}\n-  virtual ~MessageDisplayBase() {}\n+  public:\n+    MessageDisplayBase()\n+    : QObject() {}\n \n   /**\n    * @brief ROS Visualzation plugin initialization function\n    * @param ROS Node shared pointer\n    * @throws anything rclcpp::exceptions::throw_from_rcl_error can throw.\n    */\n-  virtual void initialize(rclcpp::Node::SharedPtr) {};\n+  public:\n+    virtual void initialize(rclcpp::Node::SharedPtr) {};\n+\n   // virtual void LoadConfig(const tinyxml2::XMLElement * /*_pluginElem*/) {}\n };\n \n template<typename MessageType>\n class MessageDisplay : public MessageDisplayBase\n {\n+  // No Q_OBJECT macro here, moc does not support Q_OBJECT in a templated class.\n public:\n-  MessageDisplay() : MessageDisplayBase() {}\n+  MessageDisplay()\n+  : MessageDisplayBase() {}\n+\n   virtual ~MessageDisplay() {}\n \n-  virtual void initialize(rclcpp::Node::SharedPtr) {};\n+  virtual void initialize(rclcpp::Node::SharedPtr) {}\n \n   /**\n    * @brief ROS subscriber callback function\n    * @param ROS message type shared pointer\n    * @throws anything rclcpp::exceptions::throw_from_rcl_error can throw.\n    */\n-  virtual void callback(typename MessageType::SharedPtr) {};\n+  virtual void callback(typename MessageType::SharedPtr) {}\n \n   /**\n    * @brief Set ROS subscriber topic\n    * @param ROS topic name\n    */\n-  virtual void setTopic(std::string) {};\n+  virtual void setTopic(std::string) {}\n \n   // virtual void LoadConfig(const tinyxml2::XMLElement * /*_pluginElem*/) {}\n \n@@ -77,5 +82,4 @@ class MessageDisplay : public MessageDisplayBase\n }  // namespace plugins\n }  // namespace rviz\n }  // namespace ignition\n-\n #endif  // IGNITION__RVIZ__PLUGINS__MESSAGE_DISPLAY_BASE_HPP_"
+        },
+        {
+          "sha": "41291b17d646a7d2caf92eb37b5fabe27022af1e",
+          "filename": "ign-rviz-plugins/include/ignition/rviz/plugins/tf_display.hpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/4deb93e01982c3bf01dca70e701dad269f884f15/ign-rviz-plugins%2Finclude%2Fignition%2Frviz%2Fplugins%2Ftf_display.hpp",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/4deb93e01982c3bf01dca70e701dad269f884f15/ign-rviz-plugins%2Finclude%2Fignition%2Frviz%2Fplugins%2Ftf_display.hpp",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/ign-rviz-plugins%2Finclude%2Fignition%2Frviz%2Fplugins%2Ftf_display.hpp?ref=4deb93e01982c3bf01dca70e701dad269f884f15",
+          "patch": "@@ -66,4 +66,8 @@ class TFDisplay : public MessageDisplay<tf2_msgs::msg::TFMessage>\n }  // namespace rviz\n }  // namespace ignition\n \n+#include <pluginlib/class_list_macros.hpp>  // NOLINT\n+PLUGINLIB_EXPORT_CLASS(ignition::rviz::plugins::TFDisplay,\n+                       ignition::rviz::plugins::MessageDisplayBase)\n+\n #endif  // IGNITION__RVIZ__PLUGINS__TF_DISPLAY_HPP_"
+        },
+        {
+          "sha": "bd0a3f70e4a0f1383f1bbb4207a9e270d56312de",
+          "filename": "ign-rviz/include/ignition/rviz/rviz.hpp",
+          "status": "modified",
+          "additions": 1,
+          "deletions": 2,
+          "changes": 3,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/4deb93e01982c3bf01dca70e701dad269f884f15/ign-rviz%2Finclude%2Fignition%2Frviz%2Frviz.hpp",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/4deb93e01982c3bf01dca70e701dad269f884f15/ign-rviz%2Finclude%2Fignition%2Frviz%2Frviz.hpp",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/ign-rviz%2Finclude%2Fignition%2Frviz%2Frviz.hpp?ref=4deb93e01982c3bf01dca70e701dad269f884f15",
+          "patch": "@@ -42,8 +42,7 @@ class RViz : public QObject\n public:\n   RViz()\n   : plugin_loader(\"ign-rviz-plugins\", \"ignition::rviz::plugins::MessageDisplayBase\")\n-  {\n-  }\n+  {}\n \n   /**\n    * @brief Add Grid visual to Scene3D"
+        }
+      ]
+    },
+    {
+      "author": "atharva-18",
+      "date": "2020-11-16T16:19:19Z",
+      "sha": "e2945d30ec17176f69668a93189462031b3054ee",
+      "message": "Update getFramePose from FrameManager (#67)\n\nSigned-off-by: atharva-18 <atharvapusalkar18@gmail.com>",
+      "files_changed": 1,
+      "additions": 4,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "ba12df664b8ad8790cee645d0ea1fa9fecd1a3b1",
+          "filename": "ign_rviz_common/src/rviz/common/frame_manager.cpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/e2945d30ec17176f69668a93189462031b3054ee/ign_rviz_common%2Fsrc%2Frviz%2Fcommon%2Fframe_manager.cpp",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/e2945d30ec17176f69668a93189462031b3054ee/ign_rviz_common%2Fsrc%2Frviz%2Fcommon%2Fframe_manager.cpp",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/ign_rviz_common%2Fsrc%2Frviz%2Fcommon%2Fframe_manager.cpp?ref=e2945d30ec17176f69668a93189462031b3054ee",
+          "patch": "@@ -144,6 +144,10 @@ bool FrameManager::getFramePose(const std::string & _frame, ignition::math::Pose\n \n   _pose = math::Pose3d::Zero;\n \n+  if (this->fixedFrame == _frame) {\n+    return true;\n+  }\n+\n   auto it = this->tfTree.find(_frame);\n   if (it != tfTree.end()) {\n     _pose = it->second;"
+        }
+      ]
+    },
+    {
+      "author": "chapulina",
+      "date": "2020-08-27T00:53:31Z",
+      "sha": "f6a3aab7067985cfac0e721640aefee192f3bc0f",
+      "message": "Suggestions to README and others\n\nSigned-off-by: Louise Poubel <louise@openrobotics.org>",
+      "files_changed": 13,
+      "additions": 47,
+      "deletions": 39,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "b38b3211f6b1c876984bbf88b4c88e8c05368018",
+          "filename": "README.md",
+          "status": "modified",
+          "additions": 11,
+          "deletions": 10,
+          "changes": 21,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/f6a3aab7067985cfac0e721640aefee192f3bc0f/README.md",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/f6a3aab7067985cfac0e721640aefee192f3bc0f/README.md",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/README.md?ref=f6a3aab7067985cfac0e721640aefee192f3bc0f",
+          "patch": "@@ -1,20 +1,21 @@\n # Ignition RViz\n \n-RViz is a 3D visualization program for robots using ROS.\n+[RViz](http://wiki.ros.org/rviz) is a 3D visualization tool for robots using ROS.\n \n-This version of RViz is developed using Ignition Rendering Library.\n+Ignition RViz offers functionality similar to RViz, and is developed using\n+[Ignition](https://ignitionrobotics.org/) libraries.\n \n ![Ignition RViz CI](https://github.com/Sarath18/ign-rviz/workflows/Ignition%20RViz%20CI/badge.svg)\n \n ### Requirements\n \n-- ROS2\n-- ignition libraries\n-\t- ign-common3\n-\t- ign-gui4\n-\t- ign-rendering4\n-\t- ign-math6\n-- Qt5\n+- [ROS 2 Foxy](https://index.ros.org/doc/ros2/Releases/Release-Foxy-Fitzroy/)\n+- [Ignition Dome](https://ignitionrobotics.org/docs/dome) (under development)\n+\t- [Ignition Common](https://ignitionrobotics.org/libs/common) 3\n+\t- [Ignition GUI](https://ignitionrobotics.org/libs/gui) 4\n+\t- [Ignition Math](https://ignitionrobotics.org/libs/math) 6\n+\t- [Ignition Rendering](https://ignitionrobotics.org/libs/rendering) 4\n+- [Qt5](https://www.qt.io/)\n \n ### Setup the repository\n \n@@ -25,7 +26,7 @@ cd ~/colcon_ws/src\n ```\n - **Clone the repository**\n ```bash\n-git clone https://github.com/Sarath18/ign-rviz.git\n+git clone https://github.com/ignitionrobotics/ign-rviz.git\n ```\n \n - **Build ign-rviz**"
+        },
+        {
+          "sha": "c56769ee1ac1b7ac012165507bdde20dc3bc494a",
+          "filename": "ign_rviz/CMakeLists.txt",
+          "status": "modified",
+          "additions": 0,
+          "deletions": 1,
+          "changes": 1,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/f6a3aab7067985cfac0e721640aefee192f3bc0f/ign_rviz%2FCMakeLists.txt",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/f6a3aab7067985cfac0e721640aefee192f3bc0f/ign_rviz%2FCMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/ign_rviz%2FCMakeLists.txt?ref=f6a3aab7067985cfac0e721640aefee192f3bc0f",
+          "patch": "@@ -36,7 +36,6 @@ find_package(ign_rviz_plugins REQUIRED)\n find_package(ignition-common3 REQUIRED)\n find_package(ignition-gui4 REQUIRED)\n find_package(ignition-math6 REQUIRED)\n-find_package(ignition-rendering4 REQUIRED)\n \n qt5_add_resources(resources_RCC include/ignition/rviz/rviz.qrc)\n "
+        },
+        {
+          "sha": "17e4cffa0597f329b88cf63a4afe0a5431cbe074",
+          "filename": "ign_rviz/package.xml",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 1,
+          "changes": 5,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/f6a3aab7067985cfac0e721640aefee192f3bc0f/ign_rviz%2Fpackage.xml",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/f6a3aab7067985cfac0e721640aefee192f3bc0f/ign_rviz%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/ign_rviz%2Fpackage.xml?ref=f6a3aab7067985cfac0e721640aefee192f3bc0f",
+          "patch": "@@ -3,7 +3,7 @@\n <package format=\"3\">\n   <name>ign_rviz</name>\n   <version>0.0.0</version>\n-  <description>RViz Developed using ignition-rendering</description>\n+  <description>RViz developed using Ignition libraries</description>\n \n   <maintainer email=\"sarathkrishnan99@gmail.com\">Sarathkrishnan Ramesh</maintainer>\n \n@@ -12,6 +12,9 @@\n   <depend>geometry_msgs</depend>\n   <depend>ign_rviz_common</depend>\n   <depend>ign_rviz_plugins</depend>\n+  <depend>ignition-common3</depend>\n+  <depend>ignition-gui4</depend>\n+  <depend>ignition-math6</depend>\n   <depend>nav_msgs</depend>\n   <depend>rclcpp</depend>\n   <depend>sensor_msgs</depend>"
+        },
+        {
+          "sha": "83aef5d73d77e76e7641fa3b6397d6290077a302",
+          "filename": "ign_rviz_common/package.xml",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/f6a3aab7067985cfac0e721640aefee192f3bc0f/ign_rviz_common%2Fpackage.xml",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/f6a3aab7067985cfac0e721640aefee192f3bc0f/ign_rviz_common%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/ign_rviz_common%2Fpackage.xml?ref=f6a3aab7067985cfac0e721640aefee192f3bc0f",
+          "patch": "@@ -11,6 +11,8 @@\n \n   <depend>rclcpp</depend>\n   <depend>geometry_msgs</depend>\n+  <depend>ignition-common3</depend>\n+  <depend>ignition-math6</depend>\n   <depend>tf2_geometry_msgs</depend>\n   <depend>tf2_msgs</depend>\n   <depend>tf2_ros</depend>"
+        },
+        {
+          "sha": "bc451efa1dd24f5223897ac3ea5c7b5139aca337",
+          "filename": "ign_rviz_plugins/package.xml",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 0,
+          "changes": 4,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/f6a3aab7067985cfac0e721640aefee192f3bc0f/ign_rviz_plugins%2Fpackage.xml",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/f6a3aab7067985cfac0e721640aefee192f3bc0f/ign_rviz_plugins%2Fpackage.xml",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/ign_rviz_plugins%2Fpackage.xml?ref=f6a3aab7067985cfac0e721640aefee192f3bc0f",
+          "patch": "@@ -11,6 +11,10 @@\n \n   <depend>geometry_msgs</depend>\n   <depend>ign_rviz_common</depend>\n+  <depend>ignition-common3</depend>\n+  <depend>ignition-gui4</depend>\n+  <depend>ignition-math6</depend>\n+  <depend>ignition-rendering4</depend>\n   <depend>nav_msgs</depend>\n   <depend>rclcpp</depend>\n   <depend>sensor_msgs</depend>"
+        },
+        {
+          "sha": "8f9530dad2f8223153158e4d47b11419673e80b8",
+          "filename": "ign_rviz_plugins/src/rviz/plugins/LaserScanDisplay.cpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 4,
+          "changes": 7,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/f6a3aab7067985cfac0e721640aefee192f3bc0f/ign_rviz_plugins%2Fsrc%2Frviz%2Fplugins%2FLaserScanDisplay.cpp",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/f6a3aab7067985cfac0e721640aefee192f3bc0f/ign_rviz_plugins%2Fsrc%2Frviz%2Fplugins%2FLaserScanDisplay.cpp",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/ign_rviz_plugins%2Fsrc%2Frviz%2Fplugins%2FLaserScanDisplay.cpp?ref=f6a3aab7067985cfac0e721640aefee192f3bc0f",
+          "patch": "@@ -14,15 +14,14 @@\n \n #include \"ignition/rviz/plugins/LaserScanDisplay.hpp\"\n \n-#include <ignition/math.hh>\n-#include <ignition/math/Color.hh>\n-#include <ignition/plugin/Register.hh>\n #include <ignition/gui/Application.hh>\n #include <ignition/gui/GuiEvents.hh>\n+#include <ignition/math/Pose3.hh>\n+#include <ignition/plugin/Register.hh>\n \n+#include <memory>\n #include <string>\n #include <utility>\n-#include <memory>\n #include <vector>\n \n namespace ignition"
+        },
+        {
+          "sha": "8bd405ecfad87376741350153cd67ccfa4945ce6",
+          "filename": "ign_rviz_plugins/src/rviz/plugins/PathDisplay.cpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 3,
+          "changes": 7,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/f6a3aab7067985cfac0e721640aefee192f3bc0f/ign_rviz_plugins%2Fsrc%2Frviz%2Fplugins%2FPathDisplay.cpp",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/f6a3aab7067985cfac0e721640aefee192f3bc0f/ign_rviz_plugins%2Fsrc%2Frviz%2Fplugins%2FPathDisplay.cpp",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/ign_rviz_plugins%2Fsrc%2Frviz%2Fplugins%2FPathDisplay.cpp?ref=f6a3aab7067985cfac0e721640aefee192f3bc0f",
+          "patch": "@@ -14,11 +14,12 @@\n \n #include \"ignition/rviz/plugins/PathDisplay.hpp\"\n \n-#include <ignition/math.hh>\n-#include <ignition/math/Color.hh>\n-#include <ignition/plugin/Register.hh>\n #include <ignition/gui/Application.hh>\n #include <ignition/gui/GuiEvents.hh>\n+#include <ignition/math/Pose3.hh>\n+#include <ignition/math/Quaternion.hh>\n+#include <ignition/math/Vector3.hh>\n+#include <ignition/plugin/Register.hh>\n \n #include <string>\n #include <utility>"
+        },
+        {
+          "sha": "3703ed025974688b613a69108413f1eecc8bb3e4",
+          "filename": "ign_rviz_plugins/src/rviz/plugins/PointStampedDisplay.cpp",
+          "status": "modified",
+          "additions": 2,
+          "deletions": 3,
+          "changes": 5,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/f6a3aab7067985cfac0e721640aefee192f3bc0f/ign_rviz_plugins%2Fsrc%2Frviz%2Fplugins%2FPointStampedDisplay.cpp",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/f6a3aab7067985cfac0e721640aefee192f3bc0f/ign_rviz_plugins%2Fsrc%2Frviz%2Fplugins%2FPointStampedDisplay.cpp",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/ign_rviz_plugins%2Fsrc%2Frviz%2Fplugins%2FPointStampedDisplay.cpp?ref=f6a3aab7067985cfac0e721640aefee192f3bc0f",
+          "patch": "@@ -14,11 +14,10 @@\n \n #include \"ignition/rviz/plugins/PointStampedDisplay.hpp\"\n \n-#include <ignition/math.hh>\n-#include <ignition/math/Color.hh>\n-#include <ignition/plugin/Register.hh>\n #include <ignition/gui/Application.hh>\n #include <ignition/gui/GuiEvents.hh>\n+#include <ignition/math/Pose3.hh>\n+#include <ignition/plugin/Register.hh>\n \n #include <string>\n #include <utility>"
+        },
+        {
+          "sha": "96190642e9e516abdd2bdbe40c7fb398db963bb0",
+          "filename": "ign_rviz_plugins/src/rviz/plugins/PolygonDisplay.cpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 4,
+          "changes": 7,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/f6a3aab7067985cfac0e721640aefee192f3bc0f/ign_rviz_plugins%2Fsrc%2Frviz%2Fplugins%2FPolygonDisplay.cpp",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/f6a3aab7067985cfac0e721640aefee192f3bc0f/ign_rviz_plugins%2Fsrc%2Frviz%2Fplugins%2FPolygonDisplay.cpp",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/ign_rviz_plugins%2Fsrc%2Frviz%2Fplugins%2FPolygonDisplay.cpp?ref=f6a3aab7067985cfac0e721640aefee192f3bc0f",
+          "patch": "@@ -14,15 +14,14 @@\n \n #include \"ignition/rviz/plugins/PolygonDisplay.hpp\"\n \n-#include <ignition/math.hh>\n-#include <ignition/math/Color.hh>\n-#include <ignition/plugin/Register.hh>\n #include <ignition/gui/Application.hh>\n #include <ignition/gui/GuiEvents.hh>\n+#include <ignition/math/Pose3.hh>\n+#include <ignition/plugin/Register.hh>\n \n+#include <memory>\n #include <string>\n #include <utility>\n-#include <memory>\n #include <vector>\n \n namespace ignition"
+        },
+        {
+          "sha": "5ffa0e68653133cb823a5b4ef1e184a65df63f71",
+          "filename": "ign_rviz_plugins/src/rviz/plugins/PoseArrayDisplay.cpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 4,
+          "changes": 8,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/f6a3aab7067985cfac0e721640aefee192f3bc0f/ign_rviz_plugins%2Fsrc%2Frviz%2Fplugins%2FPoseArrayDisplay.cpp",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/f6a3aab7067985cfac0e721640aefee192f3bc0f/ign_rviz_plugins%2Fsrc%2Frviz%2Fplugins%2FPoseArrayDisplay.cpp",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/ign_rviz_plugins%2Fsrc%2Frviz%2Fplugins%2FPoseArrayDisplay.cpp?ref=f6a3aab7067985cfac0e721640aefee192f3bc0f",
+          "patch": "@@ -14,15 +14,15 @@\n \n #include \"ignition/rviz/plugins/PoseArrayDisplay.hpp\"\n \n-#include <ignition/math.hh>\n-#include <ignition/math/Color.hh>\n-#include <ignition/plugin/Register.hh>\n #include <ignition/gui/Application.hh>\n #include <ignition/gui/GuiEvents.hh>\n+#include <ignition/math/Pose3.hh>\n+#include <ignition/math/Quaternion.hh>\n+#include <ignition/plugin/Register.hh>\n \n+#include <memory>\n #include <string>\n #include <utility>\n-#include <memory>\n #include <vector>\n \n namespace ignition"
+        },
+        {
+          "sha": "bb2c7453c833cb0a296eeb5d991abd37c5a1c1a2",
+          "filename": "ign_rviz_plugins/src/rviz/plugins/PoseDisplay.cpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/f6a3aab7067985cfac0e721640aefee192f3bc0f/ign_rviz_plugins%2Fsrc%2Frviz%2Fplugins%2FPoseDisplay.cpp",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/f6a3aab7067985cfac0e721640aefee192f3bc0f/ign_rviz_plugins%2Fsrc%2Frviz%2Fplugins%2FPoseDisplay.cpp",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/ign_rviz_plugins%2Fsrc%2Frviz%2Fplugins%2FPoseDisplay.cpp?ref=f6a3aab7067985cfac0e721640aefee192f3bc0f",
+          "patch": "@@ -14,11 +14,11 @@\n \n #include \"ignition/rviz/plugins/PoseDisplay.hpp\"\n \n-#include <ignition/math.hh>\n-#include <ignition/math/Color.hh>\n-#include <ignition/plugin/Register.hh>\n #include <ignition/gui/Application.hh>\n #include <ignition/gui/GuiEvents.hh>\n+#include <ignition/math/Pose3.hh>\n+#include <ignition/math/Quaternion.hh>\n+#include <ignition/plugin/Register.hh>\n \n #include <string>\n #include <utility>"
+        },
+        {
+          "sha": "642a5eda35e716863d7957b224985d26baf28738",
+          "filename": "ign_rviz_plugins/src/rviz/plugins/RobotModelDisplay.cpp",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 3,
+          "changes": 6,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/f6a3aab7067985cfac0e721640aefee192f3bc0f/ign_rviz_plugins%2Fsrc%2Frviz%2Fplugins%2FRobotModelDisplay.cpp",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/f6a3aab7067985cfac0e721640aefee192f3bc0f/ign_rviz_plugins%2Fsrc%2Frviz%2Fplugins%2FRobotModelDisplay.cpp",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/ign_rviz_plugins%2Fsrc%2Frviz%2Fplugins%2FRobotModelDisplay.cpp?ref=f6a3aab7067985cfac0e721640aefee192f3bc0f",
+          "patch": "@@ -14,11 +14,11 @@\n \n #include \"ignition/rviz/plugins/RobotModelDisplay.hpp\"\n \n-#include <ignition/math.hh>\n-#include <ignition/math/Color.hh>\n-#include <ignition/plugin/Register.hh>\n #include <ignition/gui/Application.hh>\n #include <ignition/gui/GuiEvents.hh>\n+#include <ignition/math/Color.hh>\n+#include <ignition/math/Pose3.hh>\n+#include <ignition/plugin/Register.hh>\n \n #include <ament_index_cpp/get_package_prefix.hpp>\n #include <ament_index_cpp/get_package_share_directory.hpp>"
+        },
+        {
+          "sha": "9f086f62ee221a9b60a66ea1ceee38a999050759",
+          "filename": "ign_rviz_plugins/src/rviz/plugins/TFDisplay.cpp",
+          "status": "modified",
+          "additions": 4,
+          "deletions": 3,
+          "changes": 7,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/f6a3aab7067985cfac0e721640aefee192f3bc0f/ign_rviz_plugins%2Fsrc%2Frviz%2Fplugins%2FTFDisplay.cpp",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/f6a3aab7067985cfac0e721640aefee192f3bc0f/ign_rviz_plugins%2Fsrc%2Frviz%2Fplugins%2FTFDisplay.cpp",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/ign_rviz_plugins%2Fsrc%2Frviz%2Fplugins%2FTFDisplay.cpp?ref=f6a3aab7067985cfac0e721640aefee192f3bc0f",
+          "patch": "@@ -14,11 +14,12 @@\n \n #include \"ignition/rviz/plugins/TFDisplay.hpp\"\n \n-#include <ignition/math.hh>\n-#include <ignition/math/Color.hh>\n-#include <ignition/plugin/Register.hh>\n #include <ignition/gui/Application.hh>\n #include <ignition/gui/GuiEvents.hh>\n+#include <ignition/math/Pose3.hh>\n+#include <ignition/math/Quaternion.hh>\n+#include <ignition/math/Vector3.hh>\n+#include <ignition/plugin/Register.hh>\n \n #include <algorithm>\n #include <memory>"
+        }
+      ]
+    },
+    {
+      "author": "Sarath18",
+      "date": "2020-02-25T14:47:51Z",
+      "sha": "f986ca9edcd04aca3ed163f5c3659839929427cd",
+      "message": "Initial Commit",
+      "files_changed": 5,
+      "additions": 80,
+      "deletions": 0,
+      "commit_type": "code",
+      "files": [
+        {
+          "sha": "990936c24302e65fd41e59db2fbbe963f607a9c8",
+          "filename": ".gitignore",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/f986ca9edcd04aca3ed163f5c3659839929427cd/.gitignore",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/f986ca9edcd04aca3ed163f5c3659839929427cd/.gitignore",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/.gitignore?ref=f986ca9edcd04aca3ed163f5c3659839929427cd",
+          "patch": "@@ -0,0 +1,2 @@\n+.idea/\n+cmake-build-debug/"
+        },
+        {
+          "sha": "d8159a92fdf5137b72fa10447c336b5db7cd7d04",
+          "filename": "CMakeLists.txt",
+          "status": "added",
+          "additions": 48,
+          "deletions": 0,
+          "changes": 48,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/f986ca9edcd04aca3ed163f5c3659839929427cd/CMakeLists.txt",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/f986ca9edcd04aca3ed163f5c3659839929427cd/CMakeLists.txt",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/CMakeLists.txt?ref=f986ca9edcd04aca3ed163f5c3659839929427cd",
+          "patch": "@@ -0,0 +1,48 @@\n+cmake_minimum_required(VERSION 2.8.3)\n+project(ign-rviz)\n+\n+add_compile_options(-std=c++11 -O2)\n+\n+find_package(catkin REQUIRED COMPONENTS\n+  roscpp\n+  std_msgs\n+  pcl_ros\n+  pcl_conversions\n+)\n+\n+find_package(ignition-rendering3 REQUIRED)\n+find_package(GLUT REQUIRED)\n+include_directories(SYSTEM ${GLUT_INCLUDE_DIRS})\n+link_directories(${GLUT_LIBRARY_DIRS})\n+\n+find_package(OpenGL REQUIRED)\n+include_directories(SYSTEM ${OpenGL_INCLUDE_DIRS})\n+link_directories(${OpenGL_LIBRARY_DIRS})\n+\n+if (NOT APPLE)\n+    find_package(GLEW REQUIRED)\n+    include_directories(SYSTEM ${GLEW_INCLUDE_DIRS})\n+    link_directories(${GLEW_LIBRARY_DIRS})\n+endif()\n+\n+catkin_package(\n+  INCLUDE_DIRS include\n+#  LIBRARIES ign-rviz\n+#  CATKIN_DEPENDS roscpp std_msgs\n+#  DEPENDS system_lib\n+)\n+\n+include_directories(\n+  include\n+  ${catkin_INCLUDE_DIRS}\n+)\n+\n+add_executable(${PROJECT_NAME} src/ign_rviz.cpp)\n+\n+target_link_libraries(${PROJECT_NAME}\n+  ${catkin_LIBRARIES}\n+  ${GLUT_LIBRARIES}\n+  ${OPENGL_LIBRARIES}\n+  ${GLEW_LIBRARIES}\n+  ${IGNITION-RENDERING_LIBRARIES}\n+)"
+        },
+        {
+          "sha": "cd3d1e3e61b05e8fc707f0ebdf73d25cfa7a3041",
+          "filename": "README.md",
+          "status": "added",
+          "additions": 2,
+          "deletions": 0,
+          "changes": 2,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/f986ca9edcd04aca3ed163f5c3659839929427cd/README.md",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/f986ca9edcd04aca3ed163f5c3659839929427cd/README.md",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/README.md?ref=f986ca9edcd04aca3ed163f5c3659839929427cd",
+          "patch": "@@ -0,0 +1,2 @@\n+#Ignition-Rviz\n+ROS package for Robot Visualization(RViz) developed using Ignition Rendering Library."
+        },
+        {
+          "sha": "d34070668fa04a970a8c7f1cf69871b52fc69028",
+          "filename": "package.xml",
+          "status": "added",
+          "additions": 22,
+          "deletions": 0,
+          "changes": 22,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/f986ca9edcd04aca3ed163f5c3659839929427cd/package.xml",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/f986ca9edcd04aca3ed163f5c3659839929427cd/package.xml",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/package.xml?ref=f986ca9edcd04aca3ed163f5c3659839929427cd",
+          "patch": "@@ -0,0 +1,22 @@\n+<?xml version=\"1.0\"?>\n+<package format=\"3\">\n+  <name>ign-rviz</name>\n+  <version>0.0.0</version>\n+  <description>The ign-rviz package</description>\n+\n+  <maintainer email=\"sarathkrishnan99@gmail.com\">Sarathkrishnan Ramesh</maintainer>\n+\n+  <license>TODO</license>\n+\n+  <buildtool_depend>catkin</buildtool_depend>\n+  <build_depend>roscpp</build_depend>\n+  <build_depend>std_msgs</build_depend>\n+  <build_export_depend>roscpp</build_export_depend>\n+  <build_export_depend>std_msgs</build_export_depend>\n+  <exec_depend>roscpp</exec_depend>\n+  <exec_depend>std_msgs</exec_depend>\n+\n+  <export>\n+\n+  </export>\n+</package>"
+        },
+        {
+          "sha": "70651458482fdc886a9204d349e6475be69c71e4",
+          "filename": "src/ign_rviz.cpp",
+          "status": "added",
+          "additions": 6,
+          "deletions": 0,
+          "changes": 6,
+          "blob_url": "https://github.com/gazebosim/gz-rviz/blob/f986ca9edcd04aca3ed163f5c3659839929427cd/src%2Fign_rviz.cpp",
+          "raw_url": "https://github.com/gazebosim/gz-rviz/raw/f986ca9edcd04aca3ed163f5c3659839929427cd/src%2Fign_rviz.cpp",
+          "contents_url": "https://api.github.com/repos/gazebosim/gz-rviz/contents/src%2Fign_rviz.cpp?ref=f986ca9edcd04aca3ed163f5c3659839929427cd",
+          "patch": "@@ -0,0 +1,6 @@\n+#include <iostream>\n+\n+int main() {\n+  std::cout << \"Hello World\\n\";\n+  return 0;\n+}\n\\ No newline at end of file"
+        }
+      ]
+    }
+  ]
+}
